@@ -930,7 +930,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 10.97);
 
-        addConstraintColocationOnly(robot, ipX, ipY, 0, 100, 0, false, -1);
+        addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
         checkTest(host, "test1", 10.98);
 
@@ -938,7 +938,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 10.99);
 
-        addConstraintOrderOnly(robot, ipX, ipY, 0, 100, 0, false, -1);
+        addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
         checkTest(host, "test1", 11);
 
@@ -1000,7 +1000,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 11.56);
 
-        addConstraintOrderOnly(robot, ipX, ipY, 0, 100, 55, false, -1);
+        addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
         checkTest(host, "test1", 11.57);
 
@@ -1008,7 +1008,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 11.58);
 
-        addConstraintColocationOnly(robot, ipX, ipY, 0, 100, 55, false, -1);
+        addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
         checkTest(host, "test1", 11.59);
 
