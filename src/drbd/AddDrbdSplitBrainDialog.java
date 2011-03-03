@@ -36,23 +36,19 @@ import drbd.gui.resources.DrbdResourceInfo;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class AddDrbdSplitBrainDialog {
+public final class AddDrbdSplitBrainDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
     private final DrbdResourceInfo dri;
 
-    /**
-     * Prepares a new <code>AddDrbdSplitBrainDialog</code> object.
-     */
+    /** Prepares a new <code>AddDrbdSplitBrainDialog</code> object. */
     public AddDrbdSplitBrainDialog(final DrbdResourceInfo dri) {
         this.dri = dri;
     }
 
-    /**
-     * Shows step by step dialogs that resolve a drbd split-brain.
-     */
-    public final void showDialogs() {
+    /** Shows step by step dialogs that resolve a drbd split-brain. */
+    public void showDialogs() {
         DrbdConfig dialog = new SplitBrain(null, dri);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -71,10 +67,8 @@ public class AddDrbdSplitBrainDialog {
         Tools.getGUIData().getMainFrame().requestFocus();
     }
 
-    /**
-     * Returns whether the wizard was canceled.
-     */
-    public final boolean isCanceled() {
+    /** Returns whether the wizard was canceled. */
+    public boolean isCanceled() {
         return canceled;
     }
 }

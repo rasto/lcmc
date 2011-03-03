@@ -146,25 +146,25 @@ public abstract class EditableInfo extends Info {
      * @param name
      *      name that will be shown to the user.
      */
-    public EditableInfo(final String name, final Browser browser) {
+    EditableInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
     /** Inits apply button. */
-    public final void initApplyButton(final ButtonCallback buttonCallback) {
+    final void initApplyButton(final ButtonCallback buttonCallback) {
         initApplyButton(buttonCallback,
                         Tools.getString("Browser.ApplyResource"));
     }
 
     /** Inits commit button. */
-    public final void initCommitButton(final ButtonCallback buttonCallback) {
+    final void initCommitButton(final ButtonCallback buttonCallback) {
         initApplyButton(buttonCallback,
                         Tools.getString("Browser.CommitResources"));
     }
 
     /** Inits apply or commit button button. */
-    public final void initApplyButton(final ButtonCallback buttonCallback,
-                                      final String text) {
+    final void initApplyButton(final ButtonCallback buttonCallback,
+                               final String text) {
         if (oldApplyButton == null) {
             applyButton = new MyButton(
                     text,
@@ -247,12 +247,12 @@ public abstract class EditableInfo extends Info {
      * Returns number of rows.
      */
     public final void addWizardParams(
-                              final JPanel optionsPanel,
-                              final String[] params,
-                              final MyButton wizardApplyButton,
-                              final int leftWidth,
-                              final int rightWidth,
-                              final Map<String, GuiComboBox> sameAsFields) {
+                                 final JPanel optionsPanel,
+                                 final String[] params,
+                                 final MyButton wizardApplyButton,
+                                 final int leftWidth,
+                                 final int rightWidth,
+                                 final Map<String, GuiComboBox> sameAsFields) {
         addParams(optionsPanel,
                   "wizard",
                   params,
@@ -353,7 +353,7 @@ public abstract class EditableInfo extends Info {
                     advancedPanelList.add(panel);
                     final JPanel p = panel;
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             p.setVisible(
                                      Tools.getConfigData().isAdvancedMode());
                         }
@@ -373,7 +373,7 @@ public abstract class EditableInfo extends Info {
 
             /* tool tip */
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     paramCb.setToolTipText(getToolTipText(param));
                     label.setToolTipText(longDesc);
                 }
@@ -395,7 +395,7 @@ public abstract class EditableInfo extends Info {
                 }
                 final GuiComboBox rpcb0 = rpcb;
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         if (paramCb.getValue() == null) {
                             rpcb0.setValueAndWait(null);
                         } else {
@@ -414,9 +414,10 @@ public abstract class EditableInfo extends Info {
             }
             final GuiComboBox realParamCb = rpcb;
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     paramCb.addListeners(new ItemListener() {
-                        public void itemStateChanged(final ItemEvent e) {
+                        @Override public void itemStateChanged(
+                                                           final ItemEvent e) {
                             if (paramCb.isCheckBox()
                                 || e.getStateChange() == ItemEvent.SELECTED) {
                                 checkParameterFields(paramCb,
@@ -429,7 +430,8 @@ public abstract class EditableInfo extends Info {
                     },
 
                     new DocumentListener() {
-                        public void insertUpdate(final DocumentEvent e) {
+                        @Override public void insertUpdate(
+                                                      final DocumentEvent e) {
                             checkParameterFields(paramCb,
                                                  realParamCb,
                                                  param,
@@ -437,7 +439,8 @@ public abstract class EditableInfo extends Info {
                                                  thisApplyButton);
                         }
 
-                        public void removeUpdate(final DocumentEvent e) {
+                        @Override public void removeUpdate(
+                                                      final DocumentEvent e) {
                             checkParameterFields(paramCb,
                                                  realParamCb,
                                                  param,
@@ -445,7 +448,8 @@ public abstract class EditableInfo extends Info {
                                                  thisApplyButton);
                         }
 
-                        public void changedUpdate(final DocumentEvent e) {
+                        @Override public void changedUpdate(
+                                                      final DocumentEvent e) {
                             checkParameterFields(paramCb,
                                                  realParamCb,
                                                  param,
@@ -518,7 +522,7 @@ public abstract class EditableInfo extends Info {
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionPanel);
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         sectionPanel.setVisible(
                                       Tools.getConfigData().isAdvancedMode());
                     }
@@ -527,7 +531,7 @@ public abstract class EditableInfo extends Info {
         }
         final boolean a = advanced;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 moreOptionsPanel.setVisible(
                                 a && !Tools.getConfigData().isAdvancedMode());
             }
@@ -560,9 +564,9 @@ public abstract class EditableInfo extends Info {
                                      final MyButton thisApplyButton) {
         final EditableInfo thisClass = this;
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 //SwingUtilities.invokeLater(new Runnable() {
-                //    public void run() {
+                //    @Override public void run() {
                 //        paramCb.setEditable();
                 //    }
                 //});
@@ -570,7 +574,7 @@ public abstract class EditableInfo extends Info {
                 boolean ch = false;
                 if (realParamCb != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             final Object value = paramCb.getStringValue();
                             realParamCb.setValueAndWait(value);
                         }
@@ -584,7 +588,7 @@ public abstract class EditableInfo extends Info {
                 final boolean check = c;
                 final boolean changed = ch;
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         if (thisApplyButton == applyButton) {
                             thisApplyButton.setEnabled(
                                   !isDialogStarted()
@@ -832,7 +836,7 @@ public abstract class EditableInfo extends Info {
         final boolean ch = checkResourceFieldsChanged(param, params);
         final boolean cor = checkResourceFieldsCorrect(param, params);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final MyButton ab = getApplyButton();
                 final Resource r = getResource();
                 if (ab != null) {
@@ -871,8 +875,8 @@ public abstract class EditableInfo extends Info {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params) {
         /* check if values are correct */
         boolean correctValue = true;
         if (params != null) {
@@ -925,7 +929,7 @@ public abstract class EditableInfo extends Info {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     cb.setBackground(
                                                 Tools.extractUnit(
                                                    getParamDefault(otherParam)),
@@ -944,7 +948,7 @@ public abstract class EditableInfo extends Info {
                             }
                         } else {
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     cb.setBackground(
                                              getParamDefault(otherParam),
                                              getParamSaved(otherParam),
@@ -979,8 +983,8 @@ public abstract class EditableInfo extends Info {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
+    boolean checkResourceFieldsChanged(final String param,
+                                       final String[] params) {
         /* check if something is different from saved values */
         boolean changedValue = false;
         if (params != null) {
@@ -1014,7 +1018,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Removes this editable object and clealrs the parameter hashes. */
-    public void removeMyself(final boolean testOnly) {
+    @Override public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         //if (applyButton != null) {
         //    for (final ActionListener al : applyButton.getActionListeners()) {
@@ -1033,7 +1037,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Should be called after info panel is done. */
-    public final void infoPanelDone() {
+    final void infoPanelDone() {
         infoPanelLatch.countDown();
     }
 
@@ -1048,7 +1052,7 @@ public abstract class EditableInfo extends Info {
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     apl.setVisible(advancedMode);
                 }
             });
@@ -1056,7 +1060,7 @@ public abstract class EditableInfo extends Info {
         }
         for (final JPanel p : advancedOnlySectionList) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     p.setVisible(advancedMode);
                 }
             });
@@ -1064,7 +1068,7 @@ public abstract class EditableInfo extends Info {
         }
         final boolean a = advanced;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 moreOptionsPanel.setVisible(a && !advancedMode);
             }
         });
@@ -1093,27 +1097,27 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Returns apply button. */
-    public final MyButton getApplyButton() {
+    final MyButton getApplyButton() {
         return applyButton;
     }
 
     /** Returns revert button. */
-    public final MyButton getRevertButton() {
+    final MyButton getRevertButton() {
         return revertButton;
     }
 
     /** Sets apply button. */
-    public final void setApplyButton(final MyButton applyButton) {
+    final void setApplyButton(final MyButton applyButton) {
         this.applyButton = applyButton;
     }
 
     /** Sets revert button. */
-    public final void setRevertButton(final MyButton revertButton) {
+    final void setRevertButton(final MyButton revertButton) {
         this.revertButton = revertButton;
     }
 
     /** Returns if dialog was started. It disables the apply button. */
-    public final boolean isDialogStarted() {
+    private boolean isDialogStarted() {
         return dialogStarted;
     }
 

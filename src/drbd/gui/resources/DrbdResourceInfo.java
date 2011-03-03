@@ -63,8 +63,8 @@ import javax.swing.JScrollPane;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-public class DrbdResourceInfo extends DrbdGuiInfo
-                              implements CommonDeviceInterface {
+public final class DrbdResourceInfo extends DrbdGuiInfo
+                                    implements CommonDeviceInterface {
     /** BlockDevInfo object of the first block device. */
     private final BlockDevInfo blockDevInfo1;
     /** BlockDevInfo object of the second block device. */
@@ -80,25 +80,24 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     /** Last created filesystem. */
     private String createdFs = null;
     /** Name of the drbd resource name parameter. */
-    public static final String DRBD_RES_PARAM_NAME = "name";
+    static final String DRBD_RES_PARAM_NAME = "name";
     /** Name of the drbd device parameter. */
-    public static final String DRBD_RES_PARAM_DEV = "device";
+    static final String DRBD_RES_PARAM_DEV = "device";
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
-    public static final String IS_USED_BY_CRM_STRING =
-                                               "it is used by cluster manager";
+    static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
     /** String that is displayed as a tool tip for disabled menu item. */
-    public static final String IS_SYNCING_STRING = "it is being full-synced";
+    static final String IS_SYNCING_STRING = "it is being full-synced";
     /** String that is displayed as a tool tip for disabled menu item. */
-    public static final String IS_VERIFYING_STRING = "it is being verified";
+    static final String IS_VERIFYING_STRING = "it is being verified";
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
      */
-    public DrbdResourceInfo(final String name,
-                            final String drbdDev,
-                            final BlockDevInfo blockDevInfo1,
-                            final BlockDevInfo blockDevInfo2,
-                            final Browser browser) {
+    DrbdResourceInfo(final String name,
+                     final String drbdDev,
+                     final BlockDevInfo blockDevInfo1,
+                     final BlockDevInfo blockDevInfo2,
+                     final Browser browser) {
         super(name, browser);
         setResource(new DrbdResource(name, null)); // TODO: ?
         setResource(new DrbdResource(name, drbdDev)); // TODO: ?
@@ -109,12 +108,12 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns device name, like /dev/drbd0. */
-    @Override public final String getDevice() {
+    @Override public String getDevice() {
         return getDrbdResource().getDevice();
     }
 
     /** Returns other block device in the drbd cluster. */
-    public final BlockDevInfo getOtherBlockDevInfo(final BlockDevInfo bdi) {
+    public BlockDevInfo getOtherBlockDevInfo(final BlockDevInfo bdi) {
         if (bdi.equals(blockDevInfo1)) {
             return blockDevInfo2;
         } else if (bdi.equals(blockDevInfo2)) {
@@ -125,23 +124,22 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns first block dev info. */
-    public final BlockDevInfo getFirstBlockDevInfo() {
+    public BlockDevInfo getFirstBlockDevInfo() {
         return blockDevInfo1;
     }
 
     /** Returns second block dev info. */
-    public final BlockDevInfo getSecondBlockDevInfo() {
+    public BlockDevInfo getSecondBlockDevInfo() {
         return blockDevInfo2;
     }
 
     /** Returns true if this is first block dev info. */
-    public final boolean isFirstBlockDevInfo(final BlockDevInfo bdi) {
+    public boolean isFirstBlockDevInfo(final BlockDevInfo bdi) {
         return blockDevInfo1 == bdi;
     }
 
     /** Creates and returns drbd config for resources. */
-    public final String drbdResourceConfig()
-                                    throws Exceptions.DrbdConfigException {
+    String drbdResourceConfig() throws Exceptions.DrbdConfigException {
         final StringBuffer config = new StringBuffer(50);
         config.append("resource " + getName() + " {\n");
         /* protocol... */
@@ -179,29 +177,29 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Clears info panel cache. */
-    @Override public final boolean selectAutomaticallyInTreeMenu() {
+    @Override public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
     /** Returns sync progress in percent. */
-    public final String getSyncedProgress() {
+    public String getSyncedProgress() {
         return blockDevInfo1.getBlockDevice().getSyncedProgress();
     }
 
     /** Returns whether the cluster is syncing. */
-    public final boolean isSyncing() {
+    public boolean isSyncing() {
         return blockDevInfo1.getBlockDevice().isSyncing()
                || blockDevInfo2.getBlockDevice().isSyncing();
     }
 
     /** Returns whether the cluster is being verified. */
-    public final boolean isVerifying() {
+    public boolean isVerifying() {
         return blockDevInfo1.getBlockDevice().isVerifying()
                || blockDevInfo2.getBlockDevice().isVerifying();
     }
 
     /** Connect block device from the specified host. */
-    public final void connect(final Host host, final boolean testOnly) {
+    public void connect(final Host host, final boolean testOnly) {
         if (blockDevInfo1.getHost() == host
             && !blockDevInfo1.isConnectedOrWF(false)) {
             blockDevInfo1.connect(testOnly);
@@ -215,7 +213,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Returns whether the resources is connected, meaning both devices are
      * connected.
      */
-    public final boolean isConnected(final boolean testOnly) {
+    public boolean isConnected(final boolean testOnly) {
         return blockDevInfo1.isConnected(testOnly)
                && blockDevInfo2.isConnected(testOnly);
     }
@@ -224,7 +222,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Returns whether any of the sides in the drbd resource are in
      * paused-sync state.
      */
-    public final boolean isPausedSync() {
+    boolean isPausedSync() {
         return blockDevInfo1.getBlockDevice().isPausedSync()
                || blockDevInfo2.getBlockDevice().isPausedSync();
     }
@@ -233,18 +231,18 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Returns whether any of the sides in the drbd resource are in
      * split-brain.
      */
-    public final boolean isSplitBrain() {
+    public boolean isSplitBrain() {
         return blockDevInfo1.getBlockDevice().isSplitBrain()
                || blockDevInfo2.getBlockDevice().isSplitBrain();
     }
 
     /** Returns drbd graphical view. */
-    @Override public final JPanel getGraphicalView() {
+    @Override public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
 
     /** Returns all parameters. */
-    @Override public final String[] getParametersFromXML() {
+    @Override public String[] getParametersFromXML() {
         return getBrowser().getDrbdXML().getParameters();
     }
 
@@ -252,7 +250,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Checks the new value of the parameter if it is conforms to its type
      * and other constraints.
      */
-    @Override protected final boolean checkParam(final String param,
+    @Override protected boolean checkParam(final String param,
                                                  final String newValue) {
         if (DRBD_RES_PARAM_AFTER.equals(param)) {
             /* drbdsetup xml syncer says it should be numeric, but in
@@ -263,7 +261,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns the default value for the drbd parameter. */
-    @Override public final String getParamDefault(final String param) {
+    @Override public String getParamDefault(final String param) {
         final String common = getDrbdInfo().getParamSaved(param);
         if (common != null) {
             return common;
@@ -272,12 +270,12 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns section to which this drbd parameter belongs. */
-    @Override protected final String getSection(final String param) {
+    @Override protected String getSection(final String param) {
         return getBrowser().getDrbdXML().getSection(param);
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected final String isEnabled(final String param) {
+    @Override protected String isEnabled(final String param) {
         if (getDrbdResource().isCommited()
             && (DRBD_RES_PARAM_NAME.equals(param)
                 || DRBD_RES_PARAM_DEV.equals(param))) {
@@ -287,7 +285,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns the widget that is used to edit this parameter. */
-    @Override protected final GuiComboBox getParamComboBox(final String param,
+    @Override protected GuiComboBox getParamComboBox(final String param,
                                                            final String prefix,
                                                            final int width) {
         GuiComboBox paramCb;
@@ -416,12 +414,12 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns the DrbdResource object of this drbd resource. */
-    public DrbdResource getDrbdResource() {
+    DrbdResource getDrbdResource() {
         return (DrbdResource) getResource();
     }
 
     /** Applies changes that user made to the drbd resource fields. */
-    public final void apply(final boolean testOnly) {
+    public void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             SwingUtilities.invokeLater(new Runnable() {
@@ -453,7 +451,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Set all apply buttons. */
-    public final void setAllApplyButtons() {
+    void setAllApplyButtons() {
         final BlockDevInfo bdi1 = blockDevInfo1;
         if (bdi1 != null) {
             bdi1.storeComboBoxValues(bdi1.getParametersFromXML());
@@ -469,7 +467,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns panel with form to configure a drbd resource. */
-    @Override public final JComponent getInfoPanel() {
+    @Override public JComponent getInfoPanel() {
         getBrowser().getDrbdGraph().pickInfo(this);
         if (infoPanel != null) {
             return infoPanel;
@@ -633,7 +631,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Removes this drbd resource with confirmation dialog. */
-    @Override public final void removeMyself(final boolean testOnly) {
+    @Override public void removeMyself(final boolean testOnly) {
         String desc = Tools.getString(
                        "ClusterBrowser.confirmRemoveDrbdResource.Description");
         desc = desc.replaceAll("@RESOURCE@", getName());
@@ -647,7 +645,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Remove myself from all hashes. */
-    public final void removeFromHashes() {
+    public void removeFromHashes() {
         getBrowser().getDrbdResHash().remove(getName());
         getBrowser().putDrbdResHash();
         getBrowser().getDrbdDevHash().remove(getDevice());
@@ -660,7 +658,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * removes this object from jtree and from list of drbd resource
      * infos without confirmation dialog.
      */
-    public final void removeMyselfNoConfirm(final boolean testOnly) {
+    void removeMyselfNoConfirm(final boolean testOnly) {
         getBrowser().drbdStatusLock();
         getBrowser().getDrbdXML().removeResource(getName());
         getBrowser().getDrbdGraph().removeDrbdResource(this);
@@ -700,7 +698,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns string of the drbd resource. */
-    @Override public final String toString() {
+    @Override public String toString() {
         String name = getName();
         if (name == null || "".equals(name)) {
             name = Tools.getString("ClusterBrowser.DrbdResUnconfigured");
@@ -709,7 +707,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns whether two drbd resources are equal. */
-    @Override public final boolean equals(final Object value) {
+    @Override public boolean equals(final Object value) {
         if (value == null) {
             return false;
         }
@@ -724,7 +722,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
         }
     }
 
-    //@Override public int hashCode() {
+    //@Override int hashCode() {
     //    return toString().hashCode();
     //}
 
@@ -732,14 +730,14 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Returns the device name that is used as the string value of
      * the device in the filesystem resource.
      */
-    @Override public final String getStringValue() {
+    @Override public String getStringValue() {
         return getDevice();
     }
 
     /** Adds old style drbddisk service in the heartbeat and graph. */
-    public final void addDrbdDisk(final FilesystemInfo fi,
-                                  final Host dcHost,
-                                  final boolean testOnly) {
+    void addDrbdDisk(final FilesystemInfo fi,
+                            final Host dcHost,
+                            final boolean testOnly) {
         final Point2D p = null;
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         final DrbddiskInfo di =
@@ -773,9 +771,9 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      *              File system before which this drbd info should be
      *              started
      */
-    public final void addLinbitDrbd(final FilesystemInfo fi,
-                                    final Host dcHost,
-                                    final boolean testOnly) {
+    void addLinbitDrbd(final FilesystemInfo fi,
+                       final Host dcHost,
+                       final boolean testOnly) {
         final Point2D p = null;
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         final LinbitDrbdInfo ldi =
@@ -810,9 +808,9 @@ public class DrbdResourceInfo extends DrbdGuiInfo
 
 
     /** Remove drbddisk heartbeat service. */
-    public final void removeDrbdDisk(final FilesystemInfo fi,
-                                     final Host dcHost,
-                                     final boolean testOnly) {
+    void removeDrbdDisk(final FilesystemInfo fi,
+                        final Host dcHost,
+                        final boolean testOnly) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
         if (drbddiskInfo != null) {
             drbddiskInfo.removeMyselfNoConfirm(dcHost, testOnly);
@@ -820,9 +818,9 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Remove drbddisk heartbeat service. */
-    public final void removeLinbitDrbd(final FilesystemInfo fi,
-                                       final Host dcHost,
-                                       final boolean testOnly) {
+    void removeLinbitDrbd(final FilesystemInfo fi,
+                          final Host dcHost,
+                          final boolean testOnly) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
             linbitDrbdInfo.removeMyselfNoConfirm(dcHost, testOnly);
@@ -830,22 +828,22 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Sets that this drbd resource is used by hb. */
-    @Override public final void setUsedByCRM(final ServiceInfo isUsedByCRM) {
+    @Override public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         this.isUsedByCRM = isUsedByCRM;
     }
 
     /** Returns whether this drbd resource is used by crm. */
-    @Override public final boolean isUsedByCRM() {
+    @Override public boolean isUsedByCRM() {
         return isUsedByCRM != null && isUsedByCRM.isManaged(false);
     }
 
     /** Returns common file systems. */
-    public final StringInfo[] getCommonFileSystems(final String defaultValue) {
+    public StringInfo[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
     }
 
     /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
-    public final Host[] getHosts() {
+    public Host[] getHosts() {
         final Host h1 = blockDevInfo1.getHost();
         final Host h2 = blockDevInfo2.getHost();
         if (h1.getName().compareToIgnoreCase(h2.getName()) < 0) {
@@ -856,18 +854,18 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Starts resolve split brain dialog. */
-    public final void resolveSplitBrain() {
+    void resolveSplitBrain() {
         final AddDrbdSplitBrainDialog adrd = new AddDrbdSplitBrainDialog(this);
         adrd.showDialogs();
     }
 
     /** Starts online verification. */
-    public final void verify(final boolean testOnly) {
+    void verify(final boolean testOnly) {
         blockDevInfo1.verify(testOnly);
     }
 
     /** Returns whether the specified host has this drbd resource. */
-    public final boolean resourceInHost(final Host host) {
+    boolean resourceInHost(final Host host) {
         if (blockDevInfo1.getHost() == host
             || blockDevInfo2.getHost() == host) {
             return true;
@@ -876,7 +874,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns the list of items for the popup menu for drbd resource. */
-    @Override public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final boolean testOnly = false;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final DrbdResourceInfo thisClass = this;
@@ -1103,17 +1101,17 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * Sets whether the meta-data have to be created, meaning there are no
      * existing meta-data for this resource on both nodes.
      */
-    public final void setHaveToCreateMD(final boolean haveToCreateMD) {
+    public void setHaveToCreateMD(final boolean haveToCreateMD) {
         this.haveToCreateMD = haveToCreateMD;
     }
 
     /** Returns whether the md has to be created or not. */
-    public final boolean isHaveToCreateMD() {
+    public boolean isHaveToCreateMD() {
         return haveToCreateMD;
     }
 
     /** Returns meta-disk device for the specified host. */
-    public final String getMetaDiskForHost(final Host host) {
+    public String getMetaDiskForHost(final Host host) {
         return getBrowser().getDrbdXML().getMetaDisk(host.getName(), getName());
     }
 
@@ -1162,17 +1160,17 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns the last created filesystem. */
-    @Override public final String getCreatedFs() {
+    @Override public String getCreatedFs() {
         return createdFs;
     }
 
     /** Sets the last created filesystem. */
-    public final void setCreatedFs(final String createdFs) {
+    public void setCreatedFs(final String createdFs) {
         this.createdFs = createdFs;
     }
 
     /** Returns how much diskspace is used on the primary. */
-    @Override public final int getUsed() {
+    @Override public int getUsed() {
         if (blockDevInfo1.getBlockDevice().isPrimary()) {
             return blockDevInfo1.getBlockDevice().getUsed();
         } else if (blockDevInfo2.getBlockDevice().isPrimary()) {
@@ -1182,7 +1180,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Sets stored parameters. */
-    public final void setParameters() {
+    public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
         for (String section : dxml.getSections()) {
@@ -1222,8 +1220,8 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params,
+    boolean checkResourceFieldsChanged(final String param,
+                                       final String[] params,
                                               final boolean fromDrbdInfo) {
         final DrbdInfo di = getDrbdInfo();
         if (di != null && !fromDrbdInfo) {
@@ -1267,9 +1265,9 @@ public class DrbdResourceInfo extends DrbdGuiInfo
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params,
-                                              final boolean fromDrbdInfo) {
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params,
+                                       final boolean fromDrbdInfo) {
         final DrbdInfo di = getDrbdInfo();
         boolean correct = true;
         final BlockDevInfo bdi1 = blockDevInfo1;
@@ -1295,7 +1293,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Revert all values. */
-    @Override public final void revert() {
+    @Override public void revert() {
         super.revert();
         final BlockDevInfo bdi1 = blockDevInfo1;
         if (bdi1 != null) {
@@ -1308,7 +1306,7 @@ public class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Sets if dialog was started. It disables the apply button. */
-    @Override public final void setDialogStarted(final boolean dialogStarted) {
+    @Override public void setDialogStarted(final boolean dialogStarted) {
         final BlockDevInfo bdi1 = blockDevInfo1;
         if (bdi1 != null) {
             bdi1.setDialogStarted(dialogStarted);

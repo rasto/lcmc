@@ -37,22 +37,17 @@ import javax.swing.JComponent;
  * @version $Id$
  *
  */
-public class DistDetection extends DialogHost {
+final class DistDetection extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>DistDetection</code> object.
-     */
-    public DistDetection(final WizardDialog previousDialog,
-                         final Host host) {
+    /** Prepares a new <code>DistDetection</code> object. */
+    DistDetection(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Inits dialog and starts the distribution detection.
-     */
-    protected final void initDialog() {
+    /** Inits dialog and starts the distribution detection. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -72,10 +67,8 @@ public class DistDetection extends DialogHost {
         }
     }
 
-    /**
-     * Returns the next dialog which is CheckInstallation.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog which is CheckInstallation. */
+    @Override public WizardDialog nextDialog() {
         return new CheckInstallation(this, getHost());
     }
 
@@ -83,7 +76,7 @@ public class DistDetection extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.DistDetection.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DistDetection.Title");
     }
 
@@ -91,14 +84,12 @@ public class DistDetection extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.DistDetection.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.DistDetection.Description");
     }
 
-    /**
-     * Returns the input pane with check boxes and other info.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the input pane with check boxes and other info. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getAnswerPane(Tools.getString(
                                       "Dialog.Host.DistDetection.Executing")));

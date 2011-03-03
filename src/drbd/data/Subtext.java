@@ -25,7 +25,7 @@ import java.awt.Color;
  * Subtext for graph with its colors.
  */
  //TODO: rename to ColorText
-public class Subtext {
+public final class Subtext {
     /** Subtext. */
     private final String subtext;
     /** Color. */
@@ -43,17 +43,17 @@ public class Subtext {
     }
 
     /** Returns subtext. */
-    public final String getSubtext() {
+    public String getSubtext() {
         return subtext;
     }
 
     /** Returns color. */
-    public final Color getColor() {
+    public Color getColor() {
         return color;
     }
 
     /** Returns text color. */
-    public final Color getTextColor() {
+    public Color getTextColor() {
         return textColor;
     }
 }

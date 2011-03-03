@@ -40,21 +40,16 @@ import javax.swing.BoxLayout;
  * @version $Id$
  *
  */
-public class SSH extends DialogHost {
+public final class SSH extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>SSH</code> object.
-     */
-    public SSH(final WizardDialog previousDialog,
-               final Host host) {
+    /** Prepares a new <code>SSH</code> object. */
+    public SSH(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Connects to all hosts.
-     */
+    /** Connects to all hosts. */
     private String connectHost() {
         final String res = null;
         final SSHGui sshGui = new SSHGui(getDialogPanel(),
@@ -63,7 +58,7 @@ public class SSH extends DialogHost {
 
         getHost().connect(sshGui, getProgressBar(),
                      new ConnectionCallback() {
-                         public void done(final int flag) {
+                         @Override public void done(final int flag) {
                              /* flag 0 now connected
                               * flag 1 already connected. */
                              Tools.debug(this,
@@ -74,16 +69,17 @@ public class SSH extends DialogHost {
                                 Tools.getString("Dialog.Host.SSH.Connected"));
                              //enableComponents();
                              SwingUtilities.invokeLater(new Runnable() {
-                                 public void run() {
+                                 @Override public void run() {
                                     buttonClass(nextButton()).pressButton();
                                  }
                              });
                          }
 
-                         public void doneError(final String errorText) {
+                         @Override public void doneError(
+                                                    final String errorText) {
                              getHost().setConnected();
                              SwingUtilities.invokeLater(new Runnable() {
-                                 public void run() {
+                                 @Override public void run() {
                                     printErrorAndRetry(Tools.getString(
                                                 "Dialog.Host.SSH.NotConnected")
                                                 + "\n" + errorText);
@@ -96,23 +92,19 @@ public class SSH extends DialogHost {
         return res;
     }
 
-    /**
-     * Returns the next dialog. Devices
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. Devices */
+    @Override public WizardDialog nextDialog() {
         return new Devices(getPreviousDialog(), getHost());
     }
 
-    /**
-     * Inits the dialog and start connecting to the hosts.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog and start connecting to the hosts. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         final Thread thread = new Thread(
             new Runnable() {
-                public void run() {
+                @Override public void run() {
                     connectHost();
                 }
             });
@@ -123,7 +115,7 @@ public class SSH extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.Host.SSH.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.SSH.Title");
     }
 
@@ -131,20 +123,18 @@ public class SSH extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.Host.SSH.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.SSH.Description");
     }
 
-    /**
-     * Returns a pane where ssh connection will be attempted.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns a pane where ssh connection will be attempted. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         //final JPanel pane = new JPanel(new SpringLayout());
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.add(getProgressBarPane(
                     new CancelCallback() {
-                        public void cancel() {
+                        @Override public void cancel() {
                             Tools.debug(this, "cancel callback");
                             getHost().getSSH().cancelConnection();
                         }

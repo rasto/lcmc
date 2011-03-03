@@ -37,7 +37,7 @@ import javax.swing.text.DefaultStyledDocument;
  * @version $Id$
  *
  */
-public class PatternDocument extends DefaultStyledDocument {
+public final class PatternDocument extends DefaultStyledDocument {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Pattern object that the document should match. */
@@ -58,9 +58,7 @@ public class PatternDocument extends DefaultStyledDocument {
         abbreviations = null;
     }
 
-    /**
-     * Prepares a new <code>PatternDocument</code> object.
-     */
+    /** Prepares a new <code>PatternDocument</code> object. */
     public PatternDocument(final String regexp,
                            final Map<String, String> abbreviations) {
         super();
@@ -69,12 +67,10 @@ public class PatternDocument extends DefaultStyledDocument {
     }
 
 
-    /**
-     * Inserts the string if the resulting string matches the pattern.
-     */
-    public final void insertString(final int offs,
-                                   String s,
-                                   final AttributeSet a)
+    /** Inserts the string if the resulting string matches the pattern. */
+    @Override public void insertString(final int offs,
+                                       String s,
+                                       final AttributeSet a)
     throws BadLocationException {
         try {
             final String text = getText(0, getLength());
@@ -97,9 +93,7 @@ public class PatternDocument extends DefaultStyledDocument {
         }
     }
 
-    /**
-     * Returns true if the text matches the pattern.
-     */
+    /** Returns true if the text matches the pattern. */
     private boolean matches(final String text) {
         return true; // TODO: disabled, because it does not work good
         //final Matcher m = pattern.matcher(text);

@@ -35,17 +35,14 @@ import java.awt.Insets;
 /**
  * Cells with jlabels, widths and colors.
  */
-public class MyCellRenderer extends JLabel
-                            implements TableCellRenderer {
+public class MyCellRenderer extends JLabel implements TableCellRenderer {
     /** Serial version uid. */
     private static final long serialVersionUID = 1L;
     /** Border for jlabel so, that there is spacing in the table. Table spacing
      * cannot be used because of row colors. */
     private static final EmptyBorder EMPTY_BORDER =
                                        new EmptyBorder(new Insets(0, 4, 0, 4));
-    /**
-     * Creates a new MyCellRenderer object.
-     */
+    /** Creates a new MyCellRenderer object. */
     public MyCellRenderer() {
         super();
         setOpaque(true);
@@ -54,7 +51,7 @@ public class MyCellRenderer extends JLabel
     /**
      * Sets background color and padding in jlabels for every cell.
      */
-    public final Component getTableCellRendererComponent(
+    @Override public final Component getTableCellRendererComponent(
                                                       final JTable table,
                                                       final Object value,
                                                       final boolean isSelected,
@@ -81,16 +78,12 @@ public class MyCellRenderer extends JLabel
         return ret;
     }
 
-    /**
-     * Alignment for the specified column.
-     */
+    /** Alignment for the specified column. */
     protected int getColumnAlignment(final int column) {
         return SwingConstants.LEFT;
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
+    /** Retrurns color for some rows. */
     protected Color getRowColor(final String key) {
         return null;
     }

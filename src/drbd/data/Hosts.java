@@ -24,7 +24,6 @@ package drbd.data;
 
 import java.util.Set;
 import java.util.LinkedHashSet;
-import java.io.Serializable;
 
 /**
  * This class holds a set of all hosts.
@@ -33,7 +32,7 @@ import java.io.Serializable;
  * @version $Id$
  *
  */
-public class Hosts implements Serializable {
+public final class Hosts {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Hosts set. */
@@ -43,58 +42,44 @@ public class Hosts implements Serializable {
      * adds new host to the hosts.
      *          host, that will be added to the hosts.
      */
-    public final void addHost(final Host host) {
+    void addHost(final Host host) {
         hosts.add(host);
     }
 
-    /**
-     * Returns number of all hosts.
-     */
-    public final int size() {
+    /** Returns number of all hosts. */
+    int size() {
         return hosts.size();
     }
 
-    /**
-     * removes host from the hosts.
-     */
-    public final void removeHost(final Host host) {
+    /** Removes host from the hosts. */
+    void removeHost(final Host host) {
         hosts.remove(host);
     }
 
-    /**
-     * Returns true if host is in the hosts or false if it is not.
-     */
-    public final boolean existsHost(final Host host) {
+    /** Returns true if host is in the hosts or false if it is not. */
+    boolean existsHost(final Host host) {
         return hosts.contains(host);
     }
 
-    /**
-     * Gets the host set.
-     */
-    public final Set<Host> getHostSet() {
+    /** Gets the host set. */
+    Set<Host> getHostSet() {
         return hosts;
     }
 
-    /**
-     * Gets an array of all hosts.
-     */
-    public final Host[] getHostsArray() {
+    /** Gets an array of all hosts. */
+    public Host[] getHostsArray() {
         return hosts.toArray(new Host [hosts.size()]);
     }
 
-    /**
-     * disconnects all hosts. This is called after application closes.
-     */
-    public final void disconnectAllHosts() {
+    /** Disconnects all hosts. This is called after application closes. */
+    void disconnectAllHosts() {
         for (final Host host : hosts) {
             host.disconnect();
         }
     }
 
-    /**
-     * removes references to the cluster from all hosts.
-     */
-    public final void removeHostsFromCluster(final Cluster cluster) {
+    /** Removes references to the cluster from all hosts. */
+    public void removeHostsFromCluster(final Cluster cluster) {
         for (final Host host : hosts) {
             if (host.getCluster() == cluster) {
                 host.setCluster(null);

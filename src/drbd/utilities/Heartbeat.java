@@ -42,14 +42,10 @@ public final class Heartbeat {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0600";
 
-    /**
-     * No instantiation.
-     */
+    /** No instantiation. */
     private Heartbeat() { }
 
-    /**
-     * Executes specified command on the host.
-     */
+    /** Executes specified command on the host. */
     private static void execCommand(final Host host,
                                     final String command,
                                     final boolean outputVisible) {
@@ -82,9 +78,7 @@ public final class Heartbeat {
         execCommand(host, command, true);
     }
 
-    /**
-     * Starts heartbeat on host and adds it to the rc.
-     */
+    /** Starts heartbeat on host and adds it to the rc. */
     public static void startHeartbeatRc(final Host host) {
         final String command = host.getDistCommand("Heartbeat.startHeartbeat"
                                                    + ";;;Heartbeat.addToRc",
@@ -92,9 +86,7 @@ public final class Heartbeat {
         execCommand(host, command, true);
     }
 
-    /**
-     * Stops the corosync and starts the heartbeat on the specified host.
-     */
+    /** Stops the corosync and starts the heartbeat on the specified host. */
     public static void switchFromCorosyncToHeartbeat(final Host host) {
         final String command = host.getDistCommand(
                                     "Corosync.deleteFromRc"
@@ -104,9 +96,7 @@ public final class Heartbeat {
         execCommand(host, command, true);
     }
 
-    /**
-     * Stops the openais and starts the heartbeat on the specified host.
-     */
+    /** Stops the openais and starts the heartbeat on the specified host. */
     public static void switchFromOpenaisToHeartbeat(final Host host) {
         final String command = host.getDistCommand(
                                     "Openais.deleteFromRc"
@@ -115,9 +105,8 @@ public final class Heartbeat {
                                     (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
-    /**
-     * Adds heartbeat to the rc.
-     */
+
+    /** Adds heartbeat to the rc. */
     public static void addHeartbeatToRc(final Host host) {
         final String command = host.getDistCommand("Heartbeat.addToRc",
                                                    (ConvertCmdCallback) null);
@@ -134,9 +123,7 @@ public final class Heartbeat {
         execCommand(host, command, true);
     }
 
-    /**
-     * Creates heartbeat config on specified hosts.
-     */
+    /** Creates heartbeat config on specified hosts. */
     public static void createHBConfig(final Host[] hosts,
                                       final StringBuffer config) {
         /* write heartbeat config on all hosts */
@@ -161,9 +148,7 @@ public final class Heartbeat {
                                      true);
     }
 
-    /**
-     * Reloads heartbeats on all nodes.
-     */
+    /** Reloads heartbeats on all nodes. */
     public static void reloadHeartbeats(final Host[] hosts) {
         for (Host host : hosts) {
             reloadHeartbeat(host);

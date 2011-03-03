@@ -38,7 +38,7 @@ import javax.swing.ImageIcon;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-public abstract class DrbdGuiInfo extends EditableInfo {
+abstract class DrbdGuiInfo extends EditableInfo {
     /** Name of the drbd after parameter. */
     protected static final String DRBD_RES_PARAM_AFTER = "after";
     /** Prepares a new <code>DrbdGuiInfo</code> object. */

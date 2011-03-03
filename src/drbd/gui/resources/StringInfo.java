@@ -27,7 +27,7 @@ import drbd.gui.Browser;
  * This class is used for elements, that have their appearence (name)
  * different than is their stored value (string).
  */
-public class StringInfo extends Info {
+public final class StringInfo extends Info {
     /** Internal string. */
     private final String string;
 
@@ -46,15 +46,13 @@ public class StringInfo extends Info {
         this.string = string;
     }
 
-    /**
-     * Returns the name. It will be shown to the user.
-     */
-    public final String toString() {
+    /** Returns the name. It will be shown to the user. */
+    @Override public String toString() {
         return getName();
     }
 
     /** Returns the string that is used internally. */
-    public final String getStringValue() {
+    @Override public String getStringValue() {
         return string;
     }
 }

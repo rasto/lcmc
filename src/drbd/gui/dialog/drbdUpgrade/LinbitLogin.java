@@ -32,22 +32,17 @@ import drbd.gui.dialog.WizardDialog;
  * @version $Id$
  *
  */
-public class LinbitLogin extends drbd.gui.dialog.host.LinbitLogin {
+final class LinbitLogin extends drbd.gui.dialog.host.LinbitLogin {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>LinbitLogin</code> object.
-     */
-    public LinbitLogin(final WizardDialog previousDialog,
-                       final Host host) {
+    /** Prepares a new <code>LinbitLogin</code> object. */
+    LinbitLogin(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Returns the next dialog.drbdUpgrade.DrbdAvailFiles.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog.drbdUpgrade.DrbdAvailFiles. */
+    @Override public WizardDialog nextDialog() {
         return new DrbdAvailFiles(this, getHost());
     }
 

@@ -57,7 +57,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class GUIData  {
+public final class GUIData  {
     /** Main frame of the whole application. */
     private Container mainFrame;
     /** Main panel of the whole application. */
@@ -97,22 +97,22 @@ public class GUIData  {
                                             new ArrayList<AllHostsUpdatable>();
 
     /** Sets main frame of this application. */
-    public final void setMainFrame(final Container mainFrame) {
+    public void setMainFrame(final Container mainFrame) {
         this.mainFrame = mainFrame;
     }
 
     /** Sets main panel of this application. */
-    public final void setMainPanel(final JPanel mainPanel) {
+    public void setMainPanel(final JPanel mainPanel) {
         this.mainPanel = mainPanel;
     }
 
     /** Gets main frame of this application. */
-    public final Container getMainFrame() {
+    public Container getMainFrame() {
         return mainFrame;
     }
 
     /** Gets root pane of the main frame of this application. */
-    public final JRootPane getMainFrameRootPane() {
+    public JRootPane getMainFrameRootPane() {
         if (mainFrame instanceof JFrame) {
             return ((JFrame) mainFrame).getRootPane();
         } else if (mainFrame instanceof JApplet) {
@@ -121,71 +121,53 @@ public class GUIData  {
         return null;
     }
 
-    /**
-     * Sets main menu of this application.
-     */
-    public final void setMainMenu(final MainMenu mainMenu) {
+    /** Sets main menu of this application. */
+    public void setMainMenu(final MainMenu mainMenu) {
         this.mainMenu = mainMenu;
     }
 
-    /**
-     * Gets main menu of this application.
-     */
-    public final MainMenu getMainMenu() {
+    /** Gets main menu of this application. */
+    public MainMenu getMainMenu() {
         return mainMenu;
     }
 
-    /**
-     * Sets empty browser of this application.
-     */
-    public final void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
+    /** Sets empty browser of this application. */
+    void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
         this.emptyBrowser = emptyBrowser;
     }
 
-    /**
-     * Gets empty browser of this application.
-     */
-    public final EmptyBrowser getEmptyBrowser() {
+    /** Gets empty browser of this application. */
+    public EmptyBrowser getEmptyBrowser() {
         return emptyBrowser;
     }
 
-    /**
-     * Returns main glass pane (with progress indicator).
-     */
-    public final ProgressIndicatorPanel getMainGlassPane() {
+    /** Returns main glass pane (with progress indicator). */
+    public ProgressIndicatorPanel getMainGlassPane() {
         return mainGlassPane;
     }
 
-    /**
-     * Sets main glass pane.
-     */
-    public final void setMainGlassPane(
-                                final ProgressIndicatorPanel mainGlassPane) {
+    /** Sets main glass pane. */
+    public void setMainGlassPane(final ProgressIndicatorPanel mainGlassPane) {
         this.mainGlassPane = mainGlassPane;
     }
 
-    /**
-     * Sets split pane that contains terminal as bottom component.
-     */
-    public final void setTerminalSplitPane(
-                                        final JSplitPane terminalSplitPane) {
+    /** Sets split pane that contains terminal as bottom component. */
+    void setTerminalSplitPane(final JSplitPane terminalSplitPane) {
         this.terminalSplitPane = terminalSplitPane;
     }
 
-    /**
-     * Sets terminal in bottom part of the split pane.
-     */
-    public final void setTerminalPanel(final Component terminalPanel) {
+    /** Sets terminal in bottom part of the split pane. */
+    public void setTerminalPanel(final Component terminalPanel) {
         final Component oldTerminalPanel =
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
                     if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 expandTerminalSplitPane(1);
                             }
                         });
@@ -195,10 +177,8 @@ public class GUIData  {
         }
     }
 
-    /**
-     * Returns the position of the terminal panel.
-     */
-    public final int getTerminalPanelPos() {
+    /** Returns the position of the terminal panel. */
+    int getTerminalPanelPos() {
         if (terminalSplitPane.getBottomComponent() == null) {
             return 0;
         } else {
@@ -208,9 +188,9 @@ public class GUIData  {
     }
 
     /** Expands the terminal split pane. */
-    public final void expandTerminalSplitPane(final int buttonNo) {
+    public void expandTerminalSplitPane(final int buttonNo) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final int height = (int)
                     terminalSplitPane.getBottomComponent().getSize()
                                                           .getHeight();
@@ -228,48 +208,38 @@ public class GUIData  {
         });
     }
 
-    /**
-     * Returns the panel with clusters.
-     */
-    public final ClustersPanel getClustersPanel() {
+    /** Returns the panel with clusters. */
+    public ClustersPanel getClustersPanel() {
         return clustersPanel;
     }
 
-    /**
-     * Sets clusters panel object, panel where are all the clusters.
-     */
-    public final void setClustersPanel(final ClustersPanel clustersPanel) {
+    /** Sets clusters panel object, panel where are all the clusters. */
+    void setClustersPanel(final ClustersPanel clustersPanel) {
         this.clustersPanel = clustersPanel;
     }
 
-    /**
-     * Repaints hosts and clusters panels.
-     */
-    public final void repaintWithNewData() {
+    /** Repaints hosts and clusters panels. */
+    void repaintWithNewData() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 clustersPanel.repaintTabs();
             }
         });
     }
 
-    /**
-     * Adds tab with new cluster to the clusters panel.
-     */
-    public final void addClusterTab(final Cluster cluster) {
+    /** Adds tab with new cluster to the clusters panel. */
+    public void addClusterTab(final Cluster cluster) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 clustersPanel.addTab(cluster);
             }
         });
     }
 
-    /**
-     * changes name of the selected cluster tab.
-     */
-    public final void renameSelectedClusterTab(final String newName) {
+    /** changes name of the selected cluster tab. */
+    public void renameSelectedClusterTab(final String newName) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 clustersPanel.renameSelectedTab(newName);
             }
         });
@@ -279,20 +249,18 @@ public class GUIData  {
      * Removes selected tab. This is used, if cluster was added, but than
      * it was canceled.
      */
-    public final void removeSelectedClusterTab() {
+    public void removeSelectedClusterTab() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 clustersPanel.removeTab();
             }
         });
     }
 
-    /**
-     * Revalidates and repaints clusters panel.
-     */
-    public final void refreshClustersPanel() {
+    /** Revalidates and repaints clusters panel. */
+    public void refreshClustersPanel() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 clustersPanel.refresh();
             }
         });
@@ -302,8 +270,7 @@ public class GUIData  {
      * Adds the 'Add Cluster' button to the list, so that it can be enabled or
      * disabled.
      */
-    public final void registerAddClusterButton(
-                                           final JComponent addClusterButton) {
+    void registerAddClusterButton(final JComponent addClusterButton) {
         try {
             mAddClusterButtonListLock.acquire();
         } catch (InterruptedException ie) {
@@ -321,8 +288,7 @@ public class GUIData  {
      * Adds the 'Add Host' button to the list, so that it can be enabled or
      * disabled.
      */
-    public final void registerAddHostButton(
-                                           final JComponent addHostButton) {
+    public void registerAddHostButton(final JComponent addHostButton) {
         try {
             mAddHostButtonListLock.acquire();
         } catch (InterruptedException ie) {
@@ -334,11 +300,8 @@ public class GUIData  {
         mAddHostButtonListLock.release();
     }
 
-    /**
-     * Removes the 'Add Cluster' button from the list.
-     */
-    public final void unregisterAddClusterButton(
-                                           final JComponent addClusterButton) {
+    /** Removes the 'Add Cluster' button from the list. */
+    void unregisterAddClusterButton(final JComponent addClusterButton) {
         try {
             mAddClusterButtonListLock.acquire();
         } catch (InterruptedException ie) {
@@ -352,11 +315,11 @@ public class GUIData  {
      * Checks 'Add Cluster' buttons and menu items and enables them, if there
      * are enough hosts to make cluster.
      */
-    public final void checkAddClusterButtons() {
+    public void checkAddClusterButtons() {
         final boolean enabled =
                             Tools.getConfigData().danglingHostsCount() >= 1;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 try {
                     mAddClusterButtonListLock.acquire();
                 } catch (InterruptedException ie) {
@@ -370,12 +333,10 @@ public class GUIData  {
         });
     }
 
-    /**
-     * Enable/Disable all 'Add Cluster' buttons.
-     */
-    public final void enableAddClusterButtons(final boolean enable) {
+    /** Enable/Disable all 'Add Cluster' buttons. */
+    public void enableAddClusterButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 try {
                     mAddClusterButtonListLock.acquire();
                 } catch (InterruptedException ie) {
@@ -389,12 +350,10 @@ public class GUIData  {
         });
     }
 
-    /**
-     * Enable/Disable all 'Add Host' buttons.
-     */
-    public final void enableAddHostButtons(final boolean enable) {
+    /** Enable/Disable all 'Add Host' buttons. */
+    public void enableAddHostButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 try {
                     mAddHostButtonListLock.acquire();
                 } catch (InterruptedException ie) {
@@ -413,8 +372,8 @@ public class GUIData  {
      * Add to the list of components that are visible only in specific access
      * mode.
      */
-    public final void addToVisibleInAccessType(final JComponent c,
-                                               final AccessMode accessMode) {
+    void addToVisibleInAccessType(final JComponent c,
+                                  final AccessMode accessMode) {
         c.setVisible(Tools.getConfigData().isAccessible(accessMode));
         visibleInAccessType.put(c, accessMode);
     }
@@ -423,8 +382,8 @@ public class GUIData  {
      * Add to the list of components that are visible only in specific access
      * mode.
      */
-    public final void addToEnabledInAccessType(final JComponent c,
-                                               final AccessMode accessMode) {
+    void addToEnabledInAccessType(final JComponent c,
+                                  final AccessMode accessMode) {
         c.setEnabled(Tools.getConfigData().isAccessible(accessMode));
         enabledInAccessType.put(c, accessMode);
     }
@@ -433,7 +392,7 @@ public class GUIData  {
      * Do gui actions when we are in the god mode.
      * - enable/disable look and feel menu etc
      */
-    public final void godModeChanged(final boolean godMode) {
+    void godModeChanged(final boolean godMode) {
         Tools.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
         Tools.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
         for (final Cluster cluster
@@ -447,8 +406,8 @@ public class GUIData  {
     }
 
     /** Sets operating mode in every cluster view. */
-    public final void setOperatingModeGlobally(final Cluster fromCluster,
-                                               final String opMode) {
+    void setOperatingModeGlobally(final Cluster fromCluster,
+                                  final String opMode) {
         for (final Cluster cluster
                         : Tools.getConfigData().getClusters().getClusterSet()) {
             if (cluster == fromCluster) {
@@ -462,8 +421,8 @@ public class GUIData  {
     }
 
     /** Sets advanced mode in every cluster view. */
-    public final void setAdvancedModeGlobally(final Cluster fromCluster,
-                                              final boolean advancedMode) {
+    void setAdvancedModeGlobally(final Cluster fromCluster,
+                                 final boolean advancedMode) {
         for (final Cluster cluster
                         : Tools.getConfigData().getClusters().getClusterSet()) {
             if (cluster == fromCluster) {
@@ -477,7 +436,7 @@ public class GUIData  {
     }
 
     /** Updates access of the item according of their access type. */
-    public final void updateGlobalItems() {
+    void updateGlobalItems() {
         for (final JComponent c : visibleInAccessType.keySet()) {
             c.setVisible(Tools.getConfigData().isAccessible(
                                                 visibleInAccessType.get(c)));
@@ -492,8 +451,7 @@ public class GUIData  {
      * Adds a component to the list of components that have allHostsUpdate
      * method that must be called when a host is added.
      */
-    public final void registerAllHostsUpdate(
-                                            final AllHostsUpdatable component) {
+    void registerAllHostsUpdate(final AllHostsUpdatable component) {
         if (!allHostsUpdateList.contains(component)) {
             allHostsUpdateList.add(component);
         }
@@ -503,13 +461,12 @@ public class GUIData  {
      * Adds a component from the list of components that have allHostsUpdate
      * method that must be called when a host is added.
      */
-    public final void unregisterAllHostsUpdate(
-                                            final AllHostsUpdatable component) {
+    void unregisterAllHostsUpdate(final AllHostsUpdatable component) {
         allHostsUpdateList.remove(component);
     }
 
     /** Calls allHostsUpdate method on all registered components. */
-    public final void allHostsUpdate() {
+    public void allHostsUpdate() {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
@@ -517,14 +474,14 @@ public class GUIData  {
     }
 
     /** Enabled the component if it is accessible. */
-    public final void setAccessible(final JComponent c,
-                                    final ConfigData.AccessType required) {
+    public void setAccessible(final JComponent c,
+                                        final ConfigData.AccessType required) {
         c.setEnabled(Tools.getConfigData().getAccessType().compareTo(
                                                                 required) >= 0);
     }
 
     /** Returns all block devices from all clusters. */
-    public final List<BlockDevInfo> getAllBlockDevices() {
+    public List<BlockDevInfo> getAllBlockDevices() {
         final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
         for (final Cluster cluster
                         : Tools.getConfigData().getClusters().getClusterSet()) {

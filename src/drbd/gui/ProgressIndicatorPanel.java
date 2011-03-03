@@ -87,8 +87,8 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * <code>setForeground()</code>.
  */
 
-public class ProgressIndicatorPanel extends JComponent
-                                    implements MouseListener, KeyListener {
+public final class ProgressIndicatorPanel extends JComponent
+                                        implements MouseListener, KeyListener {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** The animation thread is responsible for fade in/out and rotation. */
@@ -165,7 +165,7 @@ public class ProgressIndicatorPanel extends JComponent
      * @param shieldA The alpha level between 0.0 and 1.0 of the colored
      *                shield (or veil).
      */
-    public ProgressIndicatorPanel(final float shieldA) {
+    ProgressIndicatorPanel(final float shieldA) {
         this(shieldA, 300);
     }
 
@@ -176,8 +176,8 @@ public class ProgressIndicatorPanel extends JComponent
      * @param rampDelay The duration, in milli seconds, of the fade in and
      *                  the fade out of the veil.
      */
-    public ProgressIndicatorPanel(final float shield,
-                                  final int rampDelay) {
+    ProgressIndicatorPanel(final float shield,
+                           final int rampDelay) {
         super();
         this.rampDelay = rampDelay >= 0 ? rampDelay : 0;
         this.shield    = shield >= 0.0f ? shield : 0.0f;
@@ -195,14 +195,14 @@ public class ProgressIndicatorPanel extends JComponent
     }
 
     /** Is called upan a failure. */
-    public final void failure(final String text) {
+    public void failure(final String text) {
         failuresMap.add(text);
         start(text, null, false);
         stop(text);
     }
 
     /** Is called upan a failure and shows it for n seconds. */
-    public final void failure(final String text, final int n) {
+    public void failure(final String text, final int n) {
         failuresMap.add(text);
         start(text, null, false);
         Tools.sleep(n);
@@ -214,8 +214,9 @@ public class ProgressIndicatorPanel extends JComponent
      * rotating the shapes. This method handles the visibility
      * of the glass pane.
      */
-    public final void start(final String text, final Point2D position,
-                            final boolean rightMovement) {
+    public void start(final String text,
+                      final Point2D position,
+                      final boolean rightMovement) {
         try {
             mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {
@@ -282,7 +283,7 @@ public class ProgressIndicatorPanel extends JComponent
      * of the circular shape and then by fading out the veil.
      * This methods sets the panel invisible at the end.
      */
-    public final void stop(final String text) {
+    public void stop(final String text) {
         try {
             mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {
@@ -331,7 +332,7 @@ public class ProgressIndicatorPanel extends JComponent
      * running the fade out phase.
      * This methods sets the panel invisible at the end.
      */
-    public final void interrupt() {
+    private void interrupt() {
         if (animation != null) {
             animation.interrupt();
             animation = null;
@@ -342,10 +343,8 @@ public class ProgressIndicatorPanel extends JComponent
         }
     }
 
-    /**
-     * Paints the glass pane with info and progress indicator.
-     */
-    public final void paintComponent(final Graphics g) {
+    /** Paints the glass pane with info and progress indicator. */
+    @Override protected void paintComponent(final Graphics g) {
         if (started) {
             final int width  = getWidth();
 
@@ -461,31 +460,23 @@ public class ProgressIndicatorPanel extends JComponent
 
     }
 
-    /**
-     * Animation thread.
-     */
+    /** Animation thread. */
     private class Animator implements Runnable {
         /** Whether the alpha level goes up or down. */
         private volatile boolean rampUp;
 
-        /**
-         * Prepares a new <code>Animator</code> object.
-         */
+        /** Prepares a new <code>Animator</code> object. */
         protected Animator() {
             rampUp = true;
         }
 
-        /**
-         * Sets the rump up.
-         */
-        public void setRampUp(final boolean rampUp) {
+        /** Sets the rump up. */
+        private void setRampUp(final boolean rampUp) {
             this.rampUp = rampUp;
         }
 
-        /**
-         * Runs the thread.
-         */
-        public void run() {
+        /** Runs the thread. */
+        @Override public void run() {
             long start = System.currentTimeMillis();
             if (rampDelay == 0) {
                 alphaLevel = rampUp ? MAX_ALPHA_LEVEL : 0;
@@ -585,66 +576,48 @@ public class ProgressIndicatorPanel extends JComponent
         }
     }
 
-    /**
-     * Returns the animation thread.
-     */
-    public final Thread getThread() {
+    /** Returns the animation thread. */
+    private Thread getThread() {
         return animation;
     }
 
-    /**
-     * Mouse clicked.
-     */
-    public final void mouseClicked(final MouseEvent e) {
+    /** Mouse clicked. */
+    @Override public void mouseClicked(final MouseEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Mouse pressed.
-     */
-    public final void mousePressed(final MouseEvent e) {
+    /** Mouse pressed. */
+    @Override public void mousePressed(final MouseEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Mouse released.
-     */
-    public final void mouseReleased(final MouseEvent e) {
+    /** Mouse released. */
+    @Override public void mouseReleased(final MouseEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Mouse entered.
-     */
-    public final void mouseEntered(final MouseEvent e) {
+    /** Mouse entered. */
+    @Override public void mouseEntered(final MouseEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Mouse exited.
-     */
-    public final void mouseExited(final MouseEvent e) {
+    /** Mouse exited. */
+    @Override public void mouseExited(final MouseEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Key pressed.
-     */
-    public final void keyPressed(final KeyEvent e) {
+    /** Key pressed. */
+    @Override public void keyPressed(final KeyEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Key released.
-     */
-    public final void keyReleased(final KeyEvent e) {
+    /** Key released. */
+    @Override public void keyReleased(final KeyEvent e) {
         /* do nothing */
     }
 
-    /**
-     * Key typed.
-     */
-    public final void keyTyped(final KeyEvent e) {
+    /** Key typed. */
+    @Override public void keyTyped(final KeyEvent e) {
         /* do nothing */
     }
 }

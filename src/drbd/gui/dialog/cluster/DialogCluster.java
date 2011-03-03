@@ -37,26 +37,20 @@ public abstract class DialogCluster extends WizardDialog {
     /** Cluster object. */
     private final Cluster cluster;
 
-    /**
-     * Prepares a new <code>DialogCluster</code> object.
-     */
-    public DialogCluster(final WizardDialog previousDialog,
-                         final Cluster cluster) {
+    /** Prepares a new <code>DialogCluster</code> object. */
+    DialogCluster(final WizardDialog previousDialog,
+                  final Cluster cluster) {
         super(previousDialog);
         this.cluster = cluster;
     }
 
-    /**
-     * Returns cluster object.
-     */
+    /** Returns cluster object. */
     protected final Cluster getCluster() {
         return cluster;
     }
 
-    /**
-     * Returns dialog title with cluster name attached.
-     */
-    protected final String getDialogTitle() {
+    /** Returns dialog title with cluster name attached. */
+    @Override protected final String getDialogTitle() {
         final StringBuffer s = new StringBuffer(40);
         s.append(getClusterDialogTitle());
         if (cluster != null && cluster.getName() != null) {
@@ -67,8 +61,6 @@ public abstract class DialogCluster extends WizardDialog {
         return s.toString();
     }
 
-    /**
-     * Returns title for the getDialogTitle() function.
-     */
+    /** Returns title for the getDialogTitle() function. */
     protected abstract String getClusterDialogTitle();
 }

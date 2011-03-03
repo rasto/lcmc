@@ -46,7 +46,7 @@ import java.awt.Dimension;
  * @version $Id$
  *
  */
-public class Resource extends DrbdConfig {
+public final class Resource extends DrbdConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Wfc timeout option string. */
@@ -78,25 +78,19 @@ public class Resource extends DrbdConfig {
     /** Length of the secret string. */
     private static final int SECRET_STRING_LENGTH = 32;
 
-    /**
-     * Prepares a new <code>Resource</code> object.
-     */
+    /** Prepares a new <code>Resource</code> object. */
     public Resource(final WizardDialog previousDialog,
                     final DrbdResourceInfo dri) {
         super(previousDialog, dri);
     }
 
-    /**
-     * Returns a string with SECRET_STRING_LENGTH random characters.
-     */
+    /** Returns a string with SECRET_STRING_LENGTH random characters. */
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);
     }
 
-    /**
-     * Applies the changes and returns next dialog (BlockDev).
-     */
-    public final WizardDialog nextDialog() {
+    /** Applies the changes and returns next dialog (BlockDev). */
+    @Override public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         if (drbdInfo.getDrbdResources().size() <= 1) {
@@ -116,7 +110,7 @@ public class Resource extends DrbdConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.DrbdConfig.Resource.Title in TextResources.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Title");
     }
 
@@ -124,30 +118,26 @@ public class Resource extends DrbdConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.DrbdConfig.Resource.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Description");
     }
 
-    /**
-     * Inits dialog.
-     */
-    protected final void initDialog() {
+    /** Inits dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pressNextButton();
                 }
             });
         }
     }
 
-    /**
-     * Returns input pane where user can configure a drbd resource.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns input pane where user can configure a drbd resource. */
+    @Override protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         dri.waitForInfoPanel();

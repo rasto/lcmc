@@ -32,14 +32,14 @@ import drbd.gui.resources.VMSHardwareInfo;
  * This class holds info about file in a linux file system. It should overwrite
  * everything that browse file system may ask about the file.
  */
-public class LinuxFile extends File {
+public final class LinuxFile extends File {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    public static final char separatorChar = '/';
-    public static final String separator = "" + separatorChar;
-    public static final char pathSeparatorChar = '/';
-    public static final String pathSeparator = "" + pathSeparatorChar;
+    static final char separatorChar = '/';
+    static final String separator = "" + separatorChar;
+    static final char pathSeparatorChar = '/';
+    static final String pathSeparator = "" + pathSeparatorChar;
     /** Host on which is this file. */
     private final Host host;
     /** Whether it is directory. */
@@ -71,9 +71,9 @@ public class LinuxFile extends File {
     }
 
     /** Updates this file with possible new info. */
-    public final void update(final String type,
-                             final long lastModified,
-                             final long fileLength) {
+    public void update(final String type,
+                       final long lastModified,
+                       final long fileLength) {
         if ("d".equals(type)) {
             directory = true;
         }
@@ -82,12 +82,12 @@ public class LinuxFile extends File {
     }
 
     /** Returns whether it is a file. */
-    public final boolean isFile() {
+    @Override public boolean isFile() {
         return true;
     }
 
     /** Returns whether it exists. */
-    public final boolean exists() {
+    @Override public boolean exists() {
         if (existCache != null) {
             return existCache;
         }
@@ -106,44 +106,44 @@ public class LinuxFile extends File {
     }
 
     /** Returns whether it readable. */
-    public final boolean canRead() {
+    @Override public boolean canRead() {
         return true;
     }
 
     /** Returns whether it executable. */
-    public final boolean canExecute() {
+    @Override public boolean canExecute() {
         return true;
     }
 
     /** Returns whether it is directory. */
-    public final boolean isDirectory() {
+    @Override public boolean isDirectory() {
         return directory;
     }
 
     /** Returns last modified time. */
-    public final long lastModified() {
+    @Override public long lastModified() {
         return lastModified;
     }
 
     /** Returns length of the file. */
-    public final long length() {
+    @Override public long length() {
         return fileLength;
     }
 
     /** Returns file with absolute path. */
-    public final File getAbsoluteFile() {
+    @Override public File getAbsoluteFile() {
         final String absPath = getAbsolutePath();
         return vmsHardwareInfo.getLinuxDir(absPath, host);
     }
 
     /** Returns cannonical file name. */
-    public final File getCanonicalFile() throws IOException {
+    @Override public File getCanonicalFile() throws IOException {
         final String canonPath = getCanonicalPath();
         return vmsHardwareInfo.getLinuxDir(canonPath, host);
     }
 
     /** Returns parent dir. */
-    public final File getParentFile() {
+    @Override public File getParentFile() {
         final String p = getParent();
         if (p == null) {
             return null;

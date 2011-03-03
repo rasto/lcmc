@@ -56,28 +56,22 @@ public class LinbitLogin extends DialogHost {
     /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
 
-    /**
-     * Prepares a new <code>LinbitLogin</code> object.
-     */
+    /** Prepares a new <code>LinbitLogin</code> object. */
     public LinbitLogin(final WizardDialog previousDialog,
                        final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Finishes the dialog and sets the information.
-     */
-    protected final void finishDialog() {
+    /** Finishes the dialog and sets the information. */
+    @Override protected final void finishDialog() {
         Tools.getConfigData().setDownloadLogin(
                                 downloadUserField.getStringValue().trim(),
                                 downloadPasswordField.getStringValue().trim(),
                                 saveCheckBox.isSelected());
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         return new DrbdLinbitInst(this, getHost());
     }
 
@@ -87,7 +81,7 @@ public class LinbitLogin extends DialogHost {
      */
     protected final void checkFields() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
                 v = v & (downloadPasswordField.getStringValue().trim().length()
@@ -97,12 +91,10 @@ public class LinbitLogin extends DialogHost {
         });
     }
 
-    /**
-     * Check all fields if they are correct.
-     */
-    protected final void checkFields(final GuiComboBox field) {
+    /** Check all fields if they are correct. */
+    @Override protected final void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
                 v = v & (downloadPasswordField.getStringValue().trim().length()
@@ -116,7 +108,7 @@ public class LinbitLogin extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.Host.LinbitLogin.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.LinbitLogin.Title");
     }
 
@@ -124,20 +116,18 @@ public class LinbitLogin extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.Host.LinbitLogin.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected final String getDescription() {
         return Tools.getString("Dialog.Host.LinbitLogin.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
         checkFields();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 downloadUserField.requestFocus();
             }
         });
@@ -151,7 +141,7 @@ public class LinbitLogin extends DialogHost {
      * Returns the input pane, where user can enter the user name, password and
      * can select a check box to save the info for later.
      */
-    protected final JComponent getInputPane() {
+    @Override protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(
@@ -217,5 +207,4 @@ public class LinbitLogin extends DialogHost {
         p.add(inputPane, BorderLayout.SOUTH);
         return p;
     }
-
 }

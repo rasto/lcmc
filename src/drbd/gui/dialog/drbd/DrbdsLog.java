@@ -35,13 +35,11 @@ import java.util.LinkedHashMap;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class DrbdsLog extends HostLogs {
+public final class DrbdsLog extends HostLogs {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>DrbdsLog</code> object.
-     */
+    /** Prepares a new <code>DrbdsLog</code> object. */
     public DrbdsLog(final Host host) {
         super(host);
     }
@@ -49,19 +47,19 @@ public class DrbdsLog extends HostLogs {
     /**
      * Returns a command name from the DistResource that gets the drbd log file.
      */
-    protected final String logFileCommand() {
+    @Override protected String logFileCommand() {
         return "DrbdLog.log";
     }
 
     /** Returns which pattern names are selected by default. */
-    protected final Set<String> getSelectedSet() {
+    @Override protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
         selected.add("drbd");
         return selected;
     }
 
     /** Returns a map from pattern name to its pattern. */
-    protected final Map<String, String> getPatternMap() {
+    @Override protected Map<String, String> getPatternMap() {
         final Map<String, String> pm = new LinkedHashMap<String, String>();
         pm.put("drbd", wordBoundary("drbd"));
         return pm;

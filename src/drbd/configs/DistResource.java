@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are common commands for all linuxes.
  */
-public class DistResource extends
-            java.util.ListResourceBundle {
+public final class DistResource extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

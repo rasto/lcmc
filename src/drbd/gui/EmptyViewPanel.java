@@ -53,7 +53,7 @@ import javax.swing.ImageIcon;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
+final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Browser. */
@@ -91,7 +91,7 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
      */
-    public EmptyViewPanel() {
+    EmptyViewPanel() {
         super();
         browser = new EmptyBrowser();
         Tools.getGUIData().setEmptyBrowser(browser);
@@ -140,15 +140,15 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         smallButtonPanel.add(newButton);
         buttonPanel.add(smallButtonPanel);
         newButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(
                     new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             final CardLayout cl =
                                         (CardLayout) (logoPanel.getLayout());
                             final String btnString = e.getActionCommand();
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     if (HELP_BUTTON_STRING.equals(btnString)) {
                                         cl.show(logoPanel, HELP_PANEL_STRING);
                                         newButton.setText(
@@ -175,10 +175,10 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         //                Tools.getDefaultColor("DefaultButton.Background"));
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addHostButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(
                     new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             final AddHostDialog ahd = new AddHostDialog();
                             ahd.showDialogs();
                         }
@@ -202,10 +202,10 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addClusterButton.setMinimumSize(BIG_BUTTON_DIMENSION);
         addClusterButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(
                     new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             AddClusterDialog acd = new AddClusterDialog();
                             acd.showDialogs();
                         }
@@ -218,25 +218,21 @@ public class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         buttonPanel.add(addClusterButton);
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     addHostButton.pressButton();
                 }
             });
         }
     }
 
-    /**
-     * creates cluster view and updates the tree.
-     */
+    /** creates cluster view and updates the tree. */
     private void createEmptyView() {
         tree = getTree(browser);
         browser.updateHosts(tree);
     }
 
-    /**
-     * Updates the all hosts menu item.
-     */
-    public final void allHostsUpdate() {
+    /** Updates the all hosts menu item. */
+    @Override public void allHostsUpdate() {
         browser.updateHosts(tree);
     }
 }

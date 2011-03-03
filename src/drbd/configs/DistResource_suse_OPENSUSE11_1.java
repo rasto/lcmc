@@ -26,11 +26,11 @@ import java.util.Arrays;
 /**
  * Here are commands for opensuse 11.
  */
-public class DistResource_suse_OPENSUSE11_1 extends
-            java.util.ListResourceBundle {
+public final class DistResource_suse_OPENSUSE11_1
+                                        extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

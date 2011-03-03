@@ -31,7 +31,7 @@ import drbd.data.Host;
  * @version $Id$
  *
  */
-public class UcastLink extends Resource {
+public final class UcastLink extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Host object. */
@@ -48,31 +48,23 @@ public class UcastLink extends Resource {
         this.netInterface = netInterface;
     }
 
-    /**
-     * Rerurns the string.
-     */
-    public final String toString() {
+    /** Rerurns the string. */
+    @Override public String toString() {
         return host.getName() + ":" + netInterface.getName();
     }
 
-    /**
-     * Returns net interface.
-     */
-    public final String getInterface() {
+    /** Returns net interface. */
+    public String getInterface() {
         return netInterface.getName();
     }
 
-    /**
-     * Returns the ip.
-     */
-    public final String getIp() {
+    /** Returns the ip. */
+    public String getIp() {
         return netInterface.getIp();
     }
 
-    /**
-     * Returns the host.
-     */
-    public final Host getHost() {
+    /** Returns the host. */
+    public Host getHost() {
         return host;
     }
 }

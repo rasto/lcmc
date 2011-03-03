@@ -39,9 +39,7 @@ public abstract class VMConfig extends WizardDialog {
     /** VMS Virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
 
-    /**
-     * Prepares a new <code>VMConfig</code> object.
-     */
+    /** Prepares a new <code>VMConfig</code> object. */
     public VMConfig(final WizardDialog previousDialog,
                     final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog);

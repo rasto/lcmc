@@ -100,7 +100,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 toolTip.setTipText(text);
             }
         });
@@ -133,7 +133,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         if (shortDesc != null && !"".equals(shortDesc)) {
             toolTip = createToolTip();
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     toolTip.setTipText(shortDesc);
                 }
             });
@@ -190,46 +190,41 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             this.shortDesc2 = shortDesc2;
         }
     }
+
     /**
      * Sets the pos of the click that can be used in the overriden action
      * method.
      */
-    public final void setPos(final Point2D pos) {
+    @Override public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
 
-    /**
-     * Returns the saved position.
-     */
+    /** Returns the saved position. */
     protected final Point2D getPos() {
         return pos;
     }
 
-    /**
-     * Sets normal font for this menu item.
-     */
+    /** Sets normal font for this menu item. */
     private void setNormalFont() {
         final Font font = getFont();
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 setFont(new Font(name, style, size));
             }
         });
     }
 
-    /**
-     * Sets special font for this menu item.
-     */
+    /** Sets special font for this menu item. */
     public final void setSpecialFont() {
         final Font font = getFont();
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 setFont(new Font(name, style, size));
             }
         });
@@ -243,9 +238,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         Tools.appError("No action defined.");
     }
 
-    /**
-     * Returns false if the alternate menu item text etc. should be shown.
-     */
+    /** Returns false if the alternate menu item text etc. should be shown. */
     public boolean predicate() {
         return true;
     }
@@ -259,20 +252,16 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         return null;
     }
 
-    /**
-     * Returns whether the item should be visible or not.
-     */
+    /** Returns whether the item should be visible or not. */
     public boolean visiblePredicate() {
         return true;
     }
 
-    /**
-     * Updates the menu item, checking the predicate and enablePredicate.
-     */
-    public final void update() {
+    /** Updates the menu item, checking the predicate and enablePredicate. */
+    @Override public final void update() {
         if (predicate()) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     setText(text1);
                     if (icon1 != null) {
                         setIcon(icon1);
@@ -286,7 +275,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             });
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     setText(text2);
                     if (icon1 != null) { /* icon1 is here on purpose */
                         setIcon(icon2);
@@ -309,7 +298,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 setEnabled(disableTooltip == null && accessible);
                 setVisible(visible
                            && Tools.getConfigData().isAccessible(
@@ -318,7 +307,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         });
         if (toolTip != null && isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {
                         String advanced = "";
@@ -350,10 +339,10 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * When an item was selected this calls an action method that can be
      * overridden.
      */
-    public final void actionPerformed(final ActionEvent e) {
+    @Override public void actionPerformed(final ActionEvent e) {
         final Thread thread = new Thread(
             new Runnable() {
-                public void run() {
+                @Override public void run() {
                     action();
                 }
             }
@@ -361,17 +350,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         thread.start();
     }
 
-    /**
-     * Returns the text of the menu item.
-     */
-    public final String toString() {
+    /** Returns the text of the menu item. */
+    @Override public final String toString() {
         return getText();
     }
 
-    /**
-     * Creates tooltip.
-     */
-    public final JToolTip createToolTip() {
+    /** Creates tooltip. */
+    @Override public final JToolTip createToolTip() {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }
@@ -382,16 +367,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         return toolTip;
     }
 
-    /**
-     * Sets tooltip's background color.
-     */
-    public final void setToolTipBackground(final Color toolTipBackground) {
+    /** Sets tooltip's background color. */
+    @Override public final void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
     /** Returns location of the tooltip, so that it does not cover the menu
      * item. */
-    public Point getToolTipLocation(final MouseEvent event) {
+    @Override public Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();
@@ -404,7 +387,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    public final void setToolTipText(final String toolTipText) {
+    @Override public final void setToolTipText(final String toolTipText) {
         if (toolTip == null || toolTipText == null) {
             return;
         }
@@ -450,7 +433,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.sleep(1000); /* well, doesn't work all the time */
                     moveMouse();
                     Tools.sleep(2000);
@@ -462,10 +445,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Clean up. */
-    public final void cleanup() {
+    @Override public final void cleanup() {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }
-     }
-
+    }
 }

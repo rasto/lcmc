@@ -29,7 +29,7 @@ package drbd.data.resources;
  * @version $Id$
  *
  */
-public class DrbdResource extends Resource
+public final class DrbdResource extends Resource
 implements ClusterBlockDeviceInterface {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -54,17 +54,13 @@ implements ClusterBlockDeviceInterface {
         setValue("device", device);
     }
 
-    /**
-     * Returns drbd device.
-     */
-    public final String getDevice() {
+    /** Returns drbd device. */
+    @Override public String getDevice() {
         return device;
     }
 
-    /**
-     * Sets drbd device.
-     */
-    public final void setDevice(final String device) {
+    /** Sets drbd device. */
+    public void setDevice(final String device) {
         this.device = device;
         setValue("device", device);
     }
@@ -74,14 +70,12 @@ implements ClusterBlockDeviceInterface {
      * was generated and niether resource name nor drbd device can
      * be changed.
      */
-    public final void setCommited(final boolean commited) {
+    public void setCommited(final boolean commited) {
         this.commited = commited;
     }
 
-    /**
-     * Returns whether this resoure was commited.
-     */
-    public final boolean isCommited() {
+    /** Returns whether this resoure was commited. */
+    public boolean isCommited() {
         return commited;
     }
 }

@@ -56,7 +56,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @version $Id$
  *
  */
-public class ViewPanel extends JPanel {
+class ViewPanel extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** This view split pane. */
@@ -75,37 +75,33 @@ public class ViewPanel extends JPanel {
     /** Update VMS lock. */
     private final Mutex mSetPanelLock = new Mutex();
 
-    /**
-     * Prepares a new <code>ViewPanel</code> object.
-     */
-    public ViewPanel() {
+    /** Prepares a new <code>ViewPanel</code> object. */
+    ViewPanel() {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
     }
 
-    /**
-     * Returns the menu tree.
-     */
-    public final JTree getTree(final Browser browser) {
+    /** Returns the menu tree. */
+    final JTree getTree(final Browser browser) {
         final JTree tree = new JTree(browser.getTreeModel());
         browser.setTree(tree);
         tree.setOpaque(true);
         tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
         tree.setToggleClickCount(2);
         tree.addMouseListener(new MouseListener() {
-            public void mouseClicked(final MouseEvent e) {
+            @Override public void mouseClicked(final MouseEvent e) {
                 /* do nothing */
             }
 
-            public void mouseEntered(final MouseEvent e) {
+            @Override public void mouseEntered(final MouseEvent e) {
                 /* do nothing */
             }
 
-            public void mouseExited(final MouseEvent e) {
+            @Override public void mouseExited(final MouseEvent e) {
                 /* do nothing */
             }
 
-            public void mousePressed(final MouseEvent e) {
+            @Override public void mousePressed(final MouseEvent e) {
                 final int selRow = tree.getRowForLocation(e.getX(), e.getY());
                 final TreePath selPath = tree.getPathForLocation(e.getX(),
                                                                  e.getY());
@@ -120,7 +116,7 @@ public class ViewPanel extends JPanel {
                 }
             }
 
-            public void mouseReleased(final MouseEvent e) {
+            @Override public void mouseReleased(final MouseEvent e) {
                 /* do nothing */
             }
         });
@@ -145,38 +141,42 @@ public class ViewPanel extends JPanel {
 
         // Listen for when the selection changes.
         tree.addTreeSelectionListener(new TreeSelectionListener() {
-            public void valueChanged(final TreeSelectionEvent e) {
+            @Override public void valueChanged(final TreeSelectionEvent e) {
                 setRightComponentInView(tree, viewSP, browser);
             }
         });
 
         tree.getModel().addTreeModelListener(
             new TreeModelListener() {
-                public void treeNodesChanged(final TreeModelEvent e) {
+                @Override public void treeNodesChanged(final TreeModelEvent e) {
                     if (!disabledDuringLoad) {
                         final Object[] selected = e.getChildren();
                         if (selected != null && selected.length > 0) {
-                            Object o = ((DefaultMutableTreeNode) selected[0])
-                                            .getUserObject();
+                            final Object o =
+                                ((DefaultMutableTreeNode) selected[0])
+                                                             .getUserObject();
                             setRightComponentInView(browser, (Info) o);
                         }
                     }
                 }
 
-                public void treeNodesInserted(final TreeModelEvent e) {
+                @Override public void treeNodesInserted(
+                                                    final TreeModelEvent e) {
                     /* do nothing */
                 }
 
-                public void treeNodesRemoved(final TreeModelEvent e) {
+                @Override public void treeNodesRemoved(
+                                                    final TreeModelEvent e) {
                     /* do nothing */
                 }
 
-                public void treeStructureChanged(final TreeModelEvent e) {
+                @Override public void treeStructureChanged(
+                                                    final TreeModelEvent e) {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 tree.expandPath(tp);
                                 tree.setSelectionPath(tp);
                             }
@@ -190,17 +190,15 @@ public class ViewPanel extends JPanel {
 
     /** Returns whether expanding of paths is disabled during the initial load.
      */
-    public final boolean isDisabledDuringLoad() {
+    final boolean isDisabledDuringLoad() {
         return disabledDuringLoad;
     }
     /** Sets if expanding of paths should be disabled during the initial load.*/
-    public final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
+    final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
         this.disabledDuringLoad = disabledDuringLoad;
     }
 
-    /**
-     * Sets the right component in the view.
-     */
+    /** Sets the right component in the view. */
     private void setRightComponentInView(final JTree tree,
                                          final JSplitPane viewSP,
                                          final Browser browser) {
@@ -228,7 +226,7 @@ public class ViewPanel extends JPanel {
             mSetPanelLock.release();
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
                     if (!disabledDuringLoad) {
                         final int loc = viewSP.getDividerLocation();
@@ -241,11 +239,9 @@ public class ViewPanel extends JPanel {
         }
     }
 
-    /**
-     * Sets the right component in the view.
-     */
-    public final void setRightComponentInView(final Browser browser,
-                                              final Info nodeInfo) {
+    /** Sets the right component in the view. */
+    final void setRightComponentInView(final Browser browser,
+                                       final Info nodeInfo) {
         if (viewSP != null) {
             try {
                 if (!mSetPanelLock.attempt(0)) {
@@ -255,7 +251,7 @@ public class ViewPanel extends JPanel {
                 Thread.currentThread().interrupt();
             }
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     final JComponent p = browser.getInfoPanel(nodeInfo);
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();

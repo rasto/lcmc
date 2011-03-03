@@ -38,7 +38,7 @@ import javax.swing.JPanel;
 /**
  * This class is for resource defaults or rsc_defaults.
  */
-public class RscDefaultsInfo extends EditableInfo {
+public final class RscDefaultsInfo extends EditableInfo {
     /**
      * Prepares a new <code>RscDefaultsInfo</code> object and creates
      * new rsc defaults object.
@@ -49,17 +49,13 @@ public class RscDefaultsInfo extends EditableInfo {
         setResource(new Resource(name));
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /**
-     * Sets default parameters with values from resourceNode hash.
-     */
-    public final void setParameters(final Map<String, String> resourceNode) {
+    /** Sets default parameters with values from resourceNode hash. */
+    public void setParameters(final Map<String, String> resourceNode) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
             Tools.appError("crmXML is null");
@@ -95,10 +91,8 @@ public class RscDefaultsInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns parameters.
-     */
-    public final String[] getParametersFromXML() {
+    /** Returns parameters. */
+    @Override public String[] getParametersFromXML() {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
             return null;
@@ -108,19 +102,15 @@ public class RscDefaultsInfo extends EditableInfo {
         return params.toArray(new String[params.size()]);
     }
 
-    /**
-     * Returns true if the value of the parameter is ok.
-     */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
+    /** Returns true if the value of the parameter is ok. */
+    @Override protected boolean checkParam(final String param,
+                                           final String newValue) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.checkMetaAttrParam(param, newValue);
     }
 
-    /**
-     * Returns default value for specified parameter.
-     */
-    protected final String getParamDefault(final String param) {
+    /** Returns default value for specified parameter. */
+    @Override protected String getParamDefault(final String param) {
         if ("resource-stickiness".equals(param)) {
             return getBrowser().getServicesInfo().getResource().getValue(
                                                 "default-resource-stickiness");
@@ -129,10 +119,8 @@ public class RscDefaultsInfo extends EditableInfo {
         return crmXML.getRscDefaultsDefault(param);
     }
 
-    /**
-     * Returns saved value for specified parameter.
-     */
-    protected final String getParamSaved(final String param) {
+    /** Returns saved value for specified parameter. */
+    @Override protected String getParamSaved(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         String value = super.getParamSaved(param);
         if (value == null) {
@@ -147,18 +135,14 @@ public class RscDefaultsInfo extends EditableInfo {
         return value;
     }
 
-    /**
-     * Returns preferred value for specified parameter.
-     */
-    protected final String getParamPreferred(final String param) {
+    /** Returns preferred value for specified parameter. */
+    @Override protected String getParamPreferred(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsPreferred(param);
     }
 
-    /**
-     * Returns possible choices for drop down lists.
-     */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    /** Returns possible choices for drop down lists. */
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (isCheckBox(param)) {
             return crmXML.getRscDefaultsCheckBoxChoices(param);
@@ -167,32 +151,26 @@ public class RscDefaultsInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Returns short description of the specified parameter.
-     */
-    protected final String getParamShortDesc(final String param) {
+    /** Returns short description of the specified parameter. */
+    @Override protected String getParamShortDesc(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsShortDesc(param);
     }
 
-    /**
-     * Returns long description of the specified parameter.
-     */
-    protected final String getParamLongDesc(final String param) {
+    /** Returns long description of the specified parameter. */
+    @Override protected String getParamLongDesc(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsLongDesc(param);
     }
 
-    /**
-     * Returns section to which the specified parameter belongs.
-     */
-    protected final String getSection(final String param) {
+    /** Returns section to which the specified parameter belongs. */
+    @Override protected String getSection(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsSection(param);
     }
 
     /** Returns true if the specified parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         if (!Tools.areEqual(getParamDefault(param),
                             getParamSaved(param))) {
             /* it changed, show it */
@@ -203,87 +181,78 @@ public class RscDefaultsInfo extends EditableInfo {
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                        final String param) {
         return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
     }
 
     /** Whether the parameter should be enabled. */
-    protected final String isEnabled(final String param) {
+    @Override protected String isEnabled(final String param) {
         return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
+                                                        final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is required. */
-    protected final boolean isRequired(final String param) {
+    @Override protected boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsRequired(param);
     }
 
-    /**
-     * Returns true if the specified parameter is meta attribute.
-     */
-    protected final boolean isMetaAttr(final String param) {
+    /** Returns true if the specified parameter is meta attribute. */
+    protected boolean isMetaAttr(final String param) {
         return true;
     }
 
     /** Returns true if the specified parameter is integer. */
-    protected final boolean isInteger(final String param) {
+    @Override protected boolean isInteger(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsInteger(param);
     }
 
     /** Returns true if the specified parameter is label. */
-    protected final boolean isLabel(final String param) {
+    @Override protected boolean isLabel(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsLabel(param);
     }
 
-    /**
-     * Returns true if the specified parameter is of time type.
-     */
-    protected final boolean isTimeType(final String param) {
+    /** Returns true if the specified parameter is of time type. */
+    @Override protected boolean isTimeType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsTimeType(param);
     }
 
-    /**
-     * Returns whether parameter is checkbox.
-     */
-    protected final boolean isCheckBox(final String param) {
+    /** Returns whether parameter is checkbox. */
+    @Override protected boolean isCheckBox(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsBoolean(param);
     }
 
-    /**
-     * Returns the type of the parameter according to the OCF.
-     */
-    protected final String getParamType(final String param) {
+    /** Returns the type of the parameter according to the OCF. */
+    @Override protected String getParamType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsType(param);
     }
 
-    /**
-     * Returns panel with graph.
-     */
-    public final JPanel getGraphicalView() {
+    /** Returns panel with graph. */
+    @Override public JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
     /** Check the fields. */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsChanged(final String param,
+                                                 final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
 
     /** Check the fields. */
-    public final boolean checkResourceFieldsChanged(
-                                            final String param,
-                                            final String[] params,
-                                            final boolean fromServicesInfo) {
+    boolean checkResourceFieldsChanged(final String param,
+                                       final String[] params,
+                                       final boolean fromServicesInfo) {
         if (fromServicesInfo) {
             return super.checkResourceFieldsChanged(param, params);
         } else {
@@ -294,16 +263,15 @@ public class RscDefaultsInfo extends EditableInfo {
     }
 
     /** Check the fields. */
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }
 
     /** Check the fields. */
-    public final boolean checkResourceFieldsCorrect(
-                                            final String param,
-                                            final String[] params,
-                                            final boolean fromServicesInfo) {
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params,
+                                       final boolean fromServicesInfo) {
         if (fromServicesInfo) {
             return super.checkResourceFieldsCorrect(param, params);
         } else {

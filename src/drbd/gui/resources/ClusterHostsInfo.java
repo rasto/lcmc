@@ -33,31 +33,24 @@ import java.awt.Color;
 /**
  * This class holds the information hosts in this cluster.
  */
-public class ClusterHostsInfo extends CategoryInfo {
-    /**
-     * Prepares a new <code>ClusterHostsInfo</code> object.
-     */
+public final class ClusterHostsInfo extends CategoryInfo {
+    /** Prepares a new <code>ClusterHostsInfo</code> object. */
     public ClusterHostsInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns columns for the table.
-     */
-    protected final String[] getColumnNames(final String tableName) {
+    /** Returns columns for the table. */
+    @Override protected String[] getColumnNames(final String tableName) {
         return new String[]{"Host", "DRBD", "Cluster Software"};
     }
-    /**
-     * Returns data for the table.
-     */
-    protected final Object[][] getTableData(final String tableName) {
+
+    /** Returns data for the table. */
+    @Override protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final MyButton hostLabel = new MyButton(
@@ -71,12 +64,10 @@ public class ClusterHostsInfo extends CategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
-    protected final void rowClicked(final String tableName,
-                                    final String key,
-                                    final int column) {
+    /** Execute when row in the table was clicked. */
+    @Override protected void rowClicked(final String tableName,
+                                        final String key,
+                                        final int column) {
         // TODO: does not work
         final Host host = getBrowser().getCluster().getHostByName(key);
         final HostInfo hi = host.getBrowser().getHostInfo();
@@ -85,11 +76,9 @@ public class ClusterHostsInfo extends CategoryInfo {
         }
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
-    protected final Color getTableRowColor(final String tableName,
-                                           final String key) {
+    /** Retrurns color for some rows. */
+    @Override protected Color getTableRowColor(final String tableName,
+                                               final String key) {
         final Host host = getBrowser().getCluster().getHostByName(key);
         final Color c = host.getPmColors()[0];
         if (c == null) {

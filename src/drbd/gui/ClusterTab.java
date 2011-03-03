@@ -36,16 +36,14 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class ClusterTab extends JPanel {
+public final class ClusterTab extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
     private final Cluster cluster;
 
-    /**
-     * Prepares a new <code>ClusterTab</code> object.
-     */
-    public ClusterTab(final Cluster cluster) {
+    /** Prepares a new <code>ClusterTab</code> object. */
+    ClusterTab(final Cluster cluster) {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         this.cluster = cluster;
@@ -56,13 +54,11 @@ public class ClusterTab extends JPanel {
         }
     }
 
-    /**
-     * adds host views to the desktop.
-     */
-    public final void addClusterView() {
+    /** adds host views to the desktop. */
+    public void addClusterView() {
         if (cluster.hostsCount() > 0) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     add(new ClusterViewPanel(cluster));
                 }
             });
@@ -70,17 +66,13 @@ public class ClusterTab extends JPanel {
         repaint();
     }
 
-    /**
-     * Returns cluster object.
-     */
-    public final Cluster getCluster() {
+    /** Returns cluster object. */
+    Cluster getCluster() {
         return cluster;
     }
 
-    /**
-     * Returns name of the cluster.
-     */
-    public final String getName() {
+    /** Returns name of the cluster. */
+    @Override public String getName() {
         if (cluster == null) {
             return null;
         }

@@ -26,11 +26,11 @@ import java.util.Arrays;
 /**
  * Here are commands for ubuntu karmic.
  */
-public class DistResource_ubuntu_KARMIC extends
-            java.util.ListResourceBundle {
+public final class DistResource_ubuntu_KARMIC
+                                        extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

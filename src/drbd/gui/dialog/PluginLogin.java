@@ -42,7 +42,7 @@ import java.awt.BorderLayout;
  * @version $Id$
  *
  */
-public class PluginLogin extends WizardDialog {
+public final class PluginLogin extends WizardDialog {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Field with user name. */
@@ -54,15 +54,13 @@ public class PluginLogin extends WizardDialog {
     /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
 
-    /**
-     * Prepares a new <code>PluginLogin</code> object.
-     */
+    /** Prepares a new <code>PluginLogin</code> object. */
     public PluginLogin(final WizardDialog previousDialog) {
         super(previousDialog);
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    @Override protected void finishDialog() {
         Tools.getConfigData().setPluginLogin(
                                 pluginUserField.getStringValue().trim(),
                                 pluginPasswordField.getStringValue().trim(),
@@ -71,7 +69,7 @@ public class PluginLogin extends WizardDialog {
     }
 
     /** Returns the next dialog. */
-    public WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         return null;
     }
 
@@ -79,9 +77,9 @@ public class PluginLogin extends WizardDialog {
      * Check all fields if they are correct.
      * TODO: two checkfields?
      */
-    protected final void checkFields() {
+    protected void checkFields() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 boolean v =
                     (pluginUserField.getStringValue().trim().length() > 0);
                 v = v & (pluginPasswordField.getStringValue().trim().length()
@@ -92,9 +90,9 @@ public class PluginLogin extends WizardDialog {
     }
 
     /** Check all fields if they are correct. */
-    protected final void checkFields(final GuiComboBox field) {
+    @Override protected void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 boolean v =
                     (pluginUserField.getStringValue().trim().length() > 0);
                 v = v & (pluginPasswordField.getStringValue().trim().length()
@@ -108,7 +106,7 @@ public class PluginLogin extends WizardDialog {
      * Returns the title of the dialog, defined as
      * Dialog.PluginLogin.Title in TextResources.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.PluginLogin.Title");
     }
 
@@ -116,23 +114,23 @@ public class PluginLogin extends WizardDialog {
      * Returns the description of the dialog, defined as
      * Dialog.PluginLogin.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.PluginLogin.Description");
     }
 
     /** Returns localized string of Finish button. */
-    public final String finishButton() {
+    @Override public String finishButton() {
         return Tools.getString("Dialog.PluginLogin.FinishButton");
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
         checkFields();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 pluginUserField.requestFocus();
             }
         });
@@ -142,7 +140,7 @@ public class PluginLogin extends WizardDialog {
      * Returns the input pane, where user can enter the user name, password and
      * can select a check box to save the info for later.
      */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(

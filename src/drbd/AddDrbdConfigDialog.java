@@ -35,23 +35,19 @@ import drbd.gui.resources.DrbdResourceInfo;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class AddDrbdConfigDialog {
+public final class AddDrbdConfigDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
     private final DrbdResourceInfo dri;
 
-    /**
-     * Prepares new <code>AddDrbdConfigDialog</code> object.
-     */
+    /** Prepares new <code>AddDrbdConfigDialog</code> object. */
     public AddDrbdConfigDialog(final DrbdResourceInfo dri) {
         this.dri = dri;
     }
 
-    /**
-     * Shows step by step dialogs that add and configure new drbd resource.
-     */
-    public final void showDialogs() {
+    /** Shows step by step dialogs that add and configure new drbd resource. */
+    public void showDialogs() {
         dri.setDialogStarted(true);
         DrbdConfig dialog = new Resource(null, dri);
         Tools.getGUIData().expandTerminalSplitPane(0);
@@ -75,10 +71,8 @@ public class AddDrbdConfigDialog {
         Tools.getGUIData().getMainFrame().requestFocus();
     }
 
-    /**
-     * Returns whether the wizard was canceled.
-     */
-    public final boolean isCanceled() {
+    /** Returns whether the wizard was canceled. */
+    public boolean isCanceled() {
         return canceled;
     }
 }

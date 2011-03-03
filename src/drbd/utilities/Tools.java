@@ -182,16 +182,12 @@ public final class Tools {
     /** Remote plugin location. */
     private static final String PLUGIN_LOCATION =
                                      "oss.linbit.com/drbd-mc/drbd-mc-plugins/";
-    /**
-     * Private constructor.
-     */
+    /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
     }
 
-    /**
-     * This is to make this class a singleton.
-     */
+    /** This is to make this class a singleton. */
     public static Tools getInstance() {
         synchronized (Tools.class) {
             if (instance == null) {
@@ -201,9 +197,7 @@ public final class Tools {
         return instance;
     }
 
-    /**
-     * Inits this class.
-     */
+    /** Inits this class. */
     public static void init() {
         setDefaults();
         configData         = new ConfigData();
@@ -233,9 +227,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns the drbd gui release version.
-     */
+    /** Returns the drbd gui release version. */
     public static String getRelease() {
         if (release != null) {
             return release;
@@ -256,9 +248,7 @@ public final class Tools {
         System.out.println(INFO_STRING + msg);
     }
 
-    /**
-     * Sets defaults from AppDefaults bundle.
-     */
+    /** Sets defaults from AppDefaults bundle. */
     public static void setDefaults() {
         debugLevel = getDefaultInt("DebugLevel");
         if (getDefault("AppWarning").equals("y")) {
@@ -380,7 +370,7 @@ public final class Tools {
     public static void error(final String msg) {
         System.out.println("ERROR: " + getErrorString(msg));
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
                             new JScrollPane(new JTextArea(getErrorString(msg),
@@ -393,9 +383,7 @@ public final class Tools {
 
     }
 
-    /**
-     * Show an ssh error message.
-     */
+    /** Show an ssh error message. */
     public static void sshError(final Host host,
                                 final String command,
                                 final String ans,
@@ -435,9 +423,7 @@ public final class Tools {
         return cd.isPressedYesButton();
     }
 
-    /**
-     * Executes a command with progress indicator.
-     */
+    /** Executes a command with progress indicator. */
     public static SSH.SSHOutput execCommandProgressIndicator(
                                            final Host host,
                                            final String command,
@@ -453,12 +439,13 @@ public final class Tools {
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  output.append(ans);
                              }
 
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                    final String ans,
+                                                    final int exitCode) {
                                  Tools.appWarning("error: "
                                                   + command
                                                   + " "
@@ -509,12 +496,13 @@ public final class Tools {
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  output.append(ans);
                              }
 
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                          final String ans,
+                                                          final int exitCode) {
                                  if (outputVisible) {
                                     Tools.sshError(host,
                                                    command,
@@ -603,9 +591,7 @@ public final class Tools {
         appError(msg, msg2, null);
     }
 
-    /**
-     * Shows application error message dialog, with a stacktrace.
-     */
+    /** Shows application error message dialog, with a stacktrace. */
     public static void appError(final String msg, final Exception e) {
         appError(msg, "", e);
     }
@@ -675,7 +661,7 @@ public final class Tools {
         errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
         errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(errorPane),
                                               getErrorString("AppError.Title"),
@@ -684,9 +670,7 @@ public final class Tools {
         });
     }
 
-    /**
-     * Dialog that informs a user about something with ok button.
-     */
+    /** Dialog that informs a user about something with ok button. */
     public static void infoDialog(final String title,
                                   final String info1,
                                   final String info2) {
@@ -697,7 +681,7 @@ public final class Tools {
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(infoPane),
                                               getErrorString(title),
@@ -743,9 +727,7 @@ public final class Tools {
         return wasValid;
     }
 
-    /**
-     * Prints stack trace with text.
-     */
+    /** Prints stack trace with text. */
     public static void printStackTrace(final String text) {
         System.out.println(text);
         printStackTrace();
@@ -800,9 +782,7 @@ public final class Tools {
         return content.toString();
     }
 
-    /**
-     * Loads config data from the specified file.
-     */
+    /** Loads config data from the specified file. */
     public static void loadConfigData(final String filename) {
         debug("load", 0);
         final String xml = loadFile(filename, true);
@@ -821,9 +801,7 @@ public final class Tools {
         drbdGuiXML.startClusters(selectedClusters);
     }
 
-    /**
-     * Stops the specified clusters in the gui.
-     */
+    /** Stops the specified clusters in the gui. */
     public static void stopClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
             cluster.removeCluster();
@@ -845,16 +823,12 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns cluster names from the parsed save file.
-     */
+    /** Returns cluster names from the parsed save file. */
     public static void loadXML(final String xml) {
         drbdGuiXML.loadXML(xml);
     }
 
-    /**
-     * Removes all the hosts and clusters from all the panels and data.
-     */
+    /** Removes all the hosts and clusters from all the panels and data. */
     public static void removeEverything() {
         Tools.startProgressIndicator("Removing Everything");
         Tools.getConfigData().disconnectAllHosts();
@@ -1035,9 +1009,7 @@ public final class Tools {
         return text;
     }
 
-    /**
-     * Returns string that is specific to a distribution and version.
-     */
+    /** Returns string that is specific to a distribution and version. */
     public static String getDistString(final String text,
                                        String dist,
                                        String version,
@@ -1277,9 +1249,7 @@ public final class Tools {
         return ret.toString();
     }
 
-    /**
-     * Uppercases the first character.
-     */
+    /** Uppercases the first character. */
     public static String ucfirst(final String s) {
         final String f = s.substring(0, 1);
         return s.replaceFirst(".", f.toUpperCase(Locale.US));
@@ -1350,9 +1320,7 @@ public final class Tools {
         return false;
     }
 
-    /**
-     * Returns thrue if object is in StringInfo class.
-     */
+    /** Returns thrue if object is in StringInfo class. */
     public static boolean isStringInfoClass(final Object o) {
         if (o == null
             || o.getClass().getName().equals("drbd.gui.resources.StringInfo")) {
@@ -1361,9 +1329,7 @@ public final class Tools {
         return false;
     }
 
-    /**
-     * Escapes for config file.
-     */
+    /** Escapes for config file. */
     public static String escapeConfig(final String value) {
         if (value.indexOf(' ') > -1) {
             return "\"" + value + "\"";
@@ -1371,9 +1337,7 @@ public final class Tools {
         return value;
     }
 
-    /**
-     * Starts progress indicator with specified text.
-     */
+    /** Starts progress indicator with specified text. */
     public static void startProgressIndicator(final String text) {
         final boolean rightMovement = RANDOM.nextBoolean();
         if (text == null) {
@@ -1386,24 +1350,18 @@ public final class Tools {
         }
     }
 
-    /**
-     * Starts progress indicator for host or cluster command.
-     */
+    /** Starts progress indicator for host or cluster command. */
     public static void startProgressIndicator(final String name,
                                               final String text) {
         startProgressIndicator(name + ": " + text);
     }
 
-    /**
-     * Stops progress indicator with specified text.
-     */
+    /** Stops progress indicator with specified text. */
     public static void stopProgressIndicator(final String text) {
         getGUIData().getMainGlassPane().stop(text);
     }
 
-    /**
-     * Stops progress indicator for host or cluster command.
-     */
+    /** Stops progress indicator for host or cluster command. */
     public static void stopProgressIndicator(final String name,
                                              final String text) {
         stopProgressIndicator(name + ": " + text);
@@ -1435,9 +1393,7 @@ public final class Tools {
         progressIndicatorFailed(name + ": " + text, n);
     }
 
-    /**
-     * Sets fixed size for component.
-     */
+    /** Sets fixed size for component. */
     public static void setSize(final Component c,
                                final int width,
                                final int height) {
@@ -1481,9 +1437,7 @@ public final class Tools {
         return 0;
     }
 
-    /**
-     * Returns number of characters 'c' in a string 's'.
-     */
+    /** Returns number of characters 'c' in a string 's'. */
     public static int charCount(final String s, final char c) {
         int count = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -1526,9 +1480,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns border with title.
-     */
+    /** Returns border with title. */
     public static TitledBorder getBorder(final String text) {
         final TitledBorder titledBorder = new TitledBorder(
                 BorderFactory.createLineBorder(Color.BLACK, 1), text);
@@ -1554,7 +1506,7 @@ public final class Tools {
             list.setVisibleRowCount(maxSize);
         }
         list.addMouseListener(new MouseAdapter() {
-            public void mouseExited(final MouseEvent evt) {
+            @Override public void mouseExited(final MouseEvent evt) {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
@@ -1563,11 +1515,11 @@ public final class Tools {
                     }
                 }
             }
-            public void mouseEntered(final MouseEvent evt) {
+            @Override public void mouseEntered(final MouseEvent evt) {
                 list.requestFocus();
             }
 
-            public void mousePressed(final MouseEvent evt) {
+            @Override public void mousePressed(final MouseEvent evt) {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
@@ -1575,10 +1527,10 @@ public final class Tools {
                     }
                 }
                 final Thread thread = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         final int index = list.locationToIndex(evt.getPoint());
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 list.setSelectedIndex(index);
                                 //TODO: some submenus stay visible, during
                                 //ptest, but this breaks group popup menu
@@ -1596,9 +1548,9 @@ public final class Tools {
         });
 
         list.addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseMoved(final MouseEvent evt) {
+            @Override public void mouseMoved(final MouseEvent evt) {
                 final Thread thread = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         int pIndex = list.locationToIndex(evt.getPoint());
                         if (!list.getCellBounds(pIndex, pIndex).contains(
                                                          evt.getPoint())) {
@@ -1611,7 +1563,7 @@ public final class Tools {
                         }
                         prevScrollingMenuIndex = index;
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 list.setSelectedIndex(index);
                             }
                         });
@@ -1636,13 +1588,13 @@ public final class Tools {
         sp.setViewportBorder(null);
         sp.setBorder(null);
         list.addKeyListener(new KeyAdapter() {
-            public void keyTyped(final KeyEvent e) {
+            @Override public void keyTyped(final KeyEvent e) {
                 final char ch = e.getKeyChar();
                 if (ch == ' ' || ch == '\n') {
                     final MyMenuItem item =
                                        (MyMenuItem) list.getSelectedValue();
                     //SwingUtilities.invokeLater(new Runnable() {
-                    //    public void run() {
+                    //    @Override public void run() {
                     //        //menu.setPopupMenuVisible(false);
                     //        setMenuVisible(menu, false);
                     //    }
@@ -1653,7 +1605,7 @@ public final class Tools {
                 } else {
                     if (Character.isLetterOrDigit(ch)) {
                         final Thread t = new Thread(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 getGUIData().getMainGlassPane().start("" + ch,
                                                                       null,
                                                                       true);
@@ -1668,23 +1620,17 @@ public final class Tools {
         return sp;
     }
 
-    /**
-     * Returns whether the computer, where this program is run, is Linux.
-     */
+    /** Returns whether the computer, where this program is run, is Linux. */
     public static boolean isLinux() {
         return "Linux".equals(System.getProperty("os.name"));
     }
 
-    /**
-     * Returns whether the computer, where this program is run, is Windows.
-     */
+    /** Returns whether the computer, where this program is run, is Windows. */
     public static boolean isWindows() {
         return System.getProperty("os.name").indexOf("Windows") == 0;
     }
 
-    /**
-     * Sets the html font of the editor pane to be the default font.
-     */
+    /** Sets the html font of the editor pane to be the default font. */
     public static void setEditorFont(final JEditorPane ep) {
         final Font font = UIManager.getFont("Label.font");
         final String bodyRule = "body { font-family: " + font.getFamily()
@@ -1693,9 +1639,7 @@ public final class Tools {
         ((HTMLDocument) ep.getDocument()).getStyleSheet().addRule(bodyRule);
     }
 
-    /**
-     * Reads and returns a content of a text file.
-     */
+    /** Reads and returns a content of a text file. */
     public static String getFile(final String fileName) {
         try {
             final BufferedReader br =
@@ -1763,9 +1707,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Convenience sleep wrapper.
-     */
+    /** Convenience sleep wrapper. */
     public static void sleep(final int ms) {
         try {
             Thread.sleep(ms);
@@ -1774,9 +1716,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Convenience sleep wrapper with float argument.
-     */
+    /** Convenience sleep wrapper with float argument. */
     public static void sleep(final float ms) {
         sleep((int) ms);
     }
@@ -1813,9 +1753,7 @@ public final class Tools {
         return version;
     }
 
-    /**
-     * Opens default browser.
-     */
+    /** Opens default browser. */
     public static void openBrowswer(final String url) {
         try {
             java.awt.Desktop.getDesktop().browse(new URI(url));
@@ -1849,9 +1787,7 @@ public final class Tools {
         return localPort;
     }
 
-    /**
-     * Cleans up after vnc viewer. It stops ssh tunnel.
-     */
+    /** Cleans up after vnc viewer. It stops ssh tunnel. */
     private static void cleanupVncViewer(final Host host,
                                          final int localPort) {
         if (Tools.isLocalIp(host.getIp())) {
@@ -1866,9 +1802,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Starts Tight VNC viewer.
-     */
+    /** Starts Tight VNC viewer. */
     public static void startTightVncViewer(final Host host,
                                            final int remotePort) {
         final int localPort = prepareVncViewer(host, remotePort);
@@ -1888,9 +1822,7 @@ public final class Tools {
         cleanupVncViewer(host, localPort);
     }
 
-    /**
-     * Starts Ultra VNC viewer.
-     */
+    /** Starts Ultra VNC viewer. */
     public static void startUltraVncViewer(final Host host,
                                            final int remotePort) {
         final int localPort = prepareVncViewer(host, remotePort);
@@ -1911,9 +1843,7 @@ public final class Tools {
         cleanupVncViewer(host, localPort);
     }
 
-    /**
-     * Starts Real VNC viewer.
-     */
+    /** Starts Real VNC viewer. */
     public static void startRealVncViewer(final Host host,
                                           final int remotePort) {
         final int localPort = prepareVncViewer(host, remotePort);
@@ -1929,9 +1859,7 @@ public final class Tools {
         cleanupVncViewer(host, localPort);
     }
 
-    /**
-     * Hides mouse pointer.
-     */
+    /** Hides mouse pointer. */
     public static void hideMousePointer(final Component c) {
         final int[] pixels = new int[16 * 16];
         final Image image = Toolkit.getDefaultToolkit().createImage(
@@ -1943,9 +1871,7 @@ public final class Tools {
         c.setCursor(transparentCursor);
     }
 
-    /**
-     * Check whether the string is number.
-     */
+    /** Check whether the string is number. */
     public static boolean isNumber(final String s) {
         try {
             Integer.parseInt(s);
@@ -1955,9 +1881,7 @@ public final class Tools {
         }
     }
 
-    /**
-     * Returns list that is expandable by shell. {'a','b'...}
-     */
+    /** Returns list that is expandable by shell. {'a','b'...} */
     public static String shellList(final String[] items) {
         final StringBuffer list = new StringBuffer("");
         if (items == null || items.length == 0) {
@@ -2070,9 +1994,7 @@ public final class Tools {
         return o;
     }
 
-    /**
-     * Returns random secret of the specified lenght.
-     */
+    /** Returns random secret of the specified lenght. */
     public static String getRandomSecret(final int len) {
         final Random rand = new Random();
         final ArrayList<Character> charsL = new ArrayList<Character>();
@@ -2092,9 +2014,7 @@ public final class Tools {
         return s.toString();
     }
 
-    /**
-     * Returns whether the ip is localhost.
-     */
+    /** Returns whether the ip is localhost. */
     public static boolean isLocalIp(final String ip) {
         if (ip == null
             || "127.0.0.1".equals(ip)
@@ -2170,6 +2090,9 @@ public final class Tools {
             if (renderer == null) {
                 renderer = table.getTableHeader().getDefaultRenderer();
             }
+            if (renderer == null) {
+                continue;
+            }
             Component comp = renderer.getTableCellRendererComponent(
                                                         table,
                                                         col.getHeaderValue(),
@@ -2185,6 +2108,9 @@ public final class Tools {
                 width = comp.getPreferredSize().width;
                 for (int r = 0; r < table.getRowCount(); r++) {
                     renderer = table.getCellRenderer(r, vColIndex);
+                    if (renderer == null) {
+                        continue;
+                    }
                     comp = renderer.getTableCellRendererComponent(
                                               table,
                                               table.getValueAt(r, vColIndex),
@@ -2359,7 +2285,7 @@ public final class Tools {
     public static void waitForSwing() {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     /* just wait */
                 }
             });
@@ -2531,7 +2457,7 @@ public final class Tools {
             remotePlugin.init();
             pluginObjects.put(pluginName, remotePlugin);
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getGUIData().getMainMenu().enablePluginMenu(
                                                         pluginName,
                                                         pluginClass != null);

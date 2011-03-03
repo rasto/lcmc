@@ -66,7 +66,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @version $Id$
  *
  */
-public class VMSXML extends XML {
+public final class VMSXML extends XML {
     /** List of domain names. */
     private final List<String> domainNames = new ArrayList<String>();
     /** Map from configs to names. */
@@ -343,9 +343,7 @@ public class VMSXML extends XML {
     /** XML document. */
     private Document xmlDocument = null;
 
-    /**
-     * Prepares a new <code>VMSXML</code> object.
-     */
+    /** Prepares a new <code>VMSXML</code> object. */
     public VMSXML(final Host host) {
         super();
         this.host = host;
@@ -435,7 +433,7 @@ public class VMSXML extends XML {
         }
     }
 
-    /* Add CPU match node. */
+    /** Add CPU match node. */
     private void addCPUMatchNode(final Document doc,
                                  final Node root,
                                  final Map<String, String> parametersMap) {
@@ -494,7 +492,7 @@ public class VMSXML extends XML {
         }
     }
 
-    /* Add features. */
+    /** Add features. */
     private void addFeatures(final Document doc,
                              final Node root,
                              final Map<String, String> parametersMap) {
@@ -521,8 +519,8 @@ public class VMSXML extends XML {
     }
 
     /** Creates XML for new domain. */
-    public final Node createDomainXML(final String domainName,
-                                      final Map<String, String> parametersMap) {
+    public Node createDomainXML(final String domainName,
+                                final Map<String, String> parametersMap) {
         //<domain type='kvm'>
         //  <memory>524288</memory>
         //  <name>fff</name>
@@ -531,7 +529,7 @@ public class VMSXML extends XML {
         //  </os>
         //</domain>
 
-        final String type = parametersMap.get(VM_PARAM_TYPE);/* kvm/xen */
+        final String type = parametersMap.get(VM_PARAM_TYPE); /* kvm/xen */
         String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
         if ("xen".equals(type)) {
             configName = "/etc/xen/vm/" + domainName + ".xml";
@@ -551,7 +549,7 @@ public class VMSXML extends XML {
         final Element root = (Element) doc.appendChild(
                                                   doc.createElement("domain"));
         /* type */
-        root.setAttribute("type", type);/* kvm/xen */
+        root.setAttribute("type", type); /* kvm/xen */
         /* name */
         final Node nameNode = (Element) root.appendChild(
                                                     doc.createElement("name"));
@@ -633,8 +631,8 @@ public class VMSXML extends XML {
     }
 
     /** Modify xml of the domain. */
-    public final Node modifyDomainXML(final String domainName,
-                                      final Map<String, String> parametersMap) {
+    public Node modifyDomainXML(final String domainName,
+                                final Map<String, String> parametersMap) {
         final String configName = namesConfigsMap.get(domainName);
         if (configName == null) {
             return null;
@@ -828,9 +826,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify disk XML. */
-    public final void modifyDiskXML(final Node domainNode,
-                                    final String domainName,
-                                    final Map<String, String> parametersMap) {
+    public void modifyDiskXML(final Node domainNode,
+                              final String domainName,
+                              final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   DISK_TAG_MAP,
@@ -842,8 +840,8 @@ public class VMSXML extends XML {
     }
 
     /** Save and define. */
-    public final void saveAndDefine(final Node domainNode,
-                                    final String domainName) {
+    public void saveAndDefine(final Node domainNode,
+                              final String domainName) {
         final String configName = namesConfigsMap.get(domainName);
         final String defineCommand =
                             VIRSH.getDefineCommand(host, configName + ".new"
@@ -853,10 +851,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify interface XML. */
-    public final void modifyInterfaceXML(
-                                     final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifyInterfaceXML(final Node domainNode,
+                                  final String domainName,
+                                  final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   INTERFACE_TAG_MAP,
@@ -868,10 +865,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify input device XML. */
-    public final void modifyInputDevXML(
-                                     final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifyInputDevXML(final Node domainNode,
+                                  final String domainName,
+                                  final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   INPUTDEV_TAG_MAP,
@@ -883,10 +879,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify graphics device XML. */
-    public final void modifyGraphicsXML(
-                                     final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifyGraphicsXML(final Node domainNode,
+                                  final String domainName,
+                                  final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   GRAPHICS_TAG_MAP,
@@ -898,9 +893,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify sound device XML. */
-    public final void modifySoundXML(final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifySoundXML(final Node domainNode,
+                               final String domainName,
+                               final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   SOUND_TAG_MAP,
@@ -912,9 +907,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify serial device XML. */
-    public final void modifySerialXML(final Node domainNode,
-                                      final String domainName,
-                                      final Map<String, String> parametersMap) {
+    public void modifySerialXML(final Node domainNode,
+                                final String domainName,
+                                final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   SERIAL_TAG_MAP,
@@ -926,10 +921,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify parallel device XML. */
-    public final void modifyParallelXML(
-                                     final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifyParallelXML(final Node domainNode,
+                                  final String domainName,
+                                  final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   PARALLEL_TAG_MAP,
@@ -941,9 +935,9 @@ public class VMSXML extends XML {
     }
 
     /** Modify video device XML. */
-    public final void modifyVideoXML(final Node domainNode,
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void modifyVideoXML(final Node domainNode,
+                               final String domainName,
+                               final Map<String, String> parametersMap) {
         modifyXML(domainNode,
                   domainName,
                   VIDEO_TAG_MAP,
@@ -955,8 +949,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove disk XML. */
-    public final void removeDiskXML(final String domainName,
-                                    final Map<String, String> parametersMap) {
+    public void removeDiskXML(final String domainName,
+                              final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/disk",
@@ -964,9 +958,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove interface XML. */
-    public final void removeInterfaceXML(
-                                    final String domainName,
-                                    final Map<String, String> parametersMap) {
+    public void removeInterfaceXML(final String domainName,
+                                   final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/interface",
@@ -974,9 +967,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove input device XML. */
-    public final void removeInputDevXML(
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void removeInputDevXML(final String domainName,
+                                  final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/input",
@@ -984,9 +976,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove graphics device XML. */
-    public final void removeGraphicsXML(
-                                     final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void removeGraphicsXML(final String domainName,
+                                  final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/graphics",
@@ -994,8 +985,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove sound device XML. */
-    public final void removeSoundXML(final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void removeSoundXML(final String domainName,
+                               final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/sound",
@@ -1003,8 +994,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove serial device XML. */
-    public final void removeSerialXML(final String domainName,
-                                      final Map<String, String> parametersMap) {
+    public void removeSerialXML(final String domainName,
+                                final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/serial",
@@ -1012,9 +1003,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove parallel device XML. */
-    public final void removeParallelXML(
-                                      final String domainName,
-                                      final Map<String, String> parametersMap) {
+    public void removeParallelXML(final String domainName,
+                                  final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/parallel",
@@ -1022,8 +1012,8 @@ public class VMSXML extends XML {
     }
 
     /** Remove parallel device XML. */
-    public final void removeVideoXML(final String domainName,
-                                     final Map<String, String> parametersMap) {
+    public void removeVideoXML(final String domainName,
+                               final Map<String, String> parametersMap) {
         removeXML(domainName,
                   parametersMap,
                   "devices/video",
@@ -1031,7 +1021,7 @@ public class VMSXML extends XML {
     }
 
     /** Updates data. */
-    public final boolean update() {
+    public boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
         final SSH.SSHOutput ret = Tools.execCommand(
@@ -1262,7 +1252,7 @@ public class VMSXML extends XML {
                                                 getText(cpuMatchOption));
                         }
                     }
-                    if (!"".equals(policy) && features.size() > 0) {
+                    if (!"".equals(policy) && !features.isEmpty()) {
                         parameterValues.put(name,
                                             VM_PARAM_CPUMATCH_FEATURE_POLICY,
                                             policy);
@@ -1272,7 +1262,9 @@ public class VMSXML extends XML {
                     }
                 }
             } else if (VM_PARAM_ON_POWEROFF.equals(option.getNodeName())) {
-                parameterValues.put(name, VM_PARAM_ON_POWEROFF, getText(option));
+                parameterValues.put(name,
+                                    VM_PARAM_ON_POWEROFF,
+                                    getText(option));
             } else if (VM_PARAM_ON_REBOOT.equals(option.getNodeName())) {
                 parameterValues.put(name, VM_PARAM_ON_REBOOT, getText(option));
             } else if (VM_PARAM_ON_CRASH.equals(option.getNodeName())) {
@@ -1677,10 +1669,8 @@ public class VMSXML extends XML {
         parseConfig(getChildNode(vmNode, "config"), name);
     }
 
-    /**
-     * Updates all data for this domain.
-     */
-    public final void parseInfo(final String name, final String info) {
+    /** Updates all data for this domain. */
+    void parseInfo(final String name, final String info) {
         if (info != null) {
             boolean running = false;
             boolean suspended = false;
@@ -1705,15 +1695,13 @@ public class VMSXML extends XML {
         }
     }
 
-    /**
-     * Returns all domain names.
-     */
-    public final List<String> getDomainNames() {
+    /** Returns all domain names. */
+    public List<String> getDomainNames() {
         return domainNames;
     }
 
     /** Returns whether the domain is running. */
-    public final boolean isRunning(final String name) {
+    public boolean isRunning(final String name) {
         final Boolean r = runningMap.get(name);
         if (r != null) {
             return r;
@@ -1721,10 +1709,8 @@ public class VMSXML extends XML {
         return false;
     }
 
-    /**
-     * Returns whether the domain is suspended.
-     */
-    public final boolean isSuspended(final String name) {
+    /** Returns whether the domain is suspended. */
+    public boolean isSuspended(final String name) {
         final Boolean s = suspendedMap.get(name);
         if (s != null) {
             return s;
@@ -1733,91 +1719,78 @@ public class VMSXML extends XML {
     }
 
 
-    /**
-     * Returns remote port.
-     */
-    public final int getRemotePort(final String name) {
+    /** Returns remote port. */
+    public int getRemotePort(final String name) {
         return remotePorts.get(name);
     }
 
-    /**
-     * Returns host.
-     */
-    public final Host getHost() {
+    /** Returns host. */
+    public Host getHost() {
         return host;
     }
 
-    /**
-     * Returns configs of all vms.
-     */
-    public final Set<String> getConfigs() {
+    /** Returns configs of all vms. */
+    public Set<String> getConfigs() {
         return configsMap.keySet();
     }
 
-    /**
-     * Returns domain name from config file.
-     */
-    public final String getNameFromConfig(final String config) {
+    /** Returns domain name from config file. */
+    public String getNameFromConfig(final String config) {
         return configsMap.get(config);
     }
 
-    /**
-     * Returns value.
-     */
-    public final String getValue(final String name, final String param) {
+    /** Returns value. */
+    public String getValue(final String name, final String param) {
         return (String) parameterValues.get(name, param);
     }
 
-    /**
-     * Returns disk data.
-     */
-    public final Map<String, DiskData> getDisks(final String name) {
+    /** Returns disk data. */
+    public Map<String, DiskData> getDisks(final String name) {
         return disksMap.get(name);
     }
 
     /** Returns interface data. */
-    public final Map<String, InterfaceData> getInterfaces(final String name) {
+    public Map<String, InterfaceData> getInterfaces(final String name) {
         return interfacesMap.get(name);
     }
 
     /** Returns array of networks. */
-    public final List<String> getNetworks() {
+    public List<String> getNetworks() {
         return new ArrayList<String>(networkMap.keySet());
     }
 
     /** Returns array of input devices. */
-    public final Map<String, InputDevData> getInputDevs(final String name) {
+    public Map<String, InputDevData> getInputDevs(final String name) {
         return inputDevsMap.get(name);
     }
 
     /** Returns array of graphics devices. */
-    public final Map<String, GraphicsData> getGraphicDisplays(
-                                                        final String name) {
+    public Map<String, GraphicsData> getGraphicDisplays(final String name) {
         return graphicsDevsMap.get(name);
     }
 
     /** Returns array of sound devices. */
-    public final Map<String, SoundData> getSounds(final String name) {
+    public Map<String, SoundData> getSounds(final String name) {
         return soundsMap.get(name);
     }
 
     /** Returns array of serial devices. */
-    public final Map<String, SerialData> getSerials(final String name) {
+    public Map<String, SerialData> getSerials(final String name) {
         return serialsMap.get(name);
     }
 
     /** Returns array of parallel devices. */
-    public final Map<String, ParallelData> getParallels(final String name) {
+    public Map<String, ParallelData> getParallels(final String name) {
         return parallelsMap.get(name);
     }
 
     /** Returns array of video devices. */
-    public final Map<String, VideoData> getVideos(final String name) {
+    public Map<String, VideoData> getVideos(final String name) {
         return videosMap.get(name);
     }
 
     /** Class that holds data about networks. */
-    public class NetworkData extends HardwareData {
+    final class NetworkData extends HardwareData {
         /** Name of the network. */
         private final String name;
         /** UUID of the network. */
@@ -1836,28 +1809,27 @@ public class VMSXML extends XML {
         private final String bridgeForwardDelay;
 
         /** Autostart. */
-        public static final String AUTOSTART = "autostart";
+        static final String AUTOSTART = "autostart";
         /** Forward mode. */
-        public static final String FORWARD_MODE = "forward_mode";
+        static final String FORWARD_MODE = "forward_mode";
         /** Bridge name. */
-        public static final String BRIDGE_NAME = "bridge_name";
+        static final String BRIDGE_NAME = "bridge_name";
         /** Bridge STP. */
-        public static final String BRIDGE_STP = "bridge_stp";
+        static final String BRIDGE_STP = "bridge_stp";
         /** Bridge delay. */
-        public static final String BRIDGE_DELAY = "bridge_delay";
+        static final String BRIDGE_DELAY = "bridge_delay";
         /** Bridge forward delay. */
-        public static final String BRIDGE_FORWARD_DELAY =
-                                                        "bridge_forward_delay";
+        static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
 
         /** Creates new NetworkData object. */
-        public NetworkData(final String name,
-                           final String uuid,
-                           final boolean autostart,
-                           final String forwardMode,
-                           final String bridgeName,
-                           final String bridgeSTP,
-                           final String bridgeDelay,
-                           final String bridgeForwardDelay) {
+        NetworkData(final String name,
+                    final String uuid,
+                    final boolean autostart,
+                    final String forwardMode,
+                    final String bridgeName,
+                    final String bridgeSTP,
+                    final String bridgeDelay,
+                    final String bridgeForwardDelay) {
             super();
             this.name = name;
             this.uuid = uuid;
@@ -1880,40 +1852,40 @@ public class VMSXML extends XML {
         }
 
         /** Whether it is autostart. */
-        public final boolean isAutostart() {
+        boolean isAutostart() {
             return autostart;
         }
 
         /** Returns forward mode. */
-        public final String getForwardMode() {
+        String getForwardMode() {
             return forwardMode;
         }
 
         /** Returns bridge name. */
-        public final String getBridgeName() {
+        String getBridgeName() {
             return bridgeName;
         }
 
         /** Returns bridge STP. */
-        public final String getBridgeSTP() {
+        String getBridgeSTP() {
             return bridgeSTP;
         }
 
         /** Returns bridge delay. */
-        public final String getBridgeDelay() {
+        String getBridgeDelay() {
             return bridgeDelay;
         }
 
         /** Returns bridge forward delay. */
-        public final String getBridgeForwardDelay() {
+        String getBridgeForwardDelay() {
             return bridgeForwardDelay;
         }
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getDiskDataComparator() {
+    protected VirtualHardwareComparator getDiskDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 Element el = null;
@@ -1933,9 +1905,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getInterfaceDataComparator() {
+    protected VirtualHardwareComparator getInterfaceDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String macAddress = parameters.get(
@@ -1956,9 +1928,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getInputDevDataComparator() {
+    protected VirtualHardwareComparator getInputDevDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String type = parameters.get(InputDevData.SAVED_TYPE);
@@ -1980,9 +1952,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getGraphicsDataComparator() {
+    protected VirtualHardwareComparator getGraphicsDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String type = parameters.get(GraphicsData.SAVED_TYPE);
@@ -2002,9 +1974,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getSoundDataComparator() {
+    protected VirtualHardwareComparator getSoundDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String model = parameters.get(SoundData.SAVED_MODEL);
@@ -2024,9 +1996,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getSerialDataComparator() {
+    protected VirtualHardwareComparator getSerialDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String type = parameters.get(SerialData.SAVED_TYPE);
@@ -2046,9 +2018,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getParallelDataComparator() {
+    protected VirtualHardwareComparator getParallelDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 final String type = parameters.get(ParallelData.SAVED_TYPE);
@@ -2068,9 +2040,9 @@ public class VMSXML extends XML {
     }
 
     /** Returns function that gets the node that belongs to the paremeters. */
-    protected final VirtualHardwareComparator getVideoDataComparator() {
+    protected VirtualHardwareComparator getVideoDataComparator() {
         return new VirtualHardwareComparator() {
-            public final Element getElement(
+            @Override public Element getElement(
                                     final NodeList nodes,
                                     final Map<String, String> parameters) {
                 Element el = null;
@@ -2091,7 +2063,7 @@ public class VMSXML extends XML {
 
 
     /** Class that holds data about virtual disks. */
-    public class DiskData extends HardwareData {
+    public final class DiskData extends HardwareData {
         /** Type: file, block... */
         private final String type;
         /** Target device: hda, hdb, hdc, sda... */
@@ -2175,47 +2147,47 @@ public class VMSXML extends XML {
         }
 
         /** Returns type. */
-        public final String getType() {
+        public String getType() {
             return type;
         }
 
         /** Returns target device. */
-        public final String getTargetDev() {
+        public String getTargetDev() {
             return targetDev;
         }
 
         /** Returns source file. */
-        public final String getSourceFile() {
+        public String getSourceFile() {
             return sourceFile;
         }
 
         /** Returns source device. */
-        public final String getSourceDev() {
+        public String getSourceDev() {
             return sourceDev;
         }
 
         /** Returns target bus. */
-        public final String getTargetBusType() {
+        public String getTargetBusType() {
             return targetBusType;
         }
 
         /** Returns driver name. */
-        public final String getDriverName() {
+        String getDriverName() {
             return driverName;
         }
 
         /** Returns driver type. */
-        public final String getDriverType() {
+        String getDriverType() {
             return driverType;
         }
 
         /** Returns whether the disk is read only. */
-        public final boolean isReadonly() {
+        boolean isReadonly() {
             return readonly;
         }
 
         /** Returns whether the disk is read only. */
-        public final boolean isShareable() {
+        boolean isShareable() {
             return shareable;
         }
     }
@@ -2226,7 +2198,7 @@ public class VMSXML extends XML {
         private final Map<String, String> valueMap =
                                                 new HashMap<String, String>();
         /** Sets value of this parameter. */
-        public final void setValue(final String param, final String value) {
+        final void setValue(final String param, final String value) {
             valueMap.put(param, value);
         }
         /** Returns value of this parameter. */
@@ -2236,7 +2208,7 @@ public class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual interfaces. */
-    public class InterfaceData extends HardwareData {
+    public final class InterfaceData extends HardwareData {
         /** Type: network, bridge... */
         private final String type;
         /** Source network: default, ... */
@@ -2282,29 +2254,29 @@ public class VMSXML extends XML {
         }
 
         /** Returns type. */
-        public final String getType() {
+        public String getType() {
             return type;
         }
 
         /** Returns source network. */
-        public final String getSourceNetwork() {
+        public String getSourceNetwork() {
             return sourceNetwork;
         }
 
         /** Returns source bridge. */
-        public final String getSourceBridge() {
+        public String getSourceBridge() {
             return sourceBridge;
         }
 
         /** Returns target dev. */
-        public final String getTargetDev() {
+        public String getTargetDev() {
             return targetDev;
         }
 
     }
 
     /** Class that holds data about virtual input devices. */
-    public class InputDevData extends HardwareData {
+    public final class InputDevData extends HardwareData {
         /** Type: tablet, mouse... */
         private final String type;
         /** Bus: usb... */
@@ -2329,19 +2301,19 @@ public class VMSXML extends XML {
         }
 
         /** Returns type. */
-        public final String getType() {
+        public String getType() {
             return type;
         }
 
         /** Returns bus. */
-        public final String getBus() {
+        public String getBus() {
             return bus;
         }
 
     }
 
     /** Class that holds data about virtual displays. */
-    public class GraphicsData extends HardwareData {
+    public final class GraphicsData extends HardwareData {
         /** Type. */
         private final String type;
         /** Type: vnc, sdl... */
@@ -2383,14 +2355,14 @@ public class VMSXML extends XML {
         }
 
         /** Returns type. */
-        public final String getType() {
+        public String getType() {
             return type;
         }
     }
 
     /** Class that holds data about virtual sound devices. */
-    public class SoundData extends HardwareData {
-        /* Model. */
+    public final class SoundData extends HardwareData {
+        /** Model. */
         private final String model;
         /** Model: ac97, es1370, pcspk, sb16. */
         public static final String MODEL = "model";
@@ -2405,7 +2377,7 @@ public class VMSXML extends XML {
         }
 
         /** Returns model. */
-        public final String getModel() {
+        public String getModel() {
             return model;
         }
     }
@@ -2472,7 +2444,7 @@ public class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual serial devices. */
-    public class SerialData extends ParallelSerialData {
+    public final class SerialData extends ParallelSerialData {
         /** Creates new SerialData object. */
         public SerialData(final String type,
                           final String sourcePath,
@@ -2499,7 +2471,7 @@ public class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual parallel devices. */
-    public class ParallelData extends ParallelSerialData {
+    public final class ParallelData extends ParallelSerialData {
         /** Creates new ParallelData object. */
         public ParallelData(final String type,
                             final String sourcePath,
@@ -2526,8 +2498,8 @@ public class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual video devices. */
-    public class VideoData extends HardwareData {
-        /* Model type. */
+    public final class VideoData extends HardwareData {
+        /** Model type. */
         private final String modelType;
         /** Model type: cirrus, vga, vmvga, xen. */
         public static final String MODEL_TYPE = "model_type";
@@ -2550,19 +2522,20 @@ public class VMSXML extends XML {
         }
 
         /** Returns model. */
-        public final String getModelType() {
+        public String getModelType() {
             return modelType;
         }
     }
 
     /** Comparator. */
     private interface VirtualHardwareComparator {
+        /** Returns an element. */
         Element getElement(final NodeList nodes,
                            final Map<String, String> parameters);
     }
 
     /** Returns string representation of the port; it can be autoport. */
-    public static String portString(final String port) {
+    static String portString(final String port) {
         if ("-1".equals(port)) {
             return "auto";
         }
@@ -2582,7 +2555,7 @@ public class VMSXML extends XML {
     }
 
     /** Returns source file directories. */
-    public final Set<String> getsourceFileDirs() {
+    public Set<String> getsourceFileDirs() {
         return sourceFileDirs;
     }
 }

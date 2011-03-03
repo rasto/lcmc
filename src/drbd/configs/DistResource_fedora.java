@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are commands for all fedoras.
  */
-public class DistResource_fedora extends
-            java.util.ListResourceBundle {
+public final class DistResource_fedora extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

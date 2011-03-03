@@ -46,7 +46,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-public class PcmkRscSetsInfo extends HbConnectionInfo {
+final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Placeholders. */
     private final Set<ConstraintPHInfo> constraintPHInfos =
                                           new LinkedHashSet<ConstraintPHInfo>();
@@ -54,12 +54,12 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Mutex mConstraintPHLock = new Mutex();
 
     /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
-    public PcmkRscSetsInfo(final Browser browser) {
+    PcmkRscSetsInfo(final Browser browser) {
         super(browser);
     }
 
     /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
-    public PcmkRscSetsInfo(final Browser browser, final ConstraintPHInfo cphi) {
+    PcmkRscSetsInfo(final Browser browser, final ConstraintPHInfo cphi) {
         this(browser);
         try {
             mConstraintPHLock.acquire();
@@ -71,8 +71,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set colocation. */
-    public final void addColocation(final String colId,
-                                    final ConstraintPHInfo cphi) {
+    void addColocation(final String colId,
+                                 final ConstraintPHInfo cphi) {
         try {
             mConstraintPHLock.acquire();
         } catch (InterruptedException ie) {
@@ -84,8 +84,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set order. */
-    public final void addOrder(final String ordId,
-                               final ConstraintPHInfo cphi) {
+    void addOrder(final String ordId, final ConstraintPHInfo cphi) {
         try {
             mConstraintPHLock.acquire();
         } catch (InterruptedException ie) {
@@ -97,13 +96,12 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Returns info panel. */
-    public final JComponent getInfoPanel(
-                                    final ConstraintPHInfo constraintPHInfo) {
+    JComponent getInfoPanel(final ConstraintPHInfo constraintPHInfo) {
         return super.getInfoPanel();
     }
 
     /** Returns panal with user visible info. */
-    protected final JPanel getLabels(final HbConstraintInterface c) {
+    @Override protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
         final int rows = 1;
@@ -122,7 +120,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
 
     /** Applies changes to the placeholders. Called from one connection to a
      * placeholder. */
-    public final Map<CRMXML.RscSet, Map<String, String>> getAllAttributes(
+    public Map<CRMXML.RscSet, Map<String, String>> getAllAttributes(
                                         final Host dcHost,
                                         final CRMXML.RscSet appliedRscSet,
                                         final Map<String, String> appliedAttrs,
@@ -167,7 +165,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Applies changes to the placeholders. */
-    public final void apply(final Host dcHost, final boolean testOnly) {
+    @Override void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
         final Map<String, ServiceInfo> idToInfoHash =
              getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
@@ -290,8 +288,8 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Check order and colocation constraints. */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
+    @Override public boolean checkResourceFieldsChanged(final String param,
+                                                        final String[] params) {
         boolean oneIsNew = false;
         try {
             mConstraintPHLock.acquire();
@@ -310,7 +308,7 @@ public class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Return list of popup items. */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         // TODO: make submenus for all cphis
         return items;

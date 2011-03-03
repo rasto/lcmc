@@ -45,7 +45,7 @@ import java.awt.Window;
  * @version $Id$
  *
  */
-public class Cluster {
+public final class Cluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the cluster. */
@@ -65,45 +65,33 @@ public class Cluster {
                                   Color.WHITE,
                                  };
 
-    /**
-     * Prepares a new <code>Cluster</code> object.
-     */
+    /** Prepares a new <code>Cluster</code> object. */
     public Cluster() {
         /* do nothing */
     }
 
-    /**
-     * Prepares a new <code>Cluster</code> object.
-     */
+    /** Prepares a new <code>Cluster</code> object. */
     public Cluster(final String name) {
         this.name = name;
     }
 
-    /**
-     * Creates a new cluster browser object.
-     */
-    public final void createClusterBrowser() {
+    /** Creates a new cluster browser object. */
+    public void createClusterBrowser() {
         clusterBrowser = new ClusterBrowser(this);
     }
 
-    /**
-     * Sets name of this cluster.
-     */
-    public final void setName(final String name) {
+    /** Sets name of this cluster. */
+    public void setName(final String name) {
         this.name = name;
     }
 
-    /**
-     * returns resource tree for this cluster.
-     */
-    public final ClusterBrowser getBrowser() {
+    /** returns resource tree for this cluster. */
+    public ClusterBrowser getBrowser() {
         return clusterBrowser;
     }
 
-    /**
-     * Removes the cluster.
-     */
-    public final void removeCluster() {
+    /** Removes the cluster. */
+    public void removeCluster() {
         final ClusterBrowser cb = clusterBrowser;
         if (cb != null) {
             clusterBrowser.cancelServerStatus();
@@ -112,10 +100,8 @@ public class Cluster {
         }
     }
 
-    /**
-     * Adds host to hosts, that are part of this cluster.
-     */
-    public final void addHost(final Host host) {
+    /** Adds host to hosts, that are part of this cluster. */
+    public void addHost(final Host host) {
         final int id = hosts.size();
         host.setIndex(id);
         if (id < hostColors.length) {
@@ -124,24 +110,20 @@ public class Cluster {
         hosts.add(host);
     }
 
-    /**
-     * Gets set of hosts that are part of this cluster.
-     */
-    public final Set<Host> getHosts() {
+    /** Gets set of hosts that are part of this cluster. */
+    public Set<Host> getHosts() {
         return hosts;
     }
 
     /**
      * Gets set of hosts that are part of this cluster as an array of strings.
      */
-    public final Host[] getHostsArray() {
+    public Host[] getHostsArray() {
         return hosts.toArray(new Host [hosts.size()]);
     }
 
-    /**
-     * Returns names of the hosts in this cluster.
-     */
-    public final String[] getHostNames() {
+    /** Returns names of the hosts in this cluster. */
+    public String[] getHostNames() {
         final List<String> hostNames = new ArrayList<String>();
         for (Host host : hosts) {
             hostNames.add(host.getName());
@@ -149,38 +131,28 @@ public class Cluster {
         return hostNames.toArray(new String[hostNames.size()]);
     }
 
-    /**
-     * Removes all hosts.
-     */
-    public final void clearHosts() {
+    /** Removes all hosts. */
+    public void clearHosts() {
         hosts.clear();
     }
 
-    /**
-     * Returns number of hosts.
-     */
-    public final int hostsCount() {
+    /** Returns number of hosts. */
+    public int hostsCount() {
         return hosts.size();
     }
 
-    /**
-     * Gets name of this cluster.
-     */
-    public final String getName() {
+    /** Gets name of this cluster. */
+    public String getName() {
         return name;
     }
 
-    /**
-     * Sets cluster panel, that contains host views.
-     */
-    public final void setClusterTab(final ClusterTab clusterTab) {
+    /** Sets cluster panel, that contains host views. */
+    public void setClusterTab(final ClusterTab clusterTab) {
         this.clusterTab = clusterTab;
     }
 
-    /**
-     * Gets cluster panel.
-     */
-    public final ClusterTab getClusterTab() {
+    /** Gets cluster panel. */
+    public ClusterTab getClusterTab() {
         return clusterTab;
     }
 
@@ -189,7 +161,7 @@ public class Cluster {
      * The block devices, that are already in the heartbeat or are used by
      * drbd are not returned.
      */
-    public final List<String> getCommonBlockDevices() {
+    public List<String> getCommonBlockDevices() {
         List<String> blockDevicesNamesIntersection = null;
 
         for (final Host host : hosts) {
@@ -205,10 +177,8 @@ public class Cluster {
         return commonBlockDevices;
     }
 
-    /**
-     * Returns block device objects of all hosts.
-     */
-    public final BlockDevice[] getHostBlockDevices(final String device) {
+    /** Returns block device objects of all hosts. */
+    public BlockDevice[] getHostBlockDevices(final String device) {
         final List<BlockDevice> list = new ArrayList<BlockDevice>();
         for (final Host host : hosts) {
             final BlockDevice bd = host.getBlockDevice(device);
@@ -217,10 +187,8 @@ public class Cluster {
         return list.toArray(new BlockDevice [list.size()]);
     }
 
-    /**
-     * Returns true if cluster contains the host.
-     */
-    public final boolean contains(final String hostName) {
+    /** Returns true if cluster contains the host. */
+    public boolean contains(final String hostName) {
         for (final Host host : hosts) {
             if (hostName != null && hostName.equals(host.getName())) {
                 return true;
@@ -229,10 +197,8 @@ public class Cluster {
         return false;
     }
 
-    /**
-     * Gets networks that are common on all hosts in the cluster.
-     */
-    public final Network[] getCommonNetworks() {
+    /** Gets networks that are common on all hosts in the cluster. */
+    public Network[] getCommonNetworks() {
         Map<String, String> networksIntersection = null;
         for (final Host host : hosts) {
             networksIntersection =
@@ -256,10 +222,8 @@ public class Cluster {
         return commonNetworks.toArray(new Network[commonNetworks.size()]);
     }
 
-    /**
-     * Gets filesystems that are common on all hosts in the cluster.
-     */
-    public final String[] getCommonFileSystems() {
+    /** Gets filesystems that are common on all hosts in the cluster. */
+    public String[] getCommonFileSystems() {
         Set<String> intersection = null;
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getFileSystemsList(),
@@ -268,10 +232,8 @@ public class Cluster {
         return intersection.toArray(new String[intersection.size()]);
     }
 
-    /**
-     * Gets mount points that are common on all hosts in the cluster.
-     */
-    public final String[] getCommonMountPoints() {
+    /** Gets mount points that are common on all hosts in the cluster. */
+    public String[] getCommonMountPoints() {
         Set<String> intersection = null;
 
         for (final Host host : hosts) {
@@ -281,10 +243,8 @@ public class Cluster {
         return intersection.toArray(new String[intersection.size()]);
     }
 
-    /**
-     * Returns the color for graph for the specified host.
-     */
-    public final List<Color> getHostColors(final List<String> nodes) {
+    /** Returns the color for graph for the specified host. */
+    public List<Color> getHostColors(final List<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
         if (nodes == null || nodes.isEmpty()) {
             colors.add(
@@ -306,10 +266,8 @@ public class Cluster {
         return colors;
     }
 
-    /**
-     * Returns the host object with the specified name.
-     */
-    public final Host getHostByName(final String name) {
+    /** Returns the host object with the specified name. */
+    public Host getHostByName(final String name) {
         for (final Host host : hosts) {
             if (name.equals(host.getName())) {
                 return host;
@@ -319,9 +277,9 @@ public class Cluster {
     }
 
     /** Connect all hosts in the cluster. Returns false, if it was canceled. */
-    public final boolean connect(final Window rootPane,
-                                 final boolean progressIndicator,
-                                 final int index) {
+    public boolean connect(final Window rootPane,
+                           final boolean progressIndicator,
+                           final int index) {
         boolean first = true;
         String dsaKey = null;
         String rsaKey = null;
@@ -364,7 +322,7 @@ public class Cluster {
      * Get the smallest libvirt version. Returns null, if it is not installed
      * anywhere.
      */
-    public final String getMinLibvirtVersion() {
+    public String getMinLibvirtVersion() {
         String minVersion = null;
         for (final Host host : hosts) {
             final String version = host.getLibvirtVersion();

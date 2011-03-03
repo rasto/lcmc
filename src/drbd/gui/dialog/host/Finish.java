@@ -44,7 +44,7 @@ import java.awt.Dimension;
  * @version $Id$
  *
  */
-public class Finish extends DialogHost {
+final class Finish extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Add another host button. */
@@ -68,32 +68,25 @@ public class Finish extends DialogHost {
     /**
      * Prepares a new <code>Finish</code> object.
      */
-    public Finish(final WizardDialog previousDialog,
-                      final Host host) {
+    Finish(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Returns next dialog. Null
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns next dialog. */
+    @Override public WizardDialog nextDialog() {
         return nextDialog;
     }
 
-    /**
-     * Finishes the dialog, and saves the host.
-     */
-    protected final void finishDialog() {
+    /** Finishes the dialog, and saves the host. */
+    @Override protected void finishDialog() {
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
             Tools.save(saveFile);
         }
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
@@ -101,13 +94,13 @@ public class Finish extends DialogHost {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (Tools.getConfigData().danglingHostsCount() < 2) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     requestFocusLater(addAnotherHostButton);
                 }
             });
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     requestFocusLater(confClusterButton);
                 }
             });
@@ -116,7 +109,7 @@ public class Finish extends DialogHost {
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     addAnotherHostButton.pressButton();
                 }
             });
@@ -124,7 +117,7 @@ public class Finish extends DialogHost {
             if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         confClusterButton.pressButton();
                     }
                 });
@@ -136,7 +129,7 @@ public class Finish extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.Finish.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.Finish.Title");
     }
 
@@ -144,7 +137,7 @@ public class Finish extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.Finish.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.Finish.Description");
     }
 
@@ -152,7 +145,7 @@ public class Finish extends DialogHost {
      * Returns input pane with two big buttons: configure a cluster or add
      * another host.
      */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         /* host wizard button */
         addAnotherHostButton = new MyButton(
@@ -161,9 +154,9 @@ public class Finish extends DialogHost {
         addAnotherHostButton.setPreferredSize(BUTTON_DIMENSION);
         final DialogHost thisClass = this;
         addAnotherHostButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         final Host newHost = new Host();
                         newHost.getSSH().setPasswords(
                                  getHost().getSSH().getLastDSAKey(),
@@ -172,7 +165,7 @@ public class Finish extends DialogHost {
                         nextDialog = new NewHost(thisClass, newHost);
                         Tools.getGUIData().allHostsUpdate();
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 addAnotherHostButton.setEnabled(false);
                                 buttonClass(nextButton()).pressButton();
                             }
@@ -188,11 +181,11 @@ public class Finish extends DialogHost {
                 CLUSTER_ICON);
         confClusterButton.setPreferredSize(BUTTON_DIMENSION);
         confClusterButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 confClusterButton.setEnabled(false);
                                 buttonClass(finishButton()).pressButton();
                             }

@@ -40,8 +40,8 @@ import javax.swing.SwingUtilities;
 /**
  * Object that holds a colocation constraint information.
  */
-public class HbColocationInfo extends EditableInfo
-                              implements HbConstraintInterface {
+final class HbColocationInfo extends EditableInfo
+                             implements HbConstraintInterface {
     /** Resource 1 in colocation constraint. */
     private ServiceInfo serviceInfoRsc;
     /** Resource 2 in colocation constraint. */
@@ -49,13 +49,11 @@ public class HbColocationInfo extends EditableInfo
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
 
-    /**
-     * Prepares a new <code>HbColocationInfo</code> object.
-     */
-    public HbColocationInfo(final HbConnectionInfo connectionInfo,
-                            final ServiceInfo serviceInfoRsc,
-                            final ServiceInfo serviceInfoWithRsc,
-                            final Browser browser) {
+    /** Prepares a new <code>HbColocationInfo</code> object. */
+    HbColocationInfo(final HbConnectionInfo connectionInfo,
+                     final ServiceInfo serviceInfoRsc,
+                     final ServiceInfo serviceInfoWithRsc,
+                     final Browser browser) {
         super("Colocation", browser);
         setResource(new Service("Colocation"));
         this.connectionInfo = connectionInfo;
@@ -64,28 +62,23 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Sets service info of the resource. */
-    public final void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
+    void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
         this.serviceInfoRsc = serviceInfoRsc;
     }
 
     /** Sets service info of the with-resource. */
-    public final void setServiceInfoWithRsc(
-                                        final ServiceInfo serviceInfoWithRsc) {
+    void setServiceInfoWithRsc(final ServiceInfo serviceInfoWithRsc) {
         this.serviceInfoWithRsc = serviceInfoWithRsc;
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
 
-    /**
-     * Sets the colocation's parameters.
-     */
-    public final void setParameters() {
+    /** Sets the colocation's parameters. */
+    void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String colId = getService().getHeartbeatId();
         final Map<String, String> resourceNode = new HashMap<String, String>();
@@ -150,10 +143,8 @@ public class HbColocationInfo extends EditableInfo
         }
     }
 
-    /**
-     * Returns that this is order constraint.
-     */
-    public final boolean isOrder() {
+    /** Returns that this is order constraint. */
+    @Override public boolean isOrder() {
         return false;
     }
 
@@ -161,7 +152,7 @@ public class HbColocationInfo extends EditableInfo
      * Returns long description of the parameter, that is used for
      * tool tips.
      */
-    protected final String getParamLongDesc(final String param) {
+    @Override protected String getParamLongDesc(final String param) {
 
         final String text =
                     getBrowser().getCRMXML().getColocationParamLongDesc(param);
@@ -172,10 +163,8 @@ public class HbColocationInfo extends EditableInfo
         return text;
     }
 
-    /**
-     * Returns short description of the parameter, that is used as * label.
-     */
-    protected final String getParamShortDesc(final String param) {
+    /** Returns short description of the parameter, that is used as * label. */
+    @Override protected String getParamShortDesc(final String param) {
         return getBrowser().getCRMXML().getColocationParamShortDesc(param);
     }
 
@@ -183,27 +172,23 @@ public class HbColocationInfo extends EditableInfo
      * Checks if the new value is correct for the parameter type and
      * constraints.
      */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
+    @Override protected boolean checkParam(final String param,
+                                           final String newValue) {
         return getBrowser().getCRMXML().checkColocationParam(param, newValue);
     }
 
-    /**
-     * Returns default for this parameter.
-     */
-    protected final String getParamDefault(final String param) {
+    /** Returns default for this parameter. */
+    @Override protected String getParamDefault(final String param) {
         return getBrowser().getCRMXML().getColocationParamDefault(param);
     }
 
-    /**
-     * Returns preferred value for this parameter.
-     */
-    protected final String getParamPreferred(final String param) {
+    /** Returns preferred value for this parameter. */
+    @Override protected String getParamPreferred(final String param) {
         return getBrowser().getCRMXML().getColocationParamPreferred(param);
     }
 
     /** Returns lsit of all parameters as an array. */
-    public final String[] getParametersFromXML() {
+    @Override public String[] getParametersFromXML() {
         if (serviceInfoRsc == null
             || serviceInfoWithRsc == null) {
             /* rsc set colocation */
@@ -236,7 +221,7 @@ public class HbColocationInfo extends EditableInfo
      * Possible choices for pulldown menus, or null if it is not a pull
      * down menu.
      */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         if ("role".equals(param)) {
             return getBrowser().getCRMXML().getColocationParamPossibleChoices(
                                 param,
@@ -256,17 +241,13 @@ public class HbColocationInfo extends EditableInfo
         }
     }
 
-    /**
-     * Returns parameter type, boolean etc.
-     */
-    protected final String getParamType(final String param) {
+    /** Returns parameter type, boolean etc. */
+    @Override protected String getParamType(final String param) {
         return getBrowser().getCRMXML().getColocationParamType(param);
     }
 
-    /**
-     * Returns section to which the global belongs.
-     */
-    protected final String getSection(final String param) {
+    /** Returns section to which the global belongs. */
+    @Override protected String getSection(final String param) {
         return getBrowser().getCRMXML().getColocationSection(param);
     }
 
@@ -274,36 +255,32 @@ public class HbColocationInfo extends EditableInfo
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    protected final boolean isCheckBox(final String param) {
+    @Override protected boolean isCheckBox(final String param) {
         return getBrowser().getCRMXML().isColocationBoolean(param);
     }
 
-    /**
-     * Returns true if the specified parameter is of time type.
-     */
-    protected final boolean isTimeType(final String param) {
+    /** Returns true if the specified parameter is of time type. */
+    @Override protected boolean isTimeType(final String param) {
         return getBrowser().getCRMXML().isColocationTimeType(param);
     }
 
     /** Returns true if the specified parameter is integer. */
-    protected final boolean isInteger(final String param) {
+    @Override protected boolean isInteger(final String param) {
         return getBrowser().getCRMXML().isColocationInteger(param);
     }
 
     /** Returns true if the specified parameter is label. */
-    protected final boolean isLabel(final String param) {
+    @Override protected boolean isLabel(final String param) {
         return getBrowser().getCRMXML().isColocationLabel(param);
     }
 
-    /**
-     * Returns true if the specified parameter is required.
-     */
-    protected final boolean isRequired(final String param) {
+    /** Returns true if the specified parameter is required. */
+    @Override protected boolean isRequired(final String param) {
         return getBrowser().getCRMXML().isColocationRequired(param);
     }
 
     /** Returns attributes of this colocation. */
-    protected final Map<String, String> getAttributes() {
+    protected Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;
@@ -318,10 +295,10 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Applies changes to the colocation parameters. */
-    public final void apply(final Host dcHost, final boolean testOnly) {
+    @Override public void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
@@ -398,46 +375,42 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Returns service that belongs to this info object. */
-    public final Service getService() {
+    @Override public Service getService() {
         return (Service) getResource();
     }
 
     /** Returns name of the rsc1 attribute. */
-    public final String getRsc1Name() {
+    @Override public String getRsc1Name() {
         return "rsc";
     }
 
     /** Returns name of the rsc2 attribute. */
-    public final String getRsc2Name() {
+    @Override public String getRsc2Name() {
         return "with-rsc";
     }
 
     /** Resource 1 in colocation constraint. */
-    public final String getRsc1() {
+    @Override public String getRsc1() {
         return serviceInfoRsc.toString();
     }
 
     /** Resource 2 in colocation constraint. */
-    public final String getRsc2() {
+    @Override public String getRsc2() {
         return serviceInfoWithRsc.toString();
     }
 
-    /**
-     * Resource 1 object in colocation constraint.
-     */
-    public final ServiceInfo getRscInfo1() {
+    /** Resource 1 object in colocation constraint. */
+    @Override public ServiceInfo getRscInfo1() {
         return serviceInfoRsc;
     }
 
-    /**
-     * Resource 2 object in colocation constraint.
-     */
-    public final ServiceInfo getRscInfo2() {
+    /** Resource 2 object in colocation constraint. */
+    @Override public ServiceInfo getRscInfo2() {
         return serviceInfoWithRsc;
     }
 
     /** Returns the score of this colocation. */
-    public final int getScore() {
+    int getScore() {
         //final String rsc = serviceInfoRsc.getService().getHeartbeatId();
         //final String withRsc =
         //                  serviceInfoWithRsc.getService().getHeartbeatId();
@@ -460,22 +433,24 @@ public class HbColocationInfo extends EditableInfo
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         return true;
     }
 
     /** Whether the parameter should be enabled. */
-    protected final String isEnabled(final String param) {
+    @Override protected String isEnabled(final String param) {
         return null;
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                          final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
+                                                          final String param) {
          return false;
     }
 
@@ -483,8 +458,8 @@ public class HbColocationInfo extends EditableInfo
      * Checks resource fields of all constraints that are in this
      * connection with this constraint.
      */
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }
 
@@ -492,33 +467,32 @@ public class HbColocationInfo extends EditableInfo
      * Checks resource fields of all constraints that are in this
      * connection with this constraint.
      */
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                                    final String[] params,
-                                                    final boolean fromUp) {
+    @Override public boolean checkResourceFieldsCorrect(final String param,
+                                                        final String[] params,
+                                                        final boolean fromUp) {
         if (fromUp) {
             return super.checkResourceFieldsCorrect(param, params);
         } else {
             return connectionInfo.checkResourceFieldsCorrect(param, null);
         }
-                              
     }
 
     /**
      * Checks resource fields of all constraints that are in this
      * connection with this constraint.
      */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsChanged(final String param,
+                                                 final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
-    
+
     /**
      * Checks resource fields of all constraints that are in this
      * connection with this constraint.
      */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params,
-                                                    final boolean fromUp) {
+    @Override public boolean checkResourceFieldsChanged(final String param,
+                                                        final String[] params,
+                                                        final boolean fromUp) {
         if (fromUp) {
             return super.checkResourceFieldsChanged(param, params);
         } else {

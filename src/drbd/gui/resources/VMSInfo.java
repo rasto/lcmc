@@ -56,7 +56,7 @@ import java.awt.event.ActionEvent;
 /**
  * This class shows a list of virtual machines.
  */
-public class VMSInfo extends CategoryInfo {
+public final class VMSInfo extends CategoryInfo {
     /** On what raw is the vms virtual domain info object. */
     private volatile Map<String, VMSVirtualDomainInfo> domainToInfo =
                                    new HashMap<String, VMSVirtualDomainInfo>();
@@ -75,17 +75,17 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns browser object of this info. */
-    protected final ClusterBrowser getBrowser() {
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /** Returns columns for the table. */
-    protected final String[] getColumnNames(final String tableName) {
+    @Override protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Defined on", "Status", "Memory", ""};
     }
 
     /** Returns data for the table. */
-    protected final Object[][] getTableData(final String tableName) {
+    @Override protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -137,19 +137,19 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns info object for the key. */
-    protected final Info getTableInfo(final String tableName,
-                                      final String key) {
+    @Override protected Info getTableInfo(final String tableName,
+                                final String key) {
         return domainToInfo.get(key);
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName,
-                                    final String key,
-                                    final int column) {
+    @Override protected void rowClicked(final String tableName,
+                                        final String key,
+                                        final int column) {
         final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     if (DEFAULT_WIDTHS.containsKey(column)) {
                         /* remove button */
                         vmsvdi.removeMyself(false);
@@ -163,8 +163,8 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Alignment for the specified column. */
-    protected final int getTableColumnAlignment(final String tableName,
-                                                final int column) {
+    @Override protected int getTableColumnAlignment(final String tableName,
+                                                    final int column) {
         if (column == 3) {
             return SwingConstants.RIGHT;
         }
@@ -172,14 +172,14 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Selects the node in the menu. */
-    public final void selectMyself() {
+    @Override public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }
 
     /** Returns comparator for column. */
-    protected final Comparator<Object> getColComparator(final String tableName,
-                                                        final int col) {
+    @Override protected Comparator<Object> getColComparator(final String tableName,
+                                                            final int col) {
         if (col == 0) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
@@ -210,8 +210,8 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Retrurns color for some rows. */
-    protected final Color getTableRowColor(final String tableName,
-                                           final String key) {
+    @Override protected Color getTableRowColor(final String tableName,
+                                               final String key) {
         final Color c = domainToColor.get(key);
         if (c == null) {
             return Browser.PANEL_BACKGROUND;
@@ -221,13 +221,13 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns new button. */
-    protected JComponent getNewButton() {
+    @Override protected JComponent getNewButton() {
         final MyButton newButton = new MyButton(
                                      Tools.getString("VMSInfo.AddNewDomain"));
         newButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         addDomainPanel();
                     }
                 });
@@ -243,7 +243,7 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Adds new virtual domain. */
-    public final void addDomainPanel() {
+    public void addDomainPanel() {
         final VMSVirtualDomainInfo vmsdi =
                                 new VMSVirtualDomainInfo(null, getBrowser());
         vmsdi.getResource().setNew(true);
@@ -253,11 +253,11 @@ public class VMSInfo extends CategoryInfo {
         getNode().add(resource);
         getBrowser().reload(getNode(), true);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 vmsdi.getInfoPanel();
                 vmsdi.selectMyself();
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
                         avmcd.showDialogs();
                     }
@@ -268,7 +268,7 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns list of menu items for VM. */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* New domain */
         final MyMenuItem newDomainMenuItem = new MyMenuItem(
@@ -277,7 +277,7 @@ public class VMSInfo extends CategoryInfo {
                        new AccessMode(ConfigData.AccessType.ADMIN, false),
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
-                        public void action() {
+                        @Override public void action() {
                             hidePopup();
                             addDomainPanel();
                         }
@@ -287,23 +287,22 @@ public class VMSInfo extends CategoryInfo {
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    protected final Map<Integer, Integer> getDefaultWidths(
-                                                      final String tableName) {
+    @Override protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
         return DEFAULT_WIDTHS;
     }
 
     /** Returns if this column contains remove button. */
-    protected final boolean isControlButton(final String tableName,
-                                           final int column) {
+    @Override protected boolean isControlButton(final String tableName,
+                                                final int column) {
         return DEFAULT_WIDTHS.containsKey(column);
     }
 
     /** Returns tool tip text in the table. */
-    protected String getTableToolTip(final String tableName,
-                                     final String key,
-                                     final Object object,
-                                     final int raw,
-                                     final int column) {
+    @Override protected String getTableToolTip(final String tableName,
+                                               final String key,
+                                               final Object object,
+                                               final int raw,
+                                               final int column) {
         if (DEFAULT_WIDTHS.containsKey(column)) {
             return "Remove domain " + key + ".";
         }

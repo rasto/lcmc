@@ -75,43 +75,33 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * This class holds info data for services view and global heartbeat
  * config.
  */
-public class ServicesInfo extends EditableInfo {
+public final class ServicesInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    /**
-     * Prepares a new <code>ServicesInfo</code> object.
-     */
+    /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /**
-     * Sets info panel.
-     */
-    public final void setInfoPanel(final JComponent infoPanel) {
+    /** Sets info panel. */
+    void setInfoPanel(final JComponent infoPanel) {
         this.infoPanel = infoPanel;
     }
 
-    /**
-     * Returns icon for services menu item.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns icon for services menu item. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return null;
     }
 
-    /**
-     * Returns names of all global parameters.
-     */
-    public final String[] getParametersFromXML() {
+    /** Returns names of all global parameters. */
+    @Override public String[] getParametersFromXML() {
         final CRMXML crmxml = getBrowser().getCRMXML();
         if (crmxml == null) {
             return null;
@@ -123,7 +113,7 @@ public class ServicesInfo extends EditableInfo {
      * Returns long description of the global parameter, that is used for
      * tool tips.
      */
-    protected final String getParamLongDesc(final String param) {
+    @Override protected String getParamLongDesc(final String param) {
         return getBrowser().getCRMXML().getGlobalParamLongDesc(param);
     }
 
@@ -131,28 +121,22 @@ public class ServicesInfo extends EditableInfo {
      * Returns short description of the global parameter, that is used as
      * label.
      */
-    protected final String getParamShortDesc(final String param) {
+    @Override protected String getParamShortDesc(final String param) {
         return getBrowser().getCRMXML().getGlobalParamShortDesc(param);
     }
 
-    /**
-     * Returns default for this global parameter.
-     */
-    protected final String getParamDefault(final String param) {
+    /** Returns default for this global parameter. */
+    @Override protected String getParamDefault(final String param) {
         return getBrowser().getCRMXML().getGlobalParamDefault(param);
     }
 
-    /**
-     * Returns preferred value for this global parameter.
-     */
-    protected final String getParamPreferred(final String param) {
+    /** Returns preferred value for this global parameter. */
+    @Override protected String getParamPreferred(final String param) {
         return getBrowser().getCRMXML().getGlobalParamPreferred(param);
     }
 
-    /**
-     * Returns possible choices for pulldown menus if applicable.
-     */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    /** Returns possible choices for pulldown menus if applicable. */
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         return getBrowser().getCRMXML().getGlobalParamPossibleChoices(param);
     }
 
@@ -160,29 +144,27 @@ public class ServicesInfo extends EditableInfo {
      * Checks if the new value is correct for the parameter type and
      * constraints.
      */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
+    @Override protected boolean checkParam(final String param,
+                                           final String newValue) {
         return getBrowser().getCRMXML().checkGlobalParam(param, newValue);
     }
 
     /** Returns whether the global parameter is of the integer type. */
-    protected final boolean isInteger(final String param) {
+    @Override protected boolean isInteger(final String param) {
         return getBrowser().getCRMXML().isGlobalInteger(param);
     }
     /** Returns whether the global parameter is of the label type. */
-    protected final boolean isLabel(final String param) {
+    @Override protected boolean isLabel(final String param) {
         return getBrowser().getCRMXML().isGlobalLabel(param);
     }
 
-    /**
-     * Returns whether the global parameter is of the time type.
-     */
-    protected final boolean isTimeType(final String param) {
+    /** Returns whether the global parameter is of the time type. */
+    @Override protected boolean isTimeType(final String param) {
         return getBrowser().getCRMXML().isGlobalTimeType(param);
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         if (!Tools.areEqual(getParamDefault(param),
                             getParamSaved(param))) {
             /* it changed, show it */
@@ -192,24 +174,24 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                         final String param) {
         return getBrowser().getCRMXML().getGlobalAccessType(param);
     }
 
     /** Whether the parameter should be enabled. */
-    protected final String isEnabled(final String param) {
+    @Override protected String isEnabled(final String param) {
         return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
+                                                         final String param) {
         return false;
     }
 
-    /**
-     * Returns whether the global parameter is required.
-     */
-    protected final boolean isRequired(final String param) {
+    /** Returns whether the global parameter is required. */
+    @Override protected boolean isRequired(final String param) {
         return getBrowser().getCRMXML().isGlobalRequired(param);
     }
 
@@ -217,32 +199,26 @@ public class ServicesInfo extends EditableInfo {
      * Returns whether the global parameter is of boolean type and
      * requires a checkbox.
      */
-    protected final boolean isCheckBox(final String param) {
+    @Override protected boolean isCheckBox(final String param) {
         return getBrowser().getCRMXML().isGlobalBoolean(param);
     }
 
-    /**
-     * Returns type of the global parameter.
-     */
-    protected final String getParamType(final String param) {
+    /** Returns type of the global parameter. */
+    @Override protected String getParamType(final String param) {
         return getBrowser().getCRMXML().getGlobalParamType(param);
     }
 
-    /**
-     * Returns section to which the global parameter belongs.
-     */
-    protected final String getSection(final String param) {
+    /** Returns section to which the global parameter belongs. */
+    @Override protected String getSection(final String param) {
         return getBrowser().getCRMXML().getGlobalSection(param);
     }
 
-    /**
-     * Applies changes that user has entered.
-     */
-    public final void apply(final Host dcHost, final boolean testOnly) {
+    /** Applies changes that user has entered. */
+    void apply(final Host dcHost, final boolean testOnly) {
         final String[] params = getParametersFromXML();
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
@@ -306,10 +282,8 @@ public class ServicesInfo extends EditableInfo {
         }
     }
 
-    /**
-     * Sets heartbeat global parameters after they were obtained.
-     */
-    public final void setGlobalConfig() {
+    /** Sets heartbeat global parameters after they were obtained. */
+    public void setGlobalConfig() {
         final String[] params = getParametersFromXML();
         for (String param : params) {
             final String value =
@@ -325,7 +299,7 @@ public class ServicesInfo extends EditableInfo {
         }
         if (infoPanel == null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getInfoPanel();
                 }
             });
@@ -333,8 +307,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /**
-     * Check if this connection is filesystem with drbd ra and if so, set
-     * it.
+     * Check if this connection is filesystem with drbd ra and if so, set it.
      */
     private void setFilesystemWithDrbd(final ServiceInfo siP,
                                        final ServiceInfo si) {
@@ -477,7 +450,7 @@ public class ServicesInfo extends EditableInfo {
                  */
                 newSi = getBrowser().getServiceInfoFromCRMId(hbId);
                 final Map<String, String> resourceNode =
-                                                 clStatus.getParamValuePairs(hbId);
+                                             clStatus.getParamValuePairs(hbId);
                 if (newSi == null) {
                     newService = true;
                     // TODO: get rid of the service name? (everywhere)
@@ -550,7 +523,7 @@ public class ServicesInfo extends EditableInfo {
                 if (i > pos) {
                     final int p = pos;
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             final DefaultMutableTreeNode parent =
                                         (DefaultMutableTreeNode) n.getParent();
                             if (parent != null) {
@@ -581,7 +554,7 @@ public class ServicesInfo extends EditableInfo {
      * This functions goes through all services, constrains etc. in
      * clusterStatus and updates the internal structures and graph.
      */
-    public final void setAllResources(final boolean testOnly) {
+    public void setAllResources(final boolean testOnly) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final Set<String> allGroupsAndClones = clStatus.getAllGroups();
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
@@ -851,7 +824,7 @@ public class ServicesInfo extends EditableInfo {
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 hg.killRemovedEdges();
                 /** Set placeholders to "new", if they have no connections. */
                 final Map<String, ServiceInfo> idToInfoHash =
@@ -872,12 +845,12 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Clears the info panel cache, forcing it to reload. */
-    public final boolean selectAutomaticallyInTreeMenu() {
+    @Override boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
     /** Returns type of the info text. text/plain or text/html. */
-    protected final String getInfoType() {
+    @Override protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
@@ -885,7 +858,7 @@ public class ServicesInfo extends EditableInfo {
      * Returns info for info panel, that hb status failed or null, in which
      * case the getInfoPanel() function will show.
      */
-    public final String getInfo() {
+    @Override String getInfo() {
         if (getBrowser().clStatusFailed()) {
             return Tools.getString("ClusterBrowser.ClStatusFailed");
         }
@@ -907,7 +880,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Returns editable info panel for global crm config. */
-    public final JComponent getInfoPanel() {
+    @Override public JComponent getInfoPanel() {
         /* if don't have hb status we don't have all the info we need here.
          * TODO: OR we need to get hb status only once
          */
@@ -931,7 +904,7 @@ public class ServicesInfo extends EditableInfo {
             /**
              * Whether the whole thing should be enabled.
              */
-            public final boolean isEnabled() {
+            @Override public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
                     return false;
@@ -946,7 +919,7 @@ public class ServicesInfo extends EditableInfo {
                 return true;
             }
 
-            public final void mouseOut() {
+            @Override public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -955,7 +928,7 @@ public class ServicesInfo extends EditableInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            public final void mouseOver() {
+            @Override public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -1020,10 +993,10 @@ public class ServicesInfo extends EditableInfo {
                       Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"));
         getApplyButton().addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(
                         new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 getBrowser().clStatusLock();
                                 apply(getBrowser().getDCHost(), false);
                                 getBrowser().clStatusUnlock();
@@ -1036,9 +1009,9 @@ public class ServicesInfo extends EditableInfo {
         );
         getRevertButton().addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             getBrowser().clStatusLock();
                             revert();
                             getBrowser().clStatusUnlock();
@@ -1053,7 +1026,7 @@ public class ServicesInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 setApplyButtons(null, params);
             }
         });
@@ -1071,7 +1044,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Returns heartbeat graph. */
-    public final JPanel getGraphicalView() {
+    @Override public JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
@@ -1079,12 +1052,12 @@ public class ServicesInfo extends EditableInfo {
      * Adds service to the list of services.
      * TODO: are they both used?
      */
-    public final ServiceInfo addServicePanel(final ResourceAgent newRA,
-                                             final Point2D pos,
-                                             final boolean reloadNode,
-                                             final String heartbeatId,
-                                             final CloneInfo newCi,
-                                             final boolean testOnly) {
+    ServiceInfo addServicePanel(final ResourceAgent newRA,
+                                final Point2D pos,
+                                final boolean reloadNode,
+                                final String heartbeatId,
+                                final CloneInfo newCi,
+                                final boolean testOnly) {
         ServiceInfo newServiceInfo;
         final String name = newRA.getName();
         if (newRA.isFilesystem()) {
@@ -1134,11 +1107,11 @@ public class ServicesInfo extends EditableInfo {
      * will be computed later. reloadNode specifies if the node in
      * the menu should be reloaded and get uptodate.
      */
-    public final void addServicePanel(final ServiceInfo newServiceInfo,
-                                      final Point2D pos,
-                                      final boolean reloadNode,
-                                      final boolean interactive,
-                                      final boolean testOnly) {
+    void addServicePanel(final ServiceInfo newServiceInfo,
+                         final Point2D pos,
+                         final boolean reloadNode,
+                         final boolean interactive,
+                         final boolean testOnly) {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
@@ -1171,7 +1144,7 @@ public class ServicesInfo extends EditableInfo {
             }
             getBrowser().reloadAllComboBoxes(newServiceInfo);
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     hg.scale();
                 }
             });
@@ -1180,7 +1153,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Returns 'add service' list for graph popup menu. */
-    public final List<ResourceAgent> getAddServiceList(final String cl) {
+    List<ResourceAgent> getAddServiceList(final String cl) {
         return getBrowser().globalGetAddServiceList(cl);
     }
 
@@ -1188,7 +1161,7 @@ public class ServicesInfo extends EditableInfo {
      * Returns background popup. Click on background represents cluster as
      * whole.
      */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
 
@@ -1203,14 +1176,14 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     hidePopup();
                     addServicePanel(getBrowser().getCRMXML().getHbGroup(),
                                     getPos(),
@@ -1233,16 +1206,16 @@ public class ServicesInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
             private final Mutex mUpdateLock = new Mutex();
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
             }
 
-            public final void update() {
+            @Override public void update() {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         try {
                             if (mUpdateLock.attempt(0)) {
                                 updateThread();
@@ -1255,14 +1228,14 @@ public class ServicesInfo extends EditableInfo {
                 });
                 t.start();
             }
-            private final void updateThread() {
+            private void updateThread() {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         setEnabled(false);
                     }
                 });
                 Tools.invokeAndWait(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         removeAll();
                     }
                 });
@@ -1285,7 +1258,7 @@ public class ServicesInfo extends EditableInfo {
                      new AccessMode(ConfigData.AccessType.OP,
                                     false)) {
                         private static final long serialVersionUID = 1L;
-                        public void action() {
+                        @Override public void action() {
                             hidePopup();
                             if (!getBrowser().linbitDrbdConfirmDialog()) {
                                 return;
@@ -1309,7 +1282,7 @@ public class ServicesInfo extends EditableInfo {
                     }
                     ldMenuItem.setPos(pos);
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             add(ldMenuItem);
                         }
                     });
@@ -1329,7 +1302,7 @@ public class ServicesInfo extends EditableInfo {
                                         new AccessMode(ConfigData.AccessType.OP,
                                                        false)) {
                         private static final long serialVersionUID = 1L;
-                        public void action() {
+                        @Override public void action() {
                             hidePopup();
                             addServicePanel(ipService,
                                             getPos(),
@@ -1342,7 +1315,7 @@ public class ServicesInfo extends EditableInfo {
                     };
                     ipMenuItem.setPos(pos);
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             add(ipMenuItem);
                         }
                     });
@@ -1362,7 +1335,7 @@ public class ServicesInfo extends EditableInfo {
                      new AccessMode(ConfigData.AccessType.OP,
                                     false)) {
                         private static final long serialVersionUID = 1L;
-                        public void action() {
+                        @Override public void action() {
                             hidePopup();
                             final FilesystemInfo fsi = (FilesystemInfo)
                                                            addServicePanel(
@@ -1382,7 +1355,7 @@ public class ServicesInfo extends EditableInfo {
                     }
                     ddMenuItem.setPos(pos);
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             add(ddMenuItem);
                         }
                     });
@@ -1408,7 +1381,7 @@ public class ServicesInfo extends EditableInfo {
                                                     ConfigData.AccessType.OP,
                                                     false)) {
                             private static final long serialVersionUID = 1L;
-                            public void action() {
+                            @Override public void action() {
                                 hidePopup();
                                 if (ra.isLinbitDrbd()
                                     &&
@@ -1442,7 +1415,7 @@ public class ServicesInfo extends EditableInfo {
                         classItem.add(jsp);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             add(classItem);
                         }
                     });
@@ -1465,14 +1438,14 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     hidePopup();
                     final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
                     final ConstraintPHInfo cphi =
@@ -1486,7 +1459,7 @@ public class ServicesInfo extends EditableInfo {
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             hg.scale();
                         }
                     });
@@ -1502,7 +1475,7 @@ public class ServicesInfo extends EditableInfo {
                 new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -1518,7 +1491,7 @@ public class ServicesInfo extends EditableInfo {
                 return "all services are stopped";
             }
 
-            public final void action() {
+            @Override public void action() {
                 hidePopup();
                 final Host dcHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
@@ -1535,7 +1508,7 @@ public class ServicesInfo extends EditableInfo {
         };
         final ClusterBrowser.ClMenuItemCallback stopAllItemCallback =
                    getBrowser().new ClMenuItemCallback(stopAllMenuItem, null) {
-            public void action(final Host dcHost) {
+            @Override public void action(final Host dcHost) {
                 final Host thisDCHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
@@ -1560,11 +1533,11 @@ public class ServicesInfo extends EditableInfo {
                 new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public boolean visiblePredicate() {
+            @Override public boolean visiblePredicate() {
                 return enablePredicate() == null;
             }
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -1581,7 +1554,7 @@ public class ServicesInfo extends EditableInfo {
                 return "nothing to unmigrate";
             }
 
-            public final void action() {
+            @Override public void action() {
                 hidePopup();
                 final Host dcHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
@@ -1596,7 +1569,7 @@ public class ServicesInfo extends EditableInfo {
         };
         final ClusterBrowser.ClMenuItemCallback unmigrateAllItemCallback =
                getBrowser().new ClMenuItemCallback(unmigrateAllMenuItem, null) {
-            public void action(final Host dcHost) {
+            @Override public void action(final Host dcHost) {
                 final Host thisDCHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                                 : getBrowser().getExistingServiceList(null)) {
@@ -1618,7 +1591,7 @@ public class ServicesInfo extends EditableInfo {
                 new AccessMode(ConfigData.AccessType.ADMIN, true)) {
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -1628,7 +1601,7 @@ public class ServicesInfo extends EditableInfo {
                 return null;
             }
 
-            public final void action() {
+            @Override public void action() {
                 hidePopup();
                 if (Tools.confirmDialog(
                      Tools.getString(
@@ -1667,11 +1640,11 @@ public class ServicesInfo extends EditableInfo {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     ClusterLogs l = new ClusterLogs(getBrowser().getCluster());
                     l.showDialog();
                 }
@@ -1681,7 +1654,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Returns units. */
-    protected final Unit[] getUnits() {
+    @Override protected Unit[] getUnits() {
         return new Unit[]{
             new Unit("", "s", "Second", "Seconds"), /* default unit */
             new Unit("ms",  "ms", "Millisecond", "Milliseconds"),
@@ -1696,7 +1669,7 @@ public class ServicesInfo extends EditableInfo {
      * Removes this services info.
      * TODO: is not called yet
      */
-    public final void removeMyself(final boolean testOnly) {
+    @Override public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
     }
 
@@ -1706,8 +1679,8 @@ public class ServicesInfo extends EditableInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         boolean ret = true;
         if (!rdi.checkResourceFieldsCorrect(param,
@@ -1735,8 +1708,8 @@ public class ServicesInfo extends EditableInfo {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
+    @Override public boolean checkResourceFieldsChanged(final String param,
+                                                        final String[] params) {
         boolean changed = false;
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         if (super.checkResourceFieldsChanged(param, params)) {
@@ -1760,7 +1733,7 @@ public class ServicesInfo extends EditableInfo {
     }
 
     /** Revert all values. */
-    public final void revert() {
+    @Override public void revert() {
         super.revert();
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         rdi.revert();

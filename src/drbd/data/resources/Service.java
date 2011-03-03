@@ -82,9 +82,7 @@ public class Service extends Resource {
         super(name);
     }
 
-    /**
-     * Returns id that is used in the heartbeat for this service.
-     */
+    /** Returns id that is used in the heartbeat for this service. */
     public final String getHeartbeatId() {
         return crmId;
     }
@@ -138,15 +136,12 @@ public class Service extends Resource {
         setValue("id", id);
     }
 
-    /**
-     * Sets the id.
-     */
+    /** Sets the id. */
     public final void setId(final String id) {
         this.id = id;
     }
-    /**
-     * Returns crm id from entered id.
-     */
+
+    /** Returns crm id from entered id. */
     public final String getCrmIdFromId(final String id) {
         if (GROUP_NAME.equals(getName())) {
             if (id.startsWith(GRP_ID_PREFIX)) {
@@ -178,9 +173,8 @@ public class Service extends Resource {
             }
         }
     }
-    /**
-     * Sets the id and crm id.
-     */
+
+    /** Sets the id and crm id. */
     public final void setIdAndCrmId(final String id) {
         this.id = id;
         crmId = getCrmIdFromId(id);
@@ -200,16 +194,12 @@ public class Service extends Resource {
         return removed || removing;
     }
 
-    /**
-     * Sets that the service was done being removed.
-     */
+    /** Sets that the service was done being removed. */
     public final void doneRemoving() {
         this.removing = false;
     }
 
-    /**
-     * Sets whether the service was modified.
-     */
+    /** Sets whether the service was modified. */
     public final void setModified(final boolean modified) {
         this.modified = modified;
         if (modified) {
@@ -217,9 +207,7 @@ public class Service extends Resource {
         }
     }
 
-    /**
-     * Sets that the service is done being modified.
-     */
+    /** Sets that the service is done being modified. */
     public final void doneModifying() {
         modifying = false;
     }
@@ -276,23 +264,17 @@ public class Service extends Resource {
         this.resourceClass = resourceClass;
     }
 
-    /**
-     * Returns the heartbeat class of this service.
-     */
+    /** Returns the heartbeat class of this service. */
     public final String getResourceClass() {
         return resourceClass;
     }
 
-    /**
-     * Sets this service if it is master.
-     */
+    /** Sets this service if it is master. */
     public final void setMaster(final boolean master) {
         this.master = master;
     }
 
-    /**
-     * Returns whether this clone is master, if it is clone.
-     */
+    /** Returns whether this clone is master, if it is clone. */
     public final boolean isMaster() {
         return master;
     }

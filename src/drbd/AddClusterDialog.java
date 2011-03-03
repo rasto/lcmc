@@ -36,7 +36,7 @@ import drbd.utilities.Tools;
  * @version $Id$
  */
 
-public class AddClusterDialog {
+public final class AddClusterDialog {
     /** All clusters object. */
     private Clusters clusters;
     /** Whether the wizard was canceled. */
@@ -46,7 +46,7 @@ public class AddClusterDialog {
      * Shows step by step dialogs that add and configure new cluster.
      * Must allways be called from thread.
      */
-    public final void showDialogs() {
+    public void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
         DialogCluster dialog = new Name(null, cluster);
@@ -76,17 +76,13 @@ public class AddClusterDialog {
         Tools.getGUIData().checkAddClusterButtons();
     }
 
-    /**
-     * Whether the wizard was canceled.
-     */
-    public final boolean canceled() {
+    /** Whether the wizard was canceled. */
+    boolean canceled() {
         return canceled;
     }
 
-    /**
-     * Returns the clusters.
-     */
-    public final Clusters getClusters() {
+    /** Returns the clusters. */
+    Clusters getClusters() {
         return clusters;
     }
 }

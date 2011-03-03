@@ -73,7 +73,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -107,7 +106,7 @@ import org.apache.commons.collections.map.LinkedMap;
  * @version $Id$
  *
  */
-public class ClusterBrowser extends Browser {
+public final class ClusterBrowser extends Browser {
     /**
      * Cluster object that holds data of the cluster. (One Browser belongs to
      * one cluster).
@@ -310,7 +309,7 @@ public class ClusterBrowser extends Browser {
     }
     /** Operations that should not have default values. */
     public static final List<String> HB_OP_IGNORE_DEFAULT =
-                                                    new ArrayList<String>();
+                                                      new ArrayList<String>();
     static {
         HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
         HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
@@ -336,14 +335,12 @@ public class ClusterBrowser extends Browser {
     private static final String CLUSTER_STATUS_ERROR =
                                   "---start---\r\nerror\r\n\r\n---done---\r\n";
     /** Small cluster icon. */
-    public static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
+    static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
                           Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
     /** String that appears as a tooltip in menu items if status was disabled.*/
     public static final String UNKNOWN_CLUSTER_STATUS_STRING =
                                                      "unknown cluster status";
-    /**
-     * Prepares a new <code>CusterBrowser</code> object.
-     */
+    /** Prepares a new <code>CusterBrowser</code> object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
         this.cluster = cluster;
@@ -353,9 +350,7 @@ public class ClusterBrowser extends Browser {
 
     }
 
-    /**
-     * Inits operations.
-     */
+    /** Inits operations. */
     private void initOperations() {
         crmOperationParams.put(HB_OP_START,
                                 new ArrayList<String>(
@@ -408,46 +403,33 @@ public class ClusterBrowser extends Browser {
                                                           HB_PAR_INTERVAL)));
     }
 
-    /**
-     * CRM operation parameters.
-     */
-    public final Map<String, List<String>> getCRMOperationParams() {
+    /** CRM operation parameters. */
+    public Map<String, List<String>> getCRMOperationParams() {
         return crmOperationParams;
     }
 
-    /**
-     * Sets the cluster view panel.
-     */
-    public final void setClusterViewPanel(
-                                    final ClusterViewPanel clusterViewPanel) {
+    /** Sets the cluster view panel. */
+    void setClusterViewPanel(final ClusterViewPanel clusterViewPanel) {
         this.clusterViewPanel = clusterViewPanel;
     }
 
-    /**
-     * Returns cluster view panel.
-     */
-    public final ClusterViewPanel getClusterViewPanel() {
+    /** Returns cluster view panel. */
+    ClusterViewPanel getClusterViewPanel() {
         return clusterViewPanel;
     }
 
-    /**
-     * Returns all nodes that belong to this cluster.
-     */
-    public final Host[] getClusterHosts() {
+    /** Returns all nodes that belong to this cluster. */
+    public Host[] getClusterHosts() {
         return cluster.getHostsArray();
     }
 
-    /**
-     * Returns cluster data object.
-     */
-    public final Cluster getCluster() {
+    /** Returns cluster data object. */
+    public Cluster getCluster() {
         return cluster;
     }
 
-    /**
-     * Sets the info panel component in the cluster view panel.
-     */
-    public final void setRightComponentInView(final Info i) {
+    /** Sets the info panel component in the cluster view panel. */
+    public void setRightComponentInView(final Info i) {
         clusterViewPanel.setRightComponentInView(this, i);
     }
 
@@ -455,7 +437,7 @@ public class ClusterBrowser extends Browser {
      * Saves positions of service and block devices from the heartbeat and drbd
      * graphs to the config files on every node.
      */
-    public final void saveGraphPositions() {
+    public void saveGraphPositions() {
         final Map<String, Point2D> positions = new HashMap<String, Point2D>();
         if (drbdGraph != null) {
             drbdGraph.getPositions(positions);
@@ -476,24 +458,18 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Returns heartbeat graph for this cluster.
-     */
-    public final HeartbeatGraph getHeartbeatGraph() {
+    /** Returns heartbeat graph for this cluster. */
+    public HeartbeatGraph getHeartbeatGraph() {
         return heartbeatGraph;
     }
 
-    /**
-     * Returns drbd graph for this cluster.
-     */
-    public final DrbdGraph getDrbdGraph() {
+    /** Returns drbd graph for this cluster. */
+    public DrbdGraph getDrbdGraph() {
         return drbdGraph;
     }
 
-    /**
-     * Returns all hosts are don't get cluster status.
-     */
-    public final boolean allHostsDown() {
+    /** Returns all hosts are don't get cluster status. */
+    public boolean allHostsDown() {
        boolean hostsDown = true;
        final Host[] hosts = cluster.getHostsArray();
        for (Host host : hosts) {
@@ -505,10 +481,8 @@ public class ClusterBrowser extends Browser {
        return hostsDown;
     }
 
-    /**
-     * Returns whether there is at least one drbddisk resource.
-     */
-    public final boolean atLeastOneDrbddisk() {
+    /** Returns whether there is at least one drbddisk resource. */
+    public boolean atLeastOneDrbddisk() {
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {
@@ -525,10 +499,8 @@ public class ClusterBrowser extends Browser {
         return false;
     }
 
-    /**
-     * Returns whether there is at least one drbddisk resource.
-     */
-    public final boolean isOneLinbitDrbd() {
+    /** Returns whether there is at least one drbddisk resource. */
+    public boolean isOneLinbitDrbd() {
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {
@@ -545,10 +517,8 @@ public class ClusterBrowser extends Browser {
         return false;
     }
 
-    /**
-     * Adds VMs node.
-     */
-    public final void addVMSNode() {
+    /** Adds VMs node. */
+    void addVMSNode() {
         /* VMs */
         if (vmsNode == null) {
             vmsNode = new DefaultMutableTreeNode(
@@ -560,7 +530,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Initializes cluster resources for cluster view. */
-    public final void initClusterBrowser() {
+    void initClusterBrowser() {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(
                                 new AllHostsInfo(
@@ -635,9 +605,9 @@ public class ClusterBrowser extends Browser {
      * @param commonMountPoints
      *          mount points that are common on both hosts
      */
-    public final void updateClusterResources(final Host[] clusterHosts,
-                                             final String[] commonFileSystems,
-                                             final String[] commonMountPoints) {
+    void updateClusterResources(final Host[] clusterHosts,
+                                final String[] commonFileSystems,
+                                final String[] commonMountPoints) {
         this.commonFileSystems = commonFileSystems;
         this.commonMountPoints = commonMountPoints;
         DefaultMutableTreeNode resource;
@@ -672,32 +642,28 @@ public class ClusterBrowser extends Browser {
         /* networks */
         updateNetworks();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 heartbeatGraph.scale();
             }
         });
         updateHeartbeatDrbdThread();
     }
 
-    /**
-     * Returns mountpoints that exist on all servers.
-     */
-    public final String[] getCommonMountPoints() {
+    /** Returns mountpoints that exist on all servers. */
+    public String[] getCommonMountPoints() {
         return commonMountPoints;
     }
 
-    /**
-     * Starts everything.
-     */
+    /** Starts everything. */
     private void updateHeartbeatDrbdThread() {
         final Thread tt = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
                     host.waitForServerStatusLatch();
                 }
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(
                                                                 false);
                         selectServices();
@@ -707,7 +673,7 @@ public class ClusterBrowser extends Browser {
         });
         tt.start();
         final Runnable runnable = new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Host firstHost = null;
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
@@ -772,14 +738,14 @@ public class ClusterBrowser extends Browser {
 
                 updateDrbdResources();
                 //SwingUtilities.invokeLater(new Runnable() {
-                //    public void run() {
+                //    @Override public void run() {
                 //        drbdGraph.scale();
                 //    }
                 //});
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
                 //SwingUtilities.invokeLater(new Runnable() {
-                //    public void run() {
+                //    @Override public void run() {
                 //        drbdGraph.getDrbdInfo().getInfoPanel();
                 //    }
                 //});
@@ -801,11 +767,11 @@ public class ClusterBrowser extends Browser {
      * that can change on the server on the fly, like for example the block
      * devices.
      */
-    public final void startServerStatus() {
+    void startServerStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     startServerStatus(host);
                 }
             });
@@ -813,10 +779,8 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Starts polling of the server status on one host.
-     */
-    public final void startServerStatus(final Host host) {
+    /** Starts polling of the server status on one host. */
+    void startServerStatus(final Host host) {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate =
                                         new CategoryInfo[]{clusterHostsInfo};
@@ -857,7 +821,7 @@ public class ClusterBrowser extends Browser {
             }
             SwingUtilities.invokeLater(
                 new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         drbdGraph.scale(); // TODO: ?
                     }
                 });
@@ -874,8 +838,8 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /** * Updates VMs info. */
-    public final void periodicalVMSUpdate(final Host host) {
+    /** Updates VMs info. */
+    public void periodicalVMSUpdate(final Host host) {
         final VMSXML newVMSXML = new VMSXML(host);
         if (newVMSXML.update()) {
             try {
@@ -890,7 +854,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Adds new vmsxml object to the hash. */
-    public final void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
+    public void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
         try {
             mVMSLock.acquire();
         } catch (InterruptedException e) {
@@ -900,19 +864,17 @@ public class ClusterBrowser extends Browser {
         mVMSLock.release();
     }
 
-    /**
-     * Cancels the server status.
-     */
-    public final void cancelServerStatus() {
+    /** Cancels the server status. */
+    public void cancelServerStatus() {
         serverStatus = false;
     }
 
     /** Starts connection status on all hosts. */
-    public final void startConnectionStatus() {
+    void startConnectionStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     startConnectionStatus(host);
                 }
             });
@@ -921,11 +883,11 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Starts drbd status on all hosts. */
-    public final void startDrbdStatus() {
+    void startDrbdStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     startDrbdStatus(host);
                 }
             });
@@ -933,10 +895,8 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Starts drbd status.
-     */
-    public final void stopDrbdStatus() {
+    /** Starts drbd status. */
+    public void stopDrbdStatus() {
         drbdStatusCanceled = true;
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
@@ -948,21 +908,22 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Starts connection status. */
-    public final void startConnectionStatus(final Host host) {
+    void startConnectionStatus(final Host host) {
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 while (true) {
                     host.execConnectionStatusCommand(
                           new ExecCallback() {
-                               public void done(final String ans) {
+                               @Override public void done(final String ans) {
                                    Tools.debug(this, "connection ok on "
                                                      + host.getName(),
                                                2);
                                    host.setConnected();
                                }
 
-                               public void doneError(final String ans,
-                                                     final int exitCode) {
+                               @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                    Tools.debug(this, "connection lost on "
                                                      + host.getName()
                                                      + "exit code: "
@@ -980,7 +941,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Starts drbd status on host. */
-    public final void startDrbdStatus(final Host host) {
+    void startDrbdStatus(final Host host) {
         final CountDownLatch firstTime = new CountDownLatch(1);
         host.setDrbdStatus(false);
         final String hostName = host.getName();
@@ -989,14 +950,14 @@ public class ClusterBrowser extends Browser {
                         hostName,
                         Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 try {
                     firstTime.await();
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         drbdGraph.scale();
                         drbdGraph.getDrbdInfo().selectMyself();
                     }
@@ -1012,7 +973,7 @@ public class ClusterBrowser extends Browser {
         while (true) {
             host.execDrbdStatusCommand(
                   new ExecCallback() {
-                       public void done(final String ans) {
+                       @Override public void done(final String ans) {
                            if (!host.isDrbdStatus()) {
                                host.setDrbdStatus(true);
                                drbdGraph.repaint();
@@ -1023,8 +984,8 @@ public class ClusterBrowser extends Browser {
                            }
                        }
 
-                       public void doneError(final String ans,
-                                             final int exitCode) {
+                       @Override public void doneError(final String ans,
+                                                       final int exitCode) {
                            Tools.debug(this, "drbd status failed: "
                                              + host.getName()
                                              + " exit code: "
@@ -1056,7 +1017,7 @@ public class ClusterBrowser extends Browser {
                    },
 
                    new NewOutputCallback() {
-                       public void output(final String output) {
+                       @Override public void output(final String output) {
                            drbdStatusLock();
                            firstTime.countDown();
                            boolean updated = false;
@@ -1112,12 +1073,12 @@ public class ClusterBrowser extends Browser {
                                                 ClusterHostsInfo.MAIN_TABLE);
                                final Thread thread = new Thread(
                                    new Runnable() {
-                                       public void run() {
+                                       @Override public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
                                            SwingUtilities.invokeLater(
                                                new Runnable() {
-                                                   public void run() {
+                                                   @Override public void run() {
                                                        repaintTree();
                                                    }
                                                }
@@ -1144,10 +1105,8 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Stops hb status.
-     */
-    public final void stopClStatus() {
+    /** Stops hb status. */
+    public void stopClStatus() {
         clStatusCanceled = true;
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
@@ -1156,10 +1115,8 @@ public class ClusterBrowser extends Browser {
     }
 
 
-    /**
-     * Returns true if hb status on all hosts failed.
-     */
-    public final boolean clStatusFailed() {
+    /** Returns true if hb status on all hosts failed. */
+    public boolean clStatusFailed() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
             if (host.isClStatus()) {
@@ -1169,10 +1126,8 @@ public class ClusterBrowser extends Browser {
         return true;
     }
 
-    /**
-     * Sets hb status (failed / not failed for every node).
-     */
-    public final void setClStatus() {
+    /** Sets hb status (failed / not failed for every node). */
+    void setClStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
             final String online = clusterStatus.isOnlineNode(host.getName());
@@ -1184,19 +1139,15 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Starts hb status progress indicator.
-     */
-    public final void startClStatusProgressIndicator(final String clusterName) {
+    /** Starts hb status progress indicator. */
+    void startClStatusProgressIndicator(final String clusterName) {
         Tools.startProgressIndicator(
                             clusterName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
-    /**
-     * Stops hb status progress indicator.
-     */
-    public final void stopClStatusProgressIndicator(final String clusterName) {
+    /** Stops hb status progress indicator. */
+    void stopClStatusProgressIndicator(final String clusterName) {
         Tools.stopProgressIndicator(
                             clusterName,
                             Tools.getString("ClusterBrowser.HbUpdateStatus"));
@@ -1212,9 +1163,7 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Process output from cluster.
-     */
+    /** Process output from cluster. */
     private void processClusterOutput(final String output,
                                       final StringBuffer clusterStatusOutput,
                                       final Host host,
@@ -1292,16 +1241,14 @@ public class ClusterBrowser extends Browser {
         clStatusUnlock();
     }
 
-    /**
-     * Starts hb status.
-     */
-    public final void startClStatus() {
+    /** Starts hb status. */
+    void startClStatus() {
         final CountDownLatch firstTime = new CountDownLatch(1);
         final String clusterName = getCluster().getName();
         startClStatusProgressIndicator(clusterName);
         final boolean testOnly = false;
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 try {
                     firstTime.await();
                 } catch (InterruptedException ignored) {
@@ -1312,7 +1259,7 @@ public class ClusterBrowser extends Browser {
                                                    "Cluster status failed");
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                            heartbeatGraph.scale();
                        }
                     });
@@ -1336,15 +1283,15 @@ public class ClusterBrowser extends Browser {
             //clStatusCanceled = false;
             host.execClStatusCommand(
                  new ExecCallback() {
-                     public void done(final String ans) {
+                     @Override public void done(final String ans) {
                          final String online =
                                     clusterStatus.isOnlineNode(host.getName());
                          setClStatus(host, "yes".equals(online));
                          firstTime.countDown();
                      }
 
-                     public void doneError(final String ans,
-                                           final int exitCode) {
+                     @Override public void doneError(final String ans,
+                                                     final int exitCode) {
                          if (firstTime.getCount() == 1) {
                              Tools.debug(this, "hb status failed: "
                                            + host.getName()
@@ -1370,7 +1317,7 @@ public class ClusterBrowser extends Browser {
                      //TODO: check this buffer's size
                      private StringBuffer clusterStatusOutput =
                                                         new StringBuffer(300);
-                     public void output(final String output) {
+                     @Override public void output(final String output) {
                          processClusterOutput(output,
                                               clusterStatusOutput,
                                               host,
@@ -1393,15 +1340,13 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Returns 'add service' list for menus.
-     */
-    public final List<ResourceAgent> globalGetAddServiceList(final String cl) {
+    /** Returns 'add service' list for menus. */
+    public List<ResourceAgent> globalGetAddServiceList(final String cl) {
         return crmXML.getServices(cl);
     }
 
     /** Updates common block devices. */
-    public final void updateCommonBlockDevices() {
+    public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             DefaultMutableTreeNode resource;
             final List<String> bd = cluster.getCommonBlockDevices();
@@ -1441,9 +1386,7 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Updates available services.
-     */
+    /** Updates available services. */
     private void updateAvailableServices() {
         DefaultMutableTreeNode resource;
         Tools.debug(this, "update available services");
@@ -1468,7 +1411,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Updates VM nodes. */
-    public final void updateVMS() {
+    void updateVMS() {
         try {
             if (!mUpdateVMSlock.attempt(0)) {
                 return;
@@ -1563,16 +1506,12 @@ public class ClusterBrowser extends Browser {
         mUpdateVMSlock.release();
     }
 
-    /**
-     * Returns vmsinfo object.
-     */
-    public final VMSInfo getVMSInfo() {
+    /** Returns vmsinfo object. */
+    public VMSInfo getVMSInfo() {
         return (VMSInfo) vmsNode.getUserObject();
     }
 
-    /**
-     * Updates drbd resources.
-     */
+    /** Updates drbd resources. */
     private void updateDrbdResources() {
         final DrbdXML dxml = drbdXML;
         final String[] drbdResources = dxml.getResources();
@@ -1586,7 +1525,6 @@ public class ClusterBrowser extends Browser {
                                                 dxml.getHostDiskMap(resName);
             BlockDevInfo bd1 = null;
             BlockDevInfo bd2 = null;
-                                    
             for (String hostName : hostDiskMap.keySet()) {
                 if (!cluster.contains(hostName)) {
                     continue;
@@ -1631,16 +1569,14 @@ public class ClusterBrowser extends Browser {
         if (atLeastOneAdded) {
             drbdInfo.getInfoPanel();
             Tools.invokeAndWait(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     drbdInfo.setAllApplyButtons();
                 }
             });
         }
     }
 
-    /**
-     * Updates networks.
-     */
+    /** Updates networks. */
     private void updateNetworks() {
         if (networksNode != null) {
             DefaultMutableTreeNode resource;
@@ -1663,7 +1599,7 @@ public class ClusterBrowser extends Browser {
      * executed on any host.
      * It changes terminal panel to this host.
      */
-    public final Host getFirstHost() {
+    Host getFirstHost() {
         /* TODO: if none of the hosts is connected the null causes error during
          * loading. */
         final Host[] hosts = getClusterHosts();
@@ -1680,7 +1616,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Returns whether the host is in stand by. */
-    public final boolean isStandby(final Host host, final boolean testOnly) {
+    public boolean isStandby(final Host host, final boolean testOnly) {
         // TODO: make it more efficient
         final ClusterStatus cl = clusterStatus;
         if (cl == null) {
@@ -1693,10 +1629,8 @@ public class ClusterBrowser extends Browser {
         return "on".equals(standby) || "true".equals(standby);
     }
 
-    /**
-     * Returns whether the host is the real dc host as reported by dc.
-     */
-    public final boolean isRealDcHost(final Host host) {
+    /** Returns whether the host is the real dc host as reported by dc. */
+    boolean isRealDcHost(final Host host) {
         return host.equals(realDcHost);
     }
 
@@ -1704,7 +1638,7 @@ public class ClusterBrowser extends Browser {
      * Finds and returns DC host.
      * TODO: document what's going on.
      */
-    public final Host getDCHost() {
+    public Host getDCHost() {
         Host dcHost = null;
         String dc = null;
         final ClusterStatus cl = clusterStatus;
@@ -1761,7 +1695,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** clStatusLock global lock. */
-    public final void clStatusLock() {
+    public void clStatusLock() {
         try {
             mClStatusLock.acquire();
         } catch (InterruptedException e) {
@@ -1770,12 +1704,12 @@ public class ClusterBrowser extends Browser {
     }
 
     /** clStatusLock global unlock. */
-    public final void clStatusUnlock() {
+    public void clStatusUnlock() {
         mClStatusLock.release();
     }
 
     /** drbdStatusLock global lock. */
-    public final void drbdStatusLock() {
+    public void drbdStatusLock() {
         try {
             mDRBDStatusLock.acquire();
         } catch (InterruptedException e) {
@@ -1784,21 +1718,17 @@ public class ClusterBrowser extends Browser {
     }
 
     /** drbdStatusLock global unlock. */
-    public final void drbdStatusUnlock() {
+    public void drbdStatusUnlock() {
         mDRBDStatusLock.release();
     }
 
-    /**
-     * Highlights drbd node.
-     */
-    public final void selectDrbd() {
+    /** Highlights drbd node. */
+    void selectDrbd() {
         reload(drbdNode, true);
     }
 
-    /**
-     * Highlights services.
-     */
-    public final void selectServices() {
+    /** Highlights services. */
+    void selectServices() {
         // this fires treeStructureChanged in ViewPanel.
         //nodeChanged(servicesNode);
         if (getClusterViewPanel().isDisabledDuringLoad()) {
@@ -1808,7 +1738,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Returns ServiceInfo object from crm id. */
-    public final ServiceInfo getServiceInfoFromCRMId(final String crmId) {
+    public ServiceInfo getServiceInfoFromCRMId(final String crmId) {
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {
@@ -1820,7 +1750,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Locks heartbeatIdToServiceInfo hash. */
-    public final void mHeartbeatIdToServiceLock() {
+    public void mHeartbeatIdToServiceLock() {
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {
@@ -1829,20 +1759,18 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Unlocks heartbeatIdToServiceInfo hash. */
-    public final void mHeartbeatIdToServiceUnlock() {
+    public void mHeartbeatIdToServiceUnlock() {
         mHeartbeatIdToService.release();
     }
 
     /** Returns heartbeatIdToServiceInfo hash. You have to lock it. */
-    public final Map<String, ServiceInfo> getHeartbeatIdToServiceInfo() {
+    public Map<String, ServiceInfo> getHeartbeatIdToServiceInfo() {
         return heartbeatIdToServiceInfo;
     }
 
-    /**
-     * Returns ServiceInfo object identified by name and id.
-     */
-    public final ServiceInfo getServiceInfoFromId(final String name,
-                                                  final String id) {
+    /** Returns ServiceInfo object identified by name and id. */
+    public ServiceInfo getServiceInfoFromId(final String name,
+                                            final String id) {
         try {
             mNameToServiceLock.acquire();
         } catch (InterruptedException e) {
@@ -1859,18 +1787,13 @@ public class ClusterBrowser extends Browser {
         return si;
     }
 
-    /**
-     * Returns the name, id to service info hash.
-     */
-    public final Map<String,
-                     Map<String, ServiceInfo>> getNameToServiceInfoHash() {
+    /** Returns the name, id to service info hash. */
+    public Map<String, Map<String, ServiceInfo>> getNameToServiceInfoHash() {
         return nameToServiceInfoHash;
     }
 
-    /**
-     * Locks the nameToServiceInfoHash.
-     */
-    public final void lockNameToServiceInfo() {
+    /** Locks the nameToServiceInfoHash. */
+    public void lockNameToServiceInfo() {
         try {
             mNameToServiceLock.acquire();
         } catch (InterruptedException e) {
@@ -1878,17 +1801,13 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Unlocks the nameToServiceInfoHash.
-     */
-    public final void unlockNameToServiceInfo() {
+    /** Unlocks the nameToServiceInfoHash. */
+    public void unlockNameToServiceInfo() {
         mNameToServiceLock.release();
     }
 
-    /**
-     * Returns 'existing service' list for graph popup menu.
-     */
-    public final List<ServiceInfo> getExistingServiceList(final ServiceInfo p) {
+    /** Returns 'existing service' list for graph popup menu. */
+    public List<ServiceInfo> getExistingServiceList(final ServiceInfo p) {
         final List<ServiceInfo> existingServiceList =
                                                   new ArrayList<ServiceInfo>();
         try {
@@ -1927,7 +1846,7 @@ public class ClusterBrowser extends Browser {
      * @param serviceInfo
      *              service info object
      */
-    public final void removeFromServiceInfoHash(final ServiceInfo serviceInfo) {
+    public void removeFromServiceInfoHash(final ServiceInfo serviceInfo) {
         // TODO: it comes here twice sometimes
         final Service service = serviceInfo.getService();
         try {
@@ -1945,7 +1864,7 @@ public class ClusterBrowser extends Browser {
 
     /** Returns nameToServiceInfoHash for the specified service.
      *  You must lock it when you use it. */
-    public final Map<String, ServiceInfo> getNameToServiceInfoHash(
+    public Map<String, ServiceInfo> getNameToServiceInfoHash(
                                                         final String name) {
         return nameToServiceInfoHash.get(name);
     }
@@ -1953,11 +1872,8 @@ public class ClusterBrowser extends Browser {
     /**
      * Adds heartbeat id from service to the list. If service does not have an
      * id it is generated.
-     *
-     * @param si
-     *          service info object
      */
-    public final void addToHeartbeatIdList(final ServiceInfo si) {
+    public void addToHeartbeatIdList(final ServiceInfo si) {
         final String id = si.getService().getId();
         String pmId = si.getService().getHeartbeatId();
         if (pmId == null) {
@@ -2012,7 +1928,7 @@ public class ClusterBrowser extends Browser {
      * Deletes caches of all Filesystem infoPanels.
      * This is usefull if something have changed.
      */
-    public final void resetFilesystems() {
+    public void resetFilesystems() {
         try {
             mHeartbeatIdToService.acquire();
         } catch (InterruptedException ie) {
@@ -2032,7 +1948,7 @@ public class ClusterBrowser extends Browser {
      * are taken from serviceInfo object. nameToServiceInfoHash
      * contains a hash with id as a key and ServiceInfo as a value.
      */
-    public final void addNameToServiceInfoHash(final ServiceInfo serviceInfo) {
+    public void addNameToServiceInfoHash(final ServiceInfo serviceInfo) {
         /* add to the hash with service name and id as keys */
         final Service service = serviceInfo.getService();
         try {
@@ -2107,7 +2023,7 @@ public class ClusterBrowser extends Browser {
     /**
      * Returns true if user wants the heartbeat:drbd, which is not recommended.
      */
-    public final boolean hbDrbdConfirmDialog() {
+    public boolean hbDrbdConfirmDialog() {
         final Host dcHost = getDCHost();
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
@@ -2119,7 +2035,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Returns whether drbddisk RA is preferred. */
-    public final boolean isDrbddiskPreferred() {
+    public boolean isDrbddiskPreferred() {
         final Host dcHost = getDCHost();
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
@@ -2132,7 +2048,7 @@ public class ClusterBrowser extends Browser {
      * Returns true if user wants the linbit:drbd even, for old version of
      * hb or simply true if we have pacemaker.
      */
-    public final boolean linbitDrbdConfirmDialog() {
+    public boolean linbitDrbdConfirmDialog() {
         if (isDrbddiskPreferred()) {
             final String desc =
                 Tools.getString("ClusterBrowser.confirmLinbitDrbd.Description");
@@ -2148,19 +2064,15 @@ public class ClusterBrowser extends Browser {
         return true;
     }
 
-    /**
-     * Starts heartbeats on all nodes.
-     */
-    public final void startHeartbeats() {
+    /** Starts heartbeats on all nodes. */
+    void startHeartbeats() {
         final Host[] hosts = cluster.getHostsArray();
         for (Host host : hosts) {
             Heartbeat.startHeartbeat(host);
         }
     }
 
-    /**
-     * Callback to service menu items, that show ptest results in tooltips.
-     */
+    /** Callback to service menu items, that show ptest results in tooltips. */
     public abstract class ClMenuItemCallback implements ButtonCallback {
         /** Menu component on which this callback works. */
         private final ComponentWithTest component;
@@ -2169,19 +2081,15 @@ public class ClusterBrowser extends Browser {
         /** Whether the mouse is still over. */
         private volatile boolean mouseStillOver = false;
 
-        /**
-         * Creates new ClMenuItemCallback object.
-         */
+        /** Creates new ClMenuItemCallback object. */
         public ClMenuItemCallback(final ComponentWithTest component,
                                   final Host menuHost) {
             this.component = component;
             this.menuHost = menuHost;
         }
 
-        /**
-         * Can be overwritten to disable the whole thing.
-         */
-        public boolean isEnabled() {
+        /** Can be overwritten to disable the whole thing. */
+        @Override public boolean isEnabled() {
             Host h;
             if (menuHost == null) {
                 h = getDCHost();
@@ -2198,10 +2106,8 @@ public class ClusterBrowser extends Browser {
             return true;
         }
 
-        /**
-         * Mouse out, stops animation.
-         */
-        public final void mouseOut() {
+        /** Mouse out, stops animation. */
+        @Override public final void mouseOut() {
             if (isEnabled()) {
                 mouseStillOver = false;
                 heartbeatGraph.stopTestAnimation((JComponent) component);
@@ -2209,10 +2115,8 @@ public class ClusterBrowser extends Browser {
             }
         }
 
-        /**
-         * Mouse over, starts animation, calls action() and sets tooltip.
-         */
-        public final void mouseOver() {
+        /** Mouse over, starts animation, calls action() and sets tooltip. */
+        @Override public final void mouseOver() {
             if (isEnabled()) {
                 mouseStillOver = true;
                 component.setToolTipText(STARTING_PTEST_TOOLTIP);
@@ -2244,15 +2148,11 @@ public class ClusterBrowser extends Browser {
             }
         }
 
-        /**
-         * Action that is caried out on the host.
-         */
+        /** Action that is caried out on the host. */
         protected abstract void action(final Host dcHost);
     }
 
-    /**
-     * Callback to service menu items, that show ptest results in tooltips.
-     */
+    /** Callback to service menu items, that show ptest results in tooltips. */
     public abstract class DRBDMenuItemCallback implements ButtonCallback {
         /** Menu component on which this callback works. */
         private final ComponentWithTest component;
@@ -2261,26 +2161,20 @@ public class ClusterBrowser extends Browser {
         /** Whether the mouse is still over. */
         private volatile boolean mouseStillOver = false;
 
-        /**
-         * Creates new DRBDMenuItemCallback object.
-         */
+        /** Creates new DRBDMenuItemCallback object. */
         public DRBDMenuItemCallback(final ComponentWithTest component,
                                     final Host menuHost) {
             this.component = component;
             this.menuHost = menuHost;
         }
 
-        /**
-         * Whether the whole thing should be enabled.
-         */
-        public final boolean isEnabled() {
+        /** Whether the whole thing should be enabled. */
+        @Override public final boolean isEnabled() {
             return true;
         }
 
-        /**
-         * Mouse out, stops animation.
-         */
-        public final void mouseOut() {
+        /** Mouse out, stops animation. */
+        @Override public final void mouseOut() {
             if (!isEnabled()) {
                 return;
             }
@@ -2289,10 +2183,8 @@ public class ClusterBrowser extends Browser {
             component.setToolTipText(null);
         }
 
-        /**
-         * Mouse over, starts animation, calls action() and sets tooltip.
-         */
-        public final void mouseOver() {
+        /** Mouse over, starts animation, calls action() and sets tooltip. */
+        @Override public final void mouseOver() {
             if (!isEnabled()) {
                 return;
             }
@@ -2330,9 +2222,8 @@ public class ClusterBrowser extends Browser {
             drbdtestLockRelease();
             startTestLatch.countDown();
         }
-        /**
-         * Action that is caried out on the host.
-         */
+
+        /** Action that is caried out on the host. */
         protected abstract void action(final Host dcHost);
     }
 
@@ -2340,7 +2231,7 @@ public class ClusterBrowser extends Browser {
      * Returns common file systems on all nodes as StringInfo array.
      * The defaultValue is stored as the first item in the array.
      */
-    public final StringInfo[] getCommonFileSystems(final String defaultValue) {
+    public StringInfo[] getCommonFileSystems(final String defaultValue) {
         StringInfo[] cfs =  new StringInfo[commonFileSystems.length + 1];
         cfs[0] = new StringInfo(defaultValue, null, this);
         int i = 1;
@@ -2354,42 +2245,34 @@ public class ClusterBrowser extends Browser {
      * Returns nw hb connection info object. This is called from heartbeat
      * graph.
      */
-    public final HbConnectionInfo getNewHbConnectionInfo() {
+    HbConnectionInfo getNewHbConnectionInfo() {
         final HbConnectionInfo hbci = new HbConnectionInfo(this);
         //hbci.getInfoPanel();
         return hbci;
     }
 
-    /**
-     * Returns cluster status object.
-     */
-    public final ClusterStatus getClusterStatus() {
+    /** Returns cluster status object. */
+    public ClusterStatus getClusterStatus() {
         return clusterStatus;
     }
 
-    /**
-     * Returns drbd test data.
-     */
-    public final DRBDtestData getDRBDtestData() {
+    /** Returns drbd test data. */
+    public DRBDtestData getDRBDtestData() {
         drbdtestdataLockAcquire();
         final DRBDtestData dtd = drbdtestData;
         drbdtestdataLockRelease();
         return dtd;
     }
 
-    /**
-     * Sets drbd test data.
-     */
-    public final void setDRBDtestData(final DRBDtestData drbdtestData) {
+    /** Sets drbd test data. */
+    public void setDRBDtestData(final DRBDtestData drbdtestData) {
         drbdtestdataLockAcquire();
         this.drbdtestData = drbdtestData;
         drbdtestdataLockRelease();
     }
 
-    /**
-     * Acquire ptest lock.
-     */
-    public final void ptestLockAcquire() {
+    /** Acquire ptest lock. */
+    public void ptestLockAcquire() {
         try {
             mPtestLock.acquire();
         } catch (final InterruptedException e) {
@@ -2397,17 +2280,13 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Release ptest lock.
-     */
-    public final void ptestLockRelease() {
+    /** Release ptest lock. */
+    public void ptestLockRelease() {
         mPtestLock.release();
     }
 
-    /**
-     * Acquire drbd test data lock.
-     */
-    protected final void drbdtestdataLockAcquire() {
+    /** Acquire drbd test data lock. */
+    protected void drbdtestdataLockAcquire() {
         try {
             mDRBDtestdataLock.acquire();
         } catch (final InterruptedException e) {
@@ -2415,73 +2294,55 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /**
-     * Release drbd test data lock.
-     */
-    protected final void drbdtestdataLockRelease() {
+    /** Release drbd test data lock. */
+    protected void drbdtestdataLockRelease() {
         mDRBDtestdataLock.release();
     }
 
-    /**
-     * Returns xml from cluster manager.
-     */
-    public final CRMXML getCRMXML() {
+    /** Returns xml from cluster manager. */
+    public CRMXML getCRMXML() {
         return crmXML;
     }
 
-    /**
-     * Returns xml from drbd.
-     */
-    public final DrbdXML getDrbdXML() {
+    /** Returns xml from drbd. */
+    public DrbdXML getDrbdXML() {
         return drbdXML;
     }
 
-    /**
-     * sets xml from drbd.
-     */
-    public final void setDrbdXML(final DrbdXML drbdXML) {
+    /** Sets xml from drbd. */
+    public void setDrbdXML(final DrbdXML drbdXML) {
         this.drbdXML = drbdXML;
     }
 
-    /**
-     * Returns drbd node from the menu.
-     */
-    public final DefaultMutableTreeNode getDrbdNode() {
+    /** Returns drbd node from the menu. */
+    public DefaultMutableTreeNode getDrbdNode() {
         return drbdNode;
     }
 
-    /**
-     * Returns common blockdevices node from the menu.
-     */
-    public final DefaultMutableTreeNode getCommonBlockDevicesNode() {
+    /** Returns common blockdevices node from the menu. */
+    public DefaultMutableTreeNode getCommonBlockDevicesNode() {
         return commonBlockDevicesNode;
     }
 
-    /**
-     * Returns cluster hosts node from the menu.
-     */
-    public final DefaultMutableTreeNode getClusterHostsNode() {
+    /** Returns cluster hosts node from the menu. */
+    public DefaultMutableTreeNode getClusterHostsNode() {
         return clusterHostsNode;
     }
 
-    /**
-     * Returns services node from the menu.
-     */
-    public final DefaultMutableTreeNode getServicesNode() {
+    /** Returns services node from the menu. */
+    public DefaultMutableTreeNode getServicesNode() {
         return servicesNode;
     }
 
-    /**
-     * Returns services node from the menu.
-     */
-    public final DefaultMutableTreeNode getNetworksNode() {
+    /** Returns services node from the menu. */
+    public DefaultMutableTreeNode getNetworksNode() {
         return networksNode;
     }
 
     /**
      * Returns a hash from drbd device to drbd resource info. putDrbdDevHash
      * must follow after you're done. */
-    public final Map<String, DrbdResourceInfo> getDrbdDevHash() {
+    public Map<String, DrbdResourceInfo> getDrbdDevHash() {
         try {
             mDrbdDevHashLock.acquire();
         } catch (InterruptedException ie) {
@@ -2491,14 +2352,15 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Unlock drbd dev hash. */
-    public final void putDrbdDevHash() {
+    public void putDrbdDevHash() {
         mDrbdDevHashLock.release();
     }
+
     /**
      * Returns a hash from resource name to drbd resource info hash.
      * Get locks the hash and put unlocks it
      */
-    public final Map<String, DrbdResourceInfo> getDrbdResHash() {
+    public Map<String, DrbdResourceInfo> getDrbdResHash() {
         try {
             mDrbdResHashLock.acquire();
         } catch (InterruptedException ie) {
@@ -2508,12 +2370,12 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Done using drbdResHash. */
-    public final void putDrbdResHash() {
+    public void putDrbdResHash() {
         mDrbdResHashLock.release();
     }
 
     /** Returns (shallow) copy of all drbdresource info objects. */
-    public final List<DrbdResourceInfo> getDrbdResHashValues() {
+    public List<DrbdResourceInfo> getDrbdResHashValues() {
         final List<DrbdResourceInfo> values =
                    new ArrayList<DrbdResourceInfo>(getDrbdResHash().values());
         putDrbdResHash();
@@ -2521,7 +2383,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Reloads all combo boxes that need to be reloaded. */
-    public final void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
+    public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
         try {
             mNameToServiceLock.acquire();
         } catch (InterruptedException e) {
@@ -2540,10 +2402,8 @@ public class ClusterBrowser extends Browser {
         mNameToServiceLock.release();
     }
 
-    /**
-     * Returns object that holds data of all VMs.
-     */
-    public final VMSXML getVMSXML(final Host host) {
+    /** Returns object that holds data of all VMs. */
+    public VMSXML getVMSXML(final Host host) {
         try {
             mVMSLock.acquire();
         } catch (InterruptedException e) {
@@ -2558,8 +2418,7 @@ public class ClusterBrowser extends Browser {
      * Finds VMSVirtualDomainInfo object that contains the VM specified by
      * name.
      */
-    public final VMSVirtualDomainInfo findVMSVirtualDomainInfo(
-                                                        final String name) {
+    public VMSVirtualDomainInfo findVMSVirtualDomainInfo(final String name) {
         if (vmsNode != null && name != null) {
             final Enumeration e = vmsNode.children();
             while (e.hasMoreElements()) {
@@ -2575,40 +2434,34 @@ public class ClusterBrowser extends Browser {
         return null;
     }
 
-    /**
-     * Returns map to ResourceAgentClassInfo.
-     */
-    public final ResourceAgentClassInfo getClassInfoMap(final String cl) {
+    /** Returns map to ResourceAgentClassInfo. */
+    public ResourceAgentClassInfo getClassInfoMap(final String cl) {
         return classInfoMap.get(cl);
     }
 
-    /**
-     * Returns map to AvailableServiceInfo.
-     */
-    public final AvailableServiceInfo getAvailableServiceInfoMap(
-                                                     final ResourceAgent ra) {
+    /** Returns map to AvailableServiceInfo. */
+    public AvailableServiceInfo getAvailableServiceInfoMap(
+                                                    final ResourceAgent ra) {
         return availableServiceMap.get(ra);
     }
 
-    /**
-     * Returns available services info object.
-     */
-    public final AvailableServicesInfo getAvailableServicesInfo() {
+    /** Returns available services info object. */
+    public AvailableServicesInfo getAvailableServicesInfo() {
         return (AvailableServicesInfo) availableServicesNode.getUserObject();
     }
 
     /** Returns the services info object. */
-    public final ServicesInfo getServicesInfo() {
+    public ServicesInfo getServicesInfo() {
         return servicesInfo;
     }
 
     /** Returns rsc defaults info object. */
-    public final RscDefaultsInfo getRscDefaultsInfo() {
+    public RscDefaultsInfo getRscDefaultsInfo() {
         return rscDefaultsInfo;
     }
 
     /** Checks all fields in the application. */
-    public final void checkAccessOfEverything() {
+    void checkAccessOfEverything() {
         servicesInfo.checkResourceFieldsChanged(
                                          null,
                                          servicesInfo.getParametersFromXML());
@@ -2676,7 +2529,7 @@ public class ClusterBrowser extends Browser {
 
     /** Returns when at least one resource in the list of resouces can be
         promoted. */
-    public final boolean isOneMaster(final List<String> rscs) {
+    public boolean isOneMaster(final List<String> rscs) {
         for (final String id : rscs) {
             try {
                 mHeartbeatIdToService.acquire();
@@ -2692,9 +2545,8 @@ public class ClusterBrowser extends Browser {
         return false;
     }
 
-    
     /** Returns all block devices from this clusters. */
-    public final List<BlockDevInfo> getAllBlockDevices() {
+    List<BlockDevInfo> getAllBlockDevices() {
         final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
         for (final Host host : cluster.getHostsArray()) {
             bdis.addAll(host.getBrowser().getBlockDevInfos());
@@ -2703,7 +2555,7 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Updates host hardware info immediatly. */
-    public final void updateHWInfo(final Host host) {
+    public void updateHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                        new ResourceGraph[]{drbdGraph, heartbeatGraph});

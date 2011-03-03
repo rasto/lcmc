@@ -60,7 +60,7 @@ import javax.swing.SwingUtilities;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class DrbdGuiXML extends XML {
+public final class DrbdGuiXML extends XML {
     /** Host name attribute string. */
     private static final String HOST_NAME_ATTR = "name";
     /** Host ssh port attribute string. */
@@ -82,11 +82,8 @@ public class DrbdGuiXML extends XML {
     /** Plugin password. */
     private static final String PLUGIN_PASSWD_ATTR = "plgpasswd";
 
-    /**
-     * Saves data about clusters and hosts to the supplied output stream.
-     */
-    public final String saveXML(final OutputStream outputStream)
-    throws IOException {
+    /** Saves data about clusters and hosts to the supplied output stream. */
+    public String saveXML(final OutputStream outputStream) throws IOException {
         final String encoding = "UTF-8";
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;
@@ -195,7 +192,7 @@ public class DrbdGuiXML extends XML {
     /**
      * Starts specified clusters and connects to the hosts of this clusters.
      */
-    public final void startClusters(final List<Cluster> selectedClusters) {
+    public void startClusters(final List<Cluster> selectedClusters) {
         final Set<Cluster> clusters =
                         Tools.getConfigData().getClusters().getClusterSet();
         if (clusters != null) {
@@ -212,12 +209,12 @@ public class DrbdGuiXML extends XML {
                     continue;
                 }
                 final Runnable runnable = new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 cluster.getClusterTab().addClusterView();
                                 cluster.getClusterTab().requestFocus();
                             }
@@ -234,7 +231,7 @@ public class DrbdGuiXML extends XML {
      * Loads info from xml that is supplied as an argument to the internal
      * data objects.
      */
-    public final void loadXML(final String xml) {
+    public void loadXML(final String xml) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
             return;

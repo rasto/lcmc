@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @version $Id$
  *
  */
-public class PtestData {
+public final class PtestData {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)" */
@@ -70,9 +70,7 @@ public class PtestData {
     private final Map<String, Boolean> managedHash =
                                      new LinkedHashMap<String, Boolean>();
 
-    /**
-     * Prepares a new <code>PtestData</code> object.
-     */
+    /** Prepares a new <code>PtestData</code> object. */
     public PtestData(final String raw) {
         if (raw == null) {
             this.toolTip = null;
@@ -267,45 +265,33 @@ public class PtestData {
         this.shadowCib = queries[1];
     }
 
-    /**
-     * Returns tooltip.
-     */
-    public final String getToolTip() {
+    /** Returns tooltip. */
+    public String getToolTip() {
         return toolTip;
     }
 
-    /**
-     * Returns shadow cib.
-     */
-    public final String getShadowCib() {
+    /** Returns shadow cib. */
+    String getShadowCib() {
         return shadowCib;
     }
 
-    /**
-     * Returns on which nodes is service running.
-     */
-    public final List<String> getRunningOnNodes(final String pmId) {
+    /** Returns on which nodes is service running. */
+    List<String> getRunningOnNodes(final String pmId) {
         return runningOnNodes.get(pmId);
     }
 
-    /**
-     * Returns on which nodes is service master.
-     */
-    public final List<String> getMasterOnNodes(final String pmId) {
+    /** Returns on which nodes is service master. */
+    List<String> getMasterOnNodes(final String pmId) {
         return masterOnNodes.get(pmId);
     }
 
-    /**
-     * Returns on which nodes is service slave.
-     */
-    public final List<String> getSlaveOnNodes(final String pmId) {
+    /** Returns on which nodes is service slave. */
+    List<String> getSlaveOnNodes(final String pmId) {
         return slaveOnNodes.get(pmId);
     }
 
-    /**
-     * Returns if service is managed.
-     */
-    public final boolean isManaged(final String pmId) {
+    /** Returns if service is managed. */
+    boolean isManaged(final String pmId) {
         final Boolean m = managedHash.get(pmId);
         if (m == null) {
             return true;

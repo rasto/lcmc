@@ -47,9 +47,9 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
 /**
  * Object that holds an order constraint information.
  */
-public class ConstraintPHInfo extends ServiceInfo {
+public final class ConstraintPHInfo extends ServiceInfo {
     /** Name of this object. */
-    public static final String NAME = "Placeholder";
+    static final String NAME = "Placeholder";
     /** Resource set connection data for colocation. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
@@ -70,12 +70,9 @@ public class ConstraintPHInfo extends ServiceInfo {
     /** Rsc set info object lock. */
     private final Mutex mPcmkRscSetsLock = new Mutex();
 
-    /**
-     * Prepares a new <code>ConstraintPHInfo</code> object.
-     */
-    public ConstraintPHInfo(
-                    final Browser browser,
-                    final CRMXML.RscSetConnectionData rscSetConnectionData) {
+    /** Prepares a new <code>ConstraintPHInfo</code> object. */
+    ConstraintPHInfo(final Browser browser,
+                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         super(NAME, null, browser);
         if (rscSetConnectionData != null) {
             if (rscSetConnectionData.isColocation()) {
@@ -87,18 +84,18 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns resource set colocation data. */
-    public final CRMXML.RscSetConnectionData getRscSetConnectionDataCol() {
+    CRMXML.RscSetConnectionData getRscSetConnectionDataCol() {
         return rscSetConnectionDataCol;
     }
 
     /** Returns resource set order data. */
-    public final CRMXML.RscSetConnectionData getRscSetConnectionDataOrd() {
+    CRMXML.RscSetConnectionData getRscSetConnectionDataOrd() {
         return rscSetConnectionDataOrd;
     }
 
 
     /** Sets connection data to zero. */
-    public final void resetRscSetConnectionData() {
+    public void resetRscSetConnectionData() {
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
         if (rodata != null && rodata.isEmpty()) {
             rscSetConnectionDataOrd = null;
@@ -110,7 +107,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Sets resource set connection data. */
-    public final void setRscSetConnectionData(
+    void setRscSetConnectionData(
                     final CRMXML.RscSetConnectionData rscSetConnectionData) {
         if (rscSetConnectionData.isColocation()) {
             if (reverseCol) {
@@ -217,14 +214,12 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Returns long description of the parameter, that is used for
      * tool tips.
      */
-    protected final String getParamLongDesc(final String param) {
+    @Override protected String getParamLongDesc(final String param) {
         return null;
     }
 
-    /**
-     * Returns short description of the parameter, that is used as * label.
-     */
-    protected final String getParamShortDesc(final String param) {
+    /** Returns short description of the parameter, that is used as * label. */
+    @Override protected String getParamShortDesc(final String param) {
         return null;
     }
 
@@ -232,25 +227,23 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Checks if the new value is correct for the parameter type and
      * constraints.
      */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
+    @Override protected boolean checkParam(final String param,
+                                           final String newValue) {
         return true;
     }
 
-    /**
-     * Returns default for this parameter.
-     */
-    public final String getParamDefault(final String param) {
+    /** Returns default for this parameter. */
+    @Override public String getParamDefault(final String param) {
         return "default";
     }
 
     /** Returns preferred value for this parameter. */
-    protected final String getParamPreferred(final String param) {
+    @Override protected String getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns lsit of all parameters as an array. */
-    public final String[] getParametersFromXML() {
+    @Override public String[] getParametersFromXML() {
         return new String[]{};
     }
 
@@ -258,17 +251,17 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Possible choices for pulldown menus, or null if it is not a pull
      * down menu.
      */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         return null;
     }
 
     /** Returns parameter type, boolean etc. */
-    protected final String getParamType(final String param) {
+    @Override protected String getParamType(final String param) {
         return null;
     }
 
     /** Returns section to which the global belongs. */
-    protected final String getSection(final String param) {
+    @Override protected String getSection(final String param) {
         return null;
     }
 
@@ -276,42 +269,42 @@ public class ConstraintPHInfo extends ServiceInfo {
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    protected final boolean isCheckBox(final String param) {
+    @Override protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    protected final boolean isTimeType(final String param) {
+    @Override protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is integer. */
-    protected final boolean isInteger(final String param) {
+    @Override protected boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is required. */
-    protected final boolean isRequired(final String param) {
+    @Override protected boolean isRequired(final String param) {
         return true;
     }
 
     /** Applies changes to the placeholder. */
-    public final void apply(final Host dcHost, final boolean testOnly) {
+    @Override void apply(final Host dcHost, final boolean testOnly) {
         /* apply is in resource set info object. */
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         return true;
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Returns name of this placeholder. */
-    public final String toString() {
+    @Override public String toString() {
         return getName() +  " (" + getService().getId() + ")";
     }
 
@@ -320,7 +313,7 @@ public class ConstraintPHInfo extends ServiceInfo {
      * TODO: this id is used for stored position info, should be named
      * differently.
      */
-    public final String getId() {
+    @Override public String getId() {
         String ordId = "";
         String colId = "";
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
@@ -335,7 +328,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Return information panel. */
-    public final JComponent getInfoPanel() {
+    @Override public JComponent getInfoPanel() {
         try {
             mPcmkRscSetsLock.acquire();
         } catch (InterruptedException ie) {
@@ -347,12 +340,12 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns tool tip for the placeholder. */
-    public final String getToolTipText(final boolean testOnly) {
+    @Override public String getToolTipText(final boolean testOnly) {
         return Tools.getString("ConstraintPHInfo.ToolTip");
     }
 
     /** Return list of popup items. */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         addDependencyMenuItems(items, true, testOnly);
@@ -365,7 +358,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 } else if (getService().isRemoved()) {
@@ -374,7 +367,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 return null;
             }
 
-            public void action() {
+            @Override public void action() {
                 hidePopup();
                 removeMyself(false);
                 getBrowser().getHeartbeatGraph().repaint();
@@ -382,10 +375,10 @@ public class ConstraintPHInfo extends ServiceInfo {
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
                 getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
-            public final boolean isEnabled() {
+            @Override public final boolean isEnabled() {
                 return super.isEnabled() && !getService().isNew();
             }
-            public final void action(final Host dcHost) {
+            @Override public final void action(final Host dcHost) {
                 removeMyselfNoConfirm(dcHost, true); /* test only */
             }
         };
@@ -395,8 +388,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Removes the placeholder without confirmation dialog. */
-    protected final void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+    @Override protected void removeMyselfNoConfirm(final Host dcHost,
+                                                   final boolean testOnly) {
         if (getService().isNew()) {
             if (!testOnly) {
                 setUpdated(true);
@@ -414,7 +407,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         getBrowser().getHeartbeatGraph().killRemovedVertices();
                         getService().doneRemoving();
                     }
@@ -438,7 +431,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 getService().setRemoved(true);
                 getBrowser().removeFromServiceInfoHash(this);
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         getBrowser().getHeartbeatGraph().killRemovedVertices();
                         getService().doneRemoving();
                     }
@@ -448,7 +441,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Removes this placeholder from the crm with confirmation dialog. */
-    public final void removeMyself(final boolean testOnly) {
+    @Override public void removeMyself(final boolean testOnly) {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
@@ -468,7 +461,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Sets whether the info object is being updated. */
-    public final void setUpdated(final boolean updated) {
+    @Override public void setUpdated(final boolean updated) {
         if (updated && !isUpdated()) {
             getBrowser().getHeartbeatGraph().startAnimation(this);
         } else if (!updated) {
@@ -478,34 +471,34 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Whether this class is a constraint placeholder. */
-    public final boolean isConstraintPH() {
+    @Override public boolean isConstraintPH() {
         return true;
     }
 
     /** Sets whether the direction of order was reversed, meaning it is from
      * this placeholder, when it was new. */
-    public final void reverseOrder() {
+    void reverseOrder() {
         reverseOrd = true;
     }
 
     /** Sets whether the direction of colocation was reversed, meaning it is
      * from this placeholder, when it was new. */
-    public final void reverseColocation() {
+    void reverseColocation() {
         reverseCol = true;
     }
 
     /** Returns whether the colocation was reversed. */
-    public final boolean isReversedCol() {
+    boolean isReversedCol() {
         return reversedCol;
     }
 
     /** Returns whether the order was reversed. */
-    public final boolean isReversedOrd() {
+    boolean isReversedOrd() {
         return reversedOrd;
     }
 
     /** Adds constraint to or from placeholder. */
-    protected final List<CRMXML.RscSet> addConstraintWithPlaceholder(
+    protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
                                       final List<ServiceInfo> servicesAll,
                                       final List<ServiceInfo> servicesFrom,
                                       final boolean colocationOnly,
@@ -839,8 +832,7 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     /** Whether the id of this constraint is the same or there is no id in this
      * object. */
-    public final boolean sameConstraintId(
-                                final CRMXML.RscSetConnectionData otherRdata) {
+    boolean sameConstraintId(final CRMXML.RscSetConnectionData otherRdata) {
         if (otherRdata.isColocation()) {
             final CRMXML.RscSetConnectionData rdataCol =
                                                        rscSetConnectionDataCol;
@@ -859,8 +851,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Sets rsc sets info object. */
-    public final void setPcmkRscSetsInfo(
-                                     final PcmkRscSetsInfo pcmkRscSetsInfo) {
+    void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
         try {
             mPcmkRscSetsLock.acquire();
         } catch (InterruptedException ie) {
@@ -873,7 +864,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Gets rsc sets info object. */
-    public final PcmkRscSetsInfo getPcmkRscSetsInfo() {
+    PcmkRscSetsInfo getPcmkRscSetsInfo() {
         try {
             mPcmkRscSetsLock.acquire();
         } catch (InterruptedException ie) {
@@ -885,7 +876,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Hide/Show advanced panels. */
-    public final void updateAdvancedPanels() {
+    @Override public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
         try {
             mPcmkRscSetsLock.acquire();
@@ -900,7 +891,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns whether the placeholder has any connections at all. */
-    public final boolean isEmpty() {
+    boolean isEmpty() {
         final CRMXML.RscSetConnectionData rdataOrd =
                                             getRscSetConnectionDataOrd();
         final CRMXML.RscSetConnectionData rdataCol =
@@ -910,7 +901,7 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns attributes for resource_set tag. */
-    public final void getAttributes(
+    void getAttributes(
                   final boolean isCol,
                   final boolean first,
                   final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs) {
@@ -934,8 +925,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns resource that is next in sequence in the resource set. */
-    public final ServiceInfo nextInSequence(final ServiceInfo si,
-                                            final boolean isCol) {
+    public ServiceInfo nextInSequence(final ServiceInfo si,
+                                      final boolean isCol) {
         CRMXML.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataCol;
@@ -965,8 +956,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns resource that is before in sequence in the resource set. */
-    public final ServiceInfo prevInSequence(final ServiceInfo si,
-                                            final boolean isCol) {
+    public ServiceInfo prevInSequence(final ServiceInfo si,
+                                      final boolean isCol) {
         CRMXML.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataCol;
@@ -995,21 +986,21 @@ public class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns the main text that appears in the graph. */
-    public final String getMainTextForGraph() {
+    @Override public String getMainTextForGraph() {
         return getService().getId();
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public final String getIconTextForGraph(final boolean testOnly) {
+    @Override public String getIconTextForGraph(final boolean testOnly) {
         return "   PH";
     }
     /** Returns text with lines as array that appears in the cluster graph. */
-    public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    @Override public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         return null;
     }
 
     /** Stops resource in crm. */
-    public void stopResource(final Host dcHost, final boolean testOnly) {
+    @Override void stopResource(final Host dcHost, final boolean testOnly) {
         /* cannot stop placeholder */
     }
 }

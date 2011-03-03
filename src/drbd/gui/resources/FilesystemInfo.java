@@ -38,7 +38,7 @@ import java.awt.event.ItemEvent;
  * way, so that it can use block device information and drbd devices. If
  * drbd device is selected, the drbddisk service will be added too.
  */
-class FilesystemInfo extends ServiceInfo {
+final class FilesystemInfo extends ServiceInfo {
     /** linbit::drbd service object. */
     private LinbitDrbdInfo linbitDrbdInfo = null;
     /** drbddisk service object. */
@@ -52,23 +52,19 @@ class FilesystemInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
 
-    /**
-     * Creates the FilesystemInfo object.
-     */
-    public FilesystemInfo(final String name,
-                          final ResourceAgent ra,
-                          final Browser browser) {
+    /** Creates the FilesystemInfo object. */
+    FilesystemInfo(final String name,
+                   final ResourceAgent ra,
+                   final Browser browser) {
         super(name, ra, browser);
     }
 
-    /**
-     * Creates the FilesystemInfo object.
-     */
-    public FilesystemInfo(final String name,
-                          final ResourceAgent ra,
-                          final String hbId,
-                          final Map<String, String> resourceNode,
-                          final Browser browser) {
+    /** Creates the FilesystemInfo object. */
+    FilesystemInfo(final String name,
+                   final ResourceAgent ra,
+                   final String hbId,
+                   final Map<String, String> resourceNode,
+                   final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
     }
 
@@ -76,7 +72,7 @@ class FilesystemInfo extends ServiceInfo {
      * Sets Linbit::drbd info object for this Filesystem service if it uses
      * drbd block device.
      */
-    public void setLinbitDrbdInfo(final LinbitDrbdInfo linbitDrbdInfo) {
+    void setLinbitDrbdInfo(final LinbitDrbdInfo linbitDrbdInfo) {
         this.linbitDrbdInfo = linbitDrbdInfo;
     }
 
@@ -84,7 +80,7 @@ class FilesystemInfo extends ServiceInfo {
      * Returns linbit::drbd info object that is associated with the drbd
      * device or null if it is not a drbd device.
      */
-    public LinbitDrbdInfo getLinbitDrbdInfo() {
+    LinbitDrbdInfo getLinbitDrbdInfo() {
         return linbitDrbdInfo;
     }
 
@@ -92,7 +88,7 @@ class FilesystemInfo extends ServiceInfo {
      * Sets DrbddiskInfo object for this Filesystem service if it uses drbd
      * block device.
      */
-    public void setDrbddiskInfo(final DrbddiskInfo drbddiskInfo) {
+    void setDrbddiskInfo(final DrbddiskInfo drbddiskInfo) {
         this.drbddiskInfo = drbddiskInfo;
     }
 
@@ -100,7 +96,7 @@ class FilesystemInfo extends ServiceInfo {
      * Returns DrbddiskInfo object that is associated with the drbd device
      * or null if it is not a drbd device.
      */
-    public DrbddiskInfo getDrbddiskInfo() {
+    DrbddiskInfo getDrbddiskInfo() {
         return drbddiskInfo;
     }
 
@@ -110,8 +106,8 @@ class FilesystemInfo extends ServiceInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         final boolean ret = super.checkResourceFieldsCorrect(param, params);
         if (!ret) {
             return false;
@@ -123,10 +119,8 @@ class FilesystemInfo extends ServiceInfo {
         return true;
     }
 
-    /**
-     * Applies changes to the Filesystem service parameters.
-     */
-    public void apply(final Host dcHost, final boolean testOnly) {
+    /** Applies changes to the Filesystem service parameters. */
+    @Override void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             final String dir = getComboBoxValue("directory");
             boolean confirm = false; /* confirm only once */
@@ -173,17 +167,15 @@ class FilesystemInfo extends ServiceInfo {
         //TODO: escape dir
     }
 
-    /**
-     * Adds combo box listener for the parameter.
-     */
+    /** Adds combo box listener for the parameter. */
     private void addParamComboListeners(final GuiComboBox paramCb) {
         paramCb.addListeners(
             new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED
                         && fstypeParamCb != null) {
                         final Thread thread = new Thread(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 if (!(e.getItem() instanceof Info)) {
                                     return;
                                 }
@@ -217,9 +209,9 @@ class FilesystemInfo extends ServiceInfo {
     }
 
     /** Returns editable element for the parameter. */
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
+    @Override protected GuiComboBox getParamComboBox(final String param,
+                                                     final String prefix,
+                                                     final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
             final DrbdResourceInfo selectedInfo =
@@ -315,10 +307,8 @@ class FilesystemInfo extends ServiceInfo {
         return paramCb;
     }
 
-    /**
-     * Returns string representation of the filesystem service.
-     */
-    public String toString() {
+    /** Returns string representation of the filesystem service. */
+    @Override public String toString() {
         String id = getService().getId();
         if (id == null) {
             return super.toString(); /* this is for 'new Filesystem' */
@@ -345,9 +335,10 @@ class FilesystemInfo extends ServiceInfo {
 
         return s.toString();
     }
+
     /** Removes the service without confirmation dialog. */
-    protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+    @Override protected void removeMyselfNoConfirm(final Host dcHost,
+                                                   final boolean testOnly) {
         final DrbdResourceInfo oldDri =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
@@ -356,7 +347,7 @@ class FilesystemInfo extends ServiceInfo {
         if (oldDri != null && !testOnly) {
             oldDri.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     oldDri.updateMenus(null);
                 }
             });
@@ -368,8 +359,8 @@ class FilesystemInfo extends ServiceInfo {
      * Adds DrbddiskInfo before the filesysteminfo is added, returns true
      * if something was added.
      */
-    public final void addResourceBefore(final Host dcHost,
-                                        final boolean testOnly) {
+    @Override void addResourceBefore(final Host dcHost,
+                                     final boolean testOnly) {
         if (getGroupInfo() != null) {
             // TODO: disabled for now
             return;
@@ -403,14 +394,14 @@ class FilesystemInfo extends ServiceInfo {
             }
             oldDri.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     oldDri.updateMenus(null);
                 }
             });
             t.start();
             //oldDri.setUsedByCRM(false);
             //final Thread t = new Thread(new Runnable() {
-            //    public void run() {
+            //    @Override public void run() {
             //        oldDri.updateMenus(null);
             //    }
             //});
@@ -423,7 +414,7 @@ class FilesystemInfo extends ServiceInfo {
         if (newDri != null) {
             //newDri.setUsedByCRM(true);
             //final Thread t = new Thread(new Runnable() {
-            //    public void run() {
+            //    @Override public void run() {
             //        newDri.updateMenus(null);
             //    }
             //});
@@ -436,10 +427,8 @@ class FilesystemInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns how much of the filesystem is used.
-     */
-    public final int getUsed() {
+    /** Returns how much of the filesystem is used. */
+    @Override public int getUsed() {
         if (blockDeviceParamCb != null) {
             final Object value = blockDeviceParamCb.getValue();
             if (Tools.isStringClass(value)) {
@@ -458,13 +447,12 @@ class FilesystemInfo extends ServiceInfo {
     }
 
     /** Sets whether the old style drbddisk is preferred. */
-    public final void setDrbddiskIsPreferred(
-                                           final boolean drbddiskIsPreferred) {
+    void setDrbddiskIsPreferred(final boolean drbddiskIsPreferred) {
         this.drbddiskIsPreferred = drbddiskIsPreferred;
     }
 
     /** Reload combo boxes. */
-    public void reloadComboBoxes() {
+    @Override public void reloadComboBoxes() {
         super.reloadComboBoxes();
         final DrbdResourceInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(

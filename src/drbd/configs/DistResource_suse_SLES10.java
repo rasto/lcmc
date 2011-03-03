@@ -26,11 +26,11 @@ import java.util.Arrays;
 /**
  * Here are commands for suse sles 10.
  */
-public class DistResource_suse_SLES10 extends
-            java.util.ListResourceBundle {
+public final class DistResource_suse_SLES10
+                                        extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

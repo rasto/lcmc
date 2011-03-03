@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
  * @version $Id$
  *
  */
-public class BlockDevice extends Resource {
+public final class BlockDevice extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Block size in blocks. */
@@ -77,19 +77,6 @@ public class BlockDevice extends Resource {
     /** LVM group. */
     private String volumeGroup = null;
 
-    ///**
-    // * Creates a new <code>BlockDevice</code> object.
-    // */
-    //public BlockDevice(final String name,
-    //                   final String blockSize,
-    //                   final String mountedOn,
-    //                   final String fsType) {
-    //    super(name);
-    //    this.blockSize = blockSize;
-    //    this.mountedOn = mountedOn;
-    //    this.fsType    = fsType;
-    //}
-
     /**
      * Creates a new <code>BlockDevice</code> object.
      *
@@ -102,10 +89,8 @@ public class BlockDevice extends Resource {
         update(line);
     }
 
-    /**
-     * Updates the block device.
-     */
-    public final void update(final String line) {
+    /** Updates the block device. */
+    public void update(final String line) {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
@@ -134,38 +119,28 @@ public class BlockDevice extends Resource {
         }
     }
 
-    /**
-     * Returns block size.
-     */
-    public final String getBlockSize() {
+    /** Returns block size. */
+    public String getBlockSize() {
         return blockSize;
     }
 
-    /**
-     * Returns mount point.
-     */
-    public final String getMountedOn() {
+    /** Returns mount point. */
+    public String getMountedOn() {
         return mountedOn;
     }
 
-    /**
-     * Returns file system type.
-     */
-    public final String getFsType() {
+    /** Returns file system type. */
+    public String getFsType() {
         return fsType;
     }
 
-    /**
-     * Returns whether this block device is mounted.
-     */
-    public final boolean isMounted() {
+    /** Returns whether this block device is mounted. */
+    public boolean isMounted() {
         return mountedOn != null;
     }
 
-    /**
-     * Returns true if this device is drbd device.
-     */
-    public final boolean isDrbd() {
+    /** Returns true if this device is drbd device. */
+    public boolean isDrbd() {
         return drbd;
     }
 
@@ -173,14 +148,12 @@ public class BlockDevice extends Resource {
      * Returns how much of the file system is used in percents. -1 denotes that
      * there is no usage information.
      */
-    public final int getUsed() {
+    public int getUsed() {
         return used;
     }
 
-    /**
-     * Resets all drbd info. E.g. after status failure.
-     */
-    public final void resetDrbd() {
+    /** Resets all drbd info. E.g. after status failure. */
+    public void resetDrbd() {
         splitBrain = false;
         connectionState = null;
         nodeState       = null;
@@ -189,24 +162,18 @@ public class BlockDevice extends Resource {
         drbdFlags       = null;
     }
 
-    /**
-     * Returns true if this device is used by CRM.
-     */
-    public final boolean isUsedByCRM() {
+    /** Returns true if this device is used by CRM. */
+    public boolean isUsedByCRM() {
         return isUsedByCRM;
     }
 
-    /**
-     * Returns true if this device is used as drbd meta-disk.
-     */
-    public final boolean isDrbdMetaDisk() {
+    /** Returns true if this device is used as drbd meta-disk. */
+    public boolean isDrbdMetaDisk() {
         return !metaDiskOfBlockDevices.isEmpty();
     }
 
-    /**
-     * Returns the block devices of which this block device is a meta disk.
-     */
-    public final List<BlockDevice> getMetaDiskOfBlockDevices() {
+    /** Returns the block devices of which this block device is a meta disk. */
+    public List<BlockDevice> getMetaDiskOfBlockDevices() {
         return metaDiskOfBlockDevices;
     }
 
@@ -215,15 +182,13 @@ public class BlockDevice extends Resource {
      * drbd. That is if this device is not mounted and is
      * not used by CRM.
      */
-    public final boolean isAvailable() {
+    public boolean isAvailable() {
         return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk();
     }
 
 
-    /**
-     * Sets or unsets drbd flag.
-     */
-    public final void setDrbd(final boolean drbd) {
+    /** Sets or unsets drbd flag. */
+    public void setDrbd(final boolean drbd) {
         this.drbd = drbd;
         if (!drbd) {
             connectionState       = null;
@@ -243,10 +208,10 @@ public class BlockDevice extends Resource {
     /**
      * Returns whether the specified data are different than the stored data.
      */
-    public final boolean isDifferent(final String connectionState,
-                                     final String nodeState,
-                                     final String diskState,
-                                     final String drbdFlags) {
+    public boolean isDifferent(final String connectionState,
+                                         final String nodeState,
+                                         final String diskState,
+                                         final String drbdFlags) {
         return !Tools.areEqual(this.connectionState, connectionState)
                || !Tools.areEqual(this.nodeState, nodeState)
                || !Tools.areEqual(this.diskState, diskState)
@@ -254,10 +219,8 @@ public class BlockDevice extends Resource {
     }
 
 
-    /**
-     * Sets this device used by CRM flag.
-     */
-    public final void setUsedByCRM(final boolean isUsedByCRM) {
+    /** Sets this device used by CRM flag. */
+    public void setUsedByCRM(final boolean isUsedByCRM) {
         this.isUsedByCRM = isUsedByCRM;
     }
 
@@ -265,49 +228,38 @@ public class BlockDevice extends Resource {
      * Adds metaDiskOfBlockDevice which is a block device of which block device
      * is this meta disk.
      */
-    public final void addMetaDiskOfBlockDevice(
-                                    final BlockDevice metaDiskOfBlockDevice) {
+    void addMetaDiskOfBlockDevice(final BlockDevice metaDiskOfBlockDevice) {
         if (!metaDiskOfBlockDevices.contains(metaDiskOfBlockDevice)) {
             metaDiskOfBlockDevices.add(metaDiskOfBlockDevice);
         }
     }
 
-    /**
-     * Sets net interface.
-     */
-    public final void setNetInterface(final NetInterface netInterface) {
+    /** Sets net interface. */
+    void setNetInterface(final NetInterface netInterface) {
         this.netInterface = netInterface;
     }
 
-    /**
-     * Sets meta disk.
-     */
-    public final void setMetaDisk(final BlockDevice metaDisk) {
+    /** Sets meta disk. */
+    public void setMetaDisk(final BlockDevice metaDisk) {
         this.metaDisk = metaDisk;
         if (metaDisk != null) {
             metaDisk.addMetaDiskOfBlockDevice(this);
         }
     }
 
-    /**
-     * Removes the meta disk info.
-     */
-    public final void removeMetadiskOfBlockDevice(
+    /** Removes the meta disk info. */
+    public void removeMetadiskOfBlockDevice(
                                     final BlockDevice metaDiskOfBlockDevice) {
         metaDiskOfBlockDevices.remove(metaDiskOfBlockDevice);
     }
 
-    /**
-     * Returns meta-disk.
-     */
-    public final BlockDevice getMetaDisk() {
+    /** Returns meta-disk. */
+    public BlockDevice getMetaDisk() {
         return metaDisk;
     }
 
-    /**
-     * Returns net interface object.
-     */
-    public final NetInterface getNetInterface() {
+    /** Returns net interface object. */
+    NetInterface getNetInterface() {
         return netInterface;
     }
 
@@ -315,8 +267,8 @@ public class BlockDevice extends Resource {
      * Returns stored net interface and port concanated with ':'
      * It can return null if net interface or port are not defined.
      */
-    public final String getDrbdNetInterfaceWithPort(final String ni,
-                                                    final String nip) {
+    public String getDrbdNetInterfaceWithPort(final String ni,
+                                              final String nip) {
         if (ni == null || nip == null) {
             return null;
         }
@@ -327,78 +279,58 @@ public class BlockDevice extends Resource {
      * Returns stored net interface and port concanated with ':'
      * It can return null if net interface or port are not defined.
      */
-    public final String getDrbdNetInterfaceWithPort() {
+    public String getDrbdNetInterfaceWithPort() {
         return getDrbdNetInterfaceWithPort(getValue("DrbdNetInterface"),
                                            getValue("DrbdNetInterfacePort"));
     }
 
-    /**
-     * Sets drbd connection state as it is in /proc/drbd.
-     */
-    public final void setConnectionState(final String connectionState) {
+    /** Sets drbd connection state as it is in /proc/drbd. */
+    public void setConnectionState(final String connectionState) {
         this.connectionState = connectionState;
     }
 
-    /**
-     * Sets all drbd flags at once.
-     */
-    public final void setDrbdFlags(final String drbdFlags) {
+    /** Sets all drbd flags at once. */
+    public void setDrbdFlags(final String drbdFlags) {
         this.drbdFlags = drbdFlags;
     }
 
-    /**
-     * Sets drbd node state as it is in /proc/drbd.
-     */
-    public final void setNodeState(final String nodeState) {
+    /** Sets drbd node state as it is in /proc/drbd. */
+    public void setNodeState(final String nodeState) {
         this.nodeState = nodeState;
     }
 
-    /**
-     * Sets disk node state as it is in /proc/drbd.
-     */
-    public final void setDiskState(final String diskState) {
+    /** Sets disk node state as it is in /proc/drbd. */
+    public void setDiskState(final String diskState) {
         this.diskState = diskState;
     }
 
-    /**
-     * Returns connection state.
-     */
-    public final String getConnectionState() {
+    /** Returns connection state. */
+    public String getConnectionState() {
         return connectionState;
     }
 
-    /**
-     * Returns node state.
-     */
-    public final String getNodeState() {
+    /** Returns node state. */
+    public String getNodeState() {
         return nodeState;
     }
 
-    /**
-     * Returns disk state.
-     */
-    public final String getDiskState() {
+    /** Returns disk state. */
+    public String getDiskState() {
         return diskState;
     }
 
-    /**
-     * Sets the synced progress in percents.
-     */
-    public final void setSyncedProgress(final String syncedProgress) {
+    /** Sets the synced progress in percents. */
+    public void setSyncedProgress(final String syncedProgress) {
         this.syncedProgress = syncedProgress;
     }
 
-    /**
-     * Returns synced progress in percent.
-     */
-    public final String getSyncedProgress() {
+    /** Returns synced progress in percent. */
+    public String getSyncedProgress() {
         return syncedProgress;
     }
 
-    /**
-     * Returns whether this block device is attached.
-     */
-    public final boolean isAttached() {
+    /** Returns whether this block device is attached. */
+    public boolean isAttached() {
         if (!drbd) {
             return true;
         }
@@ -411,10 +343,8 @@ public class BlockDevice extends Resource {
         return true;
     }
 
-    /**
-     * Returns whether this block device is diskless.
-     */
-    public final boolean isDiskless() {
+    /** Returns whether this block device is diskless. */
+    public boolean isDiskless() {
         if (!drbd) {
             return false;
         }
@@ -431,7 +361,7 @@ public class BlockDevice extends Resource {
      * Returns whether this block device is connected and resets the split
      * brain flag if it is.
      */
-    public final boolean isConnected() {
+    public boolean isConnected() {
         if (connectionState == null) {
             return false;
         }
@@ -453,20 +383,16 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns whether the device is connected or is waiting for connection.
-     */
-    public final boolean isConnectedOrWF() {
+    /** Returns whether the device is connected or is waiting for connection. */
+    public boolean isConnectedOrWF() {
         if (isWFConnection() || isConnected()) {
             return true;
         }
         return false;
     }
 
-    /**
-     * Returns whether this device is waiting for connection.
-     */
-    public final boolean isWFConnection() {
+    /** Returns whether this device is waiting for connection. */
+    public boolean isWFConnection() {
         if (connectionState == null) {
             return false;
         }
@@ -476,10 +402,8 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns whether this device is primary.
-     */
-    public final boolean isPrimary() {
+    /** Returns whether this device is primary. */
+    public boolean isPrimary() {
         if (nodeState == null) {
             return false;
         }
@@ -489,10 +413,8 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns whether this device is secondary.
-     */
-    public final boolean isSecondary() {
+    /** Returns whether this device is secondary. */
+    public boolean isSecondary() {
         if (nodeState == null) {
             return false;
         }
@@ -502,27 +424,21 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns the boolean value of the specified flag.
-     */
+    /** Returns the boolean value of the specified flag. */
     private boolean checkDrbdFlag(final int flag) {
         return drbdFlags.indexOf(flag) >= 0;
     }
 
-    /**
-     * Returns whether the sync was paused on this block device.
-     */
-    public final boolean isPausedSync() {
+    /** Returns whether the sync was paused on this block device. */
+    public boolean isPausedSync() {
         if (drbdFlags == null) {
             return false;
         }
         return checkDrbdFlag('u');
     }
 
-    /**
-     * Returns whether the node is syncing with other node.
-     */
-    public final boolean isSyncing() {
+    /** Returns whether the node is syncing with other node. */
+    public boolean isSyncing() {
         if (nodeState == null) {
             syncedProgress = null;
             return false;
@@ -537,10 +453,8 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns whether the node is verifying with other node.
-     */
-    public final boolean isVerifying() {
+    /** Returns whether the node is verifying with other node. */
+    public boolean isVerifying() {
         if (nodeState == null) {
             return false;
         }
@@ -556,7 +470,7 @@ public class BlockDevice extends Resource {
      * Returns true if this node is source of the data, false if this node gets
      * data from other node.
      */
-    public final boolean isSyncSource() {
+    public boolean isSyncSource() {
         if (connectionState == null) {
             return false;
         }
@@ -566,10 +480,8 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Returns true if this node is target for the data, otherwise false.
-     */
-    public final boolean isSyncTarget() {
+    /** Returns true if this node is target for the data, otherwise false. */
+     public boolean isSyncTarget() {
         if (connectionState == null) {
             return false;
         }
@@ -579,25 +491,19 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /**
-     * Sets this block device to be in a split-brain situation.
-     */
-    public final void setSplitBrain(final boolean splitBrain) {
+    /** Sets this block device to be in a split-brain situation. */
+    public void setSplitBrain(final boolean splitBrain) {
         this.splitBrain = splitBrain;
     }
 
-    /**
-     * Returns whether this block device is in split-brain.
-     */
-    public final boolean isSplitBrain() {
+    /** Returns whether this block device is in split-brain. */
+    public boolean isSplitBrain() {
         return splitBrain;
     }
 
-    /**
-     * Returns string with meta disk and index in the parenthesis.
-     */
-    public final String getMetaDiskString(final String md,
-                                          final String mdi) {
+    /** Returns string with meta disk and index in the parenthesis. */
+    public String getMetaDiskString(final String md,
+                                    final String mdi) {
         if (md == null || mdi == null) {
             return null;
         }
@@ -617,19 +523,14 @@ public class BlockDevice extends Resource {
         return metaDiskString.toString();
     }
 
-    /**
-     * Returns string with stored meta disk and index in the parenthesis.
-     */
-    public final String getMetaDiskString() {
+    /** Returns string with stored meta disk and index in the parenthesis. */
+    String getMetaDiskString() {
         return getMetaDiskString(getValue("DrbdMetaDisk"),
                                  getValue("DrbdMetaDiskIndex"));
     }
 
-    /**
-     * Returns section by which the parameter is grouped in
-     * the views.
-     */
-    public final String getSection(final String parameter) {
+    /** Returns section by which the parameter is grouped in the views. */
+    public String getSection(final String parameter) {
         if ("DrbdNetInterface".equals(parameter)) {
             return "Drbd";
         } else if ("DrbdNetInterfacePort".equals(parameter)) {
@@ -643,10 +544,8 @@ public class BlockDevice extends Resource {
         }
     }
 
-    /**
-     * Returns whether the block device is swap.
-     */
-    public final boolean isSwap() {
+    /** Returns whether the block device is swap. */
+    public boolean isSwap() {
         if (fsType != null && "swap".equals(fsType)) {
             return true;
         }
@@ -654,12 +553,12 @@ public class BlockDevice extends Resource {
     }
 
     /** Returns absolute path obtained with readlink. */
-    public final String getReadlink() {
+    public String getReadlink() {
         return readlink;
     }
 
     /** Returns lvm group or null. */
-    public final String getVolumeGroup() {
-        return volumeGroup; 
+    public String getVolumeGroup() {
+        return volumeGroup;
     }
 }

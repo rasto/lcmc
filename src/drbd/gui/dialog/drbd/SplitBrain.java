@@ -50,7 +50,7 @@ import java.awt.event.ActionEvent;
  * @version $Id$
  *
  */
-public class SplitBrain extends DrbdConfig {
+public final class SplitBrain extends DrbdConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Combo box with host that has more recent data. */
@@ -61,24 +61,20 @@ public class SplitBrain extends DrbdConfig {
     /** Width of the combo box. */
     private static final int COMBOBOX_WIDTH = 160;
 
-    /**
-     * Prepares a new <code>SplitBrain</code> object.
-     */
+    /** Prepares a new <code>SplitBrain</code> object. */
     public SplitBrain(final WizardDialog previousDialog,
-                          final DrbdResourceInfo dri) {
+               final DrbdResourceInfo dri) {
         super(previousDialog, dri);
     }
 
-    /**
-     * Resolves the split brain.
-     */
-    protected final void resolve() {
+    /** Resolves the split brain. */
+    protected void resolve() {
         final Host h1 = getDrbdResourceInfo().getFirstBlockDevInfo().getHost();
         final Host h2 = getDrbdResourceInfo().getSecondBlockDevInfo().getHost();
         final String h = hostCB.getStringValue();
 
         final Runnable runnable = new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Host hostPri;
                 Host hostSec;
                 if (h.equals(h1.getName())) {
@@ -112,10 +108,8 @@ public class SplitBrain extends DrbdConfig {
         thread.start();
     }
 
-    /**
-     * Returns next dialog which is null.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns next dialog which is null. */
+    @Override public WizardDialog nextDialog() {
         return null;
     }
 
@@ -123,7 +117,7 @@ public class SplitBrain extends DrbdConfig {
      * Returns the title for the dialog. It is defined in TextResources as
      * Dialog.Drbd.SplitBrain.Title.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Title");
     }
 
@@ -131,14 +125,12 @@ public class SplitBrain extends DrbdConfig {
      * Returns the description for the dialog. It is defined in TextResources
      * as Dialog.Drbd.SplitBrain.Description.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         resolveButton.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -149,7 +141,7 @@ public class SplitBrain extends DrbdConfig {
      * Returns an input pane, where user can select the host with more recent
      * data.
      */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */
@@ -168,7 +160,7 @@ public class SplitBrain extends DrbdConfig {
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         resolveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 resolve();
             }
         });

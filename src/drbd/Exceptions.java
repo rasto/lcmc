@@ -28,9 +28,7 @@ public final class Exceptions {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * This class cannot be instantiated.
-     */
+    /** This class cannot be instantiated. */
     private Exceptions() {
     }
 
@@ -41,9 +39,7 @@ public final class Exceptions {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
-        /**
-         * Prepares a new <code>DrbdConfigException</code> object.
-         */
+        /** Prepares a new <code>DrbdConfigException</code> object. */
         public DrbdConfigException(final String msg) {
             super(msg);
         }

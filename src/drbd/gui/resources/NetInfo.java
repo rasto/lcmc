@@ -33,16 +33,14 @@ import javax.swing.JEditorPane;
 /**
  * This class holds info data for a net interface.
  */
-public class NetInfo extends Info {
+public final class NetInfo extends Info {
     /** Net interface icon. */
-    public static final ImageIcon NET_I_ICON = Tools.createImageIcon(
+    static final ImageIcon NET_I_ICON = Tools.createImageIcon(
                                    Tools.getDefault("HostBrowser.NetIntIcon"));
     /** Net interface icon. */
-    public static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
+    static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
                               Tools.getDefault("HostBrowser.NetIntIconLarge"));
-    /**
-     * Prepares a new <code>NetInfo</code> object.
-     */
+    /** Prepares a new <code>NetInfo</code> object. */
     public NetInfo(final String name,
                    final NetInterface netInterface,
                    final Browser browser) {
@@ -50,19 +48,15 @@ public class NetInfo extends Info {
         setResource(netInterface);
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final HostBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns info of this net interface, which is updatable.
-     */
-    public final void updateInfo(final JEditorPane ep) {
+    /** Returns info of this net interface, which is updatable. */
+    @Override public void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final SSH.SSHOutput ret =
                               Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/ifconfig "
@@ -78,10 +72,8 @@ public class NetInfo extends Info {
         thread.start();
     }
 
-    /**
-     * Returns string representation of the net interface.
-     */
-    public final String toString() {
+    /** Returns string representation of the net interface. */
+    @Override public String toString() {
         final StringBuffer s = new StringBuffer(getName());
         final String ip = getNetInterface().getIp();
         if (ip != null) {
@@ -90,31 +82,23 @@ public class NetInfo extends Info {
         return s.toString();
     }
 
-    /**
-     * Returns icon of the net interface for the menu.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns icon of the net interface for the menu. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return NET_I_ICON;
     }
 
-    /**
-     * Returns ip of the net interface.
-     */
-    public final String getStringValue() {
+    /** Returns ip of the net interface. */
+    @Override public String getStringValue() {
         return getNetInterface().getIp();
     }
 
-    /**
-     * Returns net interface resource.
-     */
-    public final NetInterface getNetInterface() {
+    /** Returns net interface resource. */
+    public NetInterface getNetInterface() {
         return (NetInterface) getResource();
     }
 
-    /**
-     * Returns whether ips equal.
-     */
-    public final boolean equals(final Object value) {
+    /** Returns whether ips equal. */
+    @Override public boolean equals(final Object value) {
         if (Tools.isStringClass(value)) {
             // TODO: race is here
             final NetInterface ni = getNetInterface();

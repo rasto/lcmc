@@ -38,7 +38,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class CibQuery {
+final class CibQuery {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** crm_config / global config data. */
@@ -141,17 +141,13 @@ public class CibQuery {
     private Map<String, String> opDefaultsParams =
                                                  new HashMap<String, String>();
 
-    /**
-     * Sets crm config map.
-     */
-    public final void setCrmConfig(final Map<String, String> crmConfig) {
+    /** Sets crm config map. */
+    void setCrmConfig(final Map<String, String> crmConfig) {
         this.crmConfig = crmConfig;
     }
 
-    /**
-     * Returns crm config.
-     */
-    public final Map<String, String> getCrmConfig() {
+    /** Returns crm config. */
+    Map<String, String> getCrmConfig() {
         return crmConfig;
     }
 
@@ -159,15 +155,12 @@ public class CibQuery {
      * Sets parameters map, with the first key being the resource id and the
      * second key being the parameter name.
      */
-    public final void setParameters(
-                           final Map<String, Map<String, String>> parameters) {
+    void setParameters(final Map<String, Map<String, String>> parameters) {
         this.parameters = parameters;
     }
 
-    /**
-     * Returns the parameters map.
-     */
-    public final Map<String, Map<String, String>> getParameters() {
+    /** Returns the parameters map. */
+    Map<String, Map<String, String>> getParameters() {
         return parameters;
     }
 
@@ -175,49 +168,44 @@ public class CibQuery {
      * Sets the parameters nvpairs id map, with the first key being the
      * resource id and the second key being the parameter name.
      */
-    public final void setParametersNvpairsIds(
+    void setParametersNvpairsIds(
                   final Map<String, Map<String, String>> parametersNvpairsIds) {
         this.parametersNvpairsIds = parametersNvpairsIds;
     }
 
-    /**
-     * Returns the parameters nvpairs id map.
-     */
-    public final Map<String, Map<String, String>> getParametersNvpairsIds() {
+    /** Returns the parameters nvpairs id map. */
+    Map<String, Map<String, String>> getParametersNvpairsIds() {
         return parametersNvpairsIds;
     }
 
     /** Sets the resource type map. */
-    public final void setResourceType(
-                            final Map<String, ResourceAgent> resourceType) {
+    void setResourceType(final Map<String, ResourceAgent> resourceType) {
         this.resourceType = resourceType;
     }
 
     /** Sets the list with orphaned resources. */
-    public final void setOrphaned(final Set<String> orphanedList) {
+    void setOrphaned(final Set<String> orphanedList) {
         this.orphanedList = orphanedList;
     }
 
     /** Returns the resource type map. */
-    public final Map<String, ResourceAgent> getResourceType() {
+    Map<String, ResourceAgent> getResourceType() {
         return resourceType;
     }
 
     /** Returns list with orphaned resources. */
-    public final Set<String> getOrphaned() {
+    Set<String> getOrphaned() {
         return orphanedList;
     }
 
     /** Sets the resource instance_attributes id map. */
-    public final void setResourceInstanceAttrId(
+    void setResourceInstanceAttrId(
                             final Map<String, String> resourceInstanceAttrId) {
         this.resourceInstanceAttrId = resourceInstanceAttrId;
     }
 
-    /**
-     * Returns the resource instance_attributes map.
-     */
-    public final Map<String, String> getResourceInstanceAttrId() {
+    /** Returns the resource instance_attributes map. */
+    Map<String, String> getResourceInstanceAttrId() {
         return resourceInstanceAttrId;
     }
 
@@ -226,7 +214,7 @@ public class CibQuery {
      * Sets the colocation map with one resource as a key and list of
      * colocation constraints.
      */
-    public final void setColocationRsc(
+    void setColocationRsc(
               final Map<String, List<CRMXML.ColocationData>> colocationRsc) {
         this.colocationRsc = colocationRsc;
     }
@@ -235,22 +223,18 @@ public class CibQuery {
      * Sets the colocation map with resource id as a key with colocation data
      * object.
      */
-    public final void setColocationId(
+    void setColocationId(
                   final Map<String, CRMXML.ColocationData> colocationId) {
         this.colocationId = colocationId;
     }
 
-    /**
-     * Returns colocation id map.
-     */
-    public final Map<String, CRMXML.ColocationData> getColocationId() {
+    /** Returns colocation id map. */
+    Map<String, CRMXML.ColocationData> getColocationId() {
         return colocationId;
     }
 
-    /**
-     * Returns colocation rsc map.
-     */
-    public final Map<String, List<CRMXML.ColocationData>> getColocationRsc() {
+    /** Returns colocation rsc map. */
+    Map<String, List<CRMXML.ColocationData>> getColocationRsc() {
         return colocationRsc;
     }
 
@@ -258,7 +242,7 @@ public class CibQuery {
      * Sets the colocation map with one resource as a key and list of
      * colocation constraints.
      */
-    public final void setOrderRsc(
+    void setOrderRsc(
               final Map<String, List<CRMXML.OrderData>> orderRsc) {
         this.orderRsc = orderRsc;
     }
@@ -267,400 +251,335 @@ public class CibQuery {
      * Sets the order map with resource id as a key with order data
      * object.
      */
-    public final void setOrderId(
-                  final Map<String, CRMXML.OrderData> orderId) {
+    void setOrderId(final Map<String, CRMXML.OrderData> orderId) {
         this.orderId = orderId;
     }
 
     /** Sets the order map with resource id as a key with resource sets. */
-    public final void setOrderIdRscSets(
+    void setOrderIdRscSets(
                        final Map<String, List<CRMXML.RscSet>> orderIdRscSets) {
         this.orderIdRscSets = orderIdRscSets;
     }
 
     /** Sets the order map with resource id as a key with resource sets. */
-    public final void setColocationIdRscSets(
+    void setColocationIdRscSets(
                   final Map<String, List<CRMXML.RscSet>> colocationIdRscSets) {
         this.colocationIdRscSets = colocationIdRscSets;
     }
 
     /** Returns rscSetConnections. */
-    public final List<CRMXML.RscSetConnectionData> getRscSetConnections() {
+    List<CRMXML.RscSetConnectionData> getRscSetConnections() {
         return rscSetConnections;
     }
 
     /** Sets rscSetConnections. */
-    public final void setRscSetConnections(
+    void setRscSetConnections(
                    final List<CRMXML.RscSetConnectionData> rscSetConnections) {
         this.rscSetConnections = rscSetConnections;
     }
 
     /** Returns id rsc map. */
-    public final Map<String, CRMXML.OrderData> getOrderId() {
+    Map<String, CRMXML.OrderData> getOrderId() {
         return orderId;
     }
 
     /** Returns order rsc map. */
-    public final Map<String, List<CRMXML.OrderData>> getOrderRsc() {
+    Map<String, List<CRMXML.OrderData>> getOrderRsc() {
         return orderRsc;
     }
 
     /** Returns colocation id rsc to resource set map. */
-    public final Map<String, List<CRMXML.RscSet>> getColocationIdRscSets() {
+    Map<String, List<CRMXML.RscSet>> getColocationIdRscSets() {
         return colocationIdRscSets;
     }
 
     /** Returns order id rsc to resource set map. */
-    public final Map<String, List<CRMXML.RscSet>> getOrderIdRscSets() {
+    Map<String, List<CRMXML.RscSet>> getOrderIdRscSets() {
         return orderIdRscSets;
     }
 
-    /**
-     * Sets node parameters map.
-     */
-    public final void setNodeParameters(final MultiKeyMap nodeParameters) {
+    /** Sets node parameters map. */
+    void setNodeParameters(final MultiKeyMap nodeParameters) {
         this.nodeParameters = nodeParameters;
     }
 
-    /**
-     * Gets node parameters map.
-     */
-    public final MultiKeyMap getNodeParameters() {
+    /** Gets node parameters map. */
+    MultiKeyMap getNodeParameters() {
         return nodeParameters;
     }
 
     /** Sets location map. */
-    public final void setLocation(
-                       final Map<String, Map<String, HostLocation>> location) {
+    void setLocation(final Map<String, Map<String, HostLocation>> location) {
         this.location = location;
     }
 
     /** Returns location map. */
-    public final Map<String, Map<String, HostLocation>> getLocation() {
+    Map<String, Map<String, HostLocation>> getLocation() {
         return location;
     }
 
     /** Sets ping location map. */
-    public final void setPingLocation(
-                                final Map<String, HostLocation> pingLocation) {
+    void setPingLocation(final Map<String, HostLocation> pingLocation) {
         this.pingLocation = pingLocation;
     }
 
     /** Returns ping location map. */
-    public final Map<String, HostLocation> getPingLocation() {
+    Map<String, HostLocation> getPingLocation() {
         return pingLocation;
     }
 
-    /**
-     * Sets locations id map.
-     */
-    public final void setLocationsId(
-                                final Map<String, List<String>> locationsId) {
+    /** Sets locations id map. */
+    void setLocationsId(final Map<String, List<String>> locationsId) {
         this.locationsId = locationsId;
     }
 
-    /**
-     * Returns locations id map.
-     */
-    public final Map<String, List<String>> getLocationsId() {
+    /** Returns locations id map. */
+    Map<String, List<String>> getLocationsId() {
         return locationsId;
     }
 
-    /**
-     * Sets map from location id to the score.
-     */
-    public final void setLocationMap(
-                            final Map<String, HostLocation> idToLocation) {
+    /** Sets map from location id to the score. */
+    void setLocationMap(final Map<String, HostLocation> idToLocation) {
         this.idToLocation = idToLocation;
     }
 
-    /**
-     * Returns map from location id to the score.
-     */
-    public final Map<String, HostLocation> getLocationMap() {
+    /** Returns map from location id to the score. */
+    Map<String, HostLocation> getLocationMap() {
         return idToLocation;
     }
 
     /** Sets map from resource and host to the location id. */
-    public final void setResHostToLocId(final MultiKeyMap resHostToLocId) {
+    void setResHostToLocId(final MultiKeyMap resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
 
     /** Returns map from resource and host to the location id. */
-    public final MultiKeyMap getResHostToLocId() {
+    MultiKeyMap getResHostToLocId() {
         return resHostToLocId;
     }
 
     /** Sets map from resource to the location id for ping. */
-    public final void setResPingToLocId(
-                                    final Map<String, String> resPingToLocId) {
+    void setResPingToLocId(final Map<String, String> resPingToLocId) {
         this.resPingToLocId = resPingToLocId;
     }
 
     /** Returns map from resource to the location id for ping. */
-    public final Map<String, String> getResPingToLocId() {
+    Map<String, String> getResPingToLocId() {
         return resPingToLocId;
     }
 
 
-    /**
-     * Sets operations map.
-     */
-    public final void setOperations(final MultiKeyMap operations) {
+    /** Sets operations map. */
+    void setOperations(final MultiKeyMap operations) {
         this.operations = operations;
     }
 
-    /**
-     * Sets operations refs map.
-     */
-    public final void setOperationsRefs(
-                                final Map<String, String> operationsRefs) {
+    /** Sets operations refs map. */
+    void setOperationsRefs(final Map<String, String> operationsRefs) {
         this.operationsRefs = operationsRefs;
     }
 
-    /**
-     * Sets meta attrs refs map.
-     */
-    public final void setMetaAttrsRefs(
-                                final Map<String, String> metaAttrsRefs) {
+    /** Sets meta attrs refs map. */
+    void setMetaAttrsRefs(final Map<String, String> metaAttrsRefs) {
         this.metaAttrsRefs = metaAttrsRefs;
     }
 
-    /**
-     * Sets meta attrs id map.
-     */
-    public final void setMetaAttrsId(final Map<String, String> metaAttrsId) {
+    /** Sets meta attrs id map. */
+    void setMetaAttrsId(final Map<String, String> metaAttrsId) {
         this.metaAttrsId = metaAttrsId;
     }
 
-    /**
-     * Returns meta attrs id map.
-     */
-    public final Map<String, String> getMetaAttrsId() {
+    /** Returns meta attrs id map. */
+    Map<String, String> getMetaAttrsId() {
         return metaAttrsId;
     }
 
-    /**
-     * Returns meta attrs refs map.
-     */
-    public final Map<String, String> getMetaAttrsRefs() {
+    /** Returns meta attrs refs map. */
+    Map<String, String> getMetaAttrsRefs() {
         return metaAttrsRefs;
     }
 
 
-    /**
-     * Returns operations map.
-     */
-    public final MultiKeyMap getOperations() {
+    /** Returns operations map. */
+    MultiKeyMap getOperations() {
         return operations;
     }
 
-    /**
-     * Returns operations refs map.
-     */
-    public final Map<String, String> getOperationsRefs() {
+    /** Returns operations refs map. */
+    Map<String, String> getOperationsRefs() {
         return operationsRefs;
     }
 
-    /**
-     * Sets operations id map.
-     */
-    public final void setOperationsId(final Map<String, String> operationsId) {
+    /** Sets operations id map. */
+    void setOperationsId(final Map<String, String> operationsId) {
         this.operationsId = operationsId;
     }
 
-    /**
-     * Returns operations id map.
-     */
-    public final Map<String, String> getOperationsId() {
+    /** Returns operations id map. */
+    Map<String, String> getOperationsId() {
         return operationsId;
     }
 
-    /**
-     * Sets "op" tag id map.
-     */
-    public final void setResOpIds(
-                            final Map<String, Map<String, String>> resOpIds) {
+    /** Sets "op" tag id map. */
+    void setResOpIds(final Map<String, Map<String, String>> resOpIds) {
         this.resOpIds = resOpIds;
     }
 
-    /**
-     * Returns "op" tag id map.
-     */
-    public final Map<String, Map<String, String>> getResOpIds() {
+    /** Returns "op" tag id map. */
+    Map<String, Map<String, String>> getResOpIds() {
         return resOpIds;
     }
 
     /** Sets map with nodes and if they ore online. */
-    public final void setNodeOnline(final Map<String, String> nodeOnline) {
+    void setNodeOnline(final Map<String, String> nodeOnline) {
         this.nodeOnline = nodeOnline;
     }
 
     /** Gets map whith nodes and if they are online. */
-    public final Map<String, String> getNodeOnline() {
+    Map<String, String> getNodeOnline() {
         return nodeOnline;
     }
 
     /** Sets map with nodes that are pending. */
-    public final void setNodePending(final Set<String> nodePending) {
+    void setNodePending(final Set<String> nodePending) {
         this.nodePending = nodePending;
     }
 
     /** Gets map whith nodes that are pending. */
-    public final Set<String> getNodePending() {
+    Set<String> getNodePending() {
         return nodePending;
     }
 
     /** Sets map with nodes that are fenced. */
-    public final void setFencedNodes(final Set<String> fencedNodes) {
+    void setFencedNodes(final Set<String> fencedNodes) {
         this.fencedNodes = fencedNodes;
     }
 
     /** Gets map whith nodes that are fenced. */
-    public final Set<String> getFencedNodes() {
+    Set<String> getFencedNodes() {
         return fencedNodes;
     }
 
-    /**
-     * Sets the groups to resources map.
-     */
-    public final void setGroupsToResources(
+    /** Sets the groups to resources map. */
+    void setGroupsToResources(
                            final Map<String, List<String>> groupsToResources) {
         this.groupsToResources = groupsToResources;
     }
 
-    /**
-     * Gets the groups to resources map.
-     */
-    public final Map<String, List<String>> getGroupsToResources() {
+    /** Gets the groups to resources map. */
+    Map<String, List<String>> getGroupsToResources() {
         return groupsToResources;
     }
 
-    /**
-     * Sets the clone to resource map.
-     */
-    public final void setCloneToResource(
-                           final Map<String, String> cloneToResource) {
+    /** Sets the clone to resource map. */
+    void setCloneToResource(final Map<String, String> cloneToResource) {
         this.cloneToResource = cloneToResource;
     }
 
-    /**
-     * Gets the clone to resource map.
-     */
-    public final Map<String, String> getCloneToResource() {
+    /** Gets the clone to resource map. */
+    Map<String, String> getCloneToResource() {
         return cloneToResource;
     }
 
-    /**
-     * Sets the master list.
-     */
-    public final void setMasterList(final List<String> masterList) {
+    /** Sets the master list. */
+    void setMasterList(final List<String> masterList) {
         this.masterList = masterList;
     }
 
-    /**
-     * Gets the master list.
-     */
-    public final List<String> getMasterList() {
+    /** Gets the master list. */
+    List<String> getMasterList() {
         return masterList;
     }
 
 
-    /**
-     * Sets the designated co-ordinator.
-     */
-    public final void setDC(final String dc) {
+    /** Sets the designated co-ordinator. */
+    void setDC(final String dc) {
         this.dc = dc;
     }
 
-    /**
-     * Gets the designated co-ordinator.
-     */
-    public final String getDC() {
+    /** Gets the designated co-ordinator. */
+    String getDC() {
         return dc;
     }
 
     /** Sets failed map. */
-    public final void setFailed(final MultiKeyMap failed) {
+    void setFailed(final MultiKeyMap failed) {
         this.failed = failed;
     }
 
     /** Returns failed map. */
-    public final MultiKeyMap getFailed() {
+    MultiKeyMap getFailed() {
         return failed;
     }
 
     /** Sets node ping map. */
-    public final void setPingCount(final Map<String, String> pingCount) {
+    void setPingCount(final Map<String, String> pingCount) {
         this.pingCount = pingCount;
     }
 
     /** Returns ping count map. */
-    public final Map<String, String> getPingCount() {
+    Map<String, String> getPingCount() {
         return pingCount;
     }
 
     /** Sets failed clone map. */
-    public final void setFailedClones(
-                                final Map<String, Set<String>> failedClones) {
+    void setFailedClones(final Map<String, Set<String>> failedClones) {
         this.failedClones = failedClones;
     }
 
     /** Returns failed clone map. */
-    public final Map<String, Set<String>> getFailedClones() {
+    Map<String, Set<String>> getFailedClones() {
         return failedClones;
     }
 
     /** Returns fail-count. It can be "INFINITY" */
-    public final String getFailCount(final String node, final String res) {
+    String getFailCount(final String node, final String res) {
         return (String) failed.get(node, res);
     }
 
     /** Returns ping count. */
-    public final String getPingCount(final String node) {
+    String getPingCount(final String node) {
         return pingCount.get(node);
     }
 
     /** Sets rsc_defaults meta attributes id. */
-    public final void setRscDefaultsId(final String rscDefaultsId) {
+    void setRscDefaultsId(final String rscDefaultsId) {
         this.rscDefaultsId = rscDefaultsId;
     }
 
     /** Gets rsc_defaults meta attributes id. */
-    public final String getRscDefaultsId() {
+    String getRscDefaultsId() {
         return rscDefaultsId;
     }
 
     /** Sets rsc_defaults parameters with values. */
-    public final void setRscDefaultsParams(
-                                final Map<String, String> rscDefaultsParams) {
+    void setRscDefaultsParams(final Map<String, String> rscDefaultsParams) {
         this.rscDefaultsParams = rscDefaultsParams;
     }
 
     /** Gets rsc_defaults parameters with values. */
-    public final Map<String, String> getRscDefaultsParams() {
+    Map<String, String> getRscDefaultsParams() {
         return rscDefaultsParams;
     }
 
     /** Sets rsc_defaults parameters with ids. */
-    public final void setRscDefaultsParamsNvpairIds(
+    void setRscDefaultsParamsNvpairIds(
                         final Map<String, String> rscDefaultsParamsNvpairIds) {
         this.rscDefaultsParamsNvpairIds = rscDefaultsParamsNvpairIds;
     }
 
     /** Gets rsc_defaults parameters with ids. */
-    public final Map<String, String> getRscDefaultsParamsNvpairIds() {
+    Map<String, String> getRscDefaultsParamsNvpairIds() {
         return rscDefaultsParamsNvpairIds;
     }
 
     /** Sets op_defaults parameters with values. */
-    public final void setOpDefaultsParams(
-                                final Map<String, String> opDefaultsParams) {
+    void setOpDefaultsParams(final Map<String, String> opDefaultsParams) {
         this.opDefaultsParams = opDefaultsParams;
     }
 
     /** Gets op_defaults parameters with values. */
-    public final Map<String, String> getOpDefaultsParams() {
+    Map<String, String> getOpDefaultsParams() {
         return opDefaultsParams;
     }
 }

@@ -68,7 +68,7 @@ import javax.swing.JColorChooser;
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-public class HostInfo extends Info {
+public final class HostInfo extends Info {
     /** Host data. */
     private final Host host;
     /** Host standby icon. */
@@ -123,12 +123,12 @@ public class HostInfo extends Info {
     }
 
     /** Returns browser object of this info. */
-    protected final HostBrowser getBrowser() {
+    @Override protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
     /** Returns a host icon for the menu. */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         final Cluster cl = host.getCluster();
         if (cl != null) {
             return HostBrowser.HOST_IN_CLUSTER_ICON_RIGHT_SMALL;
@@ -137,22 +137,22 @@ public class HostInfo extends Info {
     }
 
     /** Returns id, which is name of the host. */
-    public final String getId() {
+    @Override public String getId() {
         return host.getName();
     }
 
     /** Returns a host icon for the category in the menu. */
-    public final ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
     /** Returns tooltip for the host. */
-    public final String getToolTipForGraph(final boolean testOnly) {
+    @Override public String getToolTipForGraph(final boolean testOnly) {
         return getBrowser().getHostToolTip(host);
     }
 
     /** Returns info panel. */
-    public final JComponent getInfoPanel() {
+    @Override public JComponent getInfoPanel() {
         Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         final JTextArea ta = new JTextArea();
@@ -161,11 +161,12 @@ public class HostInfo extends Info {
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
-                public void done(final String ans) {
+                @Override public void done(final String ans) {
                     ta.setText(ans);
                 }
 
-                public void doneError(final String ans, final int exitCode) {
+                @Override public void doneError(final String ans,
+                                                final int exitCode) {
                     ta.setText("error");
                     Tools.sshError(host, "", ans, stacktrace, exitCode);
                 }
@@ -173,7 +174,7 @@ public class HostInfo extends Info {
             };
         final MyButton crmMonButton = new MyButton("crm_mon");
         crmMonButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 host.execCommand("HostBrowser.getCrmMon",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -185,7 +186,7 @@ public class HostInfo extends Info {
         final MyButton crmConfigureShowButton =
                                         new MyButton("crm configure show");
         crmConfigureShowButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 host.execCommand("HostBrowser.getCrmConfigureShow",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -232,7 +233,7 @@ public class HostInfo extends Info {
     }
 
     /** Gets host. */
-    public final Host getHost() {
+    public Host getHost() {
         return host;
     }
 
@@ -243,7 +244,7 @@ public class HostInfo extends Info {
      *              other host info
      * @return true if they are equal
      */
-    public final boolean equals(final HostInfo otherHI) {
+    boolean equals(final HostInfo otherHI) {
         if (otherHI == null) {
             return false;
         }
@@ -251,17 +252,17 @@ public class HostInfo extends Info {
     }
 
     /** Returns string representation of the host. It's same as name. */
-    public final String toString() {
+    @Override public String toString() {
         return host.getName();
     }
 
     /** Returns name of the host. */
-    public final String getName() {
+    @Override public String getName() {
         return host.getName();
     }
 
     /** Creates the popup for the host. */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         /* host wizard */
@@ -273,11 +274,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
                 }
@@ -298,18 +299,18 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean predicate() {
+                @Override public boolean predicate() {
                     return !isStandby(testOnly);
                 }
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isClStatus()) {
                         return NO_PCMK_STATUS_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     if (isStandby(testOnly)) {
                         CRM.standByOff(host, testOnly);
                     } else {
@@ -321,7 +322,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
                               cb.new ClMenuItemCallback(standbyItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     if (isStandby(false)) {
                         CRM.standByOff(host, true);
                     } else {
@@ -342,11 +343,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean predicate() {
+                @Override public boolean predicate() {
                     return true;
                 }
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isClStatus()) {
                         return NO_PCMK_STATUS_STRING;
                     }
@@ -357,11 +358,11 @@ public class HostInfo extends Info {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH() &&
-                            si.getGroupInfo() == null
+                        if (!si.isConstraintPH()
+                            && si.getGroupInfo() == null
                             && si.getCloneInfo() == null) {
                             final List<String> runningOnNodes =
                                                    si.getRunningOnNodes(false);
@@ -380,7 +381,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
                     cb.new ClMenuItemCallback(allMigrateFromItem, host) {
-                public void action(final Host dcHost) {
+                @Override public void action(final Host dcHost) {
                     for (final ServiceInfo si
                             : cb.getExistingServiceList(null)) {
                         if (!si.isConstraintPH() && si.getGroupInfo() == null) {
@@ -415,17 +416,17 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean predicate() {
+                @Override public boolean predicate() {
                     /* when both are running it's openais. */
                     return getHost().isCsRunning() && !getHost().isAisRunning();
                 }
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getHost().isCsRunning()
                            || getHost().isAisRunning();
                 }
 
-                public final void action() {
+                @Override public void action() {
                     if (Tools.confirmDialog(
                          Tools.getString("HostInfo.confirmCorosyncStop.Title"),
                          Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
@@ -448,7 +449,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
                             cb.new ClMenuItemCallback(stopCorosyncItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     if (!isStandby(false)) {
                         CRM.standByOn(host, true);
                     }
@@ -468,11 +469,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getHost().isHeartbeatRunning();
                 }
 
-                public final void action() {
+                @Override public void action() {
                     if (Tools.confirmDialog(
                          Tools.getString("HostInfo.confirmHeartbeatStop.Title"),
                          Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
@@ -487,7 +488,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
                             cb.new ClMenuItemCallback(stopHeartbeatItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     if (!isStandby(false)) {
                         CRM.standByOn(host, true);
                     }
@@ -507,7 +508,7 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     final Host h = getHost();
                     return h.isCorosync()
                            && h.isCsInit()
@@ -518,7 +519,7 @@ public class HostInfo extends Info {
                            && !h.isHeartbeatRc();
                 }
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     final Host h = getHost();
                     if (h.isAisRc() && !h.isCsRc()) {
                         return "Openais is in rc.d";
@@ -526,7 +527,7 @@ public class HostInfo extends Info {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     getHost().setCommLayerStarting(true);
                     if (getHost().isPcmkRc()) {
                         Corosync.startCorosyncWithPcmk(getHost());
@@ -539,7 +540,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
                             cb.new ClMenuItemCallback(startCorosyncItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     //TODO
                 }
             };
@@ -557,7 +558,7 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     final Host h = getHost();
                     return h.isAisInit()
                            && h.isCsAisConf()
@@ -567,7 +568,7 @@ public class HostInfo extends Info {
                            && !h.isHeartbeatRc();
                 }
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     final Host h = getHost();
                     if (h.isCsRc() && !h.isAisRc()) {
                         return "Corosync is in rc.d";
@@ -575,7 +576,7 @@ public class HostInfo extends Info {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     getHost().setCommLayerStarting(true);
                     Openais.startOpenais(getHost());
                     getBrowser().getClusterBrowser().updateHWInfo(host);
@@ -584,7 +585,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
                             cb.new ClMenuItemCallback(startOpenaisItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     //TODO
                 }
             };
@@ -602,7 +603,7 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     final Host h = getHost();
                     return h.isHeartbeatInit()
                            && h.isHeartbeatConf()
@@ -613,7 +614,7 @@ public class HostInfo extends Info {
                            //&& !h.isCsRc(); TODO should check /etc/defaults/
                 }
 
-                public final void action() {
+                @Override public void action() {
                     getHost().setCommLayerStarting(true);
                     Heartbeat.startHeartbeat(getHost());
                     getBrowser().getClusterBrowser().updateHWInfo(host);
@@ -622,7 +623,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
                           cb.new ClMenuItemCallback(startHeartbeatItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     //TODO
                 }
             };
@@ -641,7 +642,7 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     final Host h = getHost();
                     return h.getPcmkServiceVersion() > 0
                            && !h.isPcmkRunning()
@@ -650,11 +651,11 @@ public class HostInfo extends Info {
                            && !h.isHeartbeatRunning();
                 }
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     Corosync.startPacemaker(getHost());
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
@@ -662,7 +663,7 @@ public class HostInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
                          cb.new ClMenuItemCallback(startPcmkItem, host) {
-                public void action(final Host host) {
+                @Override public void action(final Host host) {
                     //TODO
                 }
             };
@@ -679,11 +680,11 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     final Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
                                             "Choose " + host.getName()
@@ -705,14 +706,14 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     drbd.gui.dialog.HostLogs l =
                                            new drbd.gui.dialog.HostLogs(host);
                     l.showDialog();
@@ -726,14 +727,14 @@ public class HostInfo extends Info {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            public final void update() {
+            @Override public void update() {
                 super.update();
                 getBrowser().addAdvancedMenu(this);
             }
@@ -749,14 +750,14 @@ public class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (getHost().getCluster() != null) {
                         return "it is a member of a cluster";
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     getHost().disconnect();
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
@@ -767,7 +768,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns grahical view if there is any. */
-    public final JPanel getGraphicalView() {
+    @Override public JPanel getGraphicalView() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
             return null;
@@ -776,7 +777,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns how much of this is used. */
-    public final int getUsed() {
+    public int getUsed() {
         // TODO: maybe the load?
         return -1;
     }
@@ -784,7 +785,7 @@ public class HostInfo extends Info {
     /**
      * Returns subtexts that appears in the host vertex in the cluster graph.
      */
-    public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
@@ -799,7 +800,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public final String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final boolean testOnly) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
         }
@@ -807,7 +808,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns whether this host is in stand by. */
-    public final boolean isStandby(final boolean testOnly) {
+    public boolean isStandby(final boolean testOnly) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
             return false;
@@ -816,7 +817,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns cluster status. */
-    public final ClusterStatus getClusterStatus() {
+    ClusterStatus getClusterStatus() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
             return null;
@@ -825,7 +826,7 @@ public class HostInfo extends Info {
     }
 
     /** Returns text that appears in the corner of the graph. */
-    public final Subtext getRightCornerTextForGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForGraph(final boolean testOnly) {
         if (getHost().isCommLayerStopping()) {
             return STOPPING_SUBTEXT;
         } else if (getHost().isCommLayerStarting()) {
@@ -860,7 +861,7 @@ public class HostInfo extends Info {
     }
 
     /** Selects the node in the menu and reloads everything underneath. */
-    public final void selectMyself() {
+    @Override public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }

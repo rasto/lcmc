@@ -40,7 +40,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * The very main panel, where everyting is inside.
  *
  */
-public class MainPanel extends JPanel {
+public final class MainPanel extends JPanel {
 
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
@@ -49,9 +49,7 @@ public class MainPanel extends JPanel {
     /** Expanding flag mutex. */
     private final Mutex mExpanding = new Mutex();
 
-    /**
-     * Prepares a new <code>MainPanel</code> object.
-     */
+    /** Prepares a new <code>MainPanel</code> object. */
     public MainPanel() {
         super(new BorderLayout());
         // TODO: not new Host() but null

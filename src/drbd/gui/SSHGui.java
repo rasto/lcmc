@@ -54,7 +54,7 @@ import java.util.List;
  * @version $Id$
  *
  */
-public class SSHGui {
+public final class SSHGui {
     /** Root pane on which the dialogs are comming to. */
     private final Container rootPane;
     /** Host data object. */
@@ -64,9 +64,7 @@ public class SSHGui {
     /** Default length of fields. */
     private static final int DEFAULT_FIELD_LENGTH = 20;
 
-    /**
-     * Prepares a new <code>SSHGui</code> object.
-     */
+    /** Prepares a new <code>SSHGui</code> object. */
     public SSHGui(final Container rootPane,
                   final Host host,
                   final ProgressBar progressBar) {
@@ -75,36 +73,28 @@ public class SSHGui {
         this.progressBar = progressBar;
     }
 
-    /**
-     * Displays Confirm Dialog whith Yes, No, Cancel options.
-     */
-    public final int getConfirmDialogChoice(final String message) {
+    /** Displays Confirm Dialog whith Yes, No, Cancel options. */
+    public int getConfirmDialogChoice(final String message) {
         Tools.debug(this, "get confirm dialog");
         return JOptionPane.showConfirmDialog(rootPane, message);
     }
 
-    /**
-     * Checks if choice is yes option.
-     */
-    public final boolean isConfirmDialogYes(final int choice) {
+    /** Checks if choice is yes option. */
+    public boolean isConfirmDialogYes(final int choice) {
         return choice == JOptionPane.YES_OPTION;
     }
 
-    /**
-     * Checks if choice is cancel option.
-     */
-    public final boolean isConfirmDialogCancel(final int choice) {
+    /** Checks if choice is cancel option. */
+    public boolean isConfirmDialogCancel(final int choice) {
         return choice == JOptionPane.CANCEL_OPTION;
     }
 
-    /**
-     * Creates dialog with some text or password field to enter by user.
-     */
-    public final String enterSomethingDialog(final String title,
-                                             final String[] content,
-                                             final String underText,
-                                             final String defaultValue,
-                                             final boolean isPassword) {
+    /** Creates dialog with some text or password field to enter by user. */
+    public String enterSomethingDialog(final String title,
+                                       final String[] content,
+                                       final String underText,
+                                       final String defaultValue,
+                                       final boolean isPassword) {
         EnterSomethingDialog esd;
         if (rootPane instanceof JDialog) {
             esd = new EnterSomethingDialog((JDialog) rootPane, title,
@@ -126,7 +116,7 @@ public class SSHGui {
      * This dialog displays a number of text lines and a text field.
      * The text field can either be plain text or a password field.
      */
-    class EnterSomethingDialog extends JDialog {
+    private class EnterSomethingDialog extends JDialog {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
@@ -139,14 +129,12 @@ public class SSHGui {
         /** User answer. */
         private String answer;
 
-        /**
-         * Prepares a new <code>EnterSomethingDialog</code> object.
-         */
-        public EnterSomethingDialog(final Container parent,
-                                    final String title,
-                                    final String content,
-                                    final String underText,
-                                    final boolean isPasswordA) {
+        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        EnterSomethingDialog(final Container parent,
+                             final String title,
+                             final String content,
+                             final String underText,
+                             final boolean isPasswordA) {
             this((JDialog) parent,
                  title,
                  new String[] {content},
@@ -156,37 +144,36 @@ public class SSHGui {
         }
 
         /** Prepares a new <code>EnterSomethingDialog</code> object. */
-        public EnterSomethingDialog(final JDialog parent,
-                                    final String title,
-                                    final String[] content,
-                                    final String underText,
-                                    final String defaultValue,
-                                    final boolean isPasswordA) {
+        EnterSomethingDialog(final JDialog parent,
+                             final String title,
+                             final String[] content,
+                             final String underText,
+                             final String defaultValue,
+                             final boolean isPasswordA) {
             super(parent, title, true);
             init(content, underText, defaultValue, isPasswordA);
             setLocationRelativeTo(parent);
         }
 
         /** Prepares a new <code>EnterSomethingDialog</code> object. */
-        public EnterSomethingDialog(final Frame parent,
-                                    final String title,
-                                    final String[] content,
-                                    final String underText,
-                                    final String defaultValue,
-                                    final boolean isPasswordA) {
+        EnterSomethingDialog(final Frame parent,
+                             final String title,
+                             final String[] content,
+                             final String underText,
+                             final String defaultValue,
+                             final boolean isPasswordA) {
             super(parent, title, true);
             init(content, underText, defaultValue, isPasswordA);
             setLocationRelativeTo(parent);
         }
 
         /** Prepares a new <code>EnterSomethingDialog</code> object. */
-        public EnterSomethingDialog(final JApplet parent,
-                                    final String title,
-                                    final String[] content,
-                                    final String underText,
-                                    final String defaultValue,
-                                    final boolean isPasswordA) {
-
+        EnterSomethingDialog(final JApplet parent,
+                             final String title,
+                             final String[] content,
+                             final String underText,
+                             final String defaultValue,
+                             final boolean isPasswordA) {
             super((Frame) SwingUtilities.getAncestorOfClass(Frame.class,
                                                             parent),
                   title,
@@ -251,7 +238,7 @@ public class SSHGui {
             }
 
             final KeyAdapter kl = new KeyAdapter() {
-                public void keyTyped(final KeyEvent e) {
+                @Override public void keyTyped(final KeyEvent e) {
                     if (e.getKeyChar() == '\n') {
                         finish();
                     }
@@ -276,9 +263,7 @@ public class SSHGui {
             pack();
         }
 
-        /**
-         * Finish.
-         */
+        /** Finish. */
         private void finish() {
             if (isPassword) {
                 answer = new String(passwordField.getPassword());

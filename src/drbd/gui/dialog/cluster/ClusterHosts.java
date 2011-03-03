@@ -59,7 +59,7 @@ import java.awt.LayoutManager;
  * @version $Id$
  *
  */
-public class ClusterHosts extends DialogCluster {
+final class ClusterHosts extends DialogCluster {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Map from checkboxes to the host, which they choose. */
@@ -74,18 +74,14 @@ public class ClusterHosts extends DialogCluster {
     ///** Whether the scrolling pane was already moved. */
     //private volatile boolean alreadyMoved = false;
 
-    /**
-     * Prepares a new <code>ClusterHosts</code> object.
-     */
-    public ClusterHosts(final WizardDialog previousDialog,
-                        final Cluster cluster) {
+    /** Prepares a new <code>ClusterHosts</code> object. */
+    ClusterHosts(final WizardDialog previousDialog,
+                 final Cluster cluster) {
         super(previousDialog, cluster);
     }
 
-    /**
-     * It is executed after the dialog is applied.
-     */
-    protected final void finishDialog() {
+    /** It is executed after the dialog is applied. */
+    @Override protected void finishDialog() {
         getCluster().clearHosts();
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -97,10 +93,8 @@ public class ClusterHosts extends DialogCluster {
         Tools.getGUIData().refreshClustersPanel();
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         boolean allConnected = true;
         for (final Host host : getCluster().getHosts()) {
             if (!host.isConnected()) {
@@ -114,10 +108,8 @@ public class ClusterHosts extends DialogCluster {
         }
     }
 
-    /**
-     * Checks whether at least two hosts are selected for the cluster.
-     */
-    protected final void checkCheckBoxes() {
+    /** Checks whether at least two hosts are selected for the cluster. */
+    protected void checkCheckBoxes() {
         Tools.getConfigData().getHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
@@ -146,7 +138,7 @@ public class ClusterHosts extends DialogCluster {
         }
         final boolean enableButton = enable;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
@@ -156,48 +148,40 @@ public class ClusterHosts extends DialogCluster {
         }
     }
 
-    /**
-     * Returns the title of the dialog.
-     */
-    protected final String getClusterDialogTitle() {
+    /** Returns the title of the dialog. */
+    @Override protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Title");
     }
 
-    /**
-     * Returns the description of the dialog.
-     */
-    protected final String getDescription() {
+    /** Returns the description of the dialog. */
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
 
         final Thread thread = new Thread(
             new Runnable() {
-                public void run() {
+                @Override public void run() {
                     checkCheckBoxes();
                 }
             });
         thread.start();
     }
 
-    /**
-     * Returns the panel with hosts that can be selected.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the panel with hosts that can be selected. */
+    @Override protected JComponent getInputPane() {
         /* Hosts */
         final ScrollableFlowPanel p1 =
             new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
         final Hosts hosts = Tools.getConfigData().getHosts();
 
         final ItemListener chListener = new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     checkCheckBoxes();
                 }
             };
@@ -262,7 +246,7 @@ public class ClusterHosts extends DialogCluster {
 
         //        public final void componentMoved(final ComponentEvent e) {
         //            SwingUtilities.invokeLater(new Runnable() {
-        //                public void run() {
+        //                @Override public void run() {
         //                    if (alreadyMoved) {
         //                        return;
         //                    }
@@ -287,49 +271,54 @@ public class ClusterHosts extends DialogCluster {
     /** Workaround so that flow layout scrolls right. */
     private class ScrollableFlowPanel extends JPanel
                                              implements Scrollable {
+        /** Serial version UID. */
         private static final long serialVersionUID = 1L;
-        public ScrollableFlowPanel(final LayoutManager layout) {
+        /** New ScrollableFlowPanel object. */
+        ScrollableFlowPanel(final LayoutManager layout) {
             super(layout);
         }
 
-        public void setBounds(final int x,
-                              final int y,
-                              final int width,
-                              final int height) {
+        @Override public void setBounds(final int x,
+                                        final int y,
+                                        final int width,
+                                        final int height) {
             super.setBounds(x, y, getParent().getWidth(), height);
         }
 
-        public Dimension getPreferredSize() {
+        @Override public Dimension getPreferredSize() {
             return new Dimension(getWidth(), getPreferredHeight());
         }
 
-        public Dimension getPreferredScrollableViewportSize() {
+        @Override public Dimension getPreferredScrollableViewportSize() {
             return super.getPreferredSize();
         }
 
-        public int getScrollableUnitIncrement(final Rectangle visibleRect,
-                                              final int orientation,
-                                              final int direction) {
+        @Override public int getScrollableUnitIncrement(
+                                                   final Rectangle visibleRect,
+                                                   final int orientation,
+                                                   final int direction) {
             final int hundredth = (orientation ==  SwingConstants.VERTICAL
                     ? getParent().getHeight() : getParent().getWidth()) / 100;
             return (hundredth == 0 ? 1 : hundredth);
         }
 
-        public int getScrollableBlockIncrement(final Rectangle visibleRect,
-                                               final int orientation,
-                                               final int direction) {
+        @Override public int getScrollableBlockIncrement(
+                                                   final Rectangle visibleRect,
+                                                   final int orientation,
+                                                   final int direction) {
             return orientation == SwingConstants.VERTICAL
                             ? getParent().getHeight() : getParent().getWidth();
         }
 
-        public boolean getScrollableTracksViewportWidth() {
+        @Override public boolean getScrollableTracksViewportWidth() {
             return true;
         }
 
-        public boolean getScrollableTracksViewportHeight() {
+        @Override public boolean getScrollableTracksViewportHeight() {
             return false;
         }
 
+        /** Returns preferred height. */
         private int getPreferredHeight() {
             int rv = 0;
             final int count = getComponentCount();

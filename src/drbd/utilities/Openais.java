@@ -42,14 +42,10 @@ public final class Openais {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
-    /**
-     * No instantiation.
-     */
+    /** No instantiation. */
     private Openais() { }
 
-    /**
-     * Executes specified command on the host.
-     */
+    /** Executes specified command on the host. */
     private static void execCommand(final Host host,
                                     final String command,
                                     final boolean outputVisible) {
@@ -62,9 +58,7 @@ public final class Openais {
                                 180000);
     }
 
-    /**
-     * Stops the heartbeat and starts the openais on the specified host.
-     */
+    /** Stops the heartbeat and starts the openais on the specified host. */
     public static void switchToOpenais(final Host host) {
         final String command = host.getDistCommand(
                                                 "Heartbeat.deleteFromRc"
@@ -94,9 +88,7 @@ public final class Openais {
         execCommand(host, command, true);
     }
 
-    /**
-     * Starts openais on host and adds it to the rc.
-     */
+    /** Starts openais on host and adds it to the rc. */
     public static void startOpenaisRc(final Host host) {
         final String command = host.getDistCommand("Openais.startOpenais"
                                                    + ";;;Openais.addToRc",
@@ -104,9 +96,7 @@ public final class Openais {
         execCommand(host, command, true);
     }
 
-    /**
-     * Adds openais to the rc.
-     */
+    /** Adds openais to the rc. */
     public static void addOpenaisToRc(final Host host) {
         final String command = host.getDistCommand("Openais.addToRc",
                                                    (ConvertCmdCallback) null);
@@ -123,9 +113,7 @@ public final class Openais {
         execCommand(host, command, true);
     }
 
-    /**
-     * Creates OpenAIS config on specified hosts.
-     */
+    /** Creates OpenAIS config on specified hosts. */
     public static void createAISConfig(final Host[] hosts,
                                        final StringBuffer config) {
         /* write heartbeat config on all hosts */
@@ -146,9 +134,7 @@ public final class Openais {
 
     }
 
-    /**
-     * Reloads openais daemons on all nodes.
-     */
+    /** Reloads openais daemons on all nodes. */
     public static void reloadOpenaises(final Host[] hosts) {
         for (Host host : hosts) {
             reloadOpenais(host);

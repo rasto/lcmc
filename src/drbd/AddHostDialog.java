@@ -36,12 +36,9 @@ import drbd.gui.dialog.host.NewHost;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class AddHostDialog {
-
-    /**
-     * Shows step by step dialogs that add and configure new host.
-     */
-    public final void showDialogs() {
+public final class AddHostDialog {
+    /** Shows step by step dialogs that add and configure new host. */
+    public void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
         final Host host = new Host();
         DialogHost dialog = new NewHost(null, host);

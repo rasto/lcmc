@@ -29,7 +29,7 @@ package drbd.data;
  * @version $Id$
  *
  */
-public class AisCastAddress {
+public final class AisCastAddress {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Type of the cast address. */
@@ -59,10 +59,10 @@ public class AisCastAddress {
      * the ringnumber so that two interfaces can be compared.
      */
     private String convert(final String tab,
-                             final String type,
-                             final String bindnetaddr,
-                             final String address,
-                             final String port) {
+                           final String type,
+                           final String bindnetaddr,
+                           final String address,
+                           final String port) {
         if ("mcast".equals(type)) {
             return tab + "interface {\n"
                  + tab + tab + "bindnetaddr: " + bindnetaddr + "\n"
@@ -78,8 +78,7 @@ public class AisCastAddress {
      * Convert the info of this object to the line as it appears in the
      * openais.conf.
      */
-    public final String getConfigString(final int ringnumber,
-                                        final String tab) {
+    public String getConfigString(final int ringnumber, final String tab) {
         if ("mcast".equals(type)) {
             return tab + "interface {\n"
                  + tab + tab + "ringnumber: "  + Integer.toString(ringnumber)
@@ -93,14 +92,12 @@ public class AisCastAddress {
         }
     }
 
-    /**
-     * Compares two mcast addresses if they are the same.
-     */
-    public final boolean equals(final String tab,
-                                final String t,
-                                final String b,
-                                final String a,
-                                final String p) {
+    /** Compares two mcast addresses if they are the same. */
+    public boolean equals(final String tab,
+                          final String t,
+                          final String b,
+                          final String a,
+                          final String p) {
         return convert(tab, type, bindnetaddr, address, port).equals(
                                                     convert(tab, t, b, a, p));
     }

@@ -140,7 +140,7 @@ public final class RoboTest {
         Tools.info("start click test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Tools.sleep(10000);
                 Robot rbt = null;
                 try {
@@ -190,7 +190,7 @@ public final class RoboTest {
         Tools.info("start mouse move test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Tools.sleep(10000);
                 Robot rbt = null;
                 try {
@@ -298,7 +298,7 @@ public final class RoboTest {
         aborted = false;
         Tools.info("start test " + index + " in 3 seconds");
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Tools.sleep(3000);
                 Robot robot = null;
                 try {
@@ -448,13 +448,13 @@ public final class RoboTest {
                         }
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
-                    if ("1".equals(index)) {
-                        /* DRBD new style config */
+                    if ("1".equals(index) || "x1".equals(index)) {
+                        /* DRBD 1 link */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest1(robot, host);
+                            startDRBDTest1("drbd-test" + index, robot, host);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -462,7 +462,7 @@ public final class RoboTest {
                             i++;
                         }
                     } else if ("2".equals(index)) {
-                        /* DRBD */
+                        /* DRBD cancel */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
@@ -474,26 +474,13 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if ("3".equals(index)) {
-                        /* DRBD old style config */
+                    } else if ("3".equals(index) || "x3".equals(index)) {
+                        /* DRBD 2 links */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest3(robot, host);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                     - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            i++;
-                        }
-                    } else if ("4".equals(index)) {
-                        /* DRBD old style config */
-                        int i = 1;
-                        while (!aborted) {
-                            final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest4(robot, host);
+                            startDRBDTest3("drbd-test" + index, robot, host);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -502,13 +489,13 @@ public final class RoboTest {
                         }
                     }
                 } else if ("VMs".equals(selected)) {
-                    if ("1".equals(index) || "2".equals(index)) {
+                    if ("1".equals(index) || "x1".equals(index)) {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startVMTest1and2("vm-test" + index, robot, host);
+                            startVMTest1("vm-test" + index, robot, host);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -2369,7 +2356,7 @@ public final class RoboTest {
         Tools.info("start register movement in 3 seconds");
         Tools.sleep(3000);
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Point2D prevP = new Point2D.Double(0, 0);
                 Point2D prevPrevP = new Point2D.Double(0, 0);
                 while (true) {
@@ -2400,7 +2387,9 @@ public final class RoboTest {
     }
 
     /** DRBD Test 1. */
-    private static void startDRBDTest1(final Robot robot, final Host host) {
+    private static void startDRBDTest1(final String drbdTest,
+                                       final Robot robot,
+                                       final Host host) {
         slowFactor = 0.2f;
         host.getSSH().installTestFiles();
         aborted = false;
@@ -2444,14 +2433,14 @@ public final class RoboTest {
         leftClick(robot); /* finish */
         sleep(10000);
 
-        checkDRBDTest(host, "drbd-test1", 1);
+        checkDRBDTest(host, drbdTest, 1);
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot); /* finish */
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, "drbd-test1", 2);
+        checkDRBDTest(host, drbdTest, 2);
     }
 
     /** DRBD Test 1. */
@@ -2472,64 +2461,10 @@ public final class RoboTest {
         sleep(20000);
     }
 
-    /** DRBD Test 3. */
-    private static void startDRBDTest3(final Robot robot, final Host host) {
-        /* works only with --big-drbd-conf option */
-        slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
-        aborted = false;
-        moveTo(robot, 334, 315); /* add drbd resource */
-        rightClick(robot);
-        moveTo(robot, 342, 321);
-        moveTo(robot, 667, 322);
-        leftClick(robot);
-        sleep(20000);
-
-
-        moveTo(robot, 720, 580);
-        leftClick(robot); /* next */
-        sleep(20000);
-
-        moveTo(robot, 751, 412); /* interface */
-        leftClick(robot);
-        moveTo(robot, 716, 451);
-        leftClick(robot);
-        sleep(1000);
-
-        moveTo(robot, 720, 580);
-        leftClick(robot); /* next */
-        sleep(20000);
-
-        moveTo(robot, 751, 412); /* interface again */
-        leftClick(robot);
-        moveTo(robot, 716, 451);
-        leftClick(robot);
-        sleep(1000);
-
-        moveTo(robot, 720, 580);
-        leftClick(robot); /* next */
-        sleep(20000);
-
-        moveTo(robot, 720, 580); /* meta-data */
-        leftClick(robot); /* next */
-        sleep(20000);
-
-        moveTo(robot, 820, 580); /* fs */
-        leftClick(robot); /* finish */
-        sleep(10000);
-
-        checkDRBDTest(host, "drbd-test3", 1);
-
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot); /* finish */
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
-        checkDRBDTest(host, "drbd-test3", 2);
-    }
-
     /** DRBD Test 4. */
-    private static void startDRBDTest4(final Robot robot, final Host host) {
+    private static void startDRBDTest3(final String drbdTest,
+                                       final Robot robot,
+                                       final Host host) {
         /* Two drbds. */
         slowFactor = 0.2f;
         host.getSSH().installTestFiles();
@@ -2575,11 +2510,11 @@ public final class RoboTest {
             leftClick(robot); /* finish */
             sleep(10000);
             if (offset == 0) {
-                checkDRBDTest(host, "drbd-test4", 1);
+                checkDRBDTest(host, drbdTest, 1);
             }
             offset += 40;
         }
-        checkDRBDTest(host, "drbd-test4", 2);
+        checkDRBDTest(host, drbdTest, 2);
 
         moveTo(robot, 480, 250); /* select r0 */
         leftClick(robot);
@@ -2611,7 +2546,7 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, "drbd-test4", 2.1); /* 2.1 */
+        checkDRBDTest(host, drbdTest, 2.1); /* 2.1 */
 
 
         /* common */
@@ -2629,7 +2564,7 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, "drbd-test4", 2.11); /* 2.11 */
+        checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
         moveTo(robot, 970, 380); /* wfc timeout */
         sleep(6000);
         leftClick(robot);
@@ -2673,7 +2608,7 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, "drbd-test4", 2.2); /* 2.2 */
+        checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
 
         moveTo(robot, 970, 420); /* wfc timeout */
         leftClick(robot);
@@ -2685,26 +2620,26 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, "drbd-test4", 2.3); /* 2.3 */
+        checkDRBDTest(host, drbdTest, 2.3); /* 2.3 */
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot); 
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, "drbd-test4", 3);
+        checkDRBDTest(host, drbdTest, 3);
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot); 
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, "drbd-test4", 4);
+        checkDRBDTest(host, drbdTest, 4);
     }
 
     /** VM Test 1. */
-    private static void startVMTest1and2(final String vmTest,
-                                         final Robot robot,
-                                         final Host host) {
+    private static void startVMTest1(final String vmTest,
+                                     final Robot robot,
+                                     final Host host) {
         slowFactor = 0.2f;
         host.getSSH().installTestFiles();
         aborted = false;
@@ -2759,15 +2694,16 @@ public final class RoboTest {
 
         checkVMTest(host, vmTest, 2);
 
+        Tools.sleep(20000);
         moveTo(robot, 814, 581); /* finish */
         leftClick(robot);
 
-        Tools.sleep(5000);
+        Tools.sleep(20000);
         moveTo(robot, 1066, 284); /* remove */
         leftClick(robot);
-        Tools.sleep(5000);
+        Tools.sleep(20000);
         moveTo(robot, 516, 485); /* confirm */
         leftClick(robot);
-        Tools.sleep(5000);
+        Tools.sleep(20000);
     }
 }

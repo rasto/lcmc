@@ -28,7 +28,7 @@ package drbd.utilities;
  * @version $Id$
  *
  */
-public class Unit {
+public final class Unit {
     /** Short name. */
     private final String shortName;
     /** Secondary short name used for comparisons. */
@@ -42,9 +42,7 @@ public class Unit {
     /** Whether the field to which this unit belongs is empty. */
     private boolean empty = false;
 
-    /**
-     * Prepares new <code>Unit</code> object.
-     */
+    /** Prepares new <code>Unit</code> object. */
     public Unit(final String shortName,
                 final String secShortName,
                 final String name,
@@ -55,39 +53,28 @@ public class Unit {
         this.pluralName   = pluralName;
     }
 
-    /**
-     * Returns whether the unit should be in plural.
-     */
-    public final boolean isPlural() {
+    /** Returns whether the unit should be in plural. */
+    public boolean isPlural() {
         return plural;
     }
 
-    /**
-     * Sets that the unit should be in plural.
-     */
-    public final void setPlural(final boolean plural) {
+    /** Sets that the unit should be in plural. */
+    public void setPlural(final boolean plural) {
         this.plural = plural;
     }
 
-    /**
-     * Sets whether the field to which this unit belongs is empty.
-     */
-    public final void setEmpty(final boolean empty) {
+    /** Sets whether the field to which this unit belongs is empty. */
+    public void setEmpty(final boolean empty) {
         this.empty = empty;
     }
 
-    /**
-     * Returns whether the field to which this unit belongs is empty.
-     */
-    public final boolean isEmpty() {
+    /** Returns whether the field to which this unit belongs is empty. */
+    public boolean isEmpty() {
         return empty;
     }
 
-    /**
-     * Returns the unit, plural if it should be in plural.
-     */
-    @Override
-    public final String toString() {
+    /** Returns the unit, plural if it should be in plural. */
+    @Override public String toString() {
         if (empty) {
             return "";
         }
@@ -97,11 +84,8 @@ public class Unit {
         return name;
     }
 
-    /**
-     * Returns true if units are equals.
-     */
-    @Override
-    public final boolean equals(final Object o) {
+    /** Returns true if units are equals. */
+    @Override public boolean equals(final Object o) {
         if (o == null) {
             return false;
         }
@@ -115,18 +99,13 @@ public class Unit {
                || pluralName.equals(((Unit) o).toString());
     }
 
-    /**
-     * Hash code.
-     */
-    @Override
-    public final int hashCode() {
+    /** Hash code. */
+    @Override public int hashCode() {
         return name.hashCode();
     }
 
-    /**
-     * Returns short name of the unit.
-     */
-    public final String getShortName() {
+    /** Returns short name of the unit. */
+    public String getShortName() {
         if (empty) {
             return "";
         }

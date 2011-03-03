@@ -21,7 +21,6 @@
 
 package drbd.data;
 
-import java.io.Serializable;
 import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
@@ -41,7 +40,7 @@ import java.util.LinkedHashMap;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class ConfigData implements Serializable {
+public final class ConfigData {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** access type. */
@@ -193,17 +192,13 @@ public class ConfigData implements Serializable {
         }
     }
 
-    /**
-     * Gets hosts object.
-     */
-    public final Hosts getHosts() {
+    /** Gets hosts object. */
+    public Hosts getHosts() {
         return hosts;
     }
 
-    /**
-     * Returns number of hosts that are not part of any cluster.
-     */
-    public final int danglingHostsCount() {
+    /** Returns number of hosts that are not part of any cluster. */
+    public int danglingHostsCount() {
         final Hosts hosts = Tools.getConfigData().getHosts();
         int c = 0;
         for (final Host host : hosts.getHostSet()) {
@@ -214,17 +209,13 @@ public class ConfigData implements Serializable {
         return c;
     }
 
-    /**
-     * Gets clusters object.
-     */
-    public final Clusters getClusters() {
+    /** Gets clusters object. */
+    public Clusters getClusters() {
         return clusters;
     }
 
-    /**
-     * Gets user for download area.
-     */
-    public final String getDownloadUser() {
+    /** Gets user for download area. */
+    public String getDownloadUser() {
         if (savedDownloadUser != null && !savedDownloadUser.equals("")) {
             downloadUser = savedDownloadUser;
             savedDownloadUser = "";
@@ -233,7 +224,7 @@ public class ConfigData implements Serializable {
     }
 
     /** Gets password for download area. */
-    public final String getDownloadPassword() {
+    public String getDownloadPassword() {
         if (savedDownloadPassword != null
             && !savedDownloadPassword.equals("")) {
             downloadPassword = savedDownloadPassword;
@@ -245,14 +236,14 @@ public class ConfigData implements Serializable {
     /**
      * Returns whether the user and password for download area, shuld be saved.
      */
-    public final boolean getLoginSave() {
+    public boolean getLoginSave() {
         return loginSave;
     }
 
     /** Sets user and password for download area. */
-    public final void setDownloadLogin(final String downloadUser,
-                                       final String downloadPassword,
-                                       final boolean loginSave) {
+    public void setDownloadLogin(final String downloadUser,
+                                 final String downloadPassword,
+                                 final boolean loginSave) {
         this.downloadUser = downloadUser;
         this.downloadPassword = downloadPassword;
         this.loginSave = loginSave;
@@ -266,7 +257,7 @@ public class ConfigData implements Serializable {
     }
 
     /** Gets user for plugin area. */
-    public final String getPluginUser() {
+    public String getPluginUser() {
         if (savedPluginUser != null && !savedPluginUser.equals("")) {
             pluginUser = savedPluginUser;
             savedPluginUser = "";
@@ -275,7 +266,7 @@ public class ConfigData implements Serializable {
     }
 
     /** Gets password for plugin area. */
-    public final String getPluginPassword() {
+    public String getPluginPassword() {
         if (savedPluginPassword != null
             && !savedPluginPassword.equals("")) {
             pluginPassword = savedPluginPassword;
@@ -285,9 +276,10 @@ public class ConfigData implements Serializable {
     }
 
     /** Sets user and password for plugin area. */
-    public final void setPluginLogin(final String pluginUser,
-                                     final String pluginPassword,
-                                     final boolean pluginLoginSave) {
+    public void setPluginLogin(final String pluginUser,
+                               final String pluginPassword,
+                               final boolean pluginLoginSave) {
+        //TODO: pluginLoginSave not used?
         this.pluginUser = pluginUser;
         this.pluginPassword = pluginPassword;
         this.loginSave = loginSave;
@@ -303,197 +295,145 @@ public class ConfigData implements Serializable {
     /**
      * Returns whether the user and password for plugin area, shuld be saved.
      */
-    public final boolean getPluginLoginSave() {
+    public boolean getPluginLoginSave() {
         return pluginLoginSave;
     }
 
-    /**
-     * Return whether host exists in the hosts.
-     */
-    public final boolean existsHost(final Host host) {
+    /** Return whether host exists in the hosts. */
+    public boolean existsHost(final Host host) {
         return hosts.existsHost(host);
     }
 
-    /**
-     * Adds host object to the hosts object.
-     */
-    public final void addHostToHosts(final Host host) {
+    /** Adds host object to the hosts object. */
+    public void addHostToHosts(final Host host) {
         hosts.addHost(host);
     }
 
-    /**
-     * removes host object from hosts object.
-     */
-    public final void removeHostFromHosts(final Host host) {
+    /** Removes host object from hosts object. */
+    public void removeHostFromHosts(final Host host) {
         hosts.removeHost(host);
     }
 
-    /**
-     * Return whether cluster exists in the clusters.
-     */
-    public final boolean existsCluster(final Cluster cluster) {
+    /** Return whether cluster exists in the clusters. */
+    public boolean existsCluster(final Cluster cluster) {
         return clusters.existsCluster(cluster);
     }
 
-    /**
-     * Adds cluster object to the clusters object.
-     */
-    public final void addClusterToClusters(final Cluster cluster) {
+    /** Adds cluster object to the clusters object. */
+    public void addClusterToClusters(final Cluster cluster) {
         clusters.addCluster(cluster);
     }
 
-    /**
-     * Removes cluster object from clusters object.
-     */
-    public final void removeClusterFromClusters(final Cluster cluster) {
+    /** Removes cluster object from clusters object. */
+    public void removeClusterFromClusters(final Cluster cluster) {
         clusters.removeCluster(cluster);
     }
 
-    /**
-     * Disconnects all hosts.
-     */
-    public final void disconnectAllHosts() {
+    /** Disconnects all hosts. */
+    public void disconnectAllHosts() {
         hosts.disconnectAllHosts();
     }
 
-    /**
-     * Sets global advanced mode.
-     */
-    public final void setAdvancedMode(final boolean advancedMode) {
+    /** Sets global advanced mode. */
+    public void setAdvancedMode(final boolean advancedMode) {
         this.advancedMode = advancedMode;
     }
 
     /** Gets advanced mode. */
-    public final boolean isAdvancedMode() {
+    public boolean isAdvancedMode() {
         return advancedMode;
     }
 
-    /**
-     * Sets file name where gui data are saved.
-     */
-    public final void setSaveFile(final String saveFile) {
+    /** Sets file name where gui data are saved. */
+    public void setSaveFile(final String saveFile) {
         this.saveFile = saveFile;
     }
 
-    /**
-     * Returns file name where gui data were saved the last time.
-     */
-    public final String getSaveFile() {
+    /** Returns file name where gui data were saved the last time. */
+    public String getSaveFile() {
         return saveFile;
     }
 
-    /**
-     * Returns path of the known host file.
-     */
-    public final String getKnownHostPath() {
+    /** Returns path of the known host file. */
+    public String getKnownHostPath() {
         return knownHostPath;
     }
 
-    /**
-     * Returns Id DSA path.
-     */
-    public final String getIdDSAPath() {
+    /** Returns Id DSA path. */
+    public String getIdDSAPath() {
         return idDSAPath;
     }
 
-    /**
-     * Returns Id RSA path.
-     */
-    public final String getIdRSAPath() {
+    /** Returns Id RSA path. */
+    public String getIdRSAPath() {
         return idRSAPath;
     }
 
-    /**
-     * Returns the known hosts object.
-     */
-    public final KnownHosts getKnownHosts() {
+    /** Returns the known hosts object. */
+    public KnownHosts getKnownHosts() {
         return knownHosts;
     }
 
-    /**
-     * Sets what was the last installed cluster stack.
-     */
-    public final void setLastInstalledClusterStack(
-                                       final String lastInstalledClusterStack) {
+    /** Sets what was the last installed cluster stack. */
+    public void setLastInstalledClusterStack(
+                                    final String lastInstalledClusterStack) {
         this.lastInstalledClusterStack = lastInstalledClusterStack;
     }
 
-    /**
-     * Returns what was the last installed cluster stack.
-     */
-     public final String getLastInstalledClusterStack() {
-         return lastInstalledClusterStack;
-     }
+    /** Returns what was the last installed cluster stack. */
+    public String getLastInstalledClusterStack() {
+        return lastInstalledClusterStack;
+    }
 
-    /**
-     * Sets last installed method of either Openais or Heartbeat.
-     */
-    public final void setLastHbPmInstalledMethod(
-                                    final String lastHbPmInstalledMethod) {
+    /** Sets last installed method of either Openais or Heartbeat. */
+    public void setLastHbPmInstalledMethod(
+                                        final String lastHbPmInstalledMethod) {
         this.lastHbPmInstalledMethod = lastHbPmInstalledMethod;
     }
 
-    /**
-     * Returns last installed method of either Openais or Heartbeat.
-     */
-     public final String getLastHbPmInstalledMethod() {
-         return lastHbPmInstalledMethod;
-     }
+    /** Returns last installed method of either Openais or Heartbeat. */
+    public String getLastHbPmInstalledMethod() {
+        return lastHbPmInstalledMethod;
+    }
 
-    /**
-     * Sets last drbd installed method.
-     */
-    public final void setLastDrbdInstalledMethod(
-                                    final String lastDrbdInstalledMethod) {
+    /** Sets last drbd installed method. */
+    public void setLastDrbdInstalledMethod(
+                                        final String lastDrbdInstalledMethod) {
         this.lastDrbdInstalledMethod = lastDrbdInstalledMethod;
     }
 
-    /**
-     * Returns last drbd installed method.
-     */
-    public final String getLastDrbdInstalledMethod() {
+    /** Returns last drbd installed method. */
+    public String getLastDrbdInstalledMethod() {
         return lastDrbdInstalledMethod;
     }
 
-    /**
-     * Sets last entered user.
-     */
-    public final void setLastEnteredUser(final String lastEnteredUser) {
+    /** Sets last entered user. */
+    public void setLastEnteredUser(final String lastEnteredUser) {
         this.lastEnteredUser = lastEnteredUser;
     }
 
-    /**
-     * Gets last entered user.
-     */
-    public final String getLastEnteredUser() {
+    /** Gets last entered user. */
+    public String getLastEnteredUser() {
         return lastEnteredUser;
     }
 
-    /**
-     * Sets last used sudo.
-     */
-    public final void setLastEnteredUseSudo(final Boolean lastEnteredUseSudo) {
+    /** Sets last used sudo. */
+    public void setLastEnteredUseSudo(final Boolean lastEnteredUseSudo) {
         this.lastEnteredUseSudo = lastEnteredUseSudo;
     }
 
-    /**
-     * Returns last entered sudo.
-     */
-    public final Boolean getLastEnteredUseSudo() {
+    /** Returns last entered sudo. */
+    public Boolean getLastEnteredUseSudo() {
         return lastEnteredUseSudo;
     }
 
-    /**
-     * Sets last ssh port.
-     */
-    public final void setLastEnteredSSHPort(final String lastEnteredSSHPort) {
+    /** Sets last ssh port. */
+    public void setLastEnteredSSHPort(final String lastEnteredSSHPort) {
         this.lastEnteredSSHPort = lastEnteredSSHPort;
     }
 
-    /**
-     * Returns last ssh port.
-     */
-    public final String getLastEnteredSSHPort() {
+    /** Returns last ssh port. */
+    public String getLastEnteredSSHPort() {
         return lastEnteredSSHPort;
     }
 
@@ -501,7 +441,7 @@ public class ConfigData implements Serializable {
      * Sets whether the drbd gui helper should be kept or overwritten all
      * the time.
      */
-    public final void setKeepHelper(final boolean keepHelper) {
+    public void setKeepHelper(final boolean keepHelper) {
         this.keepHelper = keepHelper;
     }
 
@@ -509,139 +449,104 @@ public class ConfigData implements Serializable {
      * Returns whether the drbd gui helper should be kept or overwritten
      * all the time.
      */
-    public final boolean getKeepHelper() {
+    public boolean getKeepHelper() {
         return keepHelper;
     }
 
-    /**
-     * Adds auto option that starts automatic actions in the gui.
-     */
-    public final void addAutoOption(final String hostOrCluster,
-                                    final String option,
-                                    final String value) {
+    /** Adds auto option that starts automatic actions in the gui. */
+    public void addAutoOption(final String hostOrCluster,
+                              final String option,
+                              final String value) {
         autoOptions.put(hostOrCluster, option, value);
     }
 
-    /**
-     * Adds host on which automatic actions will be performed.
-     */
-    public final void addAutoHost(final String host) {
+    /** Adds host on which automatic actions will be performed. */
+    public void addAutoHost(final String host) {
         autoHosts.add(host);
     }
 
-    /**
-     * Returns hosts on which automatic actions will be performed.
-     */
-    public final List<String> getAutoHosts() {
+    /** Returns hosts on which automatic actions will be performed. */
+    public List<String> getAutoHosts() {
         return autoHosts;
     }
 
-    /**
-     * Removes host after it is done.
-     */
-    public final void removeAutoHost() {
+    /** Removes host after it is done. */
+    public void removeAutoHost() {
         if (!autoHosts.isEmpty()) {
             autoHosts.remove(0);
         }
     }
 
-    /**
-     * Adds cluster on which automatic actions will be performed.
-     */
-    public final void addAutoCluster(final String cluster) {
+    /** Adds cluster on which automatic actions will be performed. */
+    public void addAutoCluster(final String cluster) {
         autoClusters.add(cluster);
     }
 
-    /**
-     * Returns clusters on which automatic actions will be performed.
-     */
-    public final List<String> getAutoClusters() {
+    /** Returns clusters on which automatic actions will be performed. */
+    public List<String> getAutoClusters() {
         return autoClusters;
     }
 
-    /**
-     * Removes cluster after it is done.
-     */
-    public final void removeAutoCluster() {
+    /** Removes cluster after it is done. */
+    public void removeAutoCluster() {
         if (!autoClusters.isEmpty()) {
             autoClusters.remove(0);
         }
     }
 
-    /**
-     * Returns an auto option for gui testing.
-     */
-    public final String getAutoOption(final String hostOrCluster,
-                                      final String option) {
+    /** Returns an auto option for gui testing. */
+    String getAutoOption(final String hostOrCluster, final String option) {
         return (String) autoOptions.get(hostOrCluster, option);
     }
 
-    /**
-     * Returns an auto option for the first host in the list.
-     */
-    public final String getAutoOptionHost(final String option) {
+    /** Returns an auto option for the first host in the list. */
+    public String getAutoOptionHost(final String option) {
         if (autoHosts.isEmpty()) {
             return null;
         }
         return (String) autoOptions.get(autoHosts.get(0), option);
     }
 
-    /**
-     * Returns an auto option for first cluster in the list.
-     */
-    public final String getAutoOptionCluster(final String option) {
+    /** Returns an auto option for first cluster in the list. */
+    public String getAutoOptionCluster(final String option) {
         if (autoClusters.isEmpty()) {
             return null;
         }
         return (String) autoOptions.get(autoClusters.get(0), option);
     }
 
-    /**
-     * Returns a global option.
-     */
-    public final String getAutoOptionGlobal(final String option) {
+    /** Returns a global option. */
+    public String getAutoOptionGlobal(final String option) {
         return (String) autoOptions.get("global", option);
     }
 
-    /**
-     * Returns remote port offset when making ssh tunnel for vnc.
-     */
-    public final int getVncPortOffset() {
+    /** Returns remote port offset when making ssh tunnel for vnc. */
+    public int getVncPortOffset() {
         return vncPortOffset;
     }
 
-    /**
-     * Sets remote port offset when making ssh tunnel for vnc.
-     */
-    public final void setVncPortOffset(final int vncPortOffset) {
+    /** Sets remote port offset when making ssh tunnel for vnc. */
+    public void setVncPortOffset(final int vncPortOffset) {
         this.vncPortOffset = vncPortOffset;
     }
 
-    /**
-     * Sets whether tight vnc viewer should be used.
-     */
-    public final void setTightvnc(final boolean tightvnc) {
+    /** Sets whether tight vnc viewer should be used. */
+    public void setTightvnc(final boolean tightvnc) {
         this.tightvnc = tightvnc;
     }
 
-    /**
-     * Sets whether ultra vnc viewer should be used.
-     */
-    public final void setUltravnc(final boolean ultravnc) {
+    /** Sets whether ultra vnc viewer should be used. */
+    public void setUltravnc(final boolean ultravnc) {
         this.ultravnc = ultravnc;
     }
 
-    /**
-     * Sets whether real vnc viewer should be used.
-     */
-    public final void setRealvnc(final boolean realvnc) {
+    /** Sets whether real vnc viewer should be used. */
+    public void setRealvnc(final boolean realvnc) {
         this.realvnc = realvnc;
     }
 
-    /**
-     * Returns whether tight vnc viewer should be used.
-     */
-    public final boolean isTightvnc() {
+    /** Returns whether tight vnc viewer should be used. */
+    public boolean isTightvnc() {
         return tightvnc;
     }
 
@@ -649,17 +554,17 @@ public class ConfigData implements Serializable {
      * Sets whether the drbd packages should be downloaded from staging
      * directory for testing.
      */
-    public final void setStagingDrbd(final boolean stagingDrbd) {
+    public void setStagingDrbd(final boolean stagingDrbd) {
         this.stagingDrbd = stagingDrbd;
     }
 
     /** Sets whether more pacemaker installation options should be shown. */
-    public final void setStagingPacemaker(final boolean stagingPacemaker) {
+    public void setStagingPacemaker(final boolean stagingPacemaker) {
         this.stagingPacemaker = stagingPacemaker;
     }
 
     /** Returns whether more pacemaker installation options should be shown. */
-    public final boolean isStagingPacemaker() {
+    public boolean isStagingPacemaker() {
         return stagingPacemaker;
     }
 
@@ -667,63 +572,47 @@ public class ConfigData implements Serializable {
      * Returns whether the drbd packages should be downloaded from staging
      * directory for testing.
      */
-    public final boolean isStagingDrbd() {
+    public boolean isStagingDrbd() {
         return stagingDrbd;
     }
 
-    /**
-     * Returns whether ultra vnc viewer should be used.
-     */
-    public final boolean isUltravnc() {
+    /** Returns whether ultra vnc viewer should be used. */
+    public boolean isUltravnc() {
         return ultravnc;
     }
 
-    /**
-     * Returns whether real vnc viewer should be used.
-     */
-    public final boolean isRealvnc() {
+    /** Returns whether real vnc viewer should be used. */
+    public boolean isRealvnc() {
         return realvnc;
     }
 
-    /**
-     * Returns frames per second for animations.
-     */
-    public final float getAnimFPS() {
+    /** Returns frames per second for animations. */
+    public float getAnimFPS() {
         return animFPS;
     }
 
-    /**
-     * Sets frames per second for animations.
-     */
-    public final void setAnimFPS(final float animFPS) {
+    /** Sets frames per second for animations. */
+    public void setAnimFPS(final float animFPS) {
         this.animFPS = animFPS;
     }
 
-    /**
-     * Sets access type.
-     */
-    public final void setAccessType(final AccessType accessType) {
+    /** Sets access type. */
+    public void setAccessType(final AccessType accessType) {
         this.accessType = accessType;
     }
 
-    /**
-     * Returns access type.
-     */
-    public final AccessType getAccessType() {
+    /** Returns access type. */
+    public AccessType getAccessType() {
         return accessType;
     }
 
-    /**
-     * Sets maximum allowed access type of the application.
-     */
-    public final void setMaxAccessType(final AccessType maxAccessType) {
+    /** Sets maximum allowed access type of the application. */
+    public void setMaxAccessType(final AccessType maxAccessType) {
         this.maxAccessType = maxAccessType;
     }
 
-    /**
-     * Gets maximum allowed access type of the application.
-     */
-    public final AccessType getMaxAccessType() {
+    /** Gets maximum allowed access type of the application. */
+    AccessType getMaxAccessType() {
         return maxAccessType;
     }
 
@@ -731,16 +620,14 @@ public class ConfigData implements Serializable {
      * Returns true if the access type is greater than the one that is
      * required and advanced mode is required and we are not in advanced mode.
      */
-    public final boolean isAccessible(final AccessMode required) {
+    public boolean isAccessible(final AccessMode required) {
         return getAccessType().compareTo(required.getAccessType()) > 0
                || (getAccessType().compareTo(required.getAccessType()) == 0
                    && (advancedMode || !required.isAdvancedMode()));
     }
 
-    /**
-     * Returns available operating modes.
-     */
-    public final String[] getOperatingModes() {
+    /** Returns available operating modes. */
+    public String[] getOperatingModes() {
         final List<String> modes = new ArrayList<String>();
         for (final AccessType at : ConfigData.OP_MODES_MAP.keySet()) {
             modes.add(OP_MODES_MAP.get(at));
@@ -752,33 +639,32 @@ public class ConfigData implements Serializable {
     }
 
     /** Sets whether the upgrade check should be enabled. */
-    public final void setUpgradeCheckEnabled(
-                                            final boolean upgradeCheckEnabled) {
+    public void setUpgradeCheckEnabled(final boolean upgradeCheckEnabled) {
         this.upgradeCheckEnabled = upgradeCheckEnabled;
     }
 
     /** Returns whether the upgrade check is enabled. */
-    public final boolean isUpgradeCheckEnabled() {
+    public boolean isUpgradeCheckEnabled() {
         return upgradeCheckEnabled;
     }
 
     /** Returns whether the plugins are enabled. */
-    public final boolean arePluginsEnabled() {
+    public boolean arePluginsEnabled() {
         return pluginsEnabled;
     }
 
     /** Sets whether the plugins should be enabled. */
-    public final void setPluginsEnabled(final boolean pluginsEnabled) {
+    public void setPluginsEnabled(final boolean pluginsEnabled) {
         this.pluginsEnabled = pluginsEnabled;
     }
 
     /** Returns whether big drbd.conf and not drbd.d/ should be used. */
-    public final boolean getBigDRBDConf() {
+    public boolean getBigDRBDConf() {
         return bigDRBDConf;
     }
 
     /** Sets whether big drbd.conf and not drbd.d/ should be used. */
-    public final void setBigDRBDConf(final boolean bigDRBDConf) {
+    public void setBigDRBDConf(final boolean bigDRBDConf) {
         this.bigDRBDConf = bigDRBDConf;
     }
 }

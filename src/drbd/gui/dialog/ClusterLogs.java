@@ -43,23 +43,19 @@ public class ClusterLogs extends Logs {
     /** Cluster object. */
     private final Cluster cluster;
 
-    /**
-     * Prepares a new <code>ClusterLogs</code> object.
-     */
+    /** Prepares a new <code>ClusterLogs</code> object. */
     public ClusterLogs(final Cluster cluster) {
         super();
         this.cluster = cluster;
     }
 
-    /**
-     * Returns the cluster object.
-     */
+    /** Returns the cluster object. */
     protected final Cluster getCluster() {
         return cluster;
     }
 
     /** Returns all hosts in the cluster. */
-    protected final Host[] getHosts() {
+    @Override protected final Host[] getHosts() {
         return cluster.getHostsArray();
     }
 
@@ -67,19 +63,17 @@ public class ClusterLogs extends Logs {
      * Command that gets the log. The command must be specified in the
      * DistResource or some such.
      */
-    protected String logFileCommand() {
+    @Override protected String logFileCommand() {
         return "Logs.hbLog";
     }
 
-    /**
-     * Gets the title of the dialog as string.
-     */
-    protected final String getDialogTitle() {
+    /** Gets the title of the dialog as string. */
+    @Override protected final String getDialogTitle() {
         return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
     /** Returns a map from pattern name to its pattern. */
-    protected Map<String, String> getPatternMap() {
+    @Override protected Map<String, String> getPatternMap() {
         final Map<String, String> pm = new LinkedHashMap<String, String>();
         pm.put("lrmd", wordBoundary("lrmd"));
         pm.put("crmd", wordBoundary("crmd"));
@@ -89,7 +83,7 @@ public class ClusterLogs extends Logs {
     }
 
     /** Returns which pattern names are selected by default. */
-    protected Set<String> getSelectedSet() {
+    @Override protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
         selected.add("ERROR");
         return selected;

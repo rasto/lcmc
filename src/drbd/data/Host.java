@@ -51,7 +51,6 @@ import java.util.LinkedHashMap;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.io.Serializable;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -63,7 +62,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class Host implements Serializable {
+public final class Host {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the host. */
@@ -191,7 +190,7 @@ public class Host implements Serializable {
     /** Is "on" if pacemaker has an init script. */
     private boolean pcmkInit = false;
     /** Pacemaker service version. From version 1, use pacamker init script. */
-    public int pcmkServiceVersion = 0;
+    private int pcmkServiceVersion = 0;
     /** Is "on" if drbd module is loaded. */
     private boolean drbdLoaded = false;
     /** Corosync version. */
@@ -248,7 +247,7 @@ public class Host implements Serializable {
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
     /** Volume group information on this host. */
-    public Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
+    private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -262,18 +261,14 @@ public class Host implements Serializable {
         addMountPoint("/mnt/");
     }
 
-    /**
-     * Prepares a new <code>Host</code> object.
-     */
+    /** Prepares a new <code>Host</code> object. */
     public Host(final String ip) {
         this();
         this.ip = ip;
     }
 
-    /**
-     * Returns borwser object for this host.
-     */
-    public final HostBrowser getBrowser() {
+    /** Returns borwser object for this host. */
+    public HostBrowser getBrowser() {
         return browser;
     }
 
@@ -282,21 +277,17 @@ public class Host implements Serializable {
      * if it is removed from the cluster. One host can be
      * only in one cluster.
      */
-    public final void setCluster(final Cluster cluster) {
+    public void setCluster(final Cluster cluster) {
         this.cluster = cluster;
     }
 
-    /**
-     * Returns the cluster data object.
-     */
-    public final Cluster getCluster() {
+    /** Returns the cluster data object. */
+    public Cluster getCluster() {
         return cluster;
     }
 
-    /**
-     * Returns color objects of this host for drbd graph.
-     */
-    public final Color[] getDrbdColors() {
+    /** Returns color objects of this host for drbd graph. */
+    public Color[] getDrbdColors() {
         if (defaultColor == null) {
             defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
@@ -320,10 +311,8 @@ public class Host implements Serializable {
     }
 
 
-    /**
-     * Returns color objects of this host.
-     */
-    public final Color[] getPmColors() {
+    /** Returns color objects of this host. */
+    public Color[] getPmColors() {
         if (defaultColor == null) {
             defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
@@ -347,7 +336,7 @@ public class Host implements Serializable {
     }
 
     /** Sets color of the host. */
-    public final void setColor(final Color defaultColor) {
+    void setColor(final Color defaultColor) {
         this.defaultColor = defaultColor;
         if (savedColor == null) {
             savedColor = defaultColor;
@@ -358,24 +347,20 @@ public class Host implements Serializable {
     }
 
     /** Sets color of the host, when it was saved. */
-    public final void setSavedColor(final Color savedColor) {
+    public void setSavedColor(final Color savedColor) {
         this.savedColor = savedColor;
         if (terminalPanel != null) {
             terminalPanel.resetPromptColor();
         }
     }
 
-    /**
-     * Sets if hb status failed or not.
-     */
-    public final void setClStatus(final boolean clStatus) {
+    /** Sets if hb status failed or not. */
+    public void setClStatus(final boolean clStatus) {
         this.clStatus = clStatus;
     }
 
-    /**
-     * Sets if drbd status failed or not.
-     */
-    public final void setDrbdStatus(final boolean drbdStatus) {
+    /** Sets if drbd status failed or not. */
+    public void setDrbdStatus(final boolean drbdStatus) {
         this.drbdStatus = drbdStatus;
         if (!drbdStatus) {
             for (BlockDevice b : getBlockDevices()) {
@@ -384,24 +369,18 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Returns whether cluster status is available.
-     */
-    public final boolean isClStatus() {
+    /** Returns whether cluster status is available. */
+    public boolean isClStatus() {
         return clStatus && isConnected();
     }
 
-    /**
-     * Returns whether drbd status is available.
-     */
-    public final boolean isDrbdStatus() {
+    /** Returns whether drbd status is available. */
+    public boolean isDrbdStatus() {
         return drbdStatus;
     }
 
-    /**
-     * Returns true when this host is in a cluster.
-     */
-    public final boolean isInCluster() {
+    /** Returns true when this host is in a cluster. */
+    public boolean isInCluster() {
         return cluster != null;
     }
 
@@ -409,7 +388,7 @@ public class Host implements Serializable {
      * Returns true when this host is in a cluster and is different than the
      * specified cluster.
      */
-    public final boolean isInCluster(final Cluster otherCluster) {
+    public boolean isInCluster(final Cluster otherCluster) {
         return cluster != null && !cluster.equals(otherCluster);
     }
 
@@ -417,7 +396,7 @@ public class Host implements Serializable {
      * Sets hostname as entered by user, this can be also ip. If
      * hostnameEntered changed, it reinitilizes the name.
      */
-    public final void setHostnameEntered(final String hostnameEntered) {
+    public void setHostnameEntered(final String hostnameEntered) {
         Tools.debug(this, "h e: " + hostnameEntered + " != "
                           + this.hostnameEntered, 1);
         if (hostnameEntered != null
@@ -430,10 +409,8 @@ public class Host implements Serializable {
         this.hostnameEntered = hostnameEntered;
     }
 
-    /**
-     * Sets hostname of the host.
-     */
-    public final void setHostname(final String hostname) {
+    /** Sets hostname of the host. */
+    public void setHostname(final String hostname) {
         this.hostname = hostname;
     }
 
@@ -442,7 +419,7 @@ public class Host implements Serializable {
      * to the host. The default is "root". If username changed disconnect
      * the old connection.
      */
-    public final void setUsername(final String username) {
+    public void setUsername(final String username) {
         if (!username.equals(this.username)) {
             ssh.disconnect();
         }
@@ -453,7 +430,7 @@ public class Host implements Serializable {
      * Sets ip. If ip has changed, disconnect the
      * old connection.
      */
-    public final void setIp(final String ip) {
+    public void setIp(final String ip) {
         if (ip != null) {
             if (!ip.equals(this.ip)) {
                 ssh.disconnect();
@@ -464,21 +441,19 @@ public class Host implements Serializable {
         this.ip = ip;
     }
 
-    /**
-     * Sets ips.
-     */
-    public final void setIps(final int hop, final String[] ipsForHop) {
+    /** Sets ips. */
+    public void setIps(final int hop, final String[] ipsForHop) {
         ips.put(hop, ipsForHop);
     }
 
     /** Returns net interfaces. */
-    public final NetInterface[] getNetInterfaces() {
+    public NetInterface[] getNetInterfaces() {
         return netInterfaces.values().toArray(
                                     new NetInterface[netInterfaces.size()]);
     }
 
     /** Get net interfaces that are bridges. */
-    public final List<String> getBridges() {
+    public List<String> getBridges() {
         final List<String> bridges = new ArrayList<String>();
         for (final NetInterface ni : netInterfaces.values()) {
             if (ni.isBridge()) {
@@ -489,7 +464,7 @@ public class Host implements Serializable {
     }
 
     /** Returns blockDevices. */
-    public final BlockDevice[] getBlockDevices() {
+    BlockDevice[] getBlockDevices() {
         return blockDevices.values().toArray(
                                     new BlockDevice[blockDevices.size()]);
     }
@@ -498,7 +473,7 @@ public class Host implements Serializable {
      * Returns blockDevices as array list of device names. Removes the
      * ones that are in the drbd and are already used in CRM.
      */
-    public final List<String> getBlockDevicesNames() {
+    List<String> getBlockDevicesNames() {
         final List<String> blockDevicesNames = new ArrayList<String>();
         for (final String bdName : blockDevices.keySet()) {
             final BlockDevice bd = blockDevices.get(bdName);
@@ -517,7 +492,7 @@ public class Host implements Serializable {
      *          block devices of this host is made.
      *
      */
-    public final List<String> getBlockDevicesNamesIntersection(
+    List<String> getBlockDevicesNamesIntersection(
                                         final List<String> otherBlockDevices) {
         final List<String> blockDevicesIntersection = new ArrayList<String>();
         if (otherBlockDevices == null) {
@@ -532,10 +507,8 @@ public class Host implements Serializable {
         return blockDevicesIntersection;
     }
 
-    /**
-     * Returns network ips as array list.
-     */
-    public final Map<String, String> getNetworkIps() {
+    /** Returns network ips as array list. */
+    Map<String, String> getNetworkIps() {
         final Map<String, String> networkIps =
                                          new LinkedHashMap<String, String>();
         for (final NetInterface ni : netInterfaces.values()) {
@@ -546,7 +519,7 @@ public class Host implements Serializable {
     }
 
     /** Returns list of networks that exist on all hosts. */
-    public final Map<String, String> getNetworksIntersection(
+    public Map<String, String> getNetworksIntersection(
                                    final Map<String, String> otherNetworkIps) {
         if (otherNetworkIps == null) {
             return getNetworkIps();
@@ -564,7 +537,7 @@ public class Host implements Serializable {
     }
 
     /** Returns ips that belong the the network. */
-    public final List<String> getIpsFromNetwork(final String netIp) {
+    List<String> getIpsFromNetwork(final String netIp) {
         final List<String> networkIps = new ArrayList<String>();
         for (final NetInterface ni : netInterfaces.values()) {
             if (netIp.equals(ni.getNetworkIp())) {
@@ -574,113 +547,93 @@ public class Host implements Serializable {
         return networkIps;
     }
 
-    /**
-     * Returns BlockDevice object identified with device name.
-     */
-    public final BlockDevice getBlockDevice(final String device) {
+    /** Returns BlockDevice object identified with device name. */
+    BlockDevice getBlockDevice(final String device) {
         return blockDevices.get(device);
     }
 
-    /**
-     * Removes file system from the list of file systems.
-     */
-    public final void removeFileSystems() {
+    /** Removes file system from the list of file systems. */
+    void removeFileSystems() {
         fileSystems.clear();
     }
 
-    /**
-     * Returns available file systems.
-     */
-    public final String[] getFileSystems() {
+    /** Returns available file systems. */
+    String[] getFileSystems() {
         return fileSystems.toArray(new String [fileSystems.size()]);
     }
 
-    /**
-     * Returns available file systems devices as a list of strings.
-     */
-    public final Set<String> getFileSystemsList() {
+    /** Returns available file systems devices as a list of strings. */
+    Set<String> getFileSystemsList() {
         return fileSystems;
     }
 
-    /**
-     * Adds file system to the list of file systems.
-     */
-    public final void addFileSystem(final String fileSystem) {
+    /** Adds file system to the list of file systems. */
+    void addFileSystem(final String fileSystem) {
         fileSystems.add(fileSystem);
     }
 
     /** Returns available crypto modules as a list of strings. */
-    public final Set<String> getCryptoModules() {
+    Set<String> getCryptoModules() {
         return cryptoModules;
     }
 
     /** Adds crypto module to the list of crypto modules. */
-    public final void addCryptoModule(final String cryptoModule) {
+    void addCryptoModule(final String cryptoModule) {
         cryptoModules.add(cryptoModule);
     }
 
     /** Returns available qemu keymaps as a list of strings. */
-    public final Set<String> getQemuKeymaps() {
+    public Set<String> getQemuKeymaps() {
         return qemuKeymaps;
     }
 
     /** Adds qemu keymap to the list of qemu keymaps. */
-    public final void addQemuKeymap(final String qemuKeymap) {
+    void addQemuKeymap(final String qemuKeymap) {
         qemuKeymaps.add(qemuKeymap);
     }
 
     /** Returns available libvirt's cpu map models. */
-    public final Set<String> getCPUMapModels() {
+    public Set<String> getCPUMapModels() {
         return cpuMapModels;
     }
 
     /** Adds libvirt's cpu map models to the list. */
-    public final void addCPUMapModel(final String cpuMapModel) {
+    void addCPUMapModel(final String cpuMapModel) {
         cpuMapModels.add(cpuMapModel);
     }
 
     /** Returns available libvirt's cpu map vendors. */
-    public final Set<String> getCPUMapVendors() {
+    public Set<String> getCPUMapVendors() {
         return cpuMapVendors;
     }
 
     /** Adds libvirt's cpu map vendors to the list. */
-    public final void addCPUMapVendor(final String cpuMapVendor) {
+    void addCPUMapVendor(final String cpuMapVendor) {
         cpuMapVendors.add(cpuMapVendor);
     }
 
-    /**
-     * Returns mount points as a list of strings.
-     */
-    public final Set<String> getMountPointsList() {
+    /** Returns mount points as a list of strings. */
+    Set<String> getMountPointsList() {
         return mountPoints;
     }
 
-    /**
-     * Adds mount point to the list of mount points.
-     */
+    /** Adds mount point to the list of mount points. */
     private void addMountPoint(final String mountPoint) {
         mountPoints.add(mountPoint);
     }
 
-    /**
-     * Returns ips of this host.
-     */
-    public final String[] getIps(final int hop) {
+    /** Returns ips of this host. */
+    public String[] getIps(final int hop) {
         return ips.get(hop);
     }
 
-    /**
-     * Sets available drbd versions.
-     */
-    public final void setAvailableDrbdVersions(final String[] versions) {
+    /** Sets available drbd versions. */
+    public void setAvailableDrbdVersions(final String[] versions) {
         availableDrbdVersions = new ArrayList<String>(Arrays.asList(versions));
     }
 
-    /**
-     * Retruns available drbd versions as array of strings.
-     */
-    public final String[] getAvailableDrbdVersions() {
+    /** Retruns available drbd versions as array of strings. */
+    public String[] getAvailableDrbdVersions() {
         if (availableDrbdVersions == null) {
             return null;
         }
@@ -688,9 +641,7 @@ public class Host implements Serializable {
                                     new String [availableDrbdVersions.size()]);
     }
 
-    /**
-     * Returns whether version v1 is greater than version 2.
-     */
+    /** Returns whether version v1 is greater than version 2. */
     private boolean versionGreater(final String v1, final String v2) {
         final Pattern p = Pattern.compile("^(\\d+)rc(\\d+)$");
         String[] v1a = (v1 + ".999999").split("\\.");
@@ -726,10 +677,8 @@ public class Host implements Serializable {
         return false;
     }
 
-    /**
-     * Returns whether there is a drbd upgrade available.
-     */
-    public final boolean isDrbdUpgradeAvailable(final String versionString) {
+    /** Returns whether there is a drbd upgrade available. */
+    public boolean isDrbdUpgradeAvailable(final String versionString) {
         if (availableDrbdVersions == null) {
             return false;
         }
@@ -742,17 +691,13 @@ public class Host implements Serializable {
         return false;
     }
 
-    /**
-     * Returns installed drbd version.
-     */
-    public final String getDrbdVersion() {
+    /** Returns installed drbd version. */
+    public String getDrbdVersion() {
         return drbdVersion;
     }
 
-    /**
-     * Returns installed drbd module version.
-     */
-    public final String getDrbdModuleVersion() {
+    /** Returns installed drbd module version. */
+    public String getDrbdModuleVersion() {
         return drbdModuleVersion;
     }
 
@@ -761,8 +706,7 @@ public class Host implements Serializable {
      * If drbd is already installed, installedDrbdVersion contains
      * its version.
      */
-    public final void setDrbdVersionToInstall(
-                                        final String drbdVersionToInstall) {
+    public void setDrbdVersionToInstall(final String drbdVersionToInstall) {
         this.drbdVersionToInstall = drbdVersionToInstall;
     }
 
@@ -770,7 +714,7 @@ public class Host implements Serializable {
      * Sets the drbd version in the form that is in the source tarball on
      * linbit website, like so: "8.3/drbd-8.3.1.tar.gz".
      */
-    public final void setDrbdVersionUrlStringToInstall(
+    public void setDrbdVersionUrlStringToInstall(
                                   final String drbdVersionUrlStringToInstall) {
         this.drbdVersionUrlStringToInstall = drbdVersionUrlStringToInstall;
     }
@@ -780,7 +724,7 @@ public class Host implements Serializable {
      * If drbd is already installed, installedDrbdVersion contains
      * its version.
      */
-    public final String getDrbdVersionToInstall() {
+    public String getDrbdVersionToInstall() {
         return drbdVersionToInstall;
     }
 
@@ -788,29 +732,24 @@ public class Host implements Serializable {
      * Gets drbd version of the source tarball in the form as it is on
      * the linbit website: "8.3/drbd-8.3.1.tar.gz".
      */
-    public final String getDrbdVersionUrlStringToInstall() {
+    public String getDrbdVersionUrlStringToInstall() {
         return drbdVersionUrlStringToInstall;
     }
 
     /**
      * Sets drbdBuildToInstall. This build is the one that is to be installed.
      */
-    public final void setDrbdBuildToInstall(final String drbdBuildToInstall) {
+    public void setDrbdBuildToInstall(final String drbdBuildToInstall) {
         this.drbdBuildToInstall = drbdBuildToInstall;
     }
 
-    /**
-     * Returns the drbd build to be installed.
-     */
-    public final String getDrbdBuildToInstall() {
+    /** Returns the drbd build to be installed. */
+    public String getDrbdBuildToInstall() {
         return drbdBuildToInstall;
     }
 
-    /**
-     * Sets drbd packages to install.
-     */
-    public final void setDrbdPackagesToInstall(
-                                        final String drbdPackagesToInstall) {
+    /** Sets drbd packages to install. */
+    public void setDrbdPackagesToInstall(final String drbdPackagesToInstall) {
         this.drbdPackagesToInstall = drbdPackagesToInstall;
     }
 
@@ -820,7 +759,7 @@ public class Host implements Serializable {
      * and distribution.
      */
     @SuppressWarnings("fallthrough")
-    public final void setDistInfo(final String[] info) {
+    void setDistInfo(final String[] info) {
         if (info == null) {
             return;
         }
@@ -871,10 +810,8 @@ public class Host implements Serializable {
         Tools.debug(this, "dist: " + detectedDist, 1);
     }
 
-    /**
-     * Initializes dist info. Must be called after setDistInfo.
-     */
-    public final void initDistInfo() {
+    /** Initializes dist info. Must be called after setDistInfo. */
+    void initDistInfo() {
         if (!"Linux".equals(detectedKernelName)) {
             Tools.appWarning("detected kernel not linux: "
                              + detectedKernelName);
@@ -899,10 +836,8 @@ public class Host implements Serializable {
                                     null));
     }
 
-    /**
-     * Returns the detected info to show.
-     */
-    public final String getDetectedInfo() {
+    /** Returns the detected info to show. */
+    public String getDetectedInfo() {
         return detectedDist + " " + detectedDistVersion;
     }
 
@@ -913,7 +848,7 @@ public class Host implements Serializable {
      * The conversion rules for distributions are defined in DistResource.java,
      * with 'dist:' prefix.
      */
-    public final String getDistFromDistVersion(final String dV) {
+    String getDistFromDistVersion(final String dV) {
         /* remove numbers */
         if ("No Match".equals(dV)) {
             return null;
@@ -927,47 +862,35 @@ public class Host implements Serializable {
     }
 
 
-    /**
-     * Sets distribution name.
-     */
-    public final void setDist(final String dist) {
+    /** Sets distribution name. */
+    void setDist(final String dist) {
         this.dist = dist;
     }
 
-    /**
-     * Sets distribution version.
-     */
-    public final void setDistVersion(final String distVersion) {
+    /** Sets distribution version. */
+    void setDistVersion(final String distVersion) {
         this.distVersion = distVersion;
         distVersionString = Tools.getDistVersionString(dist, distVersion);
         dist = getDistFromDistVersion(distVersion);
     }
 
-    /**
-     * Sets arch, e.g. "i386".
-     */
-    public final void setArch(final String arch) {
+    /** Sets arch, e.g. "i386". */
+    public void setArch(final String arch) {
         this.arch = arch;
     }
 
-    /**
-     * Sets kernel name, e.g. "linux".
-     */
-    public final void setKernelName(final String kernelName) {
+    /** Sets kernel name, e.g. "linux". */
+    void setKernelName(final String kernelName) {
         this.kernelName = kernelName;
     }
 
-    /**
-     * Sets kernel version.
-     */
-    public final void setKernelVersion(final String kernelVersion) {
+    /** Sets kernel version. */
+    void setKernelVersion(final String kernelVersion) {
         this.kernelVersion = kernelVersion;
     }
 
-    /**
-     * Gets kernel name. Normaly "Linux" for this application.
-     */
-    public final String getKernelName() {
+    /** Gets kernel name. Normaly "Linux" for this application. */
+    String getKernelName() {
         return kernelName;
     }
 
@@ -975,28 +898,22 @@ public class Host implements Serializable {
      * Gets kernel version. Usually some version,
      * like: "2.6.13.2ws-k7-up-lowmem".
      */
-    public final String getKernelVersion() {
+    public String getKernelVersion() {
         return kernelVersion;
     }
 
-    /**
-     * Returns the detected kernel version.
-     */
-    public final String getDetectedKernelVersion() {
+    /** Returns the detected kernel version. */
+    public String getDetectedKernelVersion() {
         return detectedKernelVersion;
     }
 
-    /**
-     * Gets architecture like i686.
-     */
-    public final String getArch() {
+    /** Gets architecture like i686. */
+    public String getArch() {
         return arch;
     }
 
-    /**
-     * Returns heartbeat lib path.
-     */
-    public final String getHeartbeatLibPath() {
+    /** Returns heartbeat lib path. */
+    public String getHeartbeatLibPath() {
         if ("".equals(arch)) {
             Tools.appWarning(
                         "getHeartbeatLibPath() called to soon: unknown arch");
@@ -1007,31 +924,23 @@ public class Host implements Serializable {
     }
 
 
-    /**
-     * Gets distribution, e.g., debian.
-     */
-    public final String getDist() {
+    /** Gets distribution, e.g., debian. */
+    public String getDist() {
         return dist;
     }
 
-    /**
-     * Gets distribution version.
-     */
-    public final String getDistVersion() {
+    /** Gets distribution version. */
+    public String getDistVersion() {
         return distVersion;
     }
 
-    /**
-     * Gets distribution version string.
-     */
-    public final String getDistVersionString() {
+    /** Gets distribution version string. */
+    public String getDistVersionString() {
         return distVersionString;
     }
 
-    /**
-     * Disconnects this host.
-     */
-    public final void disconnect() {
+    /** Disconnects this host. */
+    public void disconnect() {
         if (ssh.isConnected()) {
             ssh.forceDisconnect();
         }
@@ -1041,8 +950,7 @@ public class Host implements Serializable {
      * Converts command string to real command for a distribution, specifying
      * the convert command callback.
      */
-    public final String getDistCommand(
-                                 final String commandString,
+    public String getDistCommand(final String commandString,
                                  final ConvertCmdCallback convertCmdCallback) {
         return Tools.getDistCommand(commandString,
                                     dist,
@@ -1051,11 +959,8 @@ public class Host implements Serializable {
                                     convertCmdCallback);
     }
 
-    /**
-     * Converts a string that is specific to the distribution distribution.
-     */
-    public final String getDistString(
-                                 final String commandString) {
+    /** Converts a string that is specific to the distribution distribution. */
+    public String getDistString(final String commandString) {
         return Tools.getDistString(commandString,
                                    dist,
                                    distVersionString,
@@ -1066,15 +971,15 @@ public class Host implements Serializable {
      * Converts command string to real command for a distribution, specifying
      * what-with-what hash.
      */
-    public final String getDistCommand(final String commandString,
-                                       final Map<String, String> replaceHash) {
+    public String getDistCommand(final String commandString,
+                                 final Map<String, String> replaceHash) {
         return Tools.getDistCommand(
                     commandString,
                     dist,
                     distVersionString,
                     arch,
                     new ConvertCmdCallback() {
-                        public final String convert(String command) {
+                        @Override public String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
                                 if (tag != null && command.indexOf(tag) > -1) {
                                     final String s = replaceHash.get(tag);
@@ -1093,12 +998,12 @@ public class Host implements Serializable {
      * is finished execCallback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommand(
-                                final String commandString,
-                                final ExecCallback execCallback,
-                                final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible,
-                                final int commandTimeout) {
+    public ExecCommandThread execCommand(
+                               final String commandString,
+                               final ExecCallback execCallback,
+                               final ConvertCmdCallback convertCmdCallback,
+                               final boolean outputVisible,
+                               final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1121,13 +1026,13 @@ public class Host implements Serializable {
      * commands that do not return, but run in the background and occasionaly
      * print a line to the stdout.
      */
-    public final ExecCommandThread execCommand(
-                                final String commandString,
-                                final ExecCallback execCallback,
-                                final ConvertCmdCallback convertCmdCallback,
-                                final NewOutputCallback newOutputCallback,
-                                final boolean outputVisible,
-                                final int commandTimeout) {
+    public ExecCommandThread execCommand(
+                                   final String commandString,
+                                   final ExecCallback execCallback,
+                                   final ConvertCmdCallback convertCmdCallback,
+                                   final NewOutputCallback newOutputCallback,
+                                   final boolean outputVisible,
+                                   final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1143,13 +1048,12 @@ public class Host implements Serializable {
                                commandTimeout);
     }
 
-
     /**
      * Executes command. Command is not converted for different distributions
      * and is executed in a new thread, after command is finished callback.done
      * function will be called. In case of error, callback.doneError is called.
      */
-    public final ExecCommandThread execCommandRaw(final String command,
+    public ExecCommandThread execCommandRaw(final String command,
                                             final ExecCallback callback,
                                             final boolean outputVisible,
                                             final boolean commandVisible,
@@ -1170,13 +1074,13 @@ public class Host implements Serializable {
      * In case of error, callback.doneError is called.
      * Parameters will be passed directly as they are to the command.
      */
-    public final ExecCommandThread execCommand(
-                                final String commandString,
-                                final String params,
-                                final ExecCallback callback,
-                                final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible,
-                                final int commandTimeout) {
+    public ExecCommandThread execCommand(
+                               final String commandString,
+                               final String params,
+                               final ExecCallback callback,
+                               final ConvertCmdCallback convertCmdCallback,
+                               final boolean outputVisible,
+                               final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1197,13 +1101,13 @@ public class Host implements Serializable {
      * is finished callback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommand(
-                                final String commandString,
-                                final ProgressBar progressBar,
-                                final ExecCallback callback,
-                                final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible,
-                                final int commandTimeout) {
+    public ExecCommandThread execCommand(
+                               final String commandString,
+                               final ProgressBar progressBar,
+                               final ExecCallback callback,
+                               final ConvertCmdCallback convertCmdCallback,
+                               final boolean outputVisible,
+                               final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1224,13 +1128,13 @@ public class Host implements Serializable {
      * and is executed in a new thread, after command is finished callback.done
      * function will be called. In case of error, callback.doneError is called.
      */
-    public final ExecCommandThread execCommandRaw(
-                                                final String command,
-                                                final ProgressBar progressBar,
-                                                final ExecCallback execCallback,
-                                                final boolean outputVisible,
-                                                final boolean commandVisible,
-                                                final int commandTimeout) {
+    public ExecCommandThread execCommandRaw(
+                                   final String command,
+                                   final ProgressBar progressBar,
+                                   final ExecCallback execCallback,
+                                   final boolean outputVisible,
+                                   final boolean commandVisible,
+                                   final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1248,13 +1152,13 @@ public class Host implements Serializable {
      * is finished callback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public final ExecCommandThread execCommandCache(
-                                final String commandString,
-                                final ProgressBar progressBar,
-                                final ExecCallback callback,
-                                final ConvertCmdCallback convertCmdCallback,
-                                final boolean outputVisible,
-                                final int commandTimeout) {
+    public ExecCommandThread execCommandCache(
+                               final String commandString,
+                               final ProgressBar progressBar,
+                               final ExecCallback callback,
+                               final ConvertCmdCallback convertCmdCallback,
+                               final boolean outputVisible,
+                               final int commandTimeout) {
         if (outputVisible) {
             Tools.getGUIData().setTerminalPanel(getTerminalPanel());
         }
@@ -1272,8 +1176,7 @@ public class Host implements Serializable {
     }
 
     /** Executes connection status command. */
-    public final void execConnectionStatusCommand(
-                                            final ExecCallback execCallback) {
+    public void execConnectionStatusCommand(final ExecCallback execCallback) {
         if (connectionStatusThread == null) {
             connectionStatusThread = ssh.execCommand(
                                 Tools.getDistCommand(
@@ -1304,9 +1207,8 @@ public class Host implements Serializable {
      * block device object. The command is 'drbdsetup /dev/drbdX events'
      * The session is stored, so that in can be stopped with 'stop' button.
      */
-    public final void execDrbdStatusCommand(
-                                final ExecCallback execCallback,
-                                final NewOutputCallback outputCallback) {
+    public void execDrbdStatusCommand(final ExecCallback execCallback,
+                                      final NewOutputCallback outputCallback) {
         if (drbdStatusThread == null) {
             drbdStatusThread = ssh.execCommand(
                                 Tools.getDistCommand(
@@ -1326,7 +1228,7 @@ public class Host implements Serializable {
     }
 
     /** Stops drbd status background process. */
-    public final void stopDrbdStatus() {
+    public void stopDrbdStatus() {
         if (drbdStatusThread == null) {
             Tools.appWarning("trying to stop stopped drbd status");
             return;
@@ -1335,10 +1237,8 @@ public class Host implements Serializable {
         drbdStatusThread = null;
     }
 
-    /**
-     * Waits till the drbd status command finishes.
-     */
-    public final void waitOnDrbdStatus() {
+    /** Waits till the drbd status command finishes. */
+    public void waitOnDrbdStatus() {
         if (drbdStatusThread != null) {
             try {
                 /* it probably hangs after this timeout, so it will be
@@ -1351,12 +1251,9 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Executes an hb status command.
-     */
-    public final void execClStatusCommand(
-                                final ExecCallback execCallback,
-                                final NewOutputCallback outputCallback) {
+    /** Executes an hb status command. */
+    public void execClStatusCommand(final ExecCallback execCallback,
+                                    final NewOutputCallback outputCallback) {
         if (clStatusThread == null) {
             clStatusThread = ssh.execCommand(
                             Tools.getDistCommand("Heartbeat.getClStatus",
@@ -1374,10 +1271,8 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Waits while the hb status thread finishes.
-     */
-    public final void waitOnClStatus() {
+    /** Waits while the hb status thread finishes. */
+    public void waitOnClStatus() {
         try {
             clStatusThread.join();
         } catch (java.lang.InterruptedException e) {
@@ -1386,10 +1281,8 @@ public class Host implements Serializable {
         clStatusThread = null;
     }
 
-    /**
-     * Stops hb status background process.
-     */
-    public final void stopClStatus() {
+    /** Stops hb status background process. */
+    public void stopClStatus() {
         if (clStatusThread == null) {
             Tools.appWarning("trying to stop stopped hb status");
             return;
@@ -1397,17 +1290,13 @@ public class Host implements Serializable {
         clStatusThread.cancel();
     }
 
-    /**
-     * Gets ip. There can be more ips, delimited with ","
-     */
-    public final String getIp() {
+    /** Gets ip. There can be more ips, delimited with "," */
+    public String getIp() {
         return ip;
     }
 
-    /**
-     * Returns the ip for the hop.
-     */
-    public final String getIp(final int hop) {
+    /** Returns the ip for the hop. */
+    public String getIp(final int hop) {
         if (ip == null) {
             return null;
         }
@@ -1418,39 +1307,29 @@ public class Host implements Serializable {
         return ips[hop];
     }
 
-    /**
-     * Return first hop ip.
-     */
-    public final String getFirstIp() {
+    /** Return first hop ip. */
+    public String getFirstIp() {
         final String[] ips = ip.split(",");
         return ips[0];
     }
-    /**
-     * Returns username.
-     */
-    public final String getUsername() {
+    /** Returns username. */
+    public String getUsername() {
         return username;
     }
 
-    /**
-     * Returns first username in a hop.
-     */
-    public final String getFirstUsername() {
+    /** Returns first username in a hop. */
+    public String getFirstUsername() {
         final String[] usernames = username.split(",");
         return usernames[0];
     }
 
-    /**
-     * Gets hostname as entered by user.
-     */
-    public final String getHostnameEntered() {
+    /** Gets hostname as entered by user. */
+    public String getHostnameEntered() {
         return hostnameEntered;
     }
 
-    /**
-     * Escapes the quotes for the stacked ssh commands.
-     */
-    public final String escapeQuotes(final String s, final int count) {
+    /** Escapes the quotes for the stacked ssh commands. */
+    public String escapeQuotes(final String s, final int count) {
         if (s == null) {
             return null;
         }
@@ -1473,7 +1352,7 @@ public class Host implements Serializable {
     }
 
     /** Returns sudo prefix. */
-    public final String getSudoPrefix(final boolean sudoTest) {
+    String getSudoPrefix(final boolean sudoTest) {
         if (useSudo != null && useSudo) {
             if (sudoTest) {
                 return "sudo -n ";
@@ -1486,8 +1365,8 @@ public class Host implements Serializable {
         }
     }
     /** Returns command exclosed in sh -c "". */
-    public final String getSudoCommand(final String command,
-                                       final boolean sudoTest) {
+    public String getSudoCommand(final String command,
+                                 final boolean sudoTest) {
         if (useSudo != null && useSudo) {
             return "trap - SIGPIPE;"
                    + getSudoPrefix(sudoTest)
@@ -1504,7 +1383,7 @@ public class Host implements Serializable {
      * ssh -A   -tt -l root x.x.x.x "ssh -A   -tt -l root x.x.x.x \"ssh
      * -A   -tt -l root x.x.x.x \\\"ls\\\"\""
      */
-    public final String getHoppedCommand(final String command) {
+    public String getHoppedCommand(final String command) {
         final int hops = Tools.charCount(ip, ',') + 1;
         final String[] usernames = username.split(",");
         final String[] ips = ip.split(",");
@@ -1551,17 +1430,13 @@ public class Host implements Serializable {
         return s.toString();
     }
 
-    /**
-     * Returns hostname of this host.
-     */
-    public final String getHostname() {
+    /** Returns hostname of this host. */
+    public String getHostname() {
         return hostname;
     }
 
-    /**
-     * Returns the host name.
-     */
-    public final String toString() {
+    /** Returns the host name. */
+    @Override public String toString() {
         return getName();
     }
 
@@ -1569,7 +1444,7 @@ public class Host implements Serializable {
      * Gets name, that is shown in the tab. Name is either host name, if it is
      * set or ip.
      */
-    public final String getName() {
+    public String getName() {
         if (name == null) {
             String nodeName;
             if (hostname != null) {
@@ -1602,10 +1477,8 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Sets name of the host as it will be identified.
-     */
-    public final void setName(final String name) {
+    /** Sets name of the host as it will be identified. */
+    void setName(final String name) {
         this.name = name;
     }
 
@@ -1613,14 +1486,12 @@ public class Host implements Serializable {
      * Gets string with user and hostname as used in prompt or ssh like
      * rasto@linbit.at.
      */
-    public final String getUserAtHost() {
+    public String getUserAtHost() {
         return username + "@" + getHostname();
     }
 
-    /**
-     * Gets SSH object.
-     */
-    public final SSH getSSH() {
+    /** Gets SSH object. */
+    public SSH getSSH() {
         return ssh;
     }
 
@@ -1629,14 +1500,12 @@ public class Host implements Serializable {
      * Sets terminal panel object. This is the panel where the commands and
      * their results are shown for every host.
      */
-    public final void setTerminalPanel(final TerminalPanel terminalPanel) {
+    public void setTerminalPanel(final TerminalPanel terminalPanel) {
         this.terminalPanel = terminalPanel;
     }
 
-    /**
-     * Gets terminal panel object.
-     */
-    public final TerminalPanel getTerminalPanel() {
+    /** Gets terminal panel object. */
+    public TerminalPanel getTerminalPanel() {
         return terminalPanel;
     }
 
@@ -1646,8 +1515,8 @@ public class Host implements Serializable {
      * connection is established, callback.done() is called. In case
      * of error callback.doneError() is called.
      */
-    public final void connect(final SSHGui sshGui,
-                              final ConnectionCallback callback) {
+    public void connect(final SSHGui sshGui,
+                        final ConnectionCallback callback) {
         ssh.connect(sshGui, callback, this);
     }
 
@@ -1666,9 +1535,9 @@ public class Host implements Serializable {
      * @param callback
      *          callback class that implements ConnectionCallback interface
      */
-    public final void connect(final SSHGui sshGui,
-                              final ProgressBar progressBar,
-                              final ConnectionCallback callback) {
+    public void connect(final SSHGui sshGui,
+                        final ProgressBar progressBar,
+                        final ConnectionCallback callback) {
         Tools.debug(this, "host connect: " + sshGui, 1);
         ssh.connect(sshGui, progressBar, callback, this);
     }
@@ -1677,12 +1546,12 @@ public class Host implements Serializable {
      * Register a component that will be enabled if the host connected and
      * disabled if disconnected.
      */
-    public final void registerEnableOnConnect(final JComponent c) {
+    public void registerEnableOnConnect(final JComponent c) {
         if (!enableOnConnectList.contains(c)) {
             enableOnConnectList.add(c);
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 c.setEnabled(isConnected());
             }
         });
@@ -1693,10 +1562,10 @@ public class Host implements Serializable {
      * enables/disables the conponents that are registered to be enabled on
      * connect.
      */
-    public final void setConnected() {
+    public void setConnected() {
         final boolean con = isConnected();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 for (final JComponent c : enableOnConnectList) {
                     c.setEnabled(con);
                 }
@@ -1717,17 +1586,15 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Make an ssh connection to the host.
-     */
-    public final void connect(SSHGui sshGui,
-                              final boolean progressIndicator,
-                              final int index) {
+    /** Make an ssh connection to the host. */
+    void connect(SSHGui sshGui,
+                 final boolean progressIndicator,
+                 final int index) {
         if (!isConnected()) {
             final String hostName = getName();
             if (progressIndicator) {
                 Tools.startProgressIndicator(
-                                hostName, 
+                                hostName,
                                 Tools.getString("Dialog.Host.SSH.Connecting")
                                 + " (" + index + ")");
             }
@@ -1739,7 +1606,7 @@ public class Host implements Serializable {
 
             connect(sshGui,
                     new ConnectionCallback() {
-                        public void done(final int flag) {
+                        @Override public void done(final int flag) {
                             setConnected();
                             getSSH().execCommandAndWait(":", /* activate sudo */
                                     false,
@@ -1755,8 +1622,8 @@ public class Host implements Serializable {
                             }
                         }
 
-                        public void doneError(
-                                        final String errorText) {
+                        @Override public void doneError(
+                                                    final String errorText) {
                             setLoadingError();
                             setConnected();
                             if (progressIndicator) {
@@ -1778,19 +1645,18 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Gets and stores info about the host.
-     */
-    public final void getAllInfo() {
+    /** Gets and stores info about the host. */
+    void getAllInfo() {
         final Thread t = execCommand("GetHostAllInfo",
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  parseHostInfo(ans);
                                  setLoadingDone();
                              }
 
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                  setLoadingError();
                              }
                          },
@@ -1805,11 +1671,11 @@ public class Host implements Serializable {
     }
 
     /** Gets and stores hardware info about the host. */
-    public final void getHWInfo(final CategoryInfo[] infosToUpdate,
-                                final ResourceGraph[] graphs) {
+    public void getHWInfo(final CategoryInfo[] infosToUpdate,
+                          final ResourceGraph[] graphs) {
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  if (!ans.equals(oldHwInfo)) {
                                     parseHostInfo(ans);
                                     oldHwInfo = ans;
@@ -1826,8 +1692,9 @@ public class Host implements Serializable {
                                  setLoadingDone();
                              }
 
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                          final String ans,
+                                                          final int exitCode) {
                                  setLoadingError();
                              }
                          },
@@ -1843,11 +1710,11 @@ public class Host implements Serializable {
 
     /** Gets and stores hardware info about the host. Return true if something
      * has changed. */
-    public final void getHWInfoLazy(final CategoryInfo[] infosToUpdate,
-                                    final ResourceGraph[] graphs) {
+    public void getHWInfoLazy(final CategoryInfo[] infosToUpdate,
+                              final ResourceGraph[] graphs) {
         final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  if (!ans.equals(oldHwInfo)) {
                                     parseHostInfo(ans);
                                     oldHwInfo = ans;
@@ -1864,8 +1731,9 @@ public class Host implements Serializable {
                                  setLoadingDone();
                              }
 
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                        final String ans,
+                                                        final int exitCode) {
                                  setLoadingError();
                              }
                          },
@@ -1881,10 +1749,8 @@ public class Host implements Serializable {
 
 
 
-    /**
-     * Returns whether host ssh connection was established.
-     */
-    public final boolean isConnected() {
+    /** Returns whether host ssh connection was established. */
+    public boolean isConnected() {
         if (ssh == null) {
             return false;
         }
@@ -1914,8 +1780,8 @@ public class Host implements Serializable {
      *
      * @return command with replaced variables
      */
-    public final String replaceVars(String command,
-                                    final boolean hidePassword) {
+    public String replaceVars(String command,
+                              final boolean hidePassword) {
         if (command.indexOf("@USER@") > -1) {
             command = command.replaceAll(
                                     "@USER@",
@@ -1990,14 +1856,12 @@ public class Host implements Serializable {
      *
      * @return command with replaced variables
      */
-    public final String replaceVars(final String command) {
+    public String replaceVars(final String command) {
         return replaceVars(command, false);
     }
 
-    /**
-     * Parses the host info.
-     */
-    public final void parseHostInfo(final String ans) {
+    /** Parses the host info. */
+    public void parseHostInfo(final String ans) {
         Tools.debug(this, "updating host info: " + getName(), 1);
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
@@ -2091,9 +1955,7 @@ public class Host implements Serializable {
                                        getFileSystems());
     }
 
-    /**
-     * Parses the gui info, with drbd and heartbeat graph positions.
-     */
+    /** Parses the gui info, with drbd and heartbeat graph positions. */
     private void parseGuiInfo(final String line) {
         final String[] tokens = line.split(";");
         String id = null;
@@ -2118,10 +1980,8 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Parses the installation info.
-     */
-    public final void parseInstallationInfo(final String line) {
+    /** Parses the installation info. */
+    public void parseInstallationInfo(final String line) {
         final String[] tokens = line.split(":|\\s+");
         if (tokens.length < 2) {
             return;
@@ -2286,24 +2146,18 @@ public class Host implements Serializable {
         }
     }
 
-    /**
-     * Returns the graph position of id.
-     */
-    public final Point2D getGraphPosition(final String id) {
+    /** Returns the graph position of id. */
+    public Point2D getGraphPosition(final String id) {
         return servicePositions.get(id);
     }
 
-    /**
-     * Resets the graph positions.
-     */
-    public final void resetGraphPosition(final String id) {
+    /** Resets the graph positions. */
+    public void resetGraphPosition(final String id) {
         servicePositions.remove(id);
     }
 
-    /**
-     * Saves the positions in the graphs.
-     */
-    public final void saveGraphPositions(final Map<String, Point2D> positions) {
+    /** Saves the positions in the graphs. */
+    public void saveGraphPositions(final Map<String, Point2D> positions) {
         final StringBuffer lines = new StringBuffer();
         for (final String id : positions.keySet()) {
             final Point2D p = positions.get(id);
@@ -2326,84 +2180,64 @@ public class Host implements Serializable {
                               null);
     }
 
-    /**
-     * Sets the heartbeat version.
-     */
-    public final void setHeartbeatVersion(final String heartbeatVersion) {
+    /** Sets the heartbeat version. */
+    public void setHeartbeatVersion(final String heartbeatVersion) {
         this.heartbeatVersion = heartbeatVersion;
     }
 
-    /**
-     * Sets the corosync version.
-     */
-    public final void setCorosyncVersion(final String corosyncVersion) {
+    /** Sets the corosync version. */
+    public void setCorosyncVersion(final String corosyncVersion) {
         this.corosyncVersion = corosyncVersion;
     }
 
-    /**
-     * Sets the pacemaker version.
-     */
-    public final void setPacemakerVersion(final String pacemakerVersion) {
+    /** Sets the pacemaker version. */
+    public void setPacemakerVersion(final String pacemakerVersion) {
         this.pacemakerVersion = pacemakerVersion;
     }
 
-    /**
-     * Sets the openais version.
-     */
-    public final void setOpenaisVersion(final String openaisVersion) {
+    /** Sets the openais version. */
+    public void setOpenaisVersion(final String openaisVersion) {
         this.openaisVersion = openaisVersion;
     }
 
-    /**
-     * Returns the pacemaker version.
-     */
-    public final String getPacemakerVersion() {
+    /** Returns the pacemaker version. */
+    public String getPacemakerVersion() {
         return pacemakerVersion;
     }
 
-    /**
-     * Returns the corosync version.
-     */
-    public final String getCorosyncVersion() {
+    /** Returns the corosync version. */
+    public String getCorosyncVersion() {
         return corosyncVersion;
     }
 
     /** Returns whether corosync is installed. */
-    public final boolean isCorosync() {
+    public boolean isCorosync() {
         return corosyncVersion != null;
     }
 
     /** Returns whether openais is a wrapper. */
-    public final boolean isOpenaisWrapper() {
+    public boolean isOpenaisWrapper() {
         return "wrapper".equals(openaisVersion);
     }
 
 
-    /**
-     * Returns the openais version.
-     */
-    public final String getOpenaisVersion() {
+    /** Returns the openais version. */
+    public String getOpenaisVersion() {
         return openaisVersion;
     }
 
-    /**
-     * Returns the heartbeat version.
-     */
-    public final String getHeartbeatVersion() {
+    /** Returns the heartbeat version. */
+    public String getHeartbeatVersion() {
         return heartbeatVersion;
     }
 
-    /**
-     * Sets that drbd will be upgraded.
-     */
-    public final void setDrbdWillBeUpgraded(final boolean drbdWillBeUpgraded) {
+    /** Sets that drbd will be upgraded. */
+    public void setDrbdWillBeUpgraded(final boolean drbdWillBeUpgraded) {
         this.drbdWillBeUpgraded = drbdWillBeUpgraded;
     }
 
-    /**
-     * Sets that drbd was installed.
-     */
-    public final void setDrbdWasInstalled(final boolean drbdWasInstalled) {
+    /** Sets that drbd was installed. */
+    public void setDrbdWasInstalled(final boolean drbdWasInstalled) {
         this.drbdWasInstalled = drbdWasInstalled;
     }
 
@@ -2411,7 +2245,7 @@ public class Host implements Serializable {
      * Returns true if drbd will be upgraded and drbd was installed.
      * TODO: ???
      */
-    public final boolean isDrbdUpgraded() {
+    public boolean isDrbdUpgraded() {
         return drbdWillBeUpgraded && drbdWasInstalled;
     }
 
@@ -2419,14 +2253,12 @@ public class Host implements Serializable {
      * Sets the 'is loading' latch, so that something can wait while the load
      * sequence is running.
      */
-    public final void setIsLoading() {
+    public void setIsLoading() {
         isLoadingGate = new CountDownLatch(1);
     }
 
-    /**
-     * Waits on the 'is loading' latch.
-     */
-    public final void waitOnLoading() {
+    /** Waits on the 'is loading' latch. */
+    public void waitOnLoading() {
         try {
             isLoadingGate.await();
         } catch (InterruptedException ignored) {
@@ -2438,7 +2270,7 @@ public class Host implements Serializable {
      * When loading is done, this latch is opened and whatever is waiting on it
      * is notified.
      */
-    public final void setLoadingDone() {
+    void setLoadingDone() {
         isLoadingGate.countDown();
     }
 
@@ -2446,12 +2278,12 @@ public class Host implements Serializable {
      * When loading is done but with an error. Currently it is the same as
      * setLoadingDone().
      */
-    public final void setLoadingError() {
+    void setLoadingError() {
         isLoadingGate.countDown();
     }
 
     /** Waits for the server status latch. */
-    public final void waitForServerStatusLatch() {
+    public void waitForServerStatusLatch() {
         try {
             serverStatusLatch.await();
         } catch (InterruptedException ignored) {
@@ -2460,27 +2292,27 @@ public class Host implements Serializable {
     }
 
     /** The latch is set when the server status is run for the first time. */
-    public final void serverStatusLatchDone() {
+    public void serverStatusLatchDone() {
         serverStatusLatch.countDown();
     }
 
     /** Returns true if latch is set. */
-    public final boolean isServerStatusLatch() {
+    public boolean isServerStatusLatch() {
         return serverStatusLatch.getCount() == 1;
     }
 
     /** Returns ssh port. */
-    public final String getSSHPort() {
+    public String getSSHPort() {
         return sshPort;
     }
 
     /** Returns ssh port as integer. */
-    public final int getSSHPortInt() {
+    public int getSSHPortInt() {
         return Integer.valueOf(sshPort);
     }
 
     /** Sets ssh port. */
-    public final void setSSHPort(final String sshPort) {
+    public void setSSHPort(final String sshPort) {
         if (sshPort != null && !sshPort.equals(this.sshPort)) {
             ssh.disconnect();
         }
@@ -2488,175 +2320,155 @@ public class Host implements Serializable {
     }
 
     /** Returns sudo password. */
-    public final String getSudoPassword() {
+    public String getSudoPassword() {
         return sudoPassword;
     }
 
     /** Sets sudo password. */
-    public final void setSudoPassword(final String sudoPassword) {
+    public void setSudoPassword(final String sudoPassword) {
         this.sudoPassword = sudoPassword;
     }
 
     /** Returns whether sudo is used. */
-    public final Boolean isUseSudo() {
+    public Boolean isUseSudo() {
         return useSudo;
     }
 
     /** Sets whether sudo should be used. */
-    public final void setUseSudo(final Boolean useSudo) {
+    public void setUseSudo(final Boolean useSudo) {
         this.useSudo = useSudo;
     }
 
-    /**
-     * Sets openais/pacemaker installation method index.
-     */
-    public final void setPmInstallMethod(final String pmInstallMethod) {
+    /** Sets openais/pacemaker installation method index. */
+    public void setPmInstallMethod(final String pmInstallMethod) {
         this.pmInstallMethod = pmInstallMethod;
     }
 
-    /**
-     * Returns openais/pacemaker installation method.
-     */
-    public final String getPmInstallMethod() {
+    /** Returns openais/pacemaker installation method. */
+    public String getPmInstallMethod() {
         return pmInstallMethod;
     }
 
-    /**
-     * Sets heartbeat/pacemaker installation method index.
-     */
-    public final void setHbPmInstallMethod(final String hbPmInstallMethod) {
+    /** Sets heartbeat/pacemaker installation method index. */
+    public void setHbPmInstallMethod(final String hbPmInstallMethod) {
         this.hbPmInstallMethod = hbPmInstallMethod;
     }
 
-    /**
-     * Returns heartbeat/pacemaker installation method.
-     */
-    public final String getHbPmInstallMethod() {
+    /** Returns heartbeat/pacemaker installation method. */
+    public String getHbPmInstallMethod() {
         return hbPmInstallMethod;
     }
 
-    /**
-     * Sets drbd installation method index.
-     */
-    public final void setDrbdInstallMethod(final String drbdInstallMethod) {
+    /** Sets drbd installation method index. */
+    public void setDrbdInstallMethod(final String drbdInstallMethod) {
         this.drbdInstallMethod = drbdInstallMethod;
     }
 
-    /**
-     * Returns drbd installation method.
-     */
-    public final String getDrbdInstallMethod() {
+    /** Returns drbd installation method. */
+    public String getDrbdInstallMethod() {
         return drbdInstallMethod;
     }
 
     /** Returns whether Corosync is rc script. */
-    public final boolean isCsRc() {
+    public boolean isCsRc() {
        return csIsRc;
     }
 
     /** Returns whether Openais is rc script. */
-    public final boolean isAisRc() {
+    public boolean isAisRc() {
        return aisIsRc;
     }
 
     /** Returns whether Pacemaker is rc script. */
-    public final boolean isPcmkRc() {
+    public boolean isPcmkRc() {
        return pcmkIsRc;
     }
 
     /** Returns whether Heartbeat has an init script. */
-    public final boolean isHeartbeatInit() {
+    public boolean isHeartbeatInit() {
        return heartbeatInit;
     }
 
     /** Returns whether Corosync has an init script. */
-    public final boolean isCsInit() {
+    public boolean isCsInit() {
        return csInit;
     }
 
     /** Returns whether Openais has an init script. */
-    public final boolean isAisInit() {
+    public boolean isAisInit() {
        return aisInit;
     }
 
     /** Returns whether Pacemaker has an init script. */
-    public final boolean isPcmkInit() {
+    public boolean isPcmkInit() {
        return pcmkInit;
     }
 
 
     /** Returns whether Corosync is running script. */
-    public final boolean isCsRunning() {
+    public boolean isCsRunning() {
        return csRunning;
     }
 
     /** Returns whether Pacemakerd is running. */
-    public final boolean isPcmkRunning() {
+    public boolean isPcmkRunning() {
        return pcmkRunning;
     }
 
     /** Returns whether Openais is running script. */
-    public final boolean isAisRunning() {
+    public boolean isAisRunning() {
        return aisRunning;
     }
 
     /** Returns whether Corosync/Openais config exists. */
-    public final boolean isCsAisConf() {
+    public boolean isCsAisConf() {
        return csAisConf;
     }
 
     /** Returns whether Heartbeat is rc script. */
-    public final boolean isHeartbeatRc() {
+    public boolean isHeartbeatRc() {
        return heartbeatIsRc;
     }
 
     /** Returns whether Heartbeat is running script. */
-    public final boolean isHeartbeatRunning() {
+    public boolean isHeartbeatRunning() {
        return heartbeatRunning;
     }
 
     /** Returns whether Heartbeat config exists. */
-    public final boolean isHeartbeatConf() {
+    public boolean isHeartbeatConf() {
        return heartbeatConf;
     }
 
     /** Returns whether drbd module is loaded. */
-    public final boolean isDrbdLoaded() {
+    public boolean isDrbdLoaded() {
        return drbdLoaded;
     }
 
-    /**
-     * Returns MD5 checksum of VM Info from server.
-     */
-    public final String getVMInfoMD5() {
+    /** Returns MD5 checksum of VM Info from server. */
+    String getVMInfoMD5() {
         return vmInfoMD5;
     }
 
-    /**
-     * Sets MD5 checksum of VM Info from server.
-     */
-    public final void setVMInfoMD5(final String vmInfoMD5) {
+    /** Sets MD5 checksum of VM Info from server. */
+    void setVMInfoMD5(final String vmInfoMD5) {
         this.vmInfoMD5 = vmInfoMD5;
     }
 
-    /**
-     * Sets index of this host in cluster.
-     */
-    public final void setIndex(final int index) {
+    /** Sets index of this host in cluster. */
+    void setIndex(final int index) {
         this.index = index;
     }
 
-    /**
-     * Returns index of this host in cluster.
-     */
-    public final int getIndex() {
+    /** Returns index of this host in cluster. */
+    int getIndex() {
         return index;
     }
 
     /** This is part of testsuite. */
-    public final boolean checkTest(final String checkCommand,
-                                   final String test,
-                                   final double index) {
+    boolean checkTest(final String checkCommand,
+                      final String test,
+                      final double index) {
         Tools.sleep(1500);
         final StringBuffer command = new StringBuffer(50);
         command.append(replaceVars("@GUI-HELPER@"));
@@ -2698,22 +2510,22 @@ public class Host implements Serializable {
     }
 
     /** This is part of testsuite, it checks Pacemaker. */
-    public final boolean checkPCMKTest(final String test, final double index) {
+    public boolean checkPCMKTest(final String test, final double index) {
         return checkTest("gui-test", test, index);
     }
 
     /** This is part of testsuite, it checks DRBD. */
-    public final boolean checkDRBDTest(final String test, final double index) {
+    public boolean checkDRBDTest(final String test, final double index) {
         return checkTest("gui-drbd-test", test, index);
     }
 
     /** This is part of testsuite, it checks VMs. */
-    public final boolean checkVMTest(final String test, final double index) {
+    public boolean checkVMTest(final String test, final double index) {
         return checkTest("gui-vm-test", test, index);
     }
 
     /** Returns color of this host. Null if it is default color. */
-    public final String getColor() {
+    String getColor() {
         if (savedColor == null || defaultColor == savedColor) {
             return null;
         }
@@ -2721,7 +2533,7 @@ public class Host implements Serializable {
     }
 
     /** Sets color of this host. Don't if it is default color. */
-    public final void setSavedColor(final String colorString) {
+    public void setSavedColor(final String colorString) {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
         } catch (java.lang.NumberFormatException e) {
@@ -2730,53 +2542,53 @@ public class Host implements Serializable {
     }
 
     /** Returns how much is free space in a volume group. */
-    public final Long getFreeInVolumeGroup(final String volumeGroup) {
+    public Long getFreeInVolumeGroup(final String volumeGroup) {
         return volumeGroups.get(volumeGroup);
     }
-    
+
     /** Returns if corosync or heartbeat is running, null for unknown. */
-    public final Boolean getCorosyncHeartbeatRunning() {
+    public Boolean getCorosyncHeartbeatRunning() {
         return corosyncHeartbeatRunning;
     }
 
     /** Sets corosyncHeartbeatRunning. */
-    public final void setCorosyncHeartbeatRunning(
-                                      final Boolean corosyncHeartbeatRunning) {
+    public void setCorosyncHeartbeatRunning(
+                                     final Boolean corosyncHeartbeatRunning) {
         this.corosyncHeartbeatRunning = corosyncHeartbeatRunning;
     }
 
     /** Returns true if comm layer is stopping. */
-    public final boolean isCommLayerStopping() {
+    public boolean isCommLayerStopping() {
         return commLayerStopping;
     }
 
     /** Sets whether the comm layer is stopping. */
-    public final void setCommLayerStopping(final boolean commLayerStopping) {
+    public void setCommLayerStopping(final boolean commLayerStopping) {
         this.commLayerStopping = commLayerStopping;
     }
 
     /** Returns true if comm layer is starting. */
-    public final boolean isCommLayerStarting() {
+    public boolean isCommLayerStarting() {
         return commLayerStarting;
     }
 
     /** Sets whether the comm layer is starting. */
-    public final void setCommLayerStarting(final boolean commLayerStarting) {
+    public void setCommLayerStarting(final boolean commLayerStarting) {
         this.commLayerStarting = commLayerStarting;
     }
-    
+
     /** Returns pcmkServiceVersion. */
-    public final int getPcmkServiceVersion() {
+    public int getPcmkServiceVersion() {
         return pcmkServiceVersion;
     }
 
     /** Sets libvirt version. */
-    public final void setLibvirtVersion(final String libvirtVersion) {
+    void setLibvirtVersion(final String libvirtVersion) {
         this.libvirtVersion = libvirtVersion;
     }
 
     /** Returns libvirt version. */
-    public final String getLibvirtVersion() {
+    String getLibvirtVersion() {
         return libvirtVersion;
     }
 }

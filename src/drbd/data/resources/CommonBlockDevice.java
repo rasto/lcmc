@@ -32,7 +32,7 @@ import drbd.utilities.Tools;
  * @version $Id$
  *
  */
-public class CommonBlockDevice extends Resource {
+public final class CommonBlockDevice extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -46,17 +46,13 @@ public class CommonBlockDevice extends Resource {
         super(name);
     }
 
-    /**
-     * Return device name.
-     */
-    public final String getDevice() {
+    /** Return device name. */
+    public String getDevice() {
         return getName();
     }
 
-    /**
-     * Return value for parameter.
-     */
-    public final String getValue(final String parameter) {
+    /** Return value for parameter. */
+    @Override public String getValue(final String parameter) {
         if ("device".equals(parameter)) {
             return getName();
         } else {
@@ -74,7 +70,7 @@ public class CommonBlockDevice extends Resource {
      *
      * @return null
      */
-    public final String[] getPossibleChoices(final String param) {
+    @Override public String[] getPossibleChoices(final String param) {
         Tools.appError("Wrong call to getPossibleValues");
         return new String[]{};
     }

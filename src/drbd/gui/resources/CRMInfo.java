@@ -30,33 +30,24 @@ import javax.swing.JComponent;
 /**
  * This class holds data that describe the crm as whole.
  */
-public class CRMInfo extends HbCategoryInfo {
-    /**
-     * Prepares a new <code>ServicesInfo</code> object.
-     */
+public final class CRMInfo extends HbCategoryInfo {
+    /** Prepares a new <code>ServicesInfo</code> object. */
     public CRMInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns icon for the heartbeat menu item.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns icon for the heartbeat menu item. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return null;
     }
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
-    protected final String getInfoType() {
+    /** Returns type of the info text. text/plain or text/html. */
+    @Override protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
-    /**
-     * Returns editable info panel for global crm config.
-     */
-    public final JComponent getInfoPanel() {
-        return
-             getBrowser().getServicesInfo().getInfoPanel();
+
+    /** Returns editable info panel for global crm config. */
+    @Override public JComponent getInfoPanel() {
+        return getBrowser().getServicesInfo().getInfoPanel();
     }
 }
-

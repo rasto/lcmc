@@ -29,7 +29,7 @@ package drbd.data;
  * @version $Id$
  *
  */
-public class HostLocation {
+public final class HostLocation {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Host score. */
@@ -41,9 +41,7 @@ public class HostLocation {
     /** Role. */
     private final String role;
 
-    /**
-     * Prepares a new <code>AisCastAddress</code> object.
-     */
+    /** Prepares a new <code>AisCastAddress</code> object. */
     public HostLocation(final String score,
                         final String op,
                         final String value,
@@ -55,29 +53,27 @@ public class HostLocation {
     }
 
     /** Returns score. */
-    public final String getScore() {
+    public String getScore() {
         return score;
     }
 
     /** Returns score. */
-    public final String getOperation() {
+    public String getOperation() {
         return op;
     }
 
     /** Returns value. */
-    public final String getValue() {
+    public String getValue() {
         return value;
     }
 
     /** Returns role. */
-    public final String getRole() {
+    public String getRole() {
         return role;
     }
 
-    /**
-     * Return whether the two objects are equal.
-     */
-    public final boolean equals(final Object other) {
+    /** Return whether the two objects are equal. */
+    @Override public boolean equals(final Object other) {
         if (other == null) {
             return (score == null || "".equals(score))
                    && (op == null || "".equals(op))

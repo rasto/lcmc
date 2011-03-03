@@ -40,16 +40,13 @@ public final class VIRSH {
         VIRSH_COMMANDS.put("autostart",
                            "/usr/bin/virsh autostart @VALUE@ @DOMAIN@");
     }
-    /**
-     * Private constructor, cannot be instantiated.
-     */
+
+    /** Private constructor, cannot be instantiated. */
     private VIRSH() {
         /* Cannot be instantiated. */
     }
 
-    /**
-     * Executes the specified virsh commands on the specified hosts.
-     */
+    /** Executes the specified virsh commands on the specified hosts. */
     private static boolean execCommand(final Host[] hosts,
                                       final String commands,
                                       final boolean outputVisible) {
@@ -108,9 +105,7 @@ public final class VIRSH {
         }
     }
 
-    /**
-     * Starts virtual domain.
-     */
+    /** Starts virtual domain. */
     public static boolean start(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
@@ -128,9 +123,7 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /**
-     * Reboots virtual domain.
-     */
+    /** Reboots virtual domain. */
     public static boolean reboot(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
@@ -139,9 +132,7 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /**
-     * Destroys virtual domain.
-     */
+    /** Destroys virtual domain. */
     public static boolean destroy(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
@@ -150,9 +141,7 @@ public final class VIRSH {
         return execCommand(new Host[]{host}, command, true);
     }
 
-    /**
-     * Suspends virtual domain.
-     */
+    /** Suspends virtual domain. */
     public static boolean suspend(final Host host, final String domain) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);

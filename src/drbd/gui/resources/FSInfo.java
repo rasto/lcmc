@@ -28,56 +28,45 @@ import drbd.utilities.SSH;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+
 /**
  * This class holds info data for a filesystem.
  */
-public class FSInfo extends Info {
+public final class FSInfo extends Info {
     /** cached output from the modinfo command for the info panel. */
     private String modinfo = null;
     /** File system icon. */
     private static final ImageIcon FS_ICON = Tools.createImageIcon(
                                Tools.getDefault("HostBrowser.FileSystemIcon"));
-    /**
-     * Prepares a new <code>FSInfo</code> object.
-     */
+    /** Prepares a new <code>FSInfo</code> object. */
     public FSInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final HostBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns file system icon for the menu.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns file system icon for the menu. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return FS_ICON;
     }
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
-    protected final String getInfoType() {
+    /** Returns type of the info text. text/plain or text/html. */
+    @Override protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
-    /**
-     * Returns info, before it is updated.
-     */
-    public final String getInfo() {
+    /** Returns info, before it is updated. */
+    @Override String getInfo() {
         return "<html><pre>" + getName() + "</html></pre>";
     }
 
-    /**
-     * Updates info of the file system.
-     */
-    public final void updateInfo(final JEditorPane ep) {
+    /** Updates info of the file system. */
+    @Override public void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
-            public void run() {
+            @Override public void run() {
                 if (modinfo == null) {
                     final SSH.SSHOutput ret =
                               Tools.execCommand(getBrowser().getHost(),

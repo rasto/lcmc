@@ -43,26 +43,19 @@ public abstract class DialogHost extends WizardDialog {
     /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
-    /**
-     * Prepares a new <code>DialogHost</code> object.
-     */
-    public DialogHost(final WizardDialog previousDialog,
-                      final Host host) {
+    /** Prepares a new <code>DialogHost</code> object. */
+    public DialogHost(final WizardDialog previousDialog, final Host host) {
         super(previousDialog);
         this.host = host;
     }
 
-    /**
-     * Returns host for which is this dialog.
-     */
+    /** Returns host for which is this dialog. */
     protected final Host getHost() {
         return host;
     }
 
-    /**
-     * Sets the command thread, so that it can be canceled.
-     */
-    public final void setCommandThread(final ExecCommandThread commandThread) {
+    /** Sets the command thread, so that it can be canceled. */
+    final void setCommandThread(final ExecCommandThread commandThread) {
         this.commandThread = commandThread;
         if (getProgressBar() != null) {
             getProgressBar().setCancelEnabled(commandThread != null);
@@ -74,7 +67,7 @@ public abstract class DialogHost extends WizardDialog {
      */
     public final JPanel getProgressBarPane(final String title) {
         final CancelCallback cancelCallback = new CancelCallback() {
-            public void cancel() {
+            @Override public void cancel() {
                 if (commandThread != null) {
                     host.getSSH().cancelSession(commandThread);
                 }
@@ -87,9 +80,9 @@ public abstract class DialogHost extends WizardDialog {
      * Creates progress bar that can be used during connecting to the host
      * and returns pane, where the progress bar is displayed.
      */
-    public final JPanel getProgressBarPane() {
+    protected final JPanel getProgressBarPane() {
         final CancelCallback cancelCallback = new CancelCallback() {
-            public void cancel() {
+            @Override public void cancel() {
                 if (commandThread != null) {
                     host.getSSH().cancelSession(commandThread);
                 }
@@ -102,7 +95,7 @@ public abstract class DialogHost extends WizardDialog {
      * Prints error text in the answer pane, stops progress bar, reenables
      * buttons and adds retry button.
      */
-    public final void printErrorAndRetry(final String text) {
+    @Override public final void printErrorAndRetry(final String text) {
         super.printErrorAndRetry(text);
         progressBarDone();
     }
@@ -111,7 +104,7 @@ public abstract class DialogHost extends WizardDialog {
      * Cancels the dialog. It removes the host tab.
      * TODO: deprecated?
      */
-    public final void cancelDialog() {
+    @Override public final void cancelDialog() {
     //    Tools.getGUIData().removeSelectedHostTab();
     }
 
@@ -119,7 +112,7 @@ public abstract class DialogHost extends WizardDialog {
      * Returns title of the dialog, if host was already specified, the hostname
      * will appear in the dialog as well.
      */
-    protected final String getDialogTitle() {
+    @Override protected final String getDialogTitle() {
         final StringBuffer s = new StringBuffer(50);
         s.append(getHostDialogTitle());
         if (host != null
@@ -133,8 +126,6 @@ public abstract class DialogHost extends WizardDialog {
         return s.toString();
     }
 
-    /**
-     * Return title for getDialogTitle() function.
-     */
+    /** Return title for getDialogTitle() function. */
     protected abstract String getHostDialogTitle();
 }

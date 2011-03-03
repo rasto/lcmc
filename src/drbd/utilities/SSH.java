@@ -53,7 +53,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * for security).
  * Authentication with DSA, RSA, password and keyboard-interactive methods.
  */
-public class SSH {
+public final class SSH {
     /** SSHGui object for enter password dialogs etc. */
     private SSHGui sshGui;
     /** Callback when connection is failed or properly closed. */
@@ -98,10 +98,8 @@ public class SSH {
     /** Sudo prompt. */
     public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
 
-    /**
-     * Reconnect.
-     */
-    public final boolean reconnect() {
+    /** Reconnect. */
+    boolean reconnect() {
         try {
             mConnectionThreadLock.acquire();
         } catch (InterruptedException e) {
@@ -145,12 +143,10 @@ public class SSH {
         return true;
     }
 
-    /**
-     * Connects the host.
-     */
-    public final void connect(final SSHGui sshGui,
-                              final ConnectionCallback callback,
-                              final Host host) {
+    /** Connects the host. */
+    public void connect(final SSHGui sshGui,
+                 final ConnectionCallback callback,
+                 final Host host) {
         this.sshGui = sshGui;
         this.callback = callback;
         this.host = host;
@@ -179,9 +175,9 @@ public class SSH {
      * Sets passwords that will be tried first while connecting, but only if
      * they were not set before.
      */
-    public final void setPasswords(final String lastDSAKey,
-                                   final String lastRSAKey,
-                                   final String lastPassword) {
+    public void setPasswords(final String lastDSAKey,
+                             final String lastRSAKey,
+                             final String lastPassword) {
         if (this.lastDSAKey == null
             && this.lastRSAKey == null
             && this.lastPassword == null) {
@@ -191,31 +187,23 @@ public class SSH {
         }
     }
 
-    /**
-     * Returns last successful dsa key.
-     */
-    public final String getLastDSAKey() {
+    /** Returns last successful dsa key. */
+    public String getLastDSAKey() {
         return lastDSAKey;
     }
 
-    /**
-     * Returns last successful rsa key.
-     */
-    public final String getLastRSAKey() {
+    /** Returns last successful rsa key. */
+    public String getLastRSAKey() {
         return lastRSAKey;
     }
 
-    /**
-     * Returns last successful password.
-     */
-    public final String getLastPassword() {
+    /** Returns last successful password. */
+    public String getLastPassword() {
         return lastPassword;
     }
 
-    /**
-     * Waits till connection is established or is failed.
-     */
-    public final void waitForConnection() {
+    /** Waits till connection is established or is failed. */
+    public void waitForConnection() {
         try {
             mConnectionThreadLock.acquire();
         } catch (InterruptedException e) {
@@ -235,21 +223,17 @@ public class SSH {
     }
 
 
-    /**
-     * Connects the host.
-     */
-    public final void connect(final SSHGui sshGuiT,
-                              final ProgressBar progressBar,
-                              final ConnectionCallback callbackT,
-                              final Host hostT) {
+    /** Connects the host. */
+    public void connect(final SSHGui sshGuiT,
+                        final ProgressBar progressBar,
+                        final ConnectionCallback callbackT,
+                        final Host hostT) {
         this.progressBar = progressBar;
         connect(sshGuiT, callbackT, hostT);
     }
 
-    /**
-     * Cancels the creating of connection to the sshd.
-     */
-    public final void cancelConnection() {
+    /** Cancels the creating of connection to the sshd. */
+    public void cancelConnection() {
         try {
             mConnectionThreadLock.acquire();
         } catch (InterruptedException e) {
@@ -274,10 +258,8 @@ public class SSH {
         // call cannot be interrupted for now.
     }
 
-    /**
-     * Cancels the session (execution of command).
-     */
-    public final void cancelSession(final ExecCommandThread execCommandThread) {
+    /** Cancels the session (execution of command). */
+    public void cancelSession(final ExecCommandThread execCommandThread) {
         execCommandThread.cancel();
         Tools.debug(this, "session cancel", 1);
         final String message = "canceled";
@@ -288,10 +270,8 @@ public class SSH {
         host.getTerminalPanel().nextCommand();
     }
 
-    /**
-     * Disconnects this host if it has been connected.
-     */
-    public final void disconnect() {
+    /** Disconnects this host if it has been connected. */
+    public void disconnect() {
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {
@@ -320,7 +300,7 @@ public class SSH {
      *
      * After this method is called a reconnect will work as expected.
      */
-    public final void forceReconnect() {
+    public void forceReconnect() {
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {
@@ -337,10 +317,8 @@ public class SSH {
         }
     }
 
-    /**
-     * Force disconnection.
-     */
-    public final void forceDisconnect() {
+    /** Force disconnection. */
+    public void forceDisconnect() {
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {
@@ -358,10 +336,8 @@ public class SSH {
         }
     }
 
-    /**
-     * Returns true if connection is established.
-     */
-    public final boolean isConnected() {
+    /** Returns true if connection is established. */
+    public boolean isConnected() {
         try {
             mConnectionLock.acquire();
         } catch (InterruptedException e) {
@@ -372,16 +348,12 @@ public class SSH {
         return ret;
     }
 
-    /**
-     * Returns true if connection is established.
-     */
-    public final boolean isConnectionFailed() {
+    /** Returns true if connection is established. */
+    public boolean isConnectionFailed() {
         return connectionFailed;
     }
 
-    /**
-     * This class is a thread that executes commands.
-     */
+    /** This class is a thread that executes commands. */
     public class ExecCommandThread extends Thread {
         /** Command that should be executed. */
         private String command;
@@ -459,7 +431,6 @@ public class SSH {
                                                host.getHoppedCommand(command),
                                                true),
                                   2);
-                boolean checkCommand = false;
                 thisSession.execCommand(host.getSudoCommand(
                                           host.getHoppedCommand(command),
                                           false));
@@ -616,10 +587,8 @@ public class SSH {
             return new SSHOutput(res.toString(), exitCode);
         }
 
-        /**
-         * Cancel the session.
-         */
-        public final void cancel() {
+        /** Cancel the session. */
+        public void cancel() {
             cancelIt = true;
             try {
                 mSessionLock.acquire();
@@ -634,15 +603,13 @@ public class SSH {
             }
         }
 
-        /**
-         * Executes a command in a thread.
-         */
-        public ExecCommandThread(final String command,
-                                 final ExecCallback execCallback,
-                                 final NewOutputCallback newOutputCallback,
-                                 final boolean outputVisible,
-                                 final boolean commandVisible,
-                                 final int sshCommandTimeout)
+        /** Executes a command in a thread. */
+        ExecCommandThread(final String command,
+                          final ExecCallback execCallback,
+                          final NewOutputCallback newOutputCallback,
+                          final boolean outputVisible,
+                          final boolean commandVisible,
+                          final int sshCommandTimeout)
         throws java.io.IOException {
             super();
             this.command = command;
@@ -669,7 +636,7 @@ public class SSH {
          * Reconnects, connects if there is no connection and executes a
          * command.
          */
-        public final void run() {
+        @Override public void run() {
             if (reconnect()) {
                 try {
                     mConnectionLock.acquire();
@@ -689,9 +656,7 @@ public class SSH {
             }
         }
 
-        /**
-         * Executes the command.
-         */
+        /** Executes the command. */
         private void exec(final MyConnection conn) {
             // ;;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
@@ -700,8 +665,8 @@ public class SSH {
             for (int i = 0; i < commands.length; i++) {
                 final Boolean[] cancelTimeout = new Boolean[1];
                 cancelTimeout[0] = false;
-                Thread tt = new Thread(new Runnable() {
-                    public void run() {
+                final Thread tt = new Thread(new Runnable() {
+                    @Override public void run() {
                         Tools.sleep(10000);
                         if (!cancelTimeout[0]) {
                             Tools.debug(this,
@@ -779,11 +744,10 @@ public class SSH {
      * 101 no host
      * 102 no io error
      */
-    public final SSHOutput execCommandAndWait(final String command,
-                                              final boolean outputVisible,
-                                              final boolean commandVisible,
-                                              final int sshCommandTimeout) {
-
+    public SSHOutput execCommandAndWait(final String command,
+                                        final boolean outputVisible,
+                                        final boolean commandVisible,
+                                        final int sshCommandTimeout) {
         if (host == null) {
             return new SSHOutput("", 101);
         }
@@ -794,12 +758,13 @@ public class SSH {
             execCommandThread = new ExecCommandThread(
                             command,
                             new ExecCallback() {
-                                public void done(final String ans) {
+                                @Override public void done(final String ans) {
                                     answer[0] = ans;
                                     exitCode[0] = 0;
                                 }
-                                public void doneError(final String ans,
-                                                      final int ec) {
+                                @Override public void doneError(
+                                                            final String ans,
+                                                            final int ec) {
                                     answer[0] = ans;
                                     exitCode[0] = ec;
                                 }
@@ -837,13 +802,12 @@ public class SSH {
      *
      * @return command thread
      */
-    public final ExecCommandThread execCommand(final String command,
-                                               final ExecCallback execCallback,
-                                               final boolean cacheIt,
-                                               final boolean outputVisible,
-                                               final boolean commandVisible,
-                                               final int sshCommandTimeout) {
-
+    public ExecCommandThread execCommand(final String command,
+                                         final ExecCallback execCallback,
+                                         final boolean cacheIt,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
         if (host == null) {
             return null;
         }
@@ -886,11 +850,11 @@ public class SSH {
      *
      * @return thread
      */
-    public final ExecCommandThread execCommand(final String command,
-                                               final ExecCallback execCallback,
-                                               final boolean outputVisible,
-                                               final boolean commandVisible,
-                                               final int sshCommandTimeout) {
+    public ExecCommandThread execCommand(final String command,
+                                         final ExecCallback execCallback,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
         return execCommand(command,
                            execCallback,
                            false,
@@ -918,13 +882,13 @@ public class SSH {
      *
      * @return thread
      */
-    public final ExecCommandThread execCommand(
-                                     final String command,
-                                     final ExecCallback execCallback,
-                                     final NewOutputCallback newOutputCallback,
-                                     final boolean outputVisible,
-                                     final boolean commandVisible,
-                                     final int sshCommandTimeout) {
+    public ExecCommandThread execCommand(
+                               final String command,
+                               final ExecCallback execCallback,
+                               final NewOutputCallback newOutputCallback,
+                               final boolean outputVisible,
+                               final boolean commandVisible,
+                               final int sshCommandTimeout) {
         final String realCommand = host.replaceVars(command);
         ExecCommandThread execCommandThread;
         try {
@@ -963,13 +927,13 @@ public class SSH {
      *
      * @return command thread
      */
-    public final ExecCommandThread execCommand(final String command,
-                                               final ProgressBar progressBar,
-                                               final ExecCallback execCallback,
-                                               final boolean cacheIt,
-                                               final boolean outputVisible,
-                                               final boolean commandVisible,
-                                               final int sshCommandTimeout) {
+    public ExecCommandThread execCommand(final String command,
+                                         final ProgressBar progressBar,
+                                         final ExecCallback execCallback,
+                                         final boolean cacheIt,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
         Tools.debug(this, "execCommand with progress bar", 2);
         this.progressBar = progressBar;
         if (progressBar != null) {
@@ -1002,12 +966,12 @@ public class SSH {
      *
      * @return command thread
      */
-    public final ExecCommandThread execCommand(final String command,
-                                               final ProgressBar pB,
-                                               final ExecCallback execCallback,
-                                               final boolean outputVisible,
-                                               final boolean commandVisible,
-                                               final int sshCommandTimeout) {
+    public ExecCommandThread execCommand(final String command,
+                                         final ProgressBar pB,
+                                         final ExecCallback execCallback,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
         return execCommand(command,
                            pB,
                            execCallback,
@@ -1134,16 +1098,15 @@ public class SSH {
         /** To show error only once.  */
         private String lastError;
 
-        /**
-         * Prepares a new <code>InteractiveLogic</code> object.
-         */
-        public InteractiveLogic(final String lastError) {
+        /** Prepares a new <code>InteractiveLogic</code> object. */
+        InteractiveLogic(final String lastError) {
             this.lastError = lastError;
         }
 
         /**
          * The callback may be invoked several times, depending on how many
-         * questions-sets the server sends. */
+         * questions-sets the server sends.
+         */
         public String[] replyToChallenge(final String name,
                                          final String instruction,
                                          final int numPrompts,
@@ -1193,7 +1156,7 @@ public class SSH {
          * "authentication failed" even though it did not send a single
          * prompt.
          */
-        public int getPromptCount() {
+        int getPromptCount() {
             return promptCount;
         }
     }
@@ -1201,11 +1164,11 @@ public class SSH {
     /** Connection class that can cancel it's connection during openSession. */
     class MyConnection extends Connection {
         /** Creates new MyConnection object. */
-        public MyConnection(final String hostname, final int port) {
+        MyConnection(final String hostname, final int port) {
             super(hostname, port);
         }
 
-        public void dmcCancel() {
+        void dmcCancel() {
             /* public getChannelManager() { return cm }
                has to be added to the Connection.java till
                it's sorted out. */
@@ -1231,19 +1194,19 @@ public class SSH {
         private boolean cancelIt = false;
 
         /** Prepares a new <code>ConnectionThread</code> object. */
-        public ConnectionThread() {
+        ConnectionThread() {
             super();
             username = host.getFirstUsername();
             hostname = host.getFirstIp();
         }
 
         /** Cancel the connecting. */
-        public void cancel() {
+        void cancel() {
             cancelIt = true;
         }
 
         /** Start connection in the thread. */
-        public void run() {
+        @Override public void run() {
             if (callback != null && isConnected()) {
                 callback.done(1);
             }
@@ -1598,7 +1561,7 @@ public class SSH {
                     mConnectionLock.release();
                     host.setConnected();
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             host.getTerminalPanel().nextCommand();
                         }
                     });
@@ -1648,9 +1611,9 @@ public class SSH {
     }
 
     /** Enter sudo password. */
-    public final void enterSudoPassword() {
+    void enterSudoPassword() {
         if (host.isUseSudo() != null && host.isUseSudo()) {
-            String lastError = "";
+            final String lastError = "";
             final String lastSudoPwd = host.getSudoPassword();
             final String sudoPwd = sshGui.enterSomethingDialog(
                      Tools.getString("SSH.SudoAuthentication"),
@@ -1677,10 +1640,8 @@ public class SSH {
         }
     }
 
-    /**
-     * Installs gui-helper on the remote host.
-     */
-    public final void installGuiHelper() {
+    /** Installs gui-helper on the remote host. */
+    public void installGuiHelper() {
         if (!Tools.getConfigData().getKeepHelper()) {
             final String fileName = "/help-progs/drbd-gui-helper";
             final String file = Tools.getFile(fileName);
@@ -1690,10 +1651,8 @@ public class SSH {
         }
     }
 
-    /**
-     * Installs test suite on the remote host.
-     */
-    public final void installTestFiles() {
+    /** Installs test suite on the remote host. */
+    void installTestFiles() {
         final String fileName = "drbd-mc-test.tar";
         final Connection conn = connection;
         if (conn == null) {
@@ -1729,13 +1688,13 @@ public class SSH {
      * @param makeBackup
                 whether to make backup or not
      */
-    public final void createConfig(final String config,
-                                   final String fileName,
-                                   final String dir,
-                                   final String mode,
-                                   final boolean makeBackup,
-                                   final String preCommand,
-                                   final String postCommand) {
+    public void createConfig(final String config,
+                             final String fileName,
+                             final String dir,
+                             final String mode,
+                             final boolean makeBackup,
+                             final String preCommand,
+                             final String postCommand) {
         scp(config,
             dir + fileName,
             mode,
@@ -1753,13 +1712,13 @@ public class SSH {
      * @param remoteFilename
      *          new file name on the other host
      */
-    public final void scp(final String fileContent,
-                          final String remoteFilename,
-                          final String mode,
-                          final boolean makeBackup,
-                          String installCommand,
-                          final String preCommand,
-                          final String postCommand) {
+    public void scp(final String fileContent,
+                    final String remoteFilename,
+                    final String mode,
+                    final boolean makeBackup,
+                    String installCommand,
+                    final String preCommand,
+                    final String postCommand) {
         final StringBuffer commands = new StringBuffer(40);
         if (preCommand != null) {
             commands.append(preCommand);
@@ -1824,11 +1783,12 @@ public class SSH {
                             + host.escapeQuotes(fileContent, 1)
                             + commandTail,
                             new ExecCallback() {
-                                public void done(final String ans) {
+                                @Override public void done(final String ans) {
                                     /* ok */
                                 }
-                                public void doneError(final String ans,
-                                                      final int exitCode) {
+                                @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                     if (ans == null) {
                                         return;
                                     }
@@ -1840,7 +1800,7 @@ public class SSH {
                                         }
                                         final Thread t = new Thread(
                                         new Runnable() {
-                                            public void run() {
+                                            @Override public void run() {
                                                 Tools.progressIndicatorFailed(
                                                                 host.getName(),
                                                                 line,
@@ -1862,8 +1822,8 @@ public class SSH {
     }
 
     /** Starts port forwarding for vnc. */
-    public final void startVncPortForwarding(final String remoteHost,
-                                             final int remotePort)
+    void startVncPortForwarding(final String remoteHost,
+                                final int remotePort)
         throws java.io.IOException {
         final int localPort =
                         remotePort + Tools.getConfigData().getVncPortOffset();
@@ -1877,10 +1837,8 @@ public class SSH {
         }
     }
 
-    /**
-     * Stops port forwarding for vnc.
-     */
-    public final void stopVncPortForwarding(final int remotePort)
+    /** Stops port forwarding for vnc. */
+    void stopVncPortForwarding(final int remotePort)
         throws java.io.IOException {
         final int localPort =
                         remotePort + Tools.getConfigData().getVncPortOffset();
@@ -1891,23 +1849,23 @@ public class SSH {
         }
     }
 
-    /**
-     * Class that holds output of ssh command.
-     */
+    /** Class that holds output of ssh command. */
     public final class SSHOutput {
         /** Output string. */
         private final String output;
         /** Exit code. */
         private final int exitCode;
         /** Creates new SSHOutput object. */
-        public SSHOutput(final String output, final int exitCode) {
+        SSHOutput(final String output, final int exitCode) {
             this.output = output;
             this.exitCode = exitCode;
         }
+
         /** Returns output string. */
         public String getOutput() {
             return output;
         }
+
         /** Returns exit code. */
         public int getExitCode() {
             return exitCode;
@@ -1916,7 +1874,7 @@ public class SSH {
     }
 
     /** Returns whether connection was canceled. */
-    public final boolean isConnectionCanceled() {
+    public boolean isConnectionCanceled() {
         return disconnectForGood;
     }
 }

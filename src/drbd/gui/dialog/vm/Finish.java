@@ -45,20 +45,20 @@ import java.awt.event.ActionEvent;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class Finish extends VMConfig {
+final class Finish extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
 
     /** Prepares a new <code>Finish</code> object. */
-    public Finish(final WizardDialog previousDialog,
-                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    Finish(final WizardDialog previousDialog,
+           final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
     /** Next dialog. */
-    public final WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         return null;
     }
 
@@ -66,7 +66,7 @@ public class Finish extends VMConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.vm.Domain.Title in TextResources.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Finish.Title");
     }
 
@@ -74,24 +74,24 @@ public class Finish extends VMConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.vm.Domain.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.vm.Finish.Description");
     }
 
     /** Inits dialog. */
-    protected final void initDialog() {
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 buttonClass(finishButton()).setEnabled(false);
             }
         });
     }
 
     /** Returns input pane where user can configure a vm. */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
         vdi.selectMyself();
         if (inputPane != null) {
@@ -102,17 +102,17 @@ public class Finish extends VMConfig {
         final MyButton createConfigBtn = new MyButton("Create Config");
         createConfigBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
         createConfigBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
                         vdi.apply(false);
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 buttonClass(finishButton()).setEnabled(true);
                             }
                         });

@@ -41,41 +41,33 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class Connect extends DialogCluster {
+final class Connect extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
     /** Prepares a new <code>Connect</code> object. */
-    public Connect(final WizardDialog previousDialog,
-                   final Cluster cluster) {
+    Connect(final WizardDialog previousDialog,
+            final Cluster cluster) {
         super(previousDialog, cluster);
     }
 
-    /**
-     * Returns the next dialog which is ClusterDrbdConf.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog which is ClusterDrbdConf. */
+    @Override public WizardDialog nextDialog() {
         return new CommStack(getPreviousDialog(), getCluster());
     }
 
-    /**
-     * Returns cluster dialog title.
-     */
-    protected final String getClusterDialogTitle() {
+    /** Returns cluster dialog title. */
+    @Override protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Connect.Title");
     }
 
-    /**
-     * Returns description.
-     */
-    protected final String getDescription() {
+    /** Returns description. */
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Connect.Description");
     }
 
-    /**
-     * Checks hosts, if they are connected and if not reconnects them.
-     */
-    protected final void checkHosts() {
+    /** Checks hosts, if they are connected and if not reconnects them. */
+    protected void checkHosts() {
         final StringBuffer text = new StringBuffer();
         boolean pending = false;
         boolean oneFailed = false;
@@ -106,17 +98,15 @@ public class Connect extends DialogCluster {
              }
 
              SwingUtilities.invokeLater(new Runnable() {
-                 public void run() {
+                 @Override public void run() {
                     buttonClass(nextButton()).pressButton();
                  }
              });
         }
     }
 
-    /**
-     * Connects all cluster hosts.
-     */
-    protected final void connectHosts() {
+    /** Connects all cluster hosts. */
+    protected void connectHosts() {
         getCluster().connect(getDialogPanel(), true, 1);
         for (final Host host : getCluster().getHosts()) {
             host.waitOnLoading();
@@ -124,25 +114,21 @@ public class Connect extends DialogCluster {
         checkHosts();
     }
 
-    /**
-     * Inits the dialog and connects the hosts.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog and connects the hosts. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         // TODO: Tools.startProgressIndicator
         final Thread t = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 connectHosts();
             }
         });
         t.start();
     }
 
-    /**
-     * Returns the connect hosts dialog content.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the connect hosts dialog content. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final StringBuffer text = new StringBuffer();
         for (final Host host : getCluster().getHosts()) {
@@ -157,10 +143,8 @@ public class Connect extends DialogCluster {
         return pane;
     }
 
-    /**
-     * Enable skip button.
-     */
-    protected final boolean skipButtonEnabled() {
+    /** Enable skip button. */
+    @Override protected boolean skipButtonEnabled() {
         return true;
     }
 }

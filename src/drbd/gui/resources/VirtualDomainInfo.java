@@ -41,25 +41,31 @@ import java.util.regex.Matcher;
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
-class VirtualDomainInfo extends ServiceInfo {
+final class VirtualDomainInfo extends ServiceInfo {
     /** VirtualDomain in the VMs menu. */
     private VMSVirtualDomainInfo vmsVirtualDomainInfo = null;
     /** pattern that captures a name from xml file name. */
-    public static final Pattern LIBVIRT_CONF_PATTERN =
+    static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
 
-    /**
-     * Creates the VirtualDomainInfo object.
-     */
-    public VirtualDomainInfo(final String name,
-                             final ResourceAgent ra,
-                             final Browser browser) {
+    /** Creates the VirtualDomainInfo object. */
+    VirtualDomainInfo(final String name,
+                      final ResourceAgent ra,
+                      final Browser browser) {
         super(name, ra, browser);
     }
 
-    /**
-     * Returns the first on which this vm is running.
-     */
+    /** Creates the VirtualDomainInfo object. */
+    VirtualDomainInfo(final String name,
+                      final ResourceAgent ra,
+                      final String hbId,
+                      final Map<String, String> resourceNode,
+                      final Browser browser) {
+        super(name, ra, hbId, resourceNode, browser);
+    }
+
+
+    /** Returns the first on which this vm is running. */
     private Host getRunningOnHost() {
         final List<String> nodes = getRunningOnNodes(false);
         if (nodes != null
@@ -71,44 +77,25 @@ class VirtualDomainInfo extends ServiceInfo {
         return null;
     }
 
-    /**
-     * Returns object with vm data.
-     */
-    public final VMSXML getVMSXML(final Host host) {
+    /** Returns object with vm data. */
+    VMSXML getVMSXML(final Host host) {
         return getBrowser().getVMSXML(host);
     }
 
-    /**
-     * Creates the VirtualDomainInfo object.
-     */
-    public VirtualDomainInfo(final String name,
-                             final ResourceAgent ra,
-                             final String hbId,
-                             final Map<String, String> resourceNode,
-                             final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
-
-    /**
-     * Removes the service without confirmation dialog.
-     */
-    protected final void removeMyselfNoConfirm(final Host dcHost,
+    /** Removes the service without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
     }
 
-    /**
-     * Sets service parameters with values from resourceNode hash.
-     */
-    public final void setParameters(final Map<String, String> resourceNode) {
+    /** Sets service parameters with values from resourceNode hash. */
+    @Override void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         connectWithVMS();
     }
 
-    /**
-     * Connects with VMSVirtualDomainInfo object.
-     */
-    public final VMSVirtualDomainInfo connectWithVMS() {
+    /** Connects with VMSVirtualDomainInfo object. */
+    @Override public VMSVirtualDomainInfo connectWithVMS() {
         final String config = getParamSaved("config");
         VMSVirtualDomainInfo newVMSVDI = null;
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -126,10 +113,8 @@ class VirtualDomainInfo extends ServiceInfo {
         return newVMSVDI;
     }
 
-    /**
-     * Adds vnc viewer menu items.
-     */
-    public final void addVncViewersToTheMenu(final List<UpdatableItem> items) {
+    /** Adds vnc viewer menu items. */
+    void addVncViewersToTheMenu(final List<UpdatableItem> items) {
         final boolean testOnly = false;
         if (Tools.getConfigData().isTightvnc()) {
             /* tight vnc test menu */
@@ -142,7 +127,7 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public String enablePredicate() {
+                @Override public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
                         return "VM is not available";
@@ -155,7 +140,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     return null;
                 }
 
-                public void action() {
+                @Override public void action() {
                     hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
@@ -183,7 +168,7 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public String enablePredicate() {
+                @Override public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
                         return "VM is not available";
@@ -196,7 +181,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     return null;
                 }
 
-                public void action() {
+                @Override public void action() {
                     hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
@@ -224,7 +209,7 @@ class VirtualDomainInfo extends ServiceInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                public String enablePredicate() {
+                @Override public String enablePredicate() {
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml == null || vmsVirtualDomainInfo == null) {
                         return "VM is not available";
@@ -237,7 +222,7 @@ class VirtualDomainInfo extends ServiceInfo {
                     return null;
                 }
 
-                public void action() {
+                @Override public void action() {
                     hidePopup();
                     final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
@@ -255,10 +240,8 @@ class VirtualDomainInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns the possible values for the pulldown menus, if applicable.
-     */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    /** Returns the possible values for the pulldown menus, if applicable. */
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         if ("config".equals(param)) {
             final Set<String> configs = new TreeSet<String>();
             for (final Host host : getBrowser().getClusterHosts()) {
@@ -277,16 +260,14 @@ class VirtualDomainInfo extends ServiceInfo {
      * Returns list of items for service popup menu with actions that can
      * be executed on the pacemaker services.
      */
-    public List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         addVncViewersToTheMenu(items);
         return items;
     }
 
-    /**
-     * Returns a name of the service with virtual domain name.
-     */
-    public String toString() {
+    /** Returns a name of the service with virtual domain name. */
+    @Override public String toString() {
         final StringBuffer s = new StringBuffer(30);
         s.append(getName());
         final String string;
@@ -314,10 +295,8 @@ class VirtualDomainInfo extends ServiceInfo {
         return s.toString();
     }
 
-    /**
-     * Applies the changes to the service parameters.
-     */
-    public void apply(final Host dcHost, final boolean testOnly) {
+    /** Applies the changes to the service parameters. */
+    @Override void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
     }
 }

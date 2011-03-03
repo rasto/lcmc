@@ -53,7 +53,7 @@ import java.awt.event.ActionEvent;
  * @version $Id$
  *
  */
-public class CreateMD extends DrbdConfig {
+final class CreateMD extends DrbdConfig {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Metadata pulldown choices. */
@@ -65,20 +65,16 @@ public class CreateMD extends DrbdConfig {
     /** Return code of the create md command if fs is already there. */
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
 
-    /**
-     * Prepares a new <code>CreateMD</code> object.
-     */
-    public CreateMD(final WizardDialog previousDialog,
-                              final DrbdResourceInfo dri) {
+    /** Prepares a new <code>CreateMD</code> object. */
+    CreateMD(final WizardDialog previousDialog,
+                       final DrbdResourceInfo dri) {
         super(previousDialog, dri);
     }
 
-    /**
-     * Creates meta-data and checks the results.
-     */
+    /** Creates meta-data and checks the results. */
     private void createMetadata(final boolean destroyData) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 makeMDButton.setEnabled(false);
             }
         });
@@ -93,12 +89,12 @@ public class CreateMD extends DrbdConfig {
             final int index = i;
             thread[i] = new Thread(
             new Runnable() {
-                public void run() {
+                @Override public void run() {
                     final ExecCallback execCallback =
                         new ExecCallback() {
-                            public void done(final String ans) {
+                            @Override public void done(final String ans) {
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
+                                    @Override public void run() {
                                         makeMDButton.setEnabled(false);
                                     }
                                 });
@@ -106,7 +102,7 @@ public class CreateMD extends DrbdConfig {
                                 returnCode[index] = 0;
                             }
 
-                            public void doneError(final String ans,
+                            @Override public void doneError(final String ans,
                                                   final int exitCode) {
                                 answer[index] = ans;
                                 returnCode[index] = exitCode;
@@ -165,7 +161,7 @@ public class CreateMD extends DrbdConfig {
             answerPaneSetTextError(Tools.join("\n", answer));
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     makeMDButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
                     if (Tools.getConfigData().getAutoOptionGlobal(
@@ -182,7 +178,7 @@ public class CreateMD extends DrbdConfig {
      * Returns next dialog plus it calls drbd up command for both devices and
      * returns the drbd config create fs dialog.
      */
-    public final WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
@@ -195,7 +191,7 @@ public class CreateMD extends DrbdConfig {
      * Returns the title of the dialog. This is specified as
      * Dialog.DrbdConfig.CreateMD.Title in the TextResources.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.CreateMD.Title");
     }
 
@@ -203,14 +199,12 @@ public class CreateMD extends DrbdConfig {
      * Returns the description of the dialog. This is specified as
      * Dialog.DrbdConfig.CreateMD.Description in the TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.CreateMD.Description");
     }
 
-    /**
-     * Inits dialog.
-     */
-    protected final void initDialog() {
+    /** Inits dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         makeMDButton.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -222,17 +216,15 @@ public class CreateMD extends DrbdConfig {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     makeMDButton.pressButton();
                 }
             });
         }
     }
 
-    /**
-     * Returns input pane with choices what to do with meta-data.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns input pane with choices what to do with meta-data. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
 
@@ -290,7 +282,7 @@ public class CreateMD extends DrbdConfig {
         inputPane.add(metadataCB);
         metadataCB.addListeners(
             new  ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         if (metadataCB.getStringValue().equals(
                                                     useExistingMetadata)) {
@@ -306,9 +298,9 @@ public class CreateMD extends DrbdConfig {
             null);
 
         makeMDButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         getProgressBar().start(10000);
                         if (metadataCB.getStringValue().equals(
                                               createNewMetadataDestroyData)) {

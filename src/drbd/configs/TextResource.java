@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are all English and common texts.
  */
-public class TextResource extends
-            java.util.ListResourceBundle {
+public final class TextResource extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

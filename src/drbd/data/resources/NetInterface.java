@@ -31,7 +31,7 @@ import drbd.utilities.Tools;
  * @version $Id$
  *
  */
-public class NetInterface extends Resource {
+public final class NetInterface extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Ip address. */
@@ -102,17 +102,17 @@ public class NetInterface extends Resource {
     }
 
     /** Returns mac address. */
-    public final String getMacAddr() {
+    String getMacAddr() {
         return macAddr;
     }
 
     /** Returns ip. */
-    public final String getIp() {
+    public String getIp() {
         return ip;
     }
 
     /** Returns network mask. */
-    public final String getNetmask() {
+    public String getNetmask() {
         return netMask;
     }
 
@@ -145,7 +145,7 @@ public class NetInterface extends Resource {
      * Returns first ip in the network.
      * e.g. 192.168.1.1 and mask 255.255.255.0 gives * 192.168.1.0.
      */
-    public final String getNetworkIp() {
+    public String getNetworkIp() {
         if (netMask == null) {
             return null;
         }
@@ -164,7 +164,7 @@ public class NetInterface extends Resource {
     }
 
     /** Returns value for parameter. */
-    public final String getValue(final String parameter) {
+    @Override public String getValue(final String parameter) {
         if ("ip".equals(parameter)) {
             return ip;
         }
@@ -177,7 +177,7 @@ public class NetInterface extends Resource {
     }
 
     /** Returns bindnetaddr. */
-    public final String getBindnetaddr() {
+    public String getBindnetaddr() {
         final String[] ipParts = ip.split("\\.");
         if (netMask == null) {
             return null;
@@ -196,7 +196,7 @@ public class NetInterface extends Resource {
     }
 
     /** Returns whether it is a bridge. */
-    public final boolean isBridge() {
+    public boolean isBridge() {
         return bridge;
     }
 }

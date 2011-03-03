@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are japanese texts.
  */
-public class TextResource_ja_JP extends
-            java.util.ListResourceBundle {
+public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 
@@ -405,7 +404,7 @@ public class TextResource_ja_JP extends
 
         {"Dialog.Host.LinbitLogin.Description",
          "利用しているディストリビューションのパッケージを取得するためにはhttp://www.linbit.com/supportのダウンロード エリアにログインする必要があります。あなたのユーザー名とパスワードを入力してください。アカウントを得るためにはLINBITサポートに問い合わせてください。別な方法としては、自身でDRBDをインストール/アップグレードすることができます。続けるために前のダイアログに戻ります。<br><br>"
-         +"間違ったユーザー名やパスワードを入力してみたら、次のステップで何もダウンロードできないことがわかります。"},
+         + "間違ったユーザー名やパスワードを入力してみたら、次のステップで何もダウンロードできないことがわかります。"},
 
         {"Dialog.Host.LinbitLogin.EnterUser",
          "ユーザー名"},

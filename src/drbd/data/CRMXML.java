@@ -56,7 +56,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class CRMXML extends XML {
+public final class CRMXML extends XML {
     /** Host. */
     private final Host host;
     /** List of global parameters. */
@@ -181,9 +181,9 @@ public class CRMXML extends XML {
     private final List<String> hostlistChoices = new ArrayList<String>();
 
     /** Pacemaker "true" string. */
-    public static final String PCMK_TRUE = "true";
+    static final String PCMK_TRUE = "true";
     /** Pacemaker "false" string. */
-    public static final String PCMK_FALSE = "false";
+    static final String PCMK_FALSE = "false";
     /** Disabled string. */
     public static final String DISABLED_STRING = "disabled";
     /** Boolean parameter type. */
@@ -491,9 +491,8 @@ public class CRMXML extends XML {
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_ORDERED_META_ATTR,
                                          ConfigData.AccessType.ADMIN);
     }
-    /**
-     * Prepares a new <code>CRMXML</code> object.
-     */
+
+    /** Prepares a new <code>CRMXML</code> object. */
     public CRMXML(final Host host) {
         super();
         this.host = host;
@@ -899,8 +898,8 @@ public class CRMXML extends XML {
     }
 
     /** Returns choices for check box. (True, False). */
-    public final String[] getCheckBoxChoices(final ResourceAgent ra,
-                                             final String param) {
+    public String[] getCheckBoxChoices(final ResourceAgent ra,
+                                       final String param) {
         final String paramDefault = getParamDefault(ra, param);
         return getCheckBoxChoices(paramDefault);
     }
@@ -934,7 +933,7 @@ public class CRMXML extends XML {
      * Returns all services as array of strings, sorted, with filesystem and
      * ipaddr in the begining.
      */
-    public final List<ResourceAgent> getServices(final String cl) {
+    public List<ResourceAgent> getServices(final String cl) {
         final List<ResourceAgent> services = classToServicesMap.get(cl);
         if (services == null) {
             return new ArrayList<ResourceAgent>();
@@ -954,47 +953,37 @@ public class CRMXML extends XML {
      * Returns parameters for service. Parameters are obtained from
      * ocf meta-data.
      */
-    public final String[] getParameters(final ResourceAgent ra,
-                                        final boolean master) {
+    public String[] getParameters(final ResourceAgent ra,
+                                  final boolean master) {
         /* return cached values */
         return ra.getParameters(master);
     }
 
-    /**
-     * Returns global parameters.
-     */
-    public final String[] getGlobalParameters() {
+    /** Returns global parameters. */
+    public String[] getGlobalParameters() {
         if (globalParams != null) {
             return globalParams.toArray(new String[globalParams.size()]);
         }
         return null;
     }
 
-    /**
-     * Return version of the service ocf script.
-     */
-    public final String getVersion(final ResourceAgent ra) {
+    /** Return version of the service ocf script. */
+    public String getVersion(final ResourceAgent ra) {
         return ra.getVersion();
     }
 
-    /**
-     * Return short description of the service.
-     */
-    public final String getShortDesc(final ResourceAgent ra) {
+    /** Return short description of the service. */
+    public String getShortDesc(final ResourceAgent ra) {
         return ra.getShortDesc();
     }
 
-    /**
-     * Return long description of the service.
-     */
-    public final String getLongDesc(final ResourceAgent ra) {
+    /** Return long description of the service. */
+    public String getLongDesc(final ResourceAgent ra) {
         return ra.getLongDesc();
     }
 
-    /**
-     * Returns short description of the global parameter.
-     */
-    public final String getGlobalParamShortDesc(final String param) {
+    /** Returns short description of the global parameter. */
+    public String getGlobalParamShortDesc(final String param) {
         String shortDesc = paramGlobalShortDescMap.get(param);
         if (shortDesc == null) {
             shortDesc = param;
@@ -1002,18 +991,14 @@ public class CRMXML extends XML {
         return shortDesc;
     }
 
-    /**
-     * Returns short description of the service parameter.
-     */
-    public final String getParamShortDesc(final ResourceAgent ra,
-                                          final String param) {
+    /** Returns short description of the service parameter. */
+    public String getParamShortDesc(final ResourceAgent ra,
+                                    final String param) {
         return ra.getParamShortDesc(param);
     }
 
-    /**
-     * Returns long description of the global parameter.
-     */
-    public final String getGlobalParamLongDesc(final String param) {
+    /** Returns long description of the global parameter. */
+    public String getGlobalParamLongDesc(final String param) {
         final String shortDesc = getGlobalParamShortDesc(param);
         String longDesc = paramGlobalLongDescMap.get(param);
         if (longDesc == null) {
@@ -1022,11 +1007,9 @@ public class CRMXML extends XML {
         return Tools.html("<b>" + shortDesc + "</b>\n" + longDesc);
     }
 
-    /**
-     * Returns long description of the parameter and service.
-     */
-    public final String getParamLongDesc(final ResourceAgent ra,
-                                         final String param) {
+    /** Returns long description of the parameter and service. */
+    public String getParamLongDesc(final ResourceAgent ra,
+                                   final String param) {
         final String shortDesc = getParamShortDesc(ra, param);
         String longDesc = ra.getParamLongDesc(param);
         if (longDesc == null) {
@@ -1038,45 +1021,33 @@ public class CRMXML extends XML {
     /**
      * Returns type of a global parameter. It can be string, integer, boolean...
      */
-    public final String getGlobalParamType(final String param) {
+    public String getGlobalParamType(final String param) {
         return paramGlobalTypeMap.get(param);
     }
 
-    /**
-     * Returns type of the parameter. It can be string, integer, boolean...
-     */
-    public final String getParamType(final ResourceAgent ra,
-                                     final String param) {
+    /** Returns type of the parameter. It can be string, integer, boolean... */
+    public String getParamType(final ResourceAgent ra, final String param) {
         return ra.getParamType(param);
     }
 
-    /**
-     * Returns default value for the global parameter.
-     */
-    public final String getGlobalParamDefault(final String param) {
+    /** Returns default value for the global parameter. */
+    public String getGlobalParamDefault(final String param) {
         return paramGlobalDefaultMap.get(param);
     }
 
-    /**
-     * Returns the preferred value for the global parameter.
-     */
-    public final String getGlobalParamPreferred(final String param) {
+    /** Returns the preferred value for the global parameter. */
+    public String getGlobalParamPreferred(final String param) {
         return paramGlobalPreferredMap.get(param);
     }
 
-    /**
-     * Returns the preferred value for this parameter.
-     */
-    public final String getParamPreferred(final ResourceAgent ra,
-                                          final String param) {
+    /** Returns the preferred value for this parameter. */
+    public String getParamPreferred(final ResourceAgent ra,
+                                    final String param) {
         return ra.getParamPreferred(param);
     }
 
-    /**
-     * Returns default value for this parameter.
-     */
-    public final String getParamDefault(final ResourceAgent ra,
-                                        final String param) {
+    /** Returns default value for this parameter. */
+    public String getParamDefault(final ResourceAgent ra, final String param) {
         return ra.getParamDefault(param);
     }
 
@@ -1084,7 +1055,7 @@ public class CRMXML extends XML {
      * Returns possible choices for a global parameter, that will be displayed
      * in the combo box.
      */
-    public final String[] getGlobalParamPossibleChoices(final String param) {
+    public String[] getGlobalParamPossibleChoices(final String param) {
         return paramGlobalPossibleChoices.get(param);
     }
 
@@ -1092,9 +1063,9 @@ public class CRMXML extends XML {
      * Returns possible choices for a parameter, that will be displayed in
      * the combo box.
      */
-    public final String[] getParamPossibleChoices(final ResourceAgent ra,
-                                                  final String param,
-                                                  final boolean ms) {
+    public String[] getParamPossibleChoices(final ResourceAgent ra,
+                                            final String param,
+                                            final boolean ms) {
         if (ms) {
             return ra.getParamPossibleChoicesMS(param);
         } else {
@@ -1102,17 +1073,13 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Checks if the global parameter is advanced.
-     */
-    public final boolean isGlobalAdvanced(final String param) {
+    /** Checks if the global parameter is advanced. */
+    public boolean isGlobalAdvanced(final String param) {
         return !globalNotAdvancedParams.contains(param);
     }
 
-    /**
-     * Returns the global parameter's access type.
-     */
-    public final ConfigData.AccessType getGlobalAccessType(final String param) {
+    /** Returns the global parameter's access type. */
+    public ConfigData.AccessType getGlobalAccessType(final String param) {
         final ConfigData.AccessType at = paramGlobalAccessTypes.get(param);
         if (at == null) {
             return ConfigData.AccessType.ADMIN; /* default access type */
@@ -1120,18 +1087,13 @@ public class CRMXML extends XML {
         return at;
     }
 
-    /**
-     * Checks if parameter is required or not.
-     */
-    public final boolean isGlobalRequired(final String param) {
+    /** Checks if parameter is required or not. */
+    public boolean isGlobalRequired(final String param) {
         return globalRequiredParams.contains(param);
     }
 
-    /**
-     * Checks if parameter is advanced or not.
-     */
-    public final boolean isAdvanced(final ResourceAgent ra,
-                                    final String param) {
+    /** Checks if parameter is advanced or not. */
+    public boolean isAdvanced(final ResourceAgent ra, final String param) {
         if (isMetaAttr(ra, param)) {
             if (ra == hbGroup || ra == pcmkClone) {
                 return true;
@@ -1141,11 +1103,9 @@ public class CRMXML extends XML {
         return !isRequired(ra, param);
     }
 
-    /**
-     * Returns access type of the parameter.
-     */
-    public final ConfigData.AccessType getAccessType(final ResourceAgent ra,
-                                                     final String param) {
+    /** Returns access type of the parameter. */
+    public ConfigData.AccessType getAccessType(final ResourceAgent ra,
+                                               final String param) {
         if (isMetaAttr(ra, param)) {
             final ConfigData.AccessType accessType =
                                                 M_A_ACCESS_TYPE.get(param);
@@ -1156,78 +1116,60 @@ public class CRMXML extends XML {
         return ConfigData.AccessType.ADMIN;
     }
 
-    /**
-     * Checks if parameter is required or not.
-     */
-    public final boolean isRequired(final ResourceAgent ra,
-                                    final String param) {
+    /** Checks if parameter is required or not. */
+    public boolean isRequired(final ResourceAgent ra, final String param) {
         return ra.isRequired(param);
     }
 
-    /**
-     * Returns whether the parameter is meta attribute or not.
-     */
-    public final boolean isMetaAttr(final ResourceAgent ra,
-                                    final String param) {
+    /** Returns whether the parameter is meta attribute or not. */
+    public boolean isMetaAttr(final ResourceAgent ra, final String param) {
         return ra.isParamMetaAttr(param);
     }
 
     /** Returns whether the parameter expects an integer value. */
-    public final boolean isInteger(final ResourceAgent ra,
-                                   final String param) {
+    public boolean isInteger(final ResourceAgent ra, final String param) {
         final String type = getParamType(ra, param);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /** Returns whether the parameter is read only label value. */
-    public final boolean isLabel(final ResourceAgent ra,
-                                 final String param) {
+    public boolean isLabel(final ResourceAgent ra, final String param) {
         final String type = getParamType(ra, param);
         return PARAM_TYPE_LABEL.equals(type);
     }
 
-    /**
-     * Returns whether the parameter expects a boolean value.
-     */
-    public final boolean isBoolean(final ResourceAgent ra,
-                                   final String param) {
+    /** Returns whether the parameter expects a boolean value. */
+    public boolean isBoolean(final ResourceAgent ra, final String param) {
         final String type = getParamType(ra, param);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
     /** Returns whether the global parameter expects an integer value. */
-    public final boolean isGlobalInteger(final String param) {
+    public boolean isGlobalInteger(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /** Returns whether the global parameter expects a label value. */
-    public final boolean isGlobalLabel(final String param) {
+    public boolean isGlobalLabel(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_LABEL.equals(type);
     }
 
-    /**
-     * Returns whether the global parameter expects a boolean value.
-     */
-    public final boolean isGlobalBoolean(final String param) {
+    /** Returns whether the global parameter expects a boolean value. */
+    public boolean isGlobalBoolean(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
-    /**
-     * Whether the service parameter is of the time type.
-     */
-    public final boolean isTimeType(final ResourceAgent ra,
-                                    final String param) {
+    /** Whether the service parameter is of the time type. */
+    public boolean isTimeType(final ResourceAgent ra, final String param) {
         final String type = getParamType(ra, param);
         return PARAM_TYPE_TIME.equals(type);
     }
 
-    /**
-     * Whether the global parameter is of the time type.
-     */
-    public final boolean isGlobalTimeType(final String param) {
+    /** Whether the global parameter is of the time type. */
+    public boolean isGlobalTimeType(final String param) {
         final String type = getGlobalParamType(param);
         return PARAM_TYPE_TIME.equals(type);
     }
@@ -1236,7 +1178,7 @@ public class CRMXML extends XML {
      * Returns name of the section for service and parameter that will be
      * displayed.
      */
-    public final String getSection(final ResourceAgent ra, final String param) {
+    public String getSection(final ResourceAgent ra, final String param) {
         final String section = ra.getSection(param);
         if (section != null) {
             return section;
@@ -1254,7 +1196,7 @@ public class CRMXML extends XML {
      * Returns name of the section global parameter that will be
      * displayed.
      */
-    public final String getGlobalSection(final String param) {
+    public String getGlobalSection(final String param) {
         if (isGlobalRequired(param)) {
             return Tools.getString("CRMXML.GlobalRequiredOptions");
         } else {
@@ -1273,11 +1215,9 @@ public class CRMXML extends XML {
         }
         return newParam;
     }
-    /**
-     * Checks meta attribute param.
-     */
-    public final boolean checkMetaAttrParam(final String param,
-                                            final String value) {
+
+    /** Checks meta attribute param. */
+    public boolean checkMetaAttrParam(final String param, final String value) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = M_A_TYPE.get(newParam);
         final boolean required = isRscDefaultsRequired(newParam);
@@ -1285,10 +1225,8 @@ public class CRMXML extends XML {
         return checkParam(type, required, metaAttr, newParam, value);
     }
 
-    /**
-     * Returns section of the rsc defaults meta attribute.
-     */
-    public final String getRscDefaultsSection(final String param) {
+    /** Returns section of the rsc defaults meta attribute. */
+    public String getRscDefaultsSection(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String section = M_A_SECTION.get(newParam);
         if (section == null) {
@@ -1297,50 +1235,38 @@ public class CRMXML extends XML {
         return section;
     }
 
-    /**
-     * Returns default of the meta attribute.
-     */
-    public final String getRscDefaultsDefault(final String param) {
+    /** Returns default of the meta attribute. */
+    public String getRscDefaultsDefault(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_DEFAULT.get(newParam);
     }
 
-    /**
-     * Returns preferred of the meta attribute.
-     */
-    public final String getRscDefaultsPreferred(final String param) {
+    /** Returns preferred of the meta attribute. */
+    public String getRscDefaultsPreferred(final String param) {
         return null;
     }
 
-    /**
-     * Returns preferred of the meta attribute.
-     */
-    public final String[] getRscDefaultsPossibleChoices(final String param) {
+    /** Returns preferred of the meta attribute. */
+    public String[] getRscDefaultsPossibleChoices(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_POSSIBLE_CHOICES.get(newParam);
     }
 
-    /**
-     * Returns choices for check box. (True, False).
-     */
-    public final String[] getRscDefaultsCheckBoxChoices(final String param) {
+    /** Returns choices for check box. (True, False). */
+    public String[] getRscDefaultsCheckBoxChoices(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String paramDefault = getRscDefaultsDefault(newParam);
         return getCheckBoxChoices(paramDefault);
     }
 
-    /**
-     * Returns short description of the default meta attr parameter.
-     */
-    public final String getRscDefaultsShortDesc(final String param) {
+    /** Returns short description of the default meta attr parameter. */
+    public String getRscDefaultsShortDesc(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_SHORT_DESC.get(newParam);
     }
 
-    /**
-     * Return long description of the default meta attr parameter.
-     */
-    public final String getRscDefaultsLongDesc(final String param) {
+    /** Return long description of the default meta attr parameter. */
+    public String getRscDefaultsLongDesc(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_LONG_DESC.get(newParam);
     }
@@ -1349,20 +1275,19 @@ public class CRMXML extends XML {
      * Returns type of the meta attribute.
      * It can be string, integer, boolean...
      */
-    public final String getRscDefaultsType(final String param) {
+    public String getRscDefaultsType(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_TYPE.get(newParam);
     }
 
     /** Checks if parameter is advanced. */
-    public final boolean isRscDefaultsAdvanced(final String param) {
+    public boolean isRscDefaultsAdvanced(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return !M_A_NOT_ADVANCED.contains(newParam);
     }
 
     /** Returns access type of the meta attribute. */
-    public final ConfigData.AccessType getRscDefaultsAccessType(
-                                                         final String param) {
+    public ConfigData.AccessType getRscDefaultsAccessType(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final ConfigData.AccessType at =
                                 M_A_RSC_DEFAULTS_ACCESS_TYPE.get(newParam);
@@ -1372,41 +1297,35 @@ public class CRMXML extends XML {
         return at;
     }
 
-    /**
-     * Checks if parameter is required or not.
-     */
-    public final boolean isRscDefaultsRequired(final String param) {
+    /** Checks if parameter is required or not. */
+    public boolean isRscDefaultsRequired(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return false;
     }
 
     /** Checks if the meta attr parameter is integer. */
-    public final boolean isRscDefaultsInteger(final String param) {
+    public boolean isRscDefaultsInteger(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /** Returns whether meta attr parameter is label. */
-    public final boolean isRscDefaultsLabel(final String param) {
+    public boolean isRscDefaultsLabel(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_LABEL.equals(type);
     }
 
-    /**
-     * Checks if the meta attr parameter is boolean.
-     */
-    public final boolean isRscDefaultsBoolean(final String param) {
+    /** Checks if the meta attr parameter is boolean. */
+    public boolean isRscDefaultsBoolean(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
-    /**
-     * Whether the rsc default parameter is of the time type.
-     */
-    public final boolean isRscDefaultsTimeType(final String param) {
+    /** Whether the rsc default parameter is of the time type. */
+    public boolean isRscDefaultsTimeType(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = getRscDefaultsType(newParam);
         return PARAM_TYPE_TIME.equals(type);
@@ -1417,9 +1336,9 @@ public class CRMXML extends XML {
      * Checks parameter of the specified ra according to its type.
      * Returns false if value does not fit the type.
      */
-    public final boolean checkParam(final ResourceAgent ra,
-                                    final String param,
-                                    final String value) {
+    public boolean checkParam(final ResourceAgent ra,
+                              final String param,
+                              final String value) {
         final String type = getParamType(ra, param);
         final boolean required = isRequired(ra, param);
         final boolean metaAttr = isMetaAttr(ra, param);
@@ -1431,10 +1350,10 @@ public class CRMXML extends XML {
      * not fit the type.
      */
     private boolean checkParam(final String type,
-                               final boolean required,
-                               final boolean metaAttr,
-                               final String param,
-                               String value) {
+                                         final boolean required,
+                                         final boolean metaAttr,
+                                         final String param,
+                                         String value) {
         if (metaAttr
             && isRscDefaultsInteger(param)
             && DISABLED_STRING.equals(value)) {
@@ -1473,8 +1392,7 @@ public class CRMXML extends XML {
      * Checks global parameter according to its type. Returns false if value
      * does not fit the type.
      */
-    public final boolean checkGlobalParam(final String param,
-                                          final String value) {
+    public boolean checkGlobalParam(final String param, final String value) {
         final String type = getGlobalParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
@@ -1507,9 +1425,7 @@ public class CRMXML extends XML {
         return correctValue;
     }
 
-    /**
-     * Adds meta attribute to the resource agent.
-     */
+    /** Adds meta attribute to the resource agent. */
     private void addMetaAttribute(final ResourceAgent ra,
                                   final String name,
                                   String newName,
@@ -1568,7 +1484,7 @@ public class CRMXML extends XML {
      * Returns meta attribute parameters. The key is always, how the parameter
      * is called in the cluster manager and value how it is stored in the GUI.
      */
-    public final Map<String, String> getRscDefaultsParameters() {
+    public Map<String, String> getRscDefaultsParameters() {
         if (rscDefaultsMetaAttrs != null) {
             return rscDefaultsMetaAttrs;
         }
@@ -1598,9 +1514,7 @@ public class CRMXML extends XML {
         return rscDefaultsMetaAttrs;
     }
 
-    /**
-     * Parses the parameters.
-     */
+    /** Parses the parameters. */
     private void parseParameters(final ResourceAgent ra,
                                  final Node parametersNode) {
         final String hbV = host.getHeartbeatVersion();
@@ -1694,9 +1608,7 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Parses the actions node.
-     */
+    /** Parses the actions node. */
     private void parseActions(final ResourceAgent ra,
                               final Node actionsNode) {
         final NodeList actions = actionsNode.getChildNodes();
@@ -1723,10 +1635,10 @@ public class CRMXML extends XML {
      * Parses meta-data xml for parameters for service and fills up the hashes
      * "CRM Daemon"s are global config options.
      */
-    public final void parseMetaData(final String serviceName,
-                                    final String provider,
-                                    final String xml,
-                                    final boolean masterSlave) {
+    void parseMetaData(final String serviceName,
+                       final String provider,
+                       final String xml,
+                       final boolean masterSlave) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
             return;
@@ -1803,7 +1715,7 @@ public class CRMXML extends XML {
      *
      * which can be pengine or crmd
      */
-    public final void parseClusterMetaData(final String xml) {
+    void parseClusterMetaData(final String xml) {
         final Document document = getXMLDocument(xml);
         if (document == null) {
             return;
@@ -1891,16 +1803,15 @@ public class CRMXML extends XML {
         /* stonith timeout, workaround, because of param type comming wrong
          * from pacemaker */
         paramGlobalTypeMap.put("stonith-timeout", PARAM_TYPE_TIME);
-
     }
 
     /**
      * Returns the heartbeat service object for the specified service name and
      * heartbeat class.
      */
-    public final ResourceAgent getResourceAgent(final String serviceName,
-                                                final String provider,
-                                                final String raClass) {
+    public ResourceAgent getResourceAgent(final String serviceName,
+                                          final String provider,
+                                          final String raClass) {
         final ResourceAgent ra =
                (ResourceAgent) serviceToResourceAgentMap.get(serviceName,
                                                              provider,
@@ -1916,41 +1827,31 @@ public class CRMXML extends XML {
         return ra;
     }
 
-    /**
-     * Returns the heartbeat service object of the drbddisk service.
-     */
-    public final ResourceAgent getHbDrbddisk() {
+    /** Returns the heartbeat service object of the drbddisk service. */
+    public ResourceAgent getHbDrbddisk() {
         return hbDrbddisk;
     }
 
-    /**
-     * Returns the heartbeat service object of the linbit::drbd service.
-     */
-    public final ResourceAgent getHbLinbitDrbd() {
+    /** Returns the heartbeat service object of the linbit::drbd service. */
+    public ResourceAgent getHbLinbitDrbd() {
         return hbLinbitDrbd;
     }
 
-    /**
-     * Returns the heartbeat service object of the hearbeat group.
-     */
-    public final ResourceAgent getHbGroup() {
+    /** Returns the heartbeat service object of the hearbeat group. */
+    public ResourceAgent getHbGroup() {
         return hbGroup;
     }
 
-    /**
-     * Returns the heartbeat service object of the hearbeat clone set.
-     */
-    public final ResourceAgent getHbClone() {
+    /** Returns the heartbeat service object of the hearbeat clone set. */
+    public ResourceAgent getHbClone() {
         return pcmkClone;
     }
 
-    /**
-     * Parse resource defaults.
-     */
-    public final String parseRscDefaults(
-                    final Node rscDefaultsNode,
-                    final Map<String, String> rscDefaultsParams,
-                    final Map<String, String> rscDefaultsParamsNvpairIds) {
+    /** Parse resource defaults. */
+    String parseRscDefaults(
+                       final Node rscDefaultsNode,
+                       final Map<String, String> rscDefaultsParams,
+                       final Map<String, String> rscDefaultsParamsNvpairIds) {
 
         final Map<String, String> nvpairIds =
                                         new HashMap<String, String>();
@@ -1990,12 +1891,9 @@ public class CRMXML extends XML {
         return rscDefaultsId;
     }
 
-    /**
-     * Parse op defaults.
-     */
-    public final void parseOpDefaults(
-                                final Node opDefaultsNode,
-                                final Map<String, String> opDefaultsParams) {
+    /** Parse op defaults. */
+    void parseOpDefaults(final Node opDefaultsNode,
+                         final Map<String, String> opDefaultsParams) {
 
         final Map<String, String> nvpairIds =
                                         new HashMap<String, String>();
@@ -2026,9 +1924,7 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Parses attributes, operations etc. from primitives and clones.
-     */
+    /** Parses attributes, operations etc. from primitives and clones. */
     private void parseAttributes(
               final Node resourceNode,
               final String crmId,
@@ -2160,9 +2056,7 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Parses the "group" node.
-     */
+    /** Parses the "group" node. */
     private void parseGroup(
                 final Node groupNode,
                 final List<String> resList,
@@ -2260,9 +2154,7 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Parses the "primitive" node.
-     */
+    /** Parses the "primitive" node. */
     private void parsePrimitive(
                 final Node primitiveNode,
                 final List<String> groupResList,
@@ -2319,47 +2211,39 @@ public class CRMXML extends XML {
         /**
          * Creates a new ResStatus object.
          */
-        public ResStatus(final List<String> runningOnNodes,
-                         final List<String> masterOnNodes,
-                         final List<String> slaveOnNodes,
-                         final boolean managed) {
+        ResStatus(final List<String> runningOnNodes,
+                  final List<String> masterOnNodes,
+                  final List<String> slaveOnNodes,
+                  final boolean managed) {
             this.runningOnNodes = runningOnNodes;
             this.masterOnNodes = masterOnNodes;
             this.slaveOnNodes = slaveOnNodes;
             this.managed = managed;
         }
 
-        /**
-         * Gets on which nodes the resource runs, or is master.
-         */
-        public final List<String> getRunningOnNodes() {
+        /** Gets on which nodes the resource runs, or is master. */
+        List<String> getRunningOnNodes() {
             return runningOnNodes;
         }
 
-        /**
-         * Gets on which nodes the resource is master if it is m/s resource.
-         */
-        public final List<String> getMasterOnNodes() {
+        /** Gets on which nodes the resource is master if it is m/s resource. */
+        List<String> getMasterOnNodes() {
             return masterOnNodes;
         }
 
-        /**
-         * Gets on which nodes the resource is slave if it is m/s resource.
-         */
-        public final List<String> getSlaveOnNodes() {
+        /** Gets on which nodes the resource is slave if it is m/s resource. */
+        List<String> getSlaveOnNodes() {
             return slaveOnNodes;
         }
 
-        /**
-         * Returns whether the resoruce is managed.
-         */
-        public final boolean isManaged() {
+        /** Returns whether the resoruce is managed. */
+        boolean isManaged() {
             return managed;
         }
     }
 
     /** Returns a hash with resource information. (running_on) */
-    public final Map<String, ResStatus> parseResStatus(final String resStatus) {
+    Map<String, ResStatus> parseResStatus(final String resStatus) {
         final Map<String, ResStatus> resStatusMap =
                                            new HashMap<String, ResStatus>();
         final Document document = getXMLDocument(resStatus);
@@ -2421,9 +2305,7 @@ public class CRMXML extends XML {
         return resStatusMap;
     }
 
-    /**
-     * Parses the transient attributes.
-     */
+    /** Parses the transient attributes. */
     private void parseTransientAttributes(
                               final String uname,
                               final Node transientAttrNode,
@@ -2479,12 +2361,10 @@ public class CRMXML extends XML {
         }
     }
 
-    /**
-     * Parses node, to get info like if it is in stand by.
-     */
-    public final void parseNode(final String node,
-                                final Node nodeNode,
-                                final MultiKeyMap nodeParametersMap) {
+    /** Parses node, to get info like if it is in stand by. */
+    void parseNode(final String node,
+                   final Node nodeNode,
+                   final MultiKeyMap nodeParametersMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(nodeNode,
                                                    "instance_attributes");
@@ -2601,7 +2481,7 @@ public class CRMXML extends XML {
     }
 
     /** Returns CibQuery object with information from the cib node. */
-    public final CibQuery parseCibQuery(final String query) {
+    CibQuery parseCibQuery(final String query) {
         final Document document = getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
@@ -3217,7 +3097,7 @@ public class CRMXML extends XML {
     }
 
     /** Returns order parameters. */
-    public final String[] getOrderParameters() {
+    public String[] getOrderParameters() {
         if (ordParams != null) {
             return ordParams.toArray(new String[ordParams.size()]);
         }
@@ -3225,7 +3105,7 @@ public class CRMXML extends XML {
     }
 
     /** Returns order parameters for resource sets. */
-    public final String[] getRscSetOrderParameters() {
+    public String[] getRscSetOrderParameters() {
         if (rscSetOrdParams != null) {
             return rscSetOrdParams.toArray(new String[rscSetOrdParams.size()]);
         }
@@ -3234,7 +3114,7 @@ public class CRMXML extends XML {
 
     /** Returns order parameters for resource sets. (Shown when an edge
      * is clicked, resource_set tag). */
-    public final String[] getRscSetOrdConnectionParameters() {
+    public String[] getRscSetOrdConnectionParameters() {
         if (rscSetOrdConnectionParams != null) {
             return rscSetOrdConnectionParams.toArray(
                                 new String[rscSetOrdConnectionParams.size()]);
@@ -3242,17 +3122,13 @@ public class CRMXML extends XML {
         return null;
     }
 
-    /**
-     * Checks if parameter is required or not.
-     */
-    public final boolean isOrderRequired(final String param) {
+    /** Checks if parameter is required or not. */
+    public boolean isOrderRequired(final String param) {
         return ordRequiredParams.contains(param);
     }
 
-    /**
-     * Returns short description of the order parameter.
-     */
-    public final String getOrderParamShortDesc(final String param) {
+    /** Returns short description of the order parameter. */
+    public String getOrderParamShortDesc(final String param) {
         String shortDesc = paramOrdShortDescMap.get(param);
         if (shortDesc == null) {
             shortDesc = param;
@@ -3260,10 +3136,8 @@ public class CRMXML extends XML {
         return shortDesc;
     }
 
-    /**
-     * Returns long description of the order parameter.
-     */
-    public final String getOrderParamLongDesc(final String param) {
+    /** Returns long description of the order parameter. */
+    public String getOrderParamLongDesc(final String param) {
         final String shortDesc = getOrderParamShortDesc(param);
         String longDesc = paramOrdLongDescMap.get(param);
         if (longDesc == null) {
@@ -3275,21 +3149,17 @@ public class CRMXML extends XML {
     /**
      * Returns type of a order parameter. It can be string, integer, boolean...
      */
-    public final String getOrderParamType(final String param) {
+    public String getOrderParamType(final String param) {
         return paramOrdTypeMap.get(param);
     }
 
-    /**
-     * Returns default value for the order parameter.
-     */
-    public final String getOrderParamDefault(final String param) {
+    /** Returns default value for the order parameter. */
+    public String getOrderParamDefault(final String param) {
         return paramOrdDefaultMap.get(param);
     }
 
-    /**
-     * Returns the preferred value for the order parameter.
-     */
-    public final String getOrderParamPreferred(final String param) {
+    /** Returns the preferred value for the order parameter. */
+    public String getOrderParamPreferred(final String param) {
         return paramOrdPreferredMap.get(param);
     }
 
@@ -3297,8 +3167,8 @@ public class CRMXML extends XML {
      * Returns possible choices for a order parameter, that will be displayed
      * in the combo box.
      */
-    public final String[] getOrderParamPossibleChoices(final String param,
-                                                       final boolean ms) {
+    public String[] getOrderParamPossibleChoices(final String param,
+                                                 final boolean ms) {
         if (ms) {
             return paramOrdPossibleChoicesMS.get(param);
         } else {
@@ -3307,29 +3177,25 @@ public class CRMXML extends XML {
     }
 
     /** Returns whether the order parameter expects an integer value. */
-    public final boolean isOrderInteger(final String param) {
+    public boolean isOrderInteger(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /** Returns whether the order parameter expects a label value. */
-    public final boolean isOrderLabel(final String param) {
+    public boolean isOrderLabel(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_LABEL.equals(type);
     }
 
-    /**
-     * Returns whether the order parameter expects a boolean value.
-     */
-    public final boolean isOrderBoolean(final String param) {
+    /** Returns whether the order parameter expects a boolean value. */
+    public boolean isOrderBoolean(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
-    /**
-     * Whether the order parameter is of the time type.
-     */
-    public final boolean isOrderTimeType(final String param) {
+    /** Whether the order parameter is of the time type. */
+    public boolean isOrderTimeType(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_TIME.equals(type);
     }
@@ -3338,7 +3204,7 @@ public class CRMXML extends XML {
      * Returns name of the section order parameter that will be
      * displayed.
      */
-    public final String getOrderSection(final String param) {
+    public String getOrderSection(final String param) {
         return Tools.getString("CRMXML.OrderSectionParams");
     }
 
@@ -3346,8 +3212,7 @@ public class CRMXML extends XML {
      * Checks order parameter according to its type. Returns false if value
      * does not fit the type.
      */
-    public final boolean checkOrderParam(final String param,
-                                          final String value) {
+    public boolean checkOrderParam(final String param, final String value) {
         final String type = getOrderParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
@@ -3380,10 +3245,8 @@ public class CRMXML extends XML {
         return correctValue;
     }
 
-    /**
-     * Returns colocation parameters.
-     */
-    public final String[] getColocationParameters() {
+    /** Returns colocation parameters. */
+    public String[] getColocationParameters() {
         if (colParams != null) {
             return colParams.toArray(new String[colParams.size()]);
         }
@@ -3392,7 +3255,7 @@ public class CRMXML extends XML {
 
     /** Returns colocation parameters for resource sets. (Shown when a
      * placeholder is clicked, rsc_colocation tag). */
-    public final String[] getRscSetColocationParameters() {
+    public String[] getRscSetColocationParameters() {
         if (rscSetColParams != null) {
             return rscSetColParams.toArray(new String[rscSetColParams.size()]);
         }
@@ -3401,7 +3264,7 @@ public class CRMXML extends XML {
 
     /** Returns colocation parameters for resource sets. (Shown when an edge
      * is clicked, resource_set tag). */
-    public final String[] getRscSetColConnectionParameters() {
+    public String[] getRscSetColConnectionParameters() {
         if (rscSetColConnectionParams != null) {
             return rscSetColConnectionParams.toArray(
                                 new String[rscSetColConnectionParams.size()]);
@@ -3409,17 +3272,13 @@ public class CRMXML extends XML {
         return null;
     }
 
-    /**
-     * Checks if parameter is required or not.
-     */
-    public final boolean isColocationRequired(final String param) {
+    /** Checks if parameter is required or not. */
+    public boolean isColocationRequired(final String param) {
         return colRequiredParams.contains(param);
     }
 
-    /**
-     * Returns short description of the colocation parameter.
-     */
-    public final String getColocationParamShortDesc(final String param) {
+    /** Returns short description of the colocation parameter. */
+    public String getColocationParamShortDesc(final String param) {
         String shortDesc = paramColShortDescMap.get(param);
         if (shortDesc == null) {
             shortDesc = param;
@@ -3427,10 +3286,8 @@ public class CRMXML extends XML {
         return shortDesc;
     }
 
-    /**
-     * Returns long description of the colocation parameter.
-     */
-    public final String getColocationParamLongDesc(final String param) {
+    /** Returns long description of the colocation parameter. */
+    public String getColocationParamLongDesc(final String param) {
         final String shortDesc = getColocationParamShortDesc(param);
         String longDesc = paramColLongDescMap.get(param);
         if (longDesc == null) {
@@ -3439,24 +3296,18 @@ public class CRMXML extends XML {
         return Tools.html("<b>" + shortDesc + "</b>\n" + longDesc);
     }
 
-    /**
-     * Returns type of a colocation parameter. It can be string, integer...
-     */
-    public final String getColocationParamType(final String param) {
+    /** Returns type of a colocation parameter. It can be string, integer... */
+    public String getColocationParamType(final String param) {
         return paramColTypeMap.get(param);
     }
 
-    /**
-     * Returns default value for the colocation parameter.
-     */
-    public final String getColocationParamDefault(final String param) {
+    /** Returns default value for the colocation parameter. */
+    public String getColocationParamDefault(final String param) {
         return paramColDefaultMap.get(param);
     }
 
-    /**
-     * Returns the preferred value for the colocation parameter.
-     */
-    public final String getColocationParamPreferred(final String param) {
+    /** Returns the preferred value for the colocation parameter. */
+    public String getColocationParamPreferred(final String param) {
         return paramColPreferredMap.get(param);
     }
 
@@ -3464,8 +3315,8 @@ public class CRMXML extends XML {
      * Returns possible choices for a colocation parameter, that will be
      * displayed in the combo box.
      */
-    public final String[] getColocationParamPossibleChoices(final String param,
-                                                            final boolean ms) {
+    public String[] getColocationParamPossibleChoices(final String param,
+                                                      final boolean ms) {
         if (ms) {
             return paramColPossibleChoicesMS.get(param);
         } else {
@@ -3474,29 +3325,25 @@ public class CRMXML extends XML {
     }
 
     /** Returns whether the colocation parameter expects an integer value. */
-    public final boolean isColocationInteger(final String param) {
+    public boolean isColocationInteger(final String param) {
         final String type = getColocationParamType(param);
         return PARAM_TYPE_INTEGER.equals(type);
     }
 
     /** Returns whether the colocation parameter expects a label value. */
-    public final boolean isColocationLabel(final String param) {
+    public boolean isColocationLabel(final String param) {
         final String type = getColocationParamType(param);
         return PARAM_TYPE_LABEL.equals(type);
     }
 
-    /**
-     * Returns whether the colocation parameter expects a boolean value.
-     */
-    public final boolean isColocationBoolean(final String param) {
+    /** Returns whether the colocation parameter expects a boolean value. */
+    public boolean isColocationBoolean(final String param) {
         final String type = getOrderParamType(param);
         return PARAM_TYPE_BOOLEAN.equals(type);
     }
 
-    /**
-     * Whether the colocation parameter is of the time type.
-     */
-    public final boolean isColocationTimeType(final String param) {
+    /** Whether the colocation parameter is of the time type. */
+    public boolean isColocationTimeType(final String param) {
         final String type = getColocationParamType(param);
         return PARAM_TYPE_TIME.equals(type);
     }
@@ -3505,7 +3352,7 @@ public class CRMXML extends XML {
      * Returns name of the section colocation parameter that will be
      * displayed.
      */
-    public final String getColocationSection(final String param) {
+    public String getColocationSection(final String param) {
         return Tools.getString("CRMXML.ColocationSectionParams");
     }
 
@@ -3513,8 +3360,8 @@ public class CRMXML extends XML {
      * Checks colocation parameter according to its type. Returns false if value
      * does not fit the type.
      */
-    public final boolean checkColocationParam(final String param,
-                                              final String value) {
+    public boolean checkColocationParam(final String param,
+                                        final String value) {
         final String type = getColocationParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
@@ -3548,23 +3395,22 @@ public class CRMXML extends XML {
     }
 
     /** Returns whether drbddisk ra is present. */
-    public final boolean isDrbddiskPresent() {
+    public boolean isDrbddiskPresent() {
         return drbddiskPresent;
     }
 
     /** Returns whether linbit::drbd ra is present. */
-    public final boolean isLinbitDrbdPresent() {
+    public boolean isLinbitDrbdPresent() {
         return linbitDrbdPresent;
     }
 
-    /* Get resources that were removed but are in LRM. */
-    public final void parseLRM(
-                       final Node lrmNode,
-                       final List<String> resList,
-                       final Map<String, ResourceAgent> resourceTypeMap,
-                       final Map<String, Map<String, String>> parametersMap,
-                       final Set<String> orphanedList,
-                       final Map<String, Set<String>> failedClonesMap) {
+    /** Get resources that were removed but are in LRM. */
+    void parseLRM(final Node lrmNode,
+                  final List<String> resList,
+                  final Map<String, ResourceAgent> resourceTypeMap,
+                  final Map<String, Map<String, String>> parametersMap,
+                  final Set<String> orphanedList,
+                  final Map<String, Set<String>> failedClonesMap) {
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {
@@ -3606,7 +3452,7 @@ public class CRMXML extends XML {
     }
 
     /** Class that holds colocation data. */
-    public class ColocationData {
+    public final class ColocationData {
         /** Colocation id. */
         private final String id;
         /** Colocation resource 1. */
@@ -3621,12 +3467,12 @@ public class CRMXML extends XML {
         private final String score;
 
         /** Creates new ColocationData object. */
-        public ColocationData(final String id,
-                              final String rsc,
-                              final String withRsc,
-                              final String rscRole,
-                              final String withRscRole,
-                              final String score) {
+        ColocationData(final String id,
+                       final String rsc,
+                       final String withRsc,
+                       final String rscRole,
+                       final String withRscRole,
+                       final String score) {
             this.id = id;
             this.rsc = rsc;
             this.withRsc = withRsc;
@@ -3636,38 +3482,38 @@ public class CRMXML extends XML {
         }
 
         /** Returns colocation id. */
-        public final String getId() {
+        public String getId() {
             return id;
         }
 
         /** Returns colocation rsc. */
-        public final String getRsc() {
+        public String getRsc() {
             return rsc;
         }
 
         /** Returns colocation with-rsc. */
-        public final String getWithRsc() {
+        public String getWithRsc() {
             return withRsc;
         }
 
         /** Returns colocation rsc role. */
-        public final String getRscRole() {
+        public String getRscRole() {
             return rscRole;
         }
 
         /** Returns colocation with-rsc role. */
-        public final String getWithRscRole() {
+        public String getWithRscRole() {
             return withRscRole;
         }
 
         /** Returns colocation score. */
-        public final String getScore() {
+        public String getScore() {
             return score;
         }
     }
 
     /** Class that holds order data. */
-    public class OrderData {
+    public final class OrderData {
         /** Order id. */
         private final String id;
         /** Order resource 1. */
@@ -3684,13 +3530,13 @@ public class CRMXML extends XML {
         private final String thenAction;
 
         /** Creates new OrderData object. */
-        public OrderData(final String id,
-                         final String rscFirst,
-                         final String rscThen,
-                         final String score,
-                         final String symmetrical,
-                         final String firstAction,
-                         final String thenAction) {
+        OrderData(final String id,
+                  final String rscFirst,
+                  final String rscThen,
+                  final String score,
+                  final String symmetrical,
+                  final String firstAction,
+                  final String thenAction) {
             this.id = id;
             this.rscFirst = rscFirst;
             this.rscThen = rscThen;
@@ -3701,37 +3547,37 @@ public class CRMXML extends XML {
         }
 
         /** Returns order id. */
-        public final String getId() {
+        public String getId() {
             return id;
         }
 
         /** Returns order first rsc. */
-        public final String getRscFirst() {
+        String getRscFirst() {
             return rscFirst;
         }
 
         /** Returns order then rsc. */
-        public final String getRscThen() {
+        public String getRscThen() {
             return rscThen;
         }
 
         /** Returns order score. */
-        public final String getScore() {
+        public String getScore() {
             return score;
         }
 
         /** Returns order symmetrical attribute. */
-        public final String getSymmetrical() {
+        public String getSymmetrical() {
             return symmetrical;
         }
 
         /** Returns order action for "first" resource. */
-        public final String getFirstAction() {
+        public String getFirstAction() {
             return firstAction;
         }
 
         /** Returns order action for "then" resource. */
-        public final String getThenAction() {
+        public String getThenAction() {
             return thenAction;
         }
     }
@@ -3816,7 +3662,7 @@ public class CRMXML extends XML {
 
         /** Returns whether this resource set is equal to the supplied
          * resource set. The order of ids doesn't matter. */
-        public boolean equals(final RscSet oRscSet) {
+        boolean equals(final RscSet oRscSet) {
             if (oRscSet == null) {
                 return false;
             }
@@ -3863,7 +3709,7 @@ public class CRMXML extends XML {
         }
 
         /** Return whether rsc ids are empty. */
-        public boolean isRscIdsEmpty() {
+        boolean isRscIdsEmpty() {
             try {
                 mRscIdsLock.acquire();
             } catch (InterruptedException ie) {
@@ -3875,7 +3721,7 @@ public class CRMXML extends XML {
         }
 
         /** String represantation of the resources set. */
-        public String toString() {
+        @Override public String toString() {
             final StringBuffer s = new StringBuffer(20);
             s.append("rscset id: ");
             s.append(id);
@@ -3914,11 +3760,11 @@ public class CRMXML extends XML {
         private final boolean colocation;
 
         /** Creates new RscSetConnectionData object. */
-        public RscSetConnectionData(final RscSet rscSet1,
-                                    final RscSet rscSet2,
-                                    final String constraintId,
-                                    final int connectionPos,
-                                    final boolean colocation) {
+        RscSetConnectionData(final RscSet rscSet1,
+                             final RscSet rscSet2,
+                             final String constraintId,
+                             final int connectionPos,
+                             final boolean colocation) {
             this.rscSet1 = rscSet1;
             this.rscSet2 = rscSet2;
             this.constraintId = constraintId;
@@ -3952,8 +3798,7 @@ public class CRMXML extends XML {
         }
 
         /** Returns whether two resource sets are equal. */
-        private boolean rscSetsAreEqual(final RscSet set1,
-                                              final RscSet set2) {
+        private boolean rscSetsAreEqual(final RscSet set1, final RscSet set2) {
             if (set1 == set2) {
                 return true;
             }
@@ -3964,7 +3809,7 @@ public class CRMXML extends XML {
         }
 
         /** Whether the two resource sets are equal. */
-        public boolean equals(final RscSetConnectionData oRdata) {
+        boolean equals(final RscSetConnectionData oRdata) {
             final RscSet oRscSet1 = oRdata.getRscSet1();
             final RscSet oRscSet2 = oRdata.getRscSet2();
             return oRdata.isColocation() == colocation
@@ -4056,7 +3901,7 @@ public class CRMXML extends XML {
         }
 
         /** String represantation of the resource set data. */
-        public String toString() {
+        @Override public String toString() {
             final StringBuffer s = new StringBuffer(100);
             s.append("rsc set conn id: ");
             s.append(constraintId);
@@ -4081,6 +3926,4 @@ public class CRMXML extends XML {
             return s.toString();
         }
     }
-
-
 }

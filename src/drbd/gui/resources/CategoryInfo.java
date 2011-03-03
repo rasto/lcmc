@@ -45,24 +45,18 @@ public class CategoryInfo extends Info {
         super(name, browser);
     }
 
-    /**
-     * Info panel for the category.
-     */
-    public String getInfo() {
+    /** Info panel for the category. */
+    @Override String getInfo() {
         return null;
     }
 
-    /**
-     * Returns the icon.
-     */
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns the icon. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return Browser.CATEGORY_ICON;
     }
 
-    /**
-     * Returns info panel for this resource.
-     */
-    public JComponent getInfoPanel() {
+    /** Returns info panel for this resource. */
+    @Override public JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -96,7 +90,7 @@ public class CategoryInfo extends Info {
     }
 
     /** Selects the node in the menu and reloads everything underneath. */
-    public void selectMyself() {
+    @Override public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }

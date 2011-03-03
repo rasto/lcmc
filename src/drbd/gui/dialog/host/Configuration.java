@@ -48,7 +48,7 @@ import java.net.InetAddress;
  * @version $Id$
  *
  */
-public class Configuration extends DialogHost {
+final class Configuration extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Maximum hops. */
@@ -68,18 +68,14 @@ public class Configuration extends DialogHost {
     /** DNS timeout. */
     private static final int DNS_TIMEOUT = 5000;
 
-    /**
-     * Prepares a new <code>Configuration</code> object.
-     */
-    public Configuration(final WizardDialog previousDialog,
-                         final Host host) {
+    /** Prepares a new <code>Configuration</code> object. */
+    Configuration(final WizardDialog previousDialog,
+                  final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Finishes the dialog and stores the values.
-     */
-    protected final void finishDialog() {
+    /** Finishes the dialog and stores the values. */
+    @Override protected void finishDialog() {
         getHost().setHostname(Tools.join(",", hostnames, getHops()));
         final int hops = getHops();
         String[] ipsA = new String[hops];
@@ -93,7 +89,7 @@ public class Configuration extends DialogHost {
      * Returns the next dialog. Depending on if the host is already connected
      * it is the SSH or it is skipped and Devices is the next dialog.
      */
-    public final WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         if (hostnameOk) {
             if (getHost().isConnected()) {
                 return new Devices(this, getHost());
@@ -108,9 +104,9 @@ public class Configuration extends DialogHost {
     /**
      * Checks the fields and if they are correct the buttons will be enabled.
      */
-    protected final void checkFields(final GuiComboBox field) {
+    @Override protected void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 buttonClass(nextButton()).setEnabled(hostnameOk);
             }
         });
@@ -120,7 +116,7 @@ public class Configuration extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.Configuration.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.Configuration.Title");
     }
 
@@ -128,7 +124,7 @@ public class Configuration extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.Configuration.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.Configuration.Description");
     }
 
@@ -136,8 +132,7 @@ public class Configuration extends DialogHost {
      * Checks the dns entries for all the hosts.
      * This assumes that getHost().hostnameEntered was set.
      */
-    protected final boolean checkDNS(final int hop,
-                                     final String hostnameEntered) {
+    protected boolean checkDNS(final int hop, final String hostnameEntered) {
         InetAddress[] addresses = null;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
@@ -188,7 +183,7 @@ public class Configuration extends DialogHost {
     /**
      * Class that implements check dns thread.
      */
-    class CheckDNSThread extends Thread {
+    private class CheckDNSThread extends Thread {
         /** Number of hops. */
         private final int hop;
         /** Host names as entered by user. */
@@ -198,16 +193,14 @@ public class Configuration extends DialogHost {
          * Prepares a new <code>CheckDNSThread</code> object, with number of
          * hops and host names delimited with commas.
          */
-        public CheckDNSThread(final int hop, final String hostnameEntered) {
+        CheckDNSThread(final int hop, final String hostnameEntered) {
             super();
             this.hop = hop;
             this.hostnameEntered = hostnameEntered;
         }
 
-        /**
-         * Runs the check dns thread.
-         */
-        public final void run() {
+        /** Runs the check dns thread. */
+        @Override public void run() {
             answerPaneSetText(
                         Tools.getString("Dialog.Host.Configuration.DNSLookup"));
             hostnameOk = checkDNS(hop, hostnameEntered);
@@ -221,7 +214,7 @@ public class Configuration extends DialogHost {
             final String[] items = getHost().getIps(hop);
             if (items != null) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         ipCombo[hop].reloadComboBox(getHost().getIp(hop),
                                                     items);
 
@@ -234,18 +227,14 @@ public class Configuration extends DialogHost {
         }
     }
 
-    /**
-     * Returns number of hops.
-     */
-    protected final int getHops() {
+    /** Returns number of hops. */
+    protected int getHops() {
         final String hostnameEntered = getHost().getHostnameEntered();
         return Tools.charCount(hostnameEntered, ',') + 1;
     }
 
-    /**
-     * Inits dialog and starts dns check for every host.
-     */
-    protected final void initDialog() {
+    /** Inits dialog and starts dns check for every host. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
@@ -276,7 +265,7 @@ public class Configuration extends DialogHost {
 
             final Thread thread = new Thread(
                 new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         for (int i = 0; i < getHops(); i++) {
                             if (checkDNSThread[i] != null) {
                                 try {
@@ -303,7 +292,7 @@ public class Configuration extends DialogHost {
             thread.start();
         } else {
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     getHost().setHostname(
                                        Tools.join(",", hostnames, getHops()));
                     String name = getHost().getName();
@@ -311,7 +300,7 @@ public class Configuration extends DialogHost {
                         name = "";
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             for (int i = 0; i < getHops(); i++) {
                                 hostnameField[i].setEnabled(false);
                             }
@@ -333,7 +322,7 @@ public class Configuration extends DialogHost {
      * Returns input pane where names of host or more hosts delimited with
      * comma, can be entered.
      */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final int hops = getHops();
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);

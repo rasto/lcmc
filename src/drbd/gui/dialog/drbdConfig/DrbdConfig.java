@@ -38,18 +38,14 @@ public abstract class DrbdConfig extends WizardDialog {
     /** Drbd resource info object. */
     private final DrbdResourceInfo dri;
 
-    /**
-     * Prepares a new <code>DrbdConfig</code> object.
-     */
+    /** Prepares a new <code>DrbdConfig</code> object. */
     public DrbdConfig(final WizardDialog previousDialog,
                       final DrbdResourceInfo dri) {
         super(previousDialog);
         this.dri = dri;
     }
 
-    /**
-     * Returns drbd resource info object.
-     */
+    /** Returns drbd resource info object. */
     protected final DrbdResourceInfo getDrbdResourceInfo() {
         return dri;
     }

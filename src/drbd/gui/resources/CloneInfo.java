@@ -55,13 +55,11 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
 /**
  * This class holds clone service info object.
  */
-public class CloneInfo extends ServiceInfo {
+final class CloneInfo extends ServiceInfo {
     /** Service that belongs to this clone. */
     private ServiceInfo containedService = null;
-    /**
-     * Creates new CloneInfo object.
-     */
-    public CloneInfo(final ResourceAgent ra,
+    /** Creates new CloneInfo object. */
+    CloneInfo(final ResourceAgent ra,
                      final String name,
                      final boolean master,
                      final Browser browser) {
@@ -73,7 +71,7 @@ public class CloneInfo extends ServiceInfo {
      * Adds service to this clone set. Adds it in the submenu in
      * the menu tree and initializes it.
      */
-    public final void addCloneServicePanel(final ServiceInfo newServiceInfo) {
+    void addCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
@@ -93,7 +91,7 @@ public class CloneInfo extends ServiceInfo {
      * Adds service to this clone set it is called when the submenu
      * was already initialized but it was changed to be m/s set.
      */
-    public final void setCloneServicePanel(final ServiceInfo newServiceInfo) {
+    void setCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         getBrowser().addNameToServiceInfoHash(this);
         getBrowser().addToHeartbeatIdList(this);
@@ -105,10 +103,8 @@ public class CloneInfo extends ServiceInfo {
         getBrowser().reload(node, true);
     }
 
-    /**
-     * Returns info panel.
-     */
-    public final JComponent getInfoPanel() {
+    /** Returns info panel. */
+    @Override public JComponent getInfoPanel() {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             return cs.getInfoPanel();
@@ -117,21 +113,18 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns whether the resource has failed to start.
-     */
-    public final boolean isFailed(final boolean testOnly) {
+    /** Returns whether the resource has failed to start. */
+    @Override public boolean isFailed(final boolean testOnly) {
         final ServiceInfo ci = containedService;
         if (ci != null) {
             return ci.isFailed(testOnly);
         }
         return false;
     }
-    /**
-     * Returns fail count.
-     */
-    protected final String getFailCount(final String hostName,
-                                        final boolean testOnly) {
+
+    /** Returns fail count. */
+    @Override protected String getFailCount(final String hostName,
+                                            final boolean testOnly) {
         final ServiceInfo ci = containedService;
         if (ci != null) {
             return ci.getFailCount(hostName, testOnly);
@@ -140,7 +133,7 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns the main text that appears in the graph. */
-    public final String getMainTextForGraph() {
+    @Override public String getMainTextForGraph() {
         final ServiceInfo cs = containedService;
         if (cs == null) {
             return super.getMainTextForGraph();
@@ -150,7 +143,7 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns name of this resource, that is used in logs. */
-    public final String getNameForLog() {
+    @Override String getNameForLog() {
         final ServiceInfo cs = containedService;
         if (cs == null) {
             return super.getName();
@@ -159,10 +152,8 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns node name of the host where this service is slave.
-     */
-    public final List<String> getSlaveOnNodes(final boolean testOnly) {
+    /** Returns node name of the host where this service is slave. */
+    List<String> getSlaveOnNodes(final boolean testOnly) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -173,10 +164,8 @@ public class CloneInfo extends ServiceInfo {
     }
 
 
-    /**
-     * Returns node name of the host where this cloned service is running.
-     */
-    public final List<String> getRunningOnNodes(final boolean testOnly) {
+    /** Returns node name of the host where this cloned service is running. */
+    @Override List<String> getRunningOnNodes(final boolean testOnly) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
@@ -189,10 +178,8 @@ public class CloneInfo extends ServiceInfo {
         return null;
     }
 
-    /**
-     * Returns color for the host vertex.
-     */
-    public final List<Color> getHostColors(final boolean testOnly) {
+    /** Returns color for the host vertex. */
+    @Override public List<Color> getHostColors(final boolean testOnly) {
          List<String> nodes = getRunningOnNodes(testOnly);
          final List<String> slaves = getSlaveOnNodes(testOnly);
          int nodesCount = 0;
@@ -232,10 +219,8 @@ public class CloneInfo extends ServiceInfo {
         return fcString;
     }
 
-    /**
-     * Returns text with lines as array that appears in the cluster graph.
-     */
-    public final Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    /** Returns text with lines as array that appears in the cluster graph. */
+    @Override public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         final Map<String, String> notRunningOnNodes =
                                         new LinkedHashMap<String, String>();
@@ -333,8 +318,8 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns fail ping string that appears in the graph. */
-    protected String getPingCountString(final String hostName,
-                                        final boolean testOnly) {
+    @Override protected String getPingCountString(final String hostName,
+                                                  final boolean testOnly) {
         final ServiceInfo cs = getContainedService();
         if (cs != null) {
             return cs.getPingCountString(hostName, testOnly);
@@ -342,10 +327,8 @@ public class CloneInfo extends ServiceInfo {
         return "";
     }
 
-    /**
-     * Returns service that belongs to this clone.
-     */
-    public final ServiceInfo getContainedService() {
+    /** Returns service that belongs to this clone. */
+    @Override public ServiceInfo getContainedService() {
         return containedService;
     }
 
@@ -353,7 +336,7 @@ public class CloneInfo extends ServiceInfo {
      * Remove contained service and from there this clone service
      * will be removed.
      */
-    public final void removeMyself(final boolean testOnly) {
+    @Override public void removeMyself(final boolean testOnly) {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
@@ -364,16 +347,15 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** In clone resource check its containing service. */
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                                    final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }
 
     /** In clone resource check its containing service. */
-    public final boolean checkResourceFieldsCorrect(
-                                            final String param,
-                                            final String[] params,
-                                            final boolean fromServicesInfo) {
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params,
+                                       final boolean fromServicesInfo) {
         final boolean cor = super.checkResourceFieldsCorrect(param,
                                                              params,
                                                              fromServicesInfo,
@@ -389,16 +371,15 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** In clone resource check its containing service. */
-    public final boolean checkResourceFieldsChanged(final String param,
-                                                    final String[] params) {
+    @Override public boolean checkResourceFieldsChanged(final String param,
+                                                        final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
 
     /** In clone resource check its containing service. */
-    public final boolean checkResourceFieldsChanged(
-                                              final String param,
-                                              final String[] params,
-                                              final boolean fromServicesInfo) {
+    boolean checkResourceFieldsChanged(final String param,
+                                       final String[] params,
+                                       final boolean fromServicesInfo) {
         final boolean ch = super.checkResourceFieldsChanged(param,
                                                             params,
                                                             fromServicesInfo,
@@ -414,27 +395,8 @@ public class CloneInfo extends ServiceInfo {
         return ch || cch;
     }
 
-    ///**
-    // * In clone resource check its conaining service.
-    // */
-    //public final boolean checkResourceFields(final String param,
-    //                                         final String[] params) {
-    //    final boolean ccor = containedService.checkResourceFieldsCorrect(
-    //                              param,
-    //                              containedService.getParametersFromXML());
-    //    final boolean cchanged = containedService.checkResourceFieldsChanged(
-    //                              param,
-    //                              containedService.getParametersFromXML());
-    //    final boolean changed = checkResourceFieldsChanged(
-    //                                                  param,
-    //                                                  getParametersFromXML());
-    //    return ccor && (cchanged || changed);
-    //}
-
-    /**
-     * Returns whether service is started.
-     */
-    public final boolean isStarted(final boolean testOnly) {
+    /** Returns whether service is started. */
+    @Override boolean isStarted(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
@@ -451,10 +413,8 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns whether service is started.
-     */
-    public final boolean isStopped(final boolean testOnly) {
+    /** Returns whether service is started. */
+    @Override public boolean isStopped(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
@@ -471,10 +431,8 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns whether service is managed.
-     */
-    public final boolean isManaged(final boolean testOnly) {
+    /** Returns whether service is managed. */
+    @Override public boolean isManaged(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
@@ -491,11 +449,9 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Cleans up the resource.
-     */
-    public final void cleanupResource(final Host dcHost,
-                                      final boolean testOnly) {
+    /** Cleans up the resource. */
+    @Override void cleanupResource(final Host dcHost,
+                                   final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
@@ -520,10 +476,8 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Starts resource in crm.
-     */
-    public final void startResource(final Host dcHost, final boolean testOnly) {
+    /** Starts resource in crm. */
+    @Override void startResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
@@ -540,8 +494,10 @@ public class CloneInfo extends ServiceInfo {
             }
         }
     }
+
     /** Adds migrate and unmigrate menu items. */
-    protected void addMigrateMenuItems(final List<UpdatableItem> items) {
+    @Override protected void addMigrateMenuItems(
+                                             final List<UpdatableItem> items) {
         super.addMigrateMenuItems(items);
         if (!getService().isMaster()) {
             return;
@@ -566,16 +522,16 @@ public class CloneInfo extends ServiceInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
-                    public boolean predicate() {
+                    @Override public boolean predicate() {
                         return host.isClStatus();
                     }
 
-                    public boolean visiblePredicate() {
+                    @Override public boolean visiblePredicate() {
                         return !host.isClStatus()
                                || enablePredicate() == null;
                     }
 
-                    public String enablePredicate() {
+                    @Override public String enablePredicate() {
                         final List<String> runningOnNodes =
                                                getRunningOnNodes(testOnly);
                         if (runningOnNodes == null
@@ -600,7 +556,7 @@ public class CloneInfo extends ServiceInfo {
                         }
                     }
 
-                    public void action() {
+                    @Override public void action() {
                         hidePopup();
                         if (getService().isMaster()) {
                             /* without role=master */
@@ -616,7 +572,7 @@ public class CloneInfo extends ServiceInfo {
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
                getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
-                public void action(final Host dcHost) {
+                @Override public void action(final Host dcHost) {
                     if (getService().isMaster()) {
                         /* without role=master */
                         superMigrateFromResource(dcHost,
@@ -635,7 +591,7 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Stops resource in crm. */
-    public final void stopResource(final Host dcHost, final boolean testOnly) {
+    @Override void stopResource(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
@@ -654,15 +610,15 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Workaround to call method from super. */
-    private final void superMigrateFromResource(final Host dcHost,
-                                                final String fromHost,
-                                                final boolean testOnly) {
+    private void superMigrateFromResource(final Host dcHost,
+                                          final String fromHost,
+                                          final boolean testOnly) {
         super.migrateFromResource(dcHost, fromHost, testOnly);
     }
     /** Migrates resource in heartbeat from current location. */
-    public final void migrateFromResource(final Host dcHost,
-                                          final String fromHost,
-                                          final boolean testOnly) {
+    @Override void migrateFromResource(final Host dcHost,
+                             final String fromHost,
+                             final boolean testOnly) {
         String role = null;
         if (getService().isMaster()) {
             role = "Master";
@@ -687,9 +643,9 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Sets whether the service is managed. */
-    public final void setManaged(final boolean isManaged,
-                                 final Host dcHost,
-                                 final boolean testOnly) {
+    @Override void setManaged(final boolean isManaged,
+                              final Host dcHost,
+                              final boolean testOnly) {
         if (!testOnly) {
             setUpdated(true);
         }
@@ -708,12 +664,12 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
-    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
+    @Override protected void addMoreMigrateMenuItems(final MyMenu submenu) {
         /* no migrate / unmigrate menu advanced items for clones. */
     }
 
     /** Returns items for the clone popup. */
-    public final List<UpdatableItem> createPopup() {
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         final ServiceInfo cs = containedService;
         if (cs == null) {
@@ -728,13 +684,13 @@ public class CloneInfo extends ServiceInfo {
             private static final long serialVersionUID = 1L;
             private final Mutex mUpdateLock = new Mutex();
 
-            public String enablePredicate() {
+            @Override public String enablePredicate() {
                 return null;
             }
 
             public void update() {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         try {
                             if (mUpdateLock.attempt(0)) {
                                 updateThread();
@@ -750,18 +706,18 @@ public class CloneInfo extends ServiceInfo {
 
             private void updateThread() {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         setEnabled(false);
                     }
                 });
                 Tools.invokeAndWait(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         removeAll();
                     }
                 });
                 for (final UpdatableItem u : cs.createPopup()) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             add((JMenuItem) u);
                             u.update();
                         }
@@ -774,10 +730,8 @@ public class CloneInfo extends ServiceInfo {
         return items;
     }
 
-    /**
-     * Returns whether info panel is already created.
-     */
-    public final boolean isInfoPanelOk() {
+    /** Returns whether info panel is already created. */
+    @Override boolean isInfoPanelOk() {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             return cs.isInfoPanelOk();
@@ -785,10 +739,8 @@ public class CloneInfo extends ServiceInfo {
         return false;
     }
 
-    /**
-     * Update menus with positions and calles their update methods.
-     */
-    public final void updateMenus(final Point2D pos) {
+    /** Update menus with positions and calles their update methods. */
+    @Override void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
         final ServiceInfo cs = containedService;
         if (cs != null) {
@@ -796,10 +748,8 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /**
-     * Returns section to which the specified parameter belongs.
-     */
-    protected final String getSection(final String param) {
+    /** Returns section to which the specified parameter belongs. */
+    @Override protected String getSection(final String param) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             String name;
@@ -813,10 +763,8 @@ public class CloneInfo extends ServiceInfo {
         return super.getSection(param);
     }
 
-    /**
-     * Returns possible choices for drop down lists.
-     */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    /** Returns possible choices for drop down lists. */
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(getResourceAgent(), param);
@@ -828,7 +776,7 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns the icon for the category. */
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
         return getMenuIcon(testOnly);
     }
 }

@@ -44,7 +44,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class Name extends DialogCluster {
+public final class Name extends DialogCluster {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Name field. */
@@ -52,36 +52,27 @@ public class Name extends DialogCluster {
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
 
-    /**
-     * Prepares a new <code>Name</code> object.
-     */
-    public Name(final WizardDialog previousDialog,
-                final Cluster cluster) {
+    /** Prepares a new <code>Name</code> object. */
+    public Name(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
 
-    /**
-     * Called before the dialog is finished. It saves the value.
-     */
-    protected final void finishDialog() {
+    /** Called before the dialog is finished. It saves the value. */
+    @Override protected void finishDialog() {
         getCluster().setName(nameField.getStringValue().trim());
     }
 
-    /**
-     * Returns the next dialog after this dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog after this dialog. */
+    @Override public WizardDialog nextDialog() {
         return new ClusterHosts(this, getCluster());
     }
 
-    /**
-     * Checks the field if it is correct and renames the tab.
-     */
-    protected final void checkFields(final GuiComboBox field) {
+    /** Checks the field if it is correct and renames the tab. */
+    @Override protected void checkFields(final GuiComboBox field) {
         final boolean isValid =
                             (nameField.getStringValue().trim().length() > 0);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
             }
         });
@@ -89,31 +80,25 @@ public class Name extends DialogCluster {
                                         nameField.getStringValue().trim());
     }
 
-    /**
-     * Returns the title of the dialog.
-     */
-    protected final String getClusterDialogTitle() {
+    /** Returns the title of the dialog. */
+    @Override protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Name.Title");
     }
 
-    /**
-     * Returns the description of the dialog.
-     */
-    protected final String getDescription() {
+    /** Returns the description of the dialog. */
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Name.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
 
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 if (!Tools.getConfigData().existsCluster(getCluster())) {
                     Tools.getConfigData().addClusterToClusters(getCluster());
                     Tools.getGUIData().addClusterTab(getCluster());
@@ -121,7 +106,7 @@ public class Name extends DialogCluster {
             }
         });
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 nameField.requestFocus();
             }
         });
@@ -129,23 +114,21 @@ public class Name extends DialogCluster {
             final String name = Tools.getConfigData().getAutoClusters().get(0);
             if (!".".equals(name)) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         nameField.setValue(name);
                     }
                 });
             }
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pressNextButton();
                 }
             });
         }
     }
 
-    /**
-     * Returns panel where user can enter a cluster name.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns panel where user can enter a cluster name. */
+    @Override protected JComponent getInputPane() {
         /* Name */
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel pane = new JPanel(new SpringLayout());

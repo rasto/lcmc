@@ -65,9 +65,7 @@ public final class DrbdMC extends JPanel {
     private DrbdMC() {
         /* no instantiation possible. */
     }
-    /**
-     * Create the GUI and show it.
-     */
+    /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
         final java.util.List<Object> buttonGradient = Arrays.asList(
           new Object[] {new Float(.3f),
@@ -157,7 +155,7 @@ public final class DrbdMC extends JPanel {
          */
         public final void windowClosing(final WindowEvent event) {
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     // TODO: don't try to reconnect when exiting
                     System.out.println("saving...");
                     for (int i = 0; i < 10; i++) {
@@ -384,7 +382,7 @@ public final class DrbdMC extends JPanel {
             mainFrame.setJMenuBar(getMenuBar());
             mainFrame.setContentPane(getMainPanel());
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     createAndShowGUI((Container) mainFrame);
                 }
             });

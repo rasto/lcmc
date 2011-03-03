@@ -26,35 +26,30 @@ import drbd.data.ResourceAgent;
 import drbd.data.Host;
 
 import java.util.Map;
+
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
  * treated in special way.
  */
-class LinbitDrbdInfo extends ServiceInfo {
-    /**
-     * Creates new LinbitDrbdInfo object.
-     */
-    public LinbitDrbdInfo(final String name,
-                          final ResourceAgent ra,
-                          final Browser browser) {
+final class LinbitDrbdInfo extends ServiceInfo {
+    /** Creates new LinbitDrbdInfo object. */
+    LinbitDrbdInfo(final String name,
+                   final ResourceAgent ra,
+                   final Browser browser) {
         super(name, ra, browser);
     }
 
-    /**
-     * Creates new linbit::drbd info object.
-     */
-    public LinbitDrbdInfo(final String name,
-                          final ResourceAgent ra,
-                          final String hbId,
-                          final Map<String, String> resourceNode,
-                          final Browser browser) {
+    /** Creates new linbit::drbd info object. */
+    LinbitDrbdInfo(final String name,
+                   final ResourceAgent ra,
+                   final String hbId,
+                   final Map<String, String> resourceNode,
+                   final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
     }
 
-    /**
-     * Returns string representation of the linbit::drbd service.
-     */
-    public String toString() {
+    /** Returns string representation of the linbit::drbd service. */
+    @Override public String toString() {
         final StringBuffer s = new StringBuffer(30);
         final String provider = getResourceAgent().getProvider();
         if (!HB_HEARTBEAT_PROVIDER.equals(provider)
@@ -76,25 +71,19 @@ class LinbitDrbdInfo extends ServiceInfo {
         return s.toString();
     }
 
-    /**
-     * Returns resource name.
-     */
-    public String getResourceName() {
+    /** Returns resource name. */
+    String getResourceName() {
         return getParamSaved("drbd_resource");
     }
 
-    /**
-     * Sets resource name. TODO: not used?
-     */
-    public void setResourceName(final String resourceName) {
+    /** Sets resource name. TODO: not used? */
+    void setResourceName(final String resourceName) {
         getResource().setValue("drbd_resource", resourceName);
     }
 
-    /**
-     * Removes the linbit::drbd service.
-     */
-    public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
+    /** Removes the linbit::drbd service. */
+    @Override public void removeMyselfNoConfirm(final Host dcHost,
+                                                final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -103,8 +92,9 @@ class LinbitDrbdInfo extends ServiceInfo {
             dri.setUsedByCRM(null);
         }
     }
+
     /** Sets service parameters with values from resourceNode hash. */
-    public void setParameters(final Map<String, String> resourceNode) {
+    @Override void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -116,7 +106,7 @@ class LinbitDrbdInfo extends ServiceInfo {
                 dri.setUsedByCRM(null);
             }
             //final Thread t = new Thread(new Runnable() {
-            //    public void run() {
+            //    @Override public void run() {
             //        dri.updateMenus(null);
             //    }
             //});

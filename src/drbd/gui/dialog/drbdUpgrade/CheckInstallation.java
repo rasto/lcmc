@@ -45,7 +45,7 @@ import java.awt.event.ActionEvent;
  * @version $Id$
  *
  */
-public class CheckInstallation extends DialogHost {
+final class CheckInstallation extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
@@ -79,25 +79,21 @@ public class CheckInstallation extends DialogHost {
     private boolean drbdOk = false;
 
 
-    /**
-     * Prepares a new <code>CheckInstallation</code> object.
-     */
-    public CheckInstallation(final WizardDialog previousDialog,
-                             final Host host) {
+    /** Prepares a new <code>CheckInstallation</code> object. */
+    CheckInstallation(final WizardDialog previousDialog,
+                      final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         drbdOk = false;
         final CheckInstallation thisClass = this;
         DRBD_BUTTON.setEnabled(false);
         DRBD_BUTTON.addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
@@ -112,11 +108,12 @@ public class CheckInstallation extends DialogHost {
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  checkDrbd(ans);
                              }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                          final String ans,
+                                                          final int exitCode) {
                                  checkDrbd(""); /* not installed */
                              }
                          },
@@ -125,10 +122,8 @@ public class CheckInstallation extends DialogHost {
                          SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
-    /**
-     * Checks if drbd installation was ok.
-     */
-    public final void checkDrbd(final String ans) {
+    /** Checks if drbd installation was ok. */
+    void checkDrbd(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             DRBD_LABEL.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
@@ -158,10 +153,8 @@ public class CheckInstallation extends DialogHost {
         }
     }
 
-    /**
-     * Returns the next dialog object. It is set dynamicaly.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog object. It is set dynamicaly. */
+    @Override public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -169,7 +162,7 @@ public class CheckInstallation extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.CheckInstallation.Title");
     }
 
@@ -177,7 +170,7 @@ public class CheckInstallation extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.CheckInstallation.Description");
     }
 
@@ -198,10 +191,8 @@ public class CheckInstallation extends DialogHost {
         return pane;
     }
 
-    /**
-     * Returns input pane with installation pane and answer pane.
-     */
-    protected final JPanel getInputPane() {
+    /** Returns input pane with installation pane and answer pane. */
+    @Override protected JPanel getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());

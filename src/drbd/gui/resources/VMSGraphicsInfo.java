@@ -48,19 +48,25 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual graphics displays.
  */
-public class VMSGraphicsInfo extends VMSHardwareInfo {
+public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> portCB =  new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> portCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> listenCB = new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> listenCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> passwdCB = new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> passwdCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> keymapCB =  new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> keymapCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> displayCB =  new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> displayCB =
+                                            new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> xauthCB =  new HashMap<String, GuiComboBox>();
+    private Map<String, GuiComboBox> xauthCB =
+                                            new HashMap<String, GuiComboBox>();
 
     /** Parameters. AUTOPORT is generated */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
@@ -136,19 +142,19 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     private JComponent tablePanel = null;
 
     /** Creates the VMSGraphicsInfo object. */
-    public VMSGraphicsInfo(final String name, final Browser browser,
+    VMSGraphicsInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
-    protected final void addHardwareTable(final JPanel mainPanel) {
+    @Override protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Displays",
                                    VMSVirtualDomainInfo.GRAPHICS_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     tablePanel.setVisible(false);
                 }
             });
@@ -157,17 +163,17 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns service icon in the menu. */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return VMSVirtualDomainInfo.VNC_ICON_SMALL;
     }
 
     /** Returns long description of the specified parameter. */
-    protected final String getParamLongDesc(final String param) {
+    @Override protected String getParamLongDesc(final String param) {
         return getParamShortDesc(param);
     }
 
     /** Returns short description of the specified parameter. */
-    protected final String getParamShortDesc(final String param) {
+    @Override protected String getParamShortDesc(final String param) {
         final String name = SHORTNAME_MAP.get(param);
         if (name == null) {
             return param;
@@ -176,22 +182,22 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns preferred value for specified parameter. */
-    protected final String getParamPreferred(final String param) {
+    @Override protected String getParamPreferred(final String param) {
         return PREFERRED_VALUES.get(param);
     }
 
     /** Returns default value for specified parameter. */
-    protected final String getParamDefault(final String param) {
+    @Override protected String getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
     /** Returns parameters. */
-    public final String[] getParametersFromXML() {
+    @Override public String[] getParametersFromXML() {
         return PARAMETERS;
     }
 
     /** Returns possible choices for drop down lists. */
-    protected final Object[] getParamPossibleChoices(final String param) {
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         if (GraphicsData.LISTEN.equals(param)) {
             Map<String, String> networksIntersection = null;
 
@@ -248,42 +254,42 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns section to which the specified parameter belongs. */
-    protected final String getSection(final String param) {
+    @Override protected String getSection(final String param) {
         return "Display Options";
     }
 
     /** Returns true if the specified parameter is required. */
-    protected final boolean isRequired(final String param) {
+    @Override protected boolean isRequired(final String param) {
         return IS_REQUIRED.contains(param);
     }
 
     /** Returns true if the specified parameter is integer. */
-    protected final boolean isInteger(final String param) {
+    @Override protected boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is label. */
-    protected final boolean isLabel(final String param) {
+    @Override protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    protected final boolean isTimeType(final String param) {
+    @Override protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns whether parameter is checkbox. */
-    protected final boolean isCheckBox(final String param) {
+    @Override protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns the type of the parameter. */
-    protected final String getParamType(final String param) {
+    @Override protected String getParamType(final String param) {
         return "undef"; // TODO:
     }
 
     /** Returns the regexp of the parameter. */
-    protected final String getParamRegexp(final String param) {
+    @Override protected String getParamRegexp(final String param) {
         if (GraphicsData.PORT.equals(param)) {
             return "^(-1|\\d+|aa)$";
         } else if (GraphicsData.LISTEN.equals(param)) {
@@ -295,12 +301,12 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns type of the field. */
-    protected final GuiComboBox.Type getFieldType(final String param) {
+    @Override protected GuiComboBox.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
     /** Returns device parameters. */
-    protected final Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave() {
         final Map<String, String> parameters = new HashMap<String, String>();
         String[] params = {};
         boolean vnc = false;
@@ -335,12 +341,12 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Applies the changes. */
-    public final void apply(final boolean testOnly) {
+    @Override void apply(final boolean testOnly) {
         if (testOnly) {
             return;
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 getApplyButton().setEnabled(false);
                 getRevertButton().setEnabled(false);
             }
@@ -365,7 +371,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
             getBrowser().periodicalVMSUpdate(h);
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 tablePanel.setVisible(true);
             }
         });
@@ -373,7 +379,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns data for the table. */
-    protected final Object[][] getTableData(final String tableName) {
+    @Override protected Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.GRAPHICS_TABLE.equals(tableName)) {
@@ -390,33 +396,35 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         return false;
     }
 
     /** Whether the parameter should be enabled. */
-    protected final String isEnabled(final String param) {
+    @Override protected String isEnabled(final String param) {
         return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
+                                                        final String param) {
          return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
     }
 
     /** Returns access type of this parameter. */
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                        final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
-    protected final boolean checkParam(final String param,
-                                       final String newValue) {
+    @Override protected boolean checkParam(final String param,
+                                           final String newValue) {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = "vnc".equals(newValue);
             final boolean sdl = "sdl".equals(newValue);
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     for (final String p : listenCB.keySet()) {
                         listenCB.get(p).setVisible(vnc);
                     }
@@ -445,7 +453,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Updates parameters. */
-    public final void updateParameters() {
+    void updateParameters() {
         final Map<String, GraphicsData> graphicDisplays =
                               getVMSVirtualDomainInfo().getGraphicDisplays();
         if (graphicDisplays != null) {
@@ -486,7 +494,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns string representation. */
-    public final String toString() {
+    @Override public String toString() {
         final StringBuffer s = new StringBuffer(30);
         if (getName() == null) {
             s.append("new graphics device...");
@@ -498,7 +506,7 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Removes this graphics device without confirmation dialog. */
-    protected final void removeMyselfNoConfirm(final boolean testOnly) {
+    @Override protected void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
         }
@@ -522,17 +530,17 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     /**
      * Returns whether this item is removeable (null), or string why it isn't.
      */
-    protected final String isRemoveable() {
+    @Override protected String isRemoveable() {
         return null;
     }
 
     /** Returns "add new" button. */
-    public static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Graphics Display");
         newBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         vdi.addGraphicsPanel();
                     }
                 });
@@ -543,9 +551,9 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns combo box for parameter. */
-    protected final GuiComboBox getParamComboBox(final String param,
-                                                 final String prefix,
-                                                 final int width) {
+    @Override protected GuiComboBox getParamComboBox(final String param,
+                                                     final String prefix,
+                                                     final int width) {
         final GuiComboBox paramCB =
                                  super.getParamComboBox(param, prefix, width);
         if (GraphicsData.PORT.equals(param)) {
@@ -589,17 +597,17 @@ public class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Modify device xml. */
-    protected final void modifyXML(final VMSXML vmsxml,
-                                   final Node node,
-                                   final String domainName,
-                                   final Map<String, String> params) {
+    @Override protected void modifyXML(final VMSXML vmsxml,
+                                       final Node node,
+                                       final String domainName,
+                                       final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifyGraphicsXML(node, domainName, params);
         }
     }
 
     /** Returns real parameters. */
-    public String[] getRealParametersFromXML() {
+    @Override String[] getRealParametersFromXML() {
         if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
             return VNC_PARAMETERS;
         } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {

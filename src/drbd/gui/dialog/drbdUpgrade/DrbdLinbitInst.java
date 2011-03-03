@@ -31,22 +31,17 @@ import drbd.gui.dialog.WizardDialog;
  * @version $Id$
  *
  */
-public class DrbdLinbitInst extends drbd.gui.dialog.host.DrbdLinbitInst {
+final class DrbdLinbitInst extends drbd.gui.dialog.host.DrbdLinbitInst {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>DrbdLinbitInst</code> object.
-     */
-    public DrbdLinbitInst(final WizardDialog previousDialog,
-                          final Host host) {
+    /** Prepares a new <code>DrbdLinbitInst</code> object. */
+    DrbdLinbitInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Returns the next dialog.cluster.InitForUpgrade.
-     */
-    public WizardDialog nextDialog() {
+    /** Returns the next dialog.cluster.InitForUpgrade. */
+    @Override public WizardDialog nextDialog() {
         return new InitForUpgrade(null, getHost().getCluster());
     }
 }

@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are commands for debian version 3.
  */
-public class DistResource_debian_3 extends
-            java.util.ListResourceBundle {
+public final class DistResource_debian_3 extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

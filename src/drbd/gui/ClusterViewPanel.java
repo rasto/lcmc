@@ -57,7 +57,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
+final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
@@ -72,10 +72,8 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Advanced mode button. */
     private final JCheckBox advancedModeCB;
 
-    /**
-     * Prepares a new <code>ClusterViewPanel</code> object.
-     */
-    public ClusterViewPanel(final Cluster cluster) {
+    /** Prepares a new <code>ClusterViewPanel</code> object. */
+    ClusterViewPanel(final Cluster cluster) {
         super();
         this.cluster = cluster;
         cluster.createClusterBrowser();
@@ -91,9 +89,9 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                             Tools.getString("ClusterViewPanel.ClusterWizard"));
         clusterWizardButton.setPreferredSize(new Dimension(150, 20));
         clusterWizardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         final EditClusterDialog dialog =
                                                new EditClusterDialog(cluster);
                         dialog.showDialogs();
@@ -127,11 +125,11 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                                         Tools.getConfigData().getAccessType();
         opModeCB.setSelectedItem(ConfigData.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
-            public void itemStateChanged(final ItemEvent e) {
+            @Override public void itemStateChanged(final ItemEvent e) {
                 final String opMode = (String) e.getItem();
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             ConfigData.AccessType type =
                                         ConfigData.ACCESS_TYPE_MAP.get(opMode);
                             if (type == null) {
@@ -174,19 +172,19 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     }
 
     /** Returns advanced mode check box. That hides advanced options. */
-    public final JCheckBox createAdvancedModeButton() {
+    JCheckBox createAdvancedModeButton() {
         final JCheckBox emCB = new JCheckBox(Tools.getString(
                                                       "Browser.AdvancedMode"));
         emCB.setBackground(Tools.getDefaultColor(
                                             "ViewPanel.Status.Background"));
         emCB.setSelected(Tools.getConfigData().isAdvancedMode());
         emCB.addItemListener(new ItemListener() {
-            public void itemStateChanged(final ItemEvent e) {
+            @Override public void itemStateChanged(final ItemEvent e) {
                 final boolean selected =
                                     e.getStateChange() == ItemEvent.SELECTED;
                 if (selected != Tools.getConfigData().isAdvancedMode()) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             Tools.getConfigData().setAdvancedMode(selected);
                             Tools.getGUIData().setAdvancedModeGlobally(
                                                                      cluster,
@@ -202,7 +200,7 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     }
 
     /** This is called when there was added a new host. */
-    public final void allHostsUpdate() {
+    @Override public void allHostsUpdate() {
         cluster.getBrowser().updateClusterResources(
                                                 cluster.getHostsArray(),
                                                 cluster.getCommonFileSystems(),
@@ -210,19 +208,19 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     }
 
     /** Refreshes the cluster data in the view. */
-    public final void refresh() {
+    void refresh() {
         cluster.getBrowser().getTreeModel().reload();
     }
 
     /** Gets cluster object. */
-    public final Cluster getCluster() {
+    Cluster getCluster() {
         return cluster;
     }
 
     /** Modify the operating modes combo box according to the godmode. */
-    public final void resetOperatingModes(final boolean godMode) {
+    void resetOperatingModes(final boolean godMode) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 if (godMode) {
                     operatingModesCB.addItem(ConfigData.OP_MODE_GOD);
                     operatingModesCB.setSelectedItem(ConfigData.OP_MODE_GOD);
@@ -234,18 +232,18 @@ public class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     }
 
     /** Sets operating mode. */
-    public final void setOperatingMode(final String opMode) {
+    void setOperatingMode(final String opMode) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 operatingModesCB.setSelectedItem(opMode);
             }
         });
     }
 
     /** Sets advanced mode. */
-    public final void setAdvancedMode(final boolean advancedMode) {
+    void setAdvancedMode(final boolean advancedMode) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 advancedModeCB.setSelected(advancedMode);
             }
         });

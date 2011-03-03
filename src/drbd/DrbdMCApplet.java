@@ -40,9 +40,7 @@ public final class DrbdMCApplet extends JApplet {
     private static final int TOOLTIP_INITIAL_DELAY = 200;
     /** Dismiss delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_DISMISS_DELAY = 100000;
-    /**
-     * Public applet constructor.
-     */
+    /** Public applet constructor. */
     public DrbdMCApplet() {
     }
 

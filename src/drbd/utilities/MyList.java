@@ -41,7 +41,7 @@ import java.awt.Rectangle;
 /**
  * A Jlist with updatable tooltips.
  */
-public class MyList extends JList implements ComponentWithTest {
+public final class MyList extends JList implements ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Tools tip object. */
@@ -54,9 +54,7 @@ public class MyList extends JList implements ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /**
-     * Prepares a new <code>MyList</code> object.
-     */
+    /** Prepares a new <code>MyList</code> object. */
     public MyList(final ListModel dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
@@ -68,10 +66,8 @@ public class MyList extends JList implements ComponentWithTest {
         setBackground(bg);
     }
 
-    /**
-     * Creates tooltip.
-     */
-    public final JToolTip createToolTip() {
+    /** Creates tooltip. */
+    public JToolTip createToolTip() {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }
@@ -82,17 +78,13 @@ public class MyList extends JList implements ComponentWithTest {
         return toolTip;
     }
 
-    /**
-     * Sets tooltip's background color.
-     */
-    public final void setToolTipBackground(final Color toolTipBackground) {
+    /** Sets tooltip's background color. */
+    @Override public void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
-    /**
-     * Sets tooltip and wiggles the mouse to refresh it.
-     */
-    public final void setToolTipText(final String toolTipText) {
+    /** Sets tooltip and wiggles the mouse to refresh it. */
+    @Override public void setToolTipText(final String toolTipText) {
         if (toolTipText == null) {
             return;
         }
@@ -121,9 +113,11 @@ public class MyList extends JList implements ComponentWithTest {
         }
     }
 
-    /** Returns location of the tooltip, so that it does not cover the menu
-     * item. */
-    public final Point getToolTipLocation(final MouseEvent event) {
+    /**
+     * Returns location of the tooltip, so that it does not cover the menu
+     * item.
+     */
+    @Override public Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();
@@ -136,7 +130,7 @@ public class MyList extends JList implements ComponentWithTest {
     }
 
     /** Clean up. */
-    public final void cleanup() {
+    void cleanup() {
         for (int i = 0; i < getModel().getSize(); i++) {
             final MyMenuItem m = (MyMenuItem) getModel().getElementAt(i);
             m.cleanup();
@@ -147,7 +141,8 @@ public class MyList extends JList implements ComponentWithTest {
         for (final java.awt.event.KeyListener kl : getKeyListeners()) {
             removeKeyListener(kl);
         }
-        for (final java.awt.event.MouseMotionListener mml : getMouseMotionListeners()) {
+        for (final java.awt.event.MouseMotionListener mml
+                                                : getMouseMotionListeners()) {
             removeMouseMotionListener(mml);
         }
         toolTip.setComponent(null);

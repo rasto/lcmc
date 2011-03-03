@@ -77,12 +77,12 @@ public class Browser {
     /** Color of the most of backgrounds. */
     public static final Color PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Background");
-    /** Color of the extra panel with advanced options. */
-    public static final Color EXTRA_PANEL_BACKGROUND =
-                    Tools.getDefaultColor("ViewPanel.Status.Background");
     /** Color of the status backgrounds. */
     public static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Color of the extra panel with advanced options. */
+    static final Color EXTRA_PANEL_BACKGROUND =
+                    Tools.getDefaultColor("ViewPanel.Status.Background");
     /** DRBD test lock. */
     private final Mutex mDRBDtestLock = new Mutex();
 
@@ -100,23 +100,17 @@ public class Browser {
         treeModel = new DefaultTreeModel(treeTop);
     }
 
-    /**
-     * Sets the tree instance variable.
-     */
+    /** Sets the tree instance variable. */
     protected final void setTree(final JTree tree) {
         this.tree = tree;
     }
 
-    /**
-     * Returns the tree object.
-     */
+    /** Returns the tree object. */
     public final JTree getTree() {
         return tree;
     }
 
-    /**
-     * Repaints the menu tree.
-     */
+    /** Repaints the menu tree. */
     public final void repaintTree() {
         final JTree t = tree;
         if (t != null) {
@@ -124,10 +118,8 @@ public class Browser {
         }
     }
 
-    /**
-     * Gets node that is on the top of the tree.
-     */
-    public final DefaultMutableTreeNode getTreeTop() {
+    /** Gets node that is on the top of the tree. */
+    final DefaultMutableTreeNode getTreeTop() {
         return treeTop;
     }
 
@@ -135,7 +127,7 @@ public class Browser {
     public final void reload(final DefaultMutableTreeNode node,
                              final boolean select) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 TreePath path = null;
                 final JTree t = tree;
                 if (t != null) {
@@ -155,7 +147,7 @@ public class Browser {
     /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 treeModel.nodeChanged(node);
             }
         });
@@ -173,17 +165,13 @@ public class Browser {
         }
     }
 
-    /**
-     * Sets node variable in the info object that this tree node points to.
-     */
+    /** Sets node variable in the info object that this tree node points to. */
     public final void setNode(final DefaultMutableTreeNode node) {
         ((Info) node.getUserObject()).setNode(node);
     }
 
-    /**
-     * Gets tree model object.
-     */
-    public final DefaultTreeModel getTreeModel() {
+    /** Gets tree model object. */
+    final DefaultTreeModel getTreeModel() {
         return treeModel;
     }
 
@@ -193,7 +181,7 @@ public class Browser {
      * graphical view, it returns a split pane with this view and the info
      * underneath.
      */
-    public final JComponent getInfoPanel(final Object nodeInfo) {
+    final JComponent getInfoPanel(final Object nodeInfo) {
         if (nodeInfo == null) {
             return null;
         }
@@ -228,24 +216,18 @@ public class Browser {
         }
     }
 
-    /**
-     * Returns cell rendererer for tree.
-     */
-    public final CellRenderer getCellRenderer() {
+    /** Returns cell rendererer for tree. */
+    final CellRenderer getCellRenderer() {
         return new CellRenderer();
     }
 
-    /**
-     * Renders the cells for the menu.
-     */
+    /** Renders the cells for the menu. */
     class CellRenderer extends DefaultTreeCellRenderer {
         /** Serial version UUID. */
         private static final long serialVersionUID = 1L;
 
-        /**
-         * Creates new CellRenderer object.
-         */
-        public CellRenderer() {
+        /** Creates new CellRenderer object. */
+        CellRenderer() {
             super();
             setBackgroundNonSelectionColor(PANEL_BACKGROUND);
             setBackgroundSelectionColor(
@@ -260,14 +242,13 @@ public class Browser {
          * Returns the CellRenderer component, setting up the icons and
          * tooltips.
          */
-        public Component getTreeCellRendererComponent(
-                            final JTree tree,
-                            final Object value,
-                            final boolean sel,
-                            final boolean expanded,
-                            final boolean leaf,
-                            final int row,
-                            final boolean hasFocus) {
+        public Component getTreeCellRendererComponent(final JTree tree,
+                                                      final Object value,
+                                                      final boolean sel,
+                                                      final boolean expanded,
+                                                      final boolean leaf,
+                                                      final int row,
+                                                      final boolean hasFocus) {
 
             super.getTreeCellRendererComponent(
                             tree, value, sel,
@@ -294,9 +275,7 @@ public class Browser {
         }
     }
 
-    /**
-     * Acquire drbd test lock.
-     */
+    /** Acquire drbd test lock. */
     public final void drbdtestLockAcquire() {
         try {
             mDRBDtestLock.acquire();
@@ -305,9 +284,7 @@ public class Browser {
         }
     }
 
-    /**
-     * Release drbd test lock.
-     */
+    /** Release drbd test lock. */
     public final void drbdtestLockRelease() {
         mDRBDtestLock.release();
     }
@@ -316,7 +293,7 @@ public class Browser {
     protected void selectPath(final Object[] path) {
         final TreePath tp = new TreePath(path);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 getTree().expandPath(tp);
                 getTree().setSelectionPath(tp);
             }

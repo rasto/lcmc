@@ -30,7 +30,7 @@ package drbd.data;
  * @version $Id$
  *
  */
-public class CastAddress {
+public final class CastAddress {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Type of the cast address. */
@@ -42,9 +42,7 @@ public class CastAddress {
     /** Serial device. */
     private final String serial;
 
-    /**
-     * Prepares a new <code>CastAddress</code> object.
-     */
+    /** Prepares a new <code>CastAddress</code> object. */
     public CastAddress(final String type,
                        final String iface,
                        final String address,
@@ -55,9 +53,7 @@ public class CastAddress {
         this.serial     = serial;
     }
 
-    /**
-     * Convert the info to the line as it appears in the ha.cf.
-     */
+    /** Convert the info to the line as it appears in the ha.cf. */
     private String convert(final String type,
                            final String iface,
                            final String address,
@@ -76,14 +72,12 @@ public class CastAddress {
     /**
      * Convert the info of this object to the line as it appears in the ha.cf.
      */
-    public final String getConfigString() {
+    public String getConfigString() {
         return convert(type, iface, address, serial);
     }
 
-    /**
-     * Compares two cast addresses if they are the same.
-     */
-    public final boolean equals(final String t,
+    /** Compares two cast addresses if they are the same. */
+    public boolean equals(final String t,
                           final String i,
                           final String a,
                           final String s) {

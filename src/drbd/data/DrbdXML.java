@@ -55,7 +55,7 @@ import java.math.BigInteger;
  * @version $Id$
  *
  */
-public class DrbdXML extends XML {
+public final class DrbdXML extends XML {
     // TODO: should that not be per host?
     /** Drbd config filename. */
     private String configFile = "unknown";
@@ -142,20 +142,20 @@ public class DrbdXML extends XML {
     /** DRBD protocol C, that is a default. */
     private static final String PROTOCOL_C = "C / Synchronous";
     /** DRBD communication protocols. */
-    public static final StringInfo[] PROTOCOLS =
+    static final StringInfo[] PROTOCOLS =
         {new StringInfo("A / Asynchronous",     "A", null),
          new StringInfo("B / Semi-Synchronous", "B", null),
          new StringInfo(PROTOCOL_C,             "C", null)};
     /** DRBD single-primary mode, that is a default. */
     private static final String MODE_SINGLE_PRIMARY = "False";
     /** DRBD single and dual primary mode. */
-    public static final List<Object> MODES = new ArrayList<Object>();
+    static final List<Object> MODES = new ArrayList<Object>();
     static {
         MODES.add(new StringInfo("Single-Primary", MODE_SINGLE_PRIMARY, null));
         MODES.add(new StringInfo("Dual-Primary",   "True",   null));
     }
     /** Some non advanced parameters. */
-    public static final List<String> NOT_ADVANCED_PARAMS =
+    static final List<String> NOT_ADVANCED_PARAMS =
                                                     new ArrayList<String>();
     static {
         NOT_ADVANCED_PARAMS.add("rate");
@@ -170,15 +170,13 @@ public class DrbdXML extends XML {
         NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
     }
     /** Access types of some parameters. */
-    public static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
+    static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
                                 new HashMap<String, ConfigData.AccessType>();
     static {
         PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
     }
 
-    /**
-     * Prepares a new <code>DrbdXML</code> object.
-     */
+    /** Prepares a new <code>DrbdXML</code> object. */
     public DrbdXML(final Host[] hosts) {
         super();
         addSpecialParameter("resource", "name", true);
@@ -230,17 +228,13 @@ public class DrbdXML extends XML {
 
     }
 
-    /**
-     * Returns the filename of the drbd config file.
-     */
-    public final String getConfigFile() {
+    /** Returns the filename of the drbd config file. */
+    String getConfigFile() {
         return configFile;
     }
 
-    /**
-     * Returns config from server.
-     */
-    public final String getConfig(final Host host) {
+    /** Returns config from server. */
+    public String getConfig(final Host host) {
         if (!host.isConnected()) {
             return null;
         }
@@ -262,23 +256,19 @@ public class DrbdXML extends XML {
      * Retrieves and updates all the data. This should be called if there is
      * a drbd event.
      */
-    public final void update(final String configString) {
+    public void update(final String configString) {
         if (configString != null && !configString.equals("")) {
             parseConfig(configString);
         }
     }
 
-    /**
-     * Returns all drbd parameters.
-     */
-    public final String[] getParameters() {
+    /** Returns all drbd parameters. */
+    public String[] getParameters() {
         return parametersList.toArray(new String[parametersList.size()]);
     }
 
-    /**
-     * Gets short description for the parameter.
-     */
-    public final String getParamShortDesc(final String param) {
+    /** Gets short description for the parameter. */
+    public String getParamShortDesc(final String param) {
         final StringBuffer name =
                                 new StringBuffer(param.replaceAll("\\-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
@@ -288,31 +278,23 @@ public class DrbdXML extends XML {
         return name.toString();
     }
 
-    /**
-     * Gets long description for the parameter.
-     */
-    public final String getParamLongDesc(final String param) {
+    /** Gets long description for the parameter. */
+    public String getParamLongDesc(final String param) {
         return paramLongDescMap.get(param);
     }
 
-    /**
-     * Returns the long name of the unit of the specified parameter.
-     */
-    public final String getUnitLong(final String param) {
+    /** Returns the long name of the unit of the specified parameter. */
+    public String getUnitLong(final String param) {
         return paramUnitLongMap.get(param);
     }
 
-    /**
-     * Returns the default unit of the specified parameter.
-     */
-    public final String getDefaultUnit(final String param) {
+    /** Returns the default unit of the specified parameter. */
+    public String getDefaultUnit(final String param) {
         return paramDefaultUnitMap.get(param);
     }
 
-    /**
-     * Returns whether the parameter has a unit prefix.
-     */
-    public final boolean hasUnitPrefix(final String param) {
+    /** Returns whether the parameter has a unit prefix. */
+    public boolean hasUnitPrefix(final String param) {
         final String unit = getUnitLong(param);
         if (unit != null && (unit.equals("bytes")
                              || unit.equals("bytes/second"))) {
@@ -329,14 +311,12 @@ public class DrbdXML extends XML {
      *  handle
      * .
      */
-    public final String getParamType(final String param) {
+    public String getParamType(final String param) {
         return paramTypeMap.get(param);
     }
 
-    /**
-     * Gets default for the parameter.
-     */
-    public final String getParamDefault(final String param) {
+    /** Gets default for the parameter. */
+    public String getParamDefault(final String param) {
         final String defaultValue = paramDefaultMap.get(param);
 
         if (defaultValue == null) {
@@ -353,26 +333,21 @@ public class DrbdXML extends XML {
         return defaultValue;
     }
 
-    /**
-     * Gets preferred value for the parameter.
-     */
-    public final String getParamPreferred(final String param) {
+    /** Gets preferred value for the parameter. */
+    public String getParamPreferred(final String param) {
         // TODO:
         return null;
     }
 
-    /**
-     * Returns section in which this param is in.
-     */
-    public final String getSection(final String param) {
+    /** Returns section in which this param is in. */
+    public String getSection(final String param) {
         return paramSectionMap.get(param);
     }
 
     /**
      * Checks parameter according to its type. Returns false if value is wrong.
      */
-    public final boolean checkParam(final String param,
-                                    final String rawValue) {
+    public boolean checkParam(final String param, final String rawValue) {
         final String type = paramTypeMap.get(param);
         boolean correctValue = true;
 
@@ -422,28 +397,24 @@ public class DrbdXML extends XML {
     }
 
     /** Returns whether parameter expects integer value. */
-    public final boolean isInteger(final String param) {
+    public boolean isInteger(final String param) {
         final String type = paramTypeMap.get(param);
         return "numeric".equals(type);
     }
 
     /** Returns whether parameter is read only. */
-    public final boolean isLabel(final String param) {
+    public boolean isLabel(final String param) {
         return false;
     }
 
-    /**
-     * Returns whether parameter expects string value.
-     */
-    public final boolean isStringType(final String param) {
+    /** Returns whether parameter expects string value. */
+    public boolean isStringType(final String param) {
         final String type = paramTypeMap.get(param);
         return "string".equals(type);
     }
 
-    /**
-     * Checks in the cache if the parameter was correct.
-     */
-    public final boolean checkParamCache(final String param) {
+    /** Checks in the cache if the parameter was correct. */
+    boolean checkParamCache(final String param) {
         return paramCorrectValueMap.get(param).booleanValue();
     }
 
@@ -465,9 +436,7 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Add paremeter with choice combo box.
-     */
+    /** Add paremeter with choice combo box. */
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
@@ -484,9 +453,7 @@ public class DrbdXML extends XML {
         paramTypeMap.put(param, "handler");
     }
 
-    /**
-     * Adds parameter to the specified section.
-     */
+    /** Adds parameter to the specified section. */
     private void addParameter(final String section,
                               final String param,
                               final boolean required) {
@@ -499,9 +466,7 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Adds parameter with a default value to the specified section.
-     */
+    /** Adds parameter with a default value to the specified section. */
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
@@ -510,9 +475,7 @@ public class DrbdXML extends XML {
         paramDefaultMap.put(param, defaultValue);
     }
 
-    /**
-     * Adds parameter with the specified type.
-     */
+    /** Adds parameter with the specified type. */
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
@@ -522,18 +485,14 @@ public class DrbdXML extends XML {
         paramTypeMap.put(param, type);
     }
 
-    /**
-     * Returns array with all the sections.
-     */
-    public final String[] getSections() {
+    /** Returns array with all the sections. */
+    public String[] getSections() {
         return sectionParamsMap.keySet().toArray(
                                         new String[sectionParamsMap.size()]);
     }
 
-    /**
-     * Returns parameters for the specified section.
-     */
-    public final String[] getSectionParams(final String section) {
+    /** Returns parameters for the specified section. */
+    public String[] getSectionParams(final String section) {
         final List<String> params = sectionParamsMap.get(section);
         if (params == null) {
             return new String[0];
@@ -541,18 +500,14 @@ public class DrbdXML extends XML {
         return params.toArray(new String[params.size()]);
     }
 
-    /**
-     * Returns parameters for the global section.
-     */
-    public final String[] getGlobalParams() {
+    /** Returns parameters for the global section. */
+    public String[] getGlobalParams() {
         return globalParametersList.toArray(
                                      new String[globalParametersList.size()]);
     }
 
-    /**
-     * Returns possible choices.
-     */
-    public final Object[] getPossibleChoices(final String param) {
+    /** Returns possible choices. */
+    public Object[] getPossibleChoices(final String param) {
         final List<Object> items = paramItemsMap.get(param);
         if (items == null) {
             return null;
@@ -562,18 +517,18 @@ public class DrbdXML extends XML {
     }
 
     /** Returns whether parameter is required. */
-    public final boolean isRequired(final String param) {
+    public boolean isRequired(final String param) {
         return requiredParametersList.contains(param);
     }
 
     /** Returns whether parameter is advanced. */
-    public final boolean isAdvanced(final String param) {
+    public boolean isAdvanced(final String param) {
         return !isRequired(param)
                && !NOT_ADVANCED_PARAMS.contains(param);
     }
 
     /** Returns access type of the parameter. */
-    public final ConfigData.AccessType getAccessType(final String param) {
+    public ConfigData.AccessType getAccessType(final String param) {
         final ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
         if (at == null) {
           return ConfigData.AccessType.ADMIN;
@@ -581,9 +536,7 @@ public class DrbdXML extends XML {
         return at;
     }
 
-    /**
-     * Parses the global node in the drbd config.
-     */
+    /** Parses the global node in the drbd config. */
     private void parseConfigGlobalNode(final Node globalNode,
                                        final Map<String, String> nameValueMap) {
         final NodeList options = globalNode.getChildNodes();
@@ -610,9 +563,7 @@ public class DrbdXML extends XML {
     }
 
 
-    /**
-     * Parses command xml for parameters and fills up the hashes.
-     */
+    /** Parses command xml for parameters and fills up the hashes. */
     private void parseSection(final String section,
                               final String xml,
                               final Host host,
@@ -742,11 +693,10 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Parses section node and creates map with option name value pairs.
-     */
-    private void parseConfigSectionNode(final Node sectionNode,
-                                       final Map<String, String> nameValueMap) {
+    /** Parses section node and creates map with option name value pairs. */
+    private void parseConfigSectionNode(
+                                    final Node sectionNode,
+                                    final Map<String, String> nameValueMap) {
         final NodeList options = sectionNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
@@ -771,9 +721,7 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Parses host node in the drbd config.
-     */
+    /** Parses host node in the drbd config. */
     private void parseHostConfig(final String resName, final Node hostNode) {
         final String hostName = getAttribute(hostNode, "name");
         final NodeList options = hostNode.getChildNodes();
@@ -850,47 +798,36 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Returns map with hosts as keys and disks as values.
-     */
-    public final Map<String, String> getHostDiskMap(final String resName) {
+    /** Returns map with hosts as keys and disks as values. */
+    public Map<String, String> getHostDiskMap(final String resName) {
         return resourceHostDiskMap.get(resName);
     }
 
-    /**
-     * Returns map with hosts as keys and ips as values.
-     */
-    public final Map<String, String> getHostIpMap(final String resName) {
+    /** Returns map with hosts as keys and ips as values. */
+    Map<String, String> getHostIpMap(final String resName) {
         return resourceHostIpMap.get(resName);
     }
 
-    /**
-     * Gets virtual net interface port for a host and a resource.
-     */
-    public final String getVirtualInterfacePort(final String hostName,
-                                                final String resName) {
+    /** Gets virtual net interface port for a host and a resource. */
+    public String getVirtualInterfacePort(final String hostName,
+                                                    final String resName) {
         if (resourceHostPortMap.containsKey(resName)) {
             return resourceHostPortMap.get(resName).get(hostName);
         }
         return null;
     }
 
-    /**
-     * Gets virtual net interface for a host and a resource.
-     */
-    public final String getVirtualInterface(final String hostName,
-                                            final String resName) {
+    /** Gets virtual net interface for a host and a resource. */
+    public String getVirtualInterface(final String hostName,
+                                      final String resName) {
         if (resourceHostIpMap.containsKey(resName)) {
             return resourceHostIpMap.get(resName).get(hostName);
         }
         return null;
     }
 
-    /**
-     * Gets meta-disk block device for a host and a resource.
-     */
-    public final String getMetaDisk(final String hostName,
-                                    final String resName) {
+    /** Gets meta-disk block device for a host and a resource. */
+    public String getMetaDisk(final String hostName, final String resName) {
         if (resourceHostMetaDiskMap.containsKey(resName)) {
             return resourceHostMetaDiskMap.get(resName).get(hostName);
         }
@@ -902,19 +839,17 @@ public class DrbdXML extends XML {
      * be keyword 'flexible'. In this case 'flexible-meta-disk option
      * will be generated in the config.
      */
-    public final String getMetaDiskIndex(final String hostName,
-                                         final String resName) {
+    public String getMetaDiskIndex(final String hostName,
+                                   final String resName) {
         if (resourceHostMetaDiskIndexMap.containsKey(resName)) {
             return resourceHostMetaDiskIndexMap.get(resName).get(hostName);
         }
         return null;
     }
 
-    /**
-     * Parses resource xml.
-     */
+    /** Parses resource xml. */
     private void parseConfigResourceNode(final Node resourceNode,
-                                 final String resName) {
+                                         final String resName) {
         final String resProtocol = getAttribute(resourceNode, "protocol");
         if (resProtocol != null) {
             Map<String, String> nameValueMap =
@@ -952,9 +887,7 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Parses config xml from drbdadm dump-xml.
-     */
+    /** Parses config xml from drbdadm dump-xml. */
     private void parseConfig(final String configXML) {
         final int start = configXML.indexOf("<config");
         if (start < 0) {
@@ -1004,10 +937,8 @@ public class DrbdXML extends XML {
         }
     }
 
-    /**
-     * Returns value from drbd global config identified by option name.
-     */
-    public final String getGlobalConfigValue(final String optionName) {
+    /** Returns value from drbd global config identified by option name. */
+    public String getGlobalConfigValue(final String optionName) {
         final Map<String, String> option = optionsMap.get(GLOBAL_SECTION);
         String value = null;
         if (option != null) {
@@ -1023,9 +954,9 @@ public class DrbdXML extends XML {
      * Returns value from drbd config identified by resource, section and
      * option name.
      */
-    public final String getConfigValue(final String res,
-                                       final String section,
-                                       final String optionName) {
+    public String getConfigValue(final String res,
+                                 final String section,
+                                 final String optionName) {
         Map<String, String> option = optionsMap.get(res + "." + section);
 
         String value = null;
@@ -1040,9 +971,8 @@ public class DrbdXML extends XML {
     }
 
     /** Returns config value from the common section. */
-    public final String getCommonConfigValue(final String section,
-                                             final String optionName) {
-
+    public String getCommonConfigValue(final String section,
+                                       final String optionName) {
         String value = null;
         final Map<String, String> option =
                                 optionsMap.get("Section.Common." + section);
@@ -1056,10 +986,8 @@ public class DrbdXML extends XML {
         return value;
     }
 
-    /**
-     * Returns array of resource.
-     */
-    public final String[] getResources() {
+    /** Returns array of resource. */
+    public String[] getResources() {
         return resourceList.toArray(new String[resourceList.size()]);
     }
 
@@ -1067,13 +995,11 @@ public class DrbdXML extends XML {
      * Returns drbd device of the resource. Although there can be different
      * drbd devices on different hosts. We do not allow that.
      */
-    public final String getDrbdDevice(final String res) {
+    public String getDrbdDevice(final String res) {
         return resourceDeviceMap.get(res);
     }
 
-    /**
-     * Gets block device object from device number. Can return null.
-     */
+    /** Gets block device object from device number. Can return null. */
     private BlockDevInfo getBlockDevInfo(final String devNr,
                                          final String hostName,
                                          final DrbdGraph drbdGraph) {
@@ -1093,10 +1019,8 @@ public class DrbdXML extends XML {
         return bdi;
     }
 
-    /**
-     * Returns whether the drbd is loaded.
-     */
-    public final boolean isDrbdLoaded(final String hostName) {
+    /** Returns whether the drbd is loaded. */
+    boolean isDrbdLoaded(final String hostName) {
         final Boolean l = hostDrbdLoadedMap.get(hostName);
         if (l != null) {
             return l.booleanValue();
@@ -1108,9 +1032,9 @@ public class DrbdXML extends XML {
      * Parses events from drbd kernel module obtained via drbdsetup .. events
      * command and stores the values in the BlockDevice object.
      */
-    public final boolean parseDrbdEvent(final String hostName,
-                                        final DrbdGraph drbdGraph,
-                                        final String rawOutput) {
+    public boolean parseDrbdEvent(final String hostName,
+                                            final DrbdGraph drbdGraph,
+                                            final String rawOutput) {
         if (rawOutput == null || hostName == null) {
             return false;
         }
@@ -1213,7 +1137,7 @@ public class DrbdXML extends XML {
     }
 
     /** Removes the resource from resources, so that it does not reappear. */
-    public final void removeResource(final String res) {
+    public void removeResource(final String res) {
         resourceList.remove(res);
     }
 }

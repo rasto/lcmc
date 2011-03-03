@@ -26,11 +26,10 @@ import java.util.Arrays;
 /**
  * Here are commands for all openfilers.
  */
-public class DistResource_openfiler extends
-            java.util.ListResourceBundle {
+public final class DistResource_openfiler extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

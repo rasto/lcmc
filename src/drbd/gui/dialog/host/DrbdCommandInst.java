@@ -40,17 +40,14 @@ import javax.swing.JComponent;
  * @version $Id$
  *
  */
-public class DrbdCommandInst extends DialogHost {
+final class DrbdCommandInst extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /**
-     * Prepares a new <code>DrbdCommandInst</code> object.
-     */
-    public DrbdCommandInst(final WizardDialog previousDialog,
-                           final Host host) {
+    /** Prepares a new <code>DrbdCommandInst</code> object. */
+    DrbdCommandInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
@@ -58,7 +55,7 @@ public class DrbdCommandInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public final void checkAnswer(final String ans) {
+    void checkAnswer(final String ans) {
         nextDialogObject = new CheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog(),
                    getHost());
@@ -73,19 +70,15 @@ public class DrbdCommandInst extends DialogHost {
         }
     }
 
-    /**
-     * Inits the dialog and starts the installation procedure.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog and starts the installation procedure. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         getProgressBar().start(50000);
         installDrbd();
     }
 
-    /**
-     * Installs the drbd.
-     */
+    /** Installs the drbd. */
     private void installDrbd() {
         String arch = getHost().getDistString("DrbdInst.install."
                                               + getHost().getArch());
@@ -106,11 +99,12 @@ public class DrbdCommandInst extends DialogHost {
         getHost().execCommand(installCommand + ";;;DRBD.load",
                          getProgressBar(),
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  checkAnswer(ans);
                              }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                          final String ans,
+                                                          final int exitCode) {
                                  printErrorAndRetry(
                                     Tools.getString(
                                       "Dialog.Host.DrbdCommandInst.InstError"),
@@ -119,7 +113,8 @@ public class DrbdCommandInst extends DialogHost {
                              }
                          },
                          new ConvertCmdCallback() {
-                             public final String convert(final String command) {
+                             @Override public String convert(
+                                                        final String command) {
                                  return command.replaceAll("@ARCH@",
                                                            archString)
                                                .replaceAll(
@@ -134,10 +129,8 @@ public class DrbdCommandInst extends DialogHost {
                          SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -145,7 +138,7 @@ public class DrbdCommandInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.DrbdCommandInst.Description in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdCommandInst.Title");
     }
 
@@ -153,14 +146,14 @@ public class DrbdCommandInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.DrbdCommandInst.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.DrbdCommandInst.Description");
     }
 
     /**
      * Returns the input pane with info about the installation progress.
      */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

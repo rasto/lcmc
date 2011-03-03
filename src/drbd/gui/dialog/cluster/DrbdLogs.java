@@ -35,15 +35,13 @@ import java.util.LinkedHashMap;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class DrbdLogs extends ClusterLogs {
+public final class DrbdLogs extends ClusterLogs {
     /** Serial version UUID. */
     private static final long serialVersionUID = 1L;
     /** Name of the drbd device. */
     private final String deviceName;
 
-    /**
-     * Prepares a new <code>DrbdLogs</code> object.
-     */
+    /** Prepares a new <code>DrbdLogs</code> object. */
     public DrbdLogs(final Cluster cluster, final String device) {
         super(cluster);
         deviceName = device.substring(device.lastIndexOf('/') + 1);
@@ -53,19 +51,19 @@ public class DrbdLogs extends ClusterLogs {
      * Returns command string (defined in Distresource...) that prints the drbd
      * log.
      */
-    protected final String logFileCommand() {
+    @Override protected String logFileCommand() {
         return "DrbdLog.log";
     }
 
     /** Returns which pattern names are selected by default. */
-    protected final Set<String> getSelectedSet() {
+    @Override protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
         selected.add(deviceName);
         return selected;
     }
 
     /** Returns a map from pattern name to its pattern. */
-    protected final Map<String, String> getPatternMap() {
+    @Override protected Map<String, String> getPatternMap() {
         final Map<String, String> pm = new LinkedHashMap<String, String>();
         pm.put(deviceName, wordBoundary(deviceName));
         return pm;

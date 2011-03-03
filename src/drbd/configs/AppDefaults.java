@@ -27,8 +27,7 @@ import java.util.Arrays;
 /**
  * Here are default values for application.
  */
-public class AppDefaults extends
-            java.util.ListResourceBundle {
+public final class AppDefaults extends java.util.ListResourceBundle {
     /** Linbit dark orange. */
     public static final Color LINBIT_DARK_ORANGE  = new Color(214, 75, 42);
     /** Linbit orange. */
@@ -37,7 +36,7 @@ public class AppDefaults extends
     private static final Color LINBIT_LIGHT_ORANGE = new Color(253, 180, 109);
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 
@@ -339,13 +338,13 @@ public class AppDefaults extends
 
         {"Dialog.Host.CheckInstallation.CheckingIcon",
          "Icons/32X32/dialog-information.png"},
-        
+
         {"Dialog.Host.CheckInstallation.NotInstalledIcon",
          "Icons/32X32/software-update-urgent.png"},
-        
+
         {"Dialog.Host.CheckInstallation.InstalledIcon",
          "Icons/32X32/weather-clear.png"},
-        
+
         {"Dialog.Host.CheckInstallation.UpgrAvailIcon",
          "Icons/32X32/software-update-available.png"},
 

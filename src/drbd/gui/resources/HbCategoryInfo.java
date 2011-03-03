@@ -32,32 +32,24 @@ import javax.swing.JPanel;
  * heartbeat category is clicked.
  */
 public class HbCategoryInfo extends CategoryInfo {
-    /**
-     * Creates the new HbCategoryInfo object with name of the category.
-     */
+    /** Creates the new HbCategoryInfo object with name of the category. */
     public HbCategoryInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final ClusterBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
-    protected String getInfoType() {
+    /** Returns type of the info text. text/plain or text/html. */
+    @Override protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
-    /**
-     * Returns heartbeat graph.
-     */
-    public final JPanel getGraphicalView() {
+    /** Returns heartbeat graph. */
+    @Override public final JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 }

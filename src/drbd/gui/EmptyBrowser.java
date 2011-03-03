@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public class EmptyBrowser extends Browser {
+public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
     /** Panel that holds this browser. */
@@ -50,10 +50,8 @@ public class EmptyBrowser extends Browser {
     /** All hosts info object of the host of this browser. */
     private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
 
-    /**
-     * Prepares a new <code>CusterBrowser</code> object.
-     */
-    public EmptyBrowser() {
+    /** Prepares a new <code>CusterBrowser</code> object. */
+    EmptyBrowser() {
         super();
         /* Load the default file */
         final String saveFile = Tools.getConfigData().getSaveFile();
@@ -64,57 +62,45 @@ public class EmptyBrowser extends Browser {
         setTreeTop();
     }
 
-    /**
-     * Adds small box with cluster possibility to load it and remove it.
-     */
-    public final void addClusterBox(final Cluster cluster) {
+    /** Adds small box with cluster possibility to load it and remove it. */
+    public void addClusterBox(final Cluster cluster) {
         allHostsInfo.addClusterBox(cluster);
         allHostsInfo.setAsStarted(cluster);
         allHostsInfo.addCheckboxListener(cluster);
     }
 
-    /**
-     * Sets the empty view panel.
-     */
-    public final void setEmptyViewPanel(final EmptyViewPanel emptyViewPanel) {
+    /** Sets the empty view panel. */
+    void setEmptyViewPanel(final EmptyViewPanel emptyViewPanel) {
         this.emptyViewPanel = emptyViewPanel;
     }
 
-    /**
-     * Returns empty view panel.
-     */
-    public final EmptyViewPanel getEmptyViewPanel() {
+    /** Returns empty view panel. */
+    EmptyViewPanel getEmptyViewPanel() {
         return emptyViewPanel;
     }
 
-    /**
-     * Sets the info panel component in the cluster view panel.
-     */
-    public final void setRightComponentInView(final Info i) {
+    /** Sets the info panel component in the cluster view panel. */
+    void setRightComponentInView(final Info i) {
         emptyViewPanel.setRightComponentInView(this, i);
     }
 
-    /**
-     * Initializes hosts tree for the empty view.
-     */
-    public final void initHosts() {
+    /** Initializes hosts tree for the empty view. */
+    void initHosts() {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
         setNode(allHostsNode);
         topAdd(allHostsNode);
     }
 
-    /**
-     * Updates resources of a cluster in the tree.
-     */
-    public final void updateHosts(final JTree treeMenu) {
+    /** Updates resources of a cluster in the tree. */
+    void updateHosts(final JTree treeMenu) {
         this.treeMenu = treeMenu;
 
         /* all hosts */
         final Host[] allHosts =
                               Tools.getConfigData().getHosts().getHostsArray();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 DefaultMutableTreeNode resource;
                 allHostsNode.removeAllChildren();
                 for (Host host : allHosts) {

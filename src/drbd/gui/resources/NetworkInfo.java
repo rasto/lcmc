@@ -30,14 +30,12 @@ import javax.swing.ImageIcon;
 /**
  * This class holds info data for a network.
  */
-public class NetworkInfo extends Info {
+public final class NetworkInfo extends Info {
     /** Network icon. */
     private static final ImageIcon NETWORK_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.NetworkIcon"));
-    /**
-     * Prepares a new <code>NetworkInfo</code> object.
-     */
+    /** Prepares a new <code>NetworkInfo</code> object. */
     public NetworkInfo(final String name,
                        final Network network,
                        final Browser browser) {
@@ -45,10 +43,8 @@ public class NetworkInfo extends Info {
         setResource(network);
     }
 
-    /**
-     * Returns network info.
-     */
-    public final String getInfo() {
+    /** Returns network info. */
+    @Override String getInfo() {
         final String ret = "Network: " + getNetwork().getName()
                            + "\n    IPs: " + getNetwork().getIps()
                            + "\nNetmask: " + getNetwork().getNetMask()
@@ -56,17 +52,13 @@ public class NetworkInfo extends Info {
         return ret;
     }
 
-    /**
-     * Returns network resource object.
-     */
-    public final Network getNetwork() {
+    /** Returns network resource object. */
+    Network getNetwork() {
         return (Network) getResource();
     }
 
-    /**
-     * Returns menu icon for network.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns menu icon for network. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return NETWORK_ICON;
     }
 }

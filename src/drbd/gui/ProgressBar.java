@@ -40,7 +40,7 @@ import drbd.utilities.CancelCallback;
  * This class creates titled pane with progress bar and functions that update
  * the progress bar.
  */
-public class ProgressBar implements ActionListener {
+public final class ProgressBar implements ActionListener {
     /** The progress bar. */
     private JProgressBar progressBar;
     /** Progress bar panel. */
@@ -75,13 +75,11 @@ public class ProgressBar implements ActionListener {
     /** Hide progress bar after the time in milliseconds. */
     private static final int HIDE_PB_AFTER = 1000;
 
-    /**
-     * Prepares a new <code>ProgressBar</code> object.
-     */
-    public ProgressBar(final String title,
-                       final CancelCallback cancelCallback,
-                       final int width,
-                       final int height) {
+    /** Prepares a new <code>ProgressBar</code> object. */
+    ProgressBar(final String title,
+                final CancelCallback cancelCallback,
+                final int width,
+                final int height) {
         this.cancelCallback = cancelCallback;
         progressBar = new JProgressBar(0, MAX_PB_VALUE);
         progressBar.setPreferredSize(new Dimension(width, height));
@@ -115,18 +113,14 @@ public class ProgressBar implements ActionListener {
         }
     }
 
-    /**
-     * Prepares a new <code>ProgressBar</code> object without title.
-     */
-    public ProgressBar(final CancelCallback cancelCallbackA,
-                       final int width,
-                       final int height) {
+    /** Prepares a new <code>ProgressBar</code> object without title. */
+    ProgressBar(final CancelCallback cancelCallbackA,
+                final int width,
+                final int height) {
         this(null, cancelCallbackA, width, height);
     }
 
-    /**
-     * Prepares a new <code>ProgressBar</code> object.
-     */
+    /** Prepares a new <code>ProgressBar</code> object. */
     public ProgressBar(final String title,
                        final CancelCallback cancelCallbackA) {
         this(title,
@@ -135,28 +129,23 @@ public class ProgressBar implements ActionListener {
              Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
-    /**
-     * Prepares a new <code>ProgressBar</code> object without title.
-     */
+    /** Prepares a new <code>ProgressBar</code> object without title. */
     public ProgressBar(final CancelCallback cancelCallbackA) {
         this(null,
              cancelCallbackA,
              Tools.getDefaultInt("ProgressBar.DefaultWidth"),
              Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
-    /**
-     * Enables or disables cancel button if it exists.
-     */
-    public final void setCancelEnabled(final boolean enable) {
+
+    /** Enables or disables cancel button if it exists. */
+    public void setCancelEnabled(final boolean enable) {
         if (cancelButton != null) {
             cancelButton.setEnabled(enable);
         }
     }
 
-    /**
-     * Starts progress bar thread.
-     */
-    public final void start(final int t) {
+    /** Starts progress bar thread. */
+    public void start(final int t) {
         this.timeout = t;
         stopNow = false;
         if (timeout == 0) {
@@ -164,7 +153,7 @@ public class ProgressBar implements ActionListener {
         }
         if (progressThread == null) {
             final Runnable runnable = new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.debug(this,
                                 "running postgresbar timeout: " + timeout,
                                 1);
@@ -183,7 +172,7 @@ public class ProgressBar implements ActionListener {
                         if (time > progressBarDelay && !isVisible) {
                             isVisible = true;
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     progressBar.setVisible(true);
                                     if (cancelButton != null) {
                                         cancelButton.setVisible(true);
@@ -193,7 +182,7 @@ public class ProgressBar implements ActionListener {
                         }
                         if (!holdIt) {
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     progressBar.setValue(
                                             progress * MAX_PB_VALUE / timeout);
                                 }
@@ -211,14 +200,14 @@ public class ProgressBar implements ActionListener {
                         if (progress >= timeout) {
                             /* premature end */
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     progressBar.setIndeterminate(true);
                                 }
                             });
                         }
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             progressBar.setIndeterminate(false);
                             progressBar.setValue(MAX_PB_VALUE);
                         }
@@ -234,51 +223,43 @@ public class ProgressBar implements ActionListener {
         }
     }
 
-    /**
-     * Returns progress bar panel.
-     */
-    public final JPanel getProgressBarPane() {
+    /** Returns progress bar panel. */
+    public JPanel getProgressBarPane() {
         return pbPanel;
     }
 
-    /**
-     * Stops progress bar and sets it to the maximum position.
-     */
-    public final void done() {
+    /** Stops progress bar and sets it to the maximum position. */
+    public void done() {
         if (cancelButton != null) {
             cancelButton.setEnabled(false);
         }
         stopNow = true;
         progress = timeout;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setIndeterminate(false);
                 progressBar.setValue(MAX_PB_VALUE);
             }
         });
     }
 
-    /**
-     * Stops progress bar and sets it to 0.
-     */
-    public final void doneError() {
+    /** Stops progress bar and sets it to 0. */
+    public void doneError() {
         if (cancelButton != null) {
             cancelButton.setEnabled(false);
         }
         stopNow = true;
         progress = 0;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setIndeterminate(false);
                 progressBar.setValue(0);
             }
         });
     }
 
-    /**
-     * Stops progress bar and hides it after 1 second.
-     */
-    public final void doneHide() {
+    /** Stops progress bar and hides it after 1 second. */
+    void doneHide() {
         done();
         try {
             Thread.sleep(HIDE_PB_AFTER);
@@ -286,7 +267,7 @@ public class ProgressBar implements ActionListener {
             Thread.currentThread().interrupt();
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setVisible(false);
                 if (cancelButton != null) {
                     cancelButton.setVisible(false);
@@ -295,10 +276,8 @@ public class ProgressBar implements ActionListener {
         });
     }
 
-    /**
-     * Stops progress bar and sets it to 0 and hide it after 1 second.
-     */
-    public final void doneErrorHide() {
+    /** Stops progress bar and sets it to 0 and hide it after 1 second. */
+    void doneErrorHide() {
         doneError();
         try {
             Thread.sleep(HIDE_PB_AFTER);
@@ -306,7 +285,7 @@ public class ProgressBar implements ActionListener {
             Thread.currentThread().interrupt();
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setVisible(false);
                 if (cancelButton != null) {
                     cancelButton.setVisible(false);
@@ -319,9 +298,9 @@ public class ProgressBar implements ActionListener {
      * Holds progress bar until cont() is called and sets it in indeterminate
      * state.
      */
-    public final void hold() {
+    public void hold() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setVisible(true);
                 if (cancelButton != null) {
                     cancelButton.setVisible(true);
@@ -336,19 +315,17 @@ public class ProgressBar implements ActionListener {
      * Starts progress bar again from the position it was before calling
      * hold().
      */
-    public final void cont() {
+    void cont() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 progressBar.setIndeterminate(false);
             }
         });
         holdIt = false;
     }
 
-    /**
-     * cancels ssh connection.
-     */
-    public final void actionPerformed(final ActionEvent e) {
+    /** cancels ssh connection. */
+    @Override public void actionPerformed(final ActionEvent e) {
         final String command = e.getActionCommand();
 
         if (command.equals(Tools.getString("ProgressBar.Cancel"))) {

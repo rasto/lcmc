@@ -28,17 +28,15 @@ package drbd.data;
  * @author Rasto Levrinc
  *
  */
-public class AccessMode {
+public final class AccessMode {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /* Access type. */
+    /** Access type. */
     private final ConfigData.AccessType accessType;
-    /* Whether it is advanced mode or not. */
+    /** Whether it is advanced mode or not. */
     private final boolean advancedMode;
 
-    /**
-     * Prepares a new <code>AccessMode</code> object.
-     */
+    /** Prepares a new <code>AccessMode</code> object. */
     public AccessMode(final ConfigData.AccessType accessType,
                       final boolean advancedMode) {
         this.accessType = accessType;
@@ -46,12 +44,12 @@ public class AccessMode {
     }
 
     /** Returns access type. */
-    public final ConfigData.AccessType getAccessType() {
+    public ConfigData.AccessType getAccessType() {
         return accessType;
     }
 
     /** Returns advanced mode. */
-    public final boolean isAdvancedMode() {
+    public boolean isAdvancedMode() {
         return advancedMode;
     }
 }

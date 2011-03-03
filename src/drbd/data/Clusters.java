@@ -23,7 +23,6 @@ package drbd.data;
 
 import java.util.Set;
 import java.util.LinkedHashSet;
-import java.io.Serializable;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import drbd.utilities.Tools;
@@ -36,7 +35,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @version $Id$
  *
  */
-public class Clusters implements Serializable {
+public final class Clusters {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Set of cluster objects. */
@@ -44,10 +43,8 @@ public class Clusters implements Serializable {
     /** Clusters set lock. */
     private final Mutex mClustersLock = new Mutex();
 
-    /**
-     * Adds cluster to the set of clusters.
-     */
-    public final void addCluster(final Cluster cluster) {
+    /** Adds cluster to the set of clusters. */
+    void addCluster(final Cluster cluster) {
         try {
             mClustersLock.acquire();
         } catch (InterruptedException e) {
@@ -57,10 +54,8 @@ public class Clusters implements Serializable {
         mClustersLock.release();
     }
 
-    /**
-     * removes cluster from the clusters.
-     */
-    public final void removeCluster(final Cluster cluster) {
+    /** Removes cluster from the clusters. */
+    void removeCluster(final Cluster cluster) {
         try {
             mClustersLock.acquire();
         } catch (InterruptedException e) {
@@ -70,10 +65,8 @@ public class Clusters implements Serializable {
         mClustersLock.release();
     }
 
-    /**
-     * Returns true if cluster is in the clusters or false if it is not.
-     */
-    public final boolean existsCluster(final Cluster cluster) {
+    /** Returns true if cluster is in the clusters or false if it is not. */
+    boolean existsCluster(final Cluster cluster) {
         try {
             mClustersLock.acquire();
         } catch (InterruptedException e) {
@@ -84,10 +77,8 @@ public class Clusters implements Serializable {
         return ret;
     }
 
-    /**
-     * Gets set of clusters.
-     */
-    public final Set<Cluster> getClusterSet() {
+    /** Gets set of clusters. */
+    public Set<Cluster> getClusterSet() {
         final Set<Cluster> copy = new LinkedHashSet<Cluster>();
         try {
             mClustersLock.acquire();
@@ -101,10 +92,8 @@ public class Clusters implements Serializable {
         return copy;
     }
 
-    /**
-     * Return default name with incremented index.
-     */
-    public final String getDefaultClusterName() {
+    /** Return default name with incremented index. */
+    public String getDefaultClusterName() {
         int index = 0;
         final String defaultName = Tools.getString("Clusters.DefaultName");
         try {

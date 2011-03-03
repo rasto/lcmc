@@ -32,14 +32,12 @@ import javax.swing.ImageIcon;
  * in all hosts in the cluster and can be chosen in the scrolling list in
  * the filesystem service.
  */
-public class CommonBlockDevInfo extends HbCategoryInfo
-                                implements CommonDeviceInterface {
+public final class CommonBlockDevInfo extends HbCategoryInfo
+                                      implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private final BlockDevice[] blockDevices;
 
-    /**
-     * Prepares a new <code>CommonBlockDevInfo</code> object.
-     */
+    /** Prepares a new <code>CommonBlockDevInfo</code> object. */
     public CommonBlockDevInfo(final String name,
                               final BlockDevice[] blockDevices,
                               final Browser browser) {
@@ -48,24 +46,18 @@ public class CommonBlockDevInfo extends HbCategoryInfo
         this.blockDevices = blockDevices;
     }
 
-    /**
-     * Returns icon for common block devices menu category.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns icon for common block devices menu category. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
-    /**
-     * Returns device name of this block device.
-     */
-    public final String getDevice() {
+    /** Returns device name of this block device. */
+    @Override public String getDevice() {
         return getCommonBlockDevice().getDevice();
     }
 
-    /**
-     * Returns info for this block device.
-     */
-    public final String getInfo() {
+    /** Returns info for this block device. */
+    @Override String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + "\n";
     }
 
@@ -73,7 +65,7 @@ public class CommonBlockDevInfo extends HbCategoryInfo
      * Returns string representation of the block devices, used in the pull
      * down menu.
      */
-    public final String toString() {
+    @Override public String toString() {
         String name = getName();
         if (name == null || "".equals(name)) {
             name = Tools.getString("ClusterBrowser.CommonBlockDevUnconfigured");
@@ -81,10 +73,8 @@ public class CommonBlockDevInfo extends HbCategoryInfo
         return name;
     }
 
-    /**
-     * Sets this block device on all nodes ass used by crm.
-     */
-    public final void setUsedByCRM(final ServiceInfo isUsedByCRM) {
+    /** Sets this block device on all nodes ass used by crm. */
+    @Override public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         for (BlockDevice bd : blockDevices) {
             bd.setUsedByCRM(isUsedByCRM != null);
         }
@@ -94,7 +84,7 @@ public class CommonBlockDevInfo extends HbCategoryInfo
      * Returns if all of the block devices are used by crm.
      * TODO: or any is used by hb?
      */
-    public final boolean isUsedByCRM() {
+    @Override public boolean isUsedByCRM() {
         boolean is = true;
         for (int i = 0; i < blockDevices.length; i++) {
             is = is && blockDevices[i].isUsedByCRM();
@@ -102,21 +92,18 @@ public class CommonBlockDevInfo extends HbCategoryInfo
         return is;
     }
 
-    /**
-     * Retruns resource object of this block device.
-     */
-    public final CommonBlockDevice getCommonBlockDevice() {
+    /** Returns resource object of this block device. */
+    CommonBlockDevice getCommonBlockDevice() {
         return (CommonBlockDevice) getResource();
     }
+
     /** Returns the last created filesystem. */
-    public final String getCreatedFs() {
+    @Override public String getCreatedFs() {
         return null;
     }
 
-    /**
-     * Returns how much of the filesystem is used.
-     */
-    public final int getUsed() {
+    /** Returns how much of the filesystem is used. */
+    @Override public int getUsed() {
         int used = -1;
         for (BlockDevice bd : blockDevices) {
             if (bd.getUsed() > used) {

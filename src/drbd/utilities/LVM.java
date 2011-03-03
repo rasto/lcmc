@@ -22,11 +22,8 @@
 package drbd.utilities;
 
 import drbd.data.Host;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class provides LVM commands.
@@ -41,9 +38,7 @@ public final class LVM {
     /** Device placeholder. */
     private static final String DEVICE_PH     = "@DEVICE@";
 
-    /**
-     * Private constructor, cannot be instantiated.
-     */
+    /** Private constructor, cannot be instantiated. */
     private LVM() {
         /* Cannot be instantiated. */
     }

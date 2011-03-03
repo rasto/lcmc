@@ -41,7 +41,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class ResourceAgent {
+public final class ResourceAgent {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the service. */
@@ -144,9 +144,7 @@ public class ResourceAgent {
 
     }
 
-    /**
-     * Adds info paramter.
-     */
+    /** Adds info paramter. */
     private void addInfoParameter(final String section,
                                   final String name,
                                   final String defaultValue,
@@ -163,17 +161,13 @@ public class ResourceAgent {
         fieldType.put(name, GuiComboBox.Type.LABELFIELD);
     }
 
-    /**
-     * Returns the hb service name.
-     */
-    public final String getName() {
+    /** Returns the hb service name. */
+    public String getName() {
         return name;
     }
 
-    /**
-     * returns the provider.
-     */
-    public final String getProvider() {
+    /** Returns the provider. */
+    public String getProvider() {
         return provider;
     }
 
@@ -181,21 +175,17 @@ public class ResourceAgent {
      * Returns the hb name as it should appear in the pull down menus. This
      * actually only because of "Filesytem / DRBD".
      */
-    public final String getMenuName() {
+    public String getMenuName() {
         return menuName;
     }
 
-    /**
-     * Returns the class of the service, like ocf.
-     */
-    public final String getResourceClass() {
+    /** Returns the class of the service, like ocf. */
+    public String getResourceClass() {
         return resourceClass;
     }
 
-    /**
-     * Returns the hash code.
-     */
-    public final int hashCode() {
+    /** Returns the hash code. */
+    @Override public int hashCode() {
         return hash;
     }
 
@@ -203,7 +193,7 @@ public class ResourceAgent {
      * Returns whethet two service equal. They have the same name and are from
      * the same hb class.
      */
-    public final boolean equals(final Object oth) {
+    @Override public boolean equals(final Object oth) {
         if (this == oth) {
             return true;
         }
@@ -216,67 +206,49 @@ public class ResourceAgent {
                                 : resourceClass.equals(other.resourceClass));
     }
 
-    /**
-     * Sets ocf script version for service.
-     */
-    public final void setVersion(final String version) {
+    /** Sets ocf script version for service. */
+    void setVersion(final String version) {
         this.version = version;
     }
 
-    /**
-     * Returns the version of the hb ocf script.
-     */
-    public final String getVersion() {
+    /** Returns the version of the hb ocf script. */
+    String getVersion() {
         return version;
     }
 
-    /**
-     * Sets the long description of the service.
-     */
-    public final void setLongDesc(final String longDesc) {
+    /** Sets the long description of the service. */
+    void setLongDesc(final String longDesc) {
         this.longDesc = longDesc;
     }
 
-    /**
-     * Gets the long description of the service.
-     */
-    public final String getLongDesc() {
+    /** Gets the long description of the service. */
+    String getLongDesc() {
         return longDesc;
     }
 
-    /**
-     * Sets the short description of the service.
-     */
-    public final void setShortDesc(final String shortDesc) {
+    /** Sets the short description of the service. */
+    void setShortDesc(final String shortDesc) {
         this.shortDesc = shortDesc;
     }
 
-    /**
-     * Gets the short description of the service.
-     */
-    public final String getShortDesc() {
+    /** Gets the short description of the service. */
+    String getShortDesc() {
         return shortDesc;
     }
 
-    /**
-     * Adds parameter of this service.
-     */
-    public final void addMasterParameter(final String param) {
+    /** Adds parameter of this service. */
+    void addMasterParameter(final String param) {
         masterParameters.add(param);
     }
 
-    /**
-     * Adds parameter of this service.
-     */
-    public final void addParameter(final String param) {
+    /** Adds parameter of this service. */
+    void addParameter(final String param) {
         masterParameters.add(param);
         parameters.add(param);
     }
 
-    /**
-     * Returns an array of all service parameters.
-     */
-    public final String[] getParameters(final boolean master) {
+    /** Returns an array of all service parameters. */
+    String[] getParameters(final boolean master) {
         if (master) {
             return masterParameters.toArray(new String[parameters.size()]);
         } else {
@@ -292,11 +264,8 @@ public class ResourceAgent {
         Tools.appError("Wrong parameter: " + param);
     }
 
-    /**
-     * Sets whether the supplied parameter is required.
-     */
-    public final void setParamRequired(final String param,
-                                       final boolean required) {
+    /** Sets whether the supplied parameter is required. */
+    void setParamRequired(final String param, final boolean required) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -308,18 +277,14 @@ public class ResourceAgent {
         }
     }
 
-    /**
-     * Returns whether the parameter is required.
-     */
-    public final boolean isRequired(final String param) {
+    /** Returns whether the parameter is required. */
+    boolean isRequired(final String param) {
         return paramRequired.contains(param);
     }
 
-    /**
-     * Sets the parameter long description.
-     */
-    public final void setParamLongDesc(final String param,
-                                       final String longDesc) {
+    /** Sets the parameter long description. */
+    void setParamLongDesc(final String param,
+                          final String longDesc) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -327,10 +292,8 @@ public class ResourceAgent {
         paramLongDesc.put(param, longDesc);
     }
 
-    /**
-     * Sets the parameter short description.
-     */
-    public final void setParamShortDesc(final String param,
+    /** Sets the parameter short description. */
+    void setParamShortDesc(final String param,
                                         final String shortDesc) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
@@ -339,10 +302,8 @@ public class ResourceAgent {
         paramShortDesc.put(param, shortDesc);
     }
 
-    /**
-     * Sets the parameter type.
-     */
-    public final void setParamType(final String param, final String type) {
+    /** Sets the parameter type. */
+    void setParamType(final String param, final String type) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -350,18 +311,13 @@ public class ResourceAgent {
         paramType.put(param, type);
     }
 
-    /**
-     * Gets the type of the parameter.
-     */
-    public final String getParamType(final String param) {
+    /** Gets the type of the parameter. */
+    String getParamType(final String param) {
         return paramType.get(param);
     }
 
-    /**
-     * Sets the default value of the parameter.
-     */
-    public final void setParamDefault(final String param,
-                                      final String defaultValue) {
+    /** Sets the default value of the parameter. */
+    void setParamDefault(final String param, final String defaultValue) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -369,10 +325,8 @@ public class ResourceAgent {
         paramDefault.put(param, defaultValue);
     }
 
-    /**
-     * Gets the default value of the parameter.
-     */
-    public final String getParamDefault(final String param) {
+    /** Gets the default value of the parameter. */
+    String getParamDefault(final String param) {
         return paramDefault.get(param);
     }
 
@@ -380,8 +334,7 @@ public class ResourceAgent {
      * Sets the preferred value of the parameter that is preferred over default
      * value.
      */
-    public final void setParamPreferred(final String param,
-                                        final String preferredValue) {
+    void setParamPreferred(final String param, final String preferredValue) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -389,18 +342,13 @@ public class ResourceAgent {
         paramPreferred.put(param, preferredValue);
     }
 
-    /**
-     * Gets the preferred value of the parameter.
-     */
-    public final String getParamPreferred(final String param) {
+    /** Gets the preferred value of the parameter. */
+    String getParamPreferred(final String param) {
         return paramPreferred.get(param);
     }
 
-    /**
-     * Sets the possible choices for the parameter.
-     */
-    public final void setParamPossibleChoices(final String param,
-                                              final String[] choices) {
+    /** Sets the possible choices for the parameter. */
+    void setParamPossibleChoices(final String param, final String[] choices) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -408,11 +356,9 @@ public class ResourceAgent {
         paramPossibleChoices.put(param, choices);
     }
 
-    /**
-     * Sets the possible choices for the parameter.
-     */
-    public final void setParamPossibleChoicesMS(final String param,
-                                                final String[] choices) {
+    /** Sets the possible choices for the parameter. */
+    void setParamPossibleChoicesMS(final String param,
+                                   final String[] choices) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -420,17 +366,13 @@ public class ResourceAgent {
         paramPossibleChoicesMS.put(param, choices);
     }
 
-    /**
-     * Gets the array of the possible choices of the parameter.
-     */
-    public final String[] getParamPossibleChoices(final String param) {
+    /** Gets the array of the possible choices of the parameter. */
+    String[] getParamPossibleChoices(final String param) {
         return paramPossibleChoices.get(param);
     }
 
-    /**
-     * Gets the array of the possible choices of the m/s parameter.
-     */
-    public final String[] getParamPossibleChoicesMS(final String param) {
+    /** Gets the array of the possible choices of the m/s parameter. */
+    String[] getParamPossibleChoicesMS(final String param) {
         final String[] ret = paramPossibleChoicesMS.get(param);
         if (ret == null) {
             return getParamPossibleChoices(param);
@@ -439,54 +381,39 @@ public class ResourceAgent {
     }
 
 
-    /**
-     * Returns the short description of the parameter.
-     */
-    public final String getParamShortDesc(final String param) {
+    /** Returns the short description of the parameter. */
+    String getParamShortDesc(final String param) {
         return paramShortDesc.get(param);
     }
 
-    /**
-     * Returns the long description of the parameter.
-     */
-    public final String getParamLongDesc(final String param) {
+    /** Returns the long description of the parameter. */
+    String getParamLongDesc(final String param) {
         return paramLongDesc.get(param);
     }
 
-    /**
-     * Returns whether this service is filesystem.
-     */
-    public final boolean isFilesystem() {
+    /** Returns whether this service is filesystem. */
+    public boolean isFilesystem() {
         return "Filesystem".equals(name) && isOCFClass();
     }
 
-    /**
-     * Returns whether this service is drbddisk.
-     */
-    public final boolean isDrbddisk() {
+    /** Returns whether this service is drbddisk. */
+    public boolean isDrbddisk() {
         return "drbddisk".equals(name) && isHeartbeatClass();
     }
 
-    /**
-     * Returns whether this service is linbit drbd ra.
-     */
-    public final boolean isLinbitDrbd() {
+    /** Returns whether this service is linbit drbd ra. */
+    public boolean isLinbitDrbd() {
         return "drbd".equals(name) && "linbit".equals(provider);
     }
 
-    /**
-     * Returns whether this service is heartbeat drbd ra.
-     */
-    public final boolean isHbDrbd() {
+    /** Returns whether this service is heartbeat drbd ra. */
+    public boolean isHbDrbd() {
         return "drbd".equals(name) && "heartbeat".equals(provider);
     }
 
 
-    /**
-     * Sets whether the supplied parameter is meta attribute.
-     */
-    public final void setParamIsMetaAttr(final String param,
-                                         final boolean isMetaAttr) {
+    /** Sets whether the supplied parameter is meta attribute. */
+    void setParamIsMetaAttr(final String param, final boolean isMetaAttr) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -498,62 +425,46 @@ public class ResourceAgent {
         }
     }
 
-    /**
-     * Returns whether the parameter is meta attribute.
-     */
-    public final boolean isParamMetaAttr(final String param) {
+    /** Returns whether the parameter is meta attribute. */
+    boolean isParamMetaAttr(final String param) {
         return paramIsMetaAttr.contains(param);
     }
 
-    /**
-     * Returns whether this service is IPaddr or IPaddr2.
-     */
-    public final boolean isIPaddr() {
+    /** Returns whether this service is IPaddr or IPaddr2. */
+    public boolean isIPaddr() {
         return isOCFClass()
                && ("IPaddr".equals(name) || "IPaddr2".equals(name));
     }
 
-    /**
-     * Returns whether this service is VirtualDomain.
-     */
-    public final boolean isVirtualDomain() {
+    /** Returns whether this service is VirtualDomain. */
+    public boolean isVirtualDomain() {
         return isOCFClass() && "VirtualDomain".equals(name);
     }
 
-    /**
-     * Returns whether this service/object is group.
-     */
-    public final boolean isGroup() {
+    /** Returns whether this service/object is group. */
+    public boolean isGroup() {
         return ConfigData.PM_GROUP_NAME.equals(name)
                && "group".equals(resourceClass);
     }
 
-    /**
-     * Returns whether this service/object is clone set.
-     */
-    public final boolean isClone() {
+    /** Returns whether this service/object is clone set. */
+    public boolean isClone() {
         return ConfigData.PM_CLONE_SET_NAME.equals(name)
                && "clone".equals(resourceClass);
     }
 
-    /**
-     * Returns whether this service/object is stonith device.
-     */
-    public final boolean isStonith() {
+    /** Returns whether this service/object is stonith device. */
+    public boolean isStonith() {
         return "stonith".equals(resourceClass);
     }
 
-    /**
-     * Returns whether this service is in the heartbeat class.
-     */
-    public final boolean isHeartbeatClass() {
+    /** Returns whether this service is in the heartbeat class. */
+    public boolean isHeartbeatClass() {
         return "heartbeat".equals(resourceClass);
     }
 
-    /**
-     * Returns whether this service is in the ocf class.
-     */
-    public final boolean isOCFClass() {
+    /** Returns whether this service is in the ocf class. */
+    public boolean isOCFClass() {
         return "ocf".equals(resourceClass);
     }
 
@@ -561,68 +472,56 @@ public class ResourceAgent {
      * Adds default value for operation like 'start' and param like 'timeout'
      * to the hash.
      */
-    public final void addOperationDefault(final String name,
-                                          final String param,
-                                          final String defaultValue) {
+    void addOperationDefault(final String name,
+                             final String param,
+                             final String defaultValue) {
         opToDefault.put(name, param, defaultValue);
     }
 
-    /**
-     * Returns the default value of operation parameter.
-     */
-    public final String getOperationDefault(final String name,
-                                            final String param) {
+    /** Returns the default value of operation parameter. */
+    public String getOperationDefault(final String name, final String param) {
         return (String) opToDefault.get(name, param);
     }
 
     /**
      * Sets if this service is master/slave service (with certain probability).
      */
-    public final void setProbablyMasterSlave(
-                                           final boolean probablyMasterSlave) {
+    void setProbablyMasterSlave(final boolean probablyMasterSlave) {
         this.probablyMasterSlave = probablyMasterSlave;
     }
 
     /** Returns whether the service is probably master/slave resource. */
-    public final boolean isProbablyMasterSlave() {
+    public boolean isProbablyMasterSlave() {
         return probablyMasterSlave;
     }
 
-    /**
-     * Sets if this service is clone service (with certain probability).
-     */
-    public final void setProbablyClone(final boolean probablyClone) {
+    /** Sets if this service is clone service (with certain probability). */
+    void setProbablyClone(final boolean probablyClone) {
         this.probablyClone = probablyClone;
     }
 
     /** Returns whether the service is probably master/slave resource. */
-    public final boolean isProbablyClone() {
+    public boolean isProbablyClone() {
         return probablyClone;
     }
 
-    /**
-     * Returns section of some of the parameters.
-     */
-    public final String getSection(final String param) {
+    /** Returns section of some of the parameters. */
+    String getSection(final String param) {
         return sectionMap.get(param);
     }
 
-    /**
-     * Returns field type of the param.
-     */
-    public final GuiComboBox.Type getFieldType(final String param) {
+    /** Returns field type of the param. */
+    public GuiComboBox.Type getFieldType(final String param) {
         return fieldType.get(param);
     }
 
-    /**
-     * Returns resource agent string like ocf:linbit:drbd.
-     */
-    public final String getRAString() {
+    /** Returns resource agent string like ocf:linbit:drbd. */
+    String getRAString() {
         return resourceClass + "::" + provider + ":" + name;
     }
 
     /** Returns whether this resource agent is ping or pingd. */
-    public final boolean isPingService() {
+    public boolean isPingService() {
         return pingService;
     }
 }

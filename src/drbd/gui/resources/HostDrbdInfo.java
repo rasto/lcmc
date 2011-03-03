@@ -64,69 +64,51 @@ import javax.swing.JColorChooser;
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-public class HostDrbdInfo extends Info {
+public final class HostDrbdInfo extends Info {
     /** Host data. */
     private final Host host;
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_DRBD_STATUS_STRING =
                                                 "drbd status is not available";
-    /**
-     * Prepares a new <code>HostDrbdInfo</code> object.
-     */
+    /** Prepares a new <code>HostDrbdInfo</code> object. */
     public HostDrbdInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
         this.host = host;
     }
 
-    /**
-     * Returns browser object of this info.
-     */
-    protected final HostBrowser getBrowser() {
+    /** Returns browser object of this info. */
+    @Override protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /**
-     * Returns a host icon for the menu.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns a host icon for the menu. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
-    /**
-     * Returns id, which is name of the host.
-     */
-    public final String getId() {
+    /** Returns id, which is name of the host. */
+    @Override public String getId() {
         return host.getName();
     }
 
-    /**
-     * Returns a host icon for the category in the menu.
-     */
-    public final ImageIcon getCategoryIcon(final boolean testOnly) {
+    /** Returns a host icon for the category in the menu. */
+    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
-    /**
-     * Start upgrade drbd dialog.
-     */
-    public final void upgradeDrbd() {
+    /** Start upgrade drbd dialog. */
+    void upgradeDrbd() {
         final AddDrbdUpgradeDialog adud = new AddDrbdUpgradeDialog(this);
         adud.showDialogs();
     }
 
-    /**
-     * Returns tooltip for the host.
-     */
-    public final String getToolTipForGraph(final boolean testOnly) {
+    /** Returns tooltip for the host. */
+    @Override public String getToolTipForGraph(final boolean testOnly) {
         return getBrowser().getHostToolTip(host);
     }
 
-    /**
-     * Returns info panel.
-     *
-     * @return info panel
-     */
-    public final JComponent getInfoPanel() {
+    /** Returns the info panel. */
+    @Override public JComponent getInfoPanel() {
         Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         final JTextArea ta = new JTextArea();
@@ -135,12 +117,12 @@ public class HostDrbdInfo extends Info {
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
-                public void done(final String ans) {
+                @Override public void done(final String ans) {
                     ta.setText(ans);
                 }
 
-                public void doneError(final String ans,
-                                      final int exitCode) {
+                @Override public void doneError(final String ans,
+                                                final int exitCode) {
                     ta.setText("error");
                     Tools.sshError(host, "", ans, stacktrace, exitCode);
                 }
@@ -149,7 +131,7 @@ public class HostDrbdInfo extends Info {
         // TODO: disable buttons if disconnected?
         final MyButton procDrbdButton = new MyButton("/proc/drbd");
         procDrbdButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 host.execCommand("DRBD.getProcDrbd",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -160,7 +142,7 @@ public class HostDrbdInfo extends Info {
         host.registerEnableOnConnect(procDrbdButton);
         final MyButton drbdProcsButton = new MyButton("DRBD Processes");
         drbdProcsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 host.execCommand("DRBD.getProcesses",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -206,12 +188,8 @@ public class HostDrbdInfo extends Info {
         return mainPanel;
     }
 
-    /**
-     * Gets host.
-     *
-     * @return host of this info
-     */
-    public final Host getHost() {
+    /** Returns host. */
+    public Host getHost() {
         return host;
     }
 
@@ -223,31 +201,25 @@ public class HostDrbdInfo extends Info {
      *              other host info
      * @return true if they are equal
      */
-    public final boolean equals(final HostDrbdInfo otherHI) {
+    boolean equals(final HostDrbdInfo otherHI) {
         if (otherHI == null) {
             return false;
         }
         return otherHI.toString().equals(host.getName());
     }
 
-    /**
-     * Returns string representation of the host. It's same as name.
-     */
-    public final String toString() {
+    /** Returns string representation of the host. It's same as name. */
+    @Override public String toString() {
         return host.getName();
     }
 
-    /**
-     * Returns name of the host.
-     */
-    public final String getName() {
+    /** Returns name of the host. */
+    @Override public String getName() {
         return host.getName();
     }
 
-    /**
-     * Creates the popup for the host.
-     */
-    public final List<UpdatableItem> createPopup() {
+    /** Creates the popup for the host. */
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
@@ -261,11 +233,11 @@ public class HostDrbdInfo extends Info {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
                 }
@@ -282,7 +254,7 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     } else if (getHost().isDrbdStatus()) {
@@ -293,7 +265,7 @@ public class HostDrbdInfo extends Info {
                     //       && !getHost().isDrbdStatus();
                 }
 
-                public final void action() {
+                @Override public void action() {
                     DRBD.load(getHost(), testOnly);
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
@@ -309,14 +281,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                          : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -339,14 +311,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     upgradeDrbd();
                 }
             };
@@ -361,11 +333,11 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
                                             "Choose " + host.getName()
@@ -387,14 +359,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     drbd.gui.dialog.drbd.DrbdsLog l =
                                       new drbd.gui.dialog.drbd.DrbdsLog(host);
                     l.showDialog();
@@ -411,7 +383,7 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     } else {
@@ -419,7 +391,7 @@ public class HostDrbdInfo extends Info {
                     }
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                          : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -440,7 +412,7 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     } else {
@@ -448,7 +420,7 @@ public class HostDrbdInfo extends Info {
                     }
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                           : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -469,7 +441,7 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     } else {
@@ -477,7 +449,7 @@ public class HostDrbdInfo extends Info {
                     }
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                            : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -502,7 +474,7 @@ public class HostDrbdInfo extends Info {
                                                    false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     } else {
@@ -510,7 +482,7 @@ public class HostDrbdInfo extends Info {
                     }
                 }
 
-                public void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                           : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -531,7 +503,7 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     } else {
@@ -539,7 +511,7 @@ public class HostDrbdInfo extends Info {
                     }
                 }
 
-                public final void action() {
+                @Override public void action() {
                     for (final BlockDevInfo bdi
                                         : getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()
@@ -560,14 +532,14 @@ public class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (getHost().getCluster() != null) {
                         return "it is a member of a cluster";
                     }
                     return null;
                 }
 
-                public final void action() {
+                @Override public void action() {
                     getHost().disconnect();
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
@@ -582,14 +554,14 @@ public class HostDrbdInfo extends Info {
                                 new AccessMode(ConfigData.AccessType.OP,
                                                false)) {
             private static final long serialVersionUID = 1L;
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            public final void update() {
+            @Override public void update() {
                 super.update();
                 getBrowser().addAdvancedMenu(this);
             }
@@ -599,10 +571,8 @@ public class HostDrbdInfo extends Info {
         return items;
     }
 
-    /**
-     * Returns grahical view if there is any.
-     */
-    public final JPanel getGraphicalView() {
+    /** Returns grahical view if there is any. */
+    @Override public JPanel getGraphicalView() {
         final DrbdGraph dg = getBrowser().getDrbdGraph();
         if (dg == null) {
             return null;
@@ -610,10 +580,9 @@ public class HostDrbdInfo extends Info {
         dg.getDrbdInfo().setSelectedNode(null);
         return dg.getDrbdInfo().getGraphicalView();
     }
-    /**
-     * Returns how much of this is used.
-     */
-    public final int getUsed() {
+
+    /** Returns how much of this is used. */
+    public int getUsed() {
         // TODO: maybe the load?
         return -1;
     }
@@ -622,7 +591,7 @@ public class HostDrbdInfo extends Info {
      * Returns subtexts that appears in the host vertex in the cluster
      * graph.
      */
-    public final Subtext[] getSubtextsForGraph() {
+    Subtext[] getSubtextsForGraph() {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
@@ -636,10 +605,8 @@ public class HostDrbdInfo extends Info {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /**
-     * Returns subtexts that appears in the host vertex in the drbd graph.
-     */
-    public final Subtext[] getSubtextsForDrbdGraph(final boolean testOnly) {
+    /** Returns subtexts that appears in the host vertex in the drbd graph. */
+    public Subtext[] getSubtextsForDrbdGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
@@ -653,21 +620,16 @@ public class HostDrbdInfo extends Info {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /**
-     * Returns text that appears above the icon in the drbd graph.
-     */
-    public final String getIconTextForDrbdGraph(final boolean testOnly) {
+    /** Returns text that appears above the icon in the drbd graph. */
+    public String getIconTextForDrbdGraph(final boolean testOnly) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
         }
         return null;
     }
 
-    /**
-     * Returns text that appears in the corner of the drbd graph.
-     */
-    public final Subtext getRightCornerTextForDrbdGraph(
-                                                 final boolean testOnly) {
+    /** Returns text that appears in the corner of the drbd graph. */
+    public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
         return null;
     }
 }

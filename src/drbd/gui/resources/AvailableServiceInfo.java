@@ -47,7 +47,7 @@ import java.util.ArrayList;
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
-public class AvailableServiceInfo extends HbCategoryInfo {
+public final class AvailableServiceInfo extends HbCategoryInfo {
     /** Info about the service. */
     private final ResourceAgent resourceAgent;
     /** Available services icon. */
@@ -58,40 +58,30 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
 
-    /**
-     * Prepares a new <code>AvailableServiceInfo</code> object.
-     */
+    /** Prepares a new <code>AvailableServiceInfo</code> object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,
                                 final Browser browser) {
         super(resourceAgent.getName(), browser);
         this.resourceAgent = resourceAgent;
     }
 
-    /**
-     * Returns heartbeat service class.
-     */
-    public final ResourceAgent getResourceAgent() {
+    /** Returns heartbeat service class. */
+    ResourceAgent getResourceAgent() {
         return resourceAgent;
     }
 
-    /**
-     * Returns icon for this menu category.
-     */
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    /** Returns icon for this menu category. */
+    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
         return AVAIL_SERVICES_ICON;
     }
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
-    protected final String getInfoType() {
+    /** Returns type of the info text. text/plain or text/html. */
+    @Override protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
-    /**
-     * Returns the info about the service.
-     */
-    public final String getInfo() {
+    /** Returns the info about the service. */
+    @Override public String getInfo() {
         final StringBuffer s = new StringBuffer(80);
         final CRMXML crmXML = getBrowser().getCRMXML();
         s.append("<h2>");
@@ -120,21 +110,19 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         return s.toString();
     }
 
-    /**
-     * Returns back button.
-     */
-    protected final JComponent getBackButton() {
+    /** Returns back button. */
+    @Override protected JComponent getBackButton() {
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         final MyButton overviewButton = new MyButton(
-                                                     Tools.getString("ClusterBrowser.RAsOverviewButton"),
-                                                     BACK_ICON);
+                         Tools.getString("ClusterBrowser.RAsOverviewButton"),
+                         BACK_ICON);
         overviewButton.setPreferredSize(new Dimension(180, 50));
         overviewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final ResourceAgentClassInfo raci =
                         getBrowser().getClassInfoMap(
                                             resourceAgent.getResourceClass());
@@ -155,28 +143,26 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         return buttonPanel;
     }
 
-    /**
-     * Returns list of menu items.
-     */
-    public final List<UpdatableItem> createPopup() {
+    /** Returns list of menu items. */
+    @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final MyMenuItem addServiceMenu = new MyMenuItem(
-                            Tools.getString("ClusterBrowser.AddServiceToCluster"),
-                            null,
-                            null,
-                            new AccessMode(ConfigData.AccessType.ADMIN, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                        Tools.getString("ClusterBrowser.AddServiceToCluster"),
+                        null,
+                        null,
+                        new AccessMode(ConfigData.AccessType.ADMIN, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
             }
 
-            public final void action() {
+            @Override public void action() {
                 hidePopup();
                 final ServicesInfo si = getBrowser().getServicesInfo();
                 final boolean testOnly = false;

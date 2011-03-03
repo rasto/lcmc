@@ -36,23 +36,19 @@ import drbd.gui.resources.HostDrbdInfo;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class AddDrbdUpgradeDialog {
+public final class AddDrbdUpgradeDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Host on which the drbd will be upgraded. */
     private final HostDrbdInfo hostDrbdInfo;
 
-    /**
-     * Prepares a new <code>AddDrbdUpgradeDialog</code> object.
-     */
+    /** Prepares a new <code>AddDrbdUpgradeDialog</code> object. */
     public AddDrbdUpgradeDialog(final HostDrbdInfo hostDrbdInfo) {
         this.hostDrbdInfo = hostDrbdInfo;
     }
 
-    /**
-     * Shows step by step dialogs that upgrade the drbd.
-     */
-    public final void showDialogs() {
+    /** Shows step by step dialogs that upgrade the drbd. */
+    public void showDialogs() {
         WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -71,10 +67,8 @@ public class AddDrbdUpgradeDialog {
         Tools.getGUIData().getMainFrame().requestFocus();
     }
 
-    /**
-     * Returns whether the wizard was canceled.
-     */
-    public final boolean isCanceled() {
+    /** Returns whether the wizard was canceled. */
+    public boolean isCanceled() {
         return canceled;
     }
 }

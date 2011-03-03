@@ -44,7 +44,7 @@ import java.awt.Dimension;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class Storage extends VMConfig {
+final class Storage extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
@@ -62,13 +62,13 @@ public class Storage extends VMConfig {
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Storage</code> object. */
-    public Storage(final WizardDialog previousDialog,
-                   final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    Storage(final WizardDialog previousDialog,
+            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
     /** Next dialog. */
-    public final WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             nextDialogObject = new Network(this, getVMSVirtualDomainInfo());
         }
@@ -79,7 +79,7 @@ public class Storage extends VMConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.vm.Domain.Title in TextResources.
      */
-    protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Storage.Title");
     }
 
@@ -87,25 +87,25 @@ public class Storage extends VMConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.vm.Domain.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.vm.Storage.Description");
     }
 
     /** Inits dialog. */
-    protected final void initDialog() {
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
         final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
     /** Returns input pane where user can configure a vm. */
-    protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         if (vmsdi != null) {
             vmsdi.selectMyself();
         }
@@ -146,15 +146,6 @@ public class Storage extends VMConfig {
                       Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                       null);
-        //vmsdi.paramComboBoxGet(DiskData.TYPE, "wizard").setValue("file");
-        //vmsdi.paramComboBoxGet(DiskData.TARGET_BUS_TYPE, "wizard").setValue(
-        //                                                        "IDE Disk");
-        //vmsdi.paramComboBoxGet(DiskData.SOURCE_FILE, "wizard").setValue(
-        //                             "/var/lib/libvirt/images/"
-        //                             +
-        //                             getVMSVirtualDomainInfo().getComboBoxValue(
-        //                                                 VMSXML.VM_PARAM_NAME)
-        //                             + ".img");
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

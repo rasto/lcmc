@@ -51,9 +51,7 @@ public final class CRM {
         /* empty */
     }
 
-    /**
-     * Returns cibadmin command.
-     */
+    /** Returns cibadmin command. */
     public static String getCibCommand(final String command,
                                        final String objType,
                                        final String xml) {
@@ -67,9 +65,7 @@ public final class CRM {
         return cmd.toString();
     }
 
-    /**
-     * Executes specified command on the host.
-     */
+    /** Executes specified command on the host. */
     private static SSH.SSHOutput execCommand(final Host host,
                                              final String command,
                                              final boolean outputVisible,
@@ -105,9 +101,7 @@ public final class CRM {
         }
     }
 
-    /**
-     * Executes the ptest command and returns results.
-     */
+    /** Executes the ptest command and returns results. */
     public static String getPtest(final Host host) {
         try {
             mPtestLock.acquire();
@@ -608,9 +602,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Returns xml for location xml.
-     */
+    /** Returns xml for location xml. */
     private static String getLocationXML(final String resId,
                                          final String onHost,
                                          final String attribute,
@@ -728,7 +720,7 @@ public final class CRM {
         String value = null;
         String score = null;
         String scoreAttribute = null;
-        String attribute = "pingd";
+        final String attribute = "pingd";
         String idPart = "";
         if ("defined".equals(ruleType)) {
             scoreAttribute = "pingd";
@@ -760,9 +752,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Removes location constraint.
-     */
+    /** Removes location constraint. */
     public static boolean removeLocation(final Host host,
                                          final String locationId,
                                          final String resId,
@@ -866,9 +856,7 @@ public final class CRM {
         return exitCode == 0;
     }
 
-    /**
-     * Starts resource.
-     */
+    /** Starts resource. */
     public static boolean startResource(final Host host,
                                         final String resId,
                                         final boolean testOnly) {
@@ -887,9 +875,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Returns meta attributes xml.
-     */
+    /** Returns meta attributes xml. */
     private static String getMetaAttributes(final Host host,
                                            final String resId,
                                            final Map<String, String> attrs,
@@ -943,9 +929,7 @@ public final class CRM {
         return xml.toString();
     }
 
-    /**
-     * Sets whether the service should be managed or not.
-     */
+    /** Sets whether the service should be managed or not. */
     public static boolean setManaged(final Host host,
                                      final String resId,
                                      final boolean isManaged,
@@ -995,9 +979,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Migrates resource to the specified host.
-     */
+    /** Migrates resource to the specified host. */
     public static boolean migrateResource(final Host host,
                                           final String resId,
                                           final String onHost,
@@ -1025,9 +1007,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Migrates resource to the specified host.
-     */
+    /** Migrates resource to the specified host. */
     public static boolean forceMigrateResource(final Host host,
                                                final String resId,
                                                final String onHost,
@@ -1042,9 +1022,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Unmigrates resource that was previously migrated.
-     */
+    /** Unmigrates resource that was previously migrated. */
     public static boolean unmigrateResource(final Host host,
                                             final String resId,
                                             final boolean testOnly) {
@@ -1057,9 +1035,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Sets global heartbeat parameters.
-     */
+    /** Sets global heartbeat parameters. */
     public static boolean setGlobalParameters(
                                         final Host host,
                                         final Map<String, String> args,
@@ -1133,9 +1109,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Removes colocation with specified colocation id.
-     */
+    /** Removes colocation with specified colocation id. */
     public static boolean removeColocation(final Host host,
                                            final String colocationId,
                                            final boolean testOnly) {
@@ -1212,9 +1186,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Removes order constraint with specified order id.
-     */
+    /** Removes order constraint with specified order id. */
     public static boolean removeOrder(final Host host,
                                       final String orderId,
                                       final boolean testOnly) {
@@ -1229,9 +1201,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Adds order constraint.
-     */
+    /** Adds order constraint. */
     public static boolean addOrder(final Host host,
                                    final String ordId,
                                    final String parentHbId,
@@ -1305,9 +1275,7 @@ public final class CRM {
         return exitCode == 0;
     }
 
-    /**
-     * Makes heartbeat stand by.
-     */
+    /** Makes heartbeat stand by. */
     public static boolean standByOn(final Host host, final boolean testOnly) {
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
@@ -1324,9 +1292,7 @@ public final class CRM {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Undoes heartbeat stand by.
-     */
+    /** Undoes heartbeat stand by. */
     public static boolean standByOff(final Host host, final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         final String hbV = host.getHeartbeatVersion();

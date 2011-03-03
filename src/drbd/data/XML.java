@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
  * @version $Id$
  *
  */
-public class XML {
+abstract class XML {
     /** Returns child node of the node identified by the tag. */
     protected final Node getChildNode(final Node node, final String tag) {
         final NodeList nodeList = node.getChildNodes();
@@ -57,7 +57,7 @@ public class XML {
     }
 
     /** Returns attribute value for node and name of the attribute. */
-    public final String getAttribute(final Node node, final String name) {
+    final String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {
             return null;
         } else {
@@ -66,13 +66,13 @@ public class XML {
     }
 
     /** Returns CDATA section. */
-    public final String getCDATA(final Node node) {
+    final String getCDATA(final Node node) {
         final Node n = getChildNode(node, "#cdata-section");
         return n.getNodeValue();
     }
 
     /** Returns text in the node. */
-    public final String getText(final Node node) {
+    final String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
         if (ch == null) {
             return "";

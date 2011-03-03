@@ -54,7 +54,7 @@ import java.util.ArrayList;
  * @version $Id$
  *
  */
-public class CheckInstallation extends DialogHost {
+final class CheckInstallation extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
@@ -122,18 +122,14 @@ public class CheckInstallation extends DialogHost {
     /** Label of pacemaker that can be with corosync or openais. */
     private final JLabel pmJLabel = new JLabel("Pacemaker/Coro");
 
-    /**
-     * Prepares a new <code>CheckInstallation</code> object.
-     */
-    public CheckInstallation(final WizardDialog previousDialog,
-                                 final Host host) {
+    /** Prepares a new <code>CheckInstallation</code> object. */
+    CheckInstallation(final WizardDialog previousDialog,
+                      final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Inits dialog.
-     */
-    protected final void initDialog() {
+    /** Inits dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         drbdOk = false;
         pmOk = false;
@@ -142,7 +138,7 @@ public class CheckInstallation extends DialogHost {
         nextDialogObject = new Finish(this, getHost());
         final CheckInstallation thisClass = this;
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 drbdButton.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
                 drbdButton.setEnabled(false);
@@ -155,7 +151,7 @@ public class CheckInstallation extends DialogHost {
         });
         drbdButton.addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
@@ -179,7 +175,7 @@ public class CheckInstallation extends DialogHost {
                             getHost().setDrbdInstallMethod(im.getIndex());
                         }
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 buttonClass(nextButton()).pressButton();
                             }
                         });
@@ -187,7 +183,7 @@ public class CheckInstallation extends DialogHost {
                         nextDialogObject =
                                  new LinbitLogin(thisClass, getHost());
                         SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 buttonClass(nextButton()).pressButton();
                             }
                         });
@@ -200,13 +196,13 @@ public class CheckInstallation extends DialogHost {
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         hbPmButton.addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new HeartbeatInst(thisClass, getHost());
                     final InstallMethods im =
                                    (InstallMethods) hbPmInstMethodCB.getValue();
                     getHost().setHbPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             buttonClass(nextButton()).pressButton();
                         }
                     });
@@ -218,13 +214,13 @@ public class CheckInstallation extends DialogHost {
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         pmButton.addActionListener(
             new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
+                @Override public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new PacemakerInst(thisClass, getHost());
                     final InstallMethods im =
                                 (InstallMethods) pmInstMethodCB.getValue();
                     getHost().setPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             buttonClass(nextButton()).pressButton();
                         }
                     });
@@ -236,11 +232,12 @@ public class CheckInstallation extends DialogHost {
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  checkDrbd(ans);
                              }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                  checkDrbd(""); // not installed
                              }
                          },
@@ -252,10 +249,10 @@ public class CheckInstallation extends DialogHost {
     /**
      * Checks whether drbd is installed and starts heartbeat/pacemaker check.
      */
-    public final void checkDrbd(final String ans) {
+    void checkDrbd(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     drbdLabel.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
                     drbdIcon.setIcon(NOT_INSTALLED_ICON);
@@ -272,7 +269,7 @@ public class CheckInstallation extends DialogHost {
         } else {
             drbdOk = true;
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     drbdLabel.setText(": " + ans.trim());
                     if (getHost().isDrbdUpgradeAvailable(ans.trim())) {
                         drbdIcon.setIcon(UPGR_AVAIL_ICON);
@@ -299,12 +296,13 @@ public class CheckInstallation extends DialogHost {
         getHost().execCommand("HbCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  Tools.debug(this, "ans: " + ans, 2);
                                  checkAisHbPm(ans);
                              }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                  done("");
                              }
                          },
@@ -317,7 +315,7 @@ public class CheckInstallation extends DialogHost {
      * Checks whether heartbeat/pacemaker is installed and starts
      * openais/pacemaker check.
      */
-    public final void checkAisHbPm(final String ans) {
+    void checkAisHbPm(final String ans) {
         getHost().setPacemakerVersion(null);
         getHost().setOpenaisVersion(null);
         getHost().setHeartbeatVersion(null);
@@ -355,7 +353,7 @@ public class CheckInstallation extends DialogHost {
         if (hbVersion == null) {
             /* hb */
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     hbPmIcon.setIcon(NOT_INSTALLED_ICON);
                     hbPmLabel.setText(": " + Tools.getString(
                              "Dialog.Host.CheckInstallation.HbPmNotInstalled"));
@@ -375,7 +373,7 @@ public class CheckInstallation extends DialogHost {
             final String hbVersionText = text;
             getHost().setHeartbeatVersion(hbVersion);
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     if (getHost().getPacemakerVersion() == null
                         || getHost().getHeartbeatVersion().equals(
                                             getHost().getPacemakerVersion())) {
@@ -394,7 +392,7 @@ public class CheckInstallation extends DialogHost {
             || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pmIcon.setIcon(NOT_INSTALLED_ICON);
                     pmLabel.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.PmNotInstalled"));
@@ -404,7 +402,7 @@ public class CheckInstallation extends DialogHost {
         } else {
             pmOk = true;
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     String coroAisVersion = "no";
                     pmIcon.setIcon(INSTALLED_ICON);
                     if (corosyncVersion != null) {
@@ -427,7 +425,7 @@ public class CheckInstallation extends DialogHost {
             nextButtonSetEnabled(true);
             enableComponents();
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     answerPaneSetText(Tools.getString(
                                        "Dialog.Host.CheckInstallation.AllOk"));
                 }
@@ -449,7 +447,7 @@ public class CheckInstallation extends DialogHost {
         if (!drbdOk
             && Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.sleep(1000);
                     drbdButton.pressButton();
                 }
@@ -457,7 +455,7 @@ public class CheckInstallation extends DialogHost {
         } else if (!hbPmOk
             && Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.sleep(1000);
                     hbPmButton.pressButton();
                 }
@@ -465,7 +463,7 @@ public class CheckInstallation extends DialogHost {
         } else if (!pmOk
             && Tools.getConfigData().getAutoOptionHost("pminst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.sleep(1000);
                     pmButton.pressButton();
                 }
@@ -473,10 +471,8 @@ public class CheckInstallation extends DialogHost {
         }
     }
 
-    /**
-     * Returns the next dialog object. It is set dynamicaly.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog object. It is set dynamicaly. */
+    @Override public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -484,7 +480,7 @@ public class CheckInstallation extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.CheckInstallation.Title");
     }
 
@@ -492,13 +488,11 @@ public class CheckInstallation extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.CheckInstallation.Description");
     }
 
-    /**
-     * This class holds install method names, and their indeces.
-     */
+    /** This class holds install method names, and their indeces. */
     private class InstallMethods {
         /** Name of the method like "CD". */
         private final String name;
@@ -507,16 +501,12 @@ public class CheckInstallation extends DialogHost {
         /** Method string. */
         private final String method;
 
-        /**
-         * Creates new InstallMethods object.
-         */
+        /** Creates new InstallMethods object. */
         InstallMethods(final String name, final int index) {
             this(name, index, "");
         }
 
-        /**
-         * Creates new InstallMethods object.
-         */
+        /** Creates new InstallMethods object. */
         InstallMethods(final String name,
                        final int index,
                        final String method) {
@@ -525,40 +515,30 @@ public class CheckInstallation extends DialogHost {
             this.method = method;
         }
 
-        /**
-         * Returns name of the install method.
-         */
-        public final String toString() {
+        /** Returns name of the install method. */
+        @Override public String toString() {
             return name;
         }
 
-        /**
-         * Returns index of the install method.
-         */
-        public final String getIndex() {
+        /** Returns index of the install method. */
+        String getIndex() {
             return Integer.toString(index);
         }
 
-        /**
-         * Returns method.
-         */
-        public final String getMethod() {
+        /** Returns method. */
+        String getMethod() {
             return method;
         }
 
-        /**
-         * Returns whether the installation method is "source".
-         */
-         public final boolean isSourceMethod() {
-             return "source".equals(method);
-         }
+        /** Returns whether the installation method is "source". */
+        boolean isSourceMethod() {
+            return "source".equals(method);
+        }
 
-        /**
-         * Returns whether the installation method is "linbit".
-         */
-         public final boolean isLinbitMethod() {
-             return "linbit".equals(method);
-         }
+        /** Returns whether the installation method is "linbit". */
+        boolean isLinbitMethod() {
+            return "linbit".equals(method);
+        }
     }
 
     /**
@@ -646,7 +626,7 @@ public class CheckInstallation extends DialogHost {
                                   false)); /* only adv. mode */
         if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pmInstMethodCB.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
@@ -656,16 +636,16 @@ public class CheckInstallation extends DialogHost {
         }
         pmInstMethodCB.addListeners(
             new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 InstallMethods method =
                                   (InstallMethods) pmInstMethodCB.getValue();
                                 final String toolTip =
                                         getPmInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
+                                    @Override public void run() {
                                         pmInstMethodCB.setToolTipText(
                                                                       toolTip);
                                         pmButton.setToolTipText(toolTip);
@@ -725,7 +705,7 @@ public class CheckInstallation extends DialogHost {
                                   false)); /* only adv. mode */
         if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     hbPmInstMethodCB.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
@@ -735,17 +715,17 @@ public class CheckInstallation extends DialogHost {
         }
         hbPmInstMethodCB.addListeners(
             new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
-                            public void run() {
+                            @Override public void run() {
                                 InstallMethods method =
                                      (InstallMethods) hbPmInstMethodCB.
                                                                     getValue();
                                 final String toolTip =
                                          getHbPmInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
+                                    @Override public void run() {
                                         hbPmInstMethodCB.setToolTipText(
                                                                       toolTip);
                                         hbPmButton.setToolTipText(toolTip);
@@ -812,17 +792,17 @@ public class CheckInstallation extends DialogHost {
                                       false)); /* only adv. mode */
             drbdInstMethodCB.addListeners(
                 new ItemListener() {
-                    public void itemStateChanged(final ItemEvent e) {
+                    @Override public void itemStateChanged(final ItemEvent e) {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
                             final Thread thread = new Thread(new Runnable() {
-                                public void run() {
+                                @Override public void run() {
                                     InstallMethods method =
                                        (InstallMethods) drbdInstMethodCB.
                                                                     getValue();
                                     final String toolTip =
                                          getDrbdInstToolTip(method.getIndex());
                                     SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
+                                        @Override public void run() {
                                            drbdInstMethodCB.setToolTipText(
                                                                     toolTip);
                                            drbdButton.setToolTipText(toolTip);
@@ -850,7 +830,7 @@ public class CheckInstallation extends DialogHost {
         }
         if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     drbdInstMethodCB.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
@@ -891,10 +871,8 @@ public class CheckInstallation extends DialogHost {
         return pane;
     }
 
-    /**
-     * Returns input pane with installation pane and answer pane.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns input pane with installation pane and answer pane. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());
@@ -907,10 +885,8 @@ public class CheckInstallation extends DialogHost {
         return pane;
     }
 
-    /**
-     * Enable skip button.
-     */
-    protected final boolean skipButtonEnabled() {
+    /** Enable skip button. */
+    @Override protected boolean skipButtonEnabled() {
         return true;
     }
 }

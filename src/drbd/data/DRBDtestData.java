@@ -35,7 +35,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * @version $Id$
  *
  */
-public class DRBDtestData {
+public final class DRBDtestData {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Tool tip. */
@@ -52,9 +52,7 @@ public class DRBDtestData {
     /** Hash with host and drbd resource, that will be dettached. */
     private final MultiKeyMap disklessHash = new MultiKeyMap();
 
-    /**
-     * Prepares a new <code>DRBDtestData</code> object.
-     */
+    /** Prepares a new <code>DRBDtestData</code> object. */
     public DRBDtestData(final Map<Host, String> testOutput) {
         if (testOutput == null) {
             this.toolTip = null;
@@ -102,38 +100,28 @@ public class DRBDtestData {
         this.toolTip = sb.toString();
     }
 
-    /**
-     * Returns tooltip.
-     */
-    public final String getToolTip() {
+    /** Returns tooltip. */
+    public String getToolTip() {
         return toolTip;
     }
 
-    /**
-     * Returns whether the device will be disconnected on the host.
-     */
-    public final boolean isDisconnected(final Host host, final String dev) {
+    /** Returns whether the device will be disconnected on the host. */
+    public boolean isDisconnected(final Host host, final String dev) {
         return disconnectedHash.get(host, dev) != null;
     }
 
-    /**
-     * Returns whether the device will be connected on the host.
-     */
-    public final boolean isConnected(final Host host, final String dev) {
+    /** Returns whether the device will be connected on the host. */
+    public boolean isConnected(final Host host, final String dev) {
         return connectedHash.get(host, dev) != null;
     }
 
-    /**
-     * Returns whether the drbd device is diskless on the host.
-     */
-    public final boolean isDiskless(final Host host, final String dev) {
+    /** Returns whether the drbd device is diskless on the host. */
+    public boolean isDiskless(final Host host, final String dev) {
         return disklessHash.get(host, dev) != null;
     }
 
-    /**
-     * Returns whether the drbd device is diskless on the host.
-     */
-    public final boolean isAttached(final Host host, final String dev) {
+    /** Returns whether the drbd device is diskless on the host. */
+    public boolean isAttached(final Host host, final String dev) {
         return attachedHash.get(host, dev) != null;
     }
 }

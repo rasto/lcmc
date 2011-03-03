@@ -31,7 +31,7 @@ import drbd.utilities.Tools;
  * @version $Id$
  *
  */
-public class Network extends Resource {
+public final class Network extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** List of all ips in the network. */
@@ -55,24 +55,18 @@ public class Network extends Resource {
         this.netMask = netMask;
     }
 
-    /**
-     * Returns list of ips delimited with comma.
-     */
-    public final String getIps() {
+    /** Returns list of ips delimited with comma. */
+    public String getIps() {
         return Tools.join(", ", ips);
     }
 
-    /**
-     * Returns net mask of this network.
-     */
-    public final String getNetMask() {
+    /** Returns net mask of this network. */
+    public String getNetMask() {
         return netMask;
     }
 
-    /**
-     * Returns value of the parameter.
-     */
-    public final String getValue(final String parameter) {
+    /** Returns value of the parameter. */
+    @Override public String getValue(final String parameter) {
         Tools.appError("Wrong call to getValue");
         return "???";
     }

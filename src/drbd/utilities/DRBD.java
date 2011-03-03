@@ -49,9 +49,7 @@ public final class DRBD {
     /** DRBD test lock. */
     private static final Mutex M_DRBD_TEST_LOCK = new Mutex();
 
-    /**
-     * Private constructor, cannot be instantiated.
-     */
+    /** Private constructor, cannot be instantiated. */
     private DRBD() {
         /* Cannot be instantiated. */
     }
@@ -123,9 +121,7 @@ public final class DRBD {
         }
     }
 
-    /**
-     * Returns results of previous dry run.
-     */
+    /** Returns results of previous dry run. */
     public static String getDRBDtest() {
         try {
             M_DRBD_TEST_LOCK.acquire();
@@ -137,9 +133,7 @@ public final class DRBD {
         return out;
     }
 
-    /**
-     * Executes the drbdadm attach on the specified host and resource.
-     */
+    /** Executes the drbdadm attach on the specified host and resource. */
     public static boolean attach(final Host host,
                                  final String resource,
                                  final boolean testOnly) {
@@ -163,9 +157,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm detach on the specified host and resource.
-     */
+    /** Executes the drbdadm detach on the specified host and resource. */
     public static boolean detach(final Host host,
                                  final String resource,
                                  final boolean testOnly) {
@@ -189,9 +181,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm connect on the specified host and resource.
-     */
+    /** Executes the drbdadm connect on the specified host and resource. */
     public static boolean connect(final Host host,
                                   final String resource,
                                   final boolean testOnly) {
@@ -215,9 +205,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm disconnect on the specified host and resource.
-     */
+    /** Executes the drbdadm disconnect on the specified host and resource. */
     public static boolean disconnect(final Host host,
                                      final String resource,
                                      final boolean testOnly) {
@@ -241,9 +229,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm pause-sync on the specified host and resource.
-     */
+    /** Executes the drbdadm pause-sync on the specified host and resource. */
     public static boolean pauseSync(final Host host,
                                     final String resource,
                                     final boolean testOnly) {
@@ -267,9 +253,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm resume-sync on the specified host and resource.
-     */
+    /** Executes the drbdadm resume-sync on the specified host and resource. */
     public static boolean resumeSync(final Host host,
                                      final String resource,
                                      final boolean testOnly) {
@@ -293,9 +277,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm primary on the specified host and resource.
-     */
+    /** Executes the drbdadm primary on the specified host and resource. */
     public static boolean setPrimary(final Host host,
                                      final String resource,
                                      final boolean testOnly) {
@@ -319,9 +301,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm secondary on the specified host and resource.
-     */
+    /** Executes the drbdadm secondary on the specified host and resource. */
     public static boolean setSecondary(final Host host,
                                        final String resource,
                                        final boolean testOnly) {
@@ -433,9 +413,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Makes specified filesystem on the specified host and block device.
-     */
+    /** Makes specified filesystem on the specified host and block device. */
     public static boolean makeFilesystem(final Host host,
                                          final String blockDevice,
                                          final String filesystem,
@@ -494,9 +472,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm invalidate on the specified host and resource.
-     */
+    /** Executes the drbdadm invalidate on the specified host and resource. */
     public static boolean invalidate(final Host host,
                                      final String resource,
                                      final boolean testOnly) {
@@ -547,9 +523,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm resize on the specified host and resource.
-     */
+    /** Executes the drbdadm resize on the specified host and resource. */
     public static boolean resize(final Host host,
                                  final String resource,
                                  final boolean testOnly) {
@@ -574,9 +548,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm verify on the specified host and resource.
-     */
+    /** Executes the drbdadm verify on the specified host and resource. */
     public static boolean verify(final Host host,
                                  final String resource,
                                  final boolean testOnly) {
@@ -589,9 +561,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm adjust on the specified host and resource.
-     */
+    /** Executes the drbdadm adjust on the specified host and resource. */
     public static int adjust(final Host host,
                              final String resource,
                              final boolean testOnly) {
@@ -651,9 +621,7 @@ public final class DRBD {
 
     }
 
-    /**
-     * Executes the drbdadm down on the specified host and resource.
-     */
+    /** Executes the drbdadm down on the specified host and resource. */
     public static boolean down(final Host host,
                                final String resource,
                                final boolean testOnly) {
@@ -677,9 +645,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Executes the drbdadm up on the specified host and resource.
-     */
+    /** Executes the drbdadm up on the specified host and resource. */
     public static boolean up(final Host host,
                              final String resource,
                              final boolean testOnly) {
@@ -703,9 +669,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /**
-     * Start the drbd. Probably /etc/init.d/drbd start.
-     */
+    /** Start the drbd. Probably /etc/init.d/drbd start. */
     public static boolean start(final Host host, final boolean testOnly) {
         return start(host, null, testOnly);
     }
@@ -725,9 +689,7 @@ public final class DRBD {
 
     }
 
-    /**
-     * Executes load drbd command on the specified host.
-     */
+    /** Executes load drbd command on the specified host. */
     public static boolean load(final Host host, final boolean testOnly) {
         return load(host, null, testOnly);
     }

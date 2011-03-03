@@ -25,13 +25,12 @@ import java.util.Arrays;
 
 /**
  * Here are commands for rhel version 5.
- * TODO: rename it to rhel
  */
-public class DistResource_redhatenterpriseserver_5 extends
-            java.util.ListResourceBundle {
+public final class DistResource_redhatenterpriseserver_5
+                                        extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

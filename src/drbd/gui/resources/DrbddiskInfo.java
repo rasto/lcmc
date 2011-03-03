@@ -31,65 +31,51 @@ import java.util.Map;
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
  * treated in special way.
  */
-class DrbddiskInfo extends ServiceInfo {
+final class DrbddiskInfo extends ServiceInfo {
 
-    /**
-     * Creates new DrbddiskInfo object.
-     */
-    public DrbddiskInfo(final String name,
-                        final ResourceAgent ra,
-                        final Browser browser) {
+    /** Creates new DrbddiskInfo object. */
+    DrbddiskInfo(final String name,
+                 final ResourceAgent ra,
+                 final Browser browser) {
         super(name, ra, browser);
     }
 
-    /**
-     * Creates new DrbddiskInfo object.
-     */
-    public DrbddiskInfo(final String name,
-                        final ResourceAgent ra,
-                        final String resourceName,
-                        final Browser browser) {
+    /** Creates new DrbddiskInfo object. */
+    DrbddiskInfo(final String name,
+                 final ResourceAgent ra,
+                 final String resourceName,
+                 final Browser browser) {
         super(name, ra, browser);
         getResource().setValue("1", resourceName);
     }
 
-    /**
-     * Creates new DrbddiskInfo object.
-     */
-    public DrbddiskInfo(final String name,
-                        final ResourceAgent ra,
-                        final String hbId,
-                        final Map<String, String> resourceNode,
-                        final Browser browser) {
+    /** Creates new DrbddiskInfo object. */
+    DrbddiskInfo(final String name,
+                 final ResourceAgent ra,
+                 final String hbId,
+                 final Map<String, String> resourceNode,
+                 final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
     }
 
-    /**
-     * Returns string representation of the drbddisk service.
-     */
-    public String toString() {
+    /** Returns string representation of the drbddisk service. */
+    @Override public String toString() {
         return getName() + " (" + getParamSaved("1") + ")";
     }
 
-    /**
-     * Returns resource name / parameter "1".
-     */
-    public String getResourceName() {
+    /** Returns resource name / parameter "1". */
+    String getResourceName() {
         return getParamSaved("1");
     }
 
-    /**
-     * Sets resource name / parameter "1". TODO: not used?
-     */
-    public void setResourceName(final String resourceName) {
+    /** Sets resource name / parameter "1". TODO: not used? */
+    void setResourceName(final String resourceName) {
         getResource().setValue("1", resourceName);
     }
 
-    /**
-     * Removes the drbddisk service.
-     */
-    public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
+    /** Removes the drbddisk service. */
+    @Override public void removeMyselfNoConfirm(final Host dcHost,
+                                                final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -100,7 +86,7 @@ class DrbddiskInfo extends ServiceInfo {
     }
 
     /** Sets service parameters with values from resourceNode hash. */
-    public void setParameters(final Map<String, String> resourceNode) {
+    void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -112,7 +98,7 @@ class DrbddiskInfo extends ServiceInfo {
                 dri.setUsedByCRM(null);
             }
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     dri.updateMenus(null);
                 }
             });

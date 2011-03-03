@@ -33,24 +33,20 @@ import java.util.Map;
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
  * better ip entering capabilities.
  */
-class IPaddrInfo extends ServiceInfo {
-    /**
-     * Creates new IPaddrInfo object.
-     */
-    public IPaddrInfo(final String name,
-                      final ResourceAgent ra,
-                      final Browser browser) {
+final class IPaddrInfo extends ServiceInfo {
+    /** Creates new IPaddrInfo object. */
+    IPaddrInfo(final String name,
+               final ResourceAgent ra,
+               final Browser browser) {
         super(name, ra, browser);
     }
 
-    /**
-     * Creates new IPaddrInfo object.
-     */
-    public IPaddrInfo(final String name,
-                      final ResourceAgent ra,
-                      final String hbId,
-                      final Map<String, String> resourceNode,
-                      final Browser browser) {
+    /** Creates new IPaddrInfo object. */
+    IPaddrInfo(final String name,
+               final ResourceAgent ra,
+               final String hbId,
+               final Map<String, String> resourceNode,
+               final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
     }
 
@@ -60,8 +56,8 @@ class IPaddrInfo extends ServiceInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
+    @Override boolean checkResourceFieldsCorrect(final String param,
+                                                 final String[] params) {
         boolean ret = super.checkResourceFieldsCorrect(param, params);
         final GuiComboBox cb;
         if (getResourceAgent().isHeartbeatClass()) {
@@ -86,9 +82,9 @@ class IPaddrInfo extends ServiceInfo {
     }
 
     /** Returns combo box for parameter. */
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
+    @Override protected GuiComboBox getParamComboBox(final String param,
+                                                     final String prefix,
+                                                     final int width) {
         GuiComboBox paramCb;
         if ("ip".equals(param)) {
             /* get networks */
@@ -131,7 +127,7 @@ class IPaddrInfo extends ServiceInfo {
      * Returns string representation of the ip address.
      * In the form of 'ip (interface)'
      */
-    public String toString() {
+    @Override public String toString() {
         final String id = getService().getId();
         if (id == null) {
             return super.toString(); /* this is for 'new IPaddrInfo' */

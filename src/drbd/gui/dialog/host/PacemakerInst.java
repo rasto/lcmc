@@ -41,17 +41,14 @@ import javax.swing.JComponent;
  * @version $Id$
  *
  */
-public class PacemakerInst extends DialogHost {
+final class PacemakerInst extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /**
-     * Prepares a new <code>PacemakerInst</code> object.
-     */
-    public PacemakerInst(final WizardDialog previousDialog,
-                         final Host host) {
+    /** Prepares a new <code>PacemakerInst</code> object. */
+    PacemakerInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
@@ -59,8 +56,7 @@ public class PacemakerInst extends DialogHost {
      * Checks the answer of the installation and enables/disables the
      * components accordingly.
      */
-    public final void checkAnswer(final String ans,
-                                  final String installMethod) {
+    void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
         nextDialogObject = new CheckInstallation(
                                         getPreviousDialog().getPreviousDialog(),
@@ -75,18 +71,14 @@ public class PacemakerInst extends DialogHost {
         }
     }
 
-    /**
-     * Inits the dialog and starts the installation procedure.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog and starts the installation procedure. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         installPm();
     }
 
-    /**
-     * Installs the heartbeat.
-     */
+    /** Installs the heartbeat. */
     private void installPm() {
         String arch = getHost().getDistString("PmInst.install."
                                               + getHost().getArch());
@@ -131,11 +123,12 @@ public class PacemakerInst extends DialogHost {
         getHost().execCommand(installCommand,
                          getProgressBar(),
                          new ExecCallback() {
-                             public void done(final String ans) {
+                             @Override public void done(final String ans) {
                                  checkAnswer(ans, installMethod);
                              }
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             @Override public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
                                  printErrorAndRetry(
                                         Tools.getString(
                                          "Dialog.Host.PacemakerInst.InstError"),
@@ -144,7 +137,8 @@ public class PacemakerInst extends DialogHost {
                              }
                          },
                          new ConvertCmdCallback() {
-                             public final String convert(final String command) {
+                             @Override public String convert(
+                                                        final String command) {
                                  return command.replaceAll("@ARCH@",
                                                            archString);
                              }
@@ -153,10 +147,8 @@ public class PacemakerInst extends DialogHost {
                          SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -164,7 +156,7 @@ public class PacemakerInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.PacemakerInst.Description in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.PacemakerInst.Title");
     }
 
@@ -172,14 +164,12 @@ public class PacemakerInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.PacemakerInst.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.PacemakerInst.Description");
     }
 
-    /**
-     * Returns the input pane with info about the installation progress.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the input pane with info about the installation progress. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

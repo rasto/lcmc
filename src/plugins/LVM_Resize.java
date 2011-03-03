@@ -39,10 +39,8 @@ import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
 
 import java.util.List;
-import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JMenu;
 import javax.swing.JLabel;
@@ -61,7 +59,7 @@ import java.awt.event.ActionEvent;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class LVM_Resize implements RemotePlugin {
+public final class LVM_Resize implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the resize menu item. */
@@ -80,7 +78,7 @@ public class LVM_Resize implements RemotePlugin {
     }
 
     /** Inits the plugin. */
-    public final void init() {
+    @Override public void init() {
         for (final BlockDevInfo bdi
                         : Tools.getGUIData().getAllBlockDevices()) {
             registerInfo(bdi);
@@ -88,7 +86,7 @@ public class LVM_Resize implements RemotePlugin {
     }
 
     /** Adds the menu items to the specified info object. */
-    private final void registerInfo(final Info info) {
+    private void registerInfo(final Info info) {
         if (info instanceof BlockDevInfo) {
             final JMenu menu = info.getMenu();
             if (menu != null) {
@@ -100,8 +98,8 @@ public class LVM_Resize implements RemotePlugin {
     }
 
     /** Adds menu items from the plugin. */
-    public final void addPluginMenuItems(final Info info,
-                                         final List<UpdatableItem> items) {
+    @Override public void addPluginMenuItems(final Info info,
+                                             final List<UpdatableItem> items) {
         if (items != null && info instanceof BlockDevInfo) {
             items.add(getResizeLVMItem((BlockDevInfo) info));
         }
@@ -120,7 +118,7 @@ public class LVM_Resize implements RemotePlugin {
     }
 
     /** Resize menu item. (can't use anonymous classes). */
-    private class ResizeItem extends MyMenuItem {
+    private final class ResizeItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo bdi;
 
@@ -145,7 +143,7 @@ public class LVM_Resize implements RemotePlugin {
             return null;
         }
 
-        public void action() {
+        @Override public void action() {
             final LVMResizeDialog lvmrd = new LVMResizeDialog(bdi);
             while (true) {
                 lvmrd.showDialog();
@@ -160,13 +158,13 @@ public class LVM_Resize implements RemotePlugin {
     }
 
     /** Shows dialog with description. */
-    public final void showDescription() {
+    @Override public void showDescription() {
         final Description description = new Description();
         description.showDialog();
     }
 
     /** Description dialog. */
-    private class Description extends ConfigDialog {
+    private final class Description extends ConfigDialog {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
@@ -174,21 +172,21 @@ public class LVM_Resize implements RemotePlugin {
             super();
         }
 
-        protected final void initDialog() {
+        protected void initDialog() {
             super.initDialog();
             enableComponents();
         }
 
-        protected final String getDialogTitle() {
+        protected String getDialogTitle() {
             return "LVM Resize " + Tools.getRelease();
         }
 
-        protected final String getDescription() {
+        protected String getDescription() {
             return "You can now use LVM Resize menu item in the "
                    + "\"Storage (DRBD)\" view.<br><br>" + DESCRIPTION;
         }
 
-        protected final JComponent getInputPane() {
+        protected JComponent getInputPane() {
             return null;
         }
     }
@@ -290,7 +288,7 @@ public class LVM_Resize implements RemotePlugin {
                 super();
             }
 
-            public void run() {
+            @Override public void run() {
                 sizeCB.requestFocus();
             }
         }
@@ -307,7 +305,7 @@ public class LVM_Resize implements RemotePlugin {
                 this.enable = enable;
             }
 
-            public void run() {
+            @Override public void run() {
                 boolean e = enable;
                 if (enable) {
                     final long oldSize = Tools.convertToKilobytes(
@@ -419,7 +417,7 @@ public class LVM_Resize implements RemotePlugin {
             public SizeItemListener() {
                 super();
             }
-            public void itemStateChanged(final ItemEvent e) {
+            @Override public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     checkButtons();
                 }
@@ -435,15 +433,15 @@ public class LVM_Resize implements RemotePlugin {
                 checkButtons();
             }
 
-            public void insertUpdate(final DocumentEvent e) {
+            @Override public void insertUpdate(final DocumentEvent e) {
                 check();
             }
 
-            public void removeUpdate(final DocumentEvent e) {
+            @Override public void removeUpdate(final DocumentEvent e) {
                 check();
             }
 
-            public void changedUpdate(final DocumentEvent e) {
+            @Override public void changedUpdate(final DocumentEvent e) {
                 check();
             }
         }
@@ -453,7 +451,7 @@ public class LVM_Resize implements RemotePlugin {
             public ResizeActionListener() {
                 super();
             }
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new ResizeRunnable());
                 thread.start();
             }
@@ -464,7 +462,7 @@ public class LVM_Resize implements RemotePlugin {
                 super();
             }
 
-            public void run() {
+            @Override public void run() {
                 if (checkDRBD()) {
                     SwingUtilities.invokeLater(new EnableResizeRunnable(false));
                     resize(sizeCB.getStringValue());

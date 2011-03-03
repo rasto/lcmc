@@ -64,7 +64,7 @@ import java.util.regex.Matcher;
  * @version $Id$
  *
  */
-public class TerminalPanel extends JScrollPane {
+public final class TerminalPanel extends JScrollPane {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Host data object. */
@@ -137,30 +137,34 @@ public class TerminalPanel extends JScrollPane {
     private static final String DEBUG_INC = "debuginc";
     /** Command to decrement debug level. */
     private static final String DEBUG_DEC = "debugdec";
-    /** Starts test 1. */
-    private static final String TEST_1 = "starttest1";
-    /** Starts test 2. */
-    private static final String TEST_2 = "starttest2";
-    /** Starts test 3. */
-    private static final String TEST_3 = "starttest3";
-    /** Starts test 4. */
-    private static final String TEST_4 = "starttest4";
-    /** Starts test 5. */
-    private static final String TEST_5 = "starttest5";
-    /** Starts test 6. */
-    private static final String TEST_6 = "starttest6";
-    /** Starts test 7. */
-    private static final String TEST_7 = "starttest7";
-    /** Starts test 8. */
-    private static final String TEST_8 = "starttest8";
-    /** Starts test 9. */
-    private static final String TEST_9 = "starttest9";
-    /** Starts test A. */
-    private static final String TEST_A = "starttesta";
-    /** Starts test B. */
-    private static final String TEST_B = "starttestb";
-    /** Starts test C. */
-    private static final String TEST_C = "starttestc";
+    /** Starts tests. */
+    private static final Map<String, String> TESTS =
+                                            new HashMap<String, String>();
+    static {
+        TESTS.put("starttest1", "1");
+        TESTS.put("starttest2", "2");
+        TESTS.put("starttest3", "3");
+        TESTS.put("starttest4", "4");
+        TESTS.put("starttest5", "5");
+        TESTS.put("starttest6", "6");
+        TESTS.put("starttest7", "7");
+        TESTS.put("starttest8", "8");
+        TESTS.put("starttest9", "9");
+
+        TESTS.put("starttestx1", "x1");
+        TESTS.put("starttestx2", "x2");
+        TESTS.put("starttestx3", "x3");
+        TESTS.put("starttestx4", "x4");
+        TESTS.put("starttestx5", "x5");
+        TESTS.put("starttestx6", "x6");
+        TESTS.put("starttestx7", "x7");
+        TESTS.put("starttestx8", "x8");
+        TESTS.put("starttestx9", "x9");
+
+        TESTS.put("starttesta", "a");
+        TESTS.put("starttestb", "b");
+        TESTS.put("starttestc", "c");
+    }
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
@@ -186,25 +190,14 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(MOVETEST_LAZY_LONG, 0);
         CHEATS_MAP.put(DEBUG_INC, 0);
         CHEATS_MAP.put(DEBUG_DEC, 0);
-        CHEATS_MAP.put(TEST_1, 0);
-        CHEATS_MAP.put(TEST_2, 0);
-        CHEATS_MAP.put(TEST_3, 0);
-        CHEATS_MAP.put(TEST_4, 0);
-        CHEATS_MAP.put(TEST_5, 0);
-        CHEATS_MAP.put(TEST_6, 0);
-        CHEATS_MAP.put(TEST_7, 0);
-        CHEATS_MAP.put(TEST_8, 0);
-        CHEATS_MAP.put(TEST_9, 0);
-        CHEATS_MAP.put(TEST_A, 0);
-        CHEATS_MAP.put(TEST_B, 0);
-        CHEATS_MAP.put(TEST_C, 0);
+        for (final String test : TESTS.keySet()) {
+            CHEATS_MAP.put(test, 0);
+        }
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
 
 
-    /**
-     * Prepares a new <code>TerminalPanel</code> object.
-     */
+    /** Prepares a new <code>TerminalPanel</code> object. */
     public TerminalPanel(final Host host) {
         super();
         this.host = host;
@@ -233,7 +226,7 @@ public class TerminalPanel extends JScrollPane {
         final DefaultCaret caret = new DefaultCaret() {
             private static final long serialVersionUID = 1L;
 
-            protected synchronized void damage(final Rectangle r) {
+            @Override protected synchronized void damage(final Rectangle r) {
                 if (r != null) {
                     x = r.x;
                     y = r.y;
@@ -243,7 +236,7 @@ public class TerminalPanel extends JScrollPane {
                 }
             }
 
-            public void paint(final Graphics g) {
+            @Override public void paint(final Graphics g) {
                 /* painting cursor. If it is not visible it is out of focus, we
                  * make it barely visible. */
                 try {
@@ -273,7 +266,7 @@ public class TerminalPanel extends JScrollPane {
         };
         terminalArea.setCaret(caret);
         terminalArea.addCaretListener(new CaretListener() {
-            public void caretUpdate(final CaretEvent e) {
+            @Override public void caretUpdate(final CaretEvent e) {
                 /* don't do this if caret moved because of selection */
                 if (e != null
                     && e.getDot() < commandOffset
@@ -313,9 +306,7 @@ public class TerminalPanel extends JScrollPane {
         setMaximumSize(getPreferredSize());
     }
 
-    /**
-     * Returns terminal output color.
-     */
+    /** Returns terminal output color. */
     private Color getColorFromString(final String s) {
         /* "]" default color */
         if ("[".equals(s)) {
@@ -339,9 +330,7 @@ public class TerminalPanel extends JScrollPane {
         return null;
     }
 
-    /**
-     * Get char count.
-     */
+    /** Get char count. */
     private int getCharCount(final String s) {
         final Pattern p1 = Pattern.compile("^\\[(\\d+)$");
         final Matcher m1 = p1.matcher(s);
@@ -352,9 +341,7 @@ public class TerminalPanel extends JScrollPane {
     }
 
 
-    /**
-     * Appends a text whith specified color to the terminal area.
-     */
+    /** Appends a text whith specified color to the terminal area. */
     private void append(final String text,
                         final MutableAttributeSet colorAS) {
         userCommand = false;
@@ -448,17 +435,13 @@ public class TerminalPanel extends JScrollPane {
         userCommand = true;
     }
 
-    /**
-     * Sets the terminal area editable.
-     */
-    public final void setEditable(final boolean editable) {
+    /** Sets the terminal area editable. */
+    void setEditable(final boolean editable) {
         terminalArea.setEditable(editable);
     }
 
-    /**
-     * Executes the specified command, if the host is connected.
-     */
-    public final void execCommand(final String command) {
+    /** Executes the specified command, if the host is connected. */
+    void execCommand(final String command) {
         final String hostName = host.getName();
 
         if (!host.isConnected()) {
@@ -469,14 +452,15 @@ public class TerminalPanel extends JScrollPane {
         }
         host.execCommandRaw(command,
              new ExecCallback() {
-                 public void done(final String ans) {
+                 @Override public void done(final String ans) {
                      if (!"".equals(command)) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
                  }
 
-                 public void doneError(final String ans, final int exitCode) {
+                 @Override public void doneError(final String ans,
+                                                 final int exitCode) {
                      if (!"".equals(command)) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
@@ -492,15 +476,13 @@ public class TerminalPanel extends JScrollPane {
      * Sets the prompt color to the host's color when it is added to the
      * cluster.
      */
-    public final void resetPromptColor() {
+    public void resetPromptColor() {
         StyleConstants.setForeground(promptColor, host.getPmColors()[0]);
         addCommand("");
         nextCommand();
     }
 
-    /**
-     * Returns a prompt.
-     */
+    /** Returns a prompt. */
     private String prompt() {
         if (host.isConnected()) {
             return "[" + host.getUserAtHost() + ":~#] ";
@@ -513,22 +495,20 @@ public class TerminalPanel extends JScrollPane {
      * Is called after execution of command is finnished. It shows the prompt
      * and scrolls the text up.
      */
-    public final void nextCommand() {
+    public void nextCommand() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 append(prompt(), promptColor);
             }
         });
     }
 
-    /**
-     * Adds command to the terminal textarea and scrolls up.
-     */
-    public final void addCommand(final String command) {
+    /** Adds command to the terminal textarea and scrolls up. */
+    public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 append(lines[0], commandColor);
                 for (int i = 1; i < lines.length; i++) {
 
@@ -539,23 +519,19 @@ public class TerminalPanel extends JScrollPane {
         });
     }
 
-    /**
-     * Adds command output to the terminal textarea and scrolls up.
-     */
-    public final void addCommandOutput(final String output) {
+    /** Adds command output to the terminal textarea and scrolls up. */
+    public void addCommandOutput(final String output) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 append(output, outputColor);
             }
         });
     }
 
-    /**
-     * Adds array of command output to the terminal textarea and scrolls up.
-     */
-    public final void addCommandOutput(final String[] output) {
+    /** Adds array of command output to the terminal textarea and scrolls up. */
+    void addCommandOutput(final String[] output) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 for (int i = 0; i < output.length; i++) {
                     if (output[i] != null) {
                         String newLine = "";
@@ -569,23 +545,19 @@ public class TerminalPanel extends JScrollPane {
         });
     }
 
-    /**
-     * Adds content string (output of a command) to the terminal area.
-     */
-    public final void addContent(final String c) {
+    /** Adds content string (output of a command) to the terminal area. */
+    public void addContent(final String c) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 append(c, outputColor);
             }
         });
     }
 
-    /**
-     * Adds content to the terminal textarea and scrolls up.
-     */
-    public final void addContentErr(final String c) {
+    /** Adds content to the terminal textarea and scrolls up. */
+    public void addContentErr(final String c) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 append(c, errorColor);
             }
         });
@@ -596,16 +568,16 @@ public class TerminalPanel extends JScrollPane {
      * This class overwrites the DefaultStyledDocument in order to add godmode
      * feature.
      */
-    public class MyDocument extends DefaultStyledDocument {
+    class MyDocument extends DefaultStyledDocument {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
         /**
          * Is called while a string is inserted. It checks if a cheat code is
          * in the string. */
-        public final void insertString(int offs,
-                                       final String s,
-                                       final AttributeSet a)
+        @Override public void insertString(int offs,
+                                           final String s,
+                                           final AttributeSet a)
             throws BadLocationException {
             if (offs < commandOffset) {
                 terminalArea.setCaretPosition(commandOffset);
@@ -647,10 +619,9 @@ public class TerminalPanel extends JScrollPane {
             }
         }
 
-        /**
-         * Is called while characters is removed.
-         */
-        public final void remove(final int offs,
+        /** Is called while characters is removed. */
+        @Override public void remove(
+                                 final int offs,
                                  final int len) throws BadLocationException {
             if (offs >= commandOffset) {
 
@@ -666,11 +637,8 @@ public class TerminalPanel extends JScrollPane {
             }
         }
 
-        /**
-         * Same as remove.
-         */
-        public final void removeForced(final int offs,
-                                       final int len)
+        /** Same as remove. */
+        void removeForced(final int offs, final int len)
         throws BadLocationException {
             super.remove(offs, len);
         }
@@ -699,7 +667,7 @@ public class TerminalPanel extends JScrollPane {
             Tools.info("run gc");
         } else if (ALLOCATE_10.equals(cheat)) {
             final Thread t = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     Tools.info("allocate mem");
                     Byte[] b = new Byte[1024000];
                     Tools.info("allocate mem done.");
@@ -739,30 +707,8 @@ public class TerminalPanel extends JScrollPane {
             Tools.incrementDebugLevel();
         } else if (DEBUG_DEC.equals(cheat)) {
             Tools.decrementDebugLevel();
-        } else if (TEST_1.equals(cheat)) {
-            RoboTest.startTest("1", host);
-        } else if (TEST_2.equals(cheat)) {
-            RoboTest.startTest("2", host);
-        } else if (TEST_3.equals(cheat)) {
-            RoboTest.startTest("3", host);
-        } else if (TEST_4.equals(cheat)) {
-            RoboTest.startTest("4", host);
-        } else if (TEST_5.equals(cheat)) {
-            RoboTest.startTest("5", host);
-        } else if (TEST_6.equals(cheat)) {
-            RoboTest.startTest("6", host);
-        } else if (TEST_7.equals(cheat)) {
-            RoboTest.startTest("7", host);
-        } else if (TEST_8.equals(cheat)) {
-            RoboTest.startTest("8", host);
-        } else if (TEST_9.equals(cheat)) {
-            RoboTest.startTest("9", host);
-        } else if (TEST_A.equals(cheat)) {
-            RoboTest.startTest("A", host);
-        } else if (TEST_B.equals(cheat)) {
-            RoboTest.startTest("B", host);
-        } else if (TEST_C.equals(cheat)) {
-            RoboTest.startTest("C", host);
+        } else if (TESTS.containsKey(cheat)) {
+            RoboTest.startTest(TESTS.get(cheat), host);
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
             RoboTest.registerMovement();
         }

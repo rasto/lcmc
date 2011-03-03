@@ -35,20 +35,17 @@ import drbd.gui.dialog.cluster.Name;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditClusterDialog {
+public final class EditClusterDialog {
     /** Cluster object. */
     private final Cluster cluster;
 
-    /**
-     * Prepares new <code>EditClusterDialog</code> object.
-     */
+    /** Prepares new <code>EditClusterDialog</code> object. */
     public EditClusterDialog(final Cluster cluster) {
         this.cluster = cluster;
     }
-    /**
-     * Shows step by step dialogs that configure a new cluster.
-     */
-    public final void showDialogs() {
+
+    /** Shows step by step dialogs that configure a new cluster. */
+    public void showDialogs() {
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

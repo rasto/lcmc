@@ -26,11 +26,11 @@ import java.util.Arrays;
 /**
  * Here are commands for rhel version 4.
  */
-public class DistResource_redhatenterpriseas_4_0 extends
-            java.util.ListResourceBundle {
+public final class DistResource_redhatenterpriseas_4_0
+                                    extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

@@ -42,14 +42,10 @@ public final class Corosync {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
-    /**
-     * No instantiation.
-     */
+    /** No instantiation. */
     private Corosync() { }
 
-    /**
-     * Executes specified command on the host.
-     */
+    /** Executes specified command on the host. */
     private static void execCommand(final Host host,
                                     final String command,
                                     final boolean outputVisible) {
@@ -62,9 +58,7 @@ public final class Corosync {
                                 SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 
-    /**
-     * Stops the heartbeat and starts the corosync on the specified host.
-     */
+    /** Stops the heartbeat and starts the corosync on the specified host. */
     public static void switchToCorosync(final Host host) {
         final String command = host.getDistCommand(
                                             "Heartbeat.deleteFromRc"
@@ -127,9 +121,7 @@ public final class Corosync {
         execCommand(host, command, true);
     }
 
-    /**
-     * Starts Corosync on host and adds it to the rc.
-     */
+    /** Starts Corosync on host and adds it to the rc. */
     public static void startCorosyncRc(final Host host) {
         final String command = host.getDistCommand(
                                             "Corosync.startCorosync"
@@ -138,9 +130,7 @@ public final class Corosync {
         execCommand(host, command, true);
     }
 
-    /**
-     * Adds Corosync to the rc.
-     */
+    /** Adds Corosync to the rc. */
     public static void addCorosyncToRc(final Host host) {
         final String command = host.getDistCommand("Corosync.addToRc",
                                                    (ConvertCmdCallback) null);
@@ -157,9 +147,7 @@ public final class Corosync {
         execCommand(host, command, true);
     }
 
-    /**
-     * Creates Corosync config on specified hosts.
-     */
+    /** Creates Corosync config on specified hosts. */
     public static void createCorosyncConfig(final Host[] hosts,
                                        final StringBuffer config) {
         /* write heartbeat config on all hosts */
@@ -180,9 +168,7 @@ public final class Corosync {
 
     }
 
-    /**
-     * Reloads Corosync daemons on all nodes.
-     */
+    /** Reloads Corosync daemons on all nodes. */
     public static void reloadCorosyncs(final Host[] hosts) {
         for (Host host : hosts) {
             reloadCorosync(host);

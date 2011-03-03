@@ -42,7 +42,7 @@ import java.awt.event.ActionEvent;
  * This class holds the information about resource agent class and its
  * services.
  */
-public class ResourceAgentClassInfo extends HbCategoryInfo {
+public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
     private final Map<String, ResourceAgent> raMap =
@@ -50,9 +50,7 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
-    /**
-     * Prepares a new <code>ResourceAgentClassInfo</code> object.
-     */
+    /** Prepares a new <code>ResourceAgentClassInfo</code> object. */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
         super(name, browser);
         for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
@@ -61,16 +59,13 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         }
     }
 
-    /**
-     * Returns columns for the table.
-     */
-    protected final String[] getColumnNames(final String tableName) {
+    /** Returns columns for the table. */
+    @Override protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Provider"};
     }
-    /**
-     * Returns data for the table.
-     */
-    protected final Object[][] getTableData(final String tableName) {
+
+    /** Returns data for the table. */
+    @Override  protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
@@ -83,14 +78,14 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
     }
 
     /** Returns name as it appears in the menu. */
-    public final String toString() {
+    @Override  public String toString() {
         return getName().toUpperCase();
     }
 
     /** Execute when row in the table was clicked. */
-    protected final void rowClicked(final String tableName,
-                                    final String key,
-                                    final int column) {
+    @Override  protected void rowClicked(final String tableName,
+                                         final String key,
+                                         final int column) {
         final ResourceAgent ra = raMap.get(key);
         if (ra != null) {
             final AvailableServiceInfo asi =
@@ -101,10 +96,8 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         }
     }
 
-    /**
-     * Returns back button.
-     */
-    protected final JComponent getBackButton() {
+    /** Returns back button. */
+    @Override  protected JComponent getBackButton() {
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
                                                              0,
                                                              0));
@@ -113,11 +106,11 @@ public class ResourceAgentClassInfo extends HbCategoryInfo {
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         final MyButton overviewButton = new MyButton(
-                                                     Tools.getString("ClusterBrowser.ClassesOverviewButton"),
-                                                     BACK_ICON);
+                     Tools.getString("ClusterBrowser.ClassesOverviewButton"),
+                     BACK_ICON);
         overviewButton.setPreferredSize(new Dimension(180, 50));
         overviewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 getBrowser().getAvailableServicesInfo().selectMyself();
             }
         });

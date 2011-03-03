@@ -36,22 +36,17 @@ import drbd.gui.dialog.host.SSH;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class EditHostDialog {
-
+public final class EditHostDialog {
     /** The host object. */
     private final Host host;
 
-    /**
-     * Prepares a new <code>EditHostDialog</code> object.
-     */
+    /** Prepares a new <code>EditHostDialog</code> object. */
     public EditHostDialog(final Host host) {
         this.host = host;
     }
 
-    /**
-     * Shows step by step dialogs that configure a host.
-     */
-    public final void showDialogs() {
+    /** Shows step by step dialogs that configure a host. */
+    public void showDialogs() {
         DialogHost dialog = new SSH(null, host);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

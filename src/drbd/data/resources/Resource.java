@@ -60,6 +60,7 @@ public class Resource {
      */
     public Resource() {
         /* name must be set later. */
+        //TODO:
     }
 
     /**
@@ -72,38 +73,28 @@ public class Resource {
         this.name = name;
     }
 
-    /**
-     * Sets value for paramter.
-     */
+    /** Sets value for paramter. */
     public final void setValue(final String param, final String value) {
         savedValue.put(param, value);
     }
 
-    /**
-     * Returns value for a parameter.
-     */
+    /** Returns value for a parameter. */
     public String getValue(final String param) {
         return savedValue.get(param);
     }
 
-    /**
-     * Gets name of this resource.
-     */
+    /** Gets name of this resource. */
     public final String getName() {
         return name;
     }
 
-    /**
-     * Sets name of this resource.
-     */
+    /** Sets name of this resource. */
     public final void setName(final String name) {
         this.name = name;
     }
 
-    /**
-     * Gets name of this resource.
-     */
-    public String toString() {
+    /** Gets name of this resource. */
+    @Override public String toString() {
         return name;
     }
 
@@ -143,7 +134,7 @@ public class Resource {
 
     /** Sets possible choices for parameter combo box. */
     public final void setPossibleChoices(final String param,
-                                   final Object[] possibleChoices) {
+                                         final Object[] possibleChoices) {
         possibleChoicesMap.remove(param);
         possibleChoicesMap.put(param, possibleChoices);
     }
@@ -158,7 +149,7 @@ public class Resource {
 
     /** Sets default value for the parameter. */
     public final void setDefaultValue(final String param,
-                                      final String defaultValue) {
+                               final String defaultValue) {
         defaultValueMap.put(param, defaultValue);
     }
 
@@ -168,7 +159,7 @@ public class Resource {
     }
 
     /** Sets preferred value for the parameter. */
-    public final void setPreferredValue(final String param,
+    final void setPreferredValue(final String param,
                                         final String preferredValue) {
         preferredValueMap.put(param, preferredValue);
     }

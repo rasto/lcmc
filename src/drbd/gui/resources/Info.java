@@ -142,7 +142,7 @@ public class Info implements Comparable {
      * @param name
      *      name that will be shown to the user
      */
-    public Info(final String name, final Browser browser) {
+    Info(final String name, final Browser browser) {
         this.name = name;
         this.browser = browser;
     }
@@ -157,37 +157,27 @@ public class Info implements Comparable {
         this.name = name;
     }
 
-    /**
-     * Returns the id of this object which is the name.
-     */
+    /** Returns the id of this object which is the name. */
     public String getId() {
         return name;
     }
 
-    /**
-     * Returns browser object of this info.
-     */
+    /** Returns browser object of this info. */
     protected Browser getBrowser() {
         return browser;
     }
 
-    /**
-     * Returns the tool tip for this object.
-     */
-    public String getToolTipText(final boolean testOnly) {
+    /** Returns the tool tip for this object. */
+    String getToolTipText(final boolean testOnly) {
         return "no tooltip";
     }
 
-    /**
-     * Sets resource.
-     */
+    /** Sets resource. */
     protected final void setResource(final Resource resource) {
         this.resource = resource;
     }
 
-    /**
-     * Adds the widget for parameter.
-     */
+    /** Adds the widget for parameter. */
     protected final void paramComboBoxAdd(final String param,
                                           final String prefix,
                                           final GuiComboBox paramCb) {
@@ -200,7 +190,7 @@ public class Info implements Comparable {
 
     /** Returns the widget for the parameter. */
     public final GuiComboBox paramComboBoxGet(final String param,
-                                                 final String prefix) {
+                                                        final String prefix) {
         if (prefix == null) {
             return paramComboBoxHash.get(param);
         } else {
@@ -208,9 +198,7 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Returns true if the paramComboBox contains the parameter.
-     */
+    /** Returns true if the paramComboBox contains the parameter. */
     protected final boolean paramComboBoxContains(final String param,
                                                   final String prefix) {
         if (prefix == null) {
@@ -220,9 +208,7 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Removes the parameter from the paramComboBox hash.
-     */
+    /** Removes the parameter from the paramComboBox hash. */
     protected final GuiComboBox paramComboBoxRemove(final String param,
                                                     final String prefix) {
         if (prefix == null) {
@@ -240,9 +226,7 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Clears the whole paramComboBox hash.
-     */
+    /** Clears the whole paramComboBox hash. */
     protected final void paramComboBoxClear() {
         for (final String param : paramComboBoxHash.keySet()) {
             paramComboBoxHash.get(param).cleanup();
@@ -250,9 +234,7 @@ public class Info implements Comparable {
         paramComboBoxHash.clear();
     }
 
-    /**
-     * Sets the terminal panel, if necessary.
-     */
+    /** Sets the terminal panel, if necessary. */
     protected void setTerminalPanel() {
         /* set terminal panel, or don't */
     }
@@ -265,17 +247,13 @@ public class Info implements Comparable {
         return updated;
     }
 
-    /**
-     * Sets whether the info object is being updated.
-     */
+    /** Sets whether the info object is being updated. */
     protected void setUpdated(final boolean updated) {
         this.updated = updated;
         animationIndex = 0;
     }
 
-    /**
-     * Returns the animation index.
-     */
+    /** Returns the animation index. */
     public final double getAnimationIndex() {
         return animationIndex;
     }
@@ -291,9 +269,7 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Returns the icon.
-     */
+    /** Returns the icon. */
     public ImageIcon getMenuIcon(final boolean testOnly) {
         return null;
     }
@@ -324,9 +300,7 @@ public class Info implements Comparable {
     //    return toString().hashCode();
     //}
 
-    /**
-     * Updates the info text.
-     */
+    /** Updates the info text. */
     public void updateInfo() {
         final JEditorPane ria = resourceInfoArea;
         if (ria != null) {
@@ -334,13 +308,14 @@ public class Info implements Comparable {
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         ria.setText(newInfo);
                     }
                 });
             }
         }
     }
+
     /**
      * Updates the info in the info panel, long after it is drawn. For
      * example, if command has to be executed to get the info.
@@ -349,9 +324,7 @@ public class Info implements Comparable {
         /* override this method. */
     }
 
-    /**
-     * Returns type of the info text. text/plain or text/html.
-     */
+    /** Returns type of the info text. text/plain or text/html. */
     protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_PLAIN;
     }
@@ -395,16 +368,12 @@ public class Info implements Comparable {
         return infoPanel;
     }
 
-    /**
-     * TODO: clears info panel cache most of the time.
-     */
-    public boolean selectAutomaticallyInTreeMenu() {
+    /** TODO: clears info panel cache most of the time. */
+    boolean selectAutomaticallyInTreeMenu() {
         return false;
     }
 
-    /**
-     * Returns graphics view of this resource.
-     */
+    /** Returns graphics view of this resource. */
     public JPanel getGraphicalView() {
         return null;
     }
@@ -413,40 +382,32 @@ public class Info implements Comparable {
      * Returns info as string. This can be used by simple view, when
      * getInfoPanel() is not overwritten.
      */
-    public String getInfo() {
+    String getInfo() {
         return name;
     }
 
-    /**
-     * Returns name of the object.
-     */
-    public String toString() {
+    /** Returns name of the object. */
+    @Override public String toString() {
         return name;
     }
 
-    /**
-     * Returns name of this resource.
-     */
+    /** Returns name of this resource. */
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets node of this resource or service.
-     */
-    public final DefaultMutableTreeNode getNode() {
+    /** Gets node of this resource or service. */
+    final DefaultMutableTreeNode getNode() {
         return node;
     }
 
-    /**
-     * Sets node in the tree view for this resource or service.
-     */
+    /** Sets node in the tree view for this resource or service. */
     public final void setNode(final DefaultMutableTreeNode node) {
         this.node = node;
     }
 
     /** Cleanup */
-    public final void cleanup() {
+    final void cleanup() {
         //if (menu != null) {
         //    menu.cleanup();
         //}
@@ -483,7 +444,7 @@ public class Info implements Comparable {
      * Removes this object from the tree and highlights and selects parent
      * node.
      */
-    public void removeMyself(final boolean testOnly) {
+    void removeMyself(final boolean testOnly) {
         cleanup();
         if (node != null) {
             final DefaultMutableTreeNode parent =
@@ -503,16 +464,12 @@ public class Info implements Comparable {
         getBrowser().nodeChanged(node);
     }
 
-    /**
-     * Returns resource object.
-     */
+    /** Returns resource object. */
     public final Resource getResource() {
         return resource;
     }
 
-    /**
-     * Returns tool tip for this object.
-     */
+    /** Returns tool tip for this object. */
     protected String getToolTipText(final String param,
                                     final String value) {
         return "TODO: ToolTipText";
@@ -536,11 +493,11 @@ public class Info implements Comparable {
                                 final int x,
                                 final int y) {
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             pm.show(c, x, y);
                         }
                     });
@@ -550,22 +507,18 @@ public class Info implements Comparable {
         thread.start();
     }
 
-    /**
-     * Returns tooltip for the object in the graph.
-     */
+    /** Returns tooltip for the object in the graph. */
     public String getToolTipForGraph(final boolean testOnly) {
         return getToolTipText(testOnly);
     }
 
-    /**
-     * Returns list of menu items for the popup.
-     */
+    /** Returns list of menu items for the popup. */
     protected /*abstract*/ List<UpdatableItem> createPopup() {
         return null;
     }
 
     /** Returns popup object without updating. */
-    public final void hidePopup() {
+    final void hidePopup() {
         try {
             mPopupLock.acquire();
         } catch (final InterruptedException e) {
@@ -575,12 +528,13 @@ public class Info implements Comparable {
         mPopupLock.release();
         if (popup0 != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     popup0.setVisible(false);
                 }
             });
         }
     }
+
     /**
      * Returns the popup widget. The createPopup must be defined with menu
      * items.
@@ -598,7 +552,7 @@ public class Info implements Comparable {
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             popup = new JPopupMenu();
                         }
                     });
@@ -608,7 +562,7 @@ public class Info implements Comparable {
                     Tools.printStackTrace();
                 }
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         for (final UpdatableItem u : items) {
                             popup.add((JMenuItem) u);
                         }
@@ -638,7 +592,7 @@ public class Info implements Comparable {
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             popup = new JPopupMenu();
                         }
                     });
@@ -649,7 +603,7 @@ public class Info implements Comparable {
                 }
                 for (final UpdatableItem u : items) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             popup.add((JMenuItem) u);
                         }
                     });
@@ -665,7 +619,7 @@ public class Info implements Comparable {
     }
 
     /** Returns the Action menu. */
-    public final JMenu getActionsMenu() {
+    final JMenu getActionsMenu() {
         final JMenu m = getNewMenu(Tools.getString("Browser.ActionsMenu"));
         m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
         return m;
@@ -677,7 +631,7 @@ public class Info implements Comparable {
     }
 
     /** Returns the menu with menu item spefified in the createPopup method. */
-    public final JMenu getNewMenu(final String name) {
+    final JMenu getNewMenu(final String name) {
         if (menu == null) {
             menu = new JMenu(name) {
                 /** Serial version uid. */
@@ -747,7 +701,7 @@ public class Info implements Comparable {
             menu.setIconTextGap(0);
             final Info thisObject = this;
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
                     menu.setBackground(Browser.STATUS_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
@@ -770,7 +724,7 @@ public class Info implements Comparable {
             thread.start();
         } else {
             final Thread thread = new Thread(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     updateMenus(null);
                 }
             });
@@ -791,7 +745,7 @@ public class Info implements Comparable {
     }
 
     /** Update menus with positions and calles their update methods. */
-    public void updateMenus(final Point2D pos) {
+    void updateMenus(final Point2D pos) {
         if (menuList != null) {
             try {
                 mMenuListLock.acquire();
@@ -838,7 +792,7 @@ public class Info implements Comparable {
     }
 
     /** Registers all menu items. */
-    public final void registerAllMenuItems(
+    final void registerAllMenuItems(
                                final List<UpdatableItem> allItemsAndSubitems) {
         try {
             mMenuListLock.acquire();
@@ -849,16 +803,12 @@ public class Info implements Comparable {
         mMenuListLock.release();
     }
 
-    /**
-     * Returns units.
-     */
+    /** Returns units. */
     protected Unit[] getUnits() {
         return null;
     }
 
-    /**
-     * Returns units.
-     */
+    /** Returns units. */
     protected Unit[] getTimeUnits() {
         return new Unit[]{
                    //new Unit("", "", "", ""),
@@ -871,23 +821,21 @@ public class Info implements Comparable {
        };
     }
 
-    /**
-     * Adds mouse over listener.
-     */
+    /** Adds mouse over listener. */
     protected final void addMouseOverListener(final Component c,
                                               final ButtonCallback bc) {
         if (bc == null) {
             return;
         }
         c.addMouseListener(new MouseListener() {
-            public void mouseClicked(final MouseEvent e) {
+            @Override public void mouseClicked(final MouseEvent e) {
                 /* do nothing */
             }
 
-            public void mouseEntered(final MouseEvent e) {
+            @Override public void mouseEntered(final MouseEvent e) {
                 if (c.isShowing() && c.isEnabled()) {
                     final Thread thread = new Thread(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             bc.mouseOver();
                         }
                     });
@@ -895,28 +843,28 @@ public class Info implements Comparable {
                 }
             }
 
-            public void mouseExited(final MouseEvent e) {
+            @Override public void mouseExited(final MouseEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         bc.mouseOut();
                     }
                 });
                 t.start();
             }
 
-            public void mousePressed(final MouseEvent e) {
+            @Override public void mousePressed(final MouseEvent e) {
                 mouseExited(e);
                 /* do nothing */
             }
 
-            public void mouseReleased(final MouseEvent e) {
+            @Override public void mouseReleased(final MouseEvent e) {
                 /* do nothing */
             }
         });
     }
 
     /** Compares ignoring case. */
-    public int compareTo(final Object o) {
+    @Override public int compareTo(final Object o) {
         return toString().compareToIgnoreCase(o.toString());
     }
 
@@ -985,7 +933,11 @@ public class Info implements Comparable {
                 private static final long serialVersionUID = 1L;
                 /** Overriding so that jlabels show up. */
                 public Class getColumnClass(final int c) {
-                    return getValueAt(0, c).getClass();
+                    final Object o = getValueAt(0, c);
+                    if (o == null) {
+                        return null;
+                    }
+                    return o.getClass();
                 }
 
                 public TableCellRenderer getCellRenderer(final int row,
@@ -1047,7 +999,7 @@ public class Info implements Comparable {
             table.addMouseMotionListener(new MouseMotionListener() {
                 private int row;
 
-                public void mouseMoved(final MouseEvent me) {
+                @Override public void mouseMoved(final MouseEvent me) {
                    final Point p = me.getPoint();
                    final int newRow = table.rowAtPoint(p);
                    if (row >= 0 && newRow != row) {
@@ -1074,7 +1026,7 @@ public class Info implements Comparable {
                        }
                    }
                 }
-                public void mouseDragged(final MouseEvent me) {
+                @Override public void mouseDragged(final MouseEvent me) {
                     /* nothing */
                 }
             });
@@ -1083,7 +1035,7 @@ public class Info implements Comparable {
                 private boolean paintIt = false;
                 private boolean paintItMouseOver = false;
 
-                public final void mouseClicked(final MouseEvent e) {
+                @Override public final void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() > 1
                         || SwingUtilities.isRightMouseButton(e)) {
                         return;
@@ -1096,7 +1048,7 @@ public class Info implements Comparable {
                     rowClicked(tableName, keyB.getText(), column);
                 }
 
-                public final void mousePressed(final MouseEvent e) {
+                @Override public final void mousePressed(final MouseEvent e) {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     row = table.rowAtPoint(p);
@@ -1119,7 +1071,7 @@ public class Info implements Comparable {
                     paintIt = true;
                 }
 
-                public final void mouseReleased(final MouseEvent e) {
+                @Override public final void mouseReleased(final MouseEvent e) {
                     if (paintIt) {
                         for (int c = 0; c < table.getColumnCount(); c++) {
                             final Object v = table.getValueAt(row, c);
@@ -1133,7 +1085,7 @@ public class Info implements Comparable {
                     paintIt = false;
                 }
 
-                public final void mouseEntered(final MouseEvent e) {
+                @Override public final void mouseEntered(final MouseEvent e) {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     final int row = table.rowAtPoint(p);
@@ -1151,7 +1103,7 @@ public class Info implements Comparable {
                     }
                 }
 
-                public final void mouseExited(final MouseEvent e) {
+                @Override public final void mouseExited(final MouseEvent e) {
                     if (paintItMouseOver) {
                         for (int i = 0; i < table.getRowCount(); i++) {
                             for (int c = 0; c < table.getColumnCount(); c++) {
@@ -1175,38 +1127,28 @@ public class Info implements Comparable {
     }
 
 
-    /**
-     * Alignment for the specified column.
-     */
+    /** Alignment for the specified column. */
     protected int getTableColumnAlignment(final String tableName,
                                           final int column) {
         return SwingConstants.LEFT;
     }
 
-    /**
-     * Returns info object for this row.
-     */
+    /** Returns info object for this row. */
     protected Info getTableInfo(final String tableName, final String key) {
         return null;
     }
 
-    /**
-     * Returns columns for the table.
-     */
+    /** Returns columns for the table. */
     protected String[] getColumnNames(final String tableName) {
         return new String[]{};
     }
 
-    /**
-     * Returns data for the table.
-     */
+    /** Returns data for the table. */
     protected Object[][] getTableData(final String tableName) {
         return new Object[][]{};
     }
 
-    /**
-     * Updates data in the table.
-     */
+    /** Updates data in the table. */
     @SuppressWarnings("unchecked")
     public final void updateTable(final String tableName) {
         Tools.debug(this, "update table: " + tableName, 2);
@@ -1216,7 +1158,7 @@ public class Info implements Comparable {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         final Object[][] data = getTableData(tableName);
                         Tools.debug(this, "update table in: " + getName(), 1);
                         final TableRowSorter sorter =
@@ -1233,18 +1175,14 @@ public class Info implements Comparable {
         }
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
+    /** Execute when row in the table was clicked. */
     protected void rowClicked(final String tableName,
                               final String key,
                               final int column) {
         /* do nothing */
     }
 
-    /**
-     * Returns row height for the table.
-     */
+    /** Returns row height for the table. */
     protected final int getRowHeight() {
         return 40;
     }
@@ -1300,7 +1238,7 @@ public class Info implements Comparable {
         menuList.add(pluginItem);
         mMenuListLock.release();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 menu.add(pluginItem);
             }
         });
@@ -1329,7 +1267,7 @@ public class Info implements Comparable {
         final JPopupMenu pm = popup;
         if (pm != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pm.add(pluginItem);
                 }
             });

@@ -57,7 +57,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @version $Id$
  *
  */
-public class ClustersPanel extends JPanel {
+public final class ClustersPanel extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** The tabbed pane where the tabs are painted. */
@@ -79,10 +79,8 @@ public class ClustersPanel extends JPanel {
     private final List<JEditorPane> upgradeTextFields =
                                                new ArrayList<JEditorPane>();
 
-    /**
-     * Prepares a new <code>ClustersPanel</code> object.
-     */
-    public ClustersPanel() {
+    /** Prepares a new <code>ClustersPanel</code> object. */
+    ClustersPanel() {
         super(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
         if (Tools.getConfigData().isUpgradeCheckEnabled()) {
@@ -101,9 +99,7 @@ public class ClustersPanel extends JPanel {
         showGUI();
     }
 
-    /**
-     * Shows the tabbed pane.
-     */
+    /** Shows the tabbed pane. */
     private void showGUI() {
         UIManager.put("TabbedPane.selected",
                       Tools.getDefaultColor("ViewPanel.Status.Background"));
@@ -156,10 +152,8 @@ public class ClustersPanel extends JPanel {
         });
     }
 
-    /**
-     * Adds a new cluster tab.
-     */
-    public final void addTab(final Cluster cluster) {
+    /** Adds a new cluster tab. */
+    void addTab(final Cluster cluster) {
         Tools.debug(this, "cluster add tab " + cluster.getName());
         removeEmptyTab();
         final ClusterTab ct = new ClusterTab(cluster);
@@ -174,20 +168,16 @@ public class ClustersPanel extends JPanel {
         refresh();
     }
 
-    /**
-     * Adds an epmty tab, that opens new cluster dialogs.
-     */
-    public final void addEmptyTab() {
+    /** Adds an epmty tab, that opens new cluster dialogs. */
+    void addEmptyTab() {
         tabbedPane.addTab("",
                           null,
                           newClusterTab,
                           Tools.getString("ClustersPanel.NewTabTip"));
     }
 
-    /**
-     * Removes the empty tab.
-     */
-    public final void removeEmptyTab() {
+    /** Removes the empty tab. */
+    void removeEmptyTab() {
         tabbedPane.remove(tabbedPane.getTabCount() - 1);
     }
 
@@ -195,7 +185,7 @@ public class ClustersPanel extends JPanel {
      * Removes selected tab, after clicking on the cancel button in the config
      * dialogs.
      */
-    public final void removeTab() {
+    void removeTab() {
         final ClusterTab selected = getClusterTab();
         selected.getCluster().setClusterTab(null);
         int index = tabbedPane.getSelectedIndex() - 1;
@@ -210,33 +200,25 @@ public class ClustersPanel extends JPanel {
         }
     }
 
-    /**
-     * Removes specified tab.
-     */
-    public final void removeTab(final Cluster cluster) {
+    /** Removes specified tab. */
+    public void removeTab(final Cluster cluster) {
         tabbedPane.remove(cluster.getClusterTab());
         cluster.setClusterTab(null);
     }
 
-    /**
-     * Removes all tabs.
-     */
-    public final void removeAllTabs() {
+    /** Removes all tabs. */
+    public void removeAllTabs() {
         tabbedPane.removeAll();
         addEmptyTab();
     }
 
-    /**
-     * renames selected added tab.
-     */
-    public final void renameSelectedTab(final String newName) {
+    /** Renames selected added tab. */
+    void renameSelectedTab(final String newName) {
         tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), newName);
         refresh();
     }
 
-    /**
-     * adds all cluster tabs, e.g. after loading of configuration.
-     */
+    /** Adds all cluster tabs, e.g. after loading of configuration. */
     private void addAllTabs() {
         final Clusters clusters = Tools.getConfigData().getClusters();
         if (clusters != null) {
@@ -247,27 +229,21 @@ public class ClustersPanel extends JPanel {
         addEmptyTab();
     }
 
-    /**
-     * Refreshes the view.
-     */
-    public final void refresh() {
+    /** Refreshes the view. */
+    void refresh() {
         tabbedPane.invalidate();
         tabbedPane.validate();
         tabbedPane.repaint();
     }
 
-    /**
-     * removes all tabs and adds them back, also a way to repaint them.
-     */
-    public final void repaintTabs() {
+    /** Removes all tabs and adds them back, also a way to repaint them. */
+    void repaintTabs() {
         tabbedPane.removeAll();
         addAllTabs();
     }
 
-    /**
-     * Return cluster tab, that is in the JScrollPane.
-     */
-    public final ClusterTab getClusterTab() {
+    /** Return cluster tab, that is in the JScrollPane. */
+    ClusterTab getClusterTab() {
         final Component sp = tabbedPane.getSelectedComponent();
         if (sp == null) {
             return null;
@@ -276,24 +252,18 @@ public class ClustersPanel extends JPanel {
         }
     }
 
-    /**
-     * This class is used to override the tab look.
-     */
-    public class MyTabbedPaneUI
-                            extends javax.swing.plaf.basic.BasicTabbedPaneUI {
-        /**
-         * Sets insets.
-         */
-        protected final Insets getContentBorderInsets(final int tabPlacement) {
+    /** This class is used to override the tab look. */
+    class MyTabbedPaneUI extends javax.swing.plaf.basic.BasicTabbedPaneUI {
+        /** Sets insets. */
+        @Override protected final Insets getContentBorderInsets(
+                                                    final int tabPlacement) {
             return new Insets(0, 0, 0, 0);
         }
 
-        /**
-         * Overrides the content border painting with nothing.
-         */
-        protected void paintContentBorder(final Graphics g,
-                                          final int tabPlacement,
-                                          final int selectedIndex) {
+        /** Overrides the content border painting with nothing. */
+        @Override protected void paintContentBorder(final Graphics g,
+                                                    final int tabPlacement,
+                                                    final int selectedIndex) {
             /* No border */
         }
     }
@@ -301,7 +271,7 @@ public class ClustersPanel extends JPanel {
     /** Starts upgrade check. */
     private void startUpgradeCheck() {
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final String latestVersion = Tools.getLatestVersion();
                 try {
                     mUpgradeLock.acquire();
@@ -325,7 +295,7 @@ public class ClustersPanel extends JPanel {
                 final String text = upgradeCheck;
                 mUpgradeLock.release();
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         for (final JEditorPane field : upgradeTextFields) {
                             field.setText(text);
                             field.setVisible(!"".equals(text));
@@ -340,7 +310,7 @@ public class ClustersPanel extends JPanel {
     /** Load plugins. */
     private void loadPlugins() {
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 Tools.loadPlugins();
             }
         });
@@ -351,7 +321,7 @@ public class ClustersPanel extends JPanel {
      * Register upgrade text field, that will be updated, when upgrade check is
      * done.
      */
-    public final JEditorPane registerUpgradeTextField() {
+    JEditorPane registerUpgradeTextField() {
         final JEditorPane upgradeField =
                                 new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
         final LineBorder border = new LineBorder(Color.RED);
@@ -359,7 +329,7 @@ public class ClustersPanel extends JPanel {
         Tools.setEditorFont(upgradeField);
         upgradeField.setEditable(false);
         upgradeField.addHyperlinkListener(new HyperlinkListener() {
-            public final void hyperlinkUpdate(final HyperlinkEvent e) {
+            @Override public void hyperlinkUpdate(final HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     Tools.openBrowswer(e.getURL().toString());
                 }
@@ -378,10 +348,8 @@ public class ClustersPanel extends JPanel {
         return upgradeField;
     }
 
-    /**
-     * Unregister upgrade text field.
-     */
-    public final void unregisterUpgradeTextField(final JEditorPane field) {
+    /** Unregister upgrade text field. */
+    void unregisterUpgradeTextField(final JEditorPane field) {
         try {
             mUpgradeLock.acquire();
         } catch (InterruptedException e) {

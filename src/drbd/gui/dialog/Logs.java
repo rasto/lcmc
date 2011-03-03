@@ -66,7 +66,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class Logs extends ConfigDialog {
+class Logs extends ConfigDialog {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Text area for the log. */
@@ -75,7 +75,8 @@ public class Logs extends ConfigDialog {
     private final Map<String, JCheckBox> checkBoxMap =
                                             new HashMap<String, JCheckBox>();
     /** Refresh button. */
-    private final MyButton refreshBtn = new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
+    private final MyButton refreshBtn =
+                    new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
     /** Refresh lock. */
     private final Mutex mRefreshLock = new Mutex();
 
@@ -87,9 +88,7 @@ public class Logs extends ConfigDialog {
         return "Logs.hbLog";
     }
 
-    /**
-     * Grep pattern for the log.
-     */
+    /** Grep pattern for the log. */
     protected final String grepPattern() {
         final StringBuffer pattern = new StringBuffer(40);
         pattern.append('\'');
@@ -108,10 +107,8 @@ public class Logs extends ConfigDialog {
         return pattern.toString();
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected final void initDialog() {
         super.initDialog();
         enableAllComponents(false);
         refreshLogsThread();
@@ -121,7 +118,7 @@ public class Logs extends ConfigDialog {
     private void refreshLogsThread() {
         final Thread thread = new Thread(
             new Runnable() {
-                public void run() {
+                @Override public void run() {
                     try {
                         if (!mRefreshLock.attempt(0)) {
                             return;
@@ -144,7 +141,7 @@ public class Logs extends ConfigDialog {
     /** Enables/disables all the components. */
     private void enableAllComponents(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 refreshBtn.setEnabled(enable);
                 for (final String name : checkBoxMap.keySet()) {
                     checkBoxMap.get(name).setEnabled(enable);
@@ -152,6 +149,7 @@ public class Logs extends ConfigDialog {
             }
         });
     }
+
     /**
      * Gets logs from specified command (logFileCommand) and grep pattern
      * (grepPatter). It also mixes the log files from all the nodes, sorts
@@ -173,23 +171,23 @@ public class Logs extends ConfigDialog {
             final String command = host.getDistCommand(logFileCommand(),
                                                        replaceHash);
             threads[index] = host.execCommandRaw(command,
-                                 (ProgressBar) null,
-                                 new ExecCallback() {
-                                     public void done(final String ans) {
-                                         texts[index] = ans;
-                                     }
-                                     public void doneError(final String ans,
-                                                           final int exitCode) {
-                                         texts[index] = host.getName()
-                                                        + ": "
-                                                        + ans + "\n";
-                                         Tools.sshError(host,
-                                                        command,
-                                                        ans,
-                                                        stacktrace,
-                                                        exitCode);
-                                     }
-                                 }, false, false, 30000);
+                         (ProgressBar) null,
+                         new ExecCallback() {
+                             @Override public void done(final String ans) {
+                                 texts[index] = ans;
+                             }
+                             @Override public void doneError(final String ans,
+                                                   final int exitCode) {
+                                 texts[index] = host.getName()
+                                                + ": "
+                                                + ans + "\n";
+                                 Tools.sshError(host,
+                                                command,
+                                                ans,
+                                                stacktrace,
+                                                exitCode);
+                             }
+                         }, false, false, 30000);
             i++;
         }
         i = 0;
@@ -298,10 +296,8 @@ public class Logs extends ConfigDialog {
         enableAllComponents(true);
     }
 
-    /**
-     * Gets the title of the dialog as string.
-     */
-    protected String getDialogTitle() {
+    /** Gets the title of the dialog as string. */
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
@@ -309,7 +305,7 @@ public class Logs extends ConfigDialog {
      * Returns description for dialog. This can be HTML defined in
      * TextResource.
      */
-    protected final String getDescription() {
+    @Override protected final String getDescription() {
         return "";
     }
 
@@ -341,14 +337,14 @@ public class Logs extends ConfigDialog {
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             checkBoxMap.put(name, cb);
             cb.addItemListener(new ItemListener() {
-                public void itemStateChanged(final ItemEvent e) {
+                @Override public void itemStateChanged(final ItemEvent e) {
                     refreshLogsThread();
                 }
             });
             pane.add(cb);
         }
         refreshBtn.addActionListener(new ActionListener() {
-            public final void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 refreshLogsThread();
             }
         });
@@ -356,10 +352,8 @@ public class Logs extends ConfigDialog {
         return pane;
     }
 
-    /**
-     * Returns panel for logs.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns panel for logs. */
+    @Override protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.setBackground(
@@ -376,7 +370,7 @@ public class Logs extends ConfigDialog {
     }
 
     /** Returns an icon. */
-    protected final ImageIcon icon() {
+    @Override protected final ImageIcon icon() {
         return Info.LOGFILE_ICON;
     }
 }

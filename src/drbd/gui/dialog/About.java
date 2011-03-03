@@ -34,22 +34,18 @@ import drbd.gui.SpringUtilities;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class About extends ConfigDialog {
+public final class About extends ConfigDialog {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Inits the dialog and enables all the components.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog and enables all the components. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponents();
     }
 
-    /**
-     * Gets the title of the dialog as string.
-     */
-    protected final String getDialogTitle() {
+    /** Gets the title of the dialog as string. */
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.About.Title") + Tools.getRelease();
     }
 
@@ -57,21 +53,19 @@ public class About extends ConfigDialog {
      * Returns description for dialog. This can be HTML defined in
      * TextResource.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.About.Description");
     }
 
-    /**
-     * Returns the content of the about dialog.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the content of the about dialog. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JScrollPane sp =
                       getAnswerPane(Tools.getString("Dialog.About.Licences"));
 
         pane.add(sp);
         //SwingUtilities.invokeLater(new Runnable() {
-        //    public void run() {
+        //    @Override public void run() {
         //        sp.getVerticalScrollBar().setValue(0);
         //    }
         //});

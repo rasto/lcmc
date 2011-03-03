@@ -50,7 +50,7 @@ import javax.swing.SwingUtilities;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class DrbdAvailSourceFiles extends DialogHost {
+final class DrbdAvailSourceFiles extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
@@ -60,10 +60,8 @@ public class DrbdAvailSourceFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /**
-     * Prepares a new <code>DrbdAvailSourceFiles</code> object. */
-    public DrbdAvailSourceFiles(final WizardDialog previousDialog,
-                                final Host host) {
+    /** Prepares a new <code>DrbdAvailSourceFiles</code> object. */
+    DrbdAvailSourceFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
@@ -71,7 +69,7 @@ public class DrbdAvailSourceFiles extends DialogHost {
      * Inits the dialog and starts detecting the available drbd source
      * tarballs.
      */
-    protected final void initDialog() {
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         disableComponents(new JComponent[]{drbdTarballCombo});
@@ -79,15 +77,13 @@ public class DrbdAvailSourceFiles extends DialogHost {
         availTarballs();
     }
 
-    /**
-     * Finds abailable tarballs.
-     */
-    protected final void availTarballs() {
+    /** Finds abailable tarballs. */
+    protected void availTarballs() {
         getHost().execCommandCache(
               "DrbdAvailVersionsSource",
               null, /* ProgresBar */
               new ExecCallback() {
-                public void done(final String ans) {
+                @Override public void done(final String ans) {
                     final String[] versions = ans.split("\\r?\\n");
                     if (versions.length == 0) {
                         allDone(null);
@@ -106,7 +102,7 @@ public class DrbdAvailSourceFiles extends DialogHost {
                     }
                     drbdTarballCombo.clear();
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             drbdTarballCombo.reloadComboBox(
                                    items.get(0).toString(),
                                    items.toArray(new ComboInfo[items.size()]));
@@ -118,10 +114,10 @@ public class DrbdAvailSourceFiles extends DialogHost {
                     });
                 }
 
-                public void doneError(final String ans,
-                                      final int exitCode) {
+                @Override public void doneError(final String ans,
+                                                final int exitCode) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
+                        @Override public void run() {
                             progressBarDoneError();
                             printErrorAndRetry(Tools.getString(
                                    "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
@@ -140,7 +136,7 @@ public class DrbdAvailSourceFiles extends DialogHost {
      * Is called after everything is done. It adds listeners if called for the
      * first time.
      */
-    protected final void allDone(final ComboInfo versionInfo) {
+    protected void allDone(final ComboInfo versionInfo) {
         if (versionInfo != null) {
             answerPaneSetText("http://oss.linbit.com/drbd/"
                               + versionInfo.getStringValue());
@@ -163,10 +159,8 @@ public class DrbdAvailSourceFiles extends DialogHost {
         }
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -174,7 +168,7 @@ public class DrbdAvailSourceFiles extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.DrbdAvailSourceFiles.Title in TextResources.
      */
-    protected final String getHostDialogTitle() {
+    @Override protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Title");
     }
 
@@ -182,14 +176,12 @@ public class DrbdAvailSourceFiles extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.DrbdAvailSourceFiles.Description in TextResources.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Description");
     }
 
-    /**
-     * Returns the panel with combo boxes.
-     */
-    protected final JPanel getChoiceBoxes() {
+    /** Returns the panel with combo boxes. */
+    protected JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
@@ -213,13 +205,11 @@ public class DrbdAvailSourceFiles extends DialogHost {
         return pane;
     }
 
-    /**
-     * Adds listeners to all combo boxes.
-     */
+    /** Adds listeners to all combo boxes. */
     private void addListeners() {
         /* tarball combo box */
         final ItemListener buildItemListener = new ItemListener() {
-            public void itemStateChanged(final ItemEvent e) {
+            @Override public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final ComboInfo item =
                                        (ComboInfo) drbdTarballCombo.getValue();
@@ -230,10 +220,8 @@ public class DrbdAvailSourceFiles extends DialogHost {
         drbdTarballCombo.addListeners(buildItemListener, null);
     }
 
-    /**
-     * Returns input pane with available drbd files.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns input pane with available drbd files. */
+    @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getChoiceBoxes());
         pane.add(getProgressBarPane());

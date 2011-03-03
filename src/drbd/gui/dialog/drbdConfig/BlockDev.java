@@ -47,7 +47,7 @@ import java.awt.Component;
  * @version $Id$
  *
  */
-public class BlockDev extends DrbdConfig {
+final class BlockDev extends DrbdConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** This block device. */
@@ -55,29 +55,23 @@ public class BlockDev extends DrbdConfig {
     /** Return code of adjust command that says 'no metadata'. */
     private static final int DRBD_NO_METADATA_RC = 119;
 
-    /**
-     * Prepares a new <code>BlockDev</code> object.
-     */
-    public BlockDev(final WizardDialog previousDialog,
-                    final DrbdResourceInfo dri,
-                    final BlockDevInfo blockDevInfo) {
+    /** Prepares a new <code>BlockDev</code> object. */
+    BlockDev(final WizardDialog previousDialog,
+             final DrbdResourceInfo dri,
+             final BlockDevInfo blockDevInfo) {
         super(previousDialog, dri);
         this.blockDevInfo = blockDevInfo;
         dri.getDrbdInfo().setSelectedNode(blockDevInfo);
         dri.getDrbdInfo().selectMyself();
     }
 
-    /**
-     * Applies the changes to the blockDevInfo object.
-     */
-    protected final void finishDialog() {
+    /** Applies the changes to the blockDevInfo object. */
+    @Override protected void finishDialog() {
         Tools.waitForSwing();
         blockDevInfo.apply(false);
     }
 
-    /**
-     * Calls drbd adjust, returns false if there is no meta-data area.
-     */
+    /** Calls drbd adjust, returns false if there is no meta-data area. */
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
         final int err = DRBD.adjust(bdi.getHost(),
@@ -94,7 +88,7 @@ public class BlockDev extends DrbdConfig {
      * drbd config create md dialog. In the second case the drbd admin adjust
      * is called.
      */
-    public final WizardDialog nextDialog() {
+    @Override public WizardDialog nextDialog() {
         if (getDrbdResourceInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi =
                     getDrbdResourceInfo().getOtherBlockDevInfo(blockDevInfo);
@@ -124,24 +118,20 @@ public class BlockDev extends DrbdConfig {
         }
     }
 
-    /**
-     * Returns title of the dialog.
-     */
-    protected final String getDialogTitle() {
+    /** Returns title of the dialog. */
+    @Override protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Title");
     }
 
     /**
      * Returns description of the dialog.
      */
-    protected final String getDescription() {
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
-    protected final void initDialog() {
+    /** Inits the dialog. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
         enableComponents();
@@ -151,17 +141,15 @@ public class BlockDev extends DrbdConfig {
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     pressNextButton();
                 }
             });
         }
     }
 
-    /**
-     * Returns the input pane with block device parameters.
-     */
-    protected final JComponent getInputPane() {
+    /** Returns the input pane with block device parameters. */
+    @Override protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));

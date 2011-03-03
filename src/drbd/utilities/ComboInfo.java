@@ -29,31 +29,25 @@ package drbd.utilities;
  * @version $Id$
  *
  */
-public class ComboInfo {
+public final class ComboInfo {
     /** Internal String. */
     private final String string;
     /** Name. */
     private final String name;
 
-    /**
-     * Creates a new ComboInfo object.
-     */
+    /** Creates a new ComboInfo object. */
     public ComboInfo(final String name, final String string) {
         this.name = name;
         this.string = string;
     }
 
-    /**
-     * Returns the name. It will be shown to the user.
-     */
-    public final String toString() {
+    /** Returns the name. It will be shown to the user. */
+    @Override public String toString() {
         return name;
     }
 
-    /**
-     * Returns the string that is used internally.
-     */
-    public final String getStringValue() {
+    /** Returns the string that is used internally. */
+    public String getStringValue() {
         return string;
     }
 }

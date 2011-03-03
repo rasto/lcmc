@@ -33,22 +33,17 @@ import drbd.gui.dialog.WizardDialog;
  * @version $Id$
  *
  */
-public class Dist extends DrbdLinbitAvailPackages {
+public final class Dist extends DrbdLinbitAvailPackages {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>Dist</code> object.
-     */
-    public Dist(final WizardDialog previousDialog,
-                final Host host) {
+    /** Prepares a new <code>Dist</code> object. */
+    public Dist(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
-    /**
-     * Returns the next dialog.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns the next dialog. */
+    @Override public WizardDialog nextDialog() {
         return new CheckInstallation(this, getHost());
     }
 }

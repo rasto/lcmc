@@ -35,7 +35,7 @@ import drbd.gui.resources.VMSVirtualDomainInfo;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public class AddVMConfigDialog {
+public final class AddVMConfigDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** VMS virtual domain info object. */

@@ -62,6 +62,8 @@
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 
+		  <compilerarg value="-Xmaxerrs"/> 
+		  <compilerarg value="1000"/> 
 		</javac>
 	</target>
 

@@ -38,15 +38,15 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual serial device.
  */
-public class VMSSerialInfo extends VMSParallelSerialInfo {
+final class VMSSerialInfo extends VMSParallelSerialInfo {
     /** Creates the VMSSerialInfo object. */
-    public VMSSerialInfo(final String name, final Browser browser,
-                        final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    VMSSerialInfo(final String name, final Browser browser,
+                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Returns data for the table. */
-    protected final Object[][] getTableData(final String tableName) {
+    @Override protected Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.SERIAL_TABLE.equals(tableName)) {
@@ -63,7 +63,7 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
     }
 
     /** Updates parameters. */
-    public final void updateParameters() {
+    @Override void updateParameters() {
         final Map<String, SerialData> serials =
                               getVMSVirtualDomainInfo().getSerials();
         if (serials != null) {
@@ -100,7 +100,7 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns string representation. */
-    public final String toString() {
+    @Override public String toString() {
         final StringBuffer s = new StringBuffer(30);
         final String type = getParamSaved(SerialData.TYPE);
         if (type == null) {
@@ -112,7 +112,7 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
     }
 
     /** Removes this serial device without confirmation dialog. */
-    protected final void removeMyselfNoConfirm(final boolean testOnly) {
+    @Override protected void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
         }
@@ -134,17 +134,17 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns "add new" button. */
-    protected final MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
+    @Override protected MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
         return getNewBtn(vdi);
     }
 
     /** Returns "add new" button. */
-    public static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Serial Device");
         newBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
+            @Override public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         vdi.addSerialsPanel();
                     }
                 });
@@ -155,27 +155,27 @@ public class VMSSerialInfo extends VMSParallelSerialInfo {
     }
 
     /** Modify device xml. */
-    protected final void modifyXML(final VMSXML vmsxml,
-                                   final Node node,
-                                   final String domainName,
-                                   final Map<String, String> params) {
+    @Override protected void modifyXML(final VMSXML vmsxml,
+                                       final Node node,
+                                       final String domainName,
+                                       final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifySerialXML(node, domainName, params);
         }
     }
 
     /** Return table name that appears on the screen. */
-    protected final String getTableScreenName() {
+    @Override protected String getTableScreenName() {
         return "Serial Device";
     }
 
     /** Return table name. */
-    protected final String getTableName() {
+    @Override protected String getTableName() {
         return VMSVirtualDomainInfo.SERIAL_TABLE;
     }
 
     /** Returns device parameters. */
-    protected final Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave() {
         final Map<String, String> parameters = super.getHWParametersAndSave();
         setName("serial "
                 + getParamSaved(SerialData.TARGET_PORT)

@@ -33,15 +33,12 @@ import drbd.gui.dialog.cluster.Init;
  * @version $Id$
  *
  */
-public class InitForUpgrade extends Init {
+final class InitForUpgrade extends Init {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Prepares a new <code>InitForUpgrade</code> object.
-     */
-    public InitForUpgrade(final WizardDialog previousDialog,
-                          final Cluster cluster) {
+    /** Prepares a new <code>InitForUpgrade</code> object. */
+    InitForUpgrade(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
 }

@@ -27,11 +27,11 @@ import java.util.Arrays;
  * Here are commands for ubuntu dapper.
  * TODO: It is not possible to install heartbeat-2 from here.
  */
-public class DistResource_ubuntu_DAPPER extends
-            java.util.ListResourceBundle {
+public final class DistResource_ubuntu_DAPPER
+                                        extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    protected final Object[][] getContents() {
+    @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

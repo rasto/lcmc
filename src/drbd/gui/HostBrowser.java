@@ -62,7 +62,7 @@ import EDU.oswego.cs.dl.util.concurrent.Mutex;
  * @version $Id$
  *
  */
-public class HostBrowser extends Browser {
+public final class HostBrowser extends Browser {
     /** Net interfaces node in the menu. */
     private DefaultMutableTreeNode netInterfacesNode;
     /** Block devices sytems node in the menu. */
@@ -106,7 +106,7 @@ public class HostBrowser extends Browser {
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
     /** Small host in cluster icon (left side). */
-    public static final ImageIcon HOST_IN_CLUSTER_ICON_LEFT_SMALL =
+    static final ImageIcon HOST_IN_CLUSTER_ICON_LEFT_SMALL =
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconLeftSmall"));
     /** Block device infos lock. */
@@ -130,31 +130,23 @@ public class HostBrowser extends Browser {
         setTreeTop(hostInfo);
     }
 
-    /**
-     * Returns host info for this browser.
-     */
-    public final HostInfo getHostInfo() {
+    /** Returns host info for this browser. */
+    public HostInfo getHostInfo() {
         return hostInfo;
     }
 
-    /**
-     * Returns host data object for this browser.
-     */
-    public final Host getHost() {
+    /** Returns host data object for this browser. */
+    public Host getHost() {
         return host;
     }
 
-    /**
-     * Returns host for drbd view info for this browser.
-     */
-    public final HostDrbdInfo getHostDrbdInfo() {
+    /** Returns host for drbd view info for this browser. */
+    HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
     }
 
-    /**
-     * Initializes host resources for host view.
-     */
-    public final void initHostResources() {
+    /** Initializes host resources for host view. */
+    public void initHostResources() {
         /* net interfaces */
         netInterfacesNode = new DefaultMutableTreeNode(new CategoryInfo(
                                 Tools.getString("HostBrowser.NetInterfaces"),
@@ -177,10 +169,8 @@ public class HostBrowser extends Browser {
         topAdd(fileSystemsNode);
     }
 
-    /**
-     * Returns cluster browser if available.
-     */
-    public final ClusterBrowser getClusterBrowser() {
+    /** Returns cluster browser if available. */
+    public ClusterBrowser getClusterBrowser() {
         final Cluster c = host.getCluster();
         if (c == null) {
             return null;
@@ -188,12 +178,10 @@ public class HostBrowser extends Browser {
         return c.getBrowser();
     }
 
-    /**
-     * Updates hardware resources of a host in the tree.
-     */
-    public final void updateHWResources(final NetInterface[] nis,
-                                        final BlockDevice[] bds,
-                                        final String[] fss) {
+    /** Updates hardware resources of a host in the tree. */
+    public void updateHWResources(final NetInterface[] nis,
+                                  final BlockDevice[] bds,
+                                  final String[] fss) {
         DefaultMutableTreeNode resource = null;
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces =
@@ -265,10 +253,8 @@ public class HostBrowser extends Browser {
         mFileSystemsLock.release();
     }
 
-    /**
-     * Return list of block device info objects.
-     */
-    public final Set<BlockDevInfo> getBlockDevInfos() {
+    /** Return list of block device info objects. */
+    public Set<BlockDevInfo> getBlockDevInfos() {
         final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
         try {
             mBlockDevInfosLock.acquire();
@@ -289,7 +275,7 @@ public class HostBrowser extends Browser {
     /**
      * Returns map of block device objects with its block device info objects.
      */
-    public final Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
+    Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
         final Map<BlockDevice, BlockDevInfo> blockDevices =
                                       new HashMap<BlockDevice, BlockDevInfo>();
         try {
@@ -308,10 +294,8 @@ public class HostBrowser extends Browser {
         return blockDevices;
     }
 
-    /**
-     * Returns map of net interface objects with its net info objects.
-     */
-    public final Map<NetInterface, NetInfo> getNetInterfacesMap() {
+    /** Returns map of net interface objects with its net info objects. */
+    Map<NetInterface, NetInfo> getNetInterfacesMap() {
         final Map<NetInterface, NetInfo> netInterfaces =
                                           new HashMap<NetInterface, NetInfo>();
         try {
@@ -330,10 +314,8 @@ public class HostBrowser extends Browser {
         return netInterfaces;
     }
 
-    /**
-     * Returns map of file systems its file system info objects.
-     */
-    public final Map<String, FSInfo> getFilesystemsMap() {
+    /** Returns map of file systems its file system info objects. */
+    Map<String, FSInfo> getFilesystemsMap() {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
         try {
             mFileSystemsLock.acquire();
@@ -351,10 +333,8 @@ public class HostBrowser extends Browser {
         return filesystems;
     }
 
-    /**
-     * @return list of network interfaces.
-     */
-    public final List<NetInfo> getNetInfos() {
+    /** @return list of network interfaces. */
+    List<NetInfo> getNetInfos() {
         final Enumeration e = netInterfacesNode.children();
         final List<NetInfo> netInfos = new ArrayList<NetInfo>();
         while (e.hasMoreElements()) {
@@ -366,10 +346,8 @@ public class HostBrowser extends Browser {
         return netInfos;
     }
 
-    /**
-     * Adds advanced submenu to the host menus in drbd and pacemaker view.
-     */
-    public final void addAdvancedMenu(final MyMenu submenu) {
+    /** Adds advanced submenu to the host menus in drbd and pacemaker view. */
+    public void addAdvancedMenu(final MyMenu submenu) {
         if (submenu.getItemCount() > 0) {
             return;
         }
@@ -382,14 +360,14 @@ public class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            public final void action() {
+            @Override public void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
@@ -415,14 +393,14 @@ public class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            public final void action() {
+            @Override public void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelReboot";
@@ -440,10 +418,8 @@ public class HostBrowser extends Browser {
         submenu.add(rebootMenuItem);
     }
 
-    /**
-     * Returns info string about DRBD installation.
-     */
-    public final String getDrbdInfo() {
+    /** Returns info string about DRBD installation. */
+    public String getDrbdInfo() {
         final StringBuffer tt = new StringBuffer(40);
         final String drbdV = host.getDrbdVersion();
         final String drbdModuleV = host.getDrbdModuleVersion();
@@ -474,10 +450,8 @@ public class HostBrowser extends Browser {
         return tt.toString();
     }
 
-    /**
-     * Returns info string about Pacemaker installation.
-     */
-    public final String getPacemakerInfo() {
+    /** Returns info string about Pacemaker installation. */
+    public String getPacemakerInfo() {
         final StringBuffer tt = new StringBuffer(40);
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
@@ -558,10 +532,8 @@ public class HostBrowser extends Browser {
         return tt.toString();
     }
 
-    /**
-     * Returns tooltip for host.
-     */
-    public final String getHostToolTip(final Host host) {
+    /** Returns tooltip for host. */
+    public String getHostToolTip(final Host host) {
         final StringBuffer tt = new StringBuffer(80);
         tt.append("<b>" + host.getName() + "</b>");
         final ClusterBrowser b = getClusterBrowser();
@@ -582,10 +554,8 @@ public class HostBrowser extends Browser {
         return tt.toString();
     }
 
-    /**
-     * Returns drbd graph object.
-     */
-    public final DrbdGraph getDrbdGraph() {
+    /** Returns drbd graph object. */
+    public DrbdGraph getDrbdGraph() {
         final ClusterBrowser b = getClusterBrowser();
         if (b == null) {
             return null;
@@ -593,17 +563,13 @@ public class HostBrowser extends Browser {
         return b.getDrbdGraph();
     }
 
-    /**
-     * Returns a list of used network interface ports.
-     */
-    public final List<String> getDrbdVIPortList() {
+    /** Returns a list of used network interface ports. */
+    public List<String> getDrbdVIPortList() {
         return drbdVIPortList;
     }
 
-    /**
-     * Lock block dev info objects.
-     */
-    public final void lockBlockDevInfos() {
+    /** Lock block dev info objects. */
+    public void lockBlockDevInfos() {
         try {
             mBlockDevInfosLock.acquire();
         } catch (InterruptedException e) {
@@ -611,24 +577,18 @@ public class HostBrowser extends Browser {
         }
     }
 
-    /**
-     * Unlock block dev info objects.
-     */
-    public final void unlockBlockDevInfos() {
+    /** Unlock block dev info objects. */
+    public void unlockBlockDevInfos() {
         mBlockDevInfosLock.release();
     }
 
-    /**
-     * Returns block devices node from the menu.
-     */
-    public final DefaultMutableTreeNode getBlockDevicesNode() {
+    /** Returns block devices node from the menu. */
+    public DefaultMutableTreeNode getBlockDevicesNode() {
         return blockDevicesNode;
     }
 
-    /**
-     * Returns net interfaces node from the menu.
-     */
-    public final DefaultMutableTreeNode getNetInterfacesNode() {
+    /** Returns net interfaces node from the menu. */
+    public DefaultMutableTreeNode getNetInterfacesNode() {
         return netInterfacesNode;
     }
 }

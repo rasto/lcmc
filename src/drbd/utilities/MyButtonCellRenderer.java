@@ -35,15 +35,14 @@ public class MyButtonCellRenderer extends MyButton
                                   implements TableCellRenderer {
     /** Serial version uid. */
     private static final long serialVersionUID = 1L;
-    /**
-     * Creates a new MyButtonCellRenderer object.
-     */
+
+    /** Creates a new MyButtonCellRenderer object. */
     public MyButtonCellRenderer() {
         super();
     }
 
     /** Sets background color and padding in jlabels for every cell. */
-    public final Component getTableCellRendererComponent(
+    @Override public final Component getTableCellRendererComponent(
                                                       final JTable table,
                                                       final Object value,
                                                       final boolean isSelected,
@@ -91,9 +90,7 @@ public class MyButtonCellRenderer extends MyButton
         return SwingConstants.LEFT;
     }
 
-    /**
-     * Retrurns color for some rows.
-     */
+    /** Retrurns color for some rows. */
     protected Color getRowColor(final String key) {
         return null;
     }

@@ -31,24 +31,19 @@ import java.util.Locale;
 /**
  * This class holds the information about available resource agent classes.
  */
-public class AvailableServicesInfo extends HbCategoryInfo {
-    /**
-     * Prepares a new <code>AvailableServicesInfo</code> object.
-     */
+public final class AvailableServicesInfo extends HbCategoryInfo {
+    /** Prepares a new <code>AvailableServicesInfo</code> object. */
     public AvailableServicesInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /**
-     * Returns columns for the table.
-     */
-    protected final String[] getColumnNames(final String tableName) {
+    /** Returns columns for the table. */
+    @Override protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Description"};
     }
-    /**
-     * Returns data for the table.
-     */
-    protected final Object[][] getTableData(final String tableName) {
+
+    /** Returns data for the table. */
+    @Override protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -59,12 +54,10 @@ public class AvailableServicesInfo extends HbCategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /**
-     * Execute when row in the table was clicked.
-     */
-    protected final void rowClicked(final String tableName,
-                                    final String key,
-                                    final int column) {
+    /** Execute when row in the table was clicked. */
+    @Override protected void rowClicked(final String tableName,
+                                        final String key,
+                                        final int column) {
         final ResourceAgentClassInfo raci =
                      getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
         if (raci != null) {

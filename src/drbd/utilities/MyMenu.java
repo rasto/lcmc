@@ -45,9 +45,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Access Type for this component to become visible. */
     private final AccessMode visibleAccessMode;
 
-    /**
-     * Prepares a new <code>MyMenu</code> object.
-     */
+    /** Prepares a new <code>MyMenu</code> object. */
     public MyMenu(final String text,
                   final AccessMode enableAccessMode,
                   final AccessMode visibleAccessMode) {
@@ -59,21 +57,17 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Stores the position. */
-    public final void setPos(final Point2D pos) {
+    @Override public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
 
-    /**
-     * Gets the position.
-     */
+    /** Gets the position. */
     protected final Point2D getPos() {
         return pos;
     }
 
-    /**
-     * Predicate that can be used, but it is not.
-     */
-    public boolean predicate() {
+    /** Predicate that can be used, but it is not. */
+    boolean predicate() {
         return true;
     }
 
@@ -86,10 +80,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
         return null;
     }
 
-    /**
-     * Returns whether the item should be visible or not.
-     */
-    public boolean visiblePredicate() {
+    /** Returns whether the item should be visible or not. */
+    boolean visiblePredicate() {
         return true;
     }
 
@@ -97,13 +89,13 @@ public class MyMenu extends JMenu implements UpdatableItem {
      * This function is usually overriden and is called when the menu and its
      * items are to be updated.
      */
-    public void update() {
+    @Override public void update() {
         processAccessMode();
         final Thread t = new Thread(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 final List<Component> copy = new ArrayList<Component>();
                 Tools.invokeAndWait(new Runnable() {
-                    public void run() {
+                    @Override public void run() {
                         for (final Component m : getMenuComponents()) {
                             copy.add(m);
                         }
@@ -125,13 +117,13 @@ public class MyMenu extends JMenu implements UpdatableItem {
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 setEnabled(disableTooltip == null && accessible);
             }
         });
         if (isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+                @Override public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {
                         String advanced = "";
@@ -158,7 +150,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Cleanup. */
-    public final void cleanup() {
+    @Override public final void cleanup() {
         for (final java.awt.Component m : getMenuComponents()) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).cleanup();
@@ -169,7 +161,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Remove all items. */
-    public final void removeAll() {
+    @Override public final void removeAll() {
         for (int i = 0; i < getItemCount(); i++) {
             final JMenuItem item = getItem(i);
             if (item instanceof MyMenuItem) {

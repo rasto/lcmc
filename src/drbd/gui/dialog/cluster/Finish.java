@@ -37,7 +37,7 @@ import javax.swing.JCheckBox;
  * @version $Id$
  *
  */
-public class Finish extends DialogCluster {
+final class Finish extends DialogCluster {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Save checkbox. */
@@ -45,25 +45,18 @@ public class Finish extends DialogCluster {
                                   Tools.getString("Dialog.Cluster.Finish.Save"),
                                   true);
 
-    /**
-     * Prepares a new <code>Finish</code> object.
-     */
-    public Finish(final WizardDialog previousDialog,
-                  final Cluster cluster) {
+    /** Prepares a new <code>Finish</code> object. */
+    Finish(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
 
-    /**
-     * Returns next dialog. Null in this case.
-     */
-    public final WizardDialog nextDialog() {
+    /** Returns next dialog. Null in this case. */
+    @Override public WizardDialog nextDialog() {
         return null;
     }
 
-    /**
-     * Finishes the dialog, and saves the cluster.
-     */
-    protected final void finishDialog() {
+    /** Finishes the dialog, and saves the cluster. */
+    @Override protected void finishDialog() {
         Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
@@ -71,10 +64,8 @@ public class Finish extends DialogCluster {
         }
     }
 
-    /**
-     * Inits dialog and enables the finish button.
-     */
-    protected final void initDialog() {
+    /** Inits dialog and enables the finish button. */
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
@@ -86,24 +77,18 @@ public class Finish extends DialogCluster {
         }
     }
 
-    /**
-     * Returns the title of the dialog.
-     */
-    protected final String getClusterDialogTitle() {
+    /** Returns the title of the dialog. */
+    @Override protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Finish.Title");
     }
 
-    /**
-     * Returns the description of the dialog.
-     */
-    protected final String getDescription() {
+    /** Returns the description of the dialog. */
+    @Override protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Finish.Description");
     }
 
-    /**
-     * Returns the input panel.
-     */
-    protected final JPanel getInputPane() {
+    /** Returns the input panel. */
+    @Override protected JPanel getInputPane() {
         final JPanel pane = new JPanel();
         /* Save checkbox */
         pane.add(saveCB);

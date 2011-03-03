@@ -146,10 +146,8 @@ public class MyButton extends JButton implements ComponentWithTest {
         setContentAreaFilled(false);  // *
     }
 
-    /**
-     * Creates tooltip.
-     */
-    public final JToolTip createToolTip() {
+    /** Creates tooltip. */
+    @Override public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
         if (toolTipBackground != null) {
             toolTip.setBackground(toolTipBackground);
@@ -157,15 +155,14 @@ public class MyButton extends JButton implements ComponentWithTest {
         return toolTip;
     }
 
-    /**
-     * Sets tooltip's background color.
-     */
-    public final void setToolTipBackground(final Color toolTipBackground) {
+    /** Sets tooltip's background color. */
+    @Override public final void setToolTipBackground(
+                                            final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    public final void setToolTipText(final String toolTipText) {
+    @Override public final void setToolTipText(final String toolTipText) {
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             super.setToolTipText(toolTipText);
             final GraphicsDevice[] devices =
@@ -200,25 +197,19 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
 
-    /**
-     * Sets color 1 in the gradient.
-     */
-    public final void setColor1(final Color c1) {
+    /** Sets color 1 in the gradient. */
+    final void setColor1(final Color c1) {
         this.color1 = c1;
         repaint();
     }
 
-    /**
-     * Sets color 2 in the gradient.
-     */
-    public final void setColor2(final Color c2) {
+    /** Sets color 2 in the gradient. */
+    final void setColor2(final Color c2) {
         this.color2 = c2;
         repaint();
     }
 
-    /**
-     * Sets background of the button.
-     */
+    /** Sets background of the button. */
     public final void setBackgroundColor(final Color c) {
         if (c == null) {
             color2 = DEFAULT_COLOR;
@@ -229,10 +220,8 @@ public class MyButton extends JButton implements ComponentWithTest {
         repaint();
     }
 
-    /**
-     * Gets background of the button.
-     */
-    public final Color getBackground() {
+    /** Gets background of the button. */
+    @Override public final Color getBackground() {
         if (color2 == null) {
             return DEFAULT_COLOR;
             //return super.getBackground();
@@ -240,10 +229,8 @@ public class MyButton extends JButton implements ComponentWithTest {
         return color2;
     }
 
-    /**
-     * Overloaded in order to paint the background.
-     */
-    protected final void paintComponent(final Graphics g) {
+    /** Overloaded in order to paint the background. */
+    @Override protected final void paintComponent(final Graphics g) {
         if (!isEnabled()) {
             setContentAreaFilled(false);  // *
             g.setColor(color2);
@@ -286,9 +273,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         super.paintComponent(g);
     }
 
-    /**
-     * Presses this button.
-     */
+    /** Presses this button. */
     public final void pressButton() {
         fireActionPerformed(new ActionEvent(this, 0, "pressed"));
     }
@@ -304,7 +289,8 @@ public class MyButton extends JButton implements ComponentWithTest {
         setIconTextGap(0);
     }
 
-    public void setEnabled(final boolean enabled) {
+    /** Enable/disable this butotn. */
+    @Override public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
     }
 }
