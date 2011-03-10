@@ -94,7 +94,7 @@ public final class HostInfo extends Info {
                                       new Subtext("pending", null, Color.BLUE);
     /** Fenced/unclean subtext. */
     private static final Subtext FENCED_SUBTEXT =
-                                      new Subtext("FENCED", null, Color.RED);
+                                      new Subtext("fencing...", null, Color.RED);
     /** Stopped subtext. */
     private static final Subtext STOPPED_SUBTEXT =
                                       new Subtext("stopped", null, Color.RED);
