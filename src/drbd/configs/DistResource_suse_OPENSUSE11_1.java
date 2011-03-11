@@ -43,9 +43,9 @@ public final class DistResource_suse_OPENSUSE11_1
         {"distributiondir", "sles11"},
         {"Support", "suse-OPENSUSE11_1"},
         {"DRBD.load",
-         "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
+         DistResource.SUDO + "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
          + " /etc/modprobe.d/unsupported-modules;"
-         + "/sbin/modprobe drbd"},
+         + DistResource.SUDO + "/sbin/modprobe drbd"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",

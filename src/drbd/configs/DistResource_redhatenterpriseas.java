@@ -54,7 +54,8 @@ public final class DistResource_redhatenterpriseas
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?EL\\d*).*"},
-        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+        {"DrbdInst.install",
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"HbPmInst.install.text.1", "the redhat way: HB 2.1.3 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
@@ -84,28 +85,28 @@ public final class DistResource_redhatenterpriseas
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions;"
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
         {"Heartbeat.deleteFromRc",
-         "/sbin/chkconfig --del heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
 
         {"Heartbeat.addToRc",
-         "/sbin/chkconfig --add heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
 
         {"Corosync.addToRc",
-         "/sbin/chkconfig --level 2345 corosync on "
-         + "&& /sbin/chkconfig --level 016 corosync off"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
 
         {"Corosync.deleteFromRc",
-         "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
 
         {"Openais.addToRc",
-         "/sbin/chkconfig --level 2345 openais on "
-         + "&& /sbin/chkconfig --level 016 openais off"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 openais on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 openais off"},
 
         {"Openais.deleteFromRc",
-         "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 }

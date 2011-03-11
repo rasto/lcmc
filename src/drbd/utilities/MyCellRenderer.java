@@ -63,7 +63,9 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
         if (value instanceof JLabel) {
             ret  = (JLabel) value;
         } else {
-            setText(value.toString());
+            if (value != null) {
+                setText(value.toString());
+            }
             ret = this;
         }
         ((JLabel) ret).setHorizontalAlignment(al);
@@ -74,7 +76,9 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
             ret.setBackground(bg);
         }
         ret.setBorder(EMPTY_BORDER);
-        ret.setToolTipText(value.toString());
+        if (value != null) {
+            ret.setToolTipText(value.toString());
+        }
         return ret;
     }
 

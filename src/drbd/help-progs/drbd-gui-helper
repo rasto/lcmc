@@ -33,6 +33,8 @@ use Socket;
 $ENV{LANG}="C";
 $ENV{LANGUAGE}="C";
 $ENV{LC_CTYPE}="C";
+$ENV{PATH}="/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin"
+	   .":/usr/bin:/bin:/usr/bin";
 for (keys %ENV) {
 	$ENV{$_} = "C" if /^LC_/;
 }
@@ -1438,7 +1440,9 @@ sub get_cluster_versions {
 	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
 	my $pcmk_svc_ver = "0";
 	if ($service) {
-		($pcmk_svc_ver) = $service =~ /^service.ver=(\d*)/;
+		if ($service =~ /^service.ver=(\d*)/) {
+			$pcmk_svc_ver = $1;
+		}
 	}
 	# drbd version
 	my ($drbd_version) =

@@ -37,6 +37,7 @@ import drbd.gui.resources.CategoryInfo;
 import drbd.gui.ResourceGraph;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
+import drbd.configs.DistResource;
 import java.awt.geom.Point2D;
 
 import java.awt.Color;
@@ -956,7 +957,8 @@ public final class Host {
                                     dist,
                                     distVersionString,
                                     arch,
-                                    convertCmdCallback);
+                                    convertCmdCallback,
+                                    false); /* in bash */
     }
 
     /** Converts a string that is specific to the distribution distribution. */
@@ -990,7 +992,8 @@ public final class Host {
                             }
                             return command;
                         }
-                    });
+                    },
+                    false); /* in bash */
     }
 
     /**
@@ -1011,7 +1014,8 @@ public final class Host {
                                                     dist,
                                                     distVersionString,
                                                     arch,
-                                                    convertCmdCallback),
+                                                    convertCmdCallback,
+                                                    false), /* in bash */
                                execCallback,
                                outputVisible,
                                true,
@@ -1040,7 +1044,8 @@ public final class Host {
                                                     dist,
                                                     distVersionString,
                                                     arch,
-                                                    convertCmdCallback),
+                                                    convertCmdCallback,
+                                                    false), /* in bash */
                                execCallback,
                                newOutputCallback,
                                outputVisible,
@@ -1088,7 +1093,8 @@ public final class Host {
                                                     dist,
                                                     distVersionString,
                                                     arch,
-                                                    convertCmdCallback)
+                                                    convertCmdCallback,
+                                                    false) /* in bash */
                                + params,
                                callback,
                                outputVisible,
@@ -1115,7 +1121,36 @@ public final class Host {
                                                     dist,
                                                     distVersionString,
                                                     arch,
-                                                    convertCmdCallback),
+                                                    convertCmdCallback,
+                                                    false), /* in bash */
+                               progressBar,
+                               callback,
+                               outputVisible,
+                               true,
+                               commandTimeout);
+    }
+
+    /**
+     * Executes command with bash -c. Command is executed in a new thread, after command
+     * is finished callback.done function will be called. In case of error,
+     * callback.doneError is called.
+     */
+    public ExecCommandThread execCommandInBash(
+                               final String commandString,
+                               final ProgressBar progressBar,
+                               final ExecCallback callback,
+                               final ConvertCmdCallback convertCmdCallback,
+                               final boolean outputVisible,
+                               final int commandTimeout) {
+        if (outputVisible) {
+            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
+        }
+        return ssh.execCommand(Tools.getDistCommand(commandString,
+                                                    dist,
+                                                    distVersionString,
+                                                    arch,
+                                                    convertCmdCallback,
+                                                    true), /* in bash */
                                progressBar,
                                callback,
                                outputVisible,
@@ -1166,7 +1201,8 @@ public final class Host {
                                                     dist,
                                                     distVersionString,
                                                     arch,
-                                                    convertCmdCallback),
+                                                    convertCmdCallback,
+                                                    false), /* in bash */
                                progressBar,
                                callback,
                                true,
@@ -1184,7 +1220,8 @@ public final class Host {
                                                 dist,
                                                 distVersionString,
                                                 arch,
-                                                null), /* ConvertCmdCallback */
+                                                null, /* ConvertCmdCallback */
+                                                false), /* in bash */
                                     execCallback,
                                     null,
                                     false,
@@ -1216,7 +1253,8 @@ public final class Host {
                                                 dist,
                                                 distVersionString,
                                                 arch,
-                                                null), /* ConvertCmdCallback */
+                                                null, /* ConvertCmdCallback */
+                                                false), /* in bash */
                                     execCallback,
                                     outputCallback,
                                     false,
@@ -1260,7 +1298,8 @@ public final class Host {
                                                  dist,
                                                  distVersionString,
                                                  arch,
-                                                 null), /* ConvertCmdCallback */
+                                                 null, /* ConvertCmdCallback */
+                                                 false), /* in bash */
                                 execCallback,
                                 outputCallback,
                                 false,
@@ -1328,36 +1367,13 @@ public final class Host {
         return hostnameEntered;
     }
 
-    /** Escapes the quotes for the stacked ssh commands. */
-    public String escapeQuotes(final String s, final int count) {
-        if (s == null) {
-            return null;
-        }
-        if (count <= 0) {
-            return s;
-        }
-        final StringBuffer sb = new StringBuffer("");
-        for (int i = 0; i < s.length(); i++) {
-            final char c = s.charAt(i);
-            if (c == '\\') {
-                sb.append("\\\\");
-            } else if (c == '"' || c == '$' || c == '`') {
-                sb.append('\\');
-                sb.append(c);
-            } else {
-                sb.append(c);
-            }
-        }
-        return escapeQuotes(sb.toString(), count - 1);
-    }
-
     /** Returns sudo prefix. */
     String getSudoPrefix(final boolean sudoTest) {
         if (useSudo != null && useSudo) {
             if (sudoTest) {
-                return "sudo -n ";
+                return "sudo -E -n ";
             } else {
-                return "sudo -p '"
+                return "sudo -E -p '"
                        + SSH.SUDO_PROMPT + "' ";
             }
         } else {
@@ -1368,12 +1384,10 @@ public final class Host {
     public String getSudoCommand(final String command,
                                  final boolean sudoTest) {
         if (useSudo != null && useSudo) {
-            return "trap - SIGPIPE;"
-                   + getSudoPrefix(sudoTest)
-                   + "bash -c \"trap - SIGPIPE; { "
-                   + escapeQuotes(command, 1) + "; } 2>&1\" 2>/dev/null";
+            final String sudoPrefix = getSudoPrefix(sudoTest);
+            return command.replaceAll(DistResource.SUDO, sudoPrefix);
         } else {
-            return command;
+            return command.replaceAll(DistResource.SUDO, " "); /* must be " " */
         }
     }
 
@@ -1388,7 +1402,6 @@ public final class Host {
         final String[] usernames = username.split(",");
         final String[] ips = ip.split(",");
         final StringBuffer s = new StringBuffer(200);
-        s.append("export LC_ALL=C;");
         if (hops > 1) {
             String sshAgentPid = "";
             String sshAgentSock = "";
@@ -1419,13 +1432,13 @@ public final class Host {
             s.append(' ');
             s.append(ips[i]);
             s.append(' ');
-            s.append(escapeQuotes("\"", i - 1));
+            s.append(Tools.escapeQuotes("\"", i - 1));
         }
 
-        s.append(escapeQuotes(command, hops - 1));
+        s.append(Tools.escapeQuotes(command, hops - 1));
 
         for (int i = hops - 1; i > 0; i--) {
-            s.append(escapeQuotes("\"", i - 1));
+            s.append(Tools.escapeQuotes("\"", i - 1));
         }
         return s.toString();
     }
@@ -2471,7 +2484,7 @@ public final class Host {
                       final double index) {
         Tools.sleep(1500);
         final StringBuffer command = new StringBuffer(50);
-        command.append(replaceVars("@GUI-HELPER@"));
+        command.append(DistResource.SUDO + replaceVars("@GUI-HELPER@"));
         command.append(' ');
         command.append(checkCommand);
         command.append(' ');

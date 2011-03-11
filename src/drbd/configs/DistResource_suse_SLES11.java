@@ -43,9 +43,9 @@ public final class DistResource_suse_SLES11
         {"distributiondir", "sles11"},
         {"Support", "suse-SLES11"},
         {"DRBD.load",
-         "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
+         DistResource.SUDO + "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
          + " /etc/modprobe.d/unsupported-modules;"
-         + "/sbin/modprobe drbd"},
+         + DistResource.SUDO + "/sbin/modprobe drbd"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
@@ -97,5 +97,15 @@ public final class DistResource_suse_SLES11
 
         {"DrbdInst.install.method.3",
          ""},
+
+        {"Openais.startOpenais",
+         "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start"},
+
+        {"Openais.stopOpenais",
+         "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais stop"},
+
+        {"Openais.reloadOpenais",
+         "if ! PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais status >/dev/null 2>&1; then "
+         + "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start; fi"},
     };
 }

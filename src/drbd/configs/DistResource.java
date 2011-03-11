@@ -27,7 +27,8 @@ import java.util.Arrays;
  * Here are common commands for all linuxes.
  */
 public final class DistResource extends java.util.ListResourceBundle {
-
+    /** Sudo placeholder. */
+    public static final String SUDO = "@DMCSUDO@";
     /** Get contents. */
     @Override protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
@@ -65,7 +66,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          "/sbin/drbdadm help 2>/dev/null | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions"},
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
          *
@@ -154,48 +155,51 @@ public final class DistResource extends java.util.ListResourceBundle {
          //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDPACKAGE@ "
          //+ "http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@"
          //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
-        {"DrbdInst.start",   "/etc/init.d/drbd start"},
+        {"DrbdInst.start",   SUDO + "/etc/init.d/drbd start"},
 
         {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.
 
-        {"GetHostAllInfo", "@GUI-HELPER@ all"},
-        {"GetHostHWInfo", "@GUI-HELPER@ hw-info"},
-        {"GetHostHWInfoLazy", "nice -n 19 @GUI-HELPER@ hw-info-lazy"},
-        {"GetNetInfo",  "@GUI-HELPER@ get-net-info"},
+        {"GetHostAllInfo", SUDO + "@GUI-HELPER@ all"},
+        {"GetHostHWInfo", SUDO + "@GUI-HELPER@ hw-info"},
+        {"GetHostHWInfoLazy", "nice -n 19 " + SUDO + "@GUI-HELPER@ hw-info-lazy"},
+        {"GetNetInfo",  SUDO + "@GUI-HELPER@ get-net-info"},
 
         /* heartbeat crm commands */
-        {"CRM.cleanupResource",    "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@"},
+        {"CRM.cleanupResource", SUDO + "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@"},
 
         /* 2.1.4 and before */
         {"CRM.2.1.4.startResource",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v started"},
 
         {"CRM.2.1.4.stopResource",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target_role -v stopped"},
 
         {"CRM.2.1.4.isManagedOn",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v true"},
 
         {"CRM.2.1.4.isManagedOff",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is_managed -v false"},
         /* HB 2.99.0, pacemaker and after. */
         {"CRM.startResource",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v started"},
 
         {"CRM.stopResource",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p target-role -v stopped"},
 
         {"CRM.isManagedOn",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v true"},
 
         {"CRM.isManagedOff",
-         "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
+         SUDO + "/usr/sbin/crm_resource --meta -t primitive -r @ID@ -p is-managed -v false"},
 
-        {"CRM.migrateResource",   "/usr/sbin/crm_resource -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.migrateResource",
+         SUDO + "/usr/sbin/crm_resource -r @ID@ -H @HOST@ --migrate"},
         {"CRM.forceMigrateResource",
-         "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --migrate"},
-        {"CRM.migrateFromResource", "/usr/sbin/crm_resource -r @ID@ --migrate"},
-        {"CRM.unmigrateResource", "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
+         SUDO + "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --migrate"},
+        {"CRM.migrateFromResource",
+         SUDO + "/usr/sbin/crm_resource -r @ID@ --migrate"},
+        {"CRM.unmigrateResource", 
+         SUDO + "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
 
         /* gets all ocf resources and theirs meta-data */
         /* TODO: buggy xml in heartbeat 2.0.8 in ftp and mysql */
@@ -218,122 +222,143 @@ public final class DistResource extends java.util.ListResourceBundle {
          + "done;"
          + "echo 'provider:heartbeat';"
          + "echo 'master:';"
-         + "@GUI-HELPER@ get-stonith-devices;"
-         + "@GUI-HELPER@ get-old-style-resources;"
-         + "@GUI-HELPER@ get-lsb-resources"},
+         + SUDO + "@GUI-HELPER@ get-stonith-devices;"
+         + SUDO + "@GUI-HELPER@ get-old-style-resources;"
+         + SUDO + "@GUI-HELPER@ get-lsb-resources"},
         /* vmxpath env is needed so that vmware meta-data does not hang */
         {"Heartbeat.getClusterMetadata",
-         "@GUI-HELPER@ get-cluster-metadata"},
+         SUDO + "@GUI-HELPER@ get-cluster-metadata"},
 
         {"Heartbeat.getClStatus",
-         "@GUI-HELPER@ get-cluster-events"},
+         SUDO + "@GUI-HELPER@ get-cluster-events"},
 
-        {"Heartbeat.startHeartbeat", "/etc/init.d/heartbeat start"},
-        {"Heartbeat.stopHeartbeat",  "/etc/init.d/heartbeat stop"},
-        {"Openais.startOpenais",   "/etc/init.d/openais start"},
-        {"Openais.stopOpenais",   "/etc/init.d/openais stop"},
+        {"Heartbeat.startHeartbeat",
+         SUDO + "/etc/init.d/heartbeat start"},
+
+        {"Heartbeat.stopHeartbeat",
+         SUDO + "/etc/init.d/heartbeat stop"},
+
+        {"Openais.startOpenais",
+         SUDO + "/etc/init.d/openais start"},
+
+        {"Openais.stopOpenais",
+         SUDO + "/etc/init.d/openais stop"},
+
         {"Openais.reloadOpenais",
-         "if ! /etc/init.d/openais status >/dev/null 2>&1; then"
-         + " /etc/init.d/openais start; fi"},
-        {"Corosync.startCorosync",   "/etc/init.d/corosync start"},
+         "if ! " + SUDO + "/etc/init.d/openais status >/dev/null 2>&1; then "
+         + SUDO + "/etc/init.d/openais start; fi"},
 
-        {"Corosync.startPcmk", "/etc/init.d/pacemaker start"},
+        {"Corosync.startCorosync",
+         SUDO + "/etc/init.d/corosync start"},
 
-        {"Corosync.stopCorosync",   "/etc/init.d/corosync stop"},
+        {"Corosync.startPcmk",
+         SUDO + "/etc/init.d/pacemaker start"},
+
+        {"Corosync.stopCorosync",
+         SUDO + "/etc/init.d/corosync stop"},
 
         {"Corosync.stopCorosyncWithPcmk",
-         "/etc/init.d/pacemaker stop && /etc/init.d/corosync stop"},
+         SUDO + "/etc/init.d/pacemaker stop && "
+         + SUDO + "/etc/init.d/corosync stop"},
         {"Corosync.startCorosyncWithPcmk",
-         "/etc/init.d/corosync start;;;/etc/init.d/pacemaker start"},
+         SUDO + "/etc/init.d/corosync start;;;"
+         + SUDO + "/etc/init.d/pacemaker start"},
         {"Corosync.reloadCorosync",
-         "if ! /etc/init.d/corosync status >/dev/null 2>&1; then"
-         + " /etc/init.d/corosync start; fi"},
+         "if ! " + SUDO + "/etc/init.d/corosync status >/dev/null 2>&1; then "
+         + SUDO + "/etc/init.d/corosync start; fi"},
         {"Heartbeat.reloadHeartbeat",
-         "if ! /etc/init.d/heartbeat status >/dev/null 2>&1; then"
-         + " /etc/init.d/heartbeat start; fi"},
-        {"Heartbeat.getHbConfig",    "cat /etc/ha.d/ha.cf"},
+         "if ! " + SUDO + "/etc/init.d/heartbeat status >/dev/null 2>&1; then "
+         + SUDO + "/etc/init.d/heartbeat start; fi"},
+        {"Heartbeat.getHbConfig",
+         SUDO + "cat /etc/ha.d/ha.cf"},
 
         {"Heartbeat.dopdWorkaround",
-         "if [ ! -e /var/run/heartbeat/crm ]; then"
-         + " mkdir /var/run/heartbeat/crm;"
-         + " chown hacluster:haclient /var/run/heartbeat/crm;"
+         "if [ ! -e /var/run/heartbeat/crm ]; then "
+         + SUDO + "mkdir /var/run/heartbeat/crm;"
+         + SUDO + "chown hacluster:haclient /var/run/heartbeat/crm;"
          + " fi"},
         {"Heartbeat.enableDopd",
-         "chgrp haclient /sbin/drbdsetup;"
-         + "chmod o-x /sbin/drbdsetup;"
-         + "chmod u+s /sbin/drbdsetup;"
-         + "chgrp haclient /sbin/drbdmeta;"
-         + "chmod o-x /sbin/drbdmeta;"
-         + "chmod u+s /sbin/drbdmeta;"},
+         SUDO + "chgrp haclient /sbin/drbdsetup;"
+         + SUDO + "chmod o-x /sbin/drbdsetup;"
+         + SUDO + "chmod u+s /sbin/drbdsetup;"
+         + SUDO + "chgrp haclient /sbin/drbdmeta;"
+         + SUDO + "chmod o-x /sbin/drbdmeta;"
+         + SUDO + "chmod u+s /sbin/drbdmeta;"},
 
         {"CRM.standByOn",
-         "/usr/sbin/crm_attribute -N @HOST@ -n standby -v on -l forever"},
+         SUDO + "/usr/sbin/crm_attribute -N @HOST@ -n standby -v on -l forever"},
         {"CRM.standByOff",
-         "/usr/sbin/crm_attribute -N @HOST@ -n standby -v off -l forever"},
+         SUDO + "/usr/sbin/crm_attribute -N @HOST@ -n standby -v off -l forever"},
         {"CRM.2.1.4.standByOn",
-         "/usr/sbin/crm_standby -U @HOST@ -v true"},
+         SUDO + "/usr/sbin/crm_standby -U @HOST@ -v true"},
         {"CRM.2.1.4.standByOff",
-         "/usr/sbin/crm_standby -U @HOST@ -v false"},
+         SUDO + "/usr/sbin/crm_standby -U @HOST@ -v false"},
 
-        {"CRM.setGroupOrder",
-         "echo group @GROUPID@ @RESOURCES@"
-         + "|/usr/sbin/crm configure load update -"},
-
-        {"OpenAIS.getAisConfig",     "cat /etc/ais/openais.conf"},
-        {"Corosync.getAisConfig",    "cat /etc/corosync/corosync.conf"},
+        {"OpenAIS.getAisConfig",
+         DistResource.SUDO + "cat /etc/ais/openais.conf"},
+        {"Corosync.getAisConfig",
+         DistResource.SUDO + "cat /etc/corosync/corosync.conf"},
 
         {"Cluster.Init.getInstallationInfo",
-         "@GUI-HELPER@ installation-info"},
+         SUDO + "@GUI-HELPER@ installation-info"},
 
 
         /* drbd commands */
-        {"Drbd.getParameters", "@GUI-HELPER@ get-drbd-xml"},
-        {"Drbd.getConfig",     "echo|/sbin/drbdadm dump-xml"},
+        {"Drbd.getParameters", SUDO + "@GUI-HELPER@ get-drbd-xml"},
+        {"Drbd.getConfig",     "echo|" + SUDO + "/sbin/drbdadm dump-xml"},
 
-        {"DRBD.attach",        "echo|/sbin/drbdadm @DRYRUN@ attach @RESOURCE@"},
-        {"DRBD.detach",        "echo|/sbin/drbdadm @DRYRUN@ detach @RESOURCE@"},
-        {"DRBD.connect",       "echo|/sbin/drbdadm @DRYRUN@ connect @RESOURCE@"},
-        {"DRBD.disconnect",    "echo|/sbin/drbdadm @DRYRUN@ disconnect @RESOURCE@"},
-        {"DRBD.pauseSync",     "echo|/sbin/drbdadm @DRYRUN@ pause-sync @RESOURCE@"},
-        {"DRBD.resumeSync",    "echo|/sbin/drbdadm @DRYRUN@ resume-sync @RESOURCE@"},
-        {"DRBD.setPrimary",    "echo|/sbin/drbdadm @DRYRUN@ primary @RESOURCE@"},
-        {"DRBD.setSecondary",  "echo|/sbin/drbdadm @DRYRUN@ secondary @RESOURCE@"},
+        {"DRBD.attach",        "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ attach @RESOURCE@"},
+        {"DRBD.detach",        "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ detach @RESOURCE@"},
+        {"DRBD.connect",       "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ connect @RESOURCE@"},
+        {"DRBD.disconnect",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ disconnect @RESOURCE@"},
+        {"DRBD.pauseSync",     "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ pause-sync @RESOURCE@"},
+        {"DRBD.resumeSync",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ resume-sync @RESOURCE@"},
+        {"DRBD.setPrimary",    "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RESOURCE@"},
+        {"DRBD.setSecondary",  "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ secondary @RESOURCE@"},
         {"DRBD.createMDDestroyData",
-         "dd if=/dev/zero of=@DEVICE@ bs=1024 count=8;"
-         + " echo -e \"yes\\nyes\"|/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
+         SUDO + "dd if=/dev/zero of=@DEVICE@ bs=1024 count=8;"
+         + " echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
         {"DRBD.createMD",
-         "echo -e \"yes\\nyes\"|/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
+         "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
         {"DRBD.forcePrimary",
-         "echo|/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RESOURCE@"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RESOURCE@"},
 
-        {"DRBD.invalidate",    "echo|/sbin/drbdadm @DRYRUN@ invalidate @RESOURCE@"},
+        {"DRBD.invalidate",    SUDO + "/sbin/drbdadm @DRYRUN@ invalidate @RESOURCE@"},
         {"DRBD.discardData",
-         "echo|/sbin/drbdadm @DRYRUN@ -- --discard-my-data connect @RESOURCE@"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --discard-my-data connect @RESOURCE@"},
 
-        {"DRBD.resize",        "echo|/sbin/drbdadm @DRYRUN@ resize @RESOURCE@"},
+        {"DRBD.resize",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ resize @RESOURCE@"},
 
-        {"DRBD.verify",        "echo|/sbin/drbdadm @DRYRUN@ verify @RESOURCE@"},
+        {"DRBD.verify",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ verify @RESOURCE@"},
 
         {"DRBD.getDrbdStatus",
-         "@GUI-HELPER@ get-drbd-events"},
+         SUDO + "@GUI-HELPER@ get-drbd-events"},
 
         {"DRBD.adjust",
-         "if [ -e /proc/drbd ]; then echo|/sbin/drbdadm @DRYRUN@ @DRYRUNCONF@ adjust @RESOURCE@; fi"},
+         "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ @DRYRUNCONF@ adjust @RESOURCE@; fi"},
 
-        {"DRBD.adjust.dryrun", "echo|/sbin/drbdadm -d adjust @RESOURCE@"},
-        {"DRBD.down",          "echo|/sbin/drbdadm @DRYRUN@ down @RESOURCE@"},
-        {"DRBD.up",            "echo|/sbin/drbdadm @DRYRUN@ up @RESOURCE@"},
-        {"DRBD.makeFilesystem", "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@;sync"},
+        {"DRBD.adjust.dryrun",
+         "echo|" + SUDO + "/sbin/drbdadm -d adjust @RESOURCE@"},
+        {"DRBD.down",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ down @RESOURCE@"},
+        {"DRBD.up",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ up @RESOURCE@"},
+        {"DRBD.makeFilesystem",
+         SUDO + "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@"},
 
         {"DRBD.getProcDrbd",   "cat /proc/drbd"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
-        {"DRBD.start",         "/etc/init.d/drbd start"},
-        {"DRBD.load",          "/sbin/modprobe drbd"},
+        {"DRBD.start",
+         SUDO + "/etc/init.d/drbd start"},
+        {"DRBD.load",
+         SUDO + "/sbin/modprobe drbd"},
 
         {"HostBrowser.getCrmMon",
-         "/usr/sbin/crm_mon -1"},
+         SUDO + "/usr/sbin/crm_mon -1"},
         {"HostBrowser.getCrmConfigureShow",
-         "crm configure show"},
+         SUDO + "/usr/sbin/crm configure show"},
 
         {"Logs.hbLog",
          "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"
@@ -344,6 +369,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          "(grep @GREPPATTERN@ /var/log/kern.log 2>/dev/null"
          +  " || grep @GREPPATTERN@ /var/log/messages)| tail -500"},
 
+        /* DrbdINst.install.x is automatically in 'sudo bash -c ...' */
         {"DrbdInst.install.text.1", "packages from LINBIT"},
         {"DrbdInst.install.1",
                         " packages from www.linbit.com for LINBIT customers"},
@@ -351,39 +377,40 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"Pacemaker.Service.Ver", "0"},
 
-        {"MakeKernelPanic", "echo c > /proc/sysrq-trigger"},
-        {"MakeKernelReboot", "echo b > /proc/sysrq-trigger"},
+        {"MakeKernelPanic", SUDO + "bash -c 'echo c > /proc/sysrq-trigger'"},
+        {"MakeKernelReboot", SUDO + "bash -c 'echo b > /proc/sysrq-trigger'"},
 
         {"VMSXML.GetData",
-         "@GUI-HELPER@ get-vm-info"},
+         SUDO + "@GUI-HELPER@ get-vm-info"},
 
         {"VIRSH.Start",
-         "virsh start @DOMAIN@"},
+         SUDO + "virsh start @DOMAIN@"},
 
         {"VIRSH.Shutdown",
-         "virsh shutdown @DOMAIN@"},
+         SUDO + "virsh shutdown @DOMAIN@"},
 
         {"VIRSH.Destroy",
-         "virsh destroy @DOMAIN@"},
+         SUDO + "virsh destroy @DOMAIN@"},
 
         {"VIRSH.Reboot",
-         "virsh reboot @DOMAIN@"},
+         SUDO + "virsh reboot @DOMAIN@"},
 
         {"VIRSH.Suspend",
-         "virsh suspend @DOMAIN@"},
+         SUDO + "virsh suspend @DOMAIN@"},
 
         {"VIRSH.Resume",
-         "virsh resume @DOMAIN@"},
+         SUDO + "virsh resume @DOMAIN@"},
 
         {"VIRSH.Define",
-         "virsh define @CONFIG@"},
+         SUDO + "virsh define @CONFIG@"},
 
         {"VIRSH.Undefine",
-         "virsh undefine @DOMAIN@"},
+         SUDO + "virsh undefine @DOMAIN@"},
 
         {"Host.getConnectionStatus",
-         ":"},
+         SUDO + "true"},
 
-        {"LVM.resize",        "lvresize -L@SIZE@ @DEVICE@"},
+        {"LVM.resize",
+         SUDO + "lvresize -L@SIZE@ @DEVICE@"},
     };
 }

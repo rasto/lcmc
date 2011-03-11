@@ -26,6 +26,7 @@ import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.Clusters;
 import drbd.data.DrbdGuiXML;
+import drbd.configs.DistResource;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.ServiceInfo;
@@ -1067,11 +1068,22 @@ public final class Tools {
                                  final String dist,
                                  final String version,
                                  final String arch,
-                                 final ConvertCmdCallback convertCmdCallback) {
+                                 final ConvertCmdCallback convertCmdCallback,
+                                 final boolean inBash) {
         final String[] texts = text.split(";;;");
         final List<String> results =  new ArrayList<String>();
+        int i = 0;
         for (final String t : texts) {
-            results.add(getDistString(t, dist, version, arch));
+            if (inBash && i == 0) {
+                results.add(DistResource.SUDO + "bash -c \""
+                             + Tools.escapeQuotes(
+                                        getDistString(t, dist, version, arch),
+                                        1)
+                             + "\"");
+            } else {
+                results.add(getDistString(t, dist, version, arch));
+            }
+            i++;
         }
         String ret;
         if (texts.length == 0) {
@@ -2484,4 +2496,28 @@ public final class Tools {
             pluginObjects.get(pluginName).addPluginMenuItems(info, items);
         }
     }
+
+    /** Escapes the quotes for the stacked ssh commands. */
+    public static String escapeQuotes(final String s, final int count) {
+        if (s == null) {
+            return null;
+        }
+        if (count <= 0) {
+            return s;
+        }
+        final StringBuffer sb = new StringBuffer("");
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c == '"' || c == '$' || c == '`') {
+                sb.append('\\');
+                sb.append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return escapeQuotes(sb.toString(), count - 1);
+    }
+
 }

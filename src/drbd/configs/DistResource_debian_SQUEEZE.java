@@ -67,7 +67,8 @@ public final class DistResource_debian_SQUEEZE
         // "Backports repo: 1.0.x/3.0.x"},
 
         //{"HbPmInst.install.1",
-        // "echo 'deb http://backports.debian.org/debian-backports squeeze-backports main' > /etc/apt/sources.list.d/ha-clustering.list "
+        // "echo 'deb http://backports.debian.org/debian-backports
+        // squeeze-backports main' > /etc/apt/sources.list.d/ha-clustering.list "
         // + " && apt-get update"
         // + " && apt-get -y -q  --allow-unauthenticated -t squeeze-backports install"
         // + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},

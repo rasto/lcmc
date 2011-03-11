@@ -42,36 +42,48 @@ public final class DistResource_redhatenterpriseserver_6
         /* support */
         {"Support", "redhatenterpriseserver-6"},
 
-        /* Heartbeat/Pacemaker clusterlabs */
-        {"HbPmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/3.0.x" },
-
-        {"HbPmInst.install.1",
-         "wget -N -nd -P /etc/yum.repos.d/"
-         + " http://www.clusterlabs.org/rpm/epel-6/clusterlabs.repo && "
-         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386"
-         + "/epel-release-6-4.noarch.rpm ; "
-         + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
-         + "&& /sbin/chkconfig --add heartbeat"},
-
-        /* Corosync/Openais/Pacemaker clusterlabs */
+        /* Corosync/Openais/Pacemaker native */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/1.2.x" },
+         "native: 1.1.x/1.2.x" },
 
         {"PmInst.install.1",
-         "wget -N -nd -P /etc/yum.repos.d/"
-         + " http://www.clusterlabs.org/rpm/epel-6/clusterlabs.repo && "
-         + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386"
-         + "/epel-release-6-4.noarch.rpm ; "
-         + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
-         + " && if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         "yum -y install pacemaker corosync"},
+
+        /* Heartbeat/Pacemaker native */
+        {"HbPmInst.install.text.1", "" },
+
+        {"HbPmInst.install.1", ""},
+
+        ///* Heartbeat/Pacemaker clusterlabs */
+        //{"HbPmInst.install.text.1",
+        // "clusterlabs repo: 1.0.x/3.0.x" },
+
+        //{"HbPmInst.install.1",
+        // "wget -N -nd -P /etc/yum.repos.d/"
+        // + " http://www.clusterlabs.org/rpm/epel-6/clusterlabs.repo && "
+        // + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386"
+        // + "/epel-release-6-4.noarch.rpm ; "
+        // + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+        // + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
+        // + "&& /sbin/chkconfig --add heartbeat"},
+
+        ///* Corosync/Openais/Pacemaker clusterlabs */
+        //{"PmInst.install.text.1",
+        // "clusterlabs repo: 1.0.x/1.2.x" },
+
+        //{"PmInst.install.1",
+        // "wget -N -nd -P /etc/yum.repos.d/"
+        // + " http://www.clusterlabs.org/rpm/epel-6/clusterlabs.repo && "
+        // + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/i386"
+        // + "/epel-release-6-4.noarch.rpm ; "
+        // + "(yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
+        // + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
+        // + " && if [ -e /etc/corosync/corosync.conf ]; then"
+        // + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+        // + " fi)"
+        // + " && (/sbin/chkconfig --del heartbeat;"
+        // + " /sbin/chkconfig --level 2345 corosync on"
+        // + " && /sbin/chkconfig --level 016 corosync off)"},
 
         /* Workaround, where aisexec hangs the gui if called directly. */
         {"Openais.startOpenais.i686",

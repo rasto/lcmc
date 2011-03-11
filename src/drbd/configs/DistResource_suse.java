@@ -52,7 +52,7 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         /* drbd donwload and installation */
         // { "DrbdCheck.version", "/bin/rpm -qa|grep drbd- | sed s/drbd-//" },
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
         /* heartbeat donwload and installation */
         //{ "HbCheck.version", "/bin/rpm -qa|grep heartbeat | sed s/.*heartbeat-//" },
         {"HbPmInst.install.i386", "i586" },
@@ -92,27 +92,27 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions;"
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
         {"Heartbeat.deleteFromRc",
-         "/sbin/chkconfig --del heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
 
         {"Heartbeat.addToRc",
-         "/sbin/chkconfig --add heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
 
         {"Corosync.addToRc",
-         "/sbin/chkconfig --add corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --add corosync"},
 
         {"Corosync.deleteFromRc",
-         "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
 
         {"Openais.addToRc",
-         "/sbin/chkconfig --add openais"},
+         DistResource.SUDO + "/sbin/chkconfig --add openais"},
 
         {"Openais.deleteFromRc",
-         "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
 
         {"DrbdLog.log",
          "grep @GREPPATTERN@ /var/log/messages | tail -500"},

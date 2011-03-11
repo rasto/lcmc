@@ -51,7 +51,8 @@ public final class DistResource_debian_LENNY
          "Backports repo: 1.0.x/1.1.x"},
 
         {"PmInst.install.1",
-         "echo 'deb http://backports.debian.org/debian-backports lenny-backports main'"
+         "echo 'deb http://backports.debian.org/debian-backports"
+         + " lenny-backports main'"
          + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install"
@@ -88,7 +89,9 @@ public final class DistResource_debian_LENNY
 
         {"HbPmInst.install.1",
          //"echo 'deb http://people.debian.org/~madkiss/ha lenny main' > /etc/apt/sources.list.d/ha-clustering.list "
-         "echo 'deb http://backports.debian.org/debian-backports lenny-backports main' > /etc/apt/sources.list.d/ha-clustering.list "
+         "echo 'deb http://backports.debian.org/debian-backports"
+         + " lenny-backports main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated -t lenny-backports install"
          + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},

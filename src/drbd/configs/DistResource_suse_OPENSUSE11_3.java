@@ -42,7 +42,7 @@ public final class DistResource_suse_OPENSUSE11_3
         /* distribution name that is used in the drbd download url */
         {"distributiondir", "sles11"},
         {"Support", "suse-OPENSUSE11_3"},
-        {"DRBD.load", "/sbin/modprobe drbd"},
+        {"DRBD.load", DistResource.SUDO + "/sbin/modprobe drbd"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -115,8 +115,11 @@ public final class DistResource_suse_OPENSUSE11_3
          "zypper -n install heartbeat pacemaker"
          + " && chkconfig --add heartbeat"},
 
-        {"Corosync.startCorosync",   "/etc/init.d/openais start"},
-        {"Corosync.stopCorosync",   "/etc/init.d/openais start"},
-        {"Corosync.reloadCorosync",  "/etc/init.d/openais force-reload"},
+        {"Corosync.startCorosync",
+         DistResource.SUDO + "/etc/init.d/openais start"},
+        {"Corosync.stopCorosync",
+         DistResource.SUDO + "/etc/init.d/openais start"},
+        {"Corosync.reloadCorosync",
+         DistResource.SUDO + "/etc/init.d/openais force-reload"},
     };
 }

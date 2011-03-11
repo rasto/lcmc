@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
+import drbd.configs.DistResource;
 import drbd.gui.resources.VMSHardwareInfo;
 
 /**
@@ -94,7 +95,7 @@ public final class LinuxFile extends File {
         final SSH.SSHOutput out =
                 Tools.execCommandProgressIndicator(
                               host,
-                              "stat "
+                              DistResource.SUDO + "stat "
                               + Tools.getUnixPath(toString())
                               + " 2>/dev/null",
                               null,

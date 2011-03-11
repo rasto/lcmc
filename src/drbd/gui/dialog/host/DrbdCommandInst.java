@@ -96,7 +96,8 @@ final class DrbdCommandInst extends DialogHost {
                               getHost().getDrbdVersionUrlStringToInstall();
         Tools.getConfigData().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
-        getHost().execCommand(installCommand + ";;;DRBD.load",
+        getHost().execCommandInBash(
+                         installCommand + ";;;DRBD.load",
                          getProgressBar(),
                          new ExecCallback() {
                              @Override public void done(final String ans) {

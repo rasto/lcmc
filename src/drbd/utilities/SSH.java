@@ -24,6 +24,7 @@ package drbd.utilities;
 import drbd.data.Host;
 import drbd.gui.SSHGui;
 import drbd.gui.ProgressBar;
+import drbd.configs.DistResource;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -431,9 +432,10 @@ public final class SSH {
                                                host.getHoppedCommand(command),
                                                true),
                                   2);
-                thisSession.execCommand(host.getSudoCommand(
-                                          host.getHoppedCommand(command),
-                                          false));
+                thisSession.execCommand("export LC_ALL=C;"
+                                        + host.getSudoCommand(
+                                               host.getHoppedCommand(command),
+                                               false));
 
                 final InputStream stdout = thisSession.getStdout();
                 final java.io.OutputStream stdin = thisSession.getStdin();
@@ -468,7 +470,7 @@ public final class SSH {
 
                         if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                                 /* A timeout occured. */
-                                Tools.info("SSH timeout");
+                                Tools.info("SSH timeout: " + command);
                                 throw new IOException(
                                   "Timeout while waiting for data from peer.");
                         }
@@ -520,7 +522,7 @@ public final class SSH {
                             enterSudoPassword();
                         }
                         final String pwd = host.getSudoPassword() + "\n";
-                        sudoPwd = null;
+                        sudoPwd = null; // TODO: do I want to keep the pwd?
                         stdin.write(pwd.getBytes());
                         skipNextLine = true;
                         continue;
@@ -709,12 +711,11 @@ public final class SSH {
                 }
                 commands[i].trim();
                 //Tools.commandLock();
-                if (outputVisible) {
+                if (commandVisible && outputVisible) {
                     final String consoleCommand = host.replaceVars(commands[i],
                                                                    true);
-                    if (outputVisible && commandVisible) {
-                        host.getTerminalPanel().addCommand(consoleCommand);
-                    }
+                    host.getTerminalPanel().addCommand(
+                            consoleCommand.replaceAll(DistResource.SUDO, " "));
                 }
                 final SSHOutput ret = execOneCommand(commands[i],
                                                      outputVisible);
@@ -1778,10 +1779,13 @@ public final class SSH {
                           + "..."
                           + commandTail, 1);
         final Thread t = execCommand(
-                            commands.toString()
-                            + "echo \""
-                            + host.escapeQuotes(fileContent, 1)
-                            + commandTail,
+                            DistResource.SUDO + "bash -c \""
+                            + Tools.escapeQuotes(
+                                commands.toString()
+                                + "echo \""
+                                + Tools.escapeQuotes(fileContent, 1)
+                                + commandTail, 1)
+                            + "\"",
                             new ExecCallback() {
                                 @Override public void done(final String ans) {
                                     /* ok */
@@ -1811,7 +1815,7 @@ public final class SSH {
                                     }
                                 }
                             },
-                            true,
+                            false,
                             false,
                             10000); /* smaller timeout */
         try {

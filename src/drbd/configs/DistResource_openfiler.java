@@ -60,21 +60,21 @@ public final class DistResource_openfiler extends java.util.ListResourceBundle {
         // + "/bin/rm -rf /tmp/drbdinst"},
 
         {"Heartbeat.deleteFromRc",
-         "/sbin/chkconfig --del heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
 
         {"Heartbeat.addToRc",
-         "/sbin/chkconfig --level 2345 heartbeat on"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 heartbeat on"},
 
         {"Corosync.addToRc",
-         "/sbin/chkconfig --level 2345 corosync on"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on"},
 
         {"Corosync.deleteFromRc",
-         "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
 
         {"Openais.addToRc",
-         "/sbin/chkconfig --level 2345 openais on"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 openais on"},
 
         {"Openais.deleteFromRc",
-         "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 }

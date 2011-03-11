@@ -24,6 +24,7 @@ package drbd.utilities;
 import drbd.data.Host;
 import drbd.data.HostLocation;
 import drbd.data.CRMXML;
+import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,6 +45,11 @@ public final class CRM {
     private static final Mutex mPtestLock = new Mutex();
     /** Delimiter that delimits the ptest and test cib part. */
     public static final String PTEST_END_DELIM = "--- PTEST END ---";
+    /** Location of drbd-mc-test.xml file. */
+    public static final String DRBD_MC_TEST_FILE =
+                                        "/tmp/drbd-mc-test.xml";
+    //public static final String DRBD_MC_TEST_FILE =
+    //                                    "/var/lib/heartbeat/drbd-mc-test.xml";
     /**
      * No instantiation.
      */
@@ -56,7 +62,7 @@ public final class CRM {
                                        final String objType,
                                        final String xml) {
         final StringBuffer cmd = new StringBuffer(300);
-        cmd.append("/usr/sbin/cibadmin --obj_type ");
+        cmd.append(DistResource.SUDO + "/usr/sbin/cibadmin --obj_type ");
         cmd.append(objType);
         cmd.append(' ');
         cmd.append(command);
@@ -79,9 +85,10 @@ public final class CRM {
         mPtestLock.release();
         if (testOnly) {
             final String testCmd =
-                 "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                 + "if [ ! -e $file ]; then /usr/sbin/cibadmin -Ql > $file;fi;"
-                 + "export CIB_file=$file; ";
+             "if [ ! -e " + DRBD_MC_TEST_FILE + " ]; "
+             + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
+             + DRBD_MC_TEST_FILE + ";fi;"
+             + "export CIB_file=" + DRBD_MC_TEST_FILE + ";" + DistResource.SUDO;
             final SSH.SSHOutput out = Tools.execCommand(
                                                  host,
                                                  testCmd + command,
@@ -115,11 +122,12 @@ public final class CRM {
         }
         mPtestLock.release();
         final String command =
-                            "export file=/var/lib/heartbeat/drbd-mc-test.xml;"
-                            + "/usr/sbin/ptest -VVVV -S -x $file 2>&1;echo '"
-                            + PTEST_END_DELIM
-                            + "';cat $file 2>/dev/null;"
-                            + "mv -f $file{,.last} 2>/dev/null";
+                DistResource.SUDO + "/usr/sbin/ptest -VVVV -S -x "
+                + DRBD_MC_TEST_FILE
+                + " 2>&1;echo '"
+                + PTEST_END_DELIM
+                + "';cat " + DRBD_MC_TEST_FILE + " 2>/dev/null;"
+                + "mv -f " + DRBD_MC_TEST_FILE + "{,.last} 2>/dev/null";
         final SSH.SSHOutput output = Tools.execCommand(
                                                 host,
                                                 command,
@@ -1254,25 +1262,6 @@ public final class CRM {
                                              xml.toString());
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
-    }
-
-    /** Sets new group order. */
-    public static boolean setGroupOrder(final Host host,
-                                        final String groupId,
-                                        final List<String> groupOrder,
-                                        final boolean testOnly) {
-        /* make cleanup on all cluster hosts. */
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@GROUPID@", groupId);
-        replaceHash.put("@RESOURCES@",
-                        Tools.join(" ", groupOrder.toArray(
-                                              new String[groupOrder.size()])));
-        final String command =
-                  host.getDistCommand("CRM.setGroupOrder",
-                                      replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
-        final int exitCode = ret.getExitCode();
-        return exitCode == 0;
     }
 
     /** Makes heartbeat stand by. */

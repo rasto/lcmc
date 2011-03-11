@@ -24,6 +24,7 @@ package drbd.gui.resources;
 import drbd.data.ResourceAgent;
 import drbd.data.Host;
 import drbd.data.AccessMode;
+import drbd.configs.DistResource;
 import drbd.utilities.Tools;
 import drbd.utilities.SSH;
 import drbd.gui.GuiComboBox;
@@ -125,15 +126,16 @@ final class FilesystemInfo extends ServiceInfo {
             final String dir = getComboBoxValue("directory");
             boolean confirm = false; /* confirm only once */
             for (Host host : getBrowser().getClusterHosts()) {
-                final String statCmd = "stat -c \"%F\" " + dir + "||true";
+                final String statCmd =
+                        DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final SSH.SSHOutput ret =
-                                   Tools.execCommandProgressIndicator(
-                                                host,
-                                                statCmd,
-                                                null,
-                                                true,
-                                                statCmd,
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                               Tools.execCommandProgressIndicator(
+                                    host,
+                                    statCmd,
+                                    null,
+                                    true,
+                                    statCmd.replaceAll(DistResource.SUDO, ""),
+                                    SSH.DEFAULT_COMMAND_TIMEOUT);
 
                 if (ret == null
                     || !"directory".equals(ret.getOutput().trim())) {
@@ -150,14 +152,15 @@ final class FilesystemInfo extends ServiceInfo {
                           desc,
                           Tools.getString("ClusterBrowser.CreateDir.Yes"),
                           Tools.getString("ClusterBrowser.CreateDir.No"))) {
-                        final String cmd = "mkdir " + dir;
+                        final String cmd = DistResource.SUDO
+                                           + "/bin/mkdir " + dir;
                         Tools.execCommandProgressIndicator(
-                                                host,
-                                                cmd,
-                                                null,
-                                                true,
-                                                cmd,
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                        host,
+                                        cmd,
+                                        null,
+                                        true,
+                                        cmd.replaceAll(DistResource.SUDO, ""),
+                                        SSH.DEFAULT_COMMAND_TIMEOUT);
                         confirm = true;
                     }
                 }

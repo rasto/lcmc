@@ -46,7 +46,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* DRBD native */
         {"DrbdInst.install.text.1",
@@ -92,7 +92,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + "&& if ( rpm -qa|grep drbd ); then"
          + " yum -y install drbd-pacemaker; fi"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
-         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + "  mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"
          + " && (/sbin/chkconfig --del heartbeat;"
          + " /sbin/chkconfig --level 2345 corosync on"
@@ -170,30 +170,30 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions;"
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/';"
          + "/bin/rpm -q -i corosync|perl -lne"
          + " 'print \"cs:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
         {"Heartbeat.deleteFromRc",
-         "/sbin/chkconfig --del heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
 
         {"Heartbeat.addToRc",
-         "/sbin/chkconfig --add heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
 
         {"Corosync.addToRc",
-         "/sbin/chkconfig --level 2345 corosync on "
-         + "&& /sbin/chkconfig --level 016 corosync off"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
 
         {"Corosync.deleteFromRc",
-         "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
 
         {"Openais.addToRc",
-         "/sbin/chkconfig --level 2345 openais on "
-         + "&& /sbin/chkconfig --level 016 openais off"},
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 openais on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 openais off"},
 
         {"Openais.deleteFromRc",
-         "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 }

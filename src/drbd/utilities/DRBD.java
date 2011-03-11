@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
+import drbd.configs.DistResource;
 import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
@@ -107,16 +108,16 @@ public final class DRBD {
             } else {
                 cmd = command;
             }
-            if (cmd.indexOf("@DRYRUNCONF@") >= 0) {
-                cmd = cmd.replaceAll("@DRYRUNCONF@", "");
-            }
+            cmd = cmd.replaceAll("@DRYRUNCONF@", "");
             return Tools.execCommandProgressIndicator(
                                      host,
                                      cmd,
                                      execCallback,
                                      outputVisible,
                                      Tools.getString("DRBD.ExecutingCommand")
-                                     + " " + cmd + "...",
+                                     + " "
+                                     + cmd.replaceAll(DistResource.SUDO, " ")
+                                     + "...",
                                      SSH.DEFAULT_COMMAND_TIMEOUT);
         }
     }

@@ -41,7 +41,7 @@ public final class DistResource_fedora_11 extends java.util.ListResourceBundle {
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",

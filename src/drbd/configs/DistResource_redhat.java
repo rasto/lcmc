@@ -42,7 +42,8 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+).*"},
 
-        {"DrbdInst.install", "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+        {"DrbdInst.install",
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
         {"HbPmInst.install.text.1", "the centos way: HB 2.1.3 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
@@ -80,27 +81,27 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          "/usr/bin/yum -y install kmod-drbd83 drbd83"},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions;"
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/bin/rpm -q -i openais|perl -lne"
          + " 'print \"ais:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
         {"Heartbeat.deleteFromRc",
-         "/sbin/chkconfig --del heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
 
         {"Heartbeat.addToRc",
-         "/sbin/chkconfig --add heartbeat"},
+         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
 
         {"Corosync.addToRc",
-         "/sbin/chkconfig --add corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --add corosync"},
 
         {"Corosync.deleteFromRc",
-         "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
 
         {"Openais.addToRc",
-         "/sbin/chkconfig --add openais"},
+         DistResource.SUDO + "/sbin/chkconfig --add openais"},
 
         {"Openais.deleteFromRc",
-         "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",

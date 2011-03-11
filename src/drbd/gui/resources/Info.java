@@ -935,7 +935,7 @@ public class Info implements Comparable {
                 public Class getColumnClass(final int c) {
                     final Object o = getValueAt(0, c);
                     if (o == null) {
-                        return null;
+                        return super.getColumnClass(c);
                     }
                     return o.getClass();
                 }
@@ -1119,7 +1119,6 @@ public class Info implements Comparable {
                     paintItMouseOver = false;
                 }
             });
-
             Tools.resizeTable(table, getDefaultWidths(tableName));
             return table;
         }
@@ -1167,7 +1166,7 @@ public class Info implements Comparable {
                         tableModel.setDataVector(data, colNames);
                         sorter.setSortKeys(sortKeys);
                         tableModel.fireTableDataChanged();
-                        Tools.resizeTable(tables.get(tableName),
+                        Tools.resizeTable(table,
                                           getDefaultWidths(tableName));
                     }
                 });

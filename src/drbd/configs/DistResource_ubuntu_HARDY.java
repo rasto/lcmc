@@ -96,8 +96,10 @@ public final class DistResource_ubuntu_HARDY
         {"DrbdInst.install.text.3",
          "the ubuntu way: 8.0.x (obsolete)"},
 
-        {"Openais.reloadOpenais",  "/etc/init.d/openais force-reload"},
-        {"Corosync.reloadCorosync", "/etc/init.d/corosync force-reload"},
+        {"Openais.reloadOpenais",
+         DistResource.SUDO + "/etc/init.d/openais force-reload"},
+        {"Corosync.reloadCorosync",
+         DistResource.SUDO + "/etc/init.d/corosync force-reload"},
 
     };
 }

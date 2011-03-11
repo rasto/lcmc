@@ -43,9 +43,9 @@ public final class DistResource_suse_OPENSUSE11_2
         {"distributiondir", "sles11"},
         {"Support", "suse-OPENSUSE11_2"},
         {"DRBD.load",
-         "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
+         DistResource.SUDO + "sed -i 's/\\(allow_unsupported_modules \\)0/\\11/'"
          + " /etc/modprobe.d/unsupported-modules;"
-         + "/sbin/modprobe drbd"},
+         + DistResource.SUDO + "/sbin/modprobe drbd"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",

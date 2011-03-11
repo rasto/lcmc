@@ -41,7 +41,7 @@ public final class DistResource_fedora_12 extends java.util.ListResourceBundle {
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
 
         {"DrbdInst.install",
-         "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
+         DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"PmInst.install.text.1",
          "the Fedora way: 1.0.x/1.2.x" },

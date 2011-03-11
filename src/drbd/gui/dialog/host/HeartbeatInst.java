@@ -97,7 +97,8 @@ final class HeartbeatInst extends DialogHost {
         Tools.getConfigData().setLastInstalledClusterStack(
                                                 ConfigData.HEARTBEAT_NAME);
 
-        getHost().execCommand(installCommand,
+        getHost().execCommandInBash(
+                         installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              @Override public void done(final String ans) {

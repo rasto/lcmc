@@ -48,7 +48,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
         {"DrbdInst.install",
-         "dpkg -i --force-confold" + " /tmp/drbdinst/@DRBDPACKAGES@"},
+         DistResource.SUDO + "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
@@ -106,27 +106,27 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
          + "  drbd8-utils"},
 
         {"HbCheck.version",
-         "@GUI-HELPER@ get-cluster-versions;"
+         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
          + "/usr/bin/dpkg-query -f='${Status} ais:${Version}\n' -W openais 2>&1|grep '^install ok installed'|cut -d ' ' -f 4"
          + "|sed 's/-.*//'"},
 
         {"Heartbeat.deleteFromRc",
-         "/usr/sbin/update-rc.d -f heartbeat remove"},
+         DistResource.SUDO + "/usr/sbin/update-rc.d -f heartbeat remove"},
 
         {"Heartbeat.addToRc",
-         "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
+         DistResource.SUDO + "/usr/sbin/update-rc.d heartbeat start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"Corosync.addToRc",
-         "/usr/sbin/update-rc.d corosync start 75 2 3 4 5 . stop 05 0 1 6 . "},
+         DistResource.SUDO + "/usr/sbin/update-rc.d corosync start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"Corosync.deleteFromRc",
-         "/usr/sbin/update-rc.d -f corosync remove"},
+         DistResource.SUDO + "/usr/sbin/update-rc.d -f corosync remove"},
 
         {"Openais.addToRc",
-         "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
+         DistResource.SUDO + "/usr/sbin/update-rc.d openais start 75 2 3 4 5 . stop 05 0 1 6 . "},
 
         {"Openais.deleteFromRc",
-         "/usr/sbin/update-rc.d -f openais remove"},
+         DistResource.SUDO + "/usr/sbin/update-rc.d -f openais remove"},
 
         /* corosync/pacemaker from source */
         {"PmInst.install.text.2",

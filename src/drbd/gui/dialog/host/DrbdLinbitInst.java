@@ -137,7 +137,7 @@ public class DrbdLinbitInst extends DialogHost {
                          + getHost().getDrbdInstallMethod()));
         answerPaneSetText(
                     Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
-        getHost().execCommand("DrbdInst.install;;;DRBD.load",
+        getHost().execCommandInBash("DrbdInst.install;;;DRBD.load",
                           getProgressBar(),
                           new ExecCallback() {
                             @Override public void done(final String ans) {

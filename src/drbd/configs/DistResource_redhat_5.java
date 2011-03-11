@@ -106,9 +106,9 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + "&& /sbin/chkconfig --add heartbeat"},
 
         {"Openais.startOpenais.i686",
-         "/etc/init.d/openais start"},
+         DistResource.SUDO + "/etc/init.d/openais start"},
         {"Openais.reloadOpenais.i686",
-         "/etc/init.d/openais reload"},
+         DistResource.SUDO + "/etc/init.d/openais reload"},
 
         /* Next Heartbeat/Pacemaker clusterlabs */
         {"HbPmInst.install.text.3",

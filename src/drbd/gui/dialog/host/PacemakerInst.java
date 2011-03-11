@@ -120,7 +120,8 @@ final class PacemakerInst extends DialogHost {
         Tools.getConfigData().setLastInstalledClusterStack(
                                                 ConfigData.COROSYNC_NAME);
 
-        getHost().execCommand(installCommand,
+        getHost().execCommandInBash(
+                         installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              @Override public void done(final String ans) {
