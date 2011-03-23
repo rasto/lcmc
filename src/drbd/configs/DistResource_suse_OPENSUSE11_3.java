@@ -82,11 +82,12 @@ public final class DistResource_suse_OPENSUSE11_3
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
-         "clusterlabs repo: 1.0.x/1.0.x" },
+         "clusterlabs repo: 1.0.x/1.2.x" },
         {"PmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://www.clusterlabs.org/rpm/opensuse-11.3/clusterlabs.repo && "
-         + "zypper -n --no-gpg-check install pacemaker corosync"
+         + "zypper -n --no-gpg-check install 'pacemaker<=1.1' 'corosync>=1.2.7'"
+         + " 'libpacemaker3<=1.1' 'heartbeat-3.0.3'"
          + " && /sbin/chkconfig --add corosync"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
@@ -98,7 +99,7 @@ public final class DistResource_suse_OPENSUSE11_3
          "zypper -n install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
-         + " && chkconfig --add openais"},
+         + " && /sbin/chkconfig --add openais"},
 
         /* Heartbeat/Pacemaker Clusterlabs */
         {"HbPmInst.install.text.1",
@@ -106,20 +107,31 @@ public final class DistResource_suse_OPENSUSE11_3
         {"HbPmInst.install.1",
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://www.clusterlabs.org/rpm/opensuse-11.3/clusterlabs.repo && "
-         + "zypper -n --no-gpg-check install heartbeat pacemaker"
-         + " && chkconfig --add heartbeat"},
+         + "zypper -n --no-gpg-check install 'heartbeat>=3' 'pacemaker<=1.1'"
+         + " 'libpacemaker3<=1.1' 'heartbeat-3.0.3'"
+         + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.2", "opensuse way: 1.0.x/2.99.x" },
         {"HbPmInst.install.2",
          "zypper -n install heartbeat pacemaker"
-         + " && chkconfig --add heartbeat"},
+         + " && /sbin/chkconfig --add heartbeat"},
 
         {"Corosync.startCorosync",
-         DistResource.SUDO + "/etc/init.d/openais start"},
+         DistResource.SUDO + "/etc/init.d/corosync start"},
         {"Corosync.stopCorosync",
-         DistResource.SUDO + "/etc/init.d/openais start"},
+         DistResource.SUDO + "/etc/init.d/corosync start"},
         {"Corosync.reloadCorosync",
-         DistResource.SUDO + "/etc/init.d/openais force-reload"},
+         DistResource.SUDO + "/etc/init.d/corosync force-reload"},
+
+        {"Openais.startOpenais",
+         "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start"},
+
+        {"Openais.stopOpenais",
+         "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais stop"},
+
+        {"Openais.reloadOpenais",
+         "if ! PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais status >/dev/null 2>&1; then "
+         + "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start; fi"},
     };
 }

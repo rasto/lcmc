@@ -101,7 +101,7 @@ public final class DistResource_suse_OPENSUSE11_2
          "zypper -n install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
-         + " && chkconfig --add openais"},
+         + " && /sbin/chkconfig --add openais"},
 
         /* Heartbeat/Pacemaker Clusterlabs */
         {"HbPmInst.install.text.1",
@@ -110,12 +110,12 @@ public final class DistResource_suse_OPENSUSE11_2
          "wget -N -nd -P /etc/zypp/repos.d/"
          + " http://www.clusterlabs.org/rpm/opensuse-11.2/clusterlabs.repo && "
          + "zypper -n --no-gpg-check install heartbeat pacemaker"
-         + " && chkconfig --add heartbeat"},
+         + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.2", "opensuse way: 1.0.x/2.99.x" },
         {"HbPmInst.install.2",
          "zypper -n install heartbeat pacemaker"
-         + " && chkconfig --add heartbeat"},
+         + " && /sbin/chkconfig --add heartbeat"},
     };
 }
