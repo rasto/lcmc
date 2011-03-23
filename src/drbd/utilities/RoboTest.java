@@ -2251,7 +2251,7 @@ public final class RoboTest {
             return;
         }
         robot.mousePress(InputEvent.BUTTON1_MASK);
-        Tools.sleep(300);
+        Tools.sleep(400);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
         Tools.sleep(300);
     }
@@ -2694,14 +2694,15 @@ public final class RoboTest {
 
         checkVMTest(host, vmTest, 2);
 
-        Tools.sleep(20000);
+        Tools.sleep(2000);
         moveTo(robot, 814, 581); /* finish */
         leftClick(robot);
 
-        Tools.sleep(20000);
+        Tools.sleep(10000);
         moveTo(robot, 1066, 284); /* remove */
+        Tools.sleep(10000);
         leftClick(robot);
-        Tools.sleep(20000);
+        Tools.sleep(2000);
         moveTo(robot, 516, 485); /* confirm */
         leftClick(robot);
         Tools.sleep(20000);

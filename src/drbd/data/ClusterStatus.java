@@ -666,7 +666,8 @@ public final class ClusterStatus {
     public void setPtestData(final PtestData ptestData) {
         this.ptestData = ptestData;
         if (ptestData != null) {
-            shadowCibQueryMap = crmXML.parseCibQuery(ptestData.getShadowCib());
+            shadowCibQueryMap = crmXML.parseCibQuery(
+                "<pcmk>" + ptestData.getShadowCib() + "</pcmk>");
         } else {
             shadowCibQueryMap = new CibQuery();
         }
