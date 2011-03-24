@@ -40,6 +40,7 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.DRBD;
 import drbd.utilities.SSH;
+import drbd.utilities.LVM;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -631,5 +632,13 @@ public final class HostDrbdInfo extends Info {
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
         return null;
+    }
+
+    /** Create LV. */
+    public boolean lvCreate(final String lvName,
+                            final String volumeGroup,
+                            final String size,
+                            final boolean testOnly) {
+        return LVM.lvCreate(getHost(), lvName, volumeGroup, size, testOnly);
     }
 }

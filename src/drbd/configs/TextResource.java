@@ -1790,6 +1790,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostBrowser.Hb.NoInfoAvailable",
          "no info available"},
 
+        {"HostDrbdInfo.LVMMenu",
+         "LVM"},
+
+        {"HostDrbdInfo.AddToVG",
+         "create LV in VG "},
+
         {"HostBrowser.AdvancedSubmenu",
          "More Options"},
 

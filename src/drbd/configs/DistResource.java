@@ -412,5 +412,11 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"LVM.resize",
          SUDO + "lvresize -L@SIZE@ @DEVICE@"},
+
+        {"LVM.lvcreate",
+         SUDO + "lvcreate -n@LVNAME@ -L@SIZE@ @VG@"},
+
+        {"LVM.lvremove",
+         SUDO + "lvremove -f @DEVICE@"},
     };
 }

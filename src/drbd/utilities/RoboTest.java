@@ -405,7 +405,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if ("A".equals(index)) {
+                    } else if ("a".equals(index)) {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
@@ -414,7 +414,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if ("B".equals(index)) {
+                    } else if ("b".equals(index)) {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
@@ -423,7 +423,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if ("C".equals(index)) {
+                    } else if ("c".equals(index)) {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);

@@ -738,11 +738,16 @@ public final class BlockDevInfo extends EditableInfo {
                             testOnly);
     }
 
-    /** Resize LVM. */
-    public boolean lvmResize(final String size,
-                             final boolean testOnly) {
+    /** Resize a logical volume. */
+    public boolean lvResize(final String size, final boolean testOnly) {
         final String device = getBlockDevice().getName();
         return LVM.resize(getHost(), device, size, testOnly);
+    }
+
+    /** Remove a logical volume. */
+    public boolean lvRemove(final boolean testOnly) {
+        final String device = getBlockDevice().getName();
+        return LVM.lvRemove(getHost(), device, testOnly);
     }
 
     /** Force primary. */

@@ -76,6 +76,8 @@ public final class BlockDevice extends Resource {
     private int used = -1;
     /** LVM group. */
     private String volumeGroup = null;
+    /** Logical volume. */
+    private String logicalVolume = null;
 
     /**
      * Creates a new <code>BlockDevice</code> object.
@@ -112,6 +114,7 @@ public final class BlockDevice extends Resource {
             this.mountedOn = tokens.get("mp");
             this.fsType    = tokens.get("fs");
             this.volumeGroup = tokens.get("vg");
+            this.logicalVolume = tokens.get("lv");
             final String usedStr = tokens.get("used");
             if (usedStr != null) {
                 this.used      = Integer.parseInt(usedStr);
@@ -560,5 +563,10 @@ public final class BlockDevice extends Resource {
     /** Returns lvm group or null. */
     public String getVolumeGroup() {
         return volumeGroup;
+    }
+
+    /** Returns logical volume. */
+    public String getLogicalVolume() {
+        return logicalVolume;
     }
 }

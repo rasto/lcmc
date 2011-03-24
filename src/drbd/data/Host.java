@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
@@ -249,6 +250,9 @@ public final class Host {
                                                    "not connected to the host";
     /** Volume group information on this host. */
     private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
+    /** Volume group with all lvs in it. */
+    private Map<String, Set<String>> volumeGroupsLVS =
+                                            new HashMap<String, Set<String>>();
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1885,6 +1889,8 @@ public final class Host {
                                      new LinkedHashMap<String, NetInterface>();
         final Map<String, Long> newVolumeGroups =
                                          new LinkedHashMap<String, Long>();
+        final Map<String, Set<String>> newVolumeGroupsLVS =
+                                         new HashMap<String, Set<String>>();
         final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
@@ -1932,6 +1938,18 @@ public final class Host {
                         }
                     }
                 }
+                final String vg = blockDevice.getVolumeGroup();
+                if (vg != null) {
+                    Set<String> logicalVolumes = newVolumeGroupsLVS.get(vg);
+                    if (logicalVolumes == null) {
+                        logicalVolumes = new HashSet<String>();
+                        newVolumeGroupsLVS.put(vg, logicalVolumes);
+                    }
+                    final String lv = blockDevice.getLogicalVolume();
+                    if (lv != null) {
+                        logicalVolumes.add(lv);
+                    }
+                }
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
                 if (vgi.length == 2) {
@@ -1963,6 +1981,7 @@ public final class Host {
         blockDevices = newBlockDevices;
         netInterfaces = newNetInterfaces;
         volumeGroups = newVolumeGroups;
+        volumeGroupsLVS = newVolumeGroupsLVS;
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
                                        getFileSystems());
@@ -2559,6 +2578,11 @@ public final class Host {
         return volumeGroups.get(volumeGroup);
     }
 
+    /** Returns all volume groups. */
+    public Set<String> getVolumeGroupNames() {
+        return volumeGroups.keySet();
+    }
+
     /** Returns if corosync or heartbeat is running, null for unknown. */
     public Boolean getCorosyncHeartbeatRunning() {
         return corosyncHeartbeatRunning;
@@ -2603,5 +2627,10 @@ public final class Host {
     /** Returns libvirt version. */
     String getLibvirtVersion() {
         return libvirtVersion;
+    }
+
+    /** Returns logical volumes from volume group */
+    public Set<String> getLogicalVolumesFromVolumeGroup(final String vg) {
+        return volumeGroupsLVS.get(vg);
     }
 }

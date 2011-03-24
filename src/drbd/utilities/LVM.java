@@ -34,9 +34,13 @@ import java.util.HashMap;
  */
 public final class LVM {
     /** Size placeholder. */
-    private static final String SIZE_PH     = "@SIZE@";
+    private static final String SIZE_PH    = "@SIZE@";
     /** Device placeholder. */
-    private static final String DEVICE_PH     = "@DEVICE@";
+    private static final String DEVICE_PH  = "@DEVICE@";
+    /** LV name placeholder. */
+    private static final String LV_NAME_PH = "@LVNAME@";
+    /** Volume group placeholder. */
+    private static final String VG_PH      = "@VG@";
 
     /** Private constructor, cannot be instantiated. */
     private LVM() {
@@ -70,6 +74,34 @@ public final class LVM {
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.resize", replaceHash);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Remove LVM device. */
+    public static boolean lvRemove(final Host host,
+                                   final String blockDevice,
+                                   final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(DEVICE_PH, blockDevice);
+        final String command = host.getDistCommand("LVM.lvremove", replaceHash);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Create LVM device. */
+    public static boolean lvCreate(final Host host,
+                                 final String lvName,
+                                 final String volumeGroup,
+                                 final String size,
+                                 final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(SIZE_PH, size);
+        replaceHash.put(LV_NAME_PH, lvName);
+        replaceHash.put(VG_PH, volumeGroup);
+        final String command = host.getDistCommand("LVM.lvcreate", replaceHash);
         final SSH.SSHOutput ret =
                     execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;

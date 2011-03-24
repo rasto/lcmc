@@ -32,7 +32,9 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyCellRenderer;
 import drbd.utilities.MyButtonCellRenderer;
 import drbd.utilities.MyButton;
+import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.UpdatableItem;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -1221,7 +1223,7 @@ public class Info implements Comparable {
     }
 
     /** Adds plugin menu item. */
-    public final void addPluginMenuItem(final MyMenuItem pluginItem) {
+    public final void addPluginMenuItem(final UpdatableItem pluginItem) {
         /* check if it is already there */
         try {
             mMenuListLock.acquire();
@@ -1238,13 +1240,13 @@ public class Info implements Comparable {
         mMenuListLock.release();
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
-                menu.add(pluginItem);
+                menu.add((JMenuItem) pluginItem);
             }
         });
     }
 
     /** Adds plugin action menu item. */
-    public final void addPluginActionMenuItem(final MyMenuItem pluginItem) {
+    public final void addPluginActionMenuItem(final UpdatableItem pluginItem) {
         /* check if it is already there */
         try {
             mActionMenuListLock.acquire();
@@ -1267,7 +1269,7 @@ public class Info implements Comparable {
         if (pm != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
-                    pm.add(pluginItem);
+                    pm.add((JMenuItem) pluginItem);
                 }
             });
         }

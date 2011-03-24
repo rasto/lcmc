@@ -47,6 +47,8 @@ if ($option eq "all") {
 	get_net_info();
 	print "disk-info\n";
 	get_disk_info();
+	print "vg-info\n";
+	get_vg_info();
 	print "filesystems-info\n";
 	get_filesystems_info();
 	print "crypto-info\n";
@@ -346,6 +348,7 @@ sub get_lvm {
 
 	my %major_minor_to_dev;
 	my %major_minor_to_group;
+	my %major_minor_to_lv_name;
 	my %devs_with_lvm;
 	my %lvm_devs;
 
@@ -355,6 +358,7 @@ sub get_lvm {
 		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
 		$major_minor_to_group{"$major:$minor"} = $group;
+		$major_minor_to_lv_name{"$major:$minor"} = $name;
 		$devs_with_lvm{$group_to_pv{$group}}++;
 		$lvm_devs{"$group/$name"}++;
 
@@ -363,7 +367,8 @@ sub get_lvm {
 		\%major_minor_to_dev,
 		\%devs_with_lvm,
 		\%lvm_devs,
-		\%major_minor_to_group);
+		\%major_minor_to_group,
+		\%major_minor_to_lv_name);
 }
 
 # this is used if the devices is dm but not lvm
@@ -434,7 +439,8 @@ sub get_disk_info {
 	    $lvm_major_minor_to_dev,
 	    $devs_with_lvm,
 	    $lvm_devs,
-	    $lvm_major_minor_to_group) = get_lvm();
+	    $lvm_major_minor_to_group,
+	    $lvm_major_minor_to_lv_name) = get_lvm();
 	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
 	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
@@ -464,6 +470,7 @@ sub get_disk_info {
 		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
 		my $device;
 		my $lvm_group;
+		my $lv_name;
 		if ($major == $device_mapper_major) {
 			if ($$lvm_major_minor_to_dev{"$major:$minor"}) {
 				$device = "/dev/".$$lvm_major_minor_to_dev{"$major:$minor"};
@@ -471,6 +478,7 @@ sub get_disk_info {
 				$dev = $name if !$dev;
 				$device = "/dev/".$dev;
 				$lvm_group = $$lvm_major_minor_to_group{"$major:$minor"};
+				$lv_name = $$lvm_major_minor_to_lv_name{"$major:$minor"};
 			} elsif ($$dm_major_minor_to_dev{"$major:$minor"}) {
 				$device =
 				     $$dm_major_minor_to_dev{"$major:$minor"};
@@ -505,6 +513,7 @@ sub get_disk_info {
 		$info.= " mp:".$$dev_to_mount{$device} if $$dev_to_mount{$device};
 		$info.= " fs:swap mp:swap" if $$dev_to_swap{$device};
 		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
+		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
 		$info.= "\n";
 		push @info, $info;

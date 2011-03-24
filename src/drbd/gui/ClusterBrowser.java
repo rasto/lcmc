@@ -2559,5 +2559,8 @@ public final class ClusterBrowser extends Browser {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                        new ResourceGraph[]{drbdGraph, heartbeatGraph});
+        drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
+        updateDrbdResources();
+        drbdGraph.repaint();
     }
 }
