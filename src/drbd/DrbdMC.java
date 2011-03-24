@@ -46,6 +46,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.Container;
 import java.util.Arrays;
 import javax.swing.plaf.metal.OceanTheme;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.HelpFormatter;
+
 
 
 /**
@@ -239,6 +246,23 @@ public final class DrbdMC extends JPanel {
         boolean opMode = false;
         boolean bigDRBDConf = false;
         float fps = 20.0f;
+
+        Options options = new Options();
+
+        //options.addOption("h", "help", false, "print this help");
+        //options.addOption(null, "ro", false, "read only mode");
+        //CommandLineParser parser = new PosixParser();
+        //try {
+        //    CommandLine cmd = parser.parse(options, args);
+        //    if (cmd.hasOption("help")) {
+        //        HelpFormatter formatter = new HelpFormatter();
+        //        formatter.printHelp("java -jar DMC.jar [OPTIONS]", options);
+        //        System.exit(0);
+        //    }
+        //} catch (ParseException exp) {
+        //    System.out.println("ERROR: " + exp.getMessage());
+        //    System.exit(1);
+        //}
         for (final String arg : args) {
             if (vncportoffset && Tools.isNumber(arg)) {
                 Tools.getConfigData().setVncPortOffset(Integer.parseInt(arg));
