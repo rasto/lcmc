@@ -750,6 +750,15 @@ public final class BlockDevInfo extends EditableInfo {
         return LVM.lvRemove(getHost(), device, testOnly);
     }
 
+    /** Make snapshot. */
+    public boolean lvSnapshot(final String snapshotName,
+                              final String size,
+                              final boolean testOnly) {
+        final String device = getBlockDevice().getName();
+        return LVM.lvSnapshot(getHost(), snapshotName, device, size, testOnly);
+    }
+
+
     /** Force primary. */
     public void forcePrimary(final boolean testOnly) {
         DRBD.forcePrimary(getHost(), drbdResourceInfo.getName(), testOnly);

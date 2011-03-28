@@ -141,7 +141,7 @@ public final class HostBrowser extends Browser {
     }
 
     /** Returns host for drbd view info for this browser. */
-    HostDrbdInfo getHostDrbdInfo() {
+    public HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
     }
 
