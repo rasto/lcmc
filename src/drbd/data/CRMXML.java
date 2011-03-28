@@ -272,6 +272,8 @@ public final class CRMXML extends XML {
     private static final String TARGET_ROLE_META_ATTR = "target-role";
     /** Name of the is-managed meta attribute. */
     private static final String IS_MANAGED_META_ATTR = "is-managed";
+    /** Name of the allow-migrate meta attribute. */
+    private static final String ALLOW_MIGRATE_META_ATTR = "allow-migrate";
     /** Name of the master-max clone meta attribute. */
     private static final String MASTER_MAX_META_ATTR = "master-max";
     /** Name of the master-node-max clone meta attribute. */
@@ -358,6 +360,15 @@ public final class CRMXML extends XML {
         M_A_DEFAULT.put(IS_MANAGED_META_ATTR, PCMK_TRUE);
         M_A_TYPE.put(IS_MANAGED_META_ATTR, PARAM_TYPE_BOOLEAN);
         M_A_NOT_ADVANCED.add(IS_MANAGED_META_ATTR);
+
+        /* allow-migrate */
+        M_A_POSSIBLE_CHOICES.put(ALLOW_MIGRATE_META_ATTR, PCMK_BOOLEAN_VALUES);
+        M_A_SHORT_DESC.put(ALLOW_MIGRATE_META_ATTR,
+                           Tools.getString("CRMXML.AllowMigrate.ShortDesc"));
+        M_A_LONG_DESC.put(ALLOW_MIGRATE_META_ATTR,
+                          Tools.getString("CRMXML.AllowMigrate.LongDesc"));
+        M_A_DEFAULT.put(ALLOW_MIGRATE_META_ATTR, PCMK_FALSE);
+        M_A_TYPE.put(ALLOW_MIGRATE_META_ATTR, PARAM_TYPE_BOOLEAN);
 
         /* priority */
         M_A_POSSIBLE_CHOICES.put(PRIORITY_META_ATTR,
@@ -1473,6 +1484,7 @@ public final class CRMXML extends XML {
         metaAttrParams.put(MIGRATION_THRESHOLD_META_ATTR, null);
         metaAttrParams.put(PRIORITY_META_ATTR, null);
         metaAttrParams.put(MULTIPLE_ACTIVE_META_ATTR, null);
+        metaAttrParams.put(ALLOW_MIGRATE_META_ATTR, null);
         if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
             metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
             metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);

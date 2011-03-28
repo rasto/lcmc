@@ -1838,6 +1838,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"CRMXML.IsManaged.LongDesc",
          "Select whether the service should be managed by cluster."},
 
+        {"CRMXML.AllowMigrate.ShortDesc",
+         "Allow Migrate"},
+
+        {"CRMXML.AllowMigrate.LongDesc",
+         "Set this if you want live migration."},
+
         {"CRMXML.Priority.ShortDesc",
          "Priority"},
 

@@ -71,8 +71,7 @@ public final class LVM_Remove implements RemotePlugin {
     /** Name of the remove menu item. */
     private static final String LV_REMOVE_MENU_ITEM = "LV Remove";
     /** Description. */
-    private static final String DESCRIPTION =
-                   "Manage logical volumes.";
+    private static final String DESCRIPTION = "Manage logical volumes.";
     /** Description LVM remove. */
     private static final String DESCRIPTION_REMOVE = "Remove the LVM volume.";
 

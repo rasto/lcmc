@@ -24,7 +24,6 @@ package plugins;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
-import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.HostDrbdInfo;
 
@@ -83,9 +82,10 @@ public final class LVM_Create implements RemotePlugin {
 
     /** Inits the plugin. */
     @Override public void init() {
-        for (final BlockDevInfo bdi
-                        : Tools.getGUIData().getAllBlockDevices()) {
-            registerInfo(bdi);
+        final Host[] hosts = cluster.getHostsArray();
+        for (final Host host : hosts) {
+            final HostBrowser hostBrowser = host.getBrowser();
+            registerInfo(hostBrowser.getHostDrbdInfo());
         }
     }
 
