@@ -420,6 +420,6 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "lvremove -f @DEVICE@"},
 
         {"LVM.lvsnapshot",
-         SUDO + "lvcreate -n@LVNAME@ -L@SIZE@ @DEVICE@"},
+         SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
     };
 }

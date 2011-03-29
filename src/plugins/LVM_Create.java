@@ -37,6 +37,7 @@ import drbd.utilities.Unit;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
+import drbd.data.Cluster;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
 
@@ -82,10 +83,12 @@ public final class LVM_Create implements RemotePlugin {
 
     /** Inits the plugin. */
     @Override public void init() {
-        final Host[] hosts = cluster.getHostsArray();
-        for (final Host host : hosts) {
-            final HostBrowser hostBrowser = host.getBrowser();
-            registerInfo(hostBrowser.getHostDrbdInfo());
+        for (final Cluster cluster
+                        : Tools.getConfigData().getClusters().getClusterSet()) {
+            final Host[] hosts = cluster.getHostsArray();
+            for (final Host host : hosts) {
+                registerInfo(host.getBrowser().getHostDrbdInfo());
+            }
         }
     }
 

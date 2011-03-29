@@ -88,8 +88,7 @@ public final class LVM_Resize implements RemotePlugin {
 
     /** Inits the plugin. */
     @Override public void init() {
-        for (final BlockDevInfo bdi
-                        : Tools.getGUIData().getAllBlockDevices()) {
+        for (final BlockDevInfo bdi : Tools.getGUIData().getAllBlockDevices()) {
             registerInfo(bdi);
         }
     }
