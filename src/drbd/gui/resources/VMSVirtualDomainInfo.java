@@ -71,6 +71,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Arrays;
+import java.util.UUID;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -93,6 +94,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private JComponent infoPanel = null;
     /** Whether the vm is running on at least one host. */
     private boolean running = false;
+    /** UUID. */
+    private String uuid;
     /** HTML string on which hosts the vm is defined. */
     private String definedOnString = "";
     /** HTML string on which hosts the vm is running. */
@@ -1663,6 +1666,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            if (vmsxml != null) {
+                uuid = vmsxml.getValue(getDomainName(), VMSXML.VM_PARAM_UUID);
+            }
+        }
         updateTable(HEADER_TABLE);
         updateTable(DISK_TABLE);
         updateTable(INTERFACES_TABLE);
@@ -3189,6 +3198,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final VMSXML vmsxml = new VMSXML(host);
                     getBrowser().vmsXMLPut(host, vmsxml);
                     final Node domainNode = vmsxml.createDomainXML(
+                                                           getUUID(),
                                                            getDomainName(),
                                                            parameters);
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
@@ -3210,7 +3220,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         domainNode = vmsxml.modifyDomainXML(getDomainName(),
                                                             parameters);
                     } else {
-                        domainNode = vmsxml.createDomainXML(getDomainName(),
+                        domainNode = vmsxml.createDomainXML(getUUID(),
+                                                            getDomainName(),
                                                             parameters);
                     }
                     if (domainNode != null) {
@@ -4627,5 +4638,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Sets whether it is used by CRM. */
     public void setUsedByCRM(final boolean usedByCRM) {
         this.usedByCRM = usedByCRM;
+    }
+
+    /** Returns UUID. */
+    public String getUUID() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
     }
 }

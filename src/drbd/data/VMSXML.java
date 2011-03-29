@@ -131,6 +131,8 @@ public final class VMSXML extends XML {
     private final Host host;
     /** VM field: name. */
     public static final String VM_PARAM_NAME = "name";
+    /** VM field: uuid. */
+    public static final String VM_PARAM_UUID = "uuid";
     /** VM field: defined. */
     public static final String VM_PARAM_DEFINED = "defined";
     /** VM field: status. */
@@ -519,7 +521,8 @@ public final class VMSXML extends XML {
     }
 
     /** Creates XML for new domain. */
-    public Node createDomainXML(final String domainName,
+    public Node createDomainXML(final String uuid,
+                                final String domainName,
                                 final Map<String, String> parametersMap) {
         //<domain type='kvm'>
         //  <memory>524288</memory>
@@ -550,6 +553,10 @@ public final class VMSXML extends XML {
                                                   doc.createElement("domain"));
         /* type */
         root.setAttribute("type", type); /* kvm/xen */
+        /* uuid */
+        final Node uuidNode = (Element) root.appendChild(
+                                                doc.createElement("uuid"));
+        uuidNode.appendChild(doc.createTextNode(uuid));
         /* name */
         final Node nameNode = (Element) root.appendChild(
                                                     doc.createElement("name"));
@@ -1170,6 +1177,8 @@ public final class VMSXML extends XML {
                                      + " != " + nameInFilename);
                     return;
                 }
+            } else if (VM_PARAM_UUID.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_UUID, getText(option));
             } else if (VM_PARAM_VCPU.equals(option.getNodeName())) {
                 parameterValues.put(name, VM_PARAM_VCPU, getText(option));
             } else if (VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
