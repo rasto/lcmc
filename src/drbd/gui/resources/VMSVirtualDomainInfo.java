@@ -3179,6 +3179,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getResource().setValue(param, value);
         }
         final List<Host> definedOnHosts = new ArrayList<Host>();
+        final Map<VMSHardwareInfo, Map<String, String>> allHWP =
+                                                          getAllHWParameters();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
               definedOnHostComboBoxHash.get(host.getName()).getStringValue();
@@ -3189,8 +3191,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final Node domainNode = vmsxml.createDomainXML(
                                                            getDomainName(),
                                                            parameters);
-                    final Map<VMSHardwareInfo, Map<String, String>> allHWP =
-                                                          getAllHWParameters();
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
                         hi.modifyXML(vmsxml,
                                      domainNode,
