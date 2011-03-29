@@ -245,6 +245,8 @@ public final class Host {
     private Boolean corosyncHeartbeatRunning = null;
     /** Libvirt version. */
     private String libvirtVersion = null;
+    /** Timestamp, to ensure that older hwinfo is discarded. */
+    private volatile long timestamp = 0;
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
@@ -1690,9 +1692,15 @@ public final class Host {
     /** Gets and stores hardware info about the host. */
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
                           final ResourceGraph[] graphs) {
+        final long thisTS = timestamp;
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              @Override public void done(final String ans) {
+                                 if (thisTS == timestamp) {
+                                     timestamp++;
+                                 } else {
+                                     return;
+                                 }
                                  if (!ans.equals(oldHwInfo)) {
                                     parseHostInfo(ans);
                                     oldHwInfo = ans;
@@ -1712,6 +1720,11 @@ public final class Host {
                              @Override public void doneError(
                                                           final String ans,
                                                           final int exitCode) {
+                                 if (thisTS == timestamp) {
+                                     timestamp++;
+                                 } else {
+                                     return;
+                                 }
                                  setLoadingError();
                              }
                          },
@@ -1729,9 +1742,15 @@ public final class Host {
      * has changed. */
     public void getHWInfoLazy(final CategoryInfo[] infosToUpdate,
                               final ResourceGraph[] graphs) {
+        final long thisTS = timestamp;
         final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
                              @Override public void done(final String ans) {
+                                 if (thisTS == timestamp) {
+                                     timestamp++;
+                                 } else {
+                                     return;
+                                 }
                                  if (!ans.equals(oldHwInfo)) {
                                     parseHostInfo(ans);
                                     oldHwInfo = ans;
@@ -1751,6 +1770,11 @@ public final class Host {
                              @Override public void doneError(
                                                         final String ans,
                                                         final int exitCode) {
+                                 if (thisTS == timestamp) {
+                                     timestamp++;
+                                 } else {
+                                     return;
+                                 }
                                  setLoadingError();
                              }
                          },
