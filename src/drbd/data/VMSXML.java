@@ -580,7 +580,8 @@ public final class VMSXML extends XML {
         final Element typeNode = (Element) osNode.appendChild(
                                                   doc.createElement("type"));
         typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_ARCH));
-        typeNode.setAttribute("machine", "pc-0.12");
+        //typeNode.setAttribute("machine", "pc-0.12");
+        typeNode.setAttribute("machine", "pc");
         typeNode.appendChild(doc.createTextNode("hvm"));
         final Element bootNode = (Element) osNode.appendChild(
                                                   doc.createElement("boot"));
