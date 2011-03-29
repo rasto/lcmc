@@ -352,13 +352,14 @@ public final class DrbdXML extends XML {
         boolean correctValue = true;
 
         String value = rawValue;
+        String unit = null;
         if (rawValue != null && getDefaultUnit(param) != null) {
             /* number with unit */
-            final Pattern p = Pattern.compile("\\d*([kmgsKMGS])");
-            final Matcher m = p.matcher(value);
+            final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
+            final Matcher m = p.matcher(rawValue);
             if (m.matches()) {
                 /* remove unit from value */
-                final String unit = m.group(1).toUpperCase();
+                unit = m.group(1).toUpperCase();
                 value = rawValue.substring(0,
                                            rawValue.length() - unit.length());
             }
@@ -380,14 +381,26 @@ public final class DrbdXML extends XML {
             final Matcher m = p.matcher(value);
             if (!m.matches()) {
                 correctValue = false;
-            } else if (paramMaxMap.get(param) != null
-                       && new BigInteger(value).longValue()
-                          > paramMaxMap.get(param).longValue()) {
-                correctValue = false;
-            } else if (paramMinMap.get(param) != null
-                       && new BigInteger(value).longValue()
-                          < paramMinMap.get(param).longValue()) {
-                correctValue = false;
+            } else if ((unit == null
+                        || "k".equalsIgnoreCase(unit)
+                        || "m".equalsIgnoreCase(unit)
+                        || "g".equalsIgnoreCase(unit)
+                        || "t".equalsIgnoreCase(unit))
+                       && "K".equalsIgnoreCase(getDefaultUnit(param))) {
+                /* except sectors */
+                long v;
+                if (unit == null) {
+                    v = Long.parseLong(rawValue) / 1024;
+                } else {
+                    v = Tools.convertToKilobytes(rawValue);
+                }
+                if (paramMaxMap.get(param) != null
+                    && v > paramMaxMap.get(param).longValue()) {
+                    correctValue = false;
+                } else if (paramMinMap.get(param) != null
+                           && v < paramMinMap.get(param).longValue()) {
+                    correctValue = false;
+                }
             }
         } else {
             correctValue = true;

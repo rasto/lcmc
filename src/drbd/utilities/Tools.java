@@ -2071,13 +2071,13 @@ public final class Tools {
         if (v.length == 2 && Tools.isNumber((String) v[0])) {
             long num = Long.parseLong((String) v[0]);
             final String unit = (String) v[1];
-            if ("T".equals(unit)) {
+            if ("T".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024 * 1024;
-            } else if ("G".equals(unit)) {
+            } else if ("G".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024;
-            } else if ("M".equals(unit)) {
+            } else if ("M".equalsIgnoreCase(unit)) {
                 num = num * 1024;
-            } else if ("K".equals(unit)) {
+            } else if ("K".equalsIgnoreCase(unit)) {
             } else {
                 return -1;
             }
