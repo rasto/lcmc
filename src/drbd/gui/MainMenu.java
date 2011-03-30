@@ -530,15 +530,21 @@ public final class MainMenu extends JPanel implements ActionListener {
                                     0,
                                     newRegisterPluginsActionListener(),
                                     null);
+                final Map<String, JMenu> submenuHash =
+                                                new HashMap<String, JMenu>();
                 for (final String pluginName : pluginList) {
                     String newName = pluginName;
                     final String[] dirs = newName.split(":");
                     JMenu submenu = pluginsMenu;
                     if (dirs.length > 1) {
                         for (int i = 0; i < dirs.length - 1; i++) {
-                            final JMenu m =
-                                    addMenu(dirs[i].replaceAll("_", " "), 0);
-                            submenu.add(m);
+                            final String dirStr = dirs[i].replaceAll("_", " ");
+                            JMenu m = submenuHash.get(dirStr);
+                            if (m == null) {
+                                m = addMenu(dirs[i].replaceAll("_", " "), 0);
+                                submenu.add(m);
+                                submenuHash.put(dirStr, m);
+                            }
                             submenu = m;
                         }
                         newName = dirs[dirs.length - 1];
