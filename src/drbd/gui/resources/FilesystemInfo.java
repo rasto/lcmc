@@ -247,6 +247,7 @@ final class FilesystemInfo extends ServiceInfo {
                                       new AccessMode(
                                            getAccessType(param),
                                            isEnabledOnlyInAdvancedMode(param)));
+            paramCb.setAlwaysEditable(true);
             blockDeviceParamCb = paramCb;
             addParamComboListeners(paramCb);
             paramComboBoxAdd(param, prefix, paramCb);
