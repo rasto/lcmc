@@ -108,13 +108,13 @@ public final class ConfigData {
     /** Default save file. */
     private String saveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     /** Known hosts object. */
-    private final KnownHosts knownHosts = new KnownHosts();
+    private KnownHosts knownHosts = new KnownHosts();
     /** Known hosts path. */
-    private final String knownHostPath;
+    private String knownHostPath;
     /** Id dsa path. */
-    private final String idDSAPath;
+    private String idDSAPath;
     /** Id rsa path. */
-    private final String idRSAPath;
+    private String idRSAPath;
     /** Last installed clusterStack. */
     private String lastInstalledClusterStack = null;
     /** Last installed method either Openais or Heartbeat with pacemaker. */
@@ -177,19 +177,6 @@ public final class ConfigData {
     public ConfigData() {
         hosts = new Hosts();
         clusters = new Clusters();
-        final String pwd = System.getProperty("user.home");
-        knownHostPath = pwd + "/.ssh/known_hosts";
-        idDSAPath     = pwd + "/.ssh/id_dsa";
-        idRSAPath     = pwd + "/.ssh/id_rsa";
-
-        final File knownHostFile = new File(knownHostPath);
-        if (knownHostFile.exists()) {
-            try {
-                knownHosts.addHostkeys(knownHostFile);
-            } catch (IOException e) {
-                Tools.appError("SSH.knowHostFile.NotExists", "", e);
-            }
-        }
     }
 
     /** Gets hosts object. */
@@ -359,14 +346,37 @@ public final class ConfigData {
         return knownHostPath;
     }
 
+    /** Sets path of the known host file. */
+    public void setKnownHostPath(final String knownHostPath) {
+        this.knownHostPath = knownHostPath;
+        final File knownHostFile = new File(knownHostPath);
+        if (knownHostFile.exists()) {
+            try {
+                knownHosts.addHostkeys(knownHostFile);
+            } catch (IOException e) {
+                Tools.appError("SSH.knowHostFile.NotExists", "", e);
+            }
+        }
+    }
+
     /** Returns Id DSA path. */
     public String getIdDSAPath() {
         return idDSAPath;
     }
 
+    /** Sets Id DSA path. */
+    public void setIdDSAPath(final String idDSAPath) {
+        this.idDSAPath = idDSAPath;
+    }
+
     /** Returns Id RSA path. */
     public String getIdRSAPath() {
         return idRSAPath;
+    }
+
+    /** Sets Id RSA path. */
+    public void setIdRSAPath(final String idRSAPath) {
+        this.idRSAPath = idRSAPath;
     }
 
     /** Returns the known hosts object. */

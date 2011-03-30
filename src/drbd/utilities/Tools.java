@@ -201,8 +201,8 @@ public final class Tools {
     /** Inits this class. */
     public static void init() {
         setDefaults();
-        configData         = new ConfigData();
-        guiData            = new GUIData();
+        configData = new ConfigData();
+        guiData = new GUIData();
     }
 
 

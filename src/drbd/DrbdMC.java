@@ -66,6 +66,52 @@ public final class DrbdMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY = 200;
     /** Dismiss delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_DISMISS_DELAY = 100000;
+
+    /* The --help option. */
+    private static final String HELP_OP = "help";
+    /* The --version option. */
+    private static final String VERSION_OP = "version";
+    /* The --auto option. */
+    private static final String AUTO_OP = "auto";
+    /* The --ro option. */
+    private static final String RO_OP = "ro";
+    /* The --op option. */
+    private static final String OP_OP = "op";
+    /* The --admin option. */
+    private static final String ADMIN_OP = "admin";
+    /* The --op-mode option. */
+    private static final String OP_MODE_OP = "op-mode";
+    /* The --no-upgrade-check option. */
+    private static final String NO_UPGRADE_CHECK_OP = "no-upgrade-check";
+    /* The --no-plugin-check option. */
+    private static final String NO_PLUGIN_CHECK_OP = "no-plugin-check";
+    /* The --tightvnc option. */
+    private static final String TIGHTVNC_OP = "tightvnc";
+    /* The --ultravnc option. */
+    private static final String ULTRAVNC_OP = "ultravnc";
+    /* The --realvnc option. */
+    private static final String REALVNC_OP = "realvnc";
+    /* The --big-drbd-conf option. */
+    private static final String BIGDRBDCONF_OP = "big-drbd-conf";
+    /* The --staging-drbd option. */
+    private static final String STAGING_DRBD_OP = "staging-drbd";
+    /* The --staging-pacemaker option. */
+    private static final String STAGING_PACEMAKER_OP = "staging-pacemaker";
+    /* The --vnc-port-offset option. */
+    private static final String VNC_PORT_OFFSET_OP = "vnc-port-offset";
+    /* The --slow option. */
+    private static final String SLOW_OP = "slow";
+    /* The --restore-mouse option. */
+    private static final String RESTORE_MOUSE_OP = "restore-mouse";
+    /* The --keep-helper option. */
+    private static final String KEEP_HELPER_OP = "keep-helper";
+    /* The --id-dsa option. */
+    private static final String ID_DSA_OP = "id-dsa";
+    /* The --id-rsa option. */
+    private static final String ID_RSA_OP = "id-rsa";
+    /* The --known-hosts option. */
+    private static final String KNOWN_HOSTS_OP = "known-hosts";
+
     /**
      * Private constructor.
      */
@@ -235,161 +281,171 @@ public final class DrbdMC extends JPanel {
                                    (Exception) ex);
                 }
             });
-        String autoArgs = null;
-        boolean upgradeCheck = true;
-        boolean pluginCheck = true;
-        boolean auto = false;
-        boolean tightvnc = false;
-        boolean ultravnc = false;
-        boolean realvnc = false;
-        boolean vncportoffset = false;
-        boolean opMode = false;
-        boolean bigDRBDConf = false;
         float fps = 20.0f;
-
         Options options = new Options();
 
-        //options.addOption("h", "help", false, "print this help");
-        //options.addOption(null, "ro", false, "read only mode");
-        //CommandLineParser parser = new PosixParser();
-        //try {
-        //    CommandLine cmd = parser.parse(options, args);
-        //    if (cmd.hasOption("help")) {
-        //        HelpFormatter formatter = new HelpFormatter();
-        //        formatter.printHelp("java -jar DMC.jar [OPTIONS]", options);
-        //        System.exit(0);
-        //    }
-        //} catch (ParseException exp) {
-        //    System.out.println("ERROR: " + exp.getMessage());
-        //    System.exit(1);
-        //}
-        for (final String arg : args) {
-            if (vncportoffset && Tools.isNumber(arg)) {
-                Tools.getConfigData().setVncPortOffset(Integer.parseInt(arg));
+        options.addOption("h", HELP_OP, false, "print this help");
+        options.addOption(null,
+                          KEEP_HELPER_OP,
+                          false,
+                          "do not overwrite the drbd-gui-helper program");
+        options.addOption(null, RO_OP, false, "read only mode");
+        options.addOption(null, OP_OP, false, "operator mode");
+        options.addOption(null, ADMIN_OP, false, "administrator mode");
+        options.addOption(null,
+                          OP_MODE_OP,
+                          true,
+                          "operating mode. <arg> can be:\n"
+                          + "ro - read only\n"
+                          + "op - operator\n"
+                          + "admin - administrator");
+        options.addOption(null, "auto", true, "for testing");
+        options.addOption("v", VERSION_OP, false, "print version");
+        options.addOption(null, AUTO_OP, true, "for testing");
+        options.addOption(null,
+                          NO_UPGRADE_CHECK_OP,
+                          false,
+                          "disable upgrade check");
+        options.addOption(null,
+                          NO_PLUGIN_CHECK_OP,
+                          false,
+                          "disable plugin check");
+        options.addOption(null, TIGHTVNC_OP, false, "enable tight vnc viewer");
+        options.addOption(null, ULTRAVNC_OP, false, "enable ultra vnc viewer");
+        options.addOption(null, REALVNC_OP, false, "enable real vnc viewer");
+        options.addOption(null,
+                          BIGDRBDCONF_OP,
+                          false,
+                          "create one big drbd.conf, instead of many"
+                          + " files in drbd.d/ directory");
+        options.addOption(null,
+                          STAGING_DRBD_OP,
+                          false,
+                          "enable more DRBD installation options");
+        options.addOption(null,
+                          STAGING_PACEMAKER_OP,
+                          false,
+                          "enable more Pacemaker installation options");
+        options.addOption(null,
+                          VNC_PORT_OFFSET_OP,
+                          true,
+                          "offset for port forwarding");
+        options.addOption(null,
+                          SLOW_OP,
+                          false,
+                          "specify this if you have slow computer");
+        options.addOption(null,
+                          RESTORE_MOUSE_OP,
+                          false,
+                          "for testing");
+        options.addOption(null,
+                          ID_DSA_OP,
+                          true,
+                          "location of id_dsa file ($HOME/.ssh/id_dsa)");
+        options.addOption(null,
+                          ID_RSA_OP,
+                          true,
+                          "location of id_rsa file ($HOME/.ssh/id_rsa)");
+        options.addOption(
+                     null,
+                     KNOWN_HOSTS_OP,
+                     true,
+                     "location of known_hosts file ($HOME/.ssh/known_hosts)");
+        CommandLineParser parser = new PosixParser();
+        String autoArgs = null;
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
+            boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
+            boolean realvnc = cmd.hasOption(REALVNC_OP);
+            if (!tightvnc && !ultravnc && !realvnc) {
+                if (Tools.isLinux()) {
+                    tightvnc = true;
+                } else if (Tools.isWindows()) {
+                    ultravnc = true;
+                } else {
+                    tightvnc = true;
+                    ultravnc = true;
+                }
             }
-            if ("--vnc-port-offset".equals(arg)) {
-                vncportoffset = true;
-                continue;
-            } else {
-                vncportoffset = false;
-            }
+            Tools.getConfigData().setTightvnc(tightvnc);
+            Tools.getConfigData().setUltravnc(ultravnc);
+            Tools.getConfigData().setRealvnc(realvnc);
 
-            if ("--ro".equals(arg)
-                || opMode && "ro".equals(arg)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.RO);
-                Tools.getConfigData().setMaxAccessType(
-                                                  ConfigData.AccessType.RO);
-            } else if ("--op".equals(arg)
-                       || opMode && "op".equals(arg)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.OP);
-                Tools.getConfigData().setMaxAccessType(
-                                          ConfigData.AccessType.OP);
-            } else if ("--admin".equals(arg)
-                       || opMode && "admin".equals(arg)) {
-                Tools.getConfigData().setAccessType(
-                                          ConfigData.AccessType.ADMIN);
-                Tools.getConfigData().setMaxAccessType(
-                                          ConfigData.AccessType.ADMIN);
-            } else if (opMode) {
-                Tools.appWarning("unknown operating mode: " + arg);
-            }
-            if ("--op-mode".equals(arg)
-                || "--operating-mode".equals(arg)) {
-                opMode = true;
-                continue;
-            } else {
-                opMode = false;
-            }
+            Tools.getConfigData().setUpgradeCheckEnabled(
+                                          !cmd.hasOption(NO_UPGRADE_CHECK_OP));
+            Tools.getConfigData().setPluginsEnabled(
+                                           !cmd.hasOption(NO_PLUGIN_CHECK_OP));
+            Tools.getConfigData().setBigDRBDConf(
+                                                cmd.hasOption(BIGDRBDCONF_OP));
+            Tools.getConfigData().setStagingDrbd(
+                                               cmd.hasOption(STAGING_DRBD_OP));
+            Tools.getConfigData().setStagingPacemaker(
+                                          cmd.hasOption(STAGING_PACEMAKER_OP));
+            Tools.getConfigData().setStagingPacemaker(true);
+            Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
+            final String pwd = System.getProperty("user.home");
+            final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
+                                                        pwd + "/.ssh/id_dsa");
+            final String idRsaPath = cmd.getOptionValue(ID_RSA_OP,
+                                                        pwd + "/.ssh/id_rsa");
+            final String knownHostsPath = cmd.getOptionValue(
+                                                    KNOWN_HOSTS_OP,
+                                                    pwd + "/.ssh/known_hosts");
+            Tools.getConfigData().setIdDSAPath(idDsaPath);
+            Tools.getConfigData().setIdRSAPath(idRsaPath);
+            Tools.getConfigData().setKnownHostPath(knownHostsPath);
 
-            if (auto) {
-                autoArgs = arg;
-            } else if ("--keep-helper".equals(arg)) {
-                Tools.debug(null, "--keep-helper option specified");
-                Tools.getConfigData().setKeepHelper(true);
-            } else if ("--version".equals(arg)) {
+
+            final String opMode = cmd.getOptionValue(OP_MODE_OP);
+            autoArgs = cmd.getOptionValue(AUTO_OP);
+            if (cmd.hasOption(HELP_OP)) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("java -jar DMC.jar [OPTIONS]", options);
+                System.exit(0);
+            }
+            if (cmd.hasOption(VERSION_OP)) {
                 System.out.println("DRBD MANAGEMENT CONSOLE "
                                    + Tools.getRelease()
                                    + " by Rasto Levrinc");
                 System.exit(0);
-            } else if ("--help".equals(arg)) {
-                System.out.println("DRBD MANAGEMENT CONSOLE: "
-                                   + Tools.getRelease());
-                System.out.println("--help, print this help.");
-                System.out.println("--keep-helper, do not overwrite "
-                                   + "the drbd-gui-helper program.");
-                System.out.println("--auto for testing");
-                System.out.println("--no-upgrade-check disable upgrade check");
-                System.out.println("--no-plugin-check disable plugin check");
-                System.out.println("--tightvnc, enable tight vnc viewer");
-                System.out.println("--ultravnc, enable ultra vnc viewer");
-                System.out.println("--realvnc, enable real vnc viewer");
-                System.out.println(
-                           "--vnc-port-offset OFFSET, for port forwarding");
-                System.out.println(
-                           "--staging-pacemaker, enable more installation"
-                           + " options for pacemaker");
-                System.out.println(
-                   "--slow, specify this if you have slow computer. Can be"
-                   + " specified more times");
-                System.out.println("--big-drbd-conf, create one big"
-                                 + " drbd.conf, instead of many files in\n"
-                                 + "                 drbd.d/ directory.");
-                System.out.print(
-                          "--op-mode MODE, operating mode. MODE can be: ");
-                System.out.println("ro - read only");
-                System.out.print(
-                          "                                             ");
-                System.out.println("op - operator");
-                System.out.print(
-                          "                                             ");
-                System.out.println("admin - administrator");
-                System.exit(0);
-            } else if ("--tightvnc".equals(arg)) {
-                tightvnc = true;
-            } else if ("--ultravnc".equals(arg)) {
-                ultravnc = true;
-            } else if ("--realvnc".equals(arg)) {
-                realvnc = true;
-            } else if ("--no-upgrade-check".equals(arg)) {
-                upgradeCheck = false;
-            } else if ("--no-plugin-check".equals(arg)) {
-                pluginCheck = false;
-            } else if ("--auto".equals(arg)) {
-                auto = true;
-            } else if ("--staging-drbd".equals(arg)) {
-                Tools.getConfigData().setStagingDrbd(true);
-            } else if ("--staging-pacemaker".equals(arg)) {
-                Tools.getConfigData().setStagingPacemaker(true);
-            } else if ("--slow".equals(arg)) {
+            }
+            if (cmd.hasOption("ro") || "ro".equals(opMode)) {
+                Tools.getConfigData().setAccessType(ConfigData.AccessType.RO);
+                Tools.getConfigData().setMaxAccessType(
+                                                    ConfigData.AccessType.RO);
+            } else if (cmd.hasOption("op") || "op".equals(opMode)) {
+                Tools.getConfigData().setAccessType(ConfigData.AccessType.OP);
+                Tools.getConfigData().setMaxAccessType(
+                                                    ConfigData.AccessType.OP);
+            } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
+                Tools.getConfigData().setAccessType(
+                                          ConfigData.AccessType.ADMIN);
+                Tools.getConfigData().setMaxAccessType(
+                                          ConfigData.AccessType.ADMIN);
+            } else if (opMode != null) {
+                Tools.appWarning("unknown operating mode: " + opMode);
+            }
+            if (cmd.hasOption(SLOW_OP)) {
                 fps = fps / 2;
-            } else if ("--fast".equals(arg)) {
-                /* undocumented */
-                fps = fps * 2;
-            } else if ("--big-drbd-conf".equals(arg)) {
-                bigDRBDConf = true;
-            } else if ("--restore-mouse".equals(arg)) {
+            }
+            if (cmd.hasOption(RESTORE_MOUSE_OP)) {
                 /* restore mouse if it is stuck in pressed state, during
                  * robot tests. */
                 RoboTest.restoreMouse();
             }
-        }
-        Tools.getConfigData().setAnimFPS(fps);
-        if (!tightvnc && !ultravnc && !realvnc) {
-            if (Tools.isLinux()) {
-                tightvnc = true;
-            } else if (Tools.isWindows()) {
-                ultravnc = true;
-            } else {
-                tightvnc = true;
-                ultravnc = true;
+            final String vncPortOffsetString =
+                                        cmd.getOptionValue(VNC_PORT_OFFSET_OP);
+            if (vncPortOffsetString != null
+                && Tools.isNumber(vncPortOffsetString)) {
+                Tools.getConfigData().setVncPortOffset(
+                                        Integer.parseInt(vncPortOffsetString));
             }
+            Tools.getConfigData().setAnimFPS(fps);
+        } catch (ParseException exp) {
+            System.out.println("ERROR: " + exp.getMessage());
+            System.exit(1);
         }
-        Tools.getConfigData().setUpgradeCheckEnabled(upgradeCheck);
-        Tools.getConfigData().setPluginsEnabled(pluginCheck);
-        Tools.getConfigData().setTightvnc(tightvnc);
-        Tools.getConfigData().setUltravnc(ultravnc);
-        Tools.getConfigData().setRealvnc(realvnc);
-        Tools.getConfigData().setBigDRBDConf(bigDRBDConf);
         return autoArgs;
     }
 
