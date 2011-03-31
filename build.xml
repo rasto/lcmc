@@ -1,5 +1,7 @@
 <project name="DMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
+	<property name="java.dir"	value="${src.dir}/java"/>
+	<property name="test.dir"	value="${src.dir}/test"/>
 	<property name="build.dir"	value="build"/>
 	<property name="classes.dir"	value="${build.dir}/classes"/>
 	<property name="jar.dir"	value="${build.dir}/jar"/>
@@ -23,17 +25,17 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}"/>
 		<copy todir="${classes.dir}/images">
-			<fileset dir="${src.dir}/drbd/images"/>
+			<fileset dir="${java.dir}/drbd/images"/>
 		</copy>
 		
 		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${src.dir}/drbd/help-progs"/>
+			<fileset dir="${java.dir}/drbd/help-progs"/>
 		</copy>
-		<tar tarfile="${src.dir}/drbd/drbd-mc-test.tar"
-		     basedir="${src.dir}/drbd/"
+		<tar tarfile="${java.dir}/drbd/drbd-mc-test.tar"
+		     basedir="${java.dir}/drbd/"
 		     includes="drbd-mc-test/**"/>
 		<move tofile="${classes.dir}/drbd-mc-test.tar"
-			file="${src.dir}/drbd/drbd-mc-test.tar"
+			file="${java.dir}/drbd/drbd-mc-test.tar"
 			overwrite="yes"/>
 		
 		<copy tofile="${classes.dir}/drbd/release.properties"
@@ -70,17 +72,17 @@
 	<target name="error">
 		<mkdir dir="${classes.dir}"/>
 		<copy todir="${classes.dir}/images">
-			<fileset dir="${src.dir}/drbd/images"/>
+			<fileset dir="${java.dir}/drbd/images"/>
 		</copy>
 		
 		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${src.dir}/drbd/help-progs"/>
+			<fileset dir="${java.dir}/drbd/help-progs"/>
 		</copy>
-		<tar tarfile="${src.dir}/drbd/drbd-mc-test.tar"
-		     basedir="${src.dir}/drbd/"
+		<tar tarfile="${java.dir}/drbd/drbd-mc-test.tar"
+		     basedir="${java.dir}/drbd/"
 		     includes="drbd-mc-test/**"/>
 		<move tofile="${classes.dir}/drbd-mc-test.tar"
-			file="${src.dir}/drbd/drbd-mc-test.tar"
+			file="${java.dir}/drbd/drbd-mc-test.tar"
 			overwrite="yes"/>
 		
 		<copy tofile="${classes.dir}/drbd/release.properties"
