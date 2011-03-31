@@ -366,11 +366,13 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     Tools.appWarning("cannot parse: " + param + " = " + value);
                 }
                 getResource().setValue(param, value);
-            } else if (getResource().isNew()
-                       || !Tools.areEqual(getParamSaved(param), value)) {
+            } else if (getResource().isNew()) {
                 if (!Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, value);
                 }
+                getResource().setValue(param, value);
+            } else if (!Tools.areEqual(getParamSaved(param), value)) {
+                parameters.put(param, value);
                 getResource().setValue(param, value);
             }
         }
