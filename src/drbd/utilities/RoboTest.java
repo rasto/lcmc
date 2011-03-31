@@ -2214,12 +2214,13 @@ public final class RoboTest {
 
     /** TEST 3. */
     private static void startTest3(final Robot robot) {
+        slowFactor = 0.3f;
         aborted = false;
         /* filesystem/drbd */
         moveTo(robot, 577, 253);
         rightClick(robot); /* popup */
-        moveTo(robot, 609, 278);
-        moveTo(robot, 794, 283);
+        moveTo(robot, 709, 278);
+        moveTo(robot, 894, 283);
         leftClick(robot); /* choose fs */
         moveTo(robot, 1075, 406);
         leftClick(robot); /* choose drbd */
@@ -2349,6 +2350,8 @@ public final class RoboTest {
                 break;
             }
         }
+        final Point2D p = MouseInfo.getPointerInfo().getLocation();
+        Tools.debug(null, "Moved to: " + p.getY() + " dest: " + destY, 1);
     }
 
     /** Register movement. */
@@ -2699,7 +2702,9 @@ public final class RoboTest {
         leftClick(robot);
 
         Tools.sleep(10000);
+        Tools.setDebugLevel(1);
         moveTo(robot, 1066, 284); /* remove */
+        Tools.setDebugLevel(0);
         Tools.sleep(10000);
         leftClick(robot);
         Tools.sleep(2000);

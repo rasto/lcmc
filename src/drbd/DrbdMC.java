@@ -382,7 +382,6 @@ public final class DrbdMC extends JPanel {
                                                cmd.hasOption(STAGING_DRBD_OP));
             Tools.getConfigData().setStagingPacemaker(
                                           cmd.hasOption(STAGING_PACEMAKER_OP));
-            Tools.getConfigData().setStagingPacemaker(true);
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             final String pwd = System.getProperty("user.home");
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
