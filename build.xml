@@ -1,7 +1,7 @@
 <project name="DMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/java"/>
-	<property name="test.dir"	value="${src.dir}/test"/>
+	<property name="test.dir"	value="${java.dir}/test"/>
 	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="build"/>
@@ -63,7 +63,6 @@
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
 		   <pathelement location="jai_core.jar"/>
-		   <pathelement location="junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-Xmaxerrs"/> 
 		  <compilerarg value="1000"/> 
@@ -75,14 +74,10 @@
 		 deprecation="true"
 		 memoryInitialSize="512m"
 		 memoryMaximumSize="512m"
-		 srcdir="${drbd.dir}/*/drbd" destdir="${classes.dir}"
+		 srcdir="${java.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
 		>
 		  <classpath>
-		   <pathelement location="/usr/share/java/j3dcore.jar"/>
-		   <pathelement location="/usr/share/java/j3dutils.jar"/>
-		   <pathelement location="/usr/share/java/vecmath.jar"/>
-		   <pathelement location="jai_core.jar"/>
 		   <pathelement location="junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
