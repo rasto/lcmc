@@ -1886,7 +1886,7 @@ public final class Tools {
     /** Check whether the string is number. */
     public static boolean isNumber(final String s) {
         try {
-            Integer.parseInt(s);
+            Long.parseLong(s);
             return true;
         } catch (final NumberFormatException nfe) {
             return false;
@@ -2043,29 +2043,29 @@ public final class Tools {
 
     /** Converts value in kilobytes. */
     public static String convertKilobytes(final String kb) {
-        if (isNumber(kb)) {
-            final double k = Long.parseLong(kb);
-            if (k == 0) {
-                return "0K";
-            }
-            if (k / 1024 != (long) (k / 1024)) {
-                return kb + "K";
-            }
-            final double m = k / 1024;
-            if (m / 1024 != (long) (m / 1024)) {
-                return Long.toString((long) m) + "M";
-            }
-            final double g = m / 1024;
-            if (g / 1024 != (long) (g / 1024)) {
-                return Long.toString((long) g) + "G";
-            }
-            final double t = g / 1024;
-            if (t / 1024 != (long) (t / 1024)) {
-                return Long.toString((long) t) + "T";
-            }
-            return Long.toString((long) (t / 1024)) + "P";
+        if (!isNumber(kb)) {
+            return kb;
         }
-        return kb;
+        final double k = Long.parseLong(kb);
+        if (k == 0) {
+            return "0K";
+        }
+        if (k / 1024 != (long) (k / 1024)) {
+            return kb + "K";
+        }
+        final double m = k / 1024;
+        if (m / 1024 != (long) (m / 1024)) {
+            return Long.toString((long) m) + "M";
+        }
+        final double g = m / 1024;
+        if (g / 1024 != (long) (g / 1024)) {
+            return Long.toString((long) g) + "G";
+        }
+        final double t = g / 1024;
+        if (t / 1024 != (long) (t / 1024)) {
+            return Long.toString((long) t) + "T";
+        }
+        return Long.toString((long) (t / 1024)) + "P";
     }
 
     /** Converts value with unit to kilobites. */
