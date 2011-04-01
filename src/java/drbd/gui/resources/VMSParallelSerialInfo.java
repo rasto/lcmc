@@ -304,7 +304,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 getApplyButton().setEnabled(false);
             }
         });
-        final Map<String, String> parameters = getHWParametersAndSave();
+        final Map<String, String> parameters =
+                                getHWParametersAndSave(getResource().isNew());
 
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -332,7 +333,13 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave(
+                                                   final boolean allParams) {
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getInfoPanel();
+            }
+        });
         final List<String> params = PARAMETERS_MAP.get(
                                     getComboBoxValue(ParallelSerialData.TYPE));
         final Map<String, String> parameters = new HashMap<String, String>();
@@ -345,8 +352,12 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             if (ParallelSerialData.TYPE.equals(param)) {
                 type = value;
             }
-            if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
+            if (allParams || !Tools.areEqual(getParamSaved(param), value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
+                    parameters.put(param, value);
+                }
                 getResource().setValue(param, value);
             }
         }

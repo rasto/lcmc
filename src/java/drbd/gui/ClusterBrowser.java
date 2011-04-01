@@ -1446,9 +1446,11 @@ public final class ClusterBrowser extends Browser {
                     domainNames.remove(vmsvdi.toString());
                     vmsvdi.updateParameters(); /* update old */
                 } else {
-                    /* remove not existing vms */
-                    nodesToRemove.add(node);
-                    nodeChanged = true;
+                    if (!vmsvdi.getResource().isNew()) {
+                        /* remove not existing vms */
+                        nodesToRemove.add(node);
+                        nodeChanged = true;
+                    }
                 }
             }
         }

@@ -1719,12 +1719,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             || serialNodeChanged
             || parallelNodeChanged
             || vidoNodeChanged) {
-            getBrowser().reload(getNode(), false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getBrowser().reload(getNode(), false);
+                }
+            });
         }
-        //final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
-        //if (vmsi != null) {
-        //    vmsi.updateTable(VMSInfo.MAIN_TABLE);
-        //}
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 setApplyButtons(null, getParametersFromXML());
@@ -3210,21 +3210,23 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getResource().setValue(param, value);
         }
         final List<Host> definedOnHosts = new ArrayList<Host>();
+        final Map<VMSHardwareInfo, Map<String, String>> allModifiedHWP =
+                                                      getAllHWParameters(false);
         final Map<VMSHardwareInfo, Map<String, String>> allHWP =
-                                                          getAllHWParameters();
+                                                      getAllHWParameters(true);
+        final Map<Node, VMSXML> domainNodesToSave = new HashMap<Node, VMSXML>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
               definedOnHostComboBoxHash.get(host.getName()).getStringValue();
-            System.out.println(host.getName() + " d: " + value
-                + " is new: " + getResource().isNew());
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
+                Node domainNode = null;
+                VMSXML vmsxml = null;
                 if (getResource().isNew()) {
-                    final VMSXML vmsxml = new VMSXML(host);
+                    vmsxml = new VMSXML(host);
                     getBrowser().vmsXMLPut(host, vmsxml);
-                    final Node domainNode = vmsxml.createDomainXML(
-                                                           getUUID(),
-                                                           getDomainName(),
-                                                           parameters);
+                    domainNode = vmsxml.createDomainXML(getUUID(),
+                                                        getDomainName(),
+                                                        parameters);
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
                         hi.modifyXML(vmsxml,
                                      domainNode,
@@ -3234,49 +3236,49 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     vmsxml.saveAndDefine(domainNode, getDomainName());
                 } else {
-                    VMSXML vmsxml = getBrowser().getVMSXML(host);
+                    vmsxml = getBrowser().getVMSXML(host);
                     if (vmsxml == null) {
                         vmsxml = new VMSXML(host);
                         getBrowser().vmsXMLPut(host, vmsxml);
                     }
-                    Node domainNode;
-                    boolean newDomainOnHost = false;
                     if (vmsxml.getDomainNames().contains(getDomainName())) {
                         domainNode = vmsxml.modifyDomainXML(getDomainName(),
                                                             parameters);
+                        if (domainNode != null) {
+                            for (final VMSHardwareInfo hi
+                                                   : allModifiedHWP.keySet()) {
+                               if (hi.checkResourceFieldsChanged(
+                                            null,
+                                            hi.getRealParametersFromXML(),
+                                            true)) {
+                                    hi.modifyXML(
+                                        vmsxml,
+                                        domainNode,
+                                        getDomainName(),
+                                        allModifiedHWP.get(hi));
+                                    hi.getResource().setNew(false);
+                               }
+                            }
+                        }
                     } else {
+                        /* new on this host */
                         domainNode = vmsxml.createDomainXML(getUUID(),
                                                             getDomainName(),
                                                             parameters);
-                        newDomainOnHost = true;
-                    }
-                    if (domainNode != null) {
-                        final Enumeration eee = getNode().children();
-                        while (eee.hasMoreElements()) {
-                            final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) eee.nextElement();
-                            final VMSHardwareInfo vmshi =
-                                       (VMSHardwareInfo) node.getUserObject();
-                            if (newDomainOnHost
-                                || vmshi.checkResourceFieldsChanged(
-                                            null,
-                                            vmshi.getRealParametersFromXML(),
-                                            true)) {
-                                if (newDomainOnHost) {
-                                    vmshi.getResource().setNew(true);
-                                }
-                                vmshi.modifyXML(vmsxml,
-                                                domainNode,
-                                                getDomainName(),
-                                                vmshi.getHWParametersAndSave());
-                                vmshi.getResource().setNew(false);
-                                vmshi.setApplyButtons(
-                                            null,
-                                            vmshi.getRealParametersFromXML());
+                        if (domainNode != null) {
+                            for (final VMSHardwareInfo hi : allHWP.keySet()) {
+                                hi.modifyXML(
+                                    vmsxml,
+                                    domainNode,
+                                    getDomainName(),
+                                    allHWP.get(hi));
+                                hi.getResource().setNew(false);
                             }
                         }
-                        vmsxml.saveAndDefine(domainNode, getDomainName());
                     }
+                }
+                if (domainNode != null) {
+                    domainNodesToSave.put(domainNode, vmsxml);
                 }
                 definedOnHosts.add(host);
             } else {
@@ -3286,6 +3288,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     VIRSH.undefine(host, getDomainName());
                 }
             }
+        }
+        for (final Node dn : domainNodesToSave.keySet()) {
+            domainNodesToSave.get(dn).saveAndDefine(dn, getDomainName());
+        }
+        for (final VMSHardwareInfo hi : allHWP.keySet()) {
+            hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
         if (getResource().isNew()) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -3310,11 +3318,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().periodicalVMSUpdate(host);
         }
         updateParameters();
-        getBrowser().reload(getNode(), false);
     }
 
     /** Returns parameters of all devices. */
-    protected Map<VMSHardwareInfo, Map<String, String>> getAllHWParameters() {
+    protected Map<VMSHardwareInfo, Map<String, String>> getAllHWParameters(
+                                                    final boolean allParams) {
         final Enumeration e = getNode().children();
         final Map<VMSHardwareInfo, Map<String, String>> allParamaters =
                          new TreeMap<VMSHardwareInfo, Map<String, String>>();
@@ -3322,7 +3330,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) e.nextElement();
             final VMSHardwareInfo hi = (VMSHardwareInfo) node.getUserObject();
-            allParamaters.put(hi, hi.getHWParametersAndSave());
+            allParamaters.put(hi, hi.getHWParametersAndSave(allParams));
         }
         return allParamaters;
     }

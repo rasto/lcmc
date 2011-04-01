@@ -267,17 +267,25 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave(
+                                                    final boolean allParams) {
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getInfoPanel();
+            }
+        });
         final String[] params = getRealParametersFromXML();
 
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : params) {
             final String value = getComboBoxValue(param);
-            if (getResource().isNew()
+            if (allParams
                 || InterfaceData.SOURCE_NETWORK.equals(param)
                 || InterfaceData.SOURCE_BRIDGE.equals(param)
                 || !Tools.areEqual(getParamSaved(param), value)) {
-                if (!Tools.areEqual(getParamDefault(param), value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
                     parameters.put(param, value);
                 }
                 getResource().setValue(param, value);
@@ -308,7 +316,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         });
 
-        final Map<String, String> parameters = getHWParametersAndSave();
+        final Map<String, String> parameters = getHWParametersAndSave(
+                                                        getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {

@@ -347,7 +347,13 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave(
+                                                   final boolean allParams) {
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getInfoPanel();
+            }
+        });
         final String[] params = getRealParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : params) {
@@ -372,18 +378,22 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     }
                 }
                 getResource().setValue(param, value);
-            } else if (getResource().isNew()) {
-                if (!Tools.areEqual(getParamDefault(param), value)) {
+            } else if (allParams) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
                     parameters.put(param, value);
                 }
                 getResource().setValue(param, value);
             } else if (!Tools.areEqual(getParamSaved(param), value)
                        || DiskData.SOURCE_FILE.equals(param)
                        || DiskData.SOURCE_DEVICE.equals(param)) {
-                if (!Tools.areEqual(getParamDefault(param), value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
                     parameters.put(param, value);
-                    getResource().setValue(param, value);
                 }
+                getResource().setValue(param, value);
             }
         }
         parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
@@ -401,7 +411,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 getApplyButton().setEnabled(false);
             }
         });
-        final Map<String, String> parameters = getHWParametersAndSave();
+        final Map<String, String> parameters =
+                                getHWParametersAndSave(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);

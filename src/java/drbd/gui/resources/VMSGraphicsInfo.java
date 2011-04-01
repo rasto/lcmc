@@ -145,8 +145,6 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     VMSGraphicsInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
-        System.out.println(vmsVirtualDomainInfo.getDomainName()
-                           + "new graphics info: " + name);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -308,7 +306,13 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave() {
+    @Override protected Map<String, String> getHWParametersAndSave(
+                                                   final boolean allParams) {
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getInfoPanel();
+            }
+        });
         final Map<String, String> parameters = new HashMap<String, String>();
         String[] params = {};
         boolean vnc = false;
@@ -320,9 +324,10 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         }
         for (final String param : params) {
             final String value = getComboBoxValue(param);
-            if (getResource().isNew()
-                || !Tools.areEqual(getParamSaved(param), value)) {
-                if (!Tools.areEqual(getParamDefault(param), value)) {
+            if (allParams || !Tools.areEqual(getParamSaved(param), value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
                     parameters.put(param, value);
                 }
                 if (vnc) {
@@ -353,7 +358,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 getRevertButton().setEnabled(false);
             }
         });
-        final Map<String, String> parameters = getHWParametersAndSave();
+        final Map<String, String> parameters =
+                                 getHWParametersAndSave(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);

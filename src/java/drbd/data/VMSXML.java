@@ -763,7 +763,11 @@ public final class VMSXML extends XML {
                          hwNode.getAttributes().getNamedItem(
                                                     attributeMap.get(param));
                     if (attributeNode == null) {
-                        hwNode.setAttribute(attributeMap.get(param), value);
+                        if (value != null && !"".equals(value)) {
+                            hwNode.setAttribute(attributeMap.get(param), value);
+                        }
+                    } else if (value == null || "".equals(value)) {
+                        hwNode.removeAttribute(attributeMap.get(param));
                     } else {
                         attributeNode.setNodeValue(value);
                     }
@@ -776,9 +780,9 @@ public final class VMSXML extends XML {
                     node = (Element) hwNode.appendChild(
                           domainNode.getOwnerDocument().createElement(
                                                            tagMap.get(param)));
-                } else if (!attributeMap.containsKey(param)
-                           && "False".equals(value)
-                           && node != null) {
+                } else if (node != null
+                           && !attributeMap.containsKey(param)
+                           && (value == null || "".equals(value))) {
                     hwNode.removeChild(node);
                 }
                 if (attributeMap.containsKey(param)) {
@@ -786,10 +790,11 @@ public final class VMSXML extends XML {
                                     node.getAttributes().getNamedItem(
                                                       attributeMap.get(param));
                     if (attributeNode == null) {
-                        node.setAttribute(attributeMap.get(param), value);
-
+                        if (value != null && !"".equals(value)) {
+                            node.setAttribute(attributeMap.get(param), value);
+                        }
                     } else {
-                        if ("".equals(value)) {
+                        if (value == null || "".equals(value)) {
                             node.removeAttribute(attributeMap.get(param));
                         } else {
                             attributeNode.setNodeValue(value);

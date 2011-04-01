@@ -2351,7 +2351,6 @@ public final class RoboTest {
             }
         }
         final Point2D p = MouseInfo.getPointerInfo().getLocation();
-        Tools.debug(null, "Moved to: " + p.getY() + " dest: " + destY, 1);
     }
 
     /** Register movement. */
@@ -2701,15 +2700,15 @@ public final class RoboTest {
         moveTo(robot, 814, 581); /* finish */
         leftClick(robot);
 
-        Tools.sleep(10000);
+        Tools.sleep(2000);
         Tools.setDebugLevel(1);
         moveTo(robot, 1066, 284); /* remove */
         Tools.setDebugLevel(0);
-        Tools.sleep(10000);
+        Tools.sleep(2000);
         leftClick(robot);
         Tools.sleep(2000);
         moveTo(robot, 516, 485); /* confirm */
         leftClick(robot);
-        Tools.sleep(20000);
+        Tools.sleep(10000);
     }
 }

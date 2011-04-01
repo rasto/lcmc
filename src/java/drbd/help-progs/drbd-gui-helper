@@ -597,7 +597,7 @@ sub get_crypto_info {
 sub get_qemu_keymaps_info {
 	my @modules;
 	my %module_exists;
-	for (`ls /usr/share/qemu/keymaps/ 2>&1`) {
+	for (`ls /usr/share/qemu*/keymaps/ 2>/dev/null`) {
 		print;
 	}
 }

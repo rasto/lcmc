@@ -389,14 +389,22 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns device parameters. */
-    protected Map<String, String> getHWParametersAndSave() {
+    protected Map<String, String> getHWParametersAndSave(
+                                                    final boolean allParams) {
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getInfoPanel();
+            }
+        });
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);
-            if (getResource().isNew()
+            if (allParams
                 || !Tools.areEqual(getParamSaved(param), value)) {
-                if (!Tools.areEqual(getParamDefault(param), value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, null);
+                } else {
                     parameters.put(param, value);
                 }
                 getResource().setValue(param, value);

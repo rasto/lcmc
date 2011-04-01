@@ -193,7 +193,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
                 getApplyButton().setEnabled(false);
             }
         });
-        final Map<String, String> parameters = getHWParametersAndSave();
+        final Map<String, String> parameters = getHWParametersAndSave(
+                                                        getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -222,8 +223,10 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave() {
-        final Map<String, String> params = super.getHWParametersAndSave();
+    @Override protected Map<String, String> getHWParametersAndSave(
+                                                    final boolean allParams) {
+        final Map<String, String> params =
+                                     super.getHWParametersAndSave(allParams);
         setName(getParamSaved(InputDevData.TYPE)
                 + ":"
                 + getParamSaved(InputDevData.BUS));

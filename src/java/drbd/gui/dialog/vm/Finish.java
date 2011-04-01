@@ -105,7 +105,7 @@ final class Finish extends VMConfig {
             @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             @Override public void run() {
                                 createConfigBtn.setEnabled(false);
                             }
