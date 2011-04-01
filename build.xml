@@ -260,7 +260,7 @@
 	</target>
 
 	<target name="junit" depends="compile">
-		<junit printsummary="yes" haltonfailure="no" showoutput="yes" >
+		<junit printsummary="no" haltonfailure="yes" showoutput="no" >
 			<classpath>
 				<pathelement path="${classes.dir}"/>
 				<pathelement location="junit.jar"/>
@@ -268,17 +268,11 @@
 			</classpath>                   
 
 			<batchtest fork="yes" todir="${reports.dir}/xml">
-				<formatter type="xml"/>
+				<formatter type="plain" usefile="false"/>
 				<fileset dir="${test.dir}">
 					<include name="**/*Test*.java"/>
 				</fileset>
 			</batchtest>
 		</junit>
-		<junitreport todir="${reports.dir}/">
-		        <fileset dir="${reports.dir}/xml">
-			      <include name="*.xml"/>
-			</fileset>
-			<report format="noframes" todir="${reports.dir}/html"/>
-		</junitreport>
 	</target>
 </project>
