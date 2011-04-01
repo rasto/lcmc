@@ -2,6 +2,7 @@
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/java"/>
 	<property name="test.dir"	value="${src.dir}/test"/>
+	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="build"/>
 	<property name="classes.dir"	value="${build.dir}/classes"/>
@@ -47,6 +48,26 @@
 		<!-- target="jsr14" for java runtime 1.4 -->
 		<!-- debug="true" -->
 		<!-- fork="true" -->
+		<javac 
+		 fork="true" 
+		 nowarn="true"
+		 debug="true"
+		 deprecation="false"
+		 memoryInitialSize="512m"
+		 memoryMaximumSize="512m"
+		 srcdir="${lib.dir}" destdir="${classes.dir}"
+		 encoding="utf8"
+		>
+		  <classpath>
+		   <pathelement location="/usr/share/java/j3dcore.jar"/>
+		   <pathelement location="/usr/share/java/j3dutils.jar"/>
+		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="jai_core.jar"/>
+		   <pathelement location="junit.jar"/>
+		  </classpath>
+		  <compilerarg value="-Xmaxerrs"/> 
+		  <compilerarg value="1000"/> 
+		</javac>
 		
 		<javac 
 		 fork="true" 
@@ -54,7 +75,7 @@
 		 deprecation="true"
 		 memoryInitialSize="512m"
 		 memoryMaximumSize="512m"
-		 srcdir="${src.dir}" destdir="${classes.dir}"
+		 srcdir="${drbd.dir}/*/drbd" destdir="${classes.dir}"
 		 encoding="utf8"
 		>
 		  <classpath>

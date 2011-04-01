@@ -145,6 +145,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     VMSGraphicsInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
+        System.out.println(vmsVirtualDomainInfo.getDomainName()
+                           + "new graphics info: " + name);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -402,7 +404,11 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
-        return null;
+        if (getResource().isNew() || !GraphicsData.TYPE.equals(param)) {
+            return null;
+        } else {
+            return "";
+        }
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

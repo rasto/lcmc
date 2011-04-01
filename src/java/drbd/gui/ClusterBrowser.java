@@ -1484,7 +1484,7 @@ public final class ClusterBrowser extends Browser {
             setNode(resource);
             vmsvdi.updateParameters();
             final int index = i;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 public void run() {
                     vmsNode.insert(resource, index);
                 }

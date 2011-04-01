@@ -254,7 +254,11 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
-        return null;
+        if (getResource().isNew() || !InputDevData.TYPE.equals(param)) {
+            return null;
+        } else {
+            return "";
+        }
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */

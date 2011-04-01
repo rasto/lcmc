@@ -958,7 +958,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final String prevN = prevI.getName();
                     if (!prevI.getResource().isNew()
                         && !v.getResource().isNew()
-                        && prevN.compareTo(n) > 0) {
+                        && (prevN != null && prevN.compareTo(n) > 0)) {
                         getNode().remove(j);
                         getNode().insert(node, j - 1);
                     }
@@ -998,6 +998,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (graphicsNames.contains(vmsgi.getName())) {
                 /* keeping */
                 graphicsNames.remove(vmsgi.getName());
+                try {
+                    mGraphicsToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                graphicsToInfo.put(vmsgi.getName(), vmsgi);
+                mGraphicsToInfoLock.release();
                 vmsgi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -1091,6 +1098,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (soundNames.contains(vmssi.getName())) {
                 /* keeping */
                 soundNames.remove(vmssi.getName());
+                try {
+                    mSoundToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                soundToInfo.put(vmssi.getName(), vmssi);
+                mSoundToInfoLock.release();
                 vmssi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
@@ -1385,13 +1399,20 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             if (!(node.getUserObject() instanceof VMSVideoInfo)) {
                 continue;
             }
-            final VMSVideoInfo vmspi = (VMSVideoInfo) node.getUserObject();
-            if (vmspi.getResource().isNew()) {
+            final VMSVideoInfo vmsvi = (VMSVideoInfo) node.getUserObject();
+            if (vmsvi.getResource().isNew()) {
                 /* keep */
-            } else if (videoNames.contains(vmspi.getName())) {
+            } else if (videoNames.contains(vmsvi.getName())) {
                 /* keeping */
-                videoNames.remove(vmspi.getName());
-                vmspi.updateParameters(); /* update old */
+                videoNames.remove(vmsvi.getName());
+                try {
+                    mVideoToInfoLock.acquire();
+                } catch (final InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+                videoToInfo.put(vmsvi.getName(), vmsvi);
+                mVideoToInfoLock.release();
+                vmsvi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 try {
@@ -1399,7 +1420,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
-                videoToInfo.remove(vmspi.getName());
+                videoToInfo.remove(vmsvi.getName());
                 mVideoToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
@@ -1646,7 +1667,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final String oldValue = getParamSaved(param);
             String value = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
-            for (final Host h : getBrowser().getClusterHosts()) {
+            for (final Host h : getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
                     final String savedValue =
@@ -1666,7 +1687,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
+        for (final Host h : getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 uuid = vmsxml.getValue(getDomainName(), VMSXML.VM_PARAM_UUID);
@@ -1706,6 +1727,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         //}
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                setApplyButtons(null, getParametersFromXML());
                 getBrowser().repaintTree();
             }
         });
@@ -3174,7 +3196,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (testOnly) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeAndWait(new Runnable() {
             @Override public void run() {
                 getApplyButton().setEnabled(false);
             }
@@ -3193,6 +3215,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
               definedOnHostComboBoxHash.get(host.getName()).getStringValue();
+            System.out.println(host.getName() + " d: " + value
+                + " is new: " + getResource().isNew());
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 if (getResource().isNew()) {
                     final VMSXML vmsxml = new VMSXML(host);
@@ -3216,6 +3240,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         getBrowser().vmsXMLPut(host, vmsxml);
                     }
                     Node domainNode;
+                    boolean newDomainOnHost = false;
                     if (vmsxml.getDomainNames().contains(getDomainName())) {
                         domainNode = vmsxml.modifyDomainXML(getDomainName(),
                                                             parameters);
@@ -3223,6 +3248,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         domainNode = vmsxml.createDomainXML(getUUID(),
                                                             getDomainName(),
                                                             parameters);
+                        newDomainOnHost = true;
                     }
                     if (domainNode != null) {
                         final Enumeration eee = getNode().children();
@@ -3231,10 +3257,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     (DefaultMutableTreeNode) eee.nextElement();
                             final VMSHardwareInfo vmshi =
                                        (VMSHardwareInfo) node.getUserObject();
-                            if (vmshi.checkResourceFieldsChanged(
+                            if (newDomainOnHost
+                                || vmshi.checkResourceFieldsChanged(
                                             null,
                                             vmshi.getRealParametersFromXML(),
                                             true)) {
+                                if (newDomainOnHost) {
+                                    vmshi.getResource().setNew(true);
+                                }
                                 vmshi.modifyXML(vmsxml,
                                                 domainNode,
                                                 getDomainName(),
@@ -3276,14 +3306,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             getDomainName(),
                             parameters);
         getResource().setNew(false);
-        for (final Host host : definedOnHosts) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(host);
         }
         updateParameters();
         getBrowser().reload(getNode(), false);
-        if (!testOnly) {
-            setApplyButtons(null, getParametersFromXML());
-        }
     }
 
     /** Returns parameters of all devices. */
@@ -3421,7 +3448,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all disks. */
     protected Map<String, DiskData> getDisks() {
         Map<String, DiskData> disks = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 disks = vxml.getDisks(getDomainName());
@@ -3722,7 +3749,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all interfaces. */
     protected Map<String, InterfaceData> getInterfaces() {
         Map<String, InterfaceData> interfaces = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 interfaces = vxml.getInterfaces(getDomainName());
@@ -3885,7 +3912,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all input devices. */
     protected Map<String, InputDevData> getInputDevs() {
         Map<String, InputDevData> inputDevs = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 inputDevs = vxml.getInputDevs(getDomainName());
@@ -3898,7 +3925,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all graphics devices. */
     protected Map<String, GraphicsData> getGraphicDisplays() {
         Map<String, GraphicsData> graphicDisplays = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 graphicDisplays = vxml.getGraphicDisplays(getDomainName());
@@ -3911,7 +3938,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all sound devices. */
     protected Map<String, SoundData> getSounds() {
         Map<String, SoundData> sounds = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 sounds = vxml.getSounds(getDomainName());
@@ -3924,7 +3951,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all serial devices. */
     protected Map<String, SerialData> getSerials() {
         Map<String, SerialData> serials = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 serials = vxml.getSerials(getDomainName());
@@ -3937,7 +3964,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all parallel devices. */
     protected Map<String, ParallelData> getParallels() {
         Map<String, ParallelData> parallels = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 parallels = vxml.getParallels(getDomainName());
@@ -3950,7 +3977,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns all video devices. */
     protected Map<String, VideoData> getVideos() {
         Map<String, VideoData> videos = null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getDefinedOnHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
                 videos = vxml.getVideos(getDomainName());

@@ -350,20 +350,26 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override protected Map<String, String> getHWParametersAndSave() {
         final String[] params = getRealParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
-        String type = null;
         for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
-                type = value;
                 parameters.put(param, value);
                 getResource().setValue(param, value);
             } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
-                final String[] values = value.split("/");
-                if (values.length == 2) {
-                    parameters.put(DiskData.TARGET_BUS, values[0]);
-                    parameters.put(DiskData.TARGET_TYPE, values[1]);
+                if (value == null) {
+                    parameters.put(DiskData.TARGET_BUS, null);
+                    parameters.put(DiskData.TARGET_TYPE, null);
                 } else {
-                    Tools.appWarning("cannot parse: " + param + " = " + value);
+                    final String[] values = value.split("/");
+                    if (values.length == 2) {
+                        parameters.put(DiskData.TARGET_BUS, values[0]);
+                        parameters.put(DiskData.TARGET_TYPE, values[1]);
+                    } else {
+                        Tools.appWarning("cannot parse: "
+                                         + param
+                                         + " = "
+                                         + value);
+                    }
                 }
                 getResource().setValue(param, value);
             } else if (getResource().isNew()) {
@@ -371,9 +377,13 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     parameters.put(param, value);
                 }
                 getResource().setValue(param, value);
-            } else if (!Tools.areEqual(getParamSaved(param), value)) {
-                parameters.put(param, value);
-                getResource().setValue(param, value);
+            } else if (!Tools.areEqual(getParamSaved(param), value)
+                       || DiskData.SOURCE_FILE.equals(param)
+                       || DiskData.SOURCE_DEVICE.equals(param)) {
+                if (!Tools.areEqual(getParamDefault(param), value)) {
+                    parameters.put(param, value);
+                    getResource().setValue(param, value);
+                }
             }
         }
         parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());

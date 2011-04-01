@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.Host;
+import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -55,13 +56,15 @@ public final class VIRSH {
             if (host.isConnected()) {
                 final SSH.SSHOutput ret =
                             Tools.execCommandProgressIndicator(
-                                     host,
-                                     commands,
-                                     null,
-                                     outputVisible,
-                                     Tools.getString("VIRSH.ExecutingCommand")
-                                     + " " + commands + "...",
-                                     SSH.DEFAULT_COMMAND_TIMEOUT);
+                                 host,
+                                 commands,
+                                 null,
+                                 outputVisible,
+                                 Tools.getString("VIRSH.ExecutingCommand")
+                                 + " "
+                                 + commands.replaceAll(DistResource.SUDO, " ")
+                                 + "...",
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
                 if (ret.getExitCode() != 0) {
                     return false;
                 }

@@ -263,10 +263,16 @@ final class CloneInfo extends ServiceInfo {
                     getBrowser().getCluster().getHostColors(runningOnNodes);
             int i = 0;
             for (final String n : runningOnNodes) {
+                Color color;
+                if (i < colors.size()) {
+                    color = colors.get(i);
+                } else {
+                    color = Color.GRAY;
+                }
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                       + getPingCountString(n, testOnly)
                                       + getFailCountString(n, testOnly),
-                                      colors.get(i), Color.BLACK));
+                                      color, Color.BLACK));
                 notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                 i++;
             }
@@ -284,9 +290,15 @@ final class CloneInfo extends ServiceInfo {
                     texts.add(new Subtext("slave on:", null, Color.BLACK));
                 }
                 for (final String n : slaveOnNodes) {
+                    Color color;
+                    if (i < colors.size()) {
+                        color = colors.get(i);
+                    } else {
+                        color = Color.GRAY;
+                    }
                     texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                           + getFailCountString(n, testOnly),
-                                          colors.get(i),
+                                          color,
                                           Color.BLACK));
                     notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                     i++;

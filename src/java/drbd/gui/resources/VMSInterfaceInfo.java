@@ -271,13 +271,11 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         final String[] params = getRealParametersFromXML();
 
         final Map<String, String> parameters = new HashMap<String, String>();
-        String type = null;
         for (final String param : params) {
             final String value = getComboBoxValue(param);
-            if (InterfaceData.TYPE.equals(param)) {
-                type = value;
-            }
             if (getResource().isNew()
+                || InterfaceData.SOURCE_NETWORK.equals(param)
+                || InterfaceData.SOURCE_BRIDGE.equals(param)
                 || !Tools.areEqual(getParamSaved(param), value)) {
                 if (!Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, value);
@@ -304,14 +302,13 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         if (testOnly) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeAndWait(new Runnable() {
             @Override public void run() {
                 getApplyButton().setEnabled(false);
             }
         });
 
         final Map<String, String> parameters = getHWParametersAndSave();
-        final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -333,6 +330,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
+        final String[] params = getRealParametersFromXML();
         checkResourceFieldsChanged(null, params);
     }
 

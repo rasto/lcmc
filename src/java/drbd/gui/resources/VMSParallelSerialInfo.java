@@ -336,6 +336,9 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         final List<String> params = PARAMETERS_MAP.get(
                                     getComboBoxValue(ParallelSerialData.TYPE));
         final Map<String, String> parameters = new HashMap<String, String>();
+        if (params == null) {
+            return parameters;
+        }
         String type = null;
         for (final String param : params) {
             final String value = getComboBoxValue(param);
