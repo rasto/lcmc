@@ -2045,6 +2045,9 @@ public final class Tools {
     public static String convertKilobytes(final String kb) {
         if (isNumber(kb)) {
             final double k = Long.parseLong(kb);
+            if (k == 0) {
+                return "0K";
+            }
             if (k / 1024 != (long) (k / 1024)) {
                 return kb + "K";
             }
@@ -2060,7 +2063,7 @@ public final class Tools {
             if (t / 1024 != (long) (t / 1024)) {
                 return Long.toString((long) t) + "T";
             }
-            return Long.toString((long) g) + "G";
+            return Long.toString((long) (t / 1024)) + "P";
         }
         return kb;
     }

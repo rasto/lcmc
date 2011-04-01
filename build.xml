@@ -2,6 +2,7 @@
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/java"/>
 	<property name="test.dir"	value="${src.dir}/test"/>
+	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="build"/>
 	<property name="classes.dir"	value="${build.dir}/classes"/>
 	<property name="jar.dir"	value="${build.dir}/jar"/>
@@ -61,6 +62,7 @@
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
 		   <pathelement location="jai_core.jar"/>
+		   <pathelement location="junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 
@@ -101,6 +103,7 @@
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
 		   <pathelement location="jai_core.jar"/>
+		   <pathelement location="junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xmaxerrs"/> 
@@ -238,5 +241,28 @@
 		     includes="drbd-mc/src/** drbd-mc/build.xml drbd-mc/release" />
 		<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 		<delete file="${tarball.tar}"/>
+	</target>
+
+	<target name="junit" depends="compile">
+		<junit printsummary="yes" haltonfailure="no" showoutput="yes" >
+			<classpath>
+				<pathelement path="${classes.dir}"/>
+				<pathelement location="junit.jar"/>
+		
+			</classpath>                   
+
+			<batchtest fork="yes" todir="${reports.dir}/xml">
+				<formatter type="xml"/>
+				<fileset dir="${test.dir}">
+					<include name="**/*Test*.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport todir="${reports.dir}/">
+		        <fileset dir="${reports.dir}/xml">
+			      <include name="*.xml"/>
+			</fileset>
+			<report format="noframes" todir="${reports.dir}/html"/>
+		</junitreport>
 	</target>
 </project>
