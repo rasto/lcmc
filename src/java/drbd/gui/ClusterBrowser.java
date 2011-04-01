@@ -1419,7 +1419,6 @@ public final class ClusterBrowser extends Browser {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        DefaultMutableTreeNode resource;
         Tools.debug(this, "VM status update", 1);
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
@@ -1480,14 +1479,24 @@ public final class ClusterBrowser extends Browser {
             final VMSVirtualDomainInfo vmsvdi =
                                    new VMSVirtualDomainInfo(domainName, this);
             currentVMSVDIs.add(vmsvdi);
-            resource = new DefaultMutableTreeNode(vmsvdi);
+            final DefaultMutableTreeNode resource =
+                                            new DefaultMutableTreeNode(vmsvdi);
             setNode(resource);
             vmsvdi.updateParameters();
-            vmsNode.insert(resource, i);
+            final int index = i;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    vmsNode.insert(resource, index);
+                }
+            });
             nodeChanged = true;
         }
         if (nodeChanged) {
-            reload(vmsNode, false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    reload(vmsNode, false);
+                }
+            });
         }
         for (final ServiceInfo si : getExistingServiceList(null)) {
             final VMSVirtualDomainInfo vmsvdi = si.connectWithVMS();
