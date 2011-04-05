@@ -54,6 +54,8 @@ public final class DistResource_redhatenterpriseserver_6
 
         {"HbPmInst.install.1", ""},
 
+        {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?el\\d+.*)"},
+
         ///* Heartbeat/Pacemaker clusterlabs */
         //{"HbPmInst.install.text.1",
         // "clusterlabs repo: 1.0.x/3.0.x" },

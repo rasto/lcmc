@@ -1077,13 +1077,17 @@ public final class Tools {
                                  final String arch,
                                  final ConvertCmdCallback convertCmdCallback,
                                  final boolean inBash) {
+        if (text == null) {
+            return null;
+        }
         final String[] texts = text.split(";;;");
         final List<String> results =  new ArrayList<String>();
         int i = 0;
         for (final String t : texts) {
-            final String distString = getDistString(t, dist, version, arch);
+            String distString = getDistString(t, dist, version, arch);
             if (distString == null) {
-                continue;
+                Tools.appWarning("unknown command: " + t);
+                distString = t;
             }
             if (inBash && i == 0) {
                 results.add(DistResource.SUDO + "bash -c \""
@@ -1095,7 +1099,7 @@ public final class Tools {
             i++;
         }
         String ret;
-        if (texts.length == 0) {
+        if (results.size() == 0) {
             ret = text;
         } else {
             ret = Tools.join(";;;",
@@ -1105,23 +1109,6 @@ public final class Tools {
             ret = convertCmdCallback.convert(ret);
         }
         return ret;
-    }
-
-    /**
-     * Returns array of services with service definiton from
-     * ServiceDefinitions resource bundle.
-     *
-     * @return array of services.
-     */
-    public static String[] getServiceDefinitions() {
-        final ResourceBundle resourceSD =
-                  ResourceBundle.getBundle("drbd.configs.ServiceDefinitions");
-        try {
-            return enumToStringArray(resourceSD.getKeys());
-        } catch (Exception e) {
-            Tools.appError("cannot get service definitions");
-            return new String[]{};
-        }
     }
 
     /**
@@ -1153,7 +1140,7 @@ public final class Tools {
                                               final String version,
                                               final String arch) {
         final String regexp = getDistString("kerneldir", dist, version, arch);
-        if (regexp != null) {
+        if (regexp != null && kernelVersion != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(kernelVersion);
             if (m.matches()) {

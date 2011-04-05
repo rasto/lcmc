@@ -233,11 +233,14 @@ final public class ToolsTest extends TestCase {
         Tools.save(testFile);
         assertTrue(stdout.toString().indexOf("saved:") >= 0);
         clearStdout();
-        assertNotNull("".equals(Tools.loadFile(testFile, INTERACTIVE)));
+        final String file = Tools.loadFile(testFile, INTERACTIVE);
+        assertNotNull(file);
+        assertFalse("".equals(file));
     }
 
     public void testRemoveEverything() {
-        Tools.removeEverything();
+        //TODO:
+        //Tools.removeEverything();
     }
 
     public void testGetDefault() {
@@ -329,15 +332,159 @@ final public class ToolsTest extends TestCase {
          ConvertCmdCallback convertCmdCallback
          boolean inBash
         */
-        assertNull(Tools.getDistCommand("undefined",
+        assertEquals("undefined",
+                     Tools.getDistCommand("undefined",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          null,
+                                          false));
+        assertEquals(APPWARNING_STRING + "unknown command: undefined\n",
+                     stdout.toString());
+        clearStdout();
+
+        assertEquals("undefined2;;;undefined3",
+                     Tools.getDistCommand("undefined2;;;undefined3",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          null,
+                                          false));
+        assertEquals(APPWARNING_STRING + "unknown command: undefined2\n"
+                     + APPWARNING_STRING + "unknown command: undefined3\n",
+                     stdout.toString());
+        clearStdout();
+        final drbd.utilities.ConvertCmdCallback ccc =
+                                    new drbd.utilities.ConvertCmdCallback() {
+            @Override public String convert(final String command) {
+                return command.replaceAll(drbd.configs.DistResource.SUDO,
+                                          "sudo ");
+            }
+        };
+        assertEquals("sudo /etc/init.d/corosync start",
+                     Tools.getDistCommand("Corosync.startCorosync",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          ccc,
+                                          false));
+        assertEquals("sudo bash -c \"sudo /etc/init.d/corosync start\"",
+                     Tools.getDistCommand("Corosync.startCorosync",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          ccc,
+                                          true));
+        assertEquals("sudo /etc/init.d/corosync start"
+                     + ";;;sudo /etc/init.d/corosync start",
+                     Tools.getDistCommand("Corosync.startCorosync;;;"
+                                          + "Corosync.startCorosync",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          ccc,
+                                          false));
+        assertEquals("undefined4"
+                     + ";;;sudo /etc/init.d/corosync start",
+                     Tools.getDistCommand("undefined4;;;"
+                                          + "Corosync.startCorosync",
+                                          "debian",
+                                          "squeeze",
+                                          "i386",
+                                          ccc,
+                                          false));
+        assertEquals(APPWARNING_STRING + "unknown command: undefined4\n",
+                     stdout.toString());
+        clearStdout();
+        assertNull(Tools.getDistCommand(null,
                                         "debian",
                                         "squeeze",
                                         "i386",
-                                        null,
+                                        ccc,
+                                        false));
+        assertNull(Tools.getDistCommand(null,
+                                        "debian",
+                                        "squeeze",
+                                        "i386",
+                                        ccc,
                                         true));
+        assertNull(Tools.getDistCommand(null, null, null, null, null, true));
+    }
+
+    public void testGetKernelDownloadDir() {
+        /* String kernelVersion
+           String dist
+           String version
+           String arch
+         */
+         assertNull(Tools.getKernelDownloadDir(null, null, null, null));
+         assertEquals("2.6.32-28",
+                      Tools.getKernelDownloadDir("2.6.32-28-server",
+                                                 "ubuntu",
+                                                 "lucid",
+                                                 "x86_64"));
+         assertEquals("2.6.32-28",
+                      Tools.getKernelDownloadDir("2.6.32-28-server",
+                                                 "ubuntu",
+                                                 "lucid",
+                                                 "i386"));
+         assertEquals("2.6.24-28",
+                      Tools.getKernelDownloadDir("2.6.24-28-server",
+                                                 "ubuntu",
+                                                 "hardy",
+                                                 "x86_64"));
+         assertEquals("2.6.32.27-0.2",
+                      Tools.getKernelDownloadDir("2.6.32.27-0.2-default",
+                                                 "suse",
+                                                 "SLES11",
+                                                 "x86_64"));
+         assertEquals("2.6.16.60-0.60.1",
+                      Tools.getKernelDownloadDir("2.6.16.60-0.60.1-default",
+                                                 "suse",
+                                                 "SLES10",
+                                                 "x86_64"));
+         assertEquals("2.6.18-194.8.1.el5",
+                      Tools.getKernelDownloadDir("2.6.18-194.8.1.el5",
+                                                 "redhatenterpriseserver",
+                                                 "5",
+                                                 "x86_64"));
+         assertEquals("2.6.32-71.18.1.el6.x86_64",
+                      Tools.getKernelDownloadDir("2.6.32-71.18.1.el6.x86_64",
+                                                 "redhatenterpriseserver",
+                                                 "6",
+                                                 "x86_64"));
+         assertEquals("2.6.26-2",
+                      Tools.getKernelDownloadDir("2.6.26-2-amd64",
+                                                 "debian",
+                                                 "lenny",
+                                                 "x86_64"));
+         assertEquals("2.6.32-5",
+                      Tools.getKernelDownloadDir("2.6.32-5-amd64",
+                                                 "debian",
+                                                 "squeeze",
+                                                 "x86_64"));
+         assertEquals("2.6.32-5",
+                      Tools.getKernelDownloadDir("2.6.32-5-amd64",
+                                                 "debian",
+                                                 "unknown",
+                                                 "x86_64"));
+         assertEquals("2.6.32-5-amd64",
+                      Tools.getKernelDownloadDir("2.6.32-5-amd64",
+                                                 "unknown",
+                                                 "unknown",
+                                                 "x86_64"));
+         assertNull(Tools.getKernelDownloadDir(null,
+                                               "unknown",
+                                               "unknown",
+                                               "x86_64"));
+         assertEquals("2.6.32-5-amd64",
+                      Tools.getKernelDownloadDir("2.6.32-5-amd64",
+                                                 null,
+                                                 null,
+                                                 "x86_64"));
     }
 
     public void testLast() {
-        Tools.confirmDialog("all tests finished", "", "done", "done");
+        //Tools.confirmDialog("all tests finished", "", "done", "done");
     }
 }
