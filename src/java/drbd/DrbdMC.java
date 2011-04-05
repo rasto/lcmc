@@ -173,8 +173,6 @@ public final class DrbdMC extends JPanel {
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"),
                           Tools.getDefaultInt("DrbdMC.height"));
         mainFrame.setVisible(true);
-
-
     }
 
     /** Returns the main panel. */
@@ -207,27 +205,32 @@ public final class DrbdMC extends JPanel {
          * Called when window is closed.
          */
         public final void windowClosing(final WindowEvent event) {
-            final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
-                    // TODO: don't try to reconnect when exiting
-                    System.out.println("saving...");
-                    for (int i = 0; i < 10; i++) {
-                        System.out.println(".");
-                        System.out.flush();
-                        Tools.sleep(2000);
-                    }
-                    System.out.println();
-                    System.out.println("force exit.");
-                    System.exit(5);
-                }
-            });
-            t.start();
-            Tools.getGUIData().getMainFrame().setVisible(false);
-            final String saveFile = Tools.getConfigData().getSaveFile();
-            Tools.save(saveFile);
-            Tools.getConfigData().disconnectAllHosts();
+            cleanupBeforeClosing();
             System.exit(0);
         }
+    }
+
+    /** Cleanup before closing. */
+    public static void cleanupBeforeClosing() {
+        final Thread t = new Thread(new Runnable() {
+            @Override public void run() {
+                // TODO: don't try to reconnect when exiting
+                System.out.println("saving...");
+                for (int i = 0; i < 10; i++) {
+                    System.out.println(".");
+                    System.out.flush();
+                    Tools.sleep(2000);
+                }
+                System.out.println();
+                System.out.println("force exit.");
+                System.exit(5);
+            }
+        });
+        t.start();
+        Tools.getGUIData().getMainFrame().setVisible(false);
+        final String saveFile = Tools.getConfigData().getSaveFile();
+        Tools.save(saveFile);
+        Tools.getConfigData().disconnectAllHosts();
     }
 
     /** Inits the application. */

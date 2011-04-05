@@ -1446,6 +1446,8 @@ public final class ClusterBrowser extends Browser {
                     domainNames.remove(vmsvdi.toString());
                     vmsvdi.updateParameters(); /* update old */
                 } else {
+                    System.out.println("node " + vmsvdi.toString()
+                        + " " + vmsvdi.getResource().isNew());
                     if (!vmsvdi.getResource().isNew()) {
                         /* remove not existing vms */
                         nodesToRemove.add(node);

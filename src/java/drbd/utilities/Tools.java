@@ -152,10 +152,16 @@ public final class Tools {
     private static GUIData guiData;
     /** Drbd gui xml object. */
     private static DrbdGuiXML drbdGuiXML = new DrbdGuiXML();
+    /** String that starts error messages. */
+    private static final String ERROR_STRING = "ERROR: ";
     /** String that starts info messages. */
     private static final String INFO_STRING = "INFO: ";
     /** String that starts debug messages. */
     private static final String DEBUG_STRING = "DEBUG: ";
+    /** string that starts application warnings. */
+    private static final String APPWARNING_STRING = "APPWARNING: ";
+    /** String that starts application errors. */
+    private static final String APPERROR_STRING = "APPERROR: ";
     /** Default dialog panel width. */
     private static final int DIALOG_PANEL_WIDTH = 400;
     /** Default dialog panel height. */
@@ -369,7 +375,7 @@ public final class Tools {
      *          error message
      */
     public static void error(final String msg) {
-        System.out.println("ERROR: " + getErrorString(msg));
+        System.out.println(ERROR_STRING + getErrorString(msg));
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 JOptionPane.showMessageDialog(
@@ -447,7 +453,7 @@ public final class Tools {
                              @Override public void doneError(
                                                     final String ans,
                                                     final int exitCode) {
-                                 Tools.appWarning("error: "
+                                 Tools.appWarning(ERROR_STRING
                                                   + command
                                                   + " "
                                                   + ans + " rc: "
@@ -548,9 +554,9 @@ public final class Tools {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
             if (appWarning) {
-                System.out.println("APPWARNING: " + msg);
+                System.out.println(APPWARNING_STRING + msg);
             } else {
-                debug("APPWARNING: " + msg, 2);
+                debug(APPWARNING_STRING + msg, 2);
             }
         }
     }
@@ -560,10 +566,10 @@ public final class Tools {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
             if (appWarning) {
-                System.out.println("APPWARNING: " + msg + ": "
+                System.out.println(APPWARNING_STRING + msg + ": "
                                    + e.getMessage());
             } else {
-                debug("APPWARNING: " + msg, 2);
+                debug(APPWARNING_STRING + msg, 2);
             }
         }
     }
@@ -650,7 +656,7 @@ public final class Tools {
         }
 
 
-        System.out.println("APPERROR: " + errorString);
+        System.out.println(APPERROR_STRING + errorString);
         if (!appError) {
             return;
         }
@@ -1005,6 +1011,7 @@ public final class Tools {
     /**
      * Returns converted error string. TODO: at the moment there is no
      * conversion.
+     * TODO: ?
      */
     public static String getErrorString(final String text) {
         return text;
@@ -1074,14 +1081,16 @@ public final class Tools {
         final List<String> results =  new ArrayList<String>();
         int i = 0;
         for (final String t : texts) {
+            final String distString = getDistString(t, dist, version, arch);
+            if (distString == null) {
+                continue;
+            }
             if (inBash && i == 0) {
                 results.add(DistResource.SUDO + "bash -c \""
-                             + Tools.escapeQuotes(
-                                        getDistString(t, dist, version, arch),
-                                        1)
-                             + "\"");
+                            + Tools.escapeQuotes(distString, 1)
+                            + "\"");
             } else {
-                results.add(getDistString(t, dist, version, arch));
+                results.add(distString);
             }
             i++;
         }

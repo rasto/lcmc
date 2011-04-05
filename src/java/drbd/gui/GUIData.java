@@ -158,6 +158,9 @@ public final class GUIData  {
 
     /** Sets terminal in bottom part of the split pane. */
     public void setTerminalPanel(final Component terminalPanel) {
+        if (terminalPanel == null) {
+            return;
+        }
         final Component oldTerminalPanel =
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
@@ -189,6 +192,9 @@ public final class GUIData  {
 
     /** Expands the terminal split pane. */
     public void expandTerminalSplitPane(final int buttonNo) {
+        if (terminalSplitPane == null) {
+            return;
+        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 final int height = (int)
