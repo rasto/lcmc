@@ -2678,19 +2678,19 @@ public final class RoboTest {
         moveTo(robot, 730, 580);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
-        sleep(9000);
+        sleep(5000);
         moveTo(robot, 730, 580);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* storage */
-        sleep(9000);
+        sleep(5000);
         moveTo(robot, 730, 580);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* network */
-        sleep(9000);
+        sleep(5000);
         moveTo(robot, 730, 580);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* display */
-        sleep(9000);
+        sleep(5000);
         moveTo(robot, 560, 423); /* create config */
         leftClick(robot);
 
@@ -2701,14 +2701,11 @@ public final class RoboTest {
         leftClick(robot);
 
         Tools.sleep(2000);
-        Tools.setDebugLevel(1);
         moveTo(robot, 1066, 284); /* remove */
-        Tools.setDebugLevel(0);
-        Tools.sleep(2000);
         leftClick(robot);
         Tools.sleep(2000);
         moveTo(robot, 516, 485); /* confirm */
         leftClick(robot);
-        Tools.sleep(10000);
+        Tools.sleep(5000);
     }
 }

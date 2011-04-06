@@ -35,8 +35,8 @@ final public class ToolsTest extends TestCase {
 
     protected void setUp() {
         if (Tools.getGUIData() == null) {
-            drbd.DrbdMC.main(null);
-            Tools.sleep(5000);
+            drbd.DrbdMC.main(new String[]{"--no-plugin-check",
+                                          "--no-upgrade-check"});
         }
         Tools.waitForSwing();
         System.setOut(new PrintStream(out, true));
@@ -160,9 +160,9 @@ final public class ToolsTest extends TestCase {
     public void testConfirmDialog() {
         if (INTERACTIVE) {
             assertTrue(
-                Tools.confirmDialog("tile a", "click yes", "yes (click)", "no"));
+              Tools.confirmDialog("title a", "click yes", "yes (click)", "no"));
             assertFalse(
-                Tools.confirmDialog("tile a", "click no", "yes", "no (click)"));
+              Tools.confirmDialog("title a", "click no", "yes", "no (click)"));
         }
     }
 
