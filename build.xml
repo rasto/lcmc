@@ -1,12 +1,13 @@
 <project name="DMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/java"/>
-	<property name="test.dir"	value="${java.dir}/test"/>
+	<property name="test.dir"	value="${src.dir}/test"/>
 	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="build"/>
 	<property name="classes.dir"	value="${build.dir}/classes"/>
 	<property name="jar.dir"	value="${build.dir}/jar"/>
+	<property name="signed.dir"	value="${build.dir}/signed"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
 	
 	<property name="main-class"  value="drbd.DrbdMC"/>
@@ -21,6 +22,7 @@
 	
 	<target name="superclean">
 		<delete dir="${jar.dir}"/>
+		<delete dir="${signed.dir}"/>
 		<delete dir="${build.dir}/classes/"/>
 	</target>
 	
@@ -75,6 +77,23 @@
 		 memoryInitialSize="512m"
 		 memoryMaximumSize="512m"
 		 srcdir="${java.dir}" destdir="${classes.dir}"
+		 encoding="utf8"
+		>
+		  <compilerarg value="-g"/> 
+		  <compilerarg value="-Xlint"/> 
+		  <compilerarg value="-Xmaxerrs"/> 
+		  <compilerarg value="1000"/> 
+		</javac>
+	</target>
+
+	<target name="compilejunit" depends="compile">
+		<javac 
+		 fork="true" 
+		 debug="true"
+		 deprecation="true"
+		 memoryInitialSize="512m"
+		 memoryMaximumSize="512m"
+		 srcdir="${test.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
 		>
 		  <classpath>
@@ -259,7 +278,7 @@
 		<delete file="${tarball.tar}"/>
 	</target>
 
-	<target name="junit" depends="compile">
+	<target name="junit" depends="compilejunit">
 		<junit printsummary="no" haltonfailure="yes" showoutput="no" >
 			<classpath>
 				<pathelement path="${classes.dir}"/>
