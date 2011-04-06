@@ -38,7 +38,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
         {"version:squeeze/sid/10.04",     "LUCID"},
-        {"version:squeeze/sid/9.10",     "KARMIC"},
+        {"version:squeeze/sid/9.10",      "KARMIC"},
         {"version:5.0/9.04",              "JAUNTY"},
         {"version:lenny/sid/8.10",        "INTREPID"},
         {"version:lenny/sid/8.04",        "HARDY"},

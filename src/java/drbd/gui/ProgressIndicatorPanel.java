@@ -196,6 +196,9 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure. */
     public void failure(final String text) {
+        if (text == null) {
+            return;
+        }
         failuresMap.add(text);
         start(text, null, false);
         stop(text);
@@ -203,6 +206,9 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure and shows it for n seconds. */
     public void failure(final String text, final int n) {
+        if (text == null || n < 0) {
+            return;
+        }
         failuresMap.add(text);
         start(text, null, false);
         Tools.sleep(n);
@@ -217,6 +223,9 @@ public final class ProgressIndicatorPanel extends JComponent
     public void start(final String text,
                       final Point2D position,
                       final boolean rightMovement) {
+        if (text == null) {
+            return;
+        }
         try {
             mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {
@@ -284,6 +293,9 @@ public final class ProgressIndicatorPanel extends JComponent
      * This methods sets the panel invisible at the end.
      */
     public void stop(final String text) {
+        if (text == null) {
+            return;
+        }
         try {
             mAnimatorLock.acquire();
         } catch (java.lang.InterruptedException e) {

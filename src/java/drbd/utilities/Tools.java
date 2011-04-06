@@ -1166,7 +1166,7 @@ public final class Tools {
         if (dist == null) {
             dist = "";
         }
-        debug("dist: " + dist + ", version: " + version, 1);
+        debug("dist: " + dist + ", version: " + version, 2);
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("drbd.configs.DistResource", locale);
@@ -1193,7 +1193,7 @@ public final class Tools {
                 distVersion = version;
             }
         }
-        debug("dist version: " + distVersion, 1);
+        debug("dist version: " + distVersion, 2);
         return distVersion;
     }
     /**
@@ -1217,7 +1217,9 @@ public final class Tools {
         final StringBuffer ret = new StringBuffer("");
         for (int i = 0; i < strings.length - 1; i++) {
             ret.append(strings[i]);
-            ret.append(delim);
+            if (delim != null) {
+                ret.append(delim);
+            }
         }
         ret.append(strings[strings.length - 1]);
         return ret.toString();
@@ -1226,6 +1228,9 @@ public final class Tools {
     /** Joins String list into one string with specified delimiter. */
     public static String join(final String delim,
                               final Collection<String> strings) {
+        if (strings == null) {
+            return "";
+        }
         return join(delim, strings.toArray(new String[strings.size()]));
     }
 
@@ -1245,20 +1250,27 @@ public final class Tools {
     public static String join(final String delim,
                               final String[] strings,
                               final int length) {
-        if (strings == null || length == 0) {
+        if (strings == null || strings.length == 0 || length <= 0) {
             return "";
         }
         final StringBuffer ret = new StringBuffer("");
-        for (int i = 0; i < length - 1; i++) {
+        int i;
+        for (i = 0; i < length - 1 && i < strings.length - 1; i++) {
             ret.append(strings[i]);
-            ret.append(delim);
+            if (delim != null) {
+                ret.append(delim);
+            }
         }
-        ret.append(strings[length - 1]);
+        i++;
+        ret.append(strings[i - 1]);
         return ret.toString();
     }
 
     /** Uppercases the first character. */
     public static String ucfirst(final String s) {
+        if (s == null || s.length() == 0) {
+            return s;
+        }
         final String f = s.substring(0, 1);
         return s.replaceFirst(".", f.toUpperCase(Locale.US));
     }
@@ -1271,6 +1283,9 @@ public final class Tools {
      * @return string array
      */
     public static String[] enumToStringArray(final Enumeration<String> e) {
+        if (e == null) {
+            return null;
+        }
         final List<String> list = new ArrayList<String>();
         while (e.hasMoreElements()) {
             list.add(e.nextElement());
@@ -1294,6 +1309,9 @@ public final class Tools {
         if (setB == null) {
             return setA;
         }
+        if (setA == null) {
+            return setB;
+        }
         for (final String item : setA) {
             if (setB.contains(item)) {
                 resultSet.add(item);
@@ -1311,6 +1329,9 @@ public final class Tools {
      * @return html
      */
     public static String html(final String text) {
+        if (text == null) {
+            return "<html>\n</html>";
+        }
         return "<html><p>" + text.replaceAll("\n", "<br>") + "\n</html>";
     }
 
@@ -1330,8 +1351,8 @@ public final class Tools {
 
     /** Returns thrue if object is in StringInfo class. */
     public static boolean isStringInfoClass(final Object o) {
-        if (o == null
-            || o.getClass().getName().equals("drbd.gui.resources.StringInfo")) {
+        if (o != null
+            && o.getClass().getName().equals("drbd.gui.resources.StringInfo")) {
             return true;
         }
         return false;
@@ -1339,8 +1360,11 @@ public final class Tools {
 
     /** Escapes for config file. */
     public static String escapeConfig(final String value) {
-        if (value.indexOf(' ') > -1) {
-            return "\"" + value + "\"";
+        if (value == null) {
+            return null;
+        }
+        if (value.indexOf(' ') > -1 || value.indexOf('"') > -1) {
+            return "\"" + value.replaceAll("\"", "\\\\\"") + "\"";
         }
         return value;
     }
@@ -1348,14 +1372,7 @@ public final class Tools {
     /** Starts progress indicator with specified text. */
     public static void startProgressIndicator(final String text) {
         final boolean rightMovement = RANDOM.nextBoolean();
-        if (text == null) {
-            getGUIData().getMainGlassPane().start(
-                                    Tools.getString("Tools.ExecutingCommand"),
-                                    null,
-                                    rightMovement);
-        } else {
-            getGUIData().getMainGlassPane().start(text, null, rightMovement);
-        }
+        getGUIData().getMainGlassPane().start(text, null, rightMovement);
     }
 
     /** Starts progress indicator for host or cluster command. */
@@ -1393,7 +1410,7 @@ public final class Tools {
 
     /**
      * Progress indicator with failure message for host or cluster command,
-     * that show for n seconds.
+     * that shows for n seconds.
      */
     public static void progressIndicatorFailed(final String name,
                                                final String text,
@@ -1418,7 +1435,8 @@ public final class Tools {
      */
     public static int compareVersions(final String version1,
                                       final String version2) {
-        if (version1 == null || version2 == null) {
+        if (version1 == null
+            || version2 == null) {
             return -100;
         }
         final String[] v1a = version1.split("\\.");
@@ -1427,13 +1445,29 @@ public final class Tools {
             return -100;
         }
         int i = 0;
-        for (String v1 : v1a) {
-            if (i == v1a.length || i == v2a.length) {
+        while (true) {
+            if (i == v1a.length && i == v2a.length) {
                 break;
             }
-            final String v2 = v2a[i];
-            final int v1i = Integer.parseInt(v1);
-            final int v2i = Integer.parseInt(v2);
+            int v1i = 0;
+            if (i < v1a.length) {
+                final String v1 = v1a[i];
+                try {
+                    v1i = Integer.parseInt(v1);
+                } catch (java.lang.NumberFormatException e) {
+                    return -100;
+                }
+            }
+
+            int v2i = 0;
+            if (i < v2a.length) {
+                final String v2 = v2a[i];
+                try {
+                    v2i = Integer.parseInt(v2);
+                } catch (java.lang.NumberFormatException e) {
+                    return -100;
+                }
+            }
 
             if (v1i < v2i) {
                 return -1;
@@ -1447,6 +1481,9 @@ public final class Tools {
 
     /** Returns number of characters 'c' in a string 's'. */
     public static int charCount(final String s, final char c) {
+        if (s == null) {
+            return 0;
+        }
         int count = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == c) {
@@ -1649,11 +1686,17 @@ public final class Tools {
 
     /** Reads and returns a content of a text file. */
     public static String getFile(final String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+        final URL url = Tools.class.getResource(fileName);
+        if (url == null) {
+            return null;
+        }
         try {
             final BufferedReader br =
                         new BufferedReader(
-                            new InputStreamReader(
-                               Tools.class.getResource(fileName).openStream()));
+                            new InputStreamReader(url.openStream()));
             final StringBuffer content = new StringBuffer("");
             while (br.ready()) {
                 content.append(br.readLine());
@@ -1674,6 +1717,9 @@ public final class Tools {
      * getAutoOptionHost and getAutoOptionCluster
      */
     public static void parseAutoArgs(final String line) {
+        if (line == null) {
+            return;
+        }
         final String[] args = line.split(",");
         String host = null;
         String cluster = null;
@@ -1762,7 +1808,7 @@ public final class Tools {
     }
 
     /** Opens default browser. */
-    public static void openBrowswer(final String url) {
+    public static void openBrowser(final String url) {
         try {
             java.awt.Desktop.getDesktop().browse(new URI(url));
         } catch (java.io.IOException e) {
@@ -1778,7 +1824,7 @@ public final class Tools {
      */
     private static int prepareVncViewer(final Host host,
                                         final int remotePort) {
-        if (remotePort < 0) {
+        if (remotePort < 0 || host == null) {
             return -1;
         }
         if (Tools.isLocalIp(host.getIp())) {
@@ -2070,7 +2116,9 @@ public final class Tools {
         if (v.length == 2 && Tools.isNumber((String) v[0])) {
             long num = Long.parseLong((String) v[0]);
             final String unit = (String) v[1];
-            if ("T".equalsIgnoreCase(unit)) {
+            if ("P".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024 * 1024;
+            } else if ("T".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024 * 1024;
             } else if ("G".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024;
@@ -2221,11 +2269,14 @@ public final class Tools {
 
     /** Converts windows path to unix path. */
     public static String getUnixPath(final String dir) {
+        if (dir == null) {
+            return null;
+        }
         String unixPath;
         if (isWindows()) {
             unixPath = dir.replaceAll("\\\\", "/");
             if (unixPath.length() >= 2
-                && "c:".equalsIgnoreCase(unixPath.substring(0, 2))) {
+                && ":".equalsIgnoreCase(unixPath.substring(1, 2))) {
                 unixPath = unixPath.substring(2);
             }
         } else {
@@ -2331,7 +2382,7 @@ public final class Tools {
     }
 
     /** Returns list of plugins. */
-    private static Set<String> getPluginList() {
+    public static Set<String> getPluginList() {
         final Pattern p = Pattern.compile(
                 ".*<img src=\"/icons/folder.gif\" alt=\"\\[DIR\\]\">"
                 + "</td><td><a href=\".*?/\">(.*?)/</a>.*");
