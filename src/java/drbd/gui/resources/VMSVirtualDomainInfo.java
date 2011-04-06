@@ -3304,7 +3304,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     (DefaultMutableTreeNode) eee.nextElement();
                         final VMSHardwareInfo vmshi =
                                         (VMSHardwareInfo) node.getUserObject();
-                        vmshi.getApplyButton().setVisible(true);
+                        if (vmshi != null) {
+                            vmshi.getApplyButton().setVisible(true);
+                        }
                     }
                 }
             });
