@@ -164,6 +164,25 @@ public final class TestSuite1 {
                 final String saveFile = Tools.getConfigData().getSaveFile();
                 Tools.save(saveFile);
             }
+            for (int i = 0; i < getFactor(); i++) {
+                for (final Host host : HOSTS) {
+                    host.disconnect();
+                }
+                cluster.connect(null, true, i);
+                
+                for (final Host host : HOSTS) {
+                    final boolean r = waitForCondition(
+                                            new Condition() {
+                                                public boolean passed() {
+                                                    return host.isConnected();
+                                                }
+                                            }, 300, 20000);
+                    if (!r) {
+                        error("could not establish connection to "
+                              + host.getName());
+                    }
+                }
+            }
             if (!Tools.getConfigData().existsCluster(cluster)) {
                 Tools.getConfigData().addClusterToClusters(cluster);
                 Tools.getGUIData().addClusterTab(cluster);
@@ -178,6 +197,9 @@ public final class TestSuite1 {
             cluster.getClusterTab().addClusterView();
             cluster.getClusterTab().requestFocus();
             Tools.getGUIData().checkAddClusterButtons();
+            for (final Host host : HOSTS) {
+                host.waitForServerStatusLatch();
+            }
         }
     }
 
@@ -210,22 +232,6 @@ public final class TestSuite1 {
         host.getSSH().setPasswords(ID_DSA_KEY, ID_RSA_KEY, PASSWORD);
         host.setIp(ip);
         host.setIps(0, new String[]{ip});
-        final SSHGui sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
-                                         host,
-                                         null);
-        for (int i = 0; i < getFactor(); i++) {
-            host.disconnect();
-            host.connect(sshGui, null);
-            final boolean r = waitForCondition(new Condition() {
-                                                  public boolean passed() {
-                                                      return host.isConnected();
-                                                  }
-                                               }, 1000, 20000);
-            if (!r) {
-                error("could not establish connection to " + host.getName());
-            }
-        }
-
         return host;
     }
 
