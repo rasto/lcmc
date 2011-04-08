@@ -133,7 +133,7 @@ final class IPaddrInfo extends ServiceInfo {
             return super.toString(); /* this is for 'new IPaddrInfo' */
         }
 
-        final StringBuffer s = new StringBuffer(getName());
+        final StringBuilder s = new StringBuilder(getName());
         final String inside = id + " / ";
         String ip = getParamSaved("ip");
         if (ip == null || "".equals(ip)) {

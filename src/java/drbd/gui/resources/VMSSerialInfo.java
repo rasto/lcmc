@@ -101,7 +101,7 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
 
     /** Returns string representation. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         final String type = getParamSaved(SerialData.TYPE);
         if (type == null) {
             s.append("new serial device...");

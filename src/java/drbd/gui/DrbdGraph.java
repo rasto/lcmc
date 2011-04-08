@@ -345,7 +345,7 @@ public final class DrbdGraph extends ResourceGraph {
                 });
             }
 
-            final StringBuffer l = new StringBuffer(dri.getName());
+            final StringBuilder l = new StringBuilder(dri.getName());
             if (l != null) {
                 final Map<Vertex, Point2D> vl = getVertexLocations();
                 final Point2D sp = vl.get(source);

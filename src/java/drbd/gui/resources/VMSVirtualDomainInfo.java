@@ -113,7 +113,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Resuming. */
     private final Set<String> resuming = new HashSet<String>();
     /** Progress indicator when starting or stopping. */
-    private final StringBuffer progress = new StringBuffer("-");
+    private final StringBuilder progress = new StringBuilder("-");
     /** Disk to info hash lock. */
     private final Mutex mDiskToInfoLock = new Mutex();
     /** Map from key to vms disk info object. */
@@ -3484,7 +3484,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 "unknown",
                                 removeBtn};
         }
-        final StringBuffer target = new StringBuffer(10);
+        final StringBuilder target = new StringBuilder(10);
         target.append(diskData.getTargetBusType());
         target.append(" : /dev/");
         target.append(targetDev);
@@ -3502,7 +3502,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     target.toString(),
                                     BlockDevInfo.HARDDISK_ICON_LARGE);
         targetDevLabel.setOpaque(opaque);
-        final StringBuffer source = new StringBuffer(20);
+        final StringBuilder source = new StringBuilder(20);
         String s = diskData.getSourceDev();
         if (s == null) {
             s = diskData.getSourceFile();
@@ -3576,7 +3576,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (interfaceData == null) {
             return new Object[]{mac, "unknown", removeBtn};
         }
-        final StringBuffer interf = new StringBuffer(20);
+        final StringBuilder interf = new StringBuilder(20);
         interf.append(mac);
         final String dev = interfaceData.getTargetDev();
         if (dev != null) {
@@ -3590,7 +3590,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final MyButton iLabel = new MyButton(interf.toString(),
                                              NetInfo.NET_I_ICON_LARGE);
         iLabel.setOpaque(opaque);
-        final StringBuffer source = new StringBuffer(20);
+        final StringBuilder source = new StringBuilder(20);
         final String type = interfaceData.getType();
         String s;
         if ("network".equals(type)) {

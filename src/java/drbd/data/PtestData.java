@@ -77,7 +77,7 @@ public final class PtestData {
             this.shadowCib = null;
             return;
         }
-        final StringBuffer sb = new StringBuffer(300);
+        final StringBuilder sb = new StringBuilder(300);
         sb.append("<html><b>");
         sb.append(Tools.getString("PtestData.ToolTip"));
         sb.append("</b><br>");

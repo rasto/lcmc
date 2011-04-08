@@ -181,7 +181,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns info of this block device as string. */
     @Override String getInfo() {
-        final StringBuffer ret = new StringBuffer(120);
+        final StringBuilder ret = new StringBuilder(120);
         ret.append("Host            : ");
         ret.append(getHost().getName());
         ret.append("\nDevice          : ");
@@ -218,7 +218,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns tool tip for this block device. */
     @Override public String getToolTipForGraph(final boolean testOnly) {
-        final StringBuffer tt = new StringBuffer(60);
+        final StringBuilder tt = new StringBuilder(60);
 
         if (getBlockDevice().isDrbd()) {
             tt.append("<b>");
@@ -297,7 +297,7 @@ public final class BlockDevInfo extends EditableInfo {
                                     + " (" + resource + ")");
         }
 
-        final StringBuffer config = new StringBuffer(120);
+        final StringBuilder config = new StringBuilder(120);
         config.append("\ton ");
         config.append(getHost().getName());
         config.append(" {\n\t\tdevice\t");

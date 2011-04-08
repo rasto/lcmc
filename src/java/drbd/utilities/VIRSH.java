@@ -78,7 +78,7 @@ public final class VIRSH {
     public static void setParameters(final Host[] hosts,
                                      final String domainName,
                                      final Map<String, String> parameters) {
-        final StringBuffer commands = new StringBuffer(100);
+        final StringBuilder commands = new StringBuilder(100);
         for (final String param : parameters.keySet()) {
             String command = VIRSH_COMMANDS.get(param);
             if (command == null) {

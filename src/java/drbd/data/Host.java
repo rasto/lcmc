@@ -1407,7 +1407,7 @@ public final class Host {
         final int hops = Tools.charCount(ip, ',') + 1;
         final String[] usernames = username.split(",");
         final String[] ips = ip.split(",");
-        final StringBuffer s = new StringBuffer(200);
+        final StringBuilder s = new StringBuilder(200);
         if (hops > 1) {
             String sshAgentPid = "";
             String sshAgentSock = "";
@@ -2214,7 +2214,7 @@ public final class Host {
 
     /** Saves the positions in the graphs. */
     public void saveGraphPositions(final Map<String, Point2D> positions) {
-        final StringBuffer lines = new StringBuffer();
+        final StringBuilder lines = new StringBuilder();
         for (final String id : positions.keySet()) {
             final Point2D p = positions.get(id);
             double x = p.getX();
@@ -2526,7 +2526,7 @@ public final class Host {
                       final String test,
                       final double index) {
         Tools.sleep(1500);
-        final StringBuffer command = new StringBuffer(50);
+        final StringBuilder command = new StringBuilder(50);
         command.append(DistResource.SUDO + replaceVars("@GUI-HELPER@"));
         command.append(' ');
         command.append(checkCommand);

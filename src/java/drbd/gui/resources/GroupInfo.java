@@ -695,7 +695,7 @@ public final class GroupInfo extends ServiceInfo {
         String desc = Tools.getString(
                               "ClusterBrowser.confirmRemoveGroup.Description");
 
-        final StringBuffer services = new StringBuffer();
+        final StringBuilder services = new StringBuilder();
 
         final Enumeration e = getNode().children();
         while (e.hasMoreElements()) {
@@ -781,7 +781,7 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns tool tip for the group vertex. */
     @Override public String getToolTipText(final boolean testOnly) {
         final List<String> hostNames = getRunningOnNodes(testOnly);
-        final StringBuffer sb = new StringBuffer(220);
+        final StringBuilder sb = new StringBuilder(220);
         sb.append("<b>");
         sb.append(toString());
         if (hostNames == null || hostNames.isEmpty()) {

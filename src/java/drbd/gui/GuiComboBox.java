@@ -734,7 +734,7 @@ public final class GuiComboBox extends JPanel {
         }
         final String disabledReason0 = disabledReason;
         if (disabledReason0 != null || disabledTooltip != null) {
-            final StringBuffer tt = new StringBuffer(40);
+            final StringBuilder tt = new StringBuilder(40);
             if (disabledReason0 != null) {
                 tt.append(disabledReason0);
                 tt.append("<br>");
@@ -758,7 +758,7 @@ public final class GuiComboBox extends JPanel {
         if (enableAccessMode.isAdvancedMode()) {
             advanced = "Advanced ";
         }
-        final StringBuffer sb = new StringBuffer(100);
+        final StringBuilder sb = new StringBuilder(100);
         sb.append("editable in \"");
         sb.append(advanced);
         sb.append(

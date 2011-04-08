@@ -140,7 +140,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
     /** Creates and returns drbd config for resources. */
     String drbdResourceConfig() throws Exceptions.DrbdConfigException {
-        final StringBuffer config = new StringBuffer(50);
+        final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
         /* protocol... */
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
@@ -1117,7 +1117,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
     /** Returns tool tip when mouse is over the resource edge. */
     @Override public String getToolTipForGraph(final boolean testOnly) {
-        final StringBuffer s = new StringBuffer(50);
+        final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>");
         s.append(getName());
         s.append("</b><br>");

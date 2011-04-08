@@ -811,7 +811,7 @@ public abstract class EditableInfo extends Info {
      */
     protected final String getToolTipText(final String param) {
         final String defaultValue = getParamDefault(param);
-        final StringBuffer ret = new StringBuffer(120);
+        final StringBuilder ret = new StringBuilder(120);
         final GuiComboBox cb = paramComboBoxGet(param, null);
         if (cb != null) {
             final Object value = cb.getStringValue();

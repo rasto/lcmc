@@ -420,7 +420,7 @@ public final class HostBrowser extends Browser {
 
     /** Returns info string about DRBD installation. */
     public String getDrbdInfo() {
-        final StringBuffer tt = new StringBuffer(40);
+        final StringBuilder tt = new StringBuilder(40);
         final String drbdV = host.getDrbdVersion();
         final String drbdModuleV = host.getDrbdModuleVersion();
         String drbdS = null;
@@ -452,10 +452,10 @@ public final class HostBrowser extends Browser {
 
     /** Returns info string about Pacemaker installation. */
     public String getPacemakerInfo() {
-        final StringBuffer tt = new StringBuffer(40);
+        final StringBuilder tt = new StringBuilder(40);
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
-        final StringBuffer hbRunning = new StringBuffer(20);
+        final StringBuilder hbRunning = new StringBuilder(20);
         if (host.isHeartbeatRunning()) {
             hbRunning.append("running");
             if (!host.isHeartbeatRc()) {
@@ -534,7 +534,7 @@ public final class HostBrowser extends Browser {
 
     /** Returns tooltip for host. */
     public String getHostToolTip(final Host host) {
-        final StringBuffer tt = new StringBuffer(80);
+        final StringBuilder tt = new StringBuilder(80);
         tt.append("<b>" + host.getName() + "</b>");
         final ClusterBrowser b = getClusterBrowser();
         if (b != null && b.isRealDcHost(host)) {

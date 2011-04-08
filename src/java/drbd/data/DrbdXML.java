@@ -204,7 +204,7 @@ public final class DrbdXML extends XML {
             final String[] lines = output.split("\\r?\\n");
             final Pattern bp = Pattern.compile("^<command name=\"(.*?)\".*");
             final Pattern ep = Pattern.compile("^</command>$");
-            final StringBuffer xml = new StringBuffer();
+            final StringBuilder xml = new StringBuilder();
             String section = null;
 
             for (String line : lines) {
@@ -269,8 +269,8 @@ public final class DrbdXML extends XML {
 
     /** Gets short description for the parameter. */
     public String getParamShortDesc(final String param) {
-        final StringBuffer name =
-                                new StringBuffer(param.replaceAll("\\-", " "));
+        final StringBuilder name =
+                                new StringBuilder(param.replaceAll("\\-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
         if (paramUnitLongMap.containsKey(param)) {
             name.append(" (" + paramUnitLongMap.get(param) + ")");
@@ -323,7 +323,8 @@ public final class DrbdXML extends XML {
             return "";
         }
         if (hasUnitPrefix(param)) {
-            final StringBuffer defaultValueBuf = new StringBuffer(defaultValue);
+            final StringBuilder defaultValueBuf =
+                                               new StringBuilder(defaultValue);
             final String unit = getDefaultUnit(param);
             if (unit != null) {
                 defaultValueBuf.append(unit);

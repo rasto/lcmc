@@ -466,7 +466,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns string representation. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         String source;
         if ("network".equals(getParamSaved(InterfaceData.TYPE))) {
             source = getParamSaved(InterfaceData.SOURCE_NETWORK);

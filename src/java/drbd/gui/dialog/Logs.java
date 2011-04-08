@@ -90,7 +90,7 @@ class Logs extends ConfigDialog {
 
     /** Grep pattern for the log. */
     protected final String grepPattern() {
-        final StringBuffer pattern = new StringBuffer(40);
+        final StringBuilder pattern = new StringBuilder(40);
         pattern.append('\'');
         final Map<String, String> patternMap = getPatternMap();
         boolean first = true;
@@ -191,7 +191,7 @@ class Logs extends ConfigDialog {
             i++;
         }
         i = 0;
-        final StringBuffer ans = new StringBuffer("");
+        final StringBuilder ans = new StringBuilder("");
         for (Thread t : threads) {
             try {
                 t.join();

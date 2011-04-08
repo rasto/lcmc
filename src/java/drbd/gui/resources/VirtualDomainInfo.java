@@ -268,7 +268,7 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Returns a name of the service with virtual domain name. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         s.append(getName());
         final String string;
         final String id = getService().getId();

@@ -829,7 +829,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         final Vertex parent = p.getFirst();
         final ServiceInfo si = (ServiceInfo) getInfo(v);
         final ServiceInfo siP = (ServiceInfo) getInfo(parent);
-        final StringBuffer s = new StringBuffer(100);
+        final StringBuilder s = new StringBuilder(100);
         s.append(siP.toString());
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
         if (edgeIsOrder && !hbci.isOrdScoreNull(null, null)) {
@@ -995,7 +995,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (loc2 != null) {
             s2X = loc2.getX();
         }
-        final StringBuffer sb = new StringBuffer(15);
+        final StringBuilder sb = new StringBuilder(15);
         final boolean upsideDown = s1X < s2X;
         final boolean left = hbci.isWithRsc(s2);
         if (edgeIsColocation) {

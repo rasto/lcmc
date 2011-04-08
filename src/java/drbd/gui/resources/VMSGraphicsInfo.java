@@ -507,7 +507,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns string representation. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         if (getName() == null) {
             s.append("new graphics device...");
         } else {

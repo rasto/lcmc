@@ -68,7 +68,7 @@ final class Connect extends DialogCluster {
 
     /** Checks hosts, if they are connected and if not reconnects them. */
     protected void checkHosts() {
-        final StringBuffer text = new StringBuffer();
+        final StringBuilder text = new StringBuilder();
         boolean pending = false;
         boolean oneFailed = false;
         for (final Host host : getCluster().getHosts()) {
@@ -130,7 +130,7 @@ final class Connect extends DialogCluster {
     /** Returns the connect hosts dialog content. */
     @Override protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        final StringBuffer text = new StringBuffer();
+        final StringBuilder text = new StringBuilder();
         for (final Host host : getCluster().getHosts()) {
             text.append(host.getName());
             text.append(" connecting...\n");

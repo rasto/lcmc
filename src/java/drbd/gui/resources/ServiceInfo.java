@@ -860,7 +860,7 @@ public class ServiceInfo extends EditableInfo {
      * It adds prefix 'new' if id is null.
      */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         final String provider = resourceAgent.getProvider();
         if (!HB_HEARTBEAT_PROVIDER.equals(provider)
             && !"".equals(provider)) {
@@ -1460,7 +1460,7 @@ public class ServiceInfo extends EditableInfo {
      */
     private String getHostLocationLabel(final String hostName,
                                         final String op) {
-        final StringBuffer sb = new StringBuffer(20);
+        final StringBuilder sb = new StringBuilder(20);
         if (op == null || "eq".equals(op)) {
             sb.append("on ");
         } else if ("ne".equals(op)) {
@@ -5863,7 +5863,7 @@ public class ServiceInfo extends EditableInfo {
         if (getBrowser().allHostsDown()) {
             nodeString = "unknown";
         }
-        final StringBuffer sb = new StringBuffer(200);
+        final StringBuilder sb = new StringBuilder(200);
         sb.append("<b>");
         sb.append(toString());
         String textOn;

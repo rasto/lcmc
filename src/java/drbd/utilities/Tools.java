@@ -396,7 +396,7 @@ public final class Tools {
                                 final String ans,
                                 final String stacktrace,
                                 final int exitCode) {
-        final StringBuffer onHost = new StringBuffer("");
+        final StringBuilder onHost = new StringBuilder("");
         if (host != null) {
             onHost.append(" on host ");
             final Cluster cluster = host.getCluster();
@@ -441,7 +441,7 @@ public final class Tools {
         ExecCallback ec;
         final String hostName = host.getName();
         Tools.startProgressIndicator(hostName, text);
-        final StringBuffer output = new StringBuffer("");
+        final StringBuilder output = new StringBuilder("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
@@ -498,7 +498,7 @@ public final class Tools {
                                             final boolean outputVisible,
                                             final int commandTimeout) {
         ExecCallback ec;
-        final StringBuffer output = new StringBuffer("");
+        final StringBuilder output = new StringBuilder("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
@@ -622,7 +622,7 @@ public final class Tools {
             return;
         }
         appErrorHash.add(msg + msg2);
-        final StringBuffer errorString = new StringBuffer(300);
+        final StringBuilder errorString = new StringBuilder(300);
         errorString.append(getErrorString("AppError.Text"));
         errorString.append("\nrelease: ");
         errorString.append(getRelease());
@@ -763,7 +763,7 @@ public final class Tools {
     public static String loadFile(final String filename,
                                       final boolean showError) {
         BufferedReader in = null;
-        final StringBuffer content = new StringBuffer("");
+        final StringBuilder content = new StringBuilder("");
         //Tools.startProgressIndicator(Tools.getString("Tools.Loading"));
         try {
             in = new BufferedReader(new FileReader(filename));
@@ -1175,7 +1175,7 @@ public final class Tools {
             distVersion = resourceCommand.getString("version:" + version);
         } catch (Exception e) {
             /* with wildcard */
-            final StringBuffer buf = new StringBuffer(version);
+            final StringBuilder buf = new StringBuilder(version);
             for (int i = version.length() - 1; i >= 0; i--) {
                 try {
                     distVersion = resourceCommand.getString("version:"
@@ -1214,7 +1214,7 @@ public final class Tools {
         if (strings.length == 1 && strings[0] == null) {
             return "";
         }
-        final StringBuffer ret = new StringBuffer("");
+        final StringBuilder ret = new StringBuilder("");
         for (int i = 0; i < strings.length - 1; i++) {
             ret.append(strings[i]);
             if (delim != null) {
@@ -1253,7 +1253,7 @@ public final class Tools {
         if (strings == null || strings.length == 0 || length <= 0) {
             return "";
         }
-        final StringBuffer ret = new StringBuffer("");
+        final StringBuilder ret = new StringBuilder("");
         int i;
         for (i = 0; i < length - 1 && i < strings.length - 1; i++) {
             ret.append(strings[i]);
@@ -1697,7 +1697,7 @@ public final class Tools {
             final BufferedReader br =
                         new BufferedReader(
                             new InputStreamReader(url.openStream()));
-            final StringBuffer content = new StringBuffer("");
+            final StringBuilder content = new StringBuilder("");
             while (br.ready()) {
                 content.append(br.readLine());
                 content.append('\n');
@@ -1937,7 +1937,7 @@ public final class Tools {
 
     /** Returns list that is expandable by shell. {'a','b'...} */
     public static String shellList(final String[] items) {
-        final StringBuffer list = new StringBuffer("");
+        final StringBuilder list = new StringBuilder("");
         if (items == null || items.length == 0) {
             return null;
         } else if (items.length == 1) {
@@ -2061,7 +2061,7 @@ public final class Tools {
         }
 
         final Character[] chars = charsL.toArray(new Character[charsL.size()]);
-        final StringBuffer s = new StringBuffer(len + 1);
+        final StringBuilder s = new StringBuilder(len + 1);
         for (int i = 0; i < len; i++) {
             s.append(chars[rand.nextInt(chars.length)]);
         }
@@ -2326,7 +2326,7 @@ public final class Tools {
         if (text == null || text.length() <= width) {
             return text;
         }
-        final StringBuffer out = new StringBuffer(text.length() + 10);
+        final StringBuilder out = new StringBuilder(text.length() + 10);
         /* find next space */
         String t = text;
         while (true) {
@@ -2555,7 +2555,7 @@ public final class Tools {
         if (count <= 0) {
             return s;
         }
-        final StringBuffer sb = new StringBuffer("");
+        final StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
             if (c == '\\') {

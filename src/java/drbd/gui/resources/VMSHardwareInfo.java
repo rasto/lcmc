@@ -483,7 +483,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
             @Override public final File[] getFiles(final File dir,
                                          final boolean useFileHiding) {
-                final StringBuffer dirSB = new StringBuffer(dir.toString());
+                final StringBuilder dirSB = new StringBuilder(dir.toString());
                 if ("/".equals(dir.toString())) {
                     dirSB.append('*');
                 } else {

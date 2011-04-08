@@ -86,7 +86,7 @@ public abstract class ConfigDialog {
     private final Map<String, MyButton> buttonToObjectMap =
                                             new HashMap<String, MyButton>();
     /** Text in answer pane. */
-    private final StringBuffer answerPaneText = new StringBuffer(100);
+    private final StringBuilder answerPaneText = new StringBuilder(100);
     /** Answer pane. The pane were texts can be easily written. */
     private JEditorPane answerPane = null;
     /** Components that were disabled and can be enabled later. */

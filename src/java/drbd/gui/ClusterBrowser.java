@@ -1165,7 +1165,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Process output from cluster. */
     private void processClusterOutput(final String output,
-                                      final StringBuffer clusterStatusOutput,
+                                      final StringBuilder clusterStatusOutput,
                                       final Host host,
                                       final CountDownLatch firstTime,
                                       final boolean testOnly) {
@@ -1315,8 +1315,8 @@ public final class ClusterBrowser extends Browser {
 
                  new NewOutputCallback() {
                      //TODO: check this buffer's size
-                     private StringBuffer clusterStatusOutput =
-                                                        new StringBuffer(300);
+                     private StringBuilder clusterStatusOutput =
+                                                        new StringBuilder(300);
                      @Override public void output(final String output) {
                          processClusterOutput(output,
                                               clusterStatusOutput,

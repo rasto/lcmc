@@ -58,7 +58,7 @@ public final class DRBDtestData {
             this.toolTip = null;
             return;
         }
-        final StringBuffer sb = new StringBuffer(300);
+        final StringBuilder sb = new StringBuilder(300);
         sb.append("<html><b>");
         sb.append(Tools.getString("DRBDtestData.ToolTip"));
         sb.append("</b><br>");

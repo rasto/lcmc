@@ -61,7 +61,7 @@ public final class CRM {
     public static String getCibCommand(final String command,
                                        final String objType,
                                        final String xml) {
-        final StringBuffer cmd = new StringBuffer(300);
+        final StringBuilder cmd = new StringBuilder(300);
         cmd.append(DistResource.SUDO + "/usr/sbin/cibadmin --obj_type ");
         cmd.append(objType);
         cmd.append(' ');
@@ -162,14 +162,14 @@ public final class CRM {
                            final String operationsRefId,
                            final boolean stonith,
                            final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         if (resId != null) {
             if (instanceAttrId == null) {
                 instanceAttrId = resId + "-instance_attributes";
             }
-            final StringBuffer attrsString = new StringBuffer(100);
+            final StringBuilder attrsString = new StringBuilder(100);
             for (final String attrName : pacemakerResAttrs.keySet()) {
                 final String value = pacemakerResAttrs.get(attrName);
                 attrsString.append(attrName);
@@ -298,7 +298,7 @@ public final class CRM {
                            final String operationsRefId,
                            final boolean stonith,
                            final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
@@ -393,7 +393,7 @@ public final class CRM {
                final Map<String, String> operationsRefId,
                final Map<String, Boolean> stonith,
                final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(720);
+        final StringBuilder xml = new StringBuilder(720);
         xml.append("'<group id=\"");
         xml.append(groupId);
         xml.append("\">");
@@ -473,7 +473,7 @@ public final class CRM {
     private static String getOneRscSet(final String rscSetId,
                                        final CRMXML.RscSet rscSet,
                                        Map<String, String> attrs) {
-        final StringBuffer xml = new StringBuffer(120);
+        final StringBuilder xml = new StringBuilder(120);
         xml.append("<resource_set id=\"");
         xml.append(rscSetId);
         if (attrs == null) {
@@ -574,7 +574,7 @@ public final class CRM {
                     final Map<String, String> attrs,
                     final String cibadminOpt,
                     final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<");
         xml.append(tag);
         xml.append(" id=\"");
@@ -619,7 +619,7 @@ public final class CRM {
                                          final String op,
                                          final String role,
                                          final String locationId) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
         xml.append("\" rsc=\"");
@@ -788,7 +788,7 @@ public final class CRM {
                                          final String cloneId,
                                          final boolean master,
                                          final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
@@ -888,7 +888,7 @@ public final class CRM {
                                            final String resId,
                                            final Map<String, String> attrs,
                                            final String metaAttrsRefId) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         final String hbV = host.getHeartbeatVersion();
         final String pmV = host.getPacemakerVersion();
         String idPostfix = "-meta_attributes";
@@ -1050,7 +1050,7 @@ public final class CRM {
                                         final Map<String, String> rdiMetaArgs,
                                         String rscDefaultsId,
                                         final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append(
             "'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
         final String hbV = host.getHeartbeatVersion();
@@ -1078,7 +1078,7 @@ public final class CRM {
             xml.append("</attributes>");
         }
         xml.append("</cluster_property_set></crm_config>'");
-        final StringBuffer command = new StringBuffer(getCibCommand(
+        final StringBuilder command = new StringBuilder(getCibCommand(
                                                                "-R",
                                                                "crm_config",
                                                                xml.toString()));
@@ -1091,7 +1091,7 @@ public final class CRM {
                 rscDefaultsId = "rsc-options";
                 updateOrReplace = "-U";
             }
-            final StringBuffer rscdXML = new StringBuffer(360);
+            final StringBuilder rscdXML = new StringBuilder(360);
             rscdXML.append("'<rsc_defaults><meta_attributes id=\"");
             rscdXML.append(rscDefaultsId);
             rscdXML.append("\">");
@@ -1121,7 +1121,7 @@ public final class CRM {
     public static boolean removeColocation(final Host host,
                                            final String colocationId,
                                            final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
         xml.append("\"/>'");
@@ -1162,7 +1162,7 @@ public final class CRM {
         }
         attrs.put("rsc", resId);
         attrs.put("with-rsc", parentHbId);
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
         final Map<String, String> convertHash = new HashMap<String, String>();
@@ -1198,7 +1198,7 @@ public final class CRM {
     public static boolean removeOrder(final Host host,
                                       final String orderId,
                                       final boolean testOnly) {
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
         xml.append("\"/>'");
@@ -1230,7 +1230,7 @@ public final class CRM {
         if (attrs == null) {
             attrs = new LinkedHashMap<String, String>();
         }
-        final StringBuffer xml = new StringBuffer(360);
+        final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
         attrs.put("first", parentHbId);

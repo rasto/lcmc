@@ -149,7 +149,7 @@ public final class Corosync {
 
     /** Creates Corosync config on specified hosts. */
     public static void createCorosyncConfig(final Host[] hosts,
-                                       final StringBuffer config) {
+                                            final StringBuilder config) {
         /* write heartbeat config on all hosts */
         Tools.createConfigOnAllHosts(hosts,
                                      config.toString(),
@@ -157,8 +157,8 @@ public final class Corosync {
                                      COROSYNC_CONF_DIR,
                                      COROSYNC_CONF_PERMS,
                                      true);
-        final StringBuffer authkeys =
-                                  new StringBuffer(Tools.getRandomSecret(128));
+        final StringBuilder authkeys =
+                                  new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,

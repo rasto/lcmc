@@ -113,7 +113,7 @@ public abstract class DialogHost extends WizardDialog {
      * will appear in the dialog as well.
      */
     @Override protected final String getDialogTitle() {
-        final StringBuffer s = new StringBuffer(50);
+        final StringBuilder s = new StringBuilder(50);
         s.append(getHostDialogTitle());
         if (host != null
             && !host.getName().equals("")

@@ -286,7 +286,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
      */
     protected String drbdSectionsConfig()
                      throws Exceptions.DrbdConfigException {
-        final StringBuffer config = new StringBuffer("");
+        final StringBuilder config = new StringBuilder("");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String[] sections = dxml.getSections();
         for (final String section : sections) {
@@ -297,7 +297,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
             final String[] params = dxml.getSectionParams(section);
 
             if (params.length != 0) {
-                final StringBuffer sectionConfig = new StringBuffer("");
+                final StringBuilder sectionConfig = new StringBuilder("");
                 for (String param : params) {
                     final String value = getComboBoxValue(param);
                     if (value == null) {

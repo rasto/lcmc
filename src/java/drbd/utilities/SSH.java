@@ -388,7 +388,7 @@ public final class SSH {
             this.command = command;
             this.outputVisible = outputVisible;
             int exitCode = 100;
-            final StringBuffer res = new StringBuffer("");
+            final StringBuilder res = new StringBuilder("");
             try {
                 mConnectionLock.acquire();
             } catch (InterruptedException e) {
@@ -502,7 +502,7 @@ public final class SSH {
                      */
 
                     /* stdout */
-                    final StringBuffer output = new StringBuffer("");
+                    final StringBuilder output = new StringBuilder("");
                     while (stdout.available() > 0 && !cancelIt) {
                         final int len = stdout.read(buff);
 
@@ -536,7 +536,7 @@ public final class SSH {
                     }
 
                     /* stderr */
-                    final StringBuffer errOutput = new StringBuffer("");
+                    final StringBuilder errOutput = new StringBuilder("");
                     while (stderr.available() > 0 && !cancelIt) {
                         // this is unreachable.
                         // stdout and stderr are mixed in the stdout
@@ -663,7 +663,7 @@ public final class SSH {
             // ;;; separates commands, that are to be executed one after one,
             // if previous command has finished successfully.
             final String[] commands = command.split(";;;");
-            final StringBuffer ans = new StringBuffer("");
+            final StringBuilder ans = new StringBuilder("");
             for (int i = 0; i < commands.length; i++) {
                 final Boolean[] cancelTimeout = new Boolean[1];
                 cancelTimeout[0] = false;
@@ -995,7 +995,7 @@ public final class SSH {
         throws Exception {
             final String hostString = hostname;
             final String algo = serverHostKeyAlgorithm;
-            final StringBuffer message = new StringBuffer(200);
+            final StringBuilder message = new StringBuilder(200);
 
             /* Check database */
             final int result =
@@ -1720,7 +1720,7 @@ public final class SSH {
                     String installCommand,
                     final String preCommand,
                     final String postCommand) {
-        final StringBuffer commands = new StringBuffer(40);
+        final StringBuilder commands = new StringBuilder(40);
         if (preCommand != null) {
             commands.append(preCommand);
             commands.append(';');
@@ -1748,7 +1748,7 @@ public final class SSH {
         if (postCommand != null) {
             postCommandString = " && " + postCommand;
         }
-        final StringBuffer backupString = new StringBuffer(50);
+        final StringBuilder backupString = new StringBuilder(50);
         if (makeBackup) {
             backupString.append(" && if ! diff ");
             backupString.append(remoteFilename);

@@ -50,7 +50,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
 
     /** Returns string representation of the linbit::drbd service. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         final String provider = getResourceAgent().getProvider();
         if (!HB_HEARTBEAT_PROVIDER.equals(provider)
             && !"".equals(provider)) {

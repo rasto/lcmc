@@ -726,7 +726,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns string representation. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         final String name = getName();
         if (name == null) {
             return "new disk...";

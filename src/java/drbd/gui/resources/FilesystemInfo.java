@@ -318,7 +318,7 @@ final class FilesystemInfo extends ServiceInfo {
             return super.toString(); /* this is for 'new Filesystem' */
         }
 
-        final StringBuffer s = new StringBuffer(getName());
+        final StringBuilder s = new StringBuilder(getName());
         final DrbdResourceInfo dri = getBrowser().getDrbdResHash().get(
                                              getParamSaved(FS_RES_PARAM_DEV));
         getBrowser().putDrbdResHash();

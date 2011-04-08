@@ -350,7 +350,7 @@ public final class TerminalPanel extends JScrollPane {
         pos = end + pos - maxPos;
         maxPos = end;
         final char[] chars = text.toCharArray();
-        StringBuffer colorString = new StringBuffer(10);
+        StringBuilder colorString = new StringBuilder(10);
         boolean inside = false;
         for (int i = 0; i < chars.length; i++) {
             final char c = chars[i];
@@ -370,7 +370,7 @@ public final class TerminalPanel extends JScrollPane {
                 /* funny colors, e.g. in sles */
                 inside = true;
                 printit = false;
-                colorString = new StringBuffer(10);
+                colorString = new StringBuilder(10);
             }
             if (inside) {
                 if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
@@ -384,7 +384,7 @@ public final class TerminalPanel extends JScrollPane {
                             newColor = defaultOutputColor;
                         }
                         StyleConstants.setForeground(colorAS, newColor);
-                        colorString = new StringBuffer(10);
+                        colorString = new StringBuilder(10);
                     } else if (c == 'G') {
                         final int g = getCharCount(colorString.toString());
                         pos = prevLine + g;
@@ -656,7 +656,7 @@ public final class TerminalPanel extends JScrollPane {
             editEnabled = false;
             Tools.getGUIData().godModeChanged(editEnabled);
         } else if (CHEAT_LIST.equals(cheat)) {
-            final StringBuffer list = new StringBuffer();
+            final StringBuilder list = new StringBuilder();
             for (final String ch : CHEATS_MAP.keySet()) {
                 list.append(ch);
                 list.append('\n');

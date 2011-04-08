@@ -324,7 +324,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns string representation. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(30);
+        final StringBuilder s = new StringBuilder(30);
         final String type = getParamSaved(InputDevData.TYPE);
         if (type == null) {
             s.append("new input device...");

@@ -74,7 +74,7 @@ public final class NetInfo extends Info {
 
     /** Returns string representation of the net interface. */
     @Override public String toString() {
-        final StringBuffer s = new StringBuffer(getName());
+        final StringBuilder s = new StringBuilder(getName());
         final String ip = getNetInterface().getIp();
         if (ip != null) {
             s.append(" (" + ip + ")");

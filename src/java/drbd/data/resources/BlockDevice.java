@@ -510,7 +510,7 @@ public final class BlockDevice extends Resource {
         if (md == null || mdi == null) {
             return null;
         }
-        final StringBuffer metaDiskString = new StringBuffer();
+        final StringBuilder metaDiskString = new StringBuilder();
         if ("Flexible".equals(mdi)) {
             metaDiskString.append("flexible-meta-disk\t");
             metaDiskString.append(md);

@@ -586,7 +586,7 @@ public final class CRMXML extends XML {
         final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
         final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
         final Pattern ep = Pattern.compile("^</resource-agent>$");
-        final StringBuffer xml = new StringBuffer("");
+        final StringBuilder xml = new StringBuilder("");
         String provider = null;
         String serviceName = null;
         boolean masterSlave = false; /* is probably m/s ...*/
@@ -3734,7 +3734,7 @@ public final class CRMXML extends XML {
 
         /** String represantation of the resources set. */
         @Override public String toString() {
-            final StringBuffer s = new StringBuffer(20);
+            final StringBuilder s = new StringBuilder(20);
             s.append("rscset id: ");
             s.append(id);
             s.append(" ids: ");
@@ -3914,7 +3914,7 @@ public final class CRMXML extends XML {
 
         /** String represantation of the resource set data. */
         @Override public String toString() {
-            final StringBuffer s = new StringBuffer(100);
+            final StringBuilder s = new StringBuilder(100);
             s.append("rsc set conn id: ");
             s.append(constraintId);
             if (colocation) {

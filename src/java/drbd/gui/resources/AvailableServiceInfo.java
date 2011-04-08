@@ -82,7 +82,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
 
     /** Returns the info about the service. */
     @Override public String getInfo() {
-        final StringBuffer s = new StringBuffer(80);
+        final StringBuilder s = new StringBuilder(80);
         final CRMXML crmXML = getBrowser().getCRMXML();
         s.append("<h2>");
         s.append(getName());

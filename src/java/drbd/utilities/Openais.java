@@ -115,7 +115,7 @@ public final class Openais {
 
     /** Creates OpenAIS config on specified hosts. */
     public static void createAISConfig(final Host[] hosts,
-                                       final StringBuffer config) {
+                                       final StringBuilder config) {
         /* write heartbeat config on all hosts */
         Tools.createConfigOnAllHosts(hosts,
                                      config.toString(),
@@ -123,8 +123,8 @@ public final class Openais {
                                      AIS_CONF_DIR,
                                      AIS_CONF_PERMS,
                                      true);
-        final StringBuffer authkeys =
-                                  new StringBuffer(Tools.getRandomSecret(128));
+        final StringBuilder authkeys =
+                                  new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,

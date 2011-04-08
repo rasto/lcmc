@@ -305,7 +305,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
         enableComponents();
         if (ans == null) {
-            final StringBuffer errorText = new StringBuffer(80);
+            final StringBuilder errorText = new StringBuilder(80);
             final String dist = getHost().getDistVersion();
             final String kernel = getHost().getKernelVersion();
             final String arch = getHost().getArch();
