@@ -1,0 +1,7 @@
+cd ../build/classes/
+pid=`ps auxww|grep DrbdMC|grep -v grep|perl -nle 'print+(split)[1]'`
+if [ -z $pid ]; then
+	jdb drbd.DrbdGui
+else
+	jdb -attach 8000
+fi

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ant -Dauto=host:squeeze-a,pw:rastislav,drbdinst:2,pminst:0,host:squeeze-b,pw:rastislav,drbdinst:2,pminst:0,host:squeeze-c,pw:rastislav,drbdinst:2,pminst:0
