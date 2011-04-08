@@ -59,8 +59,8 @@ public final class TestSuite1 {
     public static final boolean CONNECT_LINBIT =
                         "true".equals(System.getProperty("test.connect"));
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
-    public static final boolean TESTCLUSTER =
-                        "true".equals(System.getProperty("test.testcluster"));
+    public static final boolean CLUSTER =
+                        "true".equals(System.getProperty("test.cluster"));
     /** Factor that multiplies number of tests. */
     public static final String FACTOR = System.getProperty("test.factor");
     public static final String PASSWORD = System.getProperty("test.password");
@@ -151,32 +151,34 @@ public final class TestSuite1 {
             }
         }
         Tools.setDebugLevel(-1);
-        final String username = "root";
-        final boolean useSudo = false;
-        final Cluster cluster = new Cluster();
-        cluster.setName("test");
-        for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
-            final Host host = initHost("test" + i, username, useSudo);
-            HOSTS.add(host);
-            host.setCluster(cluster);
-            cluster.addHost(host);
+        if (CLUSTER) {
+            final String username = "root";
+            final boolean useSudo = false;
+            final Cluster cluster = new Cluster();
+            cluster.setName("test");
+            for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
+                final Host host = initHost("test" + i, username, useSudo);
+                HOSTS.add(host);
+                host.setCluster(cluster);
+                cluster.addHost(host);
+                final String saveFile = Tools.getConfigData().getSaveFile();
+                Tools.save(saveFile);
+            }
+            if (!Tools.getConfigData().existsCluster(cluster)) {
+                Tools.getConfigData().addClusterToClusters(cluster);
+                Tools.getGUIData().addClusterTab(cluster);
+            }
+
+            Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
             final String saveFile = Tools.getConfigData().getSaveFile();
             Tools.save(saveFile);
-        }
-        if (!Tools.getConfigData().existsCluster(cluster)) {
-            Tools.getConfigData().addClusterToClusters(cluster);
-            Tools.getGUIData().addClusterTab(cluster);
-        }
+            Tools.getGUIData().refreshClustersPanel();
 
-        Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
-        final String saveFile = Tools.getConfigData().getSaveFile();
-        Tools.save(saveFile);
-        Tools.getGUIData().refreshClustersPanel();
-
-        Tools.getGUIData().expandTerminalSplitPane(1);
-        cluster.getClusterTab().addClusterView();
-        cluster.getClusterTab().requestFocus();
-        Tools.getGUIData().checkAddClusterButtons();
+            Tools.getGUIData().expandTerminalSplitPane(1);
+            cluster.getClusterTab().addClusterView();
+            cluster.getClusterTab().requestFocus();
+            Tools.getGUIData().checkAddClusterButtons();
+        }
     }
 
     private static Host initHost(final String hostName,
