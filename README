@@ -1,0 +1,11 @@
+DRBD Management Console
+by Rasto Levrinc
+
+to compile and run type: ant
+
+you may need to provide following jars in build-lib/ directory in order to
+build it:
+jai_core.jar junit.jar
+
+
+

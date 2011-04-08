@@ -8,6 +8,7 @@
 	<property name="classes.dir"	value="${build.dir}/classes"/>
 	<property name="jar.dir"	value="${build.dir}/jar"/>
 	<property name="signed.dir"	value="${build.dir}/signed"/>
+	<property name="buildlib.dir"	value="build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
 	
 	<property name="main-class"  value="drbd.DrbdMC"/>
@@ -64,7 +65,7 @@
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
-		   <pathelement location="jai_core.jar"/>
+		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
 		  </classpath>
 		  <compilerarg value="-Xmaxerrs"/> 
 		  <compilerarg value="1000"/> 
@@ -97,7 +98,7 @@
 		 encoding="utf8"
 		>
 		  <classpath>
-		   <pathelement location="junit.jar"/>
+		   <pathelement location="${buildlib.dir}/junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 
@@ -137,8 +138,8 @@
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
-		   <pathelement location="jai_core.jar"/>
-		   <pathelement location="junit.jar"/>
+		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
+		   <pathelement location="${buildlib.dir}/junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xmaxerrs"/> 
@@ -176,7 +177,7 @@
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
-		   <pathelement location="jai_core.jar"/>
+		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
 		  </classpath>
 		</java>
 	</target>
@@ -273,7 +274,7 @@
 	<target name="dist" depends="init">
 		<tar tarfile="${tarball.tar}"
 		     basedir=".."
-		     includes="drbd-mc/src/** drbd-mc/build.xml drbd-mc/release" />
+		     includes="drbd-mc/src/** drbd-mc/build.xml drbd-mc/release drbd-mc/README" />
 		<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 		<delete file="${tarball.tar}"/>
 	</target>
@@ -292,7 +293,7 @@
 			<jvmarg value="-Dtest.cluster=${cluster}"/>
 			<classpath>
 				<pathelement path="${classes.dir}"/>
-				<pathelement location="junit.jar"/>
+				<pathelement location="${buildlib.dir}/junit.jar"/>
 			</classpath>
 		</java>
 	</target>
