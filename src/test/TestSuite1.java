@@ -31,6 +31,8 @@ import java.io.File;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.ArrayList;
 import junit.framework.TestSuite;
 import junit.framework.TestResult;
@@ -307,5 +309,48 @@ public final class TestSuite1 {
             timeoutLeft -= interval;
         }
         return timeoutLeft >= 0;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final Map<T, T> map) {
+        for (final T key : map.keySet()) {
+            if (key == null) {
+                return false;
+            }
+            if (map.get(key) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final List<T> list) {
+        for (final T o : list) {
+            if (o == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final Set<T> list) {
+        for (final T o : list) {
+            if (o == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final T[] strings) {
+        for (final T s : strings) {
+            if (s == null) {
+                return false;
+            }
+        }
+        return true;
     }
 }

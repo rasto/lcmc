@@ -404,8 +404,6 @@ public final class Host {
      * hostnameEntered changed, it reinitilizes the name.
      */
     public void setHostnameEntered(final String hostnameEntered) {
-        Tools.debug(this, "h e: " + hostnameEntered + " != "
-                          + this.hostnameEntered, 1);
         if (hostnameEntered != null
             && !hostnameEntered.equals(this.hostnameEntered)) {
             /* back button and hostname changed */
@@ -649,7 +647,7 @@ public final class Host {
     }
 
     /** Returns whether version v1 is greater than version 2. */
-    private boolean versionGreater(final String v1, final String v2) {
+    boolean versionGreater(final String v1, final String v2) {
         final Pattern p = Pattern.compile("^(\\d+)rc(\\d+)$");
         String[] v1a = (v1 + ".999999").split("\\.");
         String[] v2a = (v2 + ".999999").split("\\.");
