@@ -268,6 +268,10 @@ public final class ClusterBrowser extends Browser {
     private static final String HB_OP_META_DATA = "meta-data";
     /** Hb validate-all operation. */
     private static final String HB_OP_VALIDATE_ALL = "validate-all";
+    /** migrate_to operation. */
+    private static final String HB_OP_MIGRATE_TO = "migrate_to";
+    /** migrate_from operation. */
+    private static final String HB_OP_MIGRATE_FROM = "migrate_from";
     /** Promote operation. */
     public static final String HB_OP_PROMOTE = "promote";
     /** Demote operation. */
@@ -297,7 +301,9 @@ public final class ClusterBrowser extends Browser {
                                                   HB_OP_STATUS,
                                                   HB_OP_MONITOR,
                                                   HB_OP_META_DATA,
-                                                  HB_OP_VALIDATE_ALL};
+                                                  HB_OP_VALIDATE_ALL,
+                                                  HB_OP_MIGRATE_FROM,
+                                                  HB_OP_MIGRATE_TO};
     /** Not advanced operations. */
     public static final MultiKeyMap HB_OP_NOT_ADVANCED = MultiKeyMap.decorate(
                                                               new LinkedMap());
@@ -306,6 +312,8 @@ public final class ClusterBrowser extends Browser {
         HB_OP_NOT_ADVANCED.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
         HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
         HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
+        HB_OP_NOT_ADVANCED.put(HB_OP_MIGRATE_FROM, HB_PAR_TIMEOUT, 1);
+        HB_OP_NOT_ADVANCED.put(HB_OP_MIGRATE_TO, HB_PAR_TIMEOUT, 1);
     }
     /** Operations that should not have default values. */
     public static final List<String> HB_OP_IGNORE_DEFAULT =
@@ -368,6 +376,14 @@ public final class ClusterBrowser extends Browser {
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL)));
+
+        crmOperationParams.put(HB_OP_MIGRATE_FROM,
+                                new ArrayList<String>(
+                                            Arrays.asList(HB_PAR_TIMEOUT)));
+
+        crmOperationParams.put(HB_OP_MIGRATE_TO,
+                                new ArrayList<String>(
+                                            Arrays.asList(HB_PAR_TIMEOUT)));
 
         crmOperationParams.put(HB_OP_STATUS,
                                 new ArrayList<String>(
@@ -1474,7 +1490,8 @@ public final class ClusterBrowser extends Browser {
                                      (DefaultMutableTreeNode) e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                if (domainName.compareTo(vmsvdi.getName()) < 0) {
+                if (vmsvdi != null
+                    && domainName.compareTo(vmsvdi.getName()) < 0) {
                     break;
                 }
                 i++;
