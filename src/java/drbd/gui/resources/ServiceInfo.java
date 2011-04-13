@@ -671,16 +671,19 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (infoPanelOk) {
                     final GuiComboBox cb = scoreComboBoxHash.get(hi);
-                    String score = null;
-                    String op = null;
-                    if (hostLocation != null) {
-                        score = hostLocation.getScore();
-                        op = hostLocation.getOperation();
+                    if (cb != null) {
+                        String score = null;
+                        String op = null;
+                        if (hostLocation != null) {
+                            score = hostLocation.getScore();
+                            op = hostLocation.getOperation();
+                        }
+                        cb.setValue(score);
+                        final JLabel label = cb.getLabel();
+                        final String text =
+                                        getHostLocationLabel(hi.getName(), op);
+                        label.setText(text);
                     }
-                    cb.setValue(score);
-                    final JLabel label = cb.getLabel();
-                    final String text = getHostLocationLabel(hi.getName(), op);
-                    label.setText(text);
                 }
             }
         }

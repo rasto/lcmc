@@ -379,11 +379,13 @@ public final class ClusterBrowser extends Browser {
 
         crmOperationParams.put(HB_OP_MIGRATE_FROM,
                                 new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT)));
+                                            Arrays.asList(HB_PAR_TIMEOUT,
+                                                          HB_PAR_INTERVAL)));
 
         crmOperationParams.put(HB_OP_MIGRATE_TO,
                                 new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT)));
+                                            Arrays.asList(HB_PAR_TIMEOUT,
+                                                          HB_PAR_INTERVAL)));
 
         crmOperationParams.put(HB_OP_STATUS,
                                 new ArrayList<String>(
