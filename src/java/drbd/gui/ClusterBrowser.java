@@ -1492,7 +1492,7 @@ public final class ClusterBrowser extends Browser {
                                      (DefaultMutableTreeNode) e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                if (vmsvdi != null
+                if (domainName != null
                     && domainName.compareTo(vmsvdi.getName()) < 0) {
                     break;
                 }
