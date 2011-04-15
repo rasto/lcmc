@@ -154,7 +154,7 @@ public final class ClustersPanel extends JPanel {
 
     /** Adds a new cluster tab. */
     void addTab(final Cluster cluster) {
-        Tools.debug(this, "cluster add tab " + cluster.getName());
+        Tools.debug(this, "cluster add tab " + cluster.getName(), 2);
         removeEmptyTab();
         final ClusterTab ct = new ClusterTab(cluster);
         cluster.setClusterTab(ct);

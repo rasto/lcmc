@@ -471,6 +471,12 @@ public final class DrbdMC extends JPanel {
             if (autoArgs != null) {
                 Tools.parseAutoArgs(autoArgs);
             }
+            //final Thread t = new Thread(new Runnable() {
+            //    public void run() {
+            //        drbd.utilities.RoboTest.startMover(600000, true);
+            //    }
+            //});
+            //t.start();
         } catch (Exception e) {
             Tools.appError("Error in the application", "", e);
         }

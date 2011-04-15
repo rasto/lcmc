@@ -186,7 +186,8 @@ public final class RoboTest {
 
     /** Starts automatic mouse mover in 10 seconds. */
     public static void startMover(final int duration,
-                                  final boolean lazy) {
+                                  final boolean withClicks) {
+        slowFactor = 0.3f;
         Tools.info("start mouse move test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
@@ -201,71 +202,43 @@ public final class RoboTest {
                 if (rbt == null) {
                     return;
                 }
+
+                final Point2D locP =
+                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
                 final Robot robot = rbt;
                 final int xOffset = getOffset();
                 final Point2D origP = MouseInfo.getPointerInfo().getLocation();
-                final int origX = (int) origP.getX();
-                final int origY = (int) origP.getY();
+                final int origX = (int) (origP.getX() - locP.getX());
+                final int origY = (int) (origP.getY() - locP.getY());
                 Tools.info("move mouse to the end position");
                 Tools.sleep(5000);
                 final Point2D endP = MouseInfo.getPointerInfo().getLocation();
-                final int endX = (int) endP.getX();
-                final int endY = (int) endP.getY();
+                final int endX = (int) (endP.getX() - locP.getX());
+                final int endY = (int) (endP.getY() - locP.getY());
                 int destX = origX;
                 int destY = origY;
                 Tools.info("test started");
                 final long startTime = System.currentTimeMillis();
+                int i = 1;
                 while (true) {
-                    final Point2D p =
-                                MouseInfo.getPointerInfo().getLocation();
-
-                    final int x = (int) p.getX();
-                    final int y = (int) p.getY();
-                    int directionX;
-                    int directionY;
-                    if (x < destX) {
-                        directionX = 1;
-                    } else if (x > destX) {
-                        directionX = -1;
-                    } else {
-                        if (destX == endX) {
-                            destX = origX;
-                            directionX = -1;
-                        } else {
-                            destX = endX;
-                            directionX = 1;
-                        }
-                    }
-                    if (y < destY) {
-                        directionY = 1;
-                    } else if (y > destY) {
-                        directionY = -1;
-                    } else {
-                        if (destY == endY) {
-                            destY = origY;
-                            directionY = -1;
-                        } else {
-                            destY = endY;
-                            directionY = 1;
-                        }
-                    }
-                    final int directionX0 = directionX;
-                    final int directionY0 = directionY;
-                    robot.mouseMove(
-                                (int) p.getX() + xOffset + directionX0,
-                                (int) p.getY() + directionY0);
-                    if (lazy) {
-                        Tools.sleep(40);
-                    } else {
-                        Tools.sleep(5);
-                    }
+                    moveTo(robot, destX, destY);
                     if (abortWithMouseMovement()) {
                         break;
                     }
-                    final long current = System.currentTimeMillis();
-                    if ((current - startTime) > duration * 60 * 1000) {
+                    if (withClicks) {
+                        leftClick(robot);
+                        Tools.sleep(1000);
+                    }
+                    moveTo(robot, endX, endY);
+                    if (abortWithMouseMovement()) {
                         break;
                     }
+                    if (withClicks) {
+                        leftClick(robot);
+                        Tools.sleep(1000);
+                    }
+                    System.out.println("mouse move test: " + i);
+                    i++;
                 }
                 Tools.info("mouse move test done");
             }
@@ -577,7 +550,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_0);
         press(robot, KeyEvent.VK_0);
         sleep(1000);
-        setTimeouts(robot);
+        setTimeouts(robot, false);
         moveTo(robot, 814, 189);
         sleep(6000); /* ptest */
         leftClick(robot); /* apply */
@@ -700,7 +673,7 @@ public final class RoboTest {
         sleep(1000);
         typeDummy(robot);
         sleep(1000);
-        setTimeouts(robot);
+        setTimeouts(robot, true);
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
         leftClick(robot); /*  apply */
@@ -716,7 +689,7 @@ public final class RoboTest {
             sleep(1000);
             typeDummy(robot);
             sleep(i * 300);
-            setTimeouts(robot);
+            setTimeouts(robot, true);
             moveTo(robot, 809, 192); /* ptest */
             sleep(6000);
             leftClick(robot); /* apply */
@@ -1048,7 +1021,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(3000);
         press(robot, KeyEvent.VK_1);
-        setTimeouts(robot);
+        setTimeouts(robot, false);
         moveTo(robot, 812, 179);
         sleep(3000);
         leftClick(robot); /* apply */
@@ -1655,7 +1628,7 @@ public final class RoboTest {
             sleep(1000);
             typeDummy(robot);
             sleep(i * 300);
-            setTimeouts(robot);
+            setTimeouts(robot, true);
             moveTo(robot, 809, 192); /* ptest */
             sleep(6000);
             leftClick(robot); /* apply */
@@ -1797,13 +1770,18 @@ public final class RoboTest {
     }
 
     /** Sets start timeout. */
-    private static void setTimeouts(final Robot robot) {
+    private static void setTimeouts(final Robot robot,
+                                    final boolean migrateTimeouts) {
+        int yCorr = 0;
+        if (migrateTimeouts) {
+            yCorr = - 70;
+        }
         sleep(3000);
         moveTo(robot, 1105, 298);
         leftPress(robot); /* scroll bar */
         moveTo(robot, 1105, 550);
         leftRelease(robot);
-        moveTo(robot, 956, 520);
+        moveTo(robot, 956, 520 + yCorr);
         leftClick(robot); /* start timeout */
         press(robot, KeyEvent.VK_2);
         sleep(200);
@@ -1812,7 +1790,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_0);
         sleep(200);
 
-        moveTo(robot, 956, 550);
+        moveTo(robot, 956, 550 + yCorr);
         leftClick(robot); /* stop timeout */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1821,7 +1799,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_2);
         sleep(200);
 
-        moveTo(robot, 956, 580);
+        moveTo(robot, 956, 580 + yCorr);
         leftClick(robot); /* monitor timeout */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1830,7 +1808,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_4);
         sleep(200);
 
-        moveTo(robot, 956, 610);
+        moveTo(robot, 956, 610 + yCorr);
         leftClick(robot); /* monitor interval */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1838,8 +1816,27 @@ public final class RoboTest {
         sleep(200);
         press(robot, KeyEvent.VK_1);
         sleep(200);
-        moveTo(robot, 1105, 350);
+        if (migrateTimeouts) {
+            moveTo(robot, 956, 640 + yCorr);
+            leftClick(robot); /* migrate from */
+            press(robot, KeyEvent.VK_1);
+            sleep(200);
+            press(robot, KeyEvent.VK_2);
+            sleep(200);
+            press(robot, KeyEvent.VK_2);
+            sleep(200);
 
+            moveTo(robot, 956, 670 + yCorr);
+            leftClick(robot); /* migrate to */
+            press(robot, KeyEvent.VK_1);
+            sleep(200);
+            press(robot, KeyEvent.VK_2);
+            sleep(200);
+            press(robot, KeyEvent.VK_3);
+            sleep(200);
+        }
+
+        moveTo(robot, 1105, 350);
         leftPress(robot); /* scroll bar back */
         moveTo(robot, 1105, 150);
         leftRelease(robot);
@@ -1880,7 +1877,7 @@ public final class RoboTest {
         sleep(2000);
         typeDummy(robot);
         sleep(2000);
-        setTimeouts(robot);
+        setTimeouts(robot, true);
         if (clone) {
             moveTo(robot, 893, 250);
             leftClick(robot); /* clone */
