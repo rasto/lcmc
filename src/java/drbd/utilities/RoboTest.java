@@ -727,10 +727,10 @@ public final class RoboTest {
         leftRelease(robot);
 
         sleep(1000);
-        moveTo(robot, 1078, 484);
+        moveTo(robot, 1078, 424);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078, 535);
+        moveTo(robot, 1078, 475);
         sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
@@ -740,10 +740,10 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1078 , 477);
+        moveTo(robot, 1078 , 424);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 507);
+        moveTo(robot, 1078 , 447);
         leftClick(robot); /* choose "nothing selected */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
@@ -1774,7 +1774,7 @@ public final class RoboTest {
                                     final boolean migrateTimeouts) {
         int yCorr = 0;
         if (migrateTimeouts) {
-            yCorr = - 70;
+            yCorr = - 90;
         }
         sleep(3000);
         moveTo(robot, 1105, 298);
@@ -1818,21 +1818,28 @@ public final class RoboTest {
         sleep(200);
         if (migrateTimeouts) {
             moveTo(robot, 956, 640 + yCorr);
+            leftClick(robot); /* reload */
+            press(robot, KeyEvent.VK_BACK_SPACE);
+            sleep(200);
+            press(robot, KeyEvent.VK_BACK_SPACE);
+            sleep(200);
+
+            moveTo(robot, 956, 660 + yCorr);
             leftClick(robot); /* migrate from */
             press(robot, KeyEvent.VK_1);
             sleep(200);
             press(robot, KeyEvent.VK_2);
             sleep(200);
-            press(robot, KeyEvent.VK_2);
+            press(robot, KeyEvent.VK_3);
             sleep(200);
 
-            moveTo(robot, 956, 670 + yCorr);
+            moveTo(robot, 956, 690 + yCorr);
             leftClick(robot); /* migrate to */
             press(robot, KeyEvent.VK_1);
             sleep(200);
             press(robot, KeyEvent.VK_2);
             sleep(200);
-            press(robot, KeyEvent.VK_3);
+            press(robot, KeyEvent.VK_2);
             sleep(200);
         }
 
