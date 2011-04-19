@@ -23,13 +23,16 @@ package drbd.data;
 
 import drbd.utilities.Tools;
 import drbd.gui.GuiComboBox;
+import drbd.gui.ClusterBrowser;
 import drbd.gui.resources.ServiceInfo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.HashSet;
+import java.util.Arrays;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -91,6 +94,9 @@ public final class ResourceAgent {
     /** Map that holds default values for operations. The keys are the name and
      * parameter. */
     private final MultiKeyMap opToDefault = new MultiKeyMap();
+    /** Names of the operations, with some of them predefined. */
+    private final LinkedHashSet<String> operations =
+                                                  new LinkedHashSet<String>();
     /** Whether the service is probably master/slave resource. */
     private boolean probablyMasterSlave = false;
     /** Whether the service is probably clone resource. */
@@ -112,6 +118,7 @@ public final class ResourceAgent {
         this.name = name;
         this.provider = provider;
         this.resourceClass = resourceClass;
+        operations.addAll(Arrays.asList(ClusterBrowser.HB_OPERATIONS));
         hash = (name == null ? 0 : name.hashCode() * 31)
                + (resourceClass == null ? 0 : resourceClass.hashCode());
         if (!"heartbeat".equals(provider)) {
@@ -476,11 +483,17 @@ public final class ResourceAgent {
                              final String param,
                              final String defaultValue) {
         opToDefault.put(name, param, defaultValue);
+        operations.add(name);
     }
 
     /** Returns the default value of operation parameter. */
     public String getOperationDefault(final String name, final String param) {
         return (String) opToDefault.get(name, param);
+    }
+
+    /** Returns name of all operations. */
+    public LinkedHashSet<String> getOperationNames() {
+        return operations;
     }
 
     /**

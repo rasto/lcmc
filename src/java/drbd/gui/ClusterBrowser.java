@@ -268,10 +268,6 @@ public final class ClusterBrowser extends Browser {
     private static final String HB_OP_META_DATA = "meta-data";
     /** Hb validate-all operation. */
     private static final String HB_OP_VALIDATE_ALL = "validate-all";
-    /** migrate_to operation. */
-    private static final String HB_OP_MIGRATE_TO = "migrate_to";
-    /** migrate_from operation. */
-    private static final String HB_OP_MIGRATE_FROM = "migrate_from";
     /** Promote operation. */
     public static final String HB_OP_PROMOTE = "promote";
     /** Demote operation. */
@@ -301,20 +297,7 @@ public final class ClusterBrowser extends Browser {
                                                   HB_OP_STATUS,
                                                   HB_OP_MONITOR,
                                                   HB_OP_META_DATA,
-                                                  HB_OP_VALIDATE_ALL,
-                                                  HB_OP_MIGRATE_FROM,
-                                                  HB_OP_MIGRATE_TO};
-    /** Not advanced operations. */
-    public static final MultiKeyMap HB_OP_NOT_ADVANCED = MultiKeyMap.decorate(
-                                                              new LinkedMap());
-    static {
-        HB_OP_NOT_ADVANCED.put(HB_OP_START, HB_PAR_TIMEOUT, 1);
-        HB_OP_NOT_ADVANCED.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
-        HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
-        HB_OP_NOT_ADVANCED.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
-        HB_OP_NOT_ADVANCED.put(HB_OP_MIGRATE_FROM, HB_PAR_TIMEOUT, 1);
-        HB_OP_NOT_ADVANCED.put(HB_OP_MIGRATE_TO, HB_PAR_TIMEOUT, 1);
-    }
+                                                  HB_OP_VALIDATE_ALL};
     /** Operations that should not have default values. */
     public static final List<String> HB_OP_IGNORE_DEFAULT =
                                                       new ArrayList<String>();
@@ -326,6 +309,9 @@ public final class ClusterBrowser extends Browser {
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
                                      new LinkedHashMap<String, List<String>>();
+    /** Not advanced operations. */
+    private final MultiKeyMap hbOpNotAdvanced = MultiKeyMap.decorate(
+                                                              new LinkedMap());
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
     public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,
@@ -348,6 +334,10 @@ public final class ClusterBrowser extends Browser {
     /** String that appears as a tooltip in menu items if status was disabled.*/
     public static final String UNKNOWN_CLUSTER_STATUS_STRING =
                                                      "unknown cluster status";
+    private static final List<String> DEFAULT_OP_PARAMS =
+                                       new ArrayList<String>(
+                                               Arrays.asList(HB_PAR_TIMEOUT,
+                                                             HB_PAR_INTERVAL));
     /** Prepares a new <code>CusterBrowser</code> object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
@@ -360,6 +350,11 @@ public final class ClusterBrowser extends Browser {
 
     /** Inits operations. */
     private void initOperations() {
+        hbOpNotAdvanced.put(HB_OP_START, HB_PAR_TIMEOUT, 1);
+        hbOpNotAdvanced.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
+        hbOpNotAdvanced.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
+        hbOpNotAdvanced.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
+
         crmOperationParams.put(HB_OP_START,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
@@ -373,16 +368,6 @@ public final class ClusterBrowser extends Browser {
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL)));
         crmOperationParams.put(HB_OP_VALIDATE_ALL,
-                                new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT,
-                                                          HB_PAR_INTERVAL)));
-
-        crmOperationParams.put(HB_OP_MIGRATE_FROM,
-                                new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT,
-                                                          HB_PAR_INTERVAL)));
-
-        crmOperationParams.put(HB_OP_MIGRATE_TO,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
                                                           HB_PAR_INTERVAL)));
@@ -421,9 +406,22 @@ public final class ClusterBrowser extends Browser {
                                                           HB_PAR_INTERVAL)));
     }
 
-    /** CRM operation parameters. */
-    public Map<String, List<String>> getCRMOperationParams() {
-        return crmOperationParams;
+    /** CRM operation parameters for one operations. */
+    public List<String> getCRMOperationParams(final String op) {
+        final List<String> params = crmOperationParams.get(op);
+        if (params == null) {
+            return DEFAULT_OP_PARAMS;
+        } else {
+            return params;
+        }
+    }
+
+    /** Returns whether operation parameter is advanced. */
+    public boolean isCRMOperationAdvanced(final String op, final String param) {
+        if (!crmOperationParams.containsKey(op)) {
+            return !HB_PAR_TIMEOUT.equals(param);
+        }
+        return !hbOpNotAdvanced.containsKey(op, param);
     }
 
     /** Sets the cluster view panel. */

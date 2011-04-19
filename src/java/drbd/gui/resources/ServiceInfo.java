@@ -741,9 +741,9 @@ public class ServiceInfo extends EditableInfo {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
+        for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param
-                          : getBrowser().getCRMOperationParams().get(op)) {
+                          : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
                               resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
@@ -790,9 +790,9 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!sameAs) {
-            for (final String op : ClusterBrowser.HB_OPERATIONS) {
+            for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param
-                              : getBrowser().getCRMOperationParams().get(op)) {
+                              : getBrowser().getCRMOperationParams(op)) {
                     String defaultValue =
                                   resourceAgent.getOperationDefault(op, param);
                     if (defaultValue == null) {
@@ -1245,9 +1245,8 @@ public class ServiceInfo extends EditableInfo {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
-            for (final String param : getBrowser().getCRMOperationParams().get(
-                                                                          op)) {
+        for (final String op : getResourceAgent().getOperationNames()) {
+            for (final String param : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
                                 resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
@@ -1880,9 +1879,8 @@ public class ServiceInfo extends EditableInfo {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
-            for (final String param : getBrowser().getCRMOperationParams().get(
-                                                                         op)) {
+        for (final String op : getResourceAgent().getOperationNames()) {
+            for (final String param : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
                                 resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
@@ -1986,9 +1984,8 @@ public class ServiceInfo extends EditableInfo {
         addToAdvancedList(advancedOpPanel);
         advancedOpPanel.setVisible(Tools.getConfigData().isAdvancedMode());
         int advancedRows = 0;
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
-            for (final String param : getBrowser().getCRMOperationParams().get(
-                                                                          op)) {
+        for (final String op : getResourceAgent().getOperationNames()) {
+            for (final String param : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
                                    resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
@@ -2044,12 +2041,12 @@ public class ServiceInfo extends EditableInfo {
                                                   + Tools.ucfirst(param));
                 cb.setLabel(cbLabel, "");
                 JPanel panel;
-                if (ClusterBrowser.HB_OP_NOT_ADVANCED.containsKey(op, param)) {
-                    panel = normalOpPanel;
-                    normalRows++;
-                } else {
+                if (getBrowser().isCRMOperationAdvanced(op, param)) {
                     panel = advancedOpPanel;
                     advancedRows++;
+                } else {
+                    panel = normalOpPanel;
+                    normalRows++;
                 }
                 addField(panel,
                          cbLabel,
@@ -2829,9 +2826,9 @@ public class ServiceInfo extends EditableInfo {
                           ClusterBrowser.SERVICE_LABEL_WIDTH,
                           ClusterBrowser.SERVICE_FIELD_WIDTH);
             /* add item listeners to the operations combos */
-            for (final String op : ClusterBrowser.HB_OPERATIONS) {
+            for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param
-                              : getBrowser().getCRMOperationParams().get(op)) {
+                              : getBrowser().getCRMOperationParams(op)) {
                     addOperationListeners(op, param);
                 }
             }
@@ -2983,7 +2980,7 @@ public class ServiceInfo extends EditableInfo {
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final CloneInfo ci = getCloneInfo();
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
+        for (final String op : getResourceAgent().getOperationNames()) {
             final Map<String, String> opHash =
                                            new LinkedHashMap<String, String>();
             String opId = cs.getOpId(heartbeatId, op);
@@ -2995,8 +2992,7 @@ public class ServiceInfo extends EditableInfo {
              * recommended, but not used by default. */
             boolean firstTime = true;
             for (final String param : ClusterBrowser.HB_OPERATION_PARAM_LIST) {
-                if (getBrowser().getCRMOperationParams().get(op).contains(
-                                                                       param)) {
+                if (getBrowser().getCRMOperationParams(op).contains(param)) {
                     if (ci == null
                         && (ClusterBrowser.HB_OP_DEMOTE.equals(op)
                             || ClusterBrowser.HB_OP_PROMOTE.equals(op))) {
@@ -3254,9 +3250,9 @@ public class ServiceInfo extends EditableInfo {
         //}
         boolean allAreDefaultValues = true;
         boolean allSavedAreDefaultValues = true;
-        for (final String op : ClusterBrowser.HB_OPERATIONS) {
+        for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param
-                          : getBrowser().getCRMOperationParams().get(op)) {
+                          : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
                               resourceAgent.getOperationDefault(op, param);
                 if (defaultValue == null) {
@@ -3313,9 +3309,9 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!sameAs) {
-            for (final String op : ClusterBrowser.HB_OPERATIONS) {
+            for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param
-                              : getBrowser().getCRMOperationParams().get(op)) {
+                              : getBrowser().getCRMOperationParams(op)) {
                     final Object value = savedOperation.get(op, param);
                     try {
                         mOperationsComboBoxHashLock.acquire();
