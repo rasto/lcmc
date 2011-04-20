@@ -778,6 +778,15 @@ public final class DrbdInfo extends DrbdGuiInfo {
         }
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params) {
+        if (getBrowser().getDrbdResHash().isEmpty()) {
+            getBrowser().putDrbdResHash();
+            return false;
+        }
+        getBrowser().putDrbdResHash();
+        return super.checkResourceFieldsCorrect(param, params);
+    }
 
     /** Revert all values. */
     @Override public void revert() {
