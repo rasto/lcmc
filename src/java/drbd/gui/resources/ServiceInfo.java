@@ -4348,28 +4348,7 @@ public class ServiceInfo extends EditableInfo {
         } else {
             final ClusterStatus cs = getBrowser().getClusterStatus();
             if (groupInfo == null) {
-                final HbConnectionInfo[] hbcis =
-                       getBrowser().getHeartbeatGraph().getHbConnections(this);
-                for (final HbConnectionInfo hbci : hbcis) {
-                    if (hbci != null) {
-                        getBrowser().getHeartbeatGraph().removeOrder(hbci,
-                                                                     dcHost,
-                                                                     testOnly);
-                        getBrowser().getHeartbeatGraph().removeColocation(
-                                                                      hbci,
-                                                                      dcHost,
-                                                                      testOnly);
-                    }
-                }
-
-                for (final String locId : cs.getLocationIds(
-                                              getHeartbeatId(testOnly),
-                                              testOnly)) {
-                    CRM.removeLocation(dcHost,
-                                       locId,
-                                       getHeartbeatId(testOnly),
-                                       testOnly);
-                }
+                removeConstraints(dcHost, testOnly);
             }
             if (!getResourceAgent().isGroup()
                 && !getResourceAgent().isClone()) {
@@ -6162,5 +6141,32 @@ public class ServiceInfo extends EditableInfo {
     /** Whether this class is a constraint placeholder. */
     public boolean isConstraintPH() {
         return false;
+    }
+
+    /** Remove constraints of this service. */
+    void removeConstraints(final Host dcHost, final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final HbConnectionInfo[] hbcis =
+                     getBrowser().getHeartbeatGraph().getHbConnections(this);
+        for (final HbConnectionInfo hbci : hbcis) {
+            if (hbci != null) {
+                getBrowser().getHeartbeatGraph().removeOrder(hbci,
+                                                             dcHost,
+                                                             testOnly);
+                getBrowser().getHeartbeatGraph().removeColocation(
+                                                              hbci,
+                                                              dcHost,
+                                                              testOnly);
+            }
+        }
+
+        for (final String locId : cs.getLocationIds(
+                                      getHeartbeatId(testOnly),
+                                      testOnly)) {
+            CRM.removeLocation(dcHost,
+                               locId,
+                               getHeartbeatId(testOnly),
+                               testOnly);
+        }
     }
 }

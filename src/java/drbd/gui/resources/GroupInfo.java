@@ -764,6 +764,9 @@ public final class GroupInfo extends ServiceInfo {
                 master = ci.getService().isMaster();
             }
             super.removeMyselfNoConfirm(dcHost, testOnly);
+            for (final ServiceInfo child : children) {
+                child.removeConstraints(dcHost, testOnly);
+            }
             CRM.removeResource(dcHost,
                                null,
                                getHeartbeatId(testOnly),
