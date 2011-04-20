@@ -320,7 +320,7 @@ public final class RoboTest {
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
-                        startTest3(robot);
+                        startTest3(robot, host);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
@@ -2209,27 +2209,42 @@ public final class RoboTest {
     }
 
     /** TEST 3. */
-    private static void startTest3(final Robot robot) {
+    private static void startTest3(final Robot robot, final Host host) {
         slowFactor = 0.3f;
         aborted = false;
-        /* filesystem/drbd */
-        moveTo(robot, 577, 253);
-        rightClick(robot); /* popup */
-        moveTo(robot, 709, 278);
-        moveTo(robot, 894, 283);
-        leftClick(robot); /* choose fs */
-        moveTo(robot, 1075, 406);
-        leftClick(robot); /* choose drbd */
-        moveTo(robot, 1043, 444);
-        leftClick(robot); /* choose drbd */
-        moveTo(robot, 1068, 439);
-        leftClick(robot); /* mount point */
-        moveTo(robot, 1039, 475);
-        leftClick(robot); /* mount point */
-        moveTo(robot, 815, 186);
-        leftClick(robot); /* apply */
-        sleep(2000);
-        aborted = false;
+        disableStonith(robot, host);
+        for (int i = 20; i > 0; i--) {
+            Tools.info("I: " + i);
+            checkTest(host, "test3", 1);
+            /* filesystem/drbd */
+            moveTo(robot, 577, 253);
+            rightClick(robot); /* popup */
+            moveTo(robot, 709, 278);
+            moveTo(robot, 894, 283);
+            leftClick(robot); /* choose fs */
+            moveTo(robot, 1075, 406);
+            leftClick(robot); /* choose drbd */
+            moveTo(robot, 1043, 444);
+            leftClick(robot); /* choose drbd */
+            moveTo(robot, 1068, 439);
+            leftClick(robot); /* mount point */
+            moveTo(robot, 1039, 475);
+            leftClick(robot); /* mount point */
+
+            moveTo(robot, 1068, 475);
+            leftClick(robot); /* filesystem type */
+            moveTo(robot, 1039, 555);
+            leftClick(robot); /* ext3 */
+
+            moveTo(robot, 815, 186);
+            leftClick(robot); /* apply */
+            sleep(2000);
+            checkTest(host, "test3", 2);
+            stopEverything(robot);
+            checkTest(host, "test3", 3);
+            removeEverything(robot);
+        }
+        System.gc();
     }
 
     /** Press button. */
