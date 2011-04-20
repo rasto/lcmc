@@ -31,6 +31,7 @@ import drbd.data.ClusterStatus;
 import drbd.data.CRMXML;
 import drbd.data.ConfigData;
 import drbd.utilities.CRM;
+import drbd.utilities.Tools;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -297,13 +298,16 @@ final class HbColocationInfo extends EditableInfo
     /** Applies changes to the colocation parameters. */
     @Override public void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                 }
             });
         }
+        getInfoPanel();
+        waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;

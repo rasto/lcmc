@@ -227,7 +227,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Applies the changes to the constraints. */
     void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
@@ -235,6 +235,8 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             });
         }
+        getInfoPanel();
+        waitForInfoPanel();
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
         try {

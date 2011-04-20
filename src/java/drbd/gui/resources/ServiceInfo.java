@@ -3339,7 +3339,16 @@ public class ServiceInfo extends EditableInfo {
 
     /** Applies the changes to the service parameters. */
     void apply(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            Tools.invokeAndWait(new Runnable() {
+                @Override public void run() {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
+                }
+            });
+        }
         getInfoPanel();
+        waitForInfoPanel();
         /* TODO: make progress indicator per resource. */
         if (!testOnly) {
             setUpdated(true);
@@ -3367,8 +3376,6 @@ public class ServiceInfo extends EditableInfo {
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                     paramComboBoxGet(GUI_ID, null).setEnabled(false);
                     if (clInfo != null) {

@@ -819,12 +819,14 @@ public final class BlockDevInfo extends EditableInfo {
     public void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
             });
+            getInfoPanel();
+            waitForInfoPanel();
             if (getBlockDevice().getMetaDisk() != null) {
                 getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(
                                                              getBlockDevice());

@@ -188,11 +188,14 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
         if (testOnly) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeAndWait(new Runnable() {
             @Override public void run() {
                 getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
             }
         });
+        getInfoPanel();
+        waitForInfoPanel();
         final Map<String, String> parameters = getHWParametersAndSave(
                                                         getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {

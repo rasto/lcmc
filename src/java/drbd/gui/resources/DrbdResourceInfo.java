@@ -422,12 +422,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     public void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
             });
+            getInfoPanel();
+            waitForInfoPanel();
             getBrowser().getDrbdResHash().remove(getName());
             getBrowser().putDrbdResHash();
             getBrowser().getDrbdDevHash().remove(getDevice());

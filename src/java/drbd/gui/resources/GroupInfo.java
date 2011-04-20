@@ -71,7 +71,7 @@ public final class GroupInfo extends ServiceInfo {
                     final boolean testOnly) {
         final String[] params = getParametersFromXML();
         //if (!testOnly) {
-        //    SwingUtilities.invokeLater(new Runnable() {
+        //    Tools.invokeAndWait(new Runnable() {
         //        @Override public void run() {
         //            getApplyButton().setEnabled(false);
         //        }
@@ -127,6 +127,8 @@ public final class GroupInfo extends ServiceInfo {
             if (gsi == null)  {
                 continue;
             }
+            gsi.getInfoPanel();
+            gsi.waitForInfoPanel();
             pacemakerResAttrs.put(resId,
                                   gsi.getPacemakerResAttrs(testOnly));
             pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
@@ -164,11 +166,20 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the changes to the group parameters. */
     @Override void apply(final Host dcHost, final boolean testOnly) {
+        if (!testOnly) {
+            Tools.invokeAndWait(new Runnable() {
+                @Override public void run() {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
+                }
+            });
+        }
+        getInfoPanel();
+        waitForInfoPanel();
         final String[] params = getParametersFromXML();
         if (!testOnly) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
-                    getApplyButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
                     final GuiComboBox idField = paramComboBoxGet(GUI_ID, null);
                     idField.setEnabled(false);

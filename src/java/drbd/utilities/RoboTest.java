@@ -270,6 +270,7 @@ public final class RoboTest {
     public static void startTest(final String index, final Host host) {
         aborted = false;
         Tools.info("start test " + index + " in 3 seconds");
+        host.getSSH().installTestFiles();
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
                 Tools.sleep(3000);
@@ -513,7 +514,6 @@ public final class RoboTest {
     /** TEST 1. */
     private static void startTest1(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
         final int ipX = 235;
@@ -656,7 +656,6 @@ public final class RoboTest {
 
         removeResource(robot, gx, gy, 0);
 
-
         /* once again */
         moveTo(robot, gx, gy);
         sleep(1000);
@@ -702,19 +701,21 @@ public final class RoboTest {
         checkTest(host, "test1", 3.1); /* 3.1 */
 
         /* move up, move down */
-        moveTo(robot, 137, 344);
-        rightClick(robot);
-        sleep(1000);
-        moveTo(robot, 221, 493);
-        leftClick(robot); /* move res 3 up */
-        Tools.sleep(10000);
-        checkTest(host, "test1", 3.11); /* 3.11 */
-        moveTo(robot, 137, 328);
-        rightClick(robot);
-        moveTo(robot, 236, 515);
-        leftClick(robot); /* move res 3 down */
-        Tools.sleep(10000);
-        checkTest(host, "test1", 3.12); /* 3.12 */
+        for (int i = 0; i < 10; i++) {
+            moveTo(robot, 137, 344);
+            rightClick(robot);
+            sleep(1000);
+            moveTo(robot, 221, 493);
+            leftClick(robot); /* move res 3 up */
+            Tools.sleep(10000);
+            checkTest(host, "test1", 3.11); /* 3.11 */
+            moveTo(robot, 137, 328);
+            rightClick(robot);
+            moveTo(robot, 236, 515);
+            leftClick(robot); /* move res 3 down */
+            Tools.sleep(10000);
+            checkTest(host, "test1", 3.12); /* 3.12 */
+        }
 
         /* same as */
         moveTo(robot, 125, 345);
@@ -727,10 +728,10 @@ public final class RoboTest {
         leftRelease(robot);
 
         sleep(1000);
-        moveTo(robot, 1078, 424);
+        moveTo(robot, 1078, 395);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078, 475);
+        moveTo(robot, 1078, 445);
         sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
@@ -740,10 +741,10 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1078 , 424);
+        moveTo(robot, 1078 , 395);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 447);
+        moveTo(robot, 1078 , 415);
         leftClick(robot); /* choose "nothing selected */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
@@ -1166,7 +1167,6 @@ public final class RoboTest {
     /** TEST 2. */
     private static void startTest2(final Robot robot, final Host host) {
         slowFactor = 0.3f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1381,7 +1381,6 @@ public final class RoboTest {
     /** TEST 4. */
     private static void startTest4(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1457,7 +1456,6 @@ public final class RoboTest {
     /** TEST 5. */
     private static void startTest5(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1541,7 +1539,6 @@ public final class RoboTest {
     /** TEST 6. */
     private static void startTest6(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1578,7 +1575,6 @@ public final class RoboTest {
 
     private static void startTest7(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1601,7 +1597,6 @@ public final class RoboTest {
 
     private static void startTestA(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int gx = 235;
         final int gy = 255;
@@ -1644,7 +1639,6 @@ public final class RoboTest {
 
     private static void startTestB(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
@@ -1667,7 +1661,6 @@ public final class RoboTest {
 
     private static void startTestC(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         final int statefulX = 500;
         final int statefulY = 255;
         disableStonith(robot, host);
@@ -1712,7 +1705,6 @@ public final class RoboTest {
 
     private static void startTest8(final Robot robot, final Host host) {
         slowFactor = 0.5f;
-        host.getSSH().installTestFiles();
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
@@ -2397,7 +2389,6 @@ public final class RoboTest {
                                        final Robot robot,
                                        final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         moveTo(robot, 334, 315); /* add drbd resource */
         rightClick(robot);
@@ -2452,7 +2443,6 @@ public final class RoboTest {
     /** DRBD Test 1. */
     private static void startDRBDTest2(final Robot robot, final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         moveTo(robot, 334, 315); /* add drbd resource */
         rightClick(robot);
@@ -2473,7 +2463,6 @@ public final class RoboTest {
                                        final Host host) {
         /* Two drbds. */
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         int offset = 0;
         for (int i = 0; i < 2; i++) {
@@ -2647,7 +2636,6 @@ public final class RoboTest {
                                      final Robot robot,
                                      final Host host) {
         slowFactor = 0.2f;
-        host.getSSH().installTestFiles();
         aborted = false;
         checkVMTest(host, vmTest, 1);
 

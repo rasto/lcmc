@@ -3199,8 +3199,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         Tools.invokeAndWait(new Runnable() {
             @Override public void run() {
                 getApplyButton().setEnabled(false);
+                getRevertButton().setEnabled(false);
             }
         });
+        getInfoPanel();
+        waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         setName(getComboBoxValue(VMSXML.VM_PARAM_NAME));

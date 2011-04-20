@@ -217,7 +217,7 @@ public final class ServicesInfo extends EditableInfo {
     void apply(final Host dcHost, final boolean testOnly) {
         final String[] params = getParametersFromXML();
         if (!testOnly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
@@ -225,6 +225,8 @@ public final class ServicesInfo extends EditableInfo {
                 }
             });
         }
+        getInfoPanel();
+        waitForInfoPanel();
 
         /* update pacemaker */
         final Map<String, String> args = new HashMap<String, String>();

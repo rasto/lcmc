@@ -123,6 +123,14 @@ final class FilesystemInfo extends ServiceInfo {
     /** Applies changes to the Filesystem service parameters. */
     @Override void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
+            Tools.invokeAndWait(new Runnable() {
+                @Override public void run() {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
+                }
+            });
+            getInfoPanel();
+            waitForInfoPanel();
             final String dir = getComboBoxValue("directory");
             boolean confirm = false; /* confirm only once */
             for (Host host : getBrowser().getClusterHosts()) {
