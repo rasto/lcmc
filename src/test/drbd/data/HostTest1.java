@@ -152,7 +152,9 @@ public final class HostTest1 extends TestCase {
                     host.getBlockDevicesNamesIntersection(otherBlockDevices);
             assertTrue(TestSuite1.noValueIsNull(otherBlockDevices));
         }
-        assertTrue(otherBlockDevices.size() > 0);
+        if (TestSuite1.getHosts().size() > 0) {
+            assertTrue(otherBlockDevices.size() > 0);
+        }
     }
 
     @Test
@@ -170,7 +172,9 @@ public final class HostTest1 extends TestCase {
             otherNetworks = host.getNetworksIntersection(otherNetworks);
             assertTrue(TestSuite1.noValueIsNull(otherNetworks));
         }
-        assertTrue(otherNetworks.size() > 0);
+        if (TestSuite1.getHosts().size() > 0) {
+            assertTrue(otherNetworks.size() > 0);
+        }
     }
 
     @Test

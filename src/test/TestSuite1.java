@@ -74,7 +74,7 @@ public final class TestSuite1 {
     public static final String ERROR_STRING = "ERROR: ";
     public static final String APPWARNING_STRING = "APPWARNING: ";
     public static final String APPERROR_STRING = "APPERROR: ";
-    public static final int NUMBER_OF_HOSTS = 2;
+    public static final int NUMBER_OF_HOSTS = 3;
     public static final List<Host> HOSTS = new ArrayList<Host>();
 
     /** Private constructor. */

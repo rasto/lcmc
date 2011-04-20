@@ -385,6 +385,10 @@ public final class SSH {
         */
         private SSHOutput execOneCommand(final String command,
                                          final boolean outputVisible) {
+            if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
+                Tools.appWarning(sshCommandTimeout + " to small for timeout? "
+                                 + command);
+            }
             this.command = command;
             this.outputVisible = outputVisible;
             int exitCode = 100;
@@ -1671,7 +1675,7 @@ public final class SSH {
                                        "tar xf /tmp/drbd-mc-test.tar -C /tmp/",
                                        false,
                                        false,
-                                       60);
+                                       60000);
     }
 
     /**
