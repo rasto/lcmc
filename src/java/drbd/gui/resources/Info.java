@@ -756,11 +756,11 @@ public class Info implements Comparable {
             }
             final List<UpdatableItem> menuListCopy =
                                         new ArrayList<UpdatableItem>(menuList);
-            mMenuListLock.release();
             for (final UpdatableItem i : menuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
+            mMenuListLock.release();
             final int size = menuListCopy.size();
             if (size > maxMenuList) {
                 maxMenuList = size;
@@ -780,12 +780,12 @@ public class Info implements Comparable {
                 actionMenuListCopy.add(i);
             }
             final int aSize = actionMenuList.size();
-            mActionMenuListLock.release();
 
             for (final UpdatableItem i : actionMenuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
+            mActionMenuListLock.release();
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;
                 Tools.debug(this, "action menu list size: " + maxMenuList, 2);
