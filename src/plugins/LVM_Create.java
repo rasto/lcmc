@@ -34,6 +34,7 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Unit;
+import drbd.utilities.LVM;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
@@ -43,6 +44,7 @@ import drbd.gui.GuiComboBox;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -50,6 +52,7 @@ import javax.swing.JMenu;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.JCheckBox;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ItemListener;
@@ -71,11 +74,10 @@ public final class LVM_Create implements RemotePlugin {
     /** Name of the create menu item. */
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
     /** Description. */
-    private static final String DESCRIPTION =
-                   "Manage logical volumes.";
     /** Description LV create. */
-    private static final String DESCRIPTION_CREATE =
-                   "Create a logical volume in an existing volume group";
+    private static final String DESCRIPTION =
+               "Create a logical volume in an existing volume group on"
+               + " selected hosts.";
 
     /** Private. */
     public LVM_Create() {
@@ -254,6 +256,7 @@ public final class LVM_Create implements RemotePlugin {
         private GuiComboBox sizeCB;
         private GuiComboBox maxSizeCB;
         private final String volumeGroup;
+        private Map<Host, JCheckBox> hostCheckboxes = null;
         /** Create new LVCreateDialog object. */
         public LVCreateDialog(final HostDrbdInfo hostDrbdInfo,
                               final String volumeGroup) {
@@ -320,23 +323,40 @@ public final class LVM_Create implements RemotePlugin {
             @Override public void run() {
                 boolean e = enable;
                 if (enable) {
+                    final String maxBlockSize = getMaxBlockSize();
+                    final long maxSize = Long.parseLong(maxBlockSize);
+                    maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
                     final long size = Tools.convertToKilobytes(
                                                       sizeCB.getStringValue()); 
-                    final long maxSize = Tools.convertToKilobytes(
-                                                   maxSizeCB.getStringValue());
-                    if (size > maxSize) {
+                    if (size > maxSize || size <= 0) {
                         e = false;
-                    } else if (size <= 0) {
-                        e = false;
+                        sizeCB.wrongValue();
                     } else {
-                        final Set<String> lvs =
-                            hostDrbdInfo.getHost()
-                                        .getLogicalVolumesFromVolumeGroup(
+                        sizeCB.setBackground("", "", true);
+                    }
+                    boolean lvNameCorrect = true;
+                    if ("".equals(lvNameCB.getStringValue())) {
+                        lvNameCorrect = false;
+                    } else if (hostCheckboxes != null) {
+                        for (final Host h : hostCheckboxes.keySet()) {
+                            if (hostCheckboxes.get(h).isSelected()) {
+                                final Set<String> lvs =
+                                    h.getLogicalVolumesFromVolumeGroup(
                                                                   volumeGroup);
-                        if (lvs != null
-                            && lvs.contains(lvNameCB.getStringValue())) {
-                            e = false;
+                                if (lvs != null
+                                    && lvs.contains(
+                                            lvNameCB.getStringValue())) {
+                                    lvNameCorrect = false;
+                                    break;
+                                }
+                            }
                         }
+                    }
+                    if (lvNameCorrect) {
+                        lvNameCB.setBackground("", "", true);
+                    } else {
+                        e = false;
+                        lvNameCB.wrongValue();
                     }
                 }
                 createButton.setEnabled(e);
@@ -361,14 +381,14 @@ public final class LVM_Create implements RemotePlugin {
             inputPane.add(new JLabel());
             /* find next free logical volume name */
             String defaultName;
-            final Set<String> volumeGroups =
+            final Set<String> logicalVolumes =
                    hostDrbdInfo.getHost().getLogicalVolumesFromVolumeGroup(
                                                                   volumeGroup);
             int i = 0;
             while (true) {
                 defaultName = "lvol" + i;
-                if (volumeGroups == null
-                    || !volumeGroups.contains(defaultName)) {
+                if (logicalVolumes == null
+                    || !logicalVolumes.contains(defaultName)) {
                     break;
                 }
                 i++;
@@ -422,7 +442,7 @@ public final class LVM_Create implements RemotePlugin {
             inputPane.add(maxSizeLabel);
             inputPane.add(maxSizeCB);
             inputPane.add(new JLabel());
-            sizeCB.addListeners(new SizeItemListener(), 
+            sizeCB.addListeners(new ItemChangeListener(false), 
                                 new SizeDocumentListener());
 
             SpringUtilities.makeCompactGrid(inputPane, 4, 3,  // rows, cols
@@ -430,9 +450,33 @@ public final class LVM_Create implements RemotePlugin {
                                                        1, 1); // xPad, yPad
 
             pane.add(inputPane);
+            final JPanel hostsPane = new JPanel(
+                            new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+            final Cluster cluster = hostDrbdInfo.getHost().getCluster();
+            hostCheckboxes = Tools.getHostCheckboxes(cluster);
+            hostsPane.add(new JLabel("Select Hosts: "));
+            for (final Host h : hostCheckboxes.keySet()) {
+                hostCheckboxes.get(h).addItemListener(
+                                                new ItemChangeListener(true));
+                if (hostDrbdInfo.getHost() == h) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(true);
+                } else if (!h.getVolumeGroupNames().contains(volumeGroup)) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(false);
+                } else {
+                    hostCheckboxes.get(h).setEnabled(true);
+                    hostCheckboxes.get(h).setSelected(false);
+                }
+                hostsPane.add(hostCheckboxes.get(h));
+            }
+            final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
+                                                                   hostsPane);
+            sp.setPreferredSize(new java.awt.Dimension(0, 45));
+            pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
                                                   0, 0,  // initX, initY
                                                   0, 0); // xPad, yPad
             checkButtons();
@@ -440,12 +484,15 @@ public final class LVM_Create implements RemotePlugin {
         }
 
         /** Size combo box item listener. */
-        private class SizeItemListener implements ItemListener {
-            public SizeItemListener() {
+        private class ItemChangeListener implements ItemListener {
+            private final boolean onDeselect;
+            public ItemChangeListener(final boolean onDeselect) {
                 super();
+                this.onDeselect = onDeselect;
             }
             @Override public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (e.getStateChange() == ItemEvent.SELECTED
+                    || onDeselect) {
                     checkButtons();
                 }
             }
@@ -490,37 +537,54 @@ public final class LVM_Create implements RemotePlugin {
             }
 
             @Override public void run() {
-                SwingUtilities.invokeLater(new EnableCreateRunnable(false));
-                lvCreate(lvNameCB.getStringValue(),
-                         sizeCB.getStringValue());
+                Tools.invokeAndWait(new EnableCreateRunnable(false));
+                for (final Host h : hostCheckboxes.keySet()) {
+                    if (hostCheckboxes.get(h).isSelected()) {
+                        lvCreate(h,
+                                 lvNameCB.getStringValue(),
+                                 sizeCB.getStringValue());
+                    }
+                }
+                checkButtons();
             }
         }
 
         /** LV Create. */
-        private void lvCreate(final String lvName, final String size) {
-            final boolean ret = hostDrbdInfo.lvCreate(lvName,
-                                                      volumeGroup,
-                                                      size,
-                                                      false);
+        private void lvCreate(final Host host,
+                              final String lvName,
+                              final String size) {
+            final boolean ret = LVM.lvCreate(host,
+                                             lvName,
+                                             volumeGroup,
+                                             size,
+                                             false);
             if (ret) {
-                answerPaneSetText("Logical volume "
+                answerPaneAddText("Logical volume "
                                   + lvName
-                                  + " was successfully created on "
-                                  + volumeGroup + ".");
+                                  + " was successfully created in "
+                                  + volumeGroup
+                                  + " on " + host.getName() + ".");
             } else {
-                answerPaneSetTextError("Creating of logical volume "
+                answerPaneAddTextError("Creating of logical volume "
                                        + lvName
                                        + " failed.");
             }
-            final Host host = hostDrbdInfo.getHost();
             host.getBrowser().getClusterBrowser().updateHWInfo(host);
             setComboBoxes();
         }
 
         /** Returns maximum block size available in the group. */
         private String getMaxBlockSize() {
-            final long free =
+            long free =
                hostDrbdInfo.getHost().getFreeInVolumeGroup(volumeGroup) / 1024;
+            if (hostCheckboxes != null) {
+                for (final Host h : hostCheckboxes.keySet()) {
+                    if (hostCheckboxes.get(h).isSelected()
+                        && h.getFreeInVolumeGroup(volumeGroup) / 1024 < free) {
+                        free = h.getFreeInVolumeGroup(volumeGroup) / 1024;
+                    }
+                }
+            }
             return Long.toString(free);
         }
     }

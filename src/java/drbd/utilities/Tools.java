@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.Collection;
 import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.io.File;
 import java.io.InputStream;
@@ -66,6 +67,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
 import javax.swing.JTable;
+import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -2400,7 +2402,16 @@ public final class Tools {
                 final Matcher m = p.matcher(line);
                 if (m.matches()) {
                     final String pluginName = m.group(1);
-                    pluginList.add(pluginName);
+                    final String checkURL = "http://" + PLUGIN_LOCATION
+                               + pluginName + "/" + getRelease()
+                               + "/?drbd-mc-plugin-check-" + getRelease();
+                    try {
+                        new URL(checkURL).openStream();
+                        pluginList.add(pluginName);
+                    } catch (MalformedURLException mue) {
+                    } catch (IOException ioe) {
+                        /* don't show this in the menu */
+                    }
                 }
             } while (true);
         } catch (MalformedURLException mue) {
@@ -2570,4 +2581,17 @@ public final class Tools {
         return escapeQuotes(sb.toString(), count - 1);
     }
 
+    /** Returns array of host checkboxes in the specified cluster. */
+    public static Map<Host, JCheckBox> getHostCheckboxes(
+                                                       final Cluster cluster) {
+        final Map<Host, JCheckBox> components =
+                                        new LinkedHashMap<Host, JCheckBox>();
+        for (final Host host : cluster.getHosts()) {
+            final JCheckBox button = new JCheckBox(host.getName());
+            button.setBackground(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            components.put(host, button);
+        }
+        return components;
+    }
 }

@@ -633,12 +633,4 @@ public final class HostDrbdInfo extends Info {
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
         return null;
     }
-
-    /** Create LV. */
-    public boolean lvCreate(final String lvName,
-                            final String volumeGroup,
-                            final String size,
-                            final boolean testOnly) {
-        return LVM.lvCreate(getHost(), lvName, volumeGroup, size, testOnly);
-    }
 }

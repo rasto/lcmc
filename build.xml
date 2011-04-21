@@ -289,6 +289,7 @@
 			<jvmarg value="-Dtest.password=${password}"/>
 			<jvmarg value="-Dtest.dsa=${dsa}"/>
 			<jvmarg value="-Dtest.rsa=${rsa}"/>
+			<jvmarg value="-Dtest.count=${count}"/>
 			<jvmarg value="-Dtest.factor=${factor}"/>
 			<jvmarg value="-Dtest.cluster=${cluster}"/>
 			<classpath>

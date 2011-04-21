@@ -12,8 +12,10 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.Map;
 import java.awt.Dimension;
 import javax.swing.JPanel;
+import javax.swing.JCheckBox;
 import java.net.InetAddress;
 import drbd.TestSuite1;
 import drbd.data.Host;
@@ -1067,5 +1069,16 @@ public final class ToolsTest1 extends TestCase {
                      Tools.escapeQuotes("\"$`test\\", 1));
         assertEquals("\\\\\\\"\\\\\\$\\\\\\`test\\\\\\\\",
                      Tools.escapeQuotes("\"$`test\\", 2));
+    }
+
+    @Test
+    public void testGetHostCheckboxes() {
+        for (final Host host : TestSuite1.getHosts()) {
+            final Map<Host, JCheckBox> comps =
+                                    Tools.getHostCheckboxes(host.getCluster());
+            assertNotNull(comps);
+            assertTrue(comps.size() == TestSuite1.getHosts().size());
+            assertTrue(comps.containsKey(host));
+        }
     }
 }
