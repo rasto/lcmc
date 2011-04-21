@@ -206,8 +206,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
                 modifyXML(vmsxml, domainNode, domainName, parameters);
                 vmsxml.saveAndDefine(domainNode, domainName);
             }
-            getResource().setNew(false);
         }
+        getResource().setNew(false);
         getBrowser().reload(getNode(), false);
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);

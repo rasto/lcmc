@@ -1693,15 +1693,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 uuid = vmsxml.getValue(getDomainName(), VMSXML.VM_PARAM_UUID);
             }
         }
-        updateTable(HEADER_TABLE);
-        updateTable(DISK_TABLE);
-        updateTable(INTERFACES_TABLE);
-        updateTable(INPUTDEVS_TABLE);
-        updateTable(GRAPHICS_TABLE);
-        updateTable(SOUND_TABLE);
-        updateTable(SERIAL_TABLE);
-        updateTable(PARALLEL_TABLE);
-        updateTable(VIDEO_TABLE);
         /* disks */
         final boolean interfaceNodeChanged = updateInterfaceNodes();
         final boolean diskNodeChanged = updateDiskNodes();
@@ -1711,6 +1702,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final boolean serialNodeChanged = updateSerialNodes();
         final boolean parallelNodeChanged = updateParallelNodes();
         final boolean vidoNodeChanged = updateVideoNodes();
+        updateTable(HEADER_TABLE);
+        updateTable(DISK_TABLE);
+        updateTable(INTERFACES_TABLE);
+        updateTable(INPUTDEVS_TABLE);
+        updateTable(GRAPHICS_TABLE);
+        updateTable(SOUND_TABLE);
+        updateTable(SERIAL_TABLE);
+        updateTable(PARALLEL_TABLE);
+        updateTable(VIDEO_TABLE);
         if (diskNodeChanged
             || interfaceNodeChanged
             || inputDevNodeChanged

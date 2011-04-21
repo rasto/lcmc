@@ -140,7 +140,6 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-
     /** Creates the VMSGraphicsInfo object. */
     VMSGraphicsInfo(final String name, final Browser browser,
                            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
