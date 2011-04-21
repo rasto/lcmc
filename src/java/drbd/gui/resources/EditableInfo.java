@@ -582,6 +582,7 @@ public abstract class EditableInfo extends Info {
                     Tools.waitForSwing();
                     c = checkResourceFieldsCorrect(param, params);
                 } else {
+                    Tools.waitForSwing();
                     ch = checkResourceFieldsChanged(param, params);
                     c = checkResourceFieldsCorrect(param, params);
                 }
