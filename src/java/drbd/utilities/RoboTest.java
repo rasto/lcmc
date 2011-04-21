@@ -2233,7 +2233,7 @@ public final class RoboTest {
 
             moveTo(robot, 1068, 475);
             leftClick(robot); /* filesystem type */
-            moveTo(robot, 1039, 555);
+            moveTo(robot, 1039, 560);
             leftClick(robot); /* ext3 */
 
             moveTo(robot, 815, 186);

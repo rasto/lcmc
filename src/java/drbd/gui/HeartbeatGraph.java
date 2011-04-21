@@ -1119,18 +1119,9 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (!edgeIsOrderList.contains(e)
             && !edgeIsColocationList.contains(e)) {
             e.reset();
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    try {
-                        lockGraph();
-                        getGraph().removeEdge(e);
-                        unlockGraph();
-                    } catch (final Exception ignore) {
-                        unlockGraph();
-                        /* ignore */
-                    }
-                }
-            });
+            lockGraph();
+            getGraph().removeEdge(e);
+            unlockGraph();
             try {
                 mHbConnectionLock.acquire();
             } catch (final InterruptedException ie) {
@@ -1178,9 +1169,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                         putVertexLocations();
                         lockGraph();
                         getGraph().removeVertex(v);
-                        unlockGraph();
                         removeInfo(v);
                         removeVertex(cphi);
+                        unlockGraph();
                         cphi.removeInfo();
                         getVertexToMenus().remove(v);
                         vertexToConstraintPHMap.remove(v);
@@ -1203,9 +1194,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                         putVertexLocations();
                         lockGraph();
                         getGraph().removeVertex(v);
-                        unlockGraph();
                         removeInfo(v);
                         removeVertex(si);
+                        unlockGraph();
                         si.removeInfo();
                         //TODO: unregister removePopup(v);
                         getVertexToMenus().remove(v);
