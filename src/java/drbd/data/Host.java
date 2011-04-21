@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -469,7 +470,7 @@ public final class Host {
     }
 
     /** Returns blockDevices. */
-    BlockDevice[] getBlockDevices() {
+    public BlockDevice[] getBlockDevices() {
         return blockDevices.values().toArray(
                                     new BlockDevice[blockDevices.size()]);
     }
@@ -2654,5 +2655,14 @@ public final class Host {
     /** Returns logical volumes from volume group */
     public Set<String> getLogicalVolumesFromVolumeGroup(final String vg) {
         return volumeGroupsLVS.get(vg);
+    }
+
+    /** Returns all logical volumes */
+    public Set<String> getAllLogicalVolumes() {
+        final Set<String> allLVS = new LinkedHashSet<String>();
+        for (final String vg : volumeGroups.keySet()) {
+            allLVS.addAll(volumeGroupsLVS.get(vg));
+        }
+        return allLVS;
     }
 }

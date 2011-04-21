@@ -26,7 +26,6 @@ import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdResourceInfo;
-import drbd.gui.resources.HostDrbdInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
@@ -35,14 +34,18 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Unit;
+import drbd.utilities.LVM;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
+import drbd.data.Cluster;
+import drbd.data.resources.BlockDevice;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -50,6 +53,7 @@ import javax.swing.JMenu;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.swing.JCheckBox;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ItemListener;
@@ -70,11 +74,8 @@ public final class LVM_Resize implements RemotePlugin {
     private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the resize menu item. */
     private static final String LV_RESIZE_MENU_ITEM = "LV Resize";
-    /** Description. */
-    private static final String DESCRIPTION =
-                   "Manage logical volumes.";
     /** Description LVM resize. */
-    private static final String DESCRIPTION_RESIZE =
+    private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not"
                    + " smaller for now. If this volume is replicated by"
                    + " DRBD, volumes on both nodes will be resized and"
@@ -209,6 +210,7 @@ public final class LVM_Resize implements RemotePlugin {
         private GuiComboBox sizeCB;
         private GuiComboBox oldSizeCB;
         private GuiComboBox maxSizeCB;
+        private Map<Host, JCheckBox> hostCheckboxes = null;
         /** Create new LVResizeDialog object. */
         public LVResizeDialog(final BlockDevInfo blockDevInfo) {
             super(null);
@@ -322,10 +324,15 @@ public final class LVM_Resize implements RemotePlugin {
                                                    oldSizeCB.getStringValue());
                     final long size = Tools.convertToKilobytes(
                                                       sizeCB.getStringValue()); 
-                    final long maxSize = Tools.convertToKilobytes(
-                                                   maxSizeCB.getStringValue());
+                    final String maxBlockSize = getMaxBlockSize();
+                    final long maxSize = Long.parseLong(maxBlockSize);
+                    maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
+
                     if (oldSize >= size || size > maxSize) {
                         e = false;
+                        sizeCB.wrongValue();
+                    } else {
+                        sizeCB.setBackground("", "", true);
                     }
                 }
                 resizeButton.setEnabled(e);
@@ -405,7 +412,7 @@ public final class LVM_Resize implements RemotePlugin {
             inputPane.add(maxSizeLabel);
             inputPane.add(maxSizeCB);
             inputPane.add(new JLabel());
-            sizeCB.addListeners(new SizeItemListener(), 
+            sizeCB.addListeners(new ItemChangeListener(false), 
                                 new SizeDocumentListener());
 
             SpringUtilities.makeCompactGrid(inputPane, 3, 3,  // rows, cols
@@ -413,9 +420,42 @@ public final class LVM_Resize implements RemotePlugin {
                                                        1, 1); // xPad, yPad
 
             pane.add(inputPane);
+            final JPanel hostsPane = new JPanel(
+                            new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+            final Cluster cluster = blockDevInfo.getHost().getCluster();
+            hostCheckboxes = Tools.getHostCheckboxes(cluster);
+            hostsPane.add(new JLabel("Select Hosts: "));
+            final Host host = blockDevInfo.getHost();
+            final String lv = blockDevInfo.getBlockDevice().getLogicalVolume();
+            for (final Host h : hostCheckboxes.keySet()) {
+                final Set<String> allLVS = h.getAllLogicalVolumes();
+                hostCheckboxes.get(h).addItemListener(
+                                                new ItemChangeListener(true));
+                if (host == h) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(true);
+                } else if (blockDevInfo.getBlockDevice().isDrbd()
+                           && blockDevInfo.getOtherBlockDevInfo().getHost()
+                              == h) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(true);
+                } else if (!blockDevInfo.getBlockDevice().isDrbd()
+                           && !allLVS.contains(lv)) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(false);
+                } else {
+                    hostCheckboxes.get(h).setEnabled(true);
+                    hostCheckboxes.get(h).setSelected(false);
+                }
+                hostsPane.add(hostCheckboxes.get(h));
+            }
+            final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
+                                                                   hostsPane);
+            sp.setPreferredSize(new java.awt.Dimension(0, 45));
+            pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
                                                   0, 0,  // initX, initY
                                                   0, 0); // xPad, yPad
             checkButtons();
@@ -423,12 +463,15 @@ public final class LVM_Resize implements RemotePlugin {
         }
 
         /** Size combo box item listener. */
-        private class SizeItemListener implements ItemListener {
-            public SizeItemListener() {
+        private class ItemChangeListener implements ItemListener {
+            private final boolean onDeselect;
+            public ItemChangeListener(final boolean onDeselect) {
                 super();
+                this.onDeselect = onDeselect;
             }
             @Override public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (e.getStateChange() == ItemEvent.SELECTED
+                    || onDeselect) {
                     checkButtons();
                 }
             }
@@ -482,40 +525,67 @@ public final class LVM_Resize implements RemotePlugin {
 
         /** LVM Resize and DRBD Resize. */
         private void resize(final String size) {
-            final boolean ret = blockDevInfo.lvResize(size, false);
+            final boolean ret = LVM.resize(
+                                       blockDevInfo.getHost(),
+                                       blockDevInfo.getBlockDevice().getName(),
+                                       size,
+                                       false);
             if (ret) {
                 answerPaneSetText("Lodical volume was successfully resized on "
                                   + blockDevInfo.getHost() + ".");
                 /* resize lvm volume on the other node. */
+                final String lv =
+                        blockDevInfo.getBlockDevice().getLogicalVolume();
                 final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
-                if (oBDI != null) {
-                    final boolean oRet = oBDI.lvResize(size, false);
-                    if (oRet) {
-                        answerPaneAddText("Lodical volume was successfully"
-                                          + " resized on "
-                                          + oBDI.getHost() + ".");
-                        final boolean dRet = blockDevInfo.resizeDrbd(false);
-                        if (dRet) {
-                            answerPaneAddText(
-                                 "DRBD resource "
-                                 + blockDevInfo.getDrbdResourceInfo().getName()
-                                 + " was successfully resized.");
-                        } else {
-                            answerPaneAddTextError(
-                                 "DRBD resource "
-                                 + blockDevInfo.getDrbdResourceInfo().getName()
-                                 + " resizing failed.");
+                boolean resizingFailed = false;
+                for (final Host h : hostCheckboxes.keySet()) {
+                    if (h == blockDevInfo.getHost()
+                        || !hostCheckboxes.get(h).isSelected()) {
+                        continue;
+                    }
+                    for (final BlockDevice b : h.getBlockDevices()) {
+                        if (lv.equals(b.getLogicalVolume())
+                            || (oBDI != null && oBDI.getBlockDevice() == b)) {
+                            /* drbd or selected other host */
+                            final boolean oRet = LVM.resize(h,
+                                                            b.getName(),
+                                                            size,
+                                                            false);
+                            if (oRet) {
+                                answerPaneAddText("Lodical volume was successfully"
+                                                  + " resized on "
+                                                  + h.getName() + ".");
+                            } else {
+                                answerPaneAddTextError("Resizing of "
+                                                       + b.getName()
+                                                       + " on host "
+                                                       + h.getName()
+                                                       + " failed.");
+                                resizingFailed = true;
+                            }
+                            break;
                         }
+                        if (resizingFailed) {
+                            break;
+                        }
+                    }
+                }
+                if (oBDI != null && !resizingFailed) {
+                    final boolean dRet = blockDevInfo.resizeDrbd(false);
+                    if (dRet) {
+                        answerPaneAddText(
+                             "DRBD resource "
+                             + blockDevInfo.getDrbdResourceInfo().getName()
+                             + " was successfully resized.");
                     } else {
-                        answerPaneAddTextError("Resizing of "
-                                               + oBDI.getName()
-                                               + " on host "
-                                               + oBDI.getHost()
-                                               + " failed.");
+                        answerPaneAddTextError(
+                             "DRBD resource "
+                             + blockDevInfo.getDrbdResourceInfo().getName()
+                             + " resizing failed.");
                     }
                 }
             } else {
-                answerPaneSetTextError("Resizing of "
+                answerPaneAddTextError("Resizing of "
                                        + blockDevInfo.getName()
                                        + " on host "
                                        + blockDevInfo.getHost()
@@ -535,20 +605,36 @@ public final class LVM_Resize implements RemotePlugin {
                 final long taken = Long.parseLong(
                                  blockDevInfo.getBlockDevice().getBlockSize());
                 final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
-                if (oBDI == null) {
-                    maxBlockSize = Long.toString(free + taken);
-                } else {
-                    final long oFree = oBDI.getFreeInVolumeGroup() / 1024;
-                    final long oTaken = Long.parseLong(
-                                         oBDI.getBlockDevice().getBlockSize());
-                    if (free + taken < oFree + oTaken) {
-                        /* take the smaller maximum. */
-                        maxBlockSize = Long.toString(free + taken);
-                    } else {
-                        maxBlockSize = Long.toString(oFree + oTaken);
+                long max = free + taken;
+                final String lv =
+                            blockDevInfo.getBlockDevice().getLogicalVolume();
+                if (hostCheckboxes != null) {
+                    for (final Host h : hostCheckboxes.keySet()) {
+                        if (blockDevInfo.getHost() == h) {
+                            continue;
+                        }
+                        if (hostCheckboxes.get(h).isSelected()) {
+                            for (final BlockDevice b : h.getBlockDevices()) {
+                                if (lv.equals(b.getLogicalVolume())
+                                    || (oBDI != null
+                                        && oBDI.getBlockDevice() == b)) {
+                                    final long oFree =
+                                     h.getFreeInVolumeGroup(b.getVolumeGroup())
+                                     / 1024;
+                                    final long oTaken = Long.parseLong(
+                                                             b.getBlockSize());
+                                    if (oFree + oTaken < max) {
+                                        /* take the smaller maximum. */
+                                        max = oFree + oTaken;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+                maxBlockSize = Long.toString(max);
             } catch (final Exception e) {
+                Tools.appWarning("could not get max size");
                 /* ignore */
             }
             return maxBlockSize;
