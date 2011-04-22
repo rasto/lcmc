@@ -1349,8 +1349,12 @@ public class ServiceInfo extends EditableInfo {
             if (cb == null) {
                 continue;
             }
+            String labelText = null;
+            if (cb.getLabel() != null) {
+                labelText = cb.getLabel().getText();
+            }
             if (!Tools.areEqual(hsSaved, cb.getStringValue())
-                || (!Tools.areEqual(opSavedLabel, cb.getLabel().getText())
+                || (!Tools.areEqual(opSavedLabel, labelText)
                     && (hsSaved != null  && !"".equals(hsSaved)))) {
                 changed = true;
             }
