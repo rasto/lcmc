@@ -53,23 +53,23 @@ import org.w3c.dom.Node;
  */
 public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
-    private Map<String, GuiComboBox> sourceFileCB =
+    private final Map<String, GuiComboBox> sourceFileCB =
                                             new HashMap<String, GuiComboBox>();
     /** Source block combo box, so that it can be disabled, depending on type.*/
-    private Map<String, GuiComboBox> sourceDeviceCB =
+    private final Map<String, GuiComboBox> sourceDeviceCB =
                                             new HashMap<String, GuiComboBox>();
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
-    private Map<String, GuiComboBox> targetDeviceCB =
+    private final Map<String, GuiComboBox> targetDeviceCB =
                                             new HashMap<String, GuiComboBox>();
     /** Driver name combo box. */
-    private Map<String, GuiComboBox> driverNameCB =
+    private final Map<String, GuiComboBox> driverNameCB =
                                             new HashMap<String, GuiComboBox>();
     /** Driver type combo box. */
-    private Map<String, GuiComboBox> driverTypeCB =
+    private final Map<String, GuiComboBox> driverTypeCB =
                                             new HashMap<String, GuiComboBox>();
     /** Readonly combo box. */
-    private Map<String, GuiComboBox> readonlyCB =
+    private final Map<String, GuiComboBox> readonlyCB =
                                             new HashMap<String, GuiComboBox>();
     /** Previous target bus value. */
     private String prevTargetBus = null;
@@ -252,15 +252,15 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
     /** Returns parameters. */
     @Override public String[] getParametersFromXML() {
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 
     /** Returns real parameters. */
     @Override String[] getRealParametersFromXML() {
         if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
-            return BLOCK_PARAMETERS;
+            return BLOCK_PARAMETERS.clone();
         } else {
-            return FILE_PARAMETERS;
+            return FILE_PARAMETERS.clone();
         }
     }
 

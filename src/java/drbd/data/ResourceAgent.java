@@ -95,8 +95,7 @@ public final class ResourceAgent {
      * parameter. */
     private final MultiKeyMap opToDefault = new MultiKeyMap();
     /** Names of the operations, with some of them predefined. */
-    private final LinkedHashSet<String> operations =
-                                                  new LinkedHashSet<String>();
+    private final Set<String> operations = new LinkedHashSet<String>();
     /** Whether the service is probably master/slave resource. */
     private boolean probablyMasterSlave = false;
     /** Whether the service is probably clone resource. */
@@ -121,10 +120,10 @@ public final class ResourceAgent {
         operations.addAll(Arrays.asList(ClusterBrowser.HB_OPERATIONS));
         hash = (name == null ? 0 : name.hashCode() * 31)
                + (resourceClass == null ? 0 : resourceClass.hashCode());
-        if (!"heartbeat".equals(provider)) {
-            menuName = provider + ":" + name;
-        } else {
+        if ("heartbeat".equals(provider)) {
             menuName = name;
+        } else {
+            menuName = provider + ":" + name;
         }
         /* info fields */
         String section = "Resource";
@@ -492,7 +491,7 @@ public final class ResourceAgent {
     }
 
     /** Returns name of all operations. */
-    public LinkedHashSet<String> getOperationNames() {
+    public Set<String> getOperationNames() {
         return operations;
     }
 

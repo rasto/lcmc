@@ -1330,11 +1330,11 @@ final class HbConfig extends DialogCluster {
                         for (final String option : OPTIONS) {
                             final GuiComboBox cb = optionsCB.get(option);
                             if (cb != null) {
-                                if (!checkRegexp(cb.getRegexp(),
-                                                 cb.getStringValue())) {
-                                    cb.wrongValue();
-                                } else {
+                                if (checkRegexp(cb.getRegexp(),
+                                                cb.getStringValue())) {
                                     cb.setBackground(null, null, true);
+                                } else {
+                                    cb.wrongValue();
                                 }
                             }
                         }

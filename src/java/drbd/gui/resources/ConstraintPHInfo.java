@@ -299,7 +299,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                        final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
@@ -375,10 +376,10 @@ public final class ConstraintPHInfo extends ServiceInfo {
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
                 getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
-            @Override public final boolean isEnabled() {
+            @Override public boolean isEnabled() {
                 return super.isEnabled() && !getService().isNew();
             }
-            @Override public final void action(final Host dcHost) {
+            @Override public void action(final Host dcHost) {
                 removeMyselfNoConfirm(dcHost, true); /* test only */
             }
         };

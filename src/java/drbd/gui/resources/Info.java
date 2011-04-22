@@ -32,9 +32,6 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyCellRenderer;
 import drbd.utilities.MyButtonCellRenderer;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -66,8 +63,6 @@ import java.awt.Component;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Dimension;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.MouseListener;
 import java.awt.Point;
 import java.awt.Color;
@@ -408,7 +403,7 @@ public class Info implements Comparable {
         this.node = node;
     }
 
-    /** Cleanup */
+    /** Cleanup. */
     final void cleanup() {
         //if (menu != null) {
         //    menu.cleanup();
@@ -446,7 +441,7 @@ public class Info implements Comparable {
      * Removes this object from the tree and highlights and selects parent
      * node.
      */
-    void removeMyself(final boolean testOnly) {
+    public void removeMyself(final boolean testOnly) {
         cleanup();
         if (node != null) {
             final DefaultMutableTreeNode parent =
@@ -950,7 +945,7 @@ public class Info implements Comparable {
                     return super.getCellRenderer(row, column);
                 }
 
-                public String getToolTipText(MouseEvent me) {
+                public String getToolTipText(final MouseEvent me) {
                     int row = rowAtPoint(me.getPoint());
                     int column = columnAtPoint(me.getPoint());
                     try {

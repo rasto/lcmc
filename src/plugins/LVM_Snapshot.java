@@ -69,11 +69,9 @@ public final class LVM_Snapshot implements RemotePlugin {
     private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the snapshot menu item. */
     private static final String LV_SNAPSHOT_MENU_ITEM = "Create Snapshot ";
-    /** Description. */
-    private static final String DESCRIPTION = "Manage logical volumes.";
     /** Description LV snapshot. */
-    private static final String DESCRIPTION_SNAPSHOT =
-                   "Create a snapshot on the logical volume.";
+    private static final String DESCRIPTION =
+                   "Create a snapshot of the logical volume.";
 
     /** Private. */
     public LVM_Snapshot() {

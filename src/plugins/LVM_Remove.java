@@ -144,6 +144,9 @@ public final class LVM_Remove implements RemotePlugin {
         }
 
         public String enablePredicate() {
+            if (bdi.getBlockDevice().isDrbd()) {
+                return "DRBD is on it";
+            }
             return null;
         }
 

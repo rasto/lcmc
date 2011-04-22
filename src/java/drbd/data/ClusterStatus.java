@@ -665,11 +665,11 @@ public final class ClusterStatus {
     /** Sets data from ptest. */
     public void setPtestData(final PtestData ptestData) {
         this.ptestData = ptestData;
-        if (ptestData != null) {
+        if (ptestData == null) {
+            shadowCibQueryMap = new CibQuery();
+        } else {
             shadowCibQueryMap = crmXML.parseCibQuery(
                 "<pcmk>" + ptestData.getShadowCib() + "</pcmk>");
-        } else {
-            shadowCibQueryMap = new CibQuery();
         }
     }
 }

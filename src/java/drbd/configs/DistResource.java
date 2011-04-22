@@ -198,7 +198,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "/usr/sbin/crm_resource -f -r @ID@ -H @HOST@ --migrate"},
         {"CRM.migrateFromResource",
          SUDO + "/usr/sbin/crm_resource -r @ID@ --migrate"},
-        {"CRM.unmigrateResource", 
+        {"CRM.unmigrateResource",
          SUDO + "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
 
         /* gets all ocf resources and theirs meta-data */

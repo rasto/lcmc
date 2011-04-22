@@ -273,15 +273,15 @@ final class VirtualDomainInfo extends ServiceInfo {
         final String string;
         final String id = getService().getId();
         final String configName = getParamSaved("config");
-        if (configName != null) {
+        if (configName == null) {
+            string = id;
+        } else {
             final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName);
             if (m.matches()) {
                 string = m.group(1);
             } else {
                 string = id;
             }
-        } else {
-            string = id;
         }
         if (string == null) {
             s.insert(0, "new ");

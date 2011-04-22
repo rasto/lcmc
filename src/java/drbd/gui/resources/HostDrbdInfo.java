@@ -40,7 +40,6 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.DRBD;
 import drbd.utilities.SSH;
-import drbd.utilities.LVM;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -256,10 +255,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
-                    } else if (getHost().isDrbdStatus()) {
+                    if (getHost().isConnected()) {
                         return "already loaded";
+                    } else if (getHost().isDrbdStatus()) {
+                        return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                     //return getHost().isConnected()
@@ -385,10 +384,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isDrbdStatus()) {
-                        return NO_DRBD_STATUS_STRING;
-                    } else {
+                    if (getHost().isDrbdStatus()) {
                         return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
                     }
                 }
 
@@ -414,10 +413,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isDrbdStatus()) {
-                        return NO_DRBD_STATUS_STRING;
-                    } else {
+                    if (getHost().isDrbdStatus()) {
                         return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
                     }
                 }
 
@@ -443,10 +442,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isDrbdStatus()) {
-                        return NO_DRBD_STATUS_STRING;
-                    } else {
+                    if (getHost().isDrbdStatus()) {
                         return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
                     }
                 }
 
@@ -476,10 +475,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isDrbdStatus()) {
-                        return NO_DRBD_STATUS_STRING;
-                    } else {
+                    if (getHost().isDrbdStatus()) {
                         return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
                     }
                 }
 
@@ -505,10 +504,10 @@ public final class HostDrbdInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
-                    if (!getHost().isDrbdStatus()) {
-                        return NO_DRBD_STATUS_STRING;
-                    } else {
+                    if (getHost().isDrbdStatus()) {
                         return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
                     }
                 }
 

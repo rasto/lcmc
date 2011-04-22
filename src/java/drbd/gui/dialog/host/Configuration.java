@@ -141,8 +141,8 @@ final class Configuration extends DialogHost {
         }
         String hostname = null;
         String ip = null;
-        Tools.debug(this, "addresses.length: " + addresses.length + "a: "
-                          + addresses[0].getHostAddress());
+        Tools.debug(this, "addresses.length: " + addresses.length + " a: "
+                          + addresses[0].getHostAddress(), 2);
         if (addresses.length == 0) {
             Tools.debug(this, "lookup failed");
             // lookup failed;

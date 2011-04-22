@@ -1668,14 +1668,6 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     /**
-     * Removes this services info.
-     * TODO: is not called yet
-     */
-    @Override public void removeMyself(final boolean testOnly) {
-        super.removeMyself(testOnly);
-    }
-
-    /**
      * Returns whether all the parameters are correct. If param is null,
      * all paremeters will be checked, otherwise only the param, but other
      * parameters will be checked only in the cache. This is good if only

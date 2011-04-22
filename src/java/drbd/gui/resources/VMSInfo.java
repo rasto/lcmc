@@ -178,8 +178,9 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns comparator for column. */
-    @Override protected Comparator<Object> getColComparator(final String tableName,
-                                                            final int col) {
+    @Override protected Comparator<Object> getColComparator(
+                                                        final String tableName,
+                                                        final int col) {
         if (col == 0) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
@@ -287,7 +288,8 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    @Override protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
+    @Override protected Map<Integer, Integer> getDefaultWidths(
+                                                    final String tableName) {
         return DEFAULT_WIDTHS;
     }
 

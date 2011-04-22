@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Interface for remote plugins. IMPORTANT: Remote plugins can't have
- * anonymous inner classes. 
+ * anonymous inner classes.
  */
 public interface RemotePlugin {
     /** Init plugin. */

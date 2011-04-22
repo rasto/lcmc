@@ -368,7 +368,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip's background color. */
-    @Override public final void setToolTipBackground(final Color toolTipBackground) {
+    @Override public final void setToolTipBackground(
+                                              final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
@@ -395,7 +396,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setToolTipText0(toolTipText);
     }
 
-    private final void moveMouse() {
+    /** Wiggle the mouse. */
+    private void moveMouse() {
         if (robot != null) {
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -422,7 +424,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    private final void setToolTipText0(String toolTipText) {
+    private void setToolTipText0(String toolTipText) {
         if (toolTip == null) {
             return;
         }

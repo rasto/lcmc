@@ -50,22 +50,22 @@ import org.w3c.dom.Node;
  */
 public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> portCB =
+    private final Map<String, GuiComboBox> portCB =
                                             new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> listenCB =
+    private final Map<String, GuiComboBox> listenCB =
                                             new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> passwdCB =
+    private final Map<String, GuiComboBox> passwdCB =
                                             new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> keymapCB =
+    private final Map<String, GuiComboBox> keymapCB =
                                             new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> displayCB =
+    private final Map<String, GuiComboBox> displayCB =
                                             new HashMap<String, GuiComboBox>();
     /** Combo box that can be made invisible. */
-    private Map<String, GuiComboBox> xauthCB =
+    private final Map<String, GuiComboBox> xauthCB =
                                             new HashMap<String, GuiComboBox>();
 
     /** Parameters. AUTOPORT is generated */
@@ -192,7 +192,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns parameters. */
     @Override public String[] getParametersFromXML() {
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */
@@ -622,10 +622,10 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override String[] getRealParametersFromXML() {
         if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            return VNC_PARAMETERS;
+            return VNC_PARAMETERS.clone();
         } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
-            return SDL_PARAMETERS;
+            return SDL_PARAMETERS.clone();
         }
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 }

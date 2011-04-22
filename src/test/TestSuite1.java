@@ -39,7 +39,6 @@ import junit.framework.TestResult;
 import junit.framework.TestCase;
 
 import drbd.utilities.Tools;
-import drbd.gui.SSHGui;
 import drbd.gui.TerminalPanel;
 import drbd.data.Host;
 import drbd.data.Cluster;
@@ -174,12 +173,11 @@ public final class TestSuite1 {
                 final String saveFile = Tools.getConfigData().getSaveFile();
                 Tools.save(saveFile);
             }
-            for (int i = 0; i < getFactor(); i++) {
+            for (int i = 0; i <= getFactor() / 100; i++) {
                 for (final Host host : HOSTS) {
                     host.disconnect();
                 }
                 cluster.connect(null, true, i);
-                
                 for (final Host host : HOSTS) {
                     final boolean r = waitForCondition(
                                             new Condition() {

@@ -480,8 +480,7 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Returns true if combo box has changed. */
-    private boolean comboBoxChanged(final String selectedValue,
-                                    final Object[] items) {
+    private boolean comboBoxChanged(final Object[] items) {
         final JComboBox cb = (JComboBox) component;
         if (items.length != cb.getItemCount()) {
             return true;
@@ -518,7 +517,7 @@ public final class GuiComboBox extends JPanel {
                    && !selectedValue.equals(selectedItem)) {
             selectedChanged = true;
         }
-        final boolean itemsChanged = comboBoxChanged(selectedValue, items);
+        final boolean itemsChanged = comboBoxChanged(items);
         if (!selectedChanged && !itemsChanged) {
             return;
         }
@@ -842,10 +841,9 @@ public final class GuiComboBox extends JPanel {
                 final Object o0 = ((Object[]) o)[0];
                 final Object o1 = ((Object[]) o)[1];
                 String v = o0.toString();
-                if (v != null && !"".equals(v) && o1 != null) {
-                    if (o1 instanceof Unit) {
-                        v += ((Unit) o1).getShortName();
-                    }
+                if (v != null && !"".equals(v) && o1 != null
+                    && o1 instanceof Unit) {
+                    v += ((Unit) o1).getShortName();
                 }
                 return v;
             } else {
@@ -1688,11 +1686,6 @@ public final class GuiComboBox extends JPanel {
     /** Returns its component. */
     JComponent getJComponent() {
         return component;
-    }
-
-    /** Sets backbround. TODO: useless? */
-    @Override public void setBackground(final Color bg) {
-        super.setBackground(bg);
     }
 
     /** Sets background color. */

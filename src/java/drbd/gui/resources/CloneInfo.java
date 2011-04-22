@@ -106,20 +106,17 @@ final class CloneInfo extends ServiceInfo {
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
         final ServiceInfo cs = containedService;
-        if (cs != null) {
-            return cs.getInfoPanel();
-        } else {
+        if (cs == null) {
             return new JPanel();
+        } else {
+            return cs.getInfoPanel();
         }
     }
 
     /** Returns whether the resource has failed to start. */
     @Override public boolean isFailed(final boolean testOnly) {
         final ServiceInfo ci = containedService;
-        if (ci != null) {
-            return ci.isFailed(testOnly);
-        }
-        return false;
+        return ci != null && ci.isFailed(testOnly);
     }
 
     /** Returns fail count. */
@@ -183,10 +180,10 @@ final class CloneInfo extends ServiceInfo {
          List<String> nodes = getRunningOnNodes(testOnly);
          final List<String> slaves = getSlaveOnNodes(testOnly);
          int nodesCount = 0;
-         if (nodes != null) {
-             nodesCount = nodes.size();
-         } else {
+         if (nodes == null) {
              nodes = new ArrayList<String>();
+         } else {
+             nodesCount = nodes.size();
          }
          int slavesCount = 0;
          if (slaves != null) {

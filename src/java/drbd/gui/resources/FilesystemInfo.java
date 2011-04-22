@@ -393,10 +393,10 @@ final class FilesystemInfo extends ServiceInfo {
             return;
         }
         boolean oldDrbddisk = false;
-        if (getDrbddiskInfo() != null) {
-            oldDrbddisk = true;
-        } else {
+        if (getDrbddiskInfo() == null) {
             oldDrbddisk = drbddiskIsPreferred;
+        } else {
+            oldDrbddisk = true;
         }
         if (oldDri != null) {
             if (oldDrbddisk) {

@@ -948,16 +948,16 @@ public final class GroupInfo extends ServiceInfo {
                         }
                     }
                     if (someConnection) {
-                        if (!scoreFirst && !scoreThen) {
-                            /* just colocation */
-                            constraint = " --"; /* -- */
-                        } else {
+                        if (scoreFirst || scoreThen) {
                             if (scoreFirst) {
                                 constraint = " \u2192"; /* -> */
                             }
                             if (scoreThen) {
                                 constraintLeft = "\u2192 "; /* -> */
                             }
+                        } else {
+                            /* just colocation */
+                            constraint = " --"; /* -- */
                         }
                     }
                 }
@@ -1278,15 +1278,13 @@ public final class GroupInfo extends ServiceInfo {
             final DefaultMutableTreeNode n =
                                   (DefaultMutableTreeNode) e.nextElement();
             final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-            if (gsi != null) {
-                if (gsi.checkResourceFieldsChanged(
-                                              null,
-                                              gsi.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
-                    gsi.revert();
-                }
+            if (gsi != null && gsi.checkResourceFieldsChanged(
+                                                  null,
+                                                  gsi.getParametersFromXML(),
+                                                  true,
+                                                  false,
+                                                  false)) {
+                gsi.revert();
             }
         }
     }

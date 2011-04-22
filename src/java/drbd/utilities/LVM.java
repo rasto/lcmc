@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.Host;
+import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -61,7 +62,9 @@ public final class LVM {
                                  null, /* exec callback */
                                  outputVisible,
                                  Tools.getString("LVM.ExecutingCommand")
-                                 + " " + command + "...",
+                                 + " "
+                                 + command.replaceAll(DistResource.SUDO, " ")
+                                 + "...",
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
     }
 

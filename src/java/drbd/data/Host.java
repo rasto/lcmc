@@ -306,14 +306,14 @@ public final class Host {
         } else {
             col = savedColor;
         }
-        if (!isConnected()) {
-            secColor = Tools.getDefaultColor("Host.ErrorColor");
-        } else {
+        if (isConnected()) {
             if (isDrbdStatus() && isDrbdLoaded()) {
                 return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
             }
+        } else {
+            secColor = Tools.getDefaultColor("Host.ErrorColor");
         }
         return new Color[]{col, secColor};
     }
@@ -331,14 +331,14 @@ public final class Host {
         } else {
             col = savedColor;
         }
-        if (!isConnected()) {
-            secColor = Tools.getDefaultColor("Host.ErrorColor");
-        } else {
+        if (isConnected()) {
             if (isClStatus()) {
                 return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
             }
+        } else {
+            secColor = Tools.getDefaultColor("Host.ErrorColor");
         }
         return new Color[]{col, secColor};
     }
@@ -788,10 +788,10 @@ public final class Host {
                     detectedDist = lsbDist;
                 }
             case 4:
-                if (lsbVersion != null) {
-                    detectedDistVersion = info[3] + "/" + lsbVersion;
-                } else {
+                if (lsbVersion == null) {
                     detectedDistVersion = info[3];
+                } else {
+                    detectedDistVersion = info[3] + "/" + lsbVersion;
                 }
             case 3:
                 detectedKernelVersion = info[2];
@@ -1136,9 +1136,9 @@ public final class Host {
     }
 
     /**
-     * Executes command with bash -c. Command is executed in a new thread, after command
-     * is finished callback.done function will be called. In case of error,
-     * callback.doneError is called.
+     * Executes command with bash -c. Command is executed in a new thread,
+     * after command * is finished callback.done function will be called.
+     * In case of error, callback.doneError is called.
      */
     public ExecCommandThread execCommandInBash(
                                final String commandString,
@@ -2184,11 +2184,7 @@ public final class Host {
                 drbdModuleVersion = null;
             }
         }
-        if (!heartbeatRunning && !csRunning && !aisRunning) {
-            corosyncHeartbeatRunning = false;
-        } else {
-            corosyncHeartbeatRunning = true;
-        }
+        corosyncHeartbeatRunning = heartbeatRunning || csRunning || aisRunning;
         if (commLayerStarting
             && (csRunning || aisRunning || heartbeatRunning)) {
             commLayerStarting = false;
@@ -2592,6 +2588,7 @@ public final class Host {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
         } catch (java.lang.NumberFormatException e) {
+            Tools.appWarning("could not parse: " + colorString);
             /* ignore it */
         }
     }
@@ -2652,12 +2649,12 @@ public final class Host {
         return libvirtVersion;
     }
 
-    /** Returns logical volumes from volume group */
+    /** Returns logical volumes from volume group. */
     public Set<String> getLogicalVolumesFromVolumeGroup(final String vg) {
         return volumeGroupsLVS.get(vg);
     }
 
-    /** Returns all logical volumes */
+    /** Returns all logical volumes. */
     public Set<String> getAllLogicalVolumes() {
         final Set<String> allLVS = new LinkedHashSet<String>();
         for (final String vg : volumeGroups.keySet()) {

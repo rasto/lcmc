@@ -92,8 +92,6 @@ import org.w3c.dom.Node;
 public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** Whether the vm is running on at least one host. */
-    private boolean running = false;
     /** UUID. */
     private String uuid;
     /** HTML string on which hosts the vm is defined. */
@@ -372,24 +370,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
     static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
-    /** New vm domain button. */
-    private JComponent newVMButton = null;
-    /** New disk button. */
-    private MyButton newDiskBtn = null;
-    /** New interface button. */
-    private MyButton newInterfaceBtn = null;
-    /** New input button. */
-    private MyButton newInputBtn = null;
-    /** New graphics button. */
-    private MyButton newGraphicsBtn = null;
-    /** New sound button. */
-    private MyButton newSoundBtn = null;
-    /** New serial button. */
-    private MyButton newSerialBtn = null;
-    /** New parallel button. */
-    private MyButton newParallelBtn = null;
-    /** New video button. */
-    private MyButton newVideoBtn = null;
     /** This is a map from host to the check box. */
     private final Map<String, GuiComboBox> definedOnHostComboBoxHash =
                                           new HashMap<String, GuiComboBox>();
@@ -1585,7 +1565,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                           + Tools.join(", ", definedhosts.toArray(
                                      new String[definedhosts.size()]))
                           + "</html>";
-        running = !runningOnHosts.isEmpty();
+        final boolean running = !runningOnHosts.isEmpty();
         try {
             mTransitionLock.acquire();
         } catch (final InterruptedException e) {
@@ -1840,7 +1820,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         final JTable table = getTable(HEADER_TABLE);
         if (table != null) {
-            newVMButton = getBrowser().getVMSInfo().getNewButton();
+            final JComponent newVMButton =
+                                    getBrowser().getVMSInfo().getNewButton();
             mainPanel.add(newVMButton);
             mainPanel.add(table.getTableHeader());
             mainPanel.add(table);
@@ -1920,14 +1901,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         buttonPanel.add(mb, BorderLayout.EAST);
         mainPanel.add(optionsPanel);
 
-        newDiskBtn = VMSDiskInfo.getNewBtn(this);
-        newInterfaceBtn = VMSInterfaceInfo.getNewBtn(this);
-        newInputBtn = VMSInputDevInfo.getNewBtn(this);
-        newGraphicsBtn = VMSGraphicsInfo.getNewBtn(this);
-        newSoundBtn = VMSSoundInfo.getNewBtn(this);
-        newSerialBtn = VMSSerialInfo.getNewBtn(this);
-        newParallelBtn = VMSParallelInfo.getNewBtn(this);
-        newVideoBtn = VMSVideoInfo.getNewBtn(this);
+        final MyButton newDiskBtn = VMSDiskInfo.getNewBtn(this);
+        final MyButton newInterfaceBtn = VMSInterfaceInfo.getNewBtn(this);
+        final MyButton newInputBtn = VMSInputDevInfo.getNewBtn(this);
+        final MyButton newGraphicsBtn = VMSGraphicsInfo.getNewBtn(this);
+        final MyButton newSoundBtn = VMSSoundInfo.getNewBtn(this);
+        final MyButton newSerialBtn = VMSSerialInfo.getNewBtn(this);
+        final MyButton newParallelBtn = VMSParallelInfo.getNewBtn(this);
+        final MyButton newVideoBtn = VMSVideoInfo.getNewBtn(this);
         /* new video button */
         mainPanel.add(getTablePanel("Disks",
                                     DISK_TABLE,
@@ -3128,7 +3109,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns parameters. */
     @Override public String[] getParametersFromXML() {
-        return VM_PARAMETERS;
+        return VM_PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */

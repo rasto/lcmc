@@ -897,11 +897,7 @@ public final class CRM {
             && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             idPostfix = "-meta-options";
         }
-        if (metaAttrsRefId != null) {
-            xml.append("<meta_attributes id-ref=\"");
-            xml.append(metaAttrsRefId);
-            xml.append("\"/>");
-        } else {
+        if (metaAttrsRefId == null) {
             xml.append("<meta_attributes id=\"");
             xml.append(resId);
             xml.append(idPostfix);
@@ -933,6 +929,10 @@ public final class CRM {
                 xml.append("</attributes>");
             }
             xml.append("</meta_attributes>");
+        } else {
+            xml.append("<meta_attributes id-ref=\"");
+            xml.append(metaAttrsRefId);
+            xml.append("\"/>");
         }
         return xml.toString();
     }

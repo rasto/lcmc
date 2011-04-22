@@ -44,7 +44,7 @@ public final class RoboTest {
     /** Don't move the mosue pointer smothly. */
     private static final boolean MOVE_MOUSE_FAST = false;
     /** Previous position of the mouse. */
-    private static Point2D prevP = null;
+    private static volatile Point2D prevP = null;
     /** Whether the test was aborted. */
     private static volatile boolean aborted = false;
     /** Slow down the animation. */
@@ -520,8 +520,8 @@ public final class RoboTest {
         final int ipY = 255;
         final int gx = 230;
         final int gy = 374;
-        final int popX = 343;
-        final int popY = 300;
+        final int popX = 340;
+        final int popY = 305;
         final int statefulX = 500;
         final int statefulY = 255;
         disableStonith(robot, host);
@@ -1090,9 +1090,9 @@ public final class RoboTest {
         checkTest(host, "test1", 29);
         if (true) {
             removeResource(robot, ipX, ipY, -15);
-	    sleep(5000);
+            sleep(5000);
             removeGroup(robot, gx, gy, 0);
-	    sleep(5000);
+            sleep(5000);
             removeGroup(robot, statefulX, statefulY, -15);
         } else {
             removeEverything(robot);
@@ -1106,9 +1106,9 @@ public final class RoboTest {
 
     /** Stop everything. */
     private static void stopEverything(final Robot robot) {
-	sleep(10000);
+        sleep(10000);
         moveTo(robot, 335, 129); /* advanced */
-	sleep(2000);
+        sleep(2000);
         leftClick(robot);
         sleep(2000);
         moveTo(robot, 671, 568);
@@ -1118,16 +1118,16 @@ public final class RoboTest {
         sleep(3000);
         leftClick(robot);
         moveTo(robot, 335, 129); /* not advanced */
-	sleep(2000);
+        sleep(2000);
         leftClick(robot);
-	sleep(2000);
+        sleep(2000);
     }
 
     /** Remove everything. */
     private static void removeEverything(final Robot robot) {
-	sleep(10000);
+        sleep(10000);
         moveTo(robot, 335, 129); /* advanced */
-	sleep(2000);
+        sleep(2000);
         leftClick(robot);
         sleep(2000);
         moveTo(robot, 671, 568);
@@ -1140,9 +1140,9 @@ public final class RoboTest {
         sleep(3000);
         leftClick(robot);
         moveTo(robot, 335, 129); /* not advanced */
-	sleep(2000);
+        sleep(2000);
         leftClick(robot);
-	sleep(2000);
+        sleep(2000);
     }
 
     /** Disable stonith if it is enabled. */
@@ -1766,7 +1766,7 @@ public final class RoboTest {
                                     final boolean migrateTimeouts) {
         int yCorr = 0;
         if (migrateTimeouts) {
-            yCorr = - 90;
+            yCorr = -90;
         }
         sleep(3000);
         moveTo(robot, 1105, 298);
@@ -1864,7 +1864,7 @@ public final class RoboTest {
     private static void chooseDummy(final Robot robot,
                                     final int x,
                                     final int y,
-                                    boolean clone) {
+                                    final boolean clone) {
         moveTo(robot, x, y);
         sleep(1000);
         rightClick(robot); /* popup */
@@ -2138,12 +2138,16 @@ public final class RoboTest {
             rightClick(robot); /* popup */
         }
         moveTo(robot, x + 82, y + 50 + groupcor);
+        sleep(1000);
         moveTo(robot, x + 335, y + 50 + groupcor);
-        moveTo(robot, x + 335, y + 50 + groupcor + skipY + 9);
-        moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 9);
+        sleep(1000);
+        moveTo(robot, x + 335, y + 50 + groupcor + skipY + 7);
+        sleep(1000);
+        moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 7);
+        sleep(1000);
         moveTo(robot,
                x + 520 + xCorrection,
-               y + 50 + groupcor + skipY + 9 + with);
+               y + 50 + groupcor + skipY + 7 + with);
         sleep(6000); /* ptest */
         leftClick(robot); /* start before */
     }
@@ -2633,13 +2637,13 @@ public final class RoboTest {
         checkDRBDTest(host, drbdTest, 2.3); /* 2.3 */
 
         moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot); 
+        rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
         checkDRBDTest(host, drbdTest, 3);
         moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot); 
+        rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);

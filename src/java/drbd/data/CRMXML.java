@@ -174,9 +174,9 @@ public final class CRMXML extends XML {
      */
     private final MultiKeyMap serviceToResourceAgentMap = new MultiKeyMap();
     /** Whether drbddisk ra is present. */
-    private boolean drbddiskPresent = false;
+    private boolean drbddiskPresent;
     /** Whether linbit::drbd ra is present. */
-    private boolean linbitDrbdPresent = false;
+    private final boolean linbitDrbdPresent;
     /** Choices for combo box in stonith hostlists. */
     private final List<String> hostlistChoices = new ArrayList<String>();
 
@@ -574,11 +574,17 @@ public final class CRMXML extends XML {
                             false, /* outputVisible */
                             Tools.getString("CRMXML.GetOCFParameters"),
                             300000);
+        boolean linbitDrbdPresent0 = false;
+        boolean drbddiskPresent0 = false;
         if (ret.getExitCode() != 0) {
+            drbddiskPresent = drbddiskPresent0;
+            linbitDrbdPresent = linbitDrbdPresent0;
             return;
         }
         final String output = ret.getOutput();
         if (output == null) {
+            drbddiskPresent = drbddiskPresent0;
+            linbitDrbdPresent = linbitDrbdPresent0;
             return;
         }
         final String[] lines = output.split("\\r?\\n");
@@ -620,10 +626,10 @@ public final class CRMXML extends XML {
                 final Matcher m2 = ep.matcher(lines[i]);
                 if (m2.matches()) {
                     if ("drbddisk".equals(serviceName)) {
-                        drbddiskPresent = true;
+                        drbddiskPresent0 = true;
                     } else if ("drbd".equals(serviceName)
                                && "linbit".equals(provider)) {
-                        linbitDrbdPresent = true;
+                        linbitDrbdPresent0 = true;
                     }
                     parseMetaData(serviceName,
                                   provider,
@@ -634,9 +640,11 @@ public final class CRMXML extends XML {
                 }
             }
         }
+        drbddiskPresent = drbddiskPresent0;
         if (!drbddiskPresent) {
             Tools.appWarning("drbddisk heartbeat script is not present");
         }
+        linbitDrbdPresent = linbitDrbdPresent0;
         if (!linbitDrbdPresent) {
             Tools.appWarning("linbit::drbd ocf ra is not present");
         }
@@ -929,7 +937,7 @@ public final class CRMXML extends XML {
                 return new String[]{"Yes", "No"};
             } else if (PCMK_TRUE.equals(paramDefault)
                        || PCMK_FALSE.equals(paramDefault)) {
-                return PCMK_BOOLEAN_VALUES;
+                return PCMK_BOOLEAN_VALUES.clone();
             } else if ("True".equals(paramDefault)
                        || "False".equals(paramDefault)) {
                 return new String[]{"True", "False"};
@@ -937,7 +945,7 @@ public final class CRMXML extends XML {
         }
         final String hbV = host.getHeartbeatVersion();
         final String pcmkV = host.getPacemakerVersion();
-        return PCMK_BOOLEAN_VALUES;
+        return PCMK_BOOLEAN_VALUES.clone();
     }
 
     /**

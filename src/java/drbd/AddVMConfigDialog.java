@@ -47,7 +47,7 @@ public final class AddVMConfigDialog {
     }
 
     /** Shows step by step dialogs that add and configure new vm domain. */
-    public final void showDialogs() {
+    public void showDialogs() {
         vmsVirtualDomainInfo.setDialogStarted(true);
         VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
@@ -72,7 +72,7 @@ public final class AddVMConfigDialog {
     }
 
     /** Returns whether the wizard was canceled. */
-    public final boolean isCanceled() {
+    public boolean isCanceled() {
         return canceled;
     }
 }

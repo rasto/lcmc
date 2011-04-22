@@ -61,7 +61,9 @@ public class CategoryInfo extends Info {
             return infoPanel;
         }
         final JComponent table = getTable(MAIN_TABLE);
-        if (table != null) {
+        if (table == null) {
+            infoPanel = super.getInfoPanel();
+        } else {
             infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.setBackground(Browser.PANEL_BACKGROUND);
@@ -78,8 +80,6 @@ public class CategoryInfo extends Info {
             sp.getViewport().setBackground(Browser.PANEL_BACKGROUND);
             sp.setBackground(Browser.PANEL_BACKGROUND);
             infoPanel.add(sp);
-        } else {
-            infoPanel = super.getInfoPanel();
         }
         return infoPanel;
     }

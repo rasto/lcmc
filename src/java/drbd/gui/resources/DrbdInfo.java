@@ -353,7 +353,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             private volatile boolean mouseStillOver = false;
 
             /** Whether the whole thing should be enabled. */
-            @Override public final boolean isEnabled() {
+            @Override public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
                     return false;
@@ -368,7 +368,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 return true;
             }
 
-            @Override public final void mouseOut() {
+            @Override public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -377,7 +377,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public final void mouseOver() {
+            @Override public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -396,8 +396,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                                                startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
-                final Map<Host,String> testOutput =
-                                         new LinkedHashMap<Host, String>();
+                final Map<Host, String> testOutput =
+                                           new LinkedHashMap<Host, String>();
                 try {
                     createDrbdConfig(true);
                     for (final Host h
@@ -778,6 +778,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
         }
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
+
+    /** Returns true if all fields are correct. */
     boolean checkResourceFieldsCorrect(final String param,
                                        final String[] params) {
         if (getBrowser().getDrbdResHash().isEmpty()) {

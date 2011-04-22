@@ -127,7 +127,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns parameters. */
     @Override public String[] getParametersFromXML() {
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */

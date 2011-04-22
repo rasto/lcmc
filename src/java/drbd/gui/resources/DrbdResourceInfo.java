@@ -53,7 +53,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -479,11 +478,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             /**
              * Whether the whole thing should be enabled.
              */
-            @Override public final boolean isEnabled() {
+            @Override public boolean isEnabled() {
                 return true;
             }
 
-            @Override public final void mouseOut() {
+            @Override public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -492,7 +491,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public final void mouseOver() {
+            @Override public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -511,8 +510,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                                                                startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
-                final Map<Host,String> testOutput =
-                                         new LinkedHashMap<Host, String>();
+                final Map<Host, String> testOutput =
+                                            new LinkedHashMap<Host, String>();
                 try {
                     getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getCluster().getHostsArray()) {
@@ -898,7 +897,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 return !isConnected(testOnly);
             }
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
@@ -908,7 +907,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 return null;
             }
 
-            @Override public final void action() {
+            @Override public void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -965,17 +964,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public final boolean predicate() {
+            @Override public boolean predicate() {
                 return isPausedSync();
             }
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!isSyncing()) {
                     return "it is not syncing";
                 }
                 return null;
             }
-            @Override public final void action() {
+            @Override public void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -1007,7 +1006,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (isSplitBrain()) {
                     return null;
                 } else {
@@ -1015,7 +1014,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 }
             }
 
-            @Override public final void action() {
+            @Override public void action() {
                 resolveSplitBrain();
             }
         };
@@ -1031,7 +1030,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!isConnected(testOnly)) {
                     return "not connected";
                 }
@@ -1044,7 +1043,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 return null;
             }
 
-            @Override public final void action() {
+            @Override public void action() {
                 verify(testOnly);
             }
         };
@@ -1058,14 +1057,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            @Override public final void action() {
+            @Override public void action() {
                 /* this drbdResourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
                 removeMyself(testOnly);
             }
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
@@ -1084,11 +1083,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 return null;
             }
 
-            @Override public final void action() {
+            @Override public void action() {
                 hidePopup();
                 final String device = getDevice();
                 DrbdLogs l = new DrbdLogs(getCluster(), device);
@@ -1128,8 +1127,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             final String bsString =
                                 blockDevInfo1.getBlockDevice().getBlockSize();
             final String rateString = getResource().getValue("rate");
-            if (spString != null && bsString != null &&
-                rateString != null) {
+            if (spString != null && bsString != null && rateString != null) {
                 final double sp = Double.parseDouble(spString);
                 final double bs = Double.parseDouble(bsString);
                 final Object[] rateObj = Tools.extractUnit(rateString);
@@ -1147,7 +1145,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                 if (rate > 0) {
                     s.append("\nremaining at least: ");
                     final double seconds = ((100 - sp) / 100 * bs) / rate;
-                    if (seconds < 60*5) {
+                    if (seconds < 60 * 5) {
                         s.append((int) seconds);
                         s.append(" Seconds");
                     } else {

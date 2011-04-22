@@ -136,6 +136,7 @@ public final class ConfirmDialog extends ConfigDialog {
 
     /** Inits the dialog. */
     @Override protected void initDialog() {
+        /* do nothing */
     }
 
     /**

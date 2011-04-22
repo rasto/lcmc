@@ -50,11 +50,11 @@ import org.w3c.dom.Node;
 public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
-    private Map<String, GuiComboBox> sourceNetworkCB =
+    private final Map<String, GuiComboBox> sourceNetworkCB =
                                             new HashMap<String, GuiComboBox>();
     /** Source bridge combo box, so that it can be disabled, depending on
      * type. */
-    private Map<String, GuiComboBox> sourceBridgeCB =
+    private final Map<String, GuiComboBox> sourceBridgeCB =
                                             new HashMap<String, GuiComboBox>();
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
@@ -184,7 +184,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns parameters. */
     @Override public String[] getParametersFromXML() {
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */
@@ -374,12 +374,14 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected boolean isEnabledOnlyInAdvancedMode(final String param) {
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
+                                                        final String param) {
          return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(final String param) {
+    @Override protected ConfigData.AccessType getAccessType(
+                                                        final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
@@ -542,9 +544,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override String[] getRealParametersFromXML() {
         if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
-            return NETWORK_PARAMETERS;
+            return NETWORK_PARAMETERS.clone();
         } else {
-            return BRIDGE_PARAMETERS;
+            return BRIDGE_PARAMETERS.clone();
         }
     }
 }

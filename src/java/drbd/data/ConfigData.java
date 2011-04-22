@@ -108,7 +108,7 @@ public final class ConfigData {
     /** Default save file. */
     private String saveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     /** Known hosts object. */
-    private KnownHosts knownHosts = new KnownHosts();
+    private final KnownHosts knownHosts = new KnownHosts();
     /** Known hosts path. */
     private String knownHostPath;
     /** Id dsa path. */

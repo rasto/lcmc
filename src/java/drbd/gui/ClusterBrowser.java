@@ -334,6 +334,7 @@ public final class ClusterBrowser extends Browser {
     /** String that appears as a tooltip in menu items if status was disabled.*/
     public static final String UNKNOWN_CLUSTER_STATUS_STRING =
                                                      "unknown cluster status";
+    /** Default operation parameters. */
     private static final List<String> DEFAULT_OP_PARAMS =
                                        new ArrayList<String>(
                                                Arrays.asList(HB_PAR_TIMEOUT,
@@ -624,8 +625,8 @@ public final class ClusterBrowser extends Browser {
     void updateClusterResources(final Host[] clusterHosts,
                                 final String[] commonFileSystems,
                                 final String[] commonMountPoints) {
-        this.commonFileSystems = commonFileSystems;
-        this.commonMountPoints = commonMountPoints;
+        this.commonFileSystems = commonFileSystems.clone();
+        this.commonMountPoints = commonMountPoints.clone();
         DefaultMutableTreeNode resource;
 
         /* all hosts */
@@ -667,7 +668,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Returns mountpoints that exist on all servers. */
     public String[] getCommonMountPoints() {
-        return commonMountPoints;
+        return commonMountPoints.clone();
     }
 
     /** Starts everything. */
@@ -809,7 +810,6 @@ public final class ClusterBrowser extends Browser {
             }
 
             host.setIsLoading();
-            boolean changed = false;
             if (host.isServerStatusLatch() || count % 5 == 0) {
                 host.getHWInfo(infosToUpdate,
                                new ResourceGraph[]{drbdGraph, heartbeatGraph});
@@ -2026,7 +2026,7 @@ public final class ClusterBrowser extends Browser {
                                 index = i;
                             }
                         } catch (NumberFormatException nfe) {
-                            /* not a number */
+                            Tools.appWarning("could not parse: " + m.group(1));
                         }
                     }
                 }
@@ -2232,14 +2232,14 @@ public final class ClusterBrowser extends Browser {
             drbdtestLockAcquire();
             final Map<Host, String> testOutput =
                                              new LinkedHashMap<Host, String>();
-            if (menuHost != null) {
-                action(menuHost);
-                testOutput.put(menuHost, DRBD.getDRBDtest());
-            } else {
+            if (menuHost == null) {
                 for (final Host h : cluster.getHostsArray()) {
                     action(h);
                     testOutput.put(h, DRBD.getDRBDtest());
                 }
+            } else {
+                action(menuHost);
+                testOutput.put(menuHost, DRBD.getDRBDtest());
             }
             final DRBDtestData dtd = new DRBDtestData(testOutput);
             component.setToolTipText(dtd.getToolTip());

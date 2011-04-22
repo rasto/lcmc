@@ -971,7 +971,7 @@ public final class DrbdXML extends XML {
     public String getConfigValue(final String res,
                                  final String section,
                                  final String optionName) {
-        Map<String, String> option = optionsMap.get(res + "." + section);
+        final Map<String, String> option = optionsMap.get(res + "." + section);
 
         String value = null;
         if (option != null) {

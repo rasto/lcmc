@@ -129,7 +129,7 @@ public class ServiceInfo extends EditableInfo {
     /** Group info object of the group this service is in or null, if it is
      * not in any group. */
     private GroupInfo groupInfo = null;
-    /** Clone info object lock */
+    /** Clone info object lock. */
     private final Mutex mCloneInfo = new Mutex();
     /** Master/Slave info object, if is null, it is not master/slave
      * resource. */
@@ -311,7 +311,6 @@ public class ServiceInfo extends EditableInfo {
                                        final boolean fromServicesInfo,
                                        final boolean fromCloneInfo,
                                        final boolean fromGroupInfo) {
-        boolean ret = true;
         if (getComboBoxValue(GUI_ID) == null) {
             return true;
         }
@@ -360,9 +359,6 @@ public class ServiceInfo extends EditableInfo {
                 return false;
             }
         }
-        if (!ret) {
-            return false;
-        }
         return true;
     }
 
@@ -386,7 +382,6 @@ public class ServiceInfo extends EditableInfo {
                                               final boolean fromServicesInfo,
                                               final boolean fromCloneInfo,
                                               final boolean fromGroupInfo) {
-            
         final String id = getComboBoxValue(GUI_ID);
         final CloneInfo ci = getCloneInfo();
         if (!fromCloneInfo && ci != null) {
@@ -2950,7 +2945,7 @@ public class ServiceInfo extends EditableInfo {
             final String locationId = null;
             if (!Tools.areEqual(savedPingOperation,
                                 value)) {
-                String pingLocationId = cs.getPingLocationId(
+                final String pingLocationId = cs.getPingLocationId(
                                                     getHeartbeatId(testOnly),
                                                     testOnly);
                 if (pingLocationId != null) {
@@ -3011,10 +3006,10 @@ public class ServiceInfo extends EditableInfo {
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
                     mOperationsComboBoxHashLock.release();
                     String value;
-                    if (cb != null) {
-                        value = cb.getStringValue();
-                    } else {
+                    if (cb == null) {
                         value = "0";
+                    } else {
+                        value = cb.getStringValue();
                     }
                     if (value != null && !"".equals(value)) {
                         if (cb != null && firstTime) {
@@ -4545,16 +4540,16 @@ public class ServiceInfo extends EditableInfo {
         dlm.addElement(mmi);
         final ClusterBrowser.ClMenuItemCallback mmiCallback =
             getBrowser().new ClMenuItemCallback(list, null) {
-                                   @Override public void action(final Host dcHost) {
-                                       addServicePanel(asi,
-                                                       null,
-                                                       colocationOnly,
-                                                       orderOnly,
-                                                       true,
-                                                       dcHost,
-                                                       true); /* test only */
-                                   }
-                               };
+                           @Override public void action(final Host dcHost) {
+                               addServicePanel(asi,
+                                               null,
+                                               colocationOnly,
+                                               orderOnly,
+                                               true,
+                                               dcHost,
+                                               true); /* test only */
+                           }
+                       };
         callbackHash.put(mmi, mmiCallback);
     }
 
@@ -4844,8 +4839,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Adds resource agent RA menu item. It is called in swing thread. */
-    private void addResourceAgentMenu(final MyMenu menu,
-                                      final ResourceAgent ra,
+    private void addResourceAgentMenu(final ResourceAgent ra,
                                       final DefaultListModel dlm,
                                       final Point2D pos,
                                       final boolean colocationOnly,
@@ -5040,8 +5034,7 @@ public class ServiceInfo extends EditableInfo {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {
                                 @Override public void run() {
-                                    addResourceAgentMenu(thisMenu,
-                                                         ra,
+                                    addResourceAgentMenu(ra,
                                                          dlm,
                                                          pos,
                                                          colocationOnly,
@@ -5059,10 +5052,10 @@ public class ServiceInfo extends EditableInfo {
                         SwingUtilities.invokeAndWait(new Runnable() {
                             @Override public void run() {
                                 final JScrollPane jsp = Tools.getScrollingMenu(
-                                                      classItem,
-                                                  dlm,
-                                                  new MyList(dlm, getBackground()),
-                                                  null);
+                                              classItem,
+                                              dlm,
+                                              new MyList(dlm, getBackground()),
+                                              null);
                                 if (jsp == null) {
                                     classItem.setEnabled(false);
                                 } else {
@@ -5973,15 +5966,15 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
-            if (runningOnNodeString != null) {
+            if (runningOnNodeString == null) {
+                texts.add(new Subtext(textNotOn,
+                                      ClusterBrowser.FILL_PAINT_STOPPED,
+                                      textColor));
+            } else {
                 texts.add(new Subtext(textOn + ": " + runningOnNodeString
                                       + getPingCountString(runningOnNodeString,
                                                            testOnly),
                                       color,
-                                      textColor));
-            } else {
-                texts.add(new Subtext(textNotOn,
-                                      ClusterBrowser.FILL_PAINT_STOPPED,
                                       textColor));
             }
         }
@@ -6037,22 +6030,7 @@ public class ServiceInfo extends EditableInfo {
         } else if (isStarted(testOnly)) {
             if (isRunning(testOnly)) {
                 final List<Host> migratedTo = getMigratedTo(testOnly);
-                if (migratedTo != null) {
-                    final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
-                    if (runningOnNodes != null) {
-                        boolean alreadyThere = false;
-                        for (final Host mto : migratedTo) {
-                            if (runningOnNodes.contains(mto.getName())) {
-                                alreadyThere = true;
-                            }
-                            if (!alreadyThere) {
-                                return Tools.getString(
-                                                "ClusterBrowser.Hb.Migrating");
-                            }
-                        }
-                    }
-                } else {
+                if (migratedTo == null) {
                     final List<Host> migratedFrom = getMigratedFrom(testOnly);
                     if (migratedFrom != null) {
                         final List<String> runningOnNodes =
@@ -6071,6 +6049,21 @@ public class ServiceInfo extends EditableInfo {
                         if (!alreadyThere) {
                             return Tools.getString(
                                             "ClusterBrowser.Hb.Migrating");
+                        }
+                    }
+                } else {
+                    final List<String> runningOnNodes =
+                                               getRunningOnNodes(testOnly);
+                    if (runningOnNodes != null) {
+                        boolean alreadyThere = false;
+                        for (final Host mto : migratedTo) {
+                            if (runningOnNodes.contains(mto.getName())) {
+                                alreadyThere = true;
+                            }
+                            if (!alreadyThere) {
+                                return Tools.getString(
+                                                "ClusterBrowser.Hb.Migrating");
+                            }
                         }
                     }
                 }

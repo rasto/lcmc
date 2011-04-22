@@ -36,10 +36,6 @@ public final class DrbdMCApplet extends JApplet {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
-    /** Initial delay for showing any tool tip in milliseconds. */
-    private static final int TOOLTIP_INITIAL_DELAY = 200;
-    /** Dismiss delay for showing any tool tip in milliseconds. */
-    private static final int TOOLTIP_DISMISS_DELAY = 100000;
     /** Public applet constructor. */
     public DrbdMCApplet() {
     }
@@ -49,10 +45,10 @@ public final class DrbdMCApplet extends JApplet {
         Tools.init();
         String[] params;
         final String paramsLine = getParameter("params");
-        if (paramsLine != null) {
-            params = paramsLine.split("\\s+");
-        } else {
+        if (paramsLine == null) {
             params = new String[]{};
+        } else {
+            params = paramsLine.split("\\s+");
         }
 
         DrbdMC.initApp(params);

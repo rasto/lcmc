@@ -239,7 +239,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns parameters. */
     @Override public final String[] getParametersFromXML() {
-        return PARAMETERS;
+        return PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */
@@ -511,7 +511,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
        final List<String> params = PARAMETERS_MAP.get(
                                     getComboBoxValue(ParallelSerialData.TYPE));
        if (params == null) {
-           return PARAMETERS;
+           return PARAMETERS.clone();
        }
        return params.toArray(new String[params.size()]);
     }

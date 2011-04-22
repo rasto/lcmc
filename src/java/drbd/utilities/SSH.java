@@ -106,7 +106,9 @@ public final class SSH {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (connectionThread != null) {
+        if (connectionThread == null) {
+            mConnectionThreadLock.release();
+        } else {
             try {
                 final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.release();
@@ -117,8 +119,6 @@ public final class SSH {
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        } else {
-            mConnectionThreadLock.release();
         }
         if (disconnectForGood) {
             return false;
@@ -210,7 +210,9 @@ public final class SSH {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (connectionThread != null) {
+        if (connectionThread == null) {
+            mConnectionThreadLock.release();
+        } else {
             try {
                 final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.release();
@@ -218,8 +220,6 @@ public final class SSH {
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        } else {
-            mConnectionThreadLock.release();
         }
     }
 
@@ -278,7 +278,9 @@ public final class SSH {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (connection != null) {
+        if (connection == null) {
+            mConnectionLock.release();
+        } else {
             disconnectForGood = true;
             connection.close();
             connection = null;
@@ -286,8 +288,6 @@ public final class SSH {
             Tools.debug(this, "disconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
-        } else {
-            mConnectionLock.release();
         }
     }
 
@@ -307,14 +307,14 @@ public final class SSH {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (connection != null) {
+        if (connection == null) {
+            mConnectionLock.release();
+        } else {
             connection = null;
             mConnectionLock.release();
             Tools.debug(this, "force reconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
-        } else {
-            mConnectionLock.release();
         }
     }
 
@@ -325,15 +325,15 @@ public final class SSH {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        if (connection != null) {
+        if (connection == null) {
+            mConnectionLock.release();
+        } else {
             disconnectForGood = true;
             connection = null;
             mConnectionLock.release();
             Tools.debug(this, "force disconnecting: " + host.getName(), 0);
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
-        } else {
-            mConnectionLock.release();
         }
     }
 
@@ -355,7 +355,7 @@ public final class SSH {
     }
 
     /** This class is a thread that executes commands. */
-    public class ExecCommandThread extends Thread {
+    public final class ExecCommandThread extends Thread {
         /** Command that should be executed. */
         private String command;
         /** After the exec callback. */
@@ -1064,7 +1064,10 @@ public final class SSH {
                  * TODO: do this also for other OSes, when I find out the
                  * known_hosts locations.
                  */
-                if (!Tools.isWindows()) {
+                if (Tools.isWindows()) {
+                    Tools.debug(this, "Not using known_hosts file, because"
+                                      + " this is Windows.");
+                } else {
                     try {
                         KnownHosts.addHostkeyToFile(
                               new File(
@@ -1077,9 +1080,6 @@ public final class SSH {
                                        "",
                                        ignore);
                     }
-                } else {
-                    Tools.debug(this, "Not using known_hosts file, because"
-                                      + " this is not a Linux.");
                 }
 
                 return true;
@@ -1473,9 +1473,7 @@ public final class SSH {
 
                     if (conn.isAuthMethodAvailable(username, "password")) {
                         String ans;
-                        if (lastPassword != null) {
-                            ans = lastPassword;
-                        } else {
+                        if (lastPassword == null) {
                             ans = sshGui.enterSomethingDialog(
                                     Tools.getString(
                                                  "SSH.PasswordAuthentication"),
@@ -1492,6 +1490,8 @@ public final class SSH {
                                 cancelIt = true;
                                 break;
                             }
+                        } else {
+                            ans = lastPassword;
                         }
 
                         if (ans == null) {

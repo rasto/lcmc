@@ -67,49 +67,49 @@ public final class DrbdMC extends JPanel {
     /** Dismiss delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_DISMISS_DELAY = 100000;
 
-    /* The --help option. */
+    /** The --help option. */
     private static final String HELP_OP = "help";
-    /* The --version option. */
+    /** The --version option. */
     private static final String VERSION_OP = "version";
-    /* The --auto option. */
+    /** The --auto option. */
     private static final String AUTO_OP = "auto";
-    /* The --ro option. */
+    /** The --ro option. */
     private static final String RO_OP = "ro";
-    /* The --op option. */
+    /** The --op option. */
     private static final String OP_OP = "op";
-    /* The --admin option. */
+    /** The --admin option. */
     private static final String ADMIN_OP = "admin";
-    /* The --op-mode option. */
+    /** The --op-mode option. */
     private static final String OP_MODE_OP = "op-mode";
-    /* The --no-upgrade-check option. */
+    /** The --no-upgrade-check option. */
     private static final String NO_UPGRADE_CHECK_OP = "no-upgrade-check";
-    /* The --no-plugin-check option. */
+    /** The --no-plugin-check option. */
     private static final String NO_PLUGIN_CHECK_OP = "no-plugin-check";
-    /* The --tightvnc option. */
+    /** The --tightvnc option. */
     private static final String TIGHTVNC_OP = "tightvnc";
-    /* The --ultravnc option. */
+    /** The --ultravnc option. */
     private static final String ULTRAVNC_OP = "ultravnc";
-    /* The --realvnc option. */
+    /** The --realvnc option. */
     private static final String REALVNC_OP = "realvnc";
-    /* The --big-drbd-conf option. */
+    /** The --big-drbd-conf option. */
     private static final String BIGDRBDCONF_OP = "big-drbd-conf";
-    /* The --staging-drbd option. */
+    /** The --staging-drbd option. */
     private static final String STAGING_DRBD_OP = "staging-drbd";
-    /* The --staging-pacemaker option. */
+    /** The --staging-pacemaker option. */
     private static final String STAGING_PACEMAKER_OP = "staging-pacemaker";
-    /* The --vnc-port-offset option. */
+    /** The --vnc-port-offset option. */
     private static final String VNC_PORT_OFFSET_OP = "vnc-port-offset";
-    /* The --slow option. */
+    /** The --slow option. */
     private static final String SLOW_OP = "slow";
-    /* The --restore-mouse option. */
+    /** The --restore-mouse option. */
     private static final String RESTORE_MOUSE_OP = "restore-mouse";
-    /* The --keep-helper option. */
+    /** The --keep-helper option. */
     private static final String KEEP_HELPER_OP = "keep-helper";
-    /* The --id-dsa option. */
+    /** The --id-dsa option. */
     private static final String ID_DSA_OP = "id-dsa";
-    /* The --id-rsa option. */
+    /** The --id-rsa option. */
     private static final String ID_RSA_OP = "id-rsa";
-    /* The --known-hosts option. */
+    /** The --known-hosts option. */
     private static final String KNOWN_HOSTS_OP = "known-hosts";
 
     /**
@@ -285,7 +285,7 @@ public final class DrbdMC extends JPanel {
                 }
             });
         float fps = 20.0f;
-        Options options = new Options();
+        final Options options = new Options();
 
         options.addOption("h", HELP_OP, false, "print this help");
         options.addOption(null,
@@ -354,13 +354,13 @@ public final class DrbdMC extends JPanel {
                      KNOWN_HOSTS_OP,
                      true,
                      "location of known_hosts file ($HOME/.ssh/known_hosts)");
-        CommandLineParser parser = new PosixParser();
+        final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
-            CommandLine cmd = parser.parse(options, args);
+            final CommandLine cmd = parser.parse(options, args);
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
-            boolean realvnc = cmd.hasOption(REALVNC_OP);
+            final boolean realvnc = cmd.hasOption(REALVNC_OP);
             if (!tightvnc && !ultravnc && !realvnc) {
                 if (Tools.isLinux()) {
                     tightvnc = true;
@@ -402,7 +402,7 @@ public final class DrbdMC extends JPanel {
             final String opMode = cmd.getOptionValue(OP_MODE_OP);
             autoArgs = cmd.getOptionValue(AUTO_OP);
             if (cmd.hasOption(HELP_OP)) {
-                HelpFormatter formatter = new HelpFormatter();
+                final HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp("java -jar DMC.jar [OPTIONS]", options);
                 System.exit(0);
             }

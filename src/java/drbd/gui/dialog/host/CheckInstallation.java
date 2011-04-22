@@ -440,7 +440,7 @@ final class CheckInstallation extends DialogHost {
             progressBarDoneError();
             Tools.debug(this, "drbd: " + drbdOk
                               + ", ais/pm: " + pmOk
-                              + ", hb/pm: " + hbPmOk);
+                              + ", hb/pm: " + hbPmOk, 2);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         }

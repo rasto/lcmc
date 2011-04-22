@@ -106,14 +106,7 @@ final class Finish extends DialogHost {
             });
         }
         Tools.getConfigData().removeAutoHost();
-        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
-            Tools.sleep(1000);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    addAnotherHostButton.pressButton();
-                }
-            });
-        } else {
+        if (Tools.getConfigData().getAutoHosts().isEmpty()) {
             if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -122,6 +115,13 @@ final class Finish extends DialogHost {
                     }
                 });
             }
+        } else {
+            Tools.sleep(1000);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override public void run() {
+                    addAnotherHostButton.pressButton();
+                }
+            });
         }
     }
 

@@ -508,10 +508,10 @@ public abstract class EditableInfo extends Info {
                 }
             }
             sectionPanel.add(panel);
-            if (!advanced) {
-                notAdvancedSections.add(sectionPanel);
-            } else {
+            if (advanced) {
                 advancedSections.add(sectionPanel);
+            } else {
+                notAdvancedSections.add(sectionPanel);
             }
         }
         boolean advanced = false;
@@ -572,7 +572,11 @@ public abstract class EditableInfo extends Info {
                 //});
                 boolean c;
                 boolean ch = false;
-                if (realParamCb != null) {
+                if (realParamCb == null) {
+                    Tools.waitForSwing();
+                    ch = checkResourceFieldsChanged(param, params);
+                    c = checkResourceFieldsCorrect(param, params);
+                } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {
                             final Object value = paramCb.getStringValue();
@@ -580,10 +584,6 @@ public abstract class EditableInfo extends Info {
                         }
                     });
                     Tools.waitForSwing();
-                    c = checkResourceFieldsCorrect(param, params);
-                } else {
-                    Tools.waitForSwing();
-                    ch = checkResourceFieldsChanged(param, params);
                     c = checkResourceFieldsCorrect(param, params);
                 }
                 final boolean check = c;
@@ -1016,16 +1016,6 @@ public abstract class EditableInfo extends Info {
     /** Return JLabel object for the combobox. */
     protected final JLabel getLabel(final GuiComboBox cb) {
         return cb.getLabel();
-    }
-
-    /** Removes this editable object and clealrs the parameter hashes. */
-    @Override public void removeMyself(final boolean testOnly) {
-        super.removeMyself(testOnly);
-        //if (applyButton != null) {
-        //    for (final ActionListener al : applyButton.getActionListeners()) {
-        //        applyButton.removeActionListener(al);
-        //    }
-        //}
     }
 
     /** Waits till the info panel is done for the first time. */

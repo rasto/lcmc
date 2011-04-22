@@ -139,9 +139,9 @@ public final class Tools {
     private static Map<String, ImageIcon> imageIcons =
                                               new HashMap<String, ImageIcon>();
     /** Locales. */
-    private static String localeLang = "";
+    private static String localeLang = ""; //TODO: not needed?
     /** Locales. */
-    private static String localeCountry = "";
+    private static String localeCountry = ""; //TODO: not needed?
 
     /** Resource bundle. */
     private static ResourceBundle resource = null;
@@ -183,7 +183,7 @@ public final class Tools {
     /** Random number generator. */
     private static final Random RANDOM = new Random();
     /** Hash mit classes from plugin. */
-    private static final Map<String, RemotePlugin> pluginObjects =
+    private static final Map<String, RemotePlugin> PLUGIN_OBJECTS =
                                            new HashMap<String, RemotePlugin>();
     /** Local plugin directory. */
     private static final String PLUGIN_DIR = System.getProperty("user.home")
@@ -1101,7 +1101,7 @@ public final class Tools {
             i++;
         }
         String ret;
-        if (results.size() == 0) {
+        if (results.isEmpty()) {
             ret = text;
         } else {
             ret = Tools.join(";;;",
@@ -2409,12 +2409,14 @@ public final class Tools {
                         new URL(checkURL).openStream();
                         pluginList.add(pluginName);
                     } catch (MalformedURLException mue) {
+                        Tools.appWarning("malformed URL");
                     } catch (IOException ioe) {
                         /* don't show this in the menu */
                     }
                 }
             } while (true);
         } catch (MalformedURLException mue) {
+            Tools.appWarning("malformed URL");
         } catch (IOException ioe) {
         }
         final File dir = new File(PLUGIN_DIR);
@@ -2491,7 +2493,7 @@ public final class Tools {
                 fileOut.write(buff, 0, l);
             }
             fileOut.close();
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             Tools.appWarning("plugin not found", e);
             return;
         } catch (IOException e) {
@@ -2500,7 +2502,7 @@ public final class Tools {
         }
     }
 
-    /** Load all plugins */
+    /** Load all plugins. */
     public static void loadPlugins() {
         final Set<String> pluginList = getPluginList();
         getGUIData().getMainMenu().reloadPluginsMenu(pluginList);
@@ -2528,7 +2530,7 @@ public final class Tools {
                 continue;
             }
             remotePlugin.init();
-            pluginObjects.put(pluginName, remotePlugin);
+            PLUGIN_OBJECTS.put(pluginName, remotePlugin);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
                     getGUIData().getMainMenu().enablePluginMenu(
@@ -2544,7 +2546,7 @@ public final class Tools {
 
     /** Show plugin description. */
     public static void showPluginDescription(final String pluginName) {
-        final RemotePlugin remotePlugin = pluginObjects.get(pluginName);
+        final RemotePlugin remotePlugin = PLUGIN_OBJECTS.get(pluginName);
         if (remotePlugin != null) {
             remotePlugin.showDescription();
         }
@@ -2553,8 +2555,8 @@ public final class Tools {
     /** Adds menu items from plugins. */
     public static void addPluginMenuItems(final Info info,
                                           final List<UpdatableItem> items) {
-        for (final String pluginName : pluginObjects.keySet()) {
-            pluginObjects.get(pluginName).addPluginMenuItems(info, items);
+        for (final String pluginName : PLUGIN_OBJECTS.keySet()) {
+            PLUGIN_OBJECTS.get(pluginName).addPluginMenuItems(info, items);
         }
     }
 

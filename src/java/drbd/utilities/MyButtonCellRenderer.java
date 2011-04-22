@@ -36,11 +36,6 @@ public class MyButtonCellRenderer extends MyButton
     /** Serial version uid. */
     private static final long serialVersionUID = 1L;
 
-    /** Creates a new MyButtonCellRenderer object. */
-    public MyButtonCellRenderer() {
-        super();
-    }
-
     /** Sets background color and padding in jlabels for every cell. */
     @Override public final Component getTableCellRendererComponent(
                                                       final JTable table,

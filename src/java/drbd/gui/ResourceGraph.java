@@ -670,6 +670,7 @@ public abstract class ResourceGraph {
     /** This class allows to change direction of the edge. */
     class Vertex {
         Vertex() {
+            super();
         }
 
         @Override public String toString() {
@@ -983,7 +984,6 @@ public abstract class ResourceGraph {
                                         edgePopup.show(vv, posX, posY);
                                     }
                                 });
-                            } else {
                             }
                             oneEdgePressed(edge);
                         }

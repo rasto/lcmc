@@ -36,7 +36,6 @@ import drbd.utilities.Tools;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import javax.swing.SwingUtilities;
 
 /**
  * Object that holds a colocation constraint information.

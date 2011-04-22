@@ -860,11 +860,11 @@ public final class BlockDevInfo extends EditableInfo {
             /**
              * Whether the whole thing should be enabled.
              */
-            @Override public final boolean isEnabled() {
+            @Override public boolean isEnabled() {
                 return true;
             }
 
-            @Override public final void mouseOut() {
+            @Override public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -874,7 +874,7 @@ public final class BlockDevInfo extends EditableInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public final void mouseOver() {
+            @Override public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -894,7 +894,7 @@ public final class BlockDevInfo extends EditableInfo {
                 getBrowser().drbdtestLockAcquire();
                 thisClass.setDRBDtestData(null);
                 apply(true);
-                final Map<Host,String> testOutput =
+                final Map<Host, String> testOutput =
                                          new LinkedHashMap<Host, String>();
                 try {
                     drbdResourceInfo.getDrbdInfo().createDrbdConfig(true);
@@ -1096,7 +1096,7 @@ public final class BlockDevInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public final String enablePredicate() {
+            @Override public String enablePredicate() {
                 if (drbdResourceInfo != null) {
                     return "it is already a drbd resouce";
                 } else if (!getHost().isConnected()) {
@@ -1132,7 +1132,7 @@ public final class BlockDevInfo extends EditableInfo {
                                                     false)) {
                         private static final long serialVersionUID = 1L;
 
-                        @Override public final String enablePredicate() {
+                        @Override public String enablePredicate() {
                             if (!oHost.isConnected()) {
                                 return Host.NOT_CONNECTED_STRING;
                             } else if (!oHost.isDrbdLoaded()) {
@@ -1144,7 +1144,7 @@ public final class BlockDevInfo extends EditableInfo {
                             //       && oHost.isDrbdLoaded();
                         }
 
-                        @Override public final void update() {
+                        @Override public void update() {
                             super.update();
                             Tools.invokeAndWait(new Runnable() {
                                 @Override public void run() {
@@ -1256,15 +1256,15 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean predicate() {
+                @Override public boolean predicate() {
                     return isConnectedOrWF(testOnly);
                 }
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1336,7 +1336,7 @@ public final class BlockDevInfo extends EditableInfo {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1374,7 +1374,7 @@ public final class BlockDevInfo extends EditableInfo {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1404,11 +1404,11 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1435,11 +1435,11 @@ public final class BlockDevInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1483,11 +1483,11 @@ public final class BlockDevInfo extends EditableInfo {
                            && getBlockDevice().isPausedSync();
                 }
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1521,11 +1521,11 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1555,11 +1555,11 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1597,11 +1597,11 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public final boolean visiblePredicate() {
+                @Override public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public final String enablePredicate() {
+                @Override public String enablePredicate() {
                     return null;
                 }
 
@@ -1818,9 +1818,6 @@ public final class BlockDevInfo extends EditableInfo {
             if (!fromDrbdInfo) {
                 dri.setApplyButtons(null, dri.getParametersFromXML());
             }
-            //return dri.checkResourceFieldsChanged(param,
-            //                                      dri.getParametersFromXML(),
-            //                                      fromDrbdInfo);
         }
         return super.checkResourceFieldsChanged(param, params);
     }
