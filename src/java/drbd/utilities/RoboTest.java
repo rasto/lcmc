@@ -2417,35 +2417,35 @@ public final class RoboTest {
         sleep(20000);
 
 
-        moveTo(robot, 720, 580);
+        moveTo(robot, 720, 570);
         leftClick(robot); /* next */
         sleep(20000);
 
-        moveTo(robot, 751, 412); /* interface */
+        moveTo(robot, 751, 402); /* interface */
         leftClick(robot);
-        moveTo(robot, 716, 451);
-        leftClick(robot);
-        sleep(1000);
-
-        moveTo(robot, 720, 580);
-        leftClick(robot); /* next */
-        sleep(20000);
-
-        moveTo(robot, 751, 412); /* interface again */
-        leftClick(robot);
-        moveTo(robot, 716, 451);
+        moveTo(robot, 716, 441);
         leftClick(robot);
         sleep(1000);
 
-        moveTo(robot, 720, 580);
+        moveTo(robot, 720, 570);
         leftClick(robot); /* next */
         sleep(20000);
 
-        moveTo(robot, 720, 580); /* meta-data */
+        moveTo(robot, 751, 402); /* interface again */
+        leftClick(robot);
+        moveTo(robot, 716, 441);
+        leftClick(robot);
+        sleep(1000);
+
+        moveTo(robot, 720, 570);
         leftClick(robot); /* next */
         sleep(20000);
 
-        moveTo(robot, 820, 580); /* fs */
+        moveTo(robot, 720, 570); /* meta-data */
+        leftClick(robot); /* next */
+        sleep(20000);
+
+        moveTo(robot, 820, 570); /* fs */
         leftClick(robot); /* finish */
         sleep(10000);
 
@@ -2471,7 +2471,7 @@ public final class RoboTest {
         sleep(20000);
 
 
-        moveTo(robot, 960, 580);
+        moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
         sleep(20000);
     }
@@ -2493,34 +2493,34 @@ public final class RoboTest {
             sleep(20000);
 
 
-            moveTo(robot, 720, 580);
+            moveTo(robot, 720, 570);
             leftClick(robot); /* next */
             sleep(20000);
 
-            moveTo(robot, 751, 412); /* interface */
+            moveTo(robot, 751, 402); /* interface */
             leftClick(robot);
-            moveTo(robot, 716, 451);
-            leftClick(robot);
-            sleep(1000);
-
-            moveTo(robot, 720, 580);
-            leftClick(robot); /* next */
-            sleep(20000);
-
-            moveTo(robot, 751, 412); /* interface again */
-            leftClick(robot);
-            moveTo(robot, 716, 451);
+            moveTo(robot, 716, 441);
             leftClick(robot);
             sleep(1000);
 
-            moveTo(robot, 720, 580);
+            moveTo(robot, 720, 570);
             leftClick(robot); /* next */
             sleep(20000);
 
-            moveTo(robot, 720, 580); /* meta-data */
+            moveTo(robot, 751, 402); /* interface again */
+            leftClick(robot);
+            moveTo(robot, 716, 441);
+            leftClick(robot);
+            sleep(1000);
+
+            moveTo(robot, 720, 570);
             leftClick(robot); /* next */
             sleep(20000);
-            moveTo(robot, 820, 580); /* fs */
+
+            moveTo(robot, 720, 570); /* meta-data */
+            leftClick(robot); /* next */
+            sleep(20000);
+            moveTo(robot, 820, 570); /* fs */
             leftClick(robot); /* finish */
             sleep(10000);
             if (offset == 0) {
@@ -2660,9 +2660,9 @@ public final class RoboTest {
 
         moveTo(robot, 56, 252); /* popup */
         rightClick(robot);
-        moveTo(robot, 159, 273); /* new domain */
+        moveTo(robot, 159, 271); /* new domain */
         leftClick(robot);
-        moveTo(robot, 450, 395); /* domain name */
+        moveTo(robot, 450, 390); /* domain name */
         leftClick(robot);
         press(robot, KeyEvent.VK_D);
         sleep(200);
@@ -2670,11 +2670,11 @@ public final class RoboTest {
         sleep(200);
         press(robot, KeyEvent.VK_C);
         sleep(200);
-        moveTo(robot, 730, 580);
+        moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
 
-        moveTo(robot, 593, 456); /* source file */
+        moveTo(robot, 593, 450); /* source file */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -2686,36 +2686,36 @@ public final class RoboTest {
         sleep(200);
         press(robot, KeyEvent.VK_T);
         sleep(5000);
-        moveTo(robot, 730, 580);
+        moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
         sleep(5000);
-        moveTo(robot, 730, 580);
+        moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* storage */
         sleep(5000);
-        moveTo(robot, 730, 580);
+        moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* network */
         sleep(5000);
-        moveTo(robot, 730, 580);
+        moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* display */
         sleep(5000);
-        moveTo(robot, 560, 423); /* create config */
+        moveTo(robot, 560, 420); /* create config */
         leftClick(robot);
 
         checkVMTest(host, vmTest, 2);
 
         Tools.sleep(2000);
-        moveTo(robot, 814, 581); /* finish */
+        moveTo(robot, 814, 570); /* finish */
         leftClick(robot);
 
         Tools.sleep(2000);
         moveTo(robot, 1066, 284); /* remove */
         leftClick(robot);
         Tools.sleep(2000);
-        moveTo(robot, 516, 485); /* confirm */
+        moveTo(robot, 516, 480); /* confirm */
         leftClick(robot);
         Tools.sleep(5000);
     }

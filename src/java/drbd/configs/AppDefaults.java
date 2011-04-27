@@ -73,7 +73,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
          * dimensions of gui
          */
         {"DrbdMC.width",                         1120},
-        {"DrbdMC.height",                        800},
+        {"DrbdMC.height",                        768},
 
         {"MainPanel.TerminalPanelHeight",        150},
 
