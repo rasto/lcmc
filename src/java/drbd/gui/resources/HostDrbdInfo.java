@@ -226,7 +226,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
-                           null,
+                           Tools.getString("HostBrowser.HostWizard"),
                            new AccessMode(ConfigData.AccessType.RO,
                                           false),
                            new AccessMode(ConfigData.AccessType.RO,
@@ -249,7 +249,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem loadItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.LoadDrbd"),
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -277,7 +277,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem upAllItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.UpAll"),
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
@@ -306,7 +306,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem upgradeDrbdItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpgradeDrbd"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.UpgradeDrbd"),
                            new AccessMode(ConfigData.AccessType.GOD,
                                           false), // TODO: does not work yet
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
@@ -329,7 +329,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
@@ -355,7 +355,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
@@ -379,7 +379,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem connectAllItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ConnectAll"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.ConnectAll"),
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -408,7 +408,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem disconnectAllItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.DisconnectAll"),
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -437,7 +437,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem attachAllItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.AttachAll"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.AttachAll"),
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -465,14 +465,14 @@ public final class HostDrbdInfo extends Info {
         /* set all primary */
         final MyMenuItem setAllPrimaryItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
-                                           null,
-                                           null,
-                                           new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
-                                                   false),
-                                           new AccessMode(
-                                                   ConfigData.AccessType.OP,
-                                                   false)) {
+                           null,
+                           Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
+                           new AccessMode(
+                                   ConfigData.AccessType.ADMIN,
+                                   false),
+                           new AccessMode(
+                                   ConfigData.AccessType.OP,
+                                   false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override public String enablePredicate() {
@@ -499,7 +499,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem setAllSecondaryItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
                            null,
-                           null,
+                           Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
@@ -528,7 +528,7 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
-                           null,
+                           Tools.getString("HostBrowser.RemoveHost"),
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
