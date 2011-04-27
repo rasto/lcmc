@@ -510,6 +510,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
+        infoPanelDone();
         return infoPanel;
     }
 
