@@ -526,6 +526,10 @@ public final class RoboTest {
         final int statefulY = 255;
         disableStonith(robot, host);
         checkTest(host, "test1", 1);
+        enableStonith(robot, host);
+        checkTest(host, "test1", 1.1);
+        disableStonith(robot, host);
+        checkTest(host, "test1", 1);
         moveTo(robot, ipX, ipY);
         rightClick(robot); /* popup */
         moveTo(robot, ipX + 57, ipY + 28);
@@ -561,9 +565,9 @@ public final class RoboTest {
         leftPress(robot); /* scroll bar */
         moveTo(robot, 1105, 510);
         leftRelease(robot);
-        moveTo(robot, 1076, 420);
+        moveTo(robot, 1076, 390);
         leftClick(robot);
-        moveTo(robot, 1037, 487);
+        moveTo(robot, 1037, 457);
         leftClick(robot); /* no ping */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -571,9 +575,9 @@ public final class RoboTest {
         sleep(2000);
         checkTest(host, "test1", 2.1); /* 2.1 */
 
-        moveTo(robot, 1076, 420);
+        moveTo(robot, 1076, 390);
         leftClick(robot);
-        moveTo(robot, 1067, 445);
+        moveTo(robot, 1067, 415);
         leftClick(robot); /* default */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -679,12 +683,12 @@ public final class RoboTest {
         for (int i = 0; i < 2; i++) {
             /* another group resource */
             sleep(20000);
-            moveTo(robot, gx + 46, gy + 11);
+            moveTo(robot, gx + 46, gy - 19);
             rightClick(robot); /* group popup */
             sleep(2000 + i * 500);
-            moveTo(robot, gx + 80, gy + 20);
-            moveTo(robot, gx + 84, gy + 22);
-            moveTo(robot, gx + 580, gy + 22);
+            moveTo(robot, gx + 80, gy - 10);
+            moveTo(robot, gx + 84, gy - 8);
+            moveTo(robot, gx + 580, gy - 8);
             sleep(1000);
             typeDummy(robot);
             sleep(i * 300);
@@ -697,11 +701,11 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3); /* 3 */
         /* constraints */
-        addConstraint(robot, gx, gy, 0, true, -1);
+        addConstraint(robot, gx, gy - 30, 0, true, -1);
         checkTest(host, "test1", 3.1); /* 3.1 */
 
         /* move up, move down */
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             moveTo(robot, 137, 344);
             rightClick(robot);
             sleep(1000);
@@ -728,10 +732,10 @@ public final class RoboTest {
         leftRelease(robot);
 
         sleep(1000);
-        moveTo(robot, 1078, 395);
+        moveTo(robot, 1078, 365);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078, 445);
+        moveTo(robot, 1078, 415);
         sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
@@ -741,10 +745,10 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1078 , 395);
+        moveTo(robot, 1078 , 365);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 415);
+        moveTo(robot, 1078 , 385);
         leftClick(robot); /* choose "nothing selected */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
@@ -807,7 +811,7 @@ public final class RoboTest {
         checkTest(host, "test1", 5); /* 5 */
         sleep(1000);
 
-        addConstraint(robot, gx, gy, 9, true, -1);
+        addConstraint(robot, gx, gy - 30, 9, true, -1);
         sleep(5000);
         checkTest(host, "test1", 6); /* 6 */
 
@@ -835,7 +839,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 10.2);
 
-        addConstraintOrderOnly(robot, gx, gy, 0, 25, 0, true, -1);
+        addConstraintOrderOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
         checkTest(host, "test1", 10.3);
 
@@ -851,7 +855,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 10.6);
 
-        addConstraintColocationOnly(robot, gx, gy, 0, 25, 0, true, -1);
+        addConstraintColocationOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
         checkTest(host, "test1", 10.7);
 
@@ -981,7 +985,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test1", 11.7);
 
-        addConstraint(robot, gx, gy, 9, true, -1);
+        addConstraint(robot, gx, gy - 30, 9, true, -1);
         sleep(5000);
         checkTest(host, "test1", 11.8);
 
@@ -1062,27 +1066,27 @@ public final class RoboTest {
         checkTest(host, "test1", 22);
 
         /* Group cont. */
-        stopResource(robot, gx, gy, 15);
+        stopResource(robot, gx, gy - 30, 15);
         sleep(10000);
         checkTest(host, "test1", 23);
-        startResource(robot, gx, gy, 15);
+        startResource(robot, gx, gy - 30, 15);
         sleep(8000);
         checkTest(host, "test1", 24);
-        unmanageResource(robot, gx, gy, 15);
+        unmanageResource(robot, gx, gy - 30, 15);
         sleep(5000);
         checkTest(host, "test1", 25);
-        manageResource(robot, gx, gy, 15);
+        manageResource(robot, gx, gy - 30, 15);
         sleep(5000);
         checkTest(host, "test1", 26);
-        migrateResource(robot, gx, gy, 25);
+        migrateResource(robot, gx, gy - 30, 25);
         sleep(5000);
         checkTest(host, "test1", 27);
-        unmigrateResource(robot, gx, gy, 25);
+        unmigrateResource(robot, gx, gy - 30, 25);
         sleep(5000);
         checkTest(host, "test1", 28);
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
-        stopGroup(robot, gx, gy, 15);
+        stopGroup(robot, gx, gy - 30, 15);
         sleep(5000);
         stopGroup(robot, statefulX, statefulY, 0);
         stopEverything(robot); /* to be sure */
@@ -1091,7 +1095,7 @@ public final class RoboTest {
         if (true) {
             removeResource(robot, ipX, ipY, -15);
             sleep(5000);
-            removeGroup(robot, gx, gy, 0);
+            removeGroup(robot, gx, gy - 30, 0);
             sleep(5000);
             removeGroup(robot, statefulX, statefulY, -15);
         } else {
@@ -1143,6 +1147,21 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
         sleep(2000);
+    }
+
+    /** Enable stonith if it is enabled. */
+    private static void enableStonith(final Robot robot, final Host host) {
+        moveTo(robot, 271, 250);
+        leftClick(robot); /* global options */
+        final String stonith = host.getCluster().getBrowser()
+                    .getClusterStatus().getGlobalParam("stonith-enabled");
+        if (stonith != null && "false".equals(stonith)) {
+            moveTo(robot, 944, 298);
+            leftClick(robot); /* enable stonith */
+        }
+        moveTo(robot, 828, 183);
+        sleep(2000);
+        leftClick(robot); /* apply */
     }
 
     /** Disable stonith if it is enabled. */
@@ -1725,9 +1744,14 @@ public final class RoboTest {
 
     /** Sets location. */
     private static void setLocation(final Robot robot, final Integer[] events) {
-        moveTo(robot, 1041 , 615);
-        leftClick(robot);
+        moveTo(robot, 1105, 298);
+        leftPress(robot); /* scroll bar */
+        moveTo(robot, 1105, 510);
+        leftRelease(robot);
+
+        moveTo(robot, 1041 , 331);
         sleep(2000);
+        leftClick(robot);
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
@@ -1744,6 +1768,12 @@ public final class RoboTest {
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(2000);
+
+        moveTo(robot, 1105, 350);
+        leftPress(robot); /* scroll bar back */
+        moveTo(robot, 1105, 150);
+        leftRelease(robot);
+
     }
 
     /** Choose dummy resource. */
@@ -1773,7 +1803,7 @@ public final class RoboTest {
         leftPress(robot); /* scroll bar */
         moveTo(robot, 1105, 550);
         leftRelease(robot);
-        moveTo(robot, 956, 520 + yCorr);
+        moveTo(robot, 956, 490 + yCorr);
         leftClick(robot); /* start timeout */
         press(robot, KeyEvent.VK_2);
         sleep(200);
@@ -1782,7 +1812,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_0);
         sleep(200);
 
-        moveTo(robot, 956, 550 + yCorr);
+        moveTo(robot, 956, 520 + yCorr);
         leftClick(robot); /* stop timeout */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1791,7 +1821,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_2);
         sleep(200);
 
-        moveTo(robot, 956, 580 + yCorr);
+        moveTo(robot, 956, 550 + yCorr);
         leftClick(robot); /* monitor timeout */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1800,7 +1830,7 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_4);
         sleep(200);
 
-        moveTo(robot, 956, 610 + yCorr);
+        moveTo(robot, 956, 580 + yCorr);
         leftClick(robot); /* monitor interval */
         press(robot, KeyEvent.VK_1);
         sleep(200);
@@ -1809,14 +1839,14 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_1);
         sleep(200);
         if (migrateTimeouts) {
-            moveTo(robot, 956, 640 + yCorr);
+            moveTo(robot, 956, 610 + yCorr);
             leftClick(robot); /* reload */
             press(robot, KeyEvent.VK_BACK_SPACE);
             sleep(200);
             press(robot, KeyEvent.VK_BACK_SPACE);
             sleep(200);
 
-            moveTo(robot, 956, 660 + yCorr);
+            moveTo(robot, 956, 630 + yCorr);
             leftClick(robot); /* migrate from */
             press(robot, KeyEvent.VK_1);
             sleep(200);
@@ -1825,7 +1855,7 @@ public final class RoboTest {
             press(robot, KeyEvent.VK_3);
             sleep(200);
 
-            moveTo(robot, 956, 690 + yCorr);
+            moveTo(robot, 956, 660 + yCorr);
             leftClick(robot); /* migrate to */
             press(robot, KeyEvent.VK_1);
             sleep(200);
@@ -2559,6 +2589,8 @@ public final class RoboTest {
 
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
+        leftClick(robot); /* apply/disables tooltip */
+        sleep(2000); /* test */
         leftClick(robot); /* apply */
         checkDRBDTest(host, drbdTest, 2.1); /* 2.1 */
 
