@@ -256,13 +256,14 @@ public final class HostDrbdInfo extends Info {
 
                 @Override public String enablePredicate() {
                     if (getHost().isConnected()) {
-                        return "already loaded";
-                    } else if (getHost().isDrbdStatus()) {
+                        if (getHost().isDrbdStatus()) {
+                            return "already loaded";
+                        } else {
+                            return null;
+                        }
+                    } else {
                         return Host.NOT_CONNECTED_STRING;
                     }
-                    return null;
-                    //return getHost().isConnected()
-                    //       && !getHost().isDrbdStatus();
                 }
 
                 @Override public void action() {
