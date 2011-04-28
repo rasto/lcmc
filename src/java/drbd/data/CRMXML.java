@@ -553,6 +553,9 @@ public final class CRMXML extends XML {
         if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
                                           (ConvertCmdCallback) null);
+            if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
+                command = null;
+            }
         }
 
         if ((command == null || "".equals(command))
@@ -560,6 +563,9 @@ public final class CRMXML extends XML {
             && Tools.compareVersions(hbV, "2.1.4") <= 0) {
             command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
                                           (ConvertCmdCallback) null);
+            if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
+                command = null;
+            }
         }
 
         if (command == null || "".equals(command)) {
