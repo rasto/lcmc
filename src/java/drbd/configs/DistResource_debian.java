@@ -66,7 +66,10 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
 
 
         {"DrbdInst.install",
-         "echo|"
+         DistResource.SUDO
+         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
+         + "/lib/modules/`uname -r`/kernel/drivers/block/drbd/drbd.ko; "
+         + "echo|"
          + DistResource.SUDO + "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGES@"},
 
         /* Drbd install method 2 */
