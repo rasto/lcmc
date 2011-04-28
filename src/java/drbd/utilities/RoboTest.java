@@ -1080,22 +1080,27 @@ public final class RoboTest {
         checkTest(host, "test1", 26);
         migrateResource(robot, gx, gy - 30, 25);
         sleep(5000);
+        moveTo(robot, gx, gy);
+        leftClick(robot);
         checkTest(host, "test1", 27);
-        unmigrateResource(robot, gx, gy - 30, 25);
+        unmigrateResource(robot, 1020, 180, 55); /* actions menu unmigrate */
         sleep(5000);
         checkTest(host, "test1", 28);
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
-        stopGroup(robot, gx, gy - 30, 15);
+        moveTo(robot, gx, gy);
+        leftClick(robot);
+        stopGroup(robot, 1020, 180, 25); /* actions menu stop */
         sleep(5000);
         stopGroup(robot, statefulX, statefulY, 0);
         stopEverything(robot); /* to be sure */
         sleep(5000);
         checkTest(host, "test1", 29);
+
         if (true) {
             removeResource(robot, ipX, ipY, -15);
             sleep(5000);
-            removeGroup(robot, gx, gy - 30, 0);
+            removeGroup(robot, gx, gy - 20, 0);
             sleep(5000);
             removeGroup(robot, statefulX, statefulY, -15);
         } else {
@@ -1192,7 +1197,7 @@ public final class RoboTest {
         final int dummy2X = 545;
         final int dummy2Y = 255;
         final int dummy3X = 235;
-        final int dummy3Y = 500;
+        final int dummy3Y = 390;
         final int dummy4X = 545;
         final int dummy4Y = 390;
         final int phX = 445;
@@ -1249,8 +1254,8 @@ public final class RoboTest {
         sleep(5000);
         checkTest(host, "test2", 9);
 
-        final int dum3PopX = dummy3X + 130;
-        final int dum3PopY = dummy3Y - 50;
+        final int dum3PopX = dummy3X + 165;
+        final int dum3PopY = dummy3Y - 10;
         for (int i = 0; i < 2; i++) {
             removeColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
@@ -1515,6 +1520,8 @@ public final class RoboTest {
         checkTest(host, "test5", 3);
 
         leftClick(robot); /*  apply */
+        stopEverything(robot);
+        checkTest(host, "test5", 3.1);
         removeEverything(robot);
         sleep(5000);
         checkTest(host, "test5", 4);
@@ -2037,8 +2044,6 @@ public final class RoboTest {
                                           final int y,
                                           final int yFactor) {
         moveTo(robot, x + 50, y + 5);
-        sleep(12000);
-        rightClick(robot); /* popup */
         sleep(6000);
         rightClick(robot); /* popup */
         moveTo(robot, x + 140, y + 260 + yFactor);
@@ -2751,4 +2756,11 @@ public final class RoboTest {
         leftClick(robot);
         Tools.sleep(5000);
     }
+
+    private static void saveAndExit() {
+        Tools.save(Tools.getConfigData().getSaveFile());
+        Tools.sleep(10000);
+        System.exit(0);
+    }
+
 }
