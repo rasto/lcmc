@@ -483,9 +483,9 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Returns shape of the block device vertex. */
-    @SuppressWarnings("unchecked")
-    @Override protected Shape getVertexShape(final Vertex v,
-                                             final VertexShapeFactory factory) {
+    @Override protected Shape getVertexShape(
+                                    final Vertex v,
+                                    final VertexShapeFactory<Vertex> factory) {
         return factory.getRectangle(v);
     }
 

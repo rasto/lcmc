@@ -642,9 +642,9 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns shape of the service vertex. */
-    @SuppressWarnings("unchecked")
-    @Override protected Shape getVertexShape(final Vertex v,
-                                             final VertexShapeFactory factory) {
+    @Override protected Shape getVertexShape(
+                                    final Vertex v,
+                                    final VertexShapeFactory<Vertex> factory) {
         if (vertexToHostMap.containsKey(v)) {
             return factory.getRectangle(v);
         } else if (vertexToConstraintPHMap.containsKey(v)) {

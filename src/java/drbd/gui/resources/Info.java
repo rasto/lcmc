@@ -896,7 +896,6 @@ public class Info implements Comparable {
      * Returns table. The table name can be whatever but should be unique if
      * more tables are used.
      */
-    @SuppressWarnings("unchecked")
     protected final JTable getTable(final String tableName) {
         final String[] colNames = getColumnNames(tableName);
         if (colNames != null && colNames.length > 0) {
@@ -961,15 +960,16 @@ public class Info implements Comparable {
 
             };
             tables.put(tableName, table);
-            final TableRowSorter sorter =
+            final TableRowSorter<DefaultTableModel> sorter =
                         new TableRowSorter<DefaultTableModel>(tableModel);
             for (int i = 0; i < colNames.length; i++) {
-                final Comparator<Object> c = getColComparator(tableName, i);
+                final Comparator<Object> c =
+                                               getColComparator(tableName, i);
                 if (c != null) {
                     sorter.setComparator(i, c);
                 }
             }
-            table.setRowSorter((RowSorter) sorter);
+            table.setRowSorter(sorter);
             sorter.setSortsOnUpdates(true);
             table.getTableHeader().setReorderingAllowed(true);
             table.setBackground(Browser.PANEL_BACKGROUND);
@@ -1145,7 +1145,6 @@ public class Info implements Comparable {
     }
 
     /** Updates data in the table. */
-    @SuppressWarnings("unchecked")
     public final void updateTable(final String tableName) {
         Tools.debug(this, "update table: " + tableName, 2);
         final JTable table = tables.get(tableName);
@@ -1157,14 +1156,9 @@ public class Info implements Comparable {
                     @Override public void run() {
                         final Object[][] data = getTableData(tableName);
                         Tools.debug(this, "update table in: " + getName(), 1);
-                        final TableRowSorter sorter =
-                                        (TableRowSorter) table.getRowSorter();
-                        final List sortKeys = sorter.getSortKeys();
                         tableModel.setDataVector(data, colNames);
-                        sorter.setSortKeys(sortKeys);
                         tableModel.fireTableDataChanged();
-                        Tools.resizeTable(table,
-                                          getDefaultWidths(tableName));
+                        Tools.resizeTable(table, getDefaultWidths(tableName));
                     }
                 });
             }

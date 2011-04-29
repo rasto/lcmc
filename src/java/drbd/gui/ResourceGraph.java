@@ -830,9 +830,8 @@ public abstract class ResourceGraph {
     }
 
     /** Returns shape of the vertex v. */
-    @SuppressWarnings("unchecked")
     protected Shape getVertexShape(final Vertex v,
-                                   final VertexShapeFactory factory) {
+                                   final VertexShapeFactory<Vertex> factory) {
         return factory.getEllipse(v);
     }
 
@@ -859,8 +858,10 @@ public abstract class ResourceGraph {
                             });
         }
 
+        @SuppressWarnings("unchecked")
         @Override public Shape transform(final V v) {
-            return getVertexShape((Vertex) v, factory);
+            return getVertexShape((Vertex) v,
+                                  (VertexShapeFactory<Vertex>) factory);
         }
     }
 
