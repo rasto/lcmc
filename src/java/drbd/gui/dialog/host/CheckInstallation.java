@@ -493,7 +493,7 @@ final class CheckInstallation extends DialogHost {
     }
 
     /** This class holds install method names, and their indeces. */
-    private class InstallMethods {
+    private static class InstallMethods {
         /** Name of the method like "CD". */
         private final String name;
         /** Index of the method. */

@@ -253,7 +253,8 @@ public final class ClustersPanel extends JPanel {
     }
 
     /** This class is used to override the tab look. */
-    class MyTabbedPaneUI extends javax.swing.plaf.basic.BasicTabbedPaneUI {
+    static class MyTabbedPaneUI
+                        extends javax.swing.plaf.basic.BasicTabbedPaneUI {
         /** Sets insets. */
         @Override protected final Insets getContentBorderInsets(
                                                     final int tabPlacement) {

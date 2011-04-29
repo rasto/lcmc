@@ -128,7 +128,7 @@ public abstract class ResourceGraph {
     private final Map<Edge, List<MyMenuItem>> edgeToMenus =
                                 new LinkedHashMap<Edge, List<MyMenuItem>>();
     /** Empty shape for arrows. (to not show an arrow). */
-    private final Area emptyShape = new Area();
+    private static final Area EMPTY_SHAPE = new Area();
     /** Graph lock. */
     private final Mutex mGraphLock = new Mutex();
     /** The graph object. */
@@ -668,7 +668,7 @@ public abstract class ResourceGraph {
     }
 
     /** This class allows to change direction of the edge. */
-    class Vertex {
+    static class Vertex {
         Vertex() {
             super();
         }
@@ -1296,7 +1296,7 @@ public abstract class ResourceGraph {
             if (showEdgeArrow((Edge) context.element)) {
                 return super.transform(context);
             } else {
-                return emptyShape;
+                return EMPTY_SHAPE;
             }
         }
     }

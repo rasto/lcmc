@@ -1805,7 +1805,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about networks. */
-    final class NetworkData extends HardwareData {
+    static final class NetworkData extends HardwareData {
         /** Name of the network. */
         private final String name;
         /** UUID of the network. */
@@ -2078,7 +2078,7 @@ public final class VMSXML extends XML {
 
 
     /** Class that holds data about virtual disks. */
-    public final class DiskData extends HardwareData {
+    public static final class DiskData extends HardwareData {
         /** Type: file, block... */
         private final String type;
         /** Target device: hda, hdb, hdc, sda... */
@@ -2208,7 +2208,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual hardware. */
-    private abstract class HardwareData {
+    private abstract static class HardwareData {
         /** Name value pairs. */
         private final Map<String, String> valueMap =
                                                 new HashMap<String, String>();
@@ -2223,7 +2223,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual interfaces. */
-    public final class InterfaceData extends HardwareData {
+    public static final class InterfaceData extends HardwareData {
         /** Type: network, bridge... */
         private final String type;
         /** Source network: default, ... */
@@ -2291,7 +2291,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual input devices. */
-    public final class InputDevData extends HardwareData {
+    public static final class InputDevData extends HardwareData {
         /** Type: tablet, mouse... */
         private final String type;
         /** Bus: usb... */
@@ -2328,7 +2328,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual displays. */
-    public final class GraphicsData extends HardwareData {
+    public static final class GraphicsData extends HardwareData {
         /** Type. */
         private final String type;
         /** Type: vnc, sdl... */
@@ -2376,7 +2376,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual sound devices. */
-    public final class SoundData extends HardwareData {
+    public static final class SoundData extends HardwareData {
         /** Model. */
         private final String model;
         /** Model: ac97, es1370, pcspk, sb16. */
@@ -2398,7 +2398,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual parallel or serial devices. */
-    public abstract class ParallelSerialData extends HardwareData {
+    public abstract static class ParallelSerialData extends HardwareData {
         /** Type. */
         private final String type;
         /** Type: dev, file, null, pipe, pty, stdio, tcp, udp, unix, vc. */
@@ -2459,7 +2459,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual serial devices. */
-    public final class SerialData extends ParallelSerialData {
+    public static final class SerialData extends ParallelSerialData {
         /** Creates new SerialData object. */
         public SerialData(final String type,
                           final String sourcePath,
@@ -2486,7 +2486,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual parallel devices. */
-    public final class ParallelData extends ParallelSerialData {
+    public static final class ParallelData extends ParallelSerialData {
         /** Creates new ParallelData object. */
         public ParallelData(final String type,
                             final String sourcePath,
@@ -2513,7 +2513,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual video devices. */
-    public final class VideoData extends HardwareData {
+    public static final class VideoData extends HardwareData {
         /** Model type. */
         private final String modelType;
         /** Model type: cirrus, vga, vmvga, xen. */

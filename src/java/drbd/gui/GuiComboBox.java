@@ -1520,8 +1520,8 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Workaround for jcombobox so that it works with default button. */
-    class ActivateDefaultButtonListener extends KeyAdapter
-                                        implements ActionListener {
+    static class ActivateDefaultButtonListener extends KeyAdapter
+                                               implements ActionListener {
         /** Combobox, that should work with default button. */
         private final JComboBox box;
 

@@ -489,8 +489,7 @@ public final class Tools {
             Thread.currentThread().interrupt();
         }
         Tools.stopProgressIndicator(hostName, text);
-        return host.getSSH().new SSHOutput(output.toString(),
-                                           exitCodeHolder[0]);
+        return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
     }
 
     /** Executes a command. */
@@ -541,8 +540,7 @@ public final class Tools {
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        return host.getSSH().new SSHOutput(output.toString(),
-                                           exitCodeHolder[0]);
+        return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
     }
 
     /**

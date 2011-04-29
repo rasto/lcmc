@@ -222,7 +222,7 @@ public class Browser {
     }
 
     /** Renders the cells for the menu. */
-    class CellRenderer extends DefaultTreeCellRenderer {
+    static class CellRenderer extends DefaultTreeCellRenderer {
         /** Serial version UUID. */
         private static final long serialVersionUID = 1L;
 

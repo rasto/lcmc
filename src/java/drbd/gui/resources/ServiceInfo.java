@@ -3718,7 +3718,7 @@ public class ServiceInfo extends EditableInfo {
                         }
                         if (!newRscIds.isEmpty()) {
                             final CRMXML.RscSet newRscSet =
-                                    getBrowser().getCRMXML().new RscSet(
+                                    new CRMXML.RscSet(
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),
@@ -3896,7 +3896,7 @@ public class ServiceInfo extends EditableInfo {
                         }
                         if (!newRscIds.isEmpty()) {
                             final CRMXML.RscSet newRscSet =
-                                    getBrowser().getCRMXML().new RscSet(
+                                    new CRMXML.RscSet(
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),

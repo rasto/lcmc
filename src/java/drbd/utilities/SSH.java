@@ -1167,7 +1167,7 @@ public final class SSH {
     }
 
     /** Connection class that can cancel it's connection during openSession. */
-    class MyConnection extends Connection {
+    static class MyConnection extends Connection {
         /** Creates new MyConnection object. */
         MyConnection(final String hostname, final int port) {
             super(hostname, port);
@@ -1858,7 +1858,7 @@ public final class SSH {
     }
 
     /** Class that holds output of ssh command. */
-    public final class SSHOutput {
+    public final static class SSHOutput {
         /** Output string. */
         private final String output;
         /** Exit code. */

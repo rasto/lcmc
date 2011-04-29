@@ -563,28 +563,24 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     createCol = true;
                     if (isFrom) {
-                        colRscSet2 = getBrowser().getCRMXML().new RscSet(
-                                                       colId,
+                        colRscSet2 = new CRMXML.RscSet(colId,
                                                        new ArrayList<String>(),
                                                        "false",
                                                        null,
                                                        null);
-                        colRscSet1 = getBrowser().getCRMXML().new RscSet(
-                                                                      colId,
-                                                                      rscIds,
-                                                                      "false",
-                                                                      null,
-                                                                      null);
+                        colRscSet1 = new CRMXML.RscSet(colId,
+                                                       rscIds,
+                                                       "false",
+                                                       null,
+                                                       null);
                         outColRscSet1 = colRscSet1;
                     } else {
-                        colRscSet2 = getBrowser().getCRMXML().new RscSet(
-                                                                      colId,
-                                                                      rscIds,
-                                                                      "false",
-                                                                      null,
-                                                                      null);
-                        colRscSet1 = getBrowser().getCRMXML().new RscSet(
-                                                       colId,
+                        colRscSet2 = new CRMXML.RscSet(colId,
+                                                       rscIds,
+                                                       "false",
+                                                       null,
+                                                       null);
+                        colRscSet1 = new CRMXML.RscSet(colId,
                                                        new ArrayList<String>(),
                                                        "false",
                                                        null,
@@ -618,7 +614,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
                                 newRscIds.add(0, idToAdd);
                                 final CRMXML.RscSet newRscSet =
-                                    getBrowser().getCRMXML().new RscSet(
+                                    new CRMXML.RscSet(
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),
@@ -641,30 +637,27 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     if (!colRscSetAdded) {
                         final List<String> newRscIds = new ArrayList<String>();
-                                getBrowser().getCRMXML().new RscSet(
-                                                   colId,
-                                                   new ArrayList<String>(),
-                                                   "false",
-                                                   null,
-                                                   null);
+                                new CRMXML.RscSet(colId,
+                                                  new ArrayList<String>(),
+                                                  "false",
+                                                  null,
+                                                  null);
                         final CRMXML.RscSet newRscSet;
                         if (toRscSet == null) {
                             newRscSet =
-                                getBrowser().getCRMXML().new RscSet(
-                                                   colId,
-                                                   newRscIds,
-                                                   "false",
-                                                   null,
-                                                   null);
+                                new CRMXML.RscSet(colId,
+                                                  newRscIds,
+                                                  "false",
+                                                  null,
+                                                  null);
                         } else {
                             newRscIds.addAll(toRscSet.getRscIds());
                             newRscSet =
-                                getBrowser().getCRMXML().new RscSet(
-                                               toRscSet.getId(),
-                                               newRscIds,
-                                               toRscSet.getSequential(),
-                                               toRscSet.getOrderAction(),
-                                               toRscSet.getColocationRole());
+                                new CRMXML.RscSet(toRscSet.getId(),
+                                                  newRscIds,
+                                                  toRscSet.getSequential(),
+                                                  toRscSet.getOrderAction(),
+                                                  toRscSet.getColocationRole());
                         }
                         newRscSet.addRscId(idToAdd);
                         if (isFrom) {
@@ -690,32 +683,28 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     createOrd = true;
                     if (isFrom) {
-                        ordRscSet1 = getBrowser().getCRMXML().new RscSet(
-                                                                      ordId,
-                                                                      rscIds,
-                                                                      "false",
-                                                                      null,
-                                                                      null);
-                        ordRscSet2 = getBrowser().getCRMXML().new RscSet(
-                                                      ordId,
-                                                      new ArrayList<String>(),
-                                                      "false",
-                                                      null,
-                                                      null);
+                        ordRscSet1 = new CRMXML.RscSet(ordId,
+                                                       rscIds,
+                                                       "false",
+                                                       null,
+                                                       null);
+                        ordRscSet2 = new CRMXML.RscSet(ordId,
+                                                       new ArrayList<String>(),
+                                                       "false",
+                                                       null,
+                                                       null);
                         outOrdRscSet1 = ordRscSet1;
                     } else {
-                        ordRscSet1 = getBrowser().getCRMXML().new RscSet(
-                                                      ordId,
-                                                      new ArrayList<String>(),
-                                                      "false",
-                                                      null,
-                                                      null);
-                        ordRscSet2 = getBrowser().getCRMXML().new RscSet(
-                                                                      ordId,
-                                                                      rscIds,
-                                                                      "false",
-                                                                      null,
-                                                                      null);
+                        ordRscSet1 = new CRMXML.RscSet(ordId,
+                                                       new ArrayList<String>(),
+                                                       "false",
+                                                       null,
+                                                       null);
+                        ordRscSet2 = new CRMXML.RscSet(ordId,
+                                                       rscIds,
+                                                       "false",
+                                                       null,
+                                                       null);
                         outOrdRscSet2 = ordRscSet2;
                     }
                 } else {
@@ -745,7 +734,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
                                 newRscIds.add(idToAdd);
                                 final CRMXML.RscSet newRscSet =
-                                    getBrowser().getCRMXML().new RscSet(
+                                    new CRMXML.RscSet(
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),
@@ -770,17 +759,14 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         final List<String> newRscIds = new ArrayList<String>();
                         CRMXML.RscSet newRscSet;
                         if (toRscSet == null) {
-                            newRscSet =
-                                getBrowser().getCRMXML().new RscSet(
-                                                   ordId,
-                                                   newRscIds,
-                                                   "false",
-                                                   null,
-                                                   null);
+                            newRscSet = new CRMXML.RscSet(ordId,
+                                                          newRscIds,
+                                                          "false",
+                                                          null,
+                                                          null);
                         } else {
                             newRscIds.addAll(toRscSet.getRscIds());
-                            newRscSet =
-                                getBrowser().getCRMXML().new RscSet(
+                            newRscSet = new CRMXML.RscSet(
                                                toRscSet.getId(),
                                                newRscIds,
                                                toRscSet.getSequential(),

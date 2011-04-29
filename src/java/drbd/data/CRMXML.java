@@ -2224,7 +2224,7 @@ public final class CRMXML extends XML {
     /**
      * This class holds parsed status of resource, m/s set, or clone set.
      */
-    class ResStatus {
+    static class ResStatus {
         /** On which nodes the resource runs, or is master. */
         private final List<String> runningOnNodes;
         /** On which nodes the resource is master if it is m/s resource. */
@@ -3478,7 +3478,7 @@ public final class CRMXML extends XML {
     }
 
     /** Class that holds colocation data. */
-    public final class ColocationData {
+    public static final class ColocationData {
         /** Colocation id. */
         private final String id;
         /** Colocation resource 1. */
@@ -3539,7 +3539,7 @@ public final class CRMXML extends XML {
     }
 
     /** Class that holds order data. */
-    public final class OrderData {
+    public static final class OrderData {
         /** Order id. */
         private final String id;
         /** Order resource 1. */
@@ -3609,7 +3609,7 @@ public final class CRMXML extends XML {
     }
 
     /** Class that holds resource set data. */
-    public final class RscSet {
+    public static final class RscSet {
         /** Resource set id. */
         private final String id;
         /** Resources in this set. */
@@ -3773,7 +3773,7 @@ public final class CRMXML extends XML {
     }
 
     /** Class that holds data between two resource sests. */
-    public final class RscSetConnectionData {
+    public static final class RscSetConnectionData {
         /** Resource set 1. */
         private RscSet rscSet1;
         /** Resource set 2. */

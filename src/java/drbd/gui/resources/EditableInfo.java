@@ -266,7 +266,7 @@ public abstract class EditableInfo extends Info {
      * This class holds a part of the panel within the same section, access
      * type and advanced mode setting.
      */
-    private class PanelPart {
+    private static class PanelPart {
         /** Section of this panel part. */
         private final String section;
         /** Access type of this panel part. */
