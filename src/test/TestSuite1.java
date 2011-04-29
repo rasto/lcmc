@@ -292,7 +292,7 @@ public final class TestSuite1 {
                 error("unusable class: " + className);
             }
         }
-        final TestResult testResult = new TestResult();
+        //final TestResult testResult = new TestResult();
         junit.textui.TestRunner.run(suite);
     }
 

@@ -1858,7 +1858,7 @@ public final class SSH {
     }
 
     /** Class that holds output of ssh command. */
-    public final static class SSHOutput {
+    public static final class SSHOutput {
         /** Output string. */
         private final String output;
         /** Exit code. */

@@ -453,32 +453,28 @@ public final class DrbdMC extends JPanel {
 
     /** The main function for starting the application. */
     public static void main(final String[] args) {
-        try {
-            Tools.init();
-            final JFrame mainFrame = new JFrame(
-               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
-            final String autoArgs = initApp(args);
-            mainFrame.setGlassPane(getMainGlassPane());
-            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainFrame.addWindowListener(new ExitListener());
-            mainFrame.setJMenuBar(getMenuBar());
-            mainFrame.setContentPane(getMainPanel());
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    createAndShowGUI((Container) mainFrame);
-                }
-            });
-            if (autoArgs != null) {
-                Tools.parseAutoArgs(autoArgs);
+        Tools.init();
+        final JFrame mainFrame = new JFrame(
+           Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+        final String autoArgs = initApp(args);
+        mainFrame.setGlassPane(getMainGlassPane());
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new ExitListener());
+        mainFrame.setJMenuBar(getMenuBar());
+        mainFrame.setContentPane(getMainPanel());
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                createAndShowGUI((Container) mainFrame);
             }
-            //final Thread t = new Thread(new Runnable() {
-            //    public void run() {
-            //        drbd.utilities.RoboTest.startMover(600000, true);
-            //    }
-            //});
-            //t.start();
-        } catch (Exception e) {
-            Tools.appError("Error in the application", "", e);
+        });
+        if (autoArgs != null) {
+            Tools.parseAutoArgs(autoArgs);
         }
+        //final Thread t = new Thread(new Runnable() {
+        //    public void run() {
+        //        drbd.utilities.RoboTest.startMover(600000, true);
+        //    }
+        //});
+        //t.start();
     }
 }

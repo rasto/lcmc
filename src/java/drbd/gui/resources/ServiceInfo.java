@@ -546,6 +546,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns operation default for parameter. */
     private String getOpDefaultsDefault(final String param) {
+        assert param != null;
         /* if op_defaults is set... It cannot be set in the GUI  */
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (cs != null) {
