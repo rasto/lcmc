@@ -2699,7 +2699,7 @@ public final class RoboTest {
         rightClick(robot);
         moveTo(robot, 159, 271); /* new domain */
         leftClick(robot);
-        moveTo(robot, 450, 390); /* domain name */
+        moveTo(robot, 450, 380); /* domain name */
         leftClick(robot);
         press(robot, KeyEvent.VK_D);
         sleep(200);
@@ -2711,7 +2711,7 @@ public final class RoboTest {
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
 
-        moveTo(robot, 593, 450); /* source file */
+        moveTo(robot, 593, 440); /* source file */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -2739,7 +2739,7 @@ public final class RoboTest {
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* display */
         sleep(5000);
-        moveTo(robot, 560, 420); /* create config */
+        moveTo(robot, 560, 410); /* create config */
         leftClick(robot);
 
         checkVMTest(host, vmTest, 2);

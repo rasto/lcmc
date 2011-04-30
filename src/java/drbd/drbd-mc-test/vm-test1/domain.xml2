@@ -5,7 +5,7 @@
   <currentMemory>524288</currentMemory>
   <vcpu>1</vcpu>
   <os>
-    <type arch='x86_64' machine='pc-0.12'>hvm</type>
+    <type arch='x86_64' machine='pc-0.14'>hvm</type>
     <boot dev='cdrom'/>
   </os>
   <features>
