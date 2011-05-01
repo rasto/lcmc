@@ -519,7 +519,7 @@ public final class RoboTest {
         final int ipX = 235;
         final int ipY = 255;
         final int gx = 230;
-        final int gy = 374;
+        final int gy = 369;
         final int popX = 340;
         final int popY = 305;
         final int statefulX = 500;
@@ -561,13 +561,13 @@ public final class RoboTest {
         checkTest(host, "test1", 2); /* 2 */
 
         /* pingd */
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar */
-        moveTo(robot, 1105, 510);
+        moveTo(robot, 1100, 510);
         leftRelease(robot);
-        moveTo(robot, 1076, 390);
+        moveTo(robot, 1076, 387);
         leftClick(robot);
-        moveTo(robot, 1037, 457);
+        moveTo(robot, 1037, 454);
         leftClick(robot); /* no ping */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
@@ -575,17 +575,17 @@ public final class RoboTest {
         sleep(2000);
         checkTest(host, "test1", 2.1); /* 2.1 */
 
-        moveTo(robot, 1076, 390);
+        moveTo(robot, 1076, 387);
         leftClick(robot);
-        moveTo(robot, 1067, 415);
+        moveTo(robot, 1067, 412);
         leftClick(robot); /* default */
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
         leftClick(robot); /*  apply */
 
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar */
-        moveTo(robot, 1105, 550);
+        moveTo(robot, 1100, 550);
         leftRelease(robot);
 
         /* group with dummy resources */
@@ -726,16 +726,16 @@ public final class RoboTest {
         sleep(1000);
         leftClick(robot);
 
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar */
-        moveTo(robot, 1105, 510);
+        moveTo(robot, 1100, 510);
         leftRelease(robot);
 
         sleep(1000);
-        moveTo(robot, 1078, 365);
+        moveTo(robot, 1073, 360);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078, 415);
+        moveTo(robot, 1073, 410);
         sleep(1000);
         leftClick(robot); /* choose another dummy */
         sleep(1000);
@@ -745,19 +745,19 @@ public final class RoboTest {
         sleep(4000);
         checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1078 , 365);
+        moveTo(robot, 1073 , 360);
         leftClick(robot);
         sleep(1000);
-        moveTo(robot, 1078 , 385);
+        moveTo(robot, 1073 , 380);
         leftClick(robot); /* choose "nothing selected */
         sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
         sleep(4000);
         leftClick(robot); /* apply */
         sleep(9000);
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1105, 150);
+        moveTo(robot, 1100, 150);
         leftRelease(robot);
         checkTest(host, "test1", 4); /* 4 */
 
@@ -1751,9 +1751,9 @@ public final class RoboTest {
 
     /** Sets location. */
     private static void setLocation(final Robot robot, final Integer[] events) {
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar */
-        moveTo(robot, 1105, 510);
+        moveTo(robot, 1100, 510);
         leftRelease(robot);
 
         moveTo(robot, 1041 , 331);
@@ -1776,9 +1776,9 @@ public final class RoboTest {
         leftClick(robot); /* apply */
         sleep(2000);
 
-        moveTo(robot, 1105, 350);
+        moveTo(robot, 1100, 350);
         leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1105, 150);
+        moveTo(robot, 1100, 150);
         leftRelease(robot);
 
     }
@@ -1801,14 +1801,14 @@ public final class RoboTest {
     /** Sets start timeout. */
     private static void setTimeouts(final Robot robot,
                                     final boolean migrateTimeouts) {
-        int yCorr = 0;
+        int yCorr = -5;
         if (migrateTimeouts) {
-            yCorr = -90;
+            yCorr = -95;
         }
         sleep(3000);
-        moveTo(robot, 1105, 298);
+        moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar */
-        moveTo(robot, 1105, 550);
+        moveTo(robot, 1100, 550);
         leftRelease(robot);
         moveTo(robot, 956, 490 + yCorr);
         leftClick(robot); /* start timeout */
@@ -1872,9 +1872,9 @@ public final class RoboTest {
             sleep(200);
         }
 
-        moveTo(robot, 1105, 350);
+        moveTo(robot, 1100, 350);
         leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1105, 150);
+        moveTo(robot, 1100, 150);
         leftRelease(robot);
     }
 
