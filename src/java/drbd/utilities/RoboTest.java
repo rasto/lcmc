@@ -2614,6 +2614,8 @@ public final class RoboTest {
         sleep(2000);
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
+        leftClick(robot); /* apply/disables tooltip */
+        sleep(2000); /* test */
         leftClick(robot); /* apply */
         checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
         moveTo(robot, 970, 380); /* wfc timeout */
@@ -2625,6 +2627,8 @@ public final class RoboTest {
         sleep(2000);
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
+        leftClick(robot); /* apply/disables tooltip */
+        sleep(2000); /* test */
         leftClick(robot); /* apply */
 
         /* resource */
