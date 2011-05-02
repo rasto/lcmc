@@ -88,7 +88,8 @@ public final class CRM {
              "if [ ! -e " + DRBD_MC_TEST_FILE + " ]; "
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
              + DRBD_MC_TEST_FILE + ";fi;"
-             + "export CIB_file=" + DRBD_MC_TEST_FILE + ";" + DistResource.SUDO;
+             + "export CIB_file=" + DRBD_MC_TEST_FILE + ";";
+            System.out.println("cmd: " + testCmd + command);
             final SSH.SSHOutput out = Tools.execCommand(
                                                  host,
                                                  testCmd + command,
