@@ -1820,6 +1820,7 @@ sub gui_drbd_test {
 	while (<PROC>) {
 		next if /^version:/;
 		next if /^GIT-hash:/;
+		next if /^srcversion:/;
 		next if /^\s+ns:/;
 		next if /^\s+\d+:\s+cs:Unconfigured/;
 		$proc .= $_;
