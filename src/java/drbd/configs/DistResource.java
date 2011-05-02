@@ -408,7 +408,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "virsh undefine @DOMAIN@"},
 
         {"Host.getConnectionStatus",
-         SUDO + "true"},
+         "true"},
 
         {"LVM.resize",
          SUDO + "lvresize -L@SIZE@ @DEVICE@"},
