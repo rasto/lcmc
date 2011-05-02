@@ -7,5 +7,9 @@ you may need to provide following jars in build-lib/ directory in order to
 build it:
 jai_core.jar junit.jar
 
+for sudo you would need at least this commands in the sudoers file:
 
+rasto ALL=SETENV: /usr/local/bin/drbd-gui-helper-*, /sbin/drbdadm,
+/usr/sbin/cibadmin, /usr/sbin/crm_resource, /usr/sbin/crm_attribute,
+/usr/sbin/ptest
 
