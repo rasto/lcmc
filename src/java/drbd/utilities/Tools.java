@@ -1974,6 +1974,9 @@ public final class Tools {
                 return true;
             }
             final String res = ((DrbdResourceInfo) o1).getName();
+            if (res == null) {
+                return res == o2;
+            }
             if (res.equals(o2)) {
                 return true;
             }
