@@ -202,9 +202,9 @@ final class CloneInfo extends ServiceInfo {
     private String getFailCountString(final String hostName,
                                       final boolean testOnly) {
         String fcString = "";
-        if (containedService != null) {
-            final String failCount =
-                         containedService.getFailCount(hostName, testOnly);
+        final ServiceInfo cs = containedService;
+        if (cs != null) {
+            final String failCount = cs.getFailCount(hostName, testOnly);
             if (failCount != null) {
                 if (CRMXML.INFINITY_STRING.equals(failCount)) {
                     fcString = " failed";
@@ -248,8 +248,7 @@ final class CloneInfo extends ServiceInfo {
         final Host dcHost = getBrowser().getDCHost();
         final List<String> runningOnNodes = getRunningOnNodes(testOnly);
         if (runningOnNodes != null && !runningOnNodes.isEmpty()) {
-            if (containedService != null
-                && containedService.getResourceAgent().isLinbitDrbd()) {
+            if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
                 texts.add(new Subtext("primary on:", null, Color.BLACK));
             } else if (getService().isMaster()) {
                 texts.add(new Subtext("master on:", null, Color.BLACK));
@@ -280,8 +279,7 @@ final class CloneInfo extends ServiceInfo {
                 final List<Color> colors =
                         getBrowser().getCluster().getHostColors(slaveOnNodes);
                 int i = 0;
-                if (containedService != null
-                    && containedService.getResourceAgent().isLinbitDrbd()) {
+                if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
                     texts.add(new Subtext("secondary on:", null, Color.BLACK));
                 } else {
                     texts.add(new Subtext("slave on:", null, Color.BLACK));
@@ -353,6 +351,13 @@ final class CloneInfo extends ServiceInfo {
             return;
         }
         containedService.removeMyself(testOnly);
+    }
+
+    /** Removes the service without confirmation dialog. */
+    protected void removeMyselfNoConfirm(final Host dcHost,
+                                         final boolean testOnly) {
+        super.removeMyselfNoConfirm(dcHost, testOnly);
+        setUpdated(false);
     }
 
     /** In clone resource check its containing service. */
@@ -724,13 +729,16 @@ final class CloneInfo extends ServiceInfo {
                         removeAll();
                     }
                 });
-                for (final UpdatableItem u : cs.createPopup()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            add((JMenuItem) u);
-                            u.update();
-                        }
-                    });
+                final ServiceInfo cs0 = containedService;
+                if (cs0 != null) {
+                    for (final UpdatableItem u : cs0.createPopup()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override public void run() {
+                                add((JMenuItem) u);
+                                u.update();
+                            }
+                        });
+                    }
                 }
                 super.update();
             }
