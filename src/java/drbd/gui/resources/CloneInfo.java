@@ -370,14 +370,18 @@ final class CloneInfo extends ServiceInfo {
     boolean checkResourceFieldsCorrect(final String param,
                                        final String[] params,
                                        final boolean fromServicesInfo) {
+        final ServiceInfo cs = containedService;
+        if (cs == null) {
+            return false;
+        }
         final boolean cor = super.checkResourceFieldsCorrect(param,
                                                              params,
                                                              fromServicesInfo,
                                                              true,
                                                              false);
-        final boolean ccor = containedService.checkResourceFieldsCorrect(
+        final boolean ccor = cs.checkResourceFieldsCorrect(
                                   param,
-                                  containedService.getParametersFromXML(),
+                                  cs.getParametersFromXML(),
                                   fromServicesInfo,
                                   true,
                                   false);
@@ -394,15 +398,19 @@ final class CloneInfo extends ServiceInfo {
     boolean checkResourceFieldsChanged(final String param,
                                        final String[] params,
                                        final boolean fromServicesInfo) {
+        final ServiceInfo cs = containedService;
+        if (cs == null) {
+            return false;
+        }
         final boolean ch = super.checkResourceFieldsChanged(param,
                                                             params,
                                                             fromServicesInfo,
                                                             true,
                                                             false);
 
-        final boolean cch = containedService.checkResourceFieldsChanged(
+        final boolean cch = cs.checkResourceFieldsChanged(
                                   param,
-                                  containedService.getParametersFromXML(),
+                                  cs.getParametersFromXML(),
                                   fromServicesInfo,
                                   true,
                                   false);
