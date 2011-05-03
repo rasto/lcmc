@@ -1206,10 +1206,10 @@ public final class RoboTest {
         disableStonith(robot, host);
         checkTest(host, "test2", 1);
         /* create 4 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y, false);
-        chooseDummy(robot, dummy2X, dummy2Y, false);
-        chooseDummy(robot, dummy3X, dummy3Y, false);
-        chooseDummy(robot, dummy4X, dummy4Y, false);
+        chooseDummy(robot, dummy1X, dummy1Y, false, true);
+        chooseDummy(robot, dummy2X, dummy2Y, false, true);
+        chooseDummy(robot, dummy3X, dummy3Y, false, true);
+        chooseDummy(robot, dummy4X, dummy4Y, false, true);
         checkTest(host, "test2", 2);
 
         /* placeholder */
@@ -1433,12 +1433,12 @@ public final class RoboTest {
         disableStonith(robot, host);
         checkTest(host, "test4", 1);
         /* create 6 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y, false);
-        chooseDummy(robot, dummy2X, dummy2Y, false);
-        chooseDummy(robot, dummy3X, dummy3Y, false);
-        chooseDummy(robot, dummy4X, dummy4Y, false);
-        chooseDummy(robot, dummy5X, dummy5Y, false);
-        chooseDummy(robot, dummy6X, dummy6Y, false);
+        chooseDummy(robot, dummy1X, dummy1Y, false, true);
+        chooseDummy(robot, dummy2X, dummy2Y, false, true);
+        chooseDummy(robot, dummy3X, dummy3Y, false, true);
+        chooseDummy(robot, dummy4X, dummy4Y, false, true);
+        chooseDummy(robot, dummy5X, dummy5Y, false, true);
+        chooseDummy(robot, dummy6X, dummy6Y, false, true);
 
         /* 2 placeholders */
         while (true) {
@@ -1503,8 +1503,8 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        chooseDummy(robot, dummy1X, dummy1Y, false);
-        chooseDummy(robot, dummy2X, dummy2Y, false);
+        chooseDummy(robot, dummy1X, dummy1Y, false, true);
+        chooseDummy(robot, dummy2X, dummy2Y, false, true);
         //checkTest(host, "test5", 2);
 
         addConstraint(robot, dummy2X, dummy2Y, 35, false, -1);
@@ -1585,7 +1585,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        chooseDummy(robot, dummy1X, dummy1Y, false);
+        chooseDummy(robot, dummy1X, dummy1Y, false, true);
         //checkTest(host, "test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
@@ -1610,7 +1610,7 @@ public final class RoboTest {
             checkTest(host, "test7", 1);
             /* create dummy */
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, false);
+            chooseDummy(robot, dummy1X, dummy1Y, false, true);
             checkTest(host, "test7", 2);
             sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
@@ -1674,7 +1674,7 @@ public final class RoboTest {
             checkTest(host, "testB", 1);
             /* create dummy */
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, true);
+            chooseDummy(robot, dummy1X, dummy1Y, true, true);
             checkTest(host, "testB", 2);
             sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
@@ -1730,22 +1730,27 @@ public final class RoboTest {
     }
 
     private static void startTest8(final Robot robot, final Host host) {
-        slowFactor = 0.5f;
+        slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
-        disableStonith(robot, host);
-        for (int i = 5; i > 0; i--) {
-            Tools.info("I: " + i);
-            //checkTest(host, "test7", 1);
-            sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, false);
-            sleep(5000);
-            moveTo(robot, 550, 250);
-            leftPress(robot); /* move the reosurce */
-            moveTo(robot, 300, 250);
-            leftRelease(robot);
-        }
+        //for (int i = 300; i > 0; i--) {
+        //    Tools.info("I: " + i);
+        //    chooseDummy(robot, dummy1X, dummy1Y, false, false);
+        //    removeResource(robot, dummy1X, dummy1Y, -20);
+        //}
+        //disableStonith(robot, host);
+        //for (int i = 20; i > 0; i--) {
+        //    Tools.info("I: " + i);
+        //    //checkTest(host, "test7", 1);
+        //    sleep(5000);
+        //    chooseDummy(robot, dummy1X, dummy1Y, false, true);
+        //    sleep(5000);
+        //    moveTo(robot, 550, 250);
+        //    leftPress(robot); /* move the reosurce */
+        //    moveTo(robot, 300, 250);
+        //    leftRelease(robot);
+        //}
             //checkTest(host, "test7", 2);
     }
 
@@ -1901,7 +1906,8 @@ public final class RoboTest {
     private static void chooseDummy(final Robot robot,
                                     final int x,
                                     final int y,
-                                    final boolean clone) {
+                                    final boolean clone,
+                                    final boolean apply) {
         moveTo(robot, x, y);
         sleep(1000);
         rightClick(robot); /* popup */
@@ -1912,16 +1918,18 @@ public final class RoboTest {
         moveTo(robot, x + 580, y + 72);
         sleep(2000);
         typeDummy(robot);
-        sleep(2000);
-        setTimeouts(robot, true);
-        if (clone) {
-            moveTo(robot, 893, 250);
-            leftClick(robot); /* clone */
+        if (apply) {
+            sleep(2000);
+            setTimeouts(robot, true);
+            if (clone) {
+                moveTo(robot, 893, 250);
+                leftClick(robot); /* clone */
+            }
+            moveTo(robot, 809, 192); /* ptest */
+            sleep(4000);
+            leftClick(robot); /* apply */
+            sleep(2000);
         }
-        moveTo(robot, 809, 192); /* ptest */
-        sleep(4000);
-        leftClick(robot); /* apply */
-        sleep(2000);
     }
 
     /** Removes service. */
