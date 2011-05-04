@@ -2362,11 +2362,17 @@ public class ServiceInfo extends EditableInfo {
                         getBrowser().getServicesNode().remove(oldCI.getNode());
                         getBrowser().getHeartbeatGraph()
                                     .exchangeObjectInTheVertex(ci, oldCI);
+                        cleanup();
+                        oldCI.cleanup();
                         getBrowser().removeFromServiceInfoHash(oldCI);
+                        getBrowser().mHeartbeatIdToServiceLock();
+                        getBrowser().getHeartbeatIdToServiceInfo().remove(
+                                          oldCI.getService().getHeartbeatId());
+                        getBrowser().mHeartbeatIdToServiceUnlock();
+                        oldCI.getNode().setUserObject(null); // would leak
                     }
                     ci.setCloneServicePanel(thisClass);
                     infoPanel = null;
-                    selectMyself();
                 }
             });
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
@@ -2375,6 +2381,8 @@ public class ServiceInfo extends EditableInfo {
                 @Override public void run() {
                     ci.getNode().remove(getNode());
                     getBrowser().getServicesNode().remove(ci.getNode());
+                    cleanup();
+                    ci.cleanup();
                     getBrowser().getServicesNode().add(getNode());
                     getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                      thisClass,
@@ -2387,6 +2395,7 @@ public class ServiceInfo extends EditableInfo {
                     infoPanel = null;
                     setCloneInfo(null);
                     selectMyself();
+                    ci.getNode().setUserObject(null); // would leak
                 }
             });
         }

@@ -256,6 +256,9 @@ public class Browser {
                             hasFocus);
             final Info i =
                     (Info) ((DefaultMutableTreeNode) value).getUserObject();
+            if (i == null) {
+                return this;
+            }
             if (leaf) {
                 final ImageIcon icon = i.getMenuIcon(false);
                 if (icon != null) {

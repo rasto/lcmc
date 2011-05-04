@@ -164,6 +164,7 @@ public final class TerminalPanel extends JScrollPane {
         TESTS.put("starttesta", "a");
         TESTS.put("starttestb", "b");
         TESTS.put("starttestc", "c");
+        TESTS.put("starttestd", "d");
     }
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";

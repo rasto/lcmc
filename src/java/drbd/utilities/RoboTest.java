@@ -187,6 +187,7 @@ public final class RoboTest {
     /** Starts automatic mouse mover in 10 seconds. */
     public static void startMover(final int duration,
                                   final boolean withClicks) {
+        aborted = false;
         slowFactor = 0.3f;
         Tools.info("start mouse move test in 10 seconds");
         prevP = null;
@@ -220,7 +221,7 @@ public final class RoboTest {
                 Tools.info("test started");
                 final long startTime = System.currentTimeMillis();
                 int i = 1;
-                while (true) {
+                while (!aborted) {
                     moveTo(robot, destX, destY);
                     if (abortWithMouseMovement()) {
                         break;
@@ -402,6 +403,15 @@ public final class RoboTest {
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
                         startTestC(robot, host);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
+                    } else if ("d".equals(index)) {
+                        /* pacemaker leak test */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestD(robot, host);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -1734,24 +1744,62 @@ public final class RoboTest {
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
-        //for (int i = 300; i > 0; i--) {
-        //    Tools.info("I: " + i);
-        //    chooseDummy(robot, dummy1X, dummy1Y, false, false);
-        //    removeResource(robot, dummy1X, dummy1Y, -20);
-        //}
-        //disableStonith(robot, host);
-        //for (int i = 20; i > 0; i--) {
-        //    Tools.info("I: " + i);
-        //    //checkTest(host, "test7", 1);
-        //    sleep(5000);
-        //    chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        //    sleep(5000);
-        //    moveTo(robot, 550, 250);
-        //    leftPress(robot); /* move the reosurce */
-        //    moveTo(robot, 300, 250);
-        //    leftRelease(robot);
-        //}
+        disableStonith(robot, host);
+        for (int i = 20; i > 0; i--) {
+            Tools.info("I: " + i);
+            //checkTest(host, "test7", 1);
+            sleep(5000);
+            chooseDummy(robot, dummy1X, dummy1Y, false, true);
+            sleep(5000);
+            moveTo(robot, 550, 250);
+            leftPress(robot); /* move the reosurce */
+            moveTo(robot, 300, 250);
+            leftRelease(robot);
+        }
             //checkTest(host, "test7", 2);
+    }
+
+    /** Pacemaker Leak tests */
+    private static void startTestD(final Robot robot, final Host host) {
+        slowFactor = 0.2f;
+        aborted = false;
+        int count = 100;
+        final int dummy1X = 540;
+        final int dummy1Y = 250;
+        for (int i = count; i > 0; i--) {
+            Tools.info("1 I: " + i);
+            chooseDummy(robot, dummy1X, dummy1Y, false, false);
+            removeResource(robot, dummy1X, dummy1Y, -20);
+        }
+        chooseDummy(robot, dummy1X, dummy1Y, false, false);
+        int pos = 0;
+        for (int i = count; i > 0; i--) {
+            Tools.info("2 I: " + i);
+            double rand = Math.random();
+            if (rand < 0.33) {
+                if (pos == 1) {
+                    continue;
+                }
+                pos = 1;
+                moveTo(robot, 796, 247);
+                leftClick(robot);
+            } else if (rand < 0.66) {
+                if (pos == 2) {
+                    continue;
+                }
+                pos = 2;
+                moveTo(robot, 894, 248);
+                leftClick(robot);
+            } else {
+                if (pos == 3) {
+                    continue;
+                }
+                pos = 3;
+                moveTo(robot, 994, 248);
+                leftClick(robot);
+            }
+        }
+        removeResource(robot, dummy1X, dummy1Y, -20);
     }
 
     /** Sets location. */

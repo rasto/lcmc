@@ -404,13 +404,7 @@ public class Info implements Comparable {
     }
 
     /** Cleanup. */
-    final void cleanup() {
-        //if (menu != null) {
-        //    menu.cleanup();
-        //}
-        //if (popup != null) {
-        //    popup.removeAll();
-        //}
+    void cleanup() {
         try {
             mActionMenuListLock.acquire();
         } catch (InterruptedException e) {

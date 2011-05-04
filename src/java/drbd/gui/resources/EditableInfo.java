@@ -1116,4 +1116,15 @@ public abstract class EditableInfo extends Info {
     public void setDialogStarted(final boolean dialogStarted) {
         this.dialogStarted = dialogStarted;
     }
+
+    /** Clear panel lists. */
+    protected void clearPanelLists() {
+        advancedPanelList.clear();
+        advancedOnlySectionList.clear();
+    }
+
+    final void cleanup() {
+        super.cleanup();
+        clearPanelLists();
+    }
 }
