@@ -26,7 +26,9 @@ import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import drbd.utilities.Tools;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class holds a set of all clusters.
@@ -41,54 +43,50 @@ public final class Clusters {
     /** Set of cluster objects. */
     private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
     /** Clusters set lock. */
-    private final Mutex mClustersLock = new Mutex();
+    private final ReadWriteLock mClustersLock =
+                                               new ReentrantReadWriteLock();
+    private final Lock mClustersReadLock = mClustersLock.readLock();
+    private final Lock mClustersWriteLock = mClustersLock.writeLock();
 
     /** Adds cluster to the set of clusters. */
     void addCluster(final Cluster cluster) {
+        mClustersWriteLock.lock();
         try {
-            mClustersLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            clusters.add(cluster);
+        } finally {
+            mClustersWriteLock.unlock();
         }
-        clusters.add(cluster);
-        mClustersLock.release();
     }
 
     /** Removes cluster from the clusters. */
     void removeCluster(final Cluster cluster) {
+        mClustersWriteLock.lock();
         try {
-            mClustersLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            clusters.remove(cluster);
+        } finally {
+            mClustersWriteLock.unlock();
         }
-        clusters.remove(cluster);
-        mClustersLock.release();
     }
 
     /** Returns true if cluster is in the clusters or false if it is not. */
     boolean existsCluster(final Cluster cluster) {
-        try {
-            mClustersLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mClustersReadLock.lock();
         final boolean ret = clusters.contains(cluster);
-        mClustersLock.release();
+        mClustersReadLock.unlock();
         return ret;
     }
 
     /** Gets set of clusters. */
     public Set<Cluster> getClusterSet() {
         final Set<Cluster> copy = new LinkedHashSet<Cluster>();
+        mClustersReadLock.lock();
         try {
-            mClustersLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            for (final Cluster c : clusters) {
+                copy.add(c);
+            }
+        } finally {
+            mClustersReadLock.unlock();
         }
-        for (final Cluster c : clusters) {
-            copy.add(c);
-        }
-        mClustersLock.release();
         return copy;
     }
 
@@ -96,29 +94,28 @@ public final class Clusters {
     public String getDefaultClusterName() {
         int index = 0;
         final String defaultName = Tools.getString("Clusters.DefaultName");
+        mClustersReadLock.lock();
         try {
-            mClustersLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (clusters != null) {
-            for (final Cluster cluster : clusters) {
-            /* find the bigest index of cluster default name and increment it
-             * by one */
-                final String name = cluster.getName();
-                final Pattern p = Pattern.compile("^"
-                                                  + defaultName
-                                                  + "(\\d+)$");
-                final Matcher m = p.matcher(name);
-                if (m.matches()) {
-                    final int i = Integer.parseInt(m.group(1));
-                    if (i > index) {
-                        index = i;
+            if (clusters != null) {
+                for (final Cluster cluster : clusters) {
+                    /* find the bigest index of cluster default name and
+                     * increment it by one */
+                    final String name = cluster.getName();
+                    final Pattern p = Pattern.compile("^"
+                                                      + defaultName
+                                                      + "(\\d+)$");
+                    final Matcher m = p.matcher(name);
+                    if (m.matches()) {
+                        final int i = Integer.parseInt(m.group(1));
+                        if (i > index) {
+                            index = i;
+                        }
                     }
                 }
             }
+        } finally {
+            mClustersReadLock.unlock();
         }
-        mClustersLock.release();
         return defaultName + Integer.toString(index + 1);
     }
 }

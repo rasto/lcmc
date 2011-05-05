@@ -54,7 +54,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -341,7 +343,9 @@ public final class VMSXML extends XML {
     }
 
     /** XML document lock. */
-    private final Mutex mXMLDocumentLock = new Mutex();
+    private final ReadWriteLock mXMLDocumentLock = new ReentrantReadWriteLock();
+    private final Lock mXMLDocumentReadLock = mXMLDocumentLock.readLock();
+    private final Lock mXMLDocumentWriteLock = mXMLDocumentLock.writeLock();
     /** XML document. */
     private Document xmlDocument = null;
 
@@ -353,13 +357,9 @@ public final class VMSXML extends XML {
 
     /** Returns xml node of the specified domain. */
     public Node getDomainNode(final String domainName) {
-        try {
-            mXMLDocumentLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mXMLDocumentReadLock.lock();
         final Document document = xmlDocument;
-        mXMLDocumentLock.release();
+        mXMLDocumentReadLock.unlock();
         final XPath xpath = XPathFactory.newInstance().newXPath();
         Node domainNode = null;
         try {
@@ -1051,13 +1051,9 @@ public final class VMSXML extends XML {
             return false;
         }
         final Document document = getXMLDocument(output);
-        try {
-            mXMLDocumentLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mXMLDocumentWriteLock.lock();
         xmlDocument = document;
-        mXMLDocumentLock.release();
+        mXMLDocumentWriteLock.unlock();
         if (document == null) {
             return false;
         }

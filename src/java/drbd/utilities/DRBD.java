@@ -27,7 +27,9 @@ import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
 import drbd.configs.DistResource;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class provides drbd commands.
@@ -48,7 +50,12 @@ public final class DRBD {
     /** Output of the drbd test. */
     private static volatile String drbdtestOutput = null;
     /** DRBD test lock. */
-    private static final Mutex M_DRBD_TEST_LOCK = new Mutex();
+    private static final ReadWriteLock M_DRBD_TEST_LOCK =
+                                                  new ReentrantReadWriteLock();
+    private static final Lock M_DRBD_TEST_READLOCK =
+                                                   M_DRBD_TEST_LOCK.readLock();
+    private static final Lock M_DRBD_TEST_WRITELOCK =
+                                                  M_DRBD_TEST_LOCK.writeLock();
 
     /** Private constructor, cannot be instantiated. */
     private DRBD() {
@@ -68,13 +75,12 @@ public final class DRBD {
                                              final ExecCallback execCallback,
                                              final boolean outputVisible,
                                              final boolean testOnly) {
+        M_DRBD_TEST_WRITELOCK.lock();
         try {
-            M_DRBD_TEST_LOCK.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            drbdtestOutput = null;
+        } finally {
+            M_DRBD_TEST_WRITELOCK.unlock();
         }
-        drbdtestOutput = null;
-        M_DRBD_TEST_LOCK.release();
         if (testOnly) {
             if (command.indexOf("@DRYRUN@") < 0) {
                 /* it would be very bad */
@@ -92,13 +98,12 @@ public final class DRBD {
                                                 null,
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+            M_DRBD_TEST_WRITELOCK.lock();
             try {
-                M_DRBD_TEST_LOCK.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                drbdtestOutput = output.getOutput();
+            } finally {
+                M_DRBD_TEST_WRITELOCK.unlock();
             }
-            drbdtestOutput = output.getOutput();
-            M_DRBD_TEST_LOCK.release();
 
             return output;
         } else {
@@ -124,13 +129,9 @@ public final class DRBD {
 
     /** Returns results of previous dry run. */
     public static String getDRBDtest() {
-        try {
-            M_DRBD_TEST_LOCK.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        M_DRBD_TEST_READLOCK.lock();
         final String out = drbdtestOutput;
-        M_DRBD_TEST_LOCK.release();
+        M_DRBD_TEST_READLOCK.unlock();
         return out;
     }
 

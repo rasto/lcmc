@@ -58,7 +58,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.JTextPane;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -78,7 +79,7 @@ class Logs extends ConfigDialog {
     private final MyButton refreshBtn =
                     new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
     /** Refresh lock. */
-    private final Mutex mRefreshLock = new Mutex();
+    private final Lock mRefreshLock = new ReentrantLock();
 
     /**
      * Command that gets the log. The command must be specified in the
@@ -119,15 +120,14 @@ class Logs extends ConfigDialog {
         final Thread thread = new Thread(
             new Runnable() {
                 @Override public void run() {
-                    try {
-                        if (!mRefreshLock.attempt(0)) {
-                            return;
-                        }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                    if (!mRefreshLock.tryLock()) {
+                        return;
                     }
-                    refreshLogs();
-                    mRefreshLock.release();
+                    try {
+                        refreshLogs();
+                    } finally {
+                        mRefreshLock.unlock();
+                    }
                 }
             });
         thread.start();

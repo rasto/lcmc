@@ -29,7 +29,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -42,7 +45,10 @@ public final class CRM {
     /** Output of the ptest. */
     private static volatile String ptestOutput = null;
     /** Ptest lock. */
-    private static final Mutex mPtestLock = new Mutex();
+    private static final ReadWriteLock M_PTEST_LOCK =
+                                                new ReentrantReadWriteLock();
+    private static final Lock M_PTEST_READLOCK = M_PTEST_LOCK.readLock();
+    private static final Lock M_PTEST_WRITELOCK = M_PTEST_LOCK.writeLock();
     /** Delimiter that delimits the ptest and test cib part. */
     public static final String PTEST_END_DELIM = "--- PTEST END ---";
     /** Location of drbd-mc-test.xml file. */
@@ -76,13 +82,12 @@ public final class CRM {
                                              final String command,
                                              final boolean outputVisible,
                                              final boolean testOnly) {
+        M_PTEST_WRITELOCK.lock();
         try {
-            mPtestLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            ptestOutput = null;
+        } finally {
+            M_PTEST_WRITELOCK.unlock();
         }
-        ptestOutput = null;
-        mPtestLock.release();
         if (testOnly) {
             final String testCmd =
              "if [ ! -e " + DRBD_MC_TEST_FILE + " ]; "
@@ -110,17 +115,13 @@ public final class CRM {
 
     /** Executes the ptest command and returns results. */
     public static String getPtest(final Host host) {
-        try {
-            mPtestLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        M_PTEST_READLOCK.lock();
         if (ptestOutput != null) {
             final String po = ptestOutput;
-            mPtestLock.release();
+            M_PTEST_READLOCK.unlock();
             return po;
         }
-        mPtestLock.release();
+        M_PTEST_READLOCK.unlock();
         final String command =
                 DistResource.SUDO + "/usr/sbin/ptest -VVVV -S -x "
                 + DRBD_MC_TEST_FILE
@@ -134,16 +135,12 @@ public final class CRM {
                                                 null,
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
-        try {
-            mPtestLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        M_PTEST_WRITELOCK.lock();
         final String po = output.getOutput();
         if (ptestOutput == null) {
             ptestOutput = po;
         }
-        mPtestLock.release();
+        M_PTEST_WRITELOCK.unlock();
         return po;
     }
 

@@ -82,8 +82,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.geom.Point2D;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.w3c.dom.Node;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+
+import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
@@ -101,7 +105,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Row color, that is color of host on which is it running or null. */
     private Color rowColor = Browser.PANEL_BACKGROUND;
     /** Transition between states lock. */
-    private final Mutex mTransitionLock = new Mutex();
+    private final ReadWriteLock mTransitionLock = new ReentrantReadWriteLock();
+    private final Lock mTransitionReadLock = mTransitionLock.readLock();
+    private final Lock mTransitionWriteLock = mTransitionLock.writeLock();
     /** Starting. */
     private final Set<String> starting = new HashSet<String>();
     /** Shutting down. */
@@ -1530,30 +1536,18 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 if (vmsxml.isRunning(getDomainName())) {
                     if (vmsxml.isSuspended(getDomainName())) {
                         suspendedOnHosts.add(hostName);
-                        try {
-                            mTransitionLock.acquire();
-                        } catch (final InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+                        mTransitionWriteLock.lock();
                         suspending.remove(hostName);
-                        mTransitionLock.release();
+                        mTransitionWriteLock.unlock();
                     } else {
-                        try {
-                            mTransitionLock.acquire();
-                        } catch (final InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+                        mTransitionWriteLock.lock();
                         resuming.remove(hostName);
-                        mTransitionLock.release();
+                        mTransitionWriteLock.unlock();
                     }
                     runningOnHosts.add(hostName);
-                    try {
-                        mTransitionLock.acquire();
-                    } catch (final InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    mTransitionWriteLock.lock();
                     starting.remove(hostName);
-                    mTransitionLock.release();
+                    mTransitionWriteLock.unlock();
                 }
                 definedhosts.add(hostName);
             } else {
@@ -1566,21 +1560,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                      new String[definedhosts.size()]))
                           + "</html>";
         final boolean running = !runningOnHosts.isEmpty();
-        try {
-            mTransitionLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mTransitionWriteLock.lock();
         /* Set host buttons */
         setHostButtons(running);
         if (runningOnHosts.isEmpty() && starting.isEmpty()) {
             shuttingdown.clear();
             suspending.clear();
             resuming.clear();
-            mTransitionLock.release();
+            mTransitionWriteLock.unlock();
             runningOnString = "Stopped";
         } else {
-            mTransitionLock.release();
+            mTransitionWriteLock.unlock();
             if (progress.charAt(0) == '-') {
                 progress.setCharAt(0, '\\');
             } else if (progress.charAt(0) == '\\') {
@@ -1590,11 +1580,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (progress.charAt(0) == '/') {
                 progress.setCharAt(0, '-');
             }
-            try {
-                mTransitionLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTransitionReadLock.lock();
             if (!starting.isEmpty()) {
                 runningOnString =
                         "<html>Starting on: "
@@ -1636,7 +1622,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                             new String[runningOnHosts.size()]))
                         + "</html>";
             }
-            mTransitionLock.release();
+            mTransitionReadLock.unlock();
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 final GuiComboBox hcb =
@@ -1965,35 +1951,36 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final boolean ret = VIRSH.start(host, getDomainName());
         if (ret) {
             int i = 0;
-            try {
-                mTransitionLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTransitionWriteLock.lock();
             final boolean wasEmpty = starting.isEmpty();
             starting.add(host.getName());
             if (!wasEmpty) {
-                mTransitionLock.release();
+                mTransitionWriteLock.unlock();
                 return;
             }
-            while (!starting.isEmpty() && i < ACTION_TIMEOUT) {
-                mTransitionLock.release();
+            mTransitionWriteLock.unlock();
+            while (true) {
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
                 getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
                 Tools.sleep(1000);
                 i++;
-                try {
-                    mTransitionLock.acquire();
-                } catch (final InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                mTransitionReadLock.lock();
+                if (starting.isEmpty() || i >= ACTION_TIMEOUT) {
+                    mTransitionReadLock.unlock();
+                    break;
                 }
+                mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
                 Tools.appWarning("could not start on " + host.getName());
-                starting.clear();
+                mTransitionWriteLock.lock();
+                try {
+                    starting.clear();
+                } finally {
+                    mTransitionWriteLock.unlock();
+                }
             }
-            mTransitionLock.release();
             getBrowser().periodicalVMSUpdate(host);
             updateParameters();
             getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
@@ -2003,35 +1990,36 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Starts shutting down indicator. */
     private void startShuttingdownIndicator(final Host host) {
         int i = 0;
-        try {
-            mTransitionLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mTransitionWriteLock.lock();
         final boolean wasEmpty = starting.isEmpty();
         shuttingdown.add(host.getName());
         if (!wasEmpty) {
-            mTransitionLock.release();
+            mTransitionWriteLock.unlock();
             return;
         }
-        while (!shuttingdown.isEmpty() && i < ACTION_TIMEOUT) {
-            mTransitionLock.release();
+        mTransitionWriteLock.unlock();
+        while (true) {
             getBrowser().periodicalVMSUpdate(host);
             updateParameters();
             getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
             Tools.sleep(1000);
             i++;
-            try {
-                mTransitionLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
+            mTransitionReadLock.lock();
+            if (shuttingdown.isEmpty() || i >= ACTION_TIMEOUT) {
+                mTransitionReadLock.unlock();
+                break;
             }
+            mTransitionReadLock.unlock();
         }
         if (i >= ACTION_TIMEOUT) {
             Tools.appWarning("could not shut down on " + host.getName());
-            shuttingdown.clear();
+            mTransitionWriteLock.lock();
+            try {
+                shuttingdown.clear();
+            } finally {
+                mTransitionWriteLock.unlock();
+            }
         }
-        mTransitionLock.release();
         getBrowser().periodicalVMSUpdate(host);
         updateParameters();
         getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
@@ -2066,35 +2054,36 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final boolean ret = VIRSH.suspend(host, getDomainName());
         if (ret) {
             int i = 0;
-            try {
-                mTransitionLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTransitionWriteLock.lock();
             final boolean wasEmpty = suspending.isEmpty();
             suspending.add(host.getName());
             if (!wasEmpty) {
-                mTransitionLock.release();
+                mTransitionWriteLock.unlock();
                 return;
             }
+            mTransitionWriteLock.unlock();
             while (!suspending.isEmpty() && i < ACTION_TIMEOUT) {
-                mTransitionLock.release();
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
                 getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
                 Tools.sleep(1000);
                 i++;
-                try {
-                    mTransitionLock.acquire();
-                } catch (final InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                mTransitionReadLock.lock();
+                if (suspending.isEmpty() || i >= ACTION_TIMEOUT) {
+                    mTransitionReadLock.unlock();
+                    break;
                 }
+                mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
                 Tools.appWarning("could not suspend on " + host.getName());
-                suspending.clear();
+                mTransitionWriteLock.lock();
+                try {
+                    suspending.clear();
+                } finally {
+                    mTransitionWriteLock.unlock();
+                }
             }
-            mTransitionLock.release();
             getBrowser().periodicalVMSUpdate(host);
             updateParameters();
             getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
@@ -2106,35 +2095,36 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final boolean ret = VIRSH.resume(host, getDomainName());
         if (ret) {
             int i = 0;
-            try {
-                mTransitionLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTransitionWriteLock.lock();
             final boolean wasEmpty = resuming.isEmpty();
             resuming.add(host.getName());
             if (!wasEmpty) {
-                mTransitionLock.release();
+                mTransitionWriteLock.unlock();
                 return;
             }
+            mTransitionWriteLock.unlock();
             while (!resuming.isEmpty() && i < ACTION_TIMEOUT) {
-                mTransitionLock.release();
                 getBrowser().periodicalVMSUpdate(host);
                 updateParameters();
                 getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);
                 Tools.sleep(1000);
                 i++;
-                try {
-                    mTransitionLock.acquire();
-                } catch (final InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                mTransitionReadLock.lock();
+                if (resuming.isEmpty() || i >= ACTION_TIMEOUT) {
+                    mTransitionReadLock.unlock();
+                    break;
                 }
+                mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
                 Tools.appWarning("could not resume on " + host.getName());
-                resuming.clear();
+                mTransitionWriteLock.lock();
+                try {
+                    resuming.clear();
+                } finally {
+                    mTransitionWriteLock.unlock();
+                }
             }
-            mTransitionLock.release();
             getBrowser().periodicalVMSUpdate(host);
             updateParameters();
             getBrowser().getVMSInfo().updateTable(VMSInfo.MAIN_TABLE);

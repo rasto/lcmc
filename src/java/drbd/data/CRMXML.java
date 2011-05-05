@@ -43,7 +43,9 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Collections;
 import java.util.Locale;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
@@ -3615,7 +3617,9 @@ public final class CRMXML extends XML {
         /** Resources in this set. */
         private final List<String> rscIds;
         /** Resource ids lock. */
-        private final Mutex mRscIdsLock = new Mutex();
+        private final ReadWriteLock mRscIdsLock = new ReentrantReadWriteLock();
+        private final Lock mRscIdsReadLock = mRscIdsLock.readLock();
+        private final Lock mRscIdsWriteLock = mRscIdsLock.writeLock();
         /** String whether the resource set is sequential or not. */
         private final String sequential;
         /** order action. */
@@ -3643,15 +3647,14 @@ public final class CRMXML extends XML {
         /** Returns resources in this set. */
         public List<String> getRscIds() {
             final List<String> copy = new ArrayList<String>();
+            mRscIdsReadLock.lock();
             try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                for (final String id : rscIds) {
+                    copy.add(id);
+                }
+            } finally {
+                mRscIdsReadLock.unlock();
             }
-            for (final String id : rscIds) {
-                copy.add(id);
-            }
-            mRscIdsLock.release();
             return copy;
         }
 
@@ -3667,22 +3670,18 @@ public final class CRMXML extends XML {
                 return false;
             }
             final List<String> oRscIds = oRscSet.getRscIds();
-            try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mRscIdsReadLock.lock();
             if (rscIds.isEmpty()) {
-                mRscIdsLock.release();
+                mRscIdsReadLock.unlock();
                 return false;
             }
             for (final String rscId : rscIds) {
                 if (!oRscIds.contains(rscId)) {
-                    mRscIdsLock.release();
+                    mRscIdsReadLock.unlock();
                     return false;
                 }
             }
-            mRscIdsLock.release();
+            mRscIdsReadLock.unlock();
             return true;
         }
 
@@ -3693,56 +3692,46 @@ public final class CRMXML extends XML {
                 return false;
             }
             final List<String> oRscIds = oRscSet.getRscIds();
-            try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mRscIdsReadLock.lock();
             if (oRscIds.size() != rscIds.size()) {
-                mRscIdsLock.release();
+                mRscIdsReadLock.unlock();
                 return false;
             }
             for (final String rscId : rscIds) {
                 if (!oRscIds.contains(rscId)) {
-                    mRscIdsLock.release();
+                    mRscIdsReadLock.unlock();
                     return false;
                 }
             }
-            mRscIdsLock.release();
+            mRscIdsReadLock.unlock();
             return true;
         }
 
         /** Removes one id from rsc ids. */
         public void removeRscId(final String id) {
+            mRscIdsWriteLock.lock();
             try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                rscIds.remove(id);
+            } finally {
+                mRscIdsWriteLock.unlock();
             }
-            rscIds.remove(id);
-            mRscIdsLock.release();
         }
 
         /** Adds one id to rsc ids. */
         public void addRscId(final String id) {
+            mRscIdsWriteLock.lock();
             try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                rscIds.add(id);
+            } finally {
+                mRscIdsWriteLock.unlock();
             }
-            rscIds.add(id);
-            mRscIdsLock.release();
         }
 
         /** Return whether rsc ids are empty. */
         boolean isRscIdsEmpty() {
-            try {
-                mRscIdsLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mRscIdsReadLock.lock();
             final boolean empty = rscIds.isEmpty();
-            mRscIdsLock.release();
+            mRscIdsReadLock.unlock();
             return empty;
         }
 
