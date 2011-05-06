@@ -203,27 +203,23 @@ class ViewPanel extends JPanel {
     private void setRightComponentInView(final JTree tree,
                                          final JSplitPane viewSP,
                                          final Browser browser) {
-        if (!mSetPanelLock.tryLock()) {
-            return;
-        }
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                                            tree.getLastSelectedPathComponent();
         if (node == null) {
-            mSetPanelLock.unlock();
             return;
         }
         if (node.getParent() == null) {
             /* it's not shown. */
-            mSetPanelLock.unlock();
             return;
         }
 
         final Object nodeInfo = node.getUserObject();
-        if (nodeInfo == null) {
-            mSetPanelLock.unlock();
-        } else {
+        if (nodeInfo != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
+                    if (!mSetPanelLock.tryLock()) {
+                        return;
+                    }
                     final JComponent p = browser.getInfoPanel(nodeInfo);
                     if (!disabledDuringLoad) {
                         final int loc = viewSP.getDividerLocation();
@@ -240,11 +236,11 @@ class ViewPanel extends JPanel {
     final void setRightComponentInView(final Browser browser,
                                        final Info nodeInfo) {
         if (viewSP != null) {
-            if (!mSetPanelLock.tryLock()) {
-                return;
-            }
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
+                    if (!mSetPanelLock.tryLock()) {
+                        return;
+                    }
                     final JComponent p = browser.getInfoPanel(nodeInfo);
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();
