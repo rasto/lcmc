@@ -32,7 +32,8 @@ import java.awt.event.HierarchyEvent;
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyListener;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author rasto
@@ -47,7 +48,7 @@ public final class MainPanel extends JPanel {
     /** Whether the terminal was already expanded at least once. */
     private boolean expandingDone = false;
     /** Expanding flag mutex. */
-    private final Mutex mExpanding = new Mutex();
+    private final Lock mExpanding = new ReentrantLock();
 
     /** Prepares a new <code>MainPanel</code> object. */
     public MainPanel() {
@@ -65,20 +66,16 @@ public final class MainPanel extends JPanel {
 
         splitPane.addHierarchyListener(new HierarchyListener() {
             public void hierarchyChanged(final HierarchyEvent e) {
-                try {
-                    mExpanding.acquire();
-                } catch (InterruptedException ee) {
-                    Thread.currentThread().interrupt();
-                }
+                mExpanding.lock();
                 if (!expandingDone
                     && (e.getChangeFlags()
                         & HierarchyEvent.SHOWING_CHANGED) != 0) {
 
                     expandingDone = true;
-                    mExpanding.release();
+                    mExpanding.unlock();
                     Tools.getGUIData().expandTerminalSplitPane(1);
                 } else {
-                    mExpanding.release();
+                    mExpanding.unlock();
                 }
             }
         });

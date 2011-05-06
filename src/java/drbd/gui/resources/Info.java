@@ -75,7 +75,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.InvocationTargetException;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
@@ -106,15 +109,15 @@ public class Info implements Comparable {
     /** popup menu for this object. */
     private JPopupMenu popup;
     /** Popup object lock. */
-    private final Mutex mPopupLock = new Mutex();
+    private final Lock mPopupLock = new ReentrantLock();
     /** menu of this object. */
     private JMenu menu;
     /** Menu list lock. */
-    private final Mutex mMenuListLock = new Mutex();
+    private final Lock mMenuListLock = new ReentrantLock();
     /** list of items in the menu for this object. */
     private List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
     /** Action menu list lock. */
-    private final Mutex mActionMenuListLock = new Mutex();
+    private final Lock mActionMenuListLock = new ReentrantLock();
     /** list of items in the action menu for this object. */
     private List<UpdatableItem> actionMenuList = new ArrayList<UpdatableItem>();
     /** Whether the info object is being updated. */
@@ -405,29 +408,27 @@ public class Info implements Comparable {
 
     /** Cleanup. */
     void cleanup() {
+        mActionMenuListLock.lock();
         try {
-            mActionMenuListLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (actionMenuList != null) {
-            for (final UpdatableItem i : actionMenuList) {
-                i.cleanup();
+            if (actionMenuList != null) {
+                for (final UpdatableItem i : actionMenuList) {
+                    i.cleanup();
+                }
             }
+        } finally {
+            mActionMenuListLock.unlock();
         }
-        mActionMenuListLock.release();
 
+        mMenuListLock.lock();
         try {
-            mMenuListLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (menuList != null) {
-            for (final UpdatableItem i : menuList) {
-                i.cleanup();
+            if (menuList != null) {
+                for (final UpdatableItem i : menuList) {
+                    i.cleanup();
+                }
             }
+        } finally {
+            mMenuListLock.unlock();
         }
-        mMenuListLock.release();
         paramComboBoxClear();
     }
 
@@ -510,13 +511,9 @@ public class Info implements Comparable {
 
     /** Returns popup object without updating. */
     final void hidePopup() {
-        try {
-            mPopupLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mPopupLock.lock();
         final JPopupMenu popup0 = popup;
-        mPopupLock.release();
+        mPopupLock.unlock();
         if (popup0 != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
@@ -531,11 +528,7 @@ public class Info implements Comparable {
      * items.
      */
     public final JPopupMenu getPopup() {
-        try {
-            mPopupLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mPopupLock.lock();
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
@@ -562,7 +555,7 @@ public class Info implements Comparable {
             }
         }
         final JPopupMenu popup0 = popup;
-        mPopupLock.release();
+        mPopupLock.unlock();
         if (popup0 != null) {
             updateMenus(null);
         }
@@ -571,11 +564,7 @@ public class Info implements Comparable {
 
     /** Returns popup on the spefified position. */
     public final JPopupMenu getPopup(final Point2D pos) {
-        try {
-            mPopupLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mPopupLock.lock();
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
@@ -602,7 +591,7 @@ public class Info implements Comparable {
             }
         }
         final JPopupMenu popup0 = popup;
-        mPopupLock.release();
+        mPopupLock.unlock();
         if (popup0 != null) {
             updateMenus(pos);
         }
@@ -697,13 +686,9 @@ public class Info implements Comparable {
                     menu.setBackground(Browser.STATUS_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
                     Tools.addPluginMenuItems(thisObject, items);
-                    try {
-                        mActionMenuListLock.acquire();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+                    mActionMenuListLock.lock();
                     actionMenuList = items;
-                    mActionMenuListLock.release();
+                    mActionMenuListLock.unlock();
                     if (items != null) {
                         for (final UpdatableItem u : items) {
                             menu.add((JMenuItem) u);
@@ -726,31 +711,21 @@ public class Info implements Comparable {
 
     /** Force popup to be recreated. */
     protected final void resetPopup() {
-        try {
-            mPopupLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mPopupLock.lock();
         popup = null;
-        mPopupLock.release();
+        mPopupLock.unlock();
     }
 
     /** Update menus with positions and calles their update methods. */
     void updateMenus(final Point2D pos) {
         if (menuList != null) {
-            try {
-                mMenuListLock.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            final List<UpdatableItem> menuListCopy =
-                                        new ArrayList<UpdatableItem>(menuList);
-            for (final UpdatableItem i : menuListCopy) {
+            mMenuListLock.lock();
+            for (final UpdatableItem i : menuList) {
                 i.setPos(pos);
                 i.update();
             }
-            mMenuListLock.release();
-            final int size = menuListCopy.size();
+            final int size = menuList.size();
+            mMenuListLock.unlock();
             if (size > maxMenuList) {
                 maxMenuList = size;
                 Tools.debug(this, "menu list size: " + maxMenuList, 2);
@@ -758,23 +733,13 @@ public class Info implements Comparable {
         }
 
         if (actionMenuList != null) {
-            final List<UpdatableItem> actionMenuListCopy =
-                                                new ArrayList<UpdatableItem>();
-            try {
-                mActionMenuListLock.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mActionMenuListLock.lock();
             for (final UpdatableItem i : actionMenuList) {
-                actionMenuListCopy.add(i);
-            }
-            final int aSize = actionMenuList.size();
-
-            for (final UpdatableItem i : actionMenuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
-            mActionMenuListLock.release();
+            final int aSize = actionMenuList.size();
+            mActionMenuListLock.unlock();
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;
                 Tools.debug(this, "action menu list size: " + maxMenuList, 2);
@@ -785,20 +750,14 @@ public class Info implements Comparable {
     /** Registers all menu items. */
     final void registerAllMenuItems(
                                final List<UpdatableItem> allItemsAndSubitems) {
-        try {
-            mMenuListLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mMenuListLock.lock();
         menuList = allItemsAndSubitems;
-        mMenuListLock.release();
+        mMenuListLock.unlock();
     }
 
     /** Returns units. */
     protected Unit[] getUnits() {
-        return null;
-    }
-
+        return null; } 
     /** Returns units. */
     protected Unit[] getTimeUnits() {
         return new Unit[]{
@@ -1208,19 +1167,15 @@ public class Info implements Comparable {
     /** Adds plugin menu item. */
     public final void addPluginMenuItem(final UpdatableItem pluginItem) {
         /* check if it is already there */
-        try {
-            mMenuListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mMenuListLock.lock();
         for (final UpdatableItem menuItem : menuList) {
             if (menuItem.toString().equals(pluginItem.toString())) {
-                mMenuListLock.release();
+                mMenuListLock.unlock();
                 return;
             }
         }
         menuList.add(pluginItem);
-        mMenuListLock.release();
+        mMenuListLock.unlock();
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 menu.add((JMenuItem) pluginItem);
@@ -1231,23 +1186,19 @@ public class Info implements Comparable {
     /** Adds plugin action menu item. */
     public final void addPluginActionMenuItem(final UpdatableItem pluginItem) {
         /* check if it is already there */
-        try {
-            mActionMenuListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mActionMenuListLock.lock();
         if (actionMenuList == null) {
-            mActionMenuListLock.release();
+            mActionMenuListLock.unlock();
             return;
         }
         for (final UpdatableItem actionMenuItem : actionMenuList) {
             if (actionMenuItem.toString().equals(pluginItem.toString())) {
-                mActionMenuListLock.release();
+                mActionMenuListLock.unlock();
                 return;
             }
         }
         actionMenuList.add(pluginItem);
-        mActionMenuListLock.release();
+        mActionMenuListLock.unlock();
         final JPopupMenu pm = popup;
         if (pm != null) {
             SwingUtilities.invokeLater(new Runnable() {

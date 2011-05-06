@@ -58,8 +58,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import edu.uci.ics.jung.visualization.Layer;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -75,7 +79,7 @@ public final class HeartbeatGraph extends ResourceGraph {
     /** List with edges that are colocation constraints. */
     private final List<Edge> edgeIsColocationList = new ArrayList<Edge>();
     /** Vertex is present lock. */
-    private final Mutex mVertexIsPresentListLock = new Mutex();
+    private final Lock mVertexIsPresentListLock = new ReentrantLock();
     /** List with vertices that are present. */
     private List<Vertex> vertexIsPresentList = new ArrayList<Vertex>();
     /** Map from vertex to 'Add service' menu. */
@@ -91,7 +95,10 @@ public final class HeartbeatGraph extends ResourceGraph {
     private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
                                 new LinkedHashMap<HbConnectionInfo, Edge>();
     /** Pcmk connection lock. */
-    private final Mutex mHbConnectionLock = new Mutex();
+    private final ReadWriteLock mHbConnectionLock =
+                                                  new ReentrantReadWriteLock();
+    private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
+    private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
     /** Map from the vertex to the host. */
     private final Map<Vertex, HostInfo> vertexToHostMap =
                                          new LinkedHashMap<Vertex, HostInfo>();
@@ -408,11 +415,7 @@ public final class HeartbeatGraph extends ResourceGraph {
             return;
         }
 
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionWriteLock.lock();
         Edge edge = null;
         try {
             lockGraph();
@@ -430,7 +433,6 @@ public final class HeartbeatGraph extends ResourceGraph {
             }
         } catch (final Exception e) {
             unlockGraph();
-            /* ignore */
         }
         HbConnectionInfo hbci;
         if (edge == null) {
@@ -444,7 +446,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        mHbConnectionLock.release();
+        mHbConnectionWriteLock.unlock();
         if (hbci != null) {
             hbci.addOrder(ordId, parent, serviceInfo);
             if (!edgeIsOrderList.contains(edge)) {
@@ -455,13 +457,9 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** Reverse the edge. */
     void reverse(final HbConnectionInfo hbConnectionInfo) {
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge e = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         if (e != null && edgeIsColocationList.contains(e)) {
             e.reverse();
         }
@@ -548,11 +546,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (vWithRsc == null || vRsc == null) {
             return;
         }
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionWriteLock.lock();
         Edge edge = null;
         try {
             lockGraph();
@@ -576,7 +570,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         } else {
             hbci = edgeToHbconnectionMap.get(edge);
         }
-        mHbConnectionLock.release();
+        mHbConnectionWriteLock.unlock();
         if (hbci != null) {
             hbci.addColocation(colId, rsc, withRsc);
             if (!edgeIsColocationList.contains(edge)) {
@@ -1122,18 +1116,17 @@ public final class HeartbeatGraph extends ResourceGraph {
             lockGraph();
             getGraph().removeEdge(e);
             unlockGraph();
+            mHbConnectionWriteLock.lock();
             try {
-                mHbConnectionLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
+                edgeToHbconnectionMap.remove(e);
+                if (hbci != null) {
+                    hbconnectionToEdgeMap.remove(hbci);
+                    hbci.removeMyself(testOnly);
+                }
+            } finally {
+                mHbConnectionWriteLock.unlock();
             }
-            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-            edgeToHbconnectionMap.remove(e);
-            if (hbci != null) {
-                hbconnectionToEdgeMap.remove(hbci);
-                hbci.removeMyself(testOnly);
-            }
-            mHbConnectionLock.release();
         }
     }
 
@@ -1239,17 +1232,13 @@ public final class HeartbeatGraph extends ResourceGraph {
      * must be followed by putVertexIsPresentList.
      */
     List<Vertex> getVertexIsPresentList() {
-        try {
-            mVertexIsPresentListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mVertexIsPresentListLock.lock();
         return vertexIsPresentList;
     }
 
     /** Releases mVertexIsPresentListLock. */
     void putVertexIsPresentList() {
-        mVertexIsPresentListLock.release();
+        mVertexIsPresentListLock.unlock();
     }
 
     /** Set vertex-is-present list. */
@@ -1263,13 +1252,9 @@ public final class HeartbeatGraph extends ResourceGraph {
             }
             vipl.add(v);
         }
-        try {
-            mVertexIsPresentListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mVertexIsPresentListLock.lock();
         vertexIsPresentList = vipl;
-        mVertexIsPresentListLock.release();
+        mVertexIsPresentListLock.unlock();
     }
 
     ///** Set vertex as present. */
@@ -1364,13 +1349,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                                  final boolean testOnly) {
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         if (edgeIsOrderList.contains(edge)) {
             siC.removeOrder(siP, dcHost, testOnly);
         }
@@ -1406,13 +1387,9 @@ public final class HeartbeatGraph extends ResourceGraph {
         }
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         if (edgeIsOrderList.contains(edge)) {
             if (!testOnly) {
                 edgeIsOrderList.remove(edge);
@@ -1446,13 +1423,9 @@ public final class HeartbeatGraph extends ResourceGraph {
             siWithRsc.addOrder(siRsc, dcHost, testOnly);
         }
         if (testOnly) {
-            try {
-                mHbConnectionLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mHbConnectionReadLock.lock();
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            mHbConnectionLock.release();
+            mHbConnectionReadLock.unlock();
             addExistingTestEdge(edge);
         }
     }
@@ -1463,13 +1436,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                                  final boolean testOnly) {
         final ServiceInfo siRsc = hbci.getLastServiceInfoRsc();
         final ServiceInfo siWithRsc = hbci.getLastServiceInfoWithRsc();
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         if (edgeIsColocationList.contains(edge)) {
             if (!testOnly) {
                 edgeIsColocationList.remove(edge);
@@ -1499,38 +1468,26 @@ public final class HeartbeatGraph extends ResourceGraph {
             siP.addColocation(siC, dcHost, testOnly);
         }
         if (testOnly) {
-            try {
-                mHbConnectionLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mHbConnectionReadLock.lock();
             final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            mHbConnectionLock.release();
+            mHbConnectionReadLock.unlock();
             addExistingTestEdge(edge);
         }
     }
 
     /** Returns whether this hb connection is order. */
     public boolean isOrder(final HbConnectionInfo hbConnectionInfo) {
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         return edgeIsOrderList.contains(edge);
     }
 
     /** Returns whether this hb connection is colocation. */
     public boolean isColocation(final HbConnectionInfo hbConnectionInfo) {
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         return edgeIsColocationList.contains(edge);
     }
 
@@ -1709,15 +1666,11 @@ public final class HeartbeatGraph extends ResourceGraph {
     List<HbConnectionInfo> getAllHbConnections() {
         final List<HbConnectionInfo> allConnections =
                                             new ArrayList<HbConnectionInfo>();
-        try {
-            mHbConnectionLock.acquire();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHbConnectionReadLock.lock();
         for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
             allConnections.add(hbci);
         }
-        mHbConnectionLock.release();
+        mHbConnectionReadLock.unlock();
         return allConnections;
     }
 

@@ -575,12 +575,12 @@ public final class BlockDevInfo extends EditableInfo {
                                    "internal",
                                    getBrowser());
             final String defaultMetaDiskString = internalMetaDisk.toString();
-            getBrowser().lockBlockDevInfos();
+            getBrowser().lockBlockDevInfosRead();
             final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(
                                 internalMetaDisk,
                                 getName(),
                                 getBrowser().getBlockDevicesNode().children());
-            getBrowser().unlockBlockDevInfos();
+            getBrowser().unlockBlockDevInfosRead();
 
             getBlockDevice().setDefaultValue(DRBD_MD_PARAM,
                                              defaultMetaDiskString);

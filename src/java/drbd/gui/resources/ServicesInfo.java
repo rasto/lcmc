@@ -69,7 +69,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds info data for services view and global heartbeat
@@ -1207,7 +1209,7 @@ public final class ServicesInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP,
                                        false)) {
             private static final long serialVersionUID = 1L;
-            private final Mutex mUpdateLock = new Mutex();
+            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -1219,13 +1221,12 @@ public final class ServicesInfo extends EditableInfo {
             @Override public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override public void run() {
-                        try {
-                            if (mUpdateLock.attempt(0)) {
+                        if (mUpdateLock.tryLock()) {
+                            try {
                                 updateThread();
-                                mUpdateLock.release();
+                            } finally {
+                                mUpdateLock.unlock();
                             }
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
                         }
                     }
                 });

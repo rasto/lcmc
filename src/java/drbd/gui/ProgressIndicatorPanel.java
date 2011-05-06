@@ -56,7 +56,9 @@ import java.awt.geom.Point2D;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * An infinite progress panel displays a rotating figure and
  * a message to notice the user of a long, duration unknown
@@ -118,11 +120,9 @@ public final class ProgressIndicatorPanel extends JComponent
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */
-    private final Mutex mAnimatorLock = new Mutex();
-    /** Lock for ramp. */
-    private final Mutex mRampLock = new Mutex();
+    private final Lock mAnimatorLock = new ReentrantLock();
     /** Lock for manipulating the text array. */
-    private final Mutex mTextsLock = new Mutex();
+    private final Lock mTextsLock = new ReentrantLock();
     /** Cancel button icon. */
     private static final ImageIcon CANCEL_ICON =
                                 Tools.createImageIcon(Tools.getDefault(
@@ -226,33 +226,17 @@ public final class ProgressIndicatorPanel extends JComponent
         if (text == null) {
             return;
         }
-        try {
-            mAnimatorLock.acquire();
-        } catch (java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return;
-        }
-        try {
-            mTextsLock.acquire();
-        } catch (java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return;
-        }
+        mAnimatorLock.lock();
+        mTextsLock.lock();
         if (texts.containsKey(text)) {
             texts.put(text, MAX_ALPHA_LEVEL);
             textsPositions.put(text, position);
             if (rightMovement) {
                 textsRightMovement.add(text);
             }
-            mTextsLock.release();
-            try {
-                mRampLock.acquire();
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTextsLock.unlock();
             animator.setRampUp(true);
-            mRampLock.release();
-            mAnimatorLock.release();
+            mAnimatorLock.unlock();
             return;
         }
         texts.put(text, MAX_ALPHA_LEVEL);
@@ -262,18 +246,12 @@ public final class ProgressIndicatorPanel extends JComponent
         }
 
         if (texts.size() > 1) {
-            mTextsLock.release();
-            try {
-                mRampLock.acquire();
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTextsLock.unlock();
             animator.setRampUp(true);
-            mRampLock.release();
-            mAnimatorLock.release();
+            mAnimatorLock.unlock();
             return;
         }
-        mTextsLock.release();
+        mTextsLock.unlock();
         Tools.getGUIData().getMainMenu().turnOff();
         cancelButton.setEnabled(true);
         addMouseListener(this);
@@ -284,7 +262,7 @@ public final class ProgressIndicatorPanel extends JComponent
         animator = new Animator();
         animation = new Thread(animator);
         animation.start();
-        mAnimatorLock.release();
+        mAnimatorLock.unlock();
     }
 
     /**
@@ -296,21 +274,13 @@ public final class ProgressIndicatorPanel extends JComponent
         if (text == null) {
             return;
         }
-        try {
-            mAnimatorLock.acquire();
-        } catch (java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        try {
-            mTextsLock.acquire();
-        } catch (java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mAnimatorLock.lock();
+        mTextsLock.lock();
         if (!texts.containsKey(text)) {
             Tools.appWarning("progress indicator already stopped for: --"
                              + text + "--");
-            mTextsLock.release();
-            mAnimatorLock.release();
+            mTextsLock.unlock();
+            mAnimatorLock.unlock();
             Tools.printStackTrace();
             return;
         }
@@ -319,23 +289,17 @@ public final class ProgressIndicatorPanel extends JComponent
             final int a = texts.get(t).intValue();
             if (a == MAX_ALPHA_LEVEL) {
                 /* at least one is going up */
-                mTextsLock.release();
-                mAnimatorLock.release();
+                mTextsLock.unlock();
+                mAnimatorLock.unlock();
                 return;
             }
         }
-        mTextsLock.release();
-        try {
-            mRampLock.acquire();
-        } catch (java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mTextsLock.unlock();
         animator.setRampUp(false);
-        mRampLock.release();
         removeMouseListener(ProgressIndicatorPanel.this);
         removeKeyListener(ProgressIndicatorPanel.this);
         Tools.getGUIData().getMainMenu().turnOn();
-        mAnimatorLock.release();
+        mAnimatorLock.unlock();
     }
 
     /**
@@ -399,11 +363,7 @@ public final class ProgressIndicatorPanel extends JComponent
             }
 
 
-            try {
-                mTextsLock.acquire();
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mTextsLock.lock();
             if (!texts.isEmpty()) {
                 final FontRenderContext context = g2.getFontRenderContext();
                 final Font font = new Font(getFont().getName(),
@@ -466,7 +426,7 @@ public final class ProgressIndicatorPanel extends JComponent
                     }
                 }
             }
-            mTextsLock.release();
+            mTextsLock.unlock();
             super.paintComponent(g2);
         }
 
@@ -495,21 +455,8 @@ public final class ProgressIndicatorPanel extends JComponent
             }
 
             started = true;
-            try {
-                mRampLock.acquire();
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            mRampLock.release();
-
             while (true) {
-                try {
-                    mRampLock.acquire();
-                } catch (java.lang.InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
                 final boolean lRampUp = rampUp;
-                mRampLock.release();
                 if (getWidth() != oldWidth || getHeight() != oldHeight) {
                     oldWidth  = getWidth();
                     oldHeight = getHeight();
@@ -528,16 +475,12 @@ public final class ProgressIndicatorPanel extends JComponent
                                   * (time - start) / RAMP_DELAY_STOP);
                     if (newAlphaLevel <= 0) {
                         newAlphaLevel = 0;
-                        try {
-                            mTextsLock.acquire();
-                        } catch (java.lang.InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+                        mTextsLock.lock();
                         if (texts.size() <= 0) {
-                            mTextsLock.release();
+                            mTextsLock.unlock();
                             break;
                         } else {
-                            mTextsLock.release();
+                            mTextsLock.unlock();
                         }
                     }
                     alphaLevel = newAlphaLevel;
@@ -545,11 +488,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
 
                 final ArrayList<String> toRemove = new ArrayList<String>();
-                try {
-                    mTextsLock.acquire();
-                } catch (java.lang.InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                mTextsLock.lock();
                 for (final String text : texts.keySet()) {
                     int alpha = texts.get(text).intValue();
                     if (alpha < MAX_ALPHA_LEVEL) {
@@ -573,7 +512,7 @@ public final class ProgressIndicatorPanel extends JComponent
                     failuresMap.remove(text);
                 }
 
-                mTextsLock.release();
+                mTextsLock.unlock();
                 try {
                     Thread.sleep((int) (1000 / FPS));
                 } catch (InterruptedException ie) {

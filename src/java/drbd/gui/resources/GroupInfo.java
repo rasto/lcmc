@@ -53,7 +53,9 @@ import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JScrollPane;
 import java.awt.geom.Point2D;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -523,7 +525,7 @@ public final class GroupInfo extends ServiceInfo {
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Mutex mUpdateLock = new Mutex();
+            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -536,13 +538,12 @@ public final class GroupInfo extends ServiceInfo {
             @Override public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override public void run() {
-                        try {
-                            if (mUpdateLock.attempt(0)) {
+                        if (mUpdateLock.tryLock()) {
+                            try {
                                 updateThread();
-                                mUpdateLock.release();
+                            } finally {
+                                mUpdateLock.unlock();
                             }
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
                         }
                     }
                 });
@@ -639,7 +640,7 @@ public final class GroupInfo extends ServiceInfo {
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
-                    private final Mutex mUpdateLock = new Mutex();
+                    private final Lock mUpdateLock = new ReentrantLock();
 
                     @Override public String enablePredicate() {
                         return null;
@@ -648,13 +649,12 @@ public final class GroupInfo extends ServiceInfo {
                     @Override public void update() {
                         final Thread t = new Thread(new Runnable() {
                             @Override public void run() {
-                                try {
-                                    if (mUpdateLock.attempt(0)) {
+                                if (mUpdateLock.tryLock()) {
+                                    try {
                                         updateThread();
-                                        mUpdateLock.release();
+                                    } finally {
+                                        mUpdateLock.unlock();
                                     }
-                                } catch (InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
                                 }
                             }
                         });

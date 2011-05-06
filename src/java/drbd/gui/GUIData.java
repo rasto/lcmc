@@ -46,7 +46,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * GUIData
@@ -73,12 +75,22 @@ public final class GUIData  {
     /** Browser that appears if there are no clusters. */
     private EmptyBrowser emptyBrowser;
     /** 'Add Cluster" buttons list lock. */
-    private final Mutex mAddClusterButtonListLock = new Mutex();
+    private final ReadWriteLock mAddClusterButtonListLock =
+                                                new ReentrantReadWriteLock();
+    private final Lock mAddClusterButtonListReadLock =
+                                        mAddClusterButtonListLock.readLock();
+    private final Lock mAddClusterButtonListWriteLock =
+                                        mAddClusterButtonListLock.writeLock();
     /** 'Add Cluster' buttons. */
     private final List<JComponent> addClusterButtonList =
                                                    new ArrayList<JComponent>();
     /** 'Add Host" buttons list lock. */
-    private final Mutex mAddHostButtonListLock = new Mutex();
+    private final ReadWriteLock mAddHostButtonListLock =
+                                                new ReentrantReadWriteLock();
+    private final Lock mAddHostButtonListReadLock =
+                                        mAddHostButtonListLock.readLock();
+    private final Lock mAddHostButtonListWriteLock =
+                                        mAddHostButtonListLock.writeLock();
     /** 'Add Host' buttons. */
     private final List<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
@@ -277,17 +289,16 @@ public final class GUIData  {
      * disabled.
      */
     void registerAddClusterButton(final JComponent addClusterButton) {
+        mAddClusterButtonListWriteLock.lock();
         try {
-            mAddClusterButtonListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            if (!addClusterButtonList.contains(addClusterButton)) {
+                addClusterButtonList.add(addClusterButton);
+                addClusterButton.setEnabled(
+                              Tools.getConfigData().danglingHostsCount() >= 1);
+            }
+        } finally {
+            mAddClusterButtonListWriteLock.unlock();
         }
-        if (!addClusterButtonList.contains(addClusterButton)) {
-            addClusterButtonList.add(addClusterButton);
-            addClusterButton.setEnabled(
-                             Tools.getConfigData().danglingHostsCount() >= 1);
-        }
-        mAddClusterButtonListLock.release();
     }
 
     /**
@@ -295,26 +306,24 @@ public final class GUIData  {
      * disabled.
      */
     public void registerAddHostButton(final JComponent addHostButton) {
+        mAddHostButtonListWriteLock.lock();
         try {
-            mAddHostButtonListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            if (!addHostButtonList.contains(addHostButton)) {
+                addHostButtonList.add(addHostButton);
+            }
+        } finally {
+            mAddHostButtonListWriteLock.unlock();
         }
-        if (!addHostButtonList.contains(addHostButton)) {
-            addHostButtonList.add(addHostButton);
-        }
-        mAddHostButtonListLock.release();
     }
 
     /** Removes the 'Add Cluster' button from the list. */
     void unregisterAddClusterButton(final JComponent addClusterButton) {
+        mAddClusterButtonListWriteLock.lock();
         try {
-            mAddClusterButtonListLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            addClusterButtonList.remove(addClusterButton);
+        } finally {
+            mAddClusterButtonListWriteLock.unlock();
         }
-        addClusterButtonList.remove(addClusterButton);
-        mAddClusterButtonListLock.release();
     }
 
     /**
@@ -326,15 +335,15 @@ public final class GUIData  {
                             Tools.getConfigData().danglingHostsCount() >= 1;
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                mAddClusterButtonListReadLock.lock();
                 try {
-                    mAddClusterButtonListLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    for (final JComponent addClusterButton
+                                                    : addClusterButtonList) {
+                        addClusterButton.setEnabled(enabled);
+                    }
+                } finally {
+                    mAddClusterButtonListReadLock.unlock();
                 }
-                for (final JComponent addClusterButton : addClusterButtonList) {
-                    addClusterButton.setEnabled(enabled);
-                }
-                mAddClusterButtonListLock.release();
             }
         });
     }
@@ -343,15 +352,14 @@ public final class GUIData  {
     public void enableAddClusterButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                mAddClusterButtonListReadLock.lock();
                 try {
-                    mAddClusterButtonListLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    for (JComponent addClusterButton : addClusterButtonList) {
+                        addClusterButton.setEnabled(enable);
+                    }
+                } finally {
+                    mAddClusterButtonListReadLock.unlock();
                 }
-                for (JComponent addClusterButton : addClusterButtonList) {
-                    addClusterButton.setEnabled(enable);
-                }
-                mAddClusterButtonListLock.release();
             }
         });
     }
@@ -360,15 +368,14 @@ public final class GUIData  {
     public void enableAddHostButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                mAddHostButtonListReadLock.lock();
                 try {
-                    mAddHostButtonListLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    for (JComponent addHostButton : addHostButtonList) {
+                        addHostButton.setEnabled(enable);
+                    }
+                } finally {
+                    mAddHostButtonListReadLock.unlock();
                 }
-                for (JComponent addHostButton : addHostButtonList) {
-                    addHostButton.setEnabled(enable);
-                }
-                mAddHostButtonListLock.release();
             }
         });
     }

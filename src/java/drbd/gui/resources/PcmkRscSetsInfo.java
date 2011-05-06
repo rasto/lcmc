@@ -40,7 +40,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -51,7 +53,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Set<ConstraintPHInfo> constraintPHInfos =
                                           new LinkedHashSet<ConstraintPHInfo>();
     /** constraints lock. */
-    private final Mutex mConstraintPHLock = new Mutex();
+    private final Lock mConstraintPHLock = new ReentrantLock();
 
     /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
     PcmkRscSetsInfo(final Browser browser) {
@@ -61,37 +63,34 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
     PcmkRscSetsInfo(final Browser browser, final ConstraintPHInfo cphi) {
         this(browser);
+        mConstraintPHLock.lock();
         try {
-            mConstraintPHLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            constraintPHInfos.add(cphi);
+        } finally {
+            mConstraintPHLock.unlock();
         }
-        constraintPHInfos.add(cphi);
-        mConstraintPHLock.release();
     }
 
     /** Adds a new rsc set colocation. */
     void addColocation(final String colId,
                                  final ConstraintPHInfo cphi) {
+        mConstraintPHLock.lock();
         try {
-            mConstraintPHLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            constraintPHInfos.add(cphi);
+        } finally {
+            mConstraintPHLock.unlock();
         }
-        constraintPHInfos.add(cphi);
-        mConstraintPHLock.release();
         addColocation(colId, null, null);
     }
 
     /** Adds a new rsc set order. */
     void addOrder(final String ordId, final ConstraintPHInfo cphi) {
+        mConstraintPHLock.lock();
         try {
-            mConstraintPHLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            constraintPHInfos.add(cphi);
+        } finally {
+            mConstraintPHLock.unlock();
         }
-        constraintPHInfos.add(cphi);
-        mConstraintPHLock.release();
         addOrder(ordId, null, null);
     }
 
@@ -170,11 +169,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         final Map<String, ServiceInfo> idToInfoHash =
              getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
-        try {
-            mConstraintPHLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mConstraintPHLock.lock();
         final Map<ServiceInfo, ServiceInfo> parentToChild =
                             new HashMap<ServiceInfo, ServiceInfo>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
@@ -252,7 +247,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 }
             }
         }
-        mConstraintPHLock.release();
+        mConstraintPHLock.unlock();
         final Map<String, String> attrs =
                                       new LinkedHashMap<String, String>();
         attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
@@ -291,19 +286,18 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     @Override public boolean checkResourceFieldsChanged(final String param,
                                                         final String[] params) {
         boolean oneIsNew = false;
+        mConstraintPHLock.lock();
         try {
-            mConstraintPHLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        for (final ConstraintPHInfo cphi : constraintPHInfos) {
-            if (cphi.getService().isNew()
-                && !getBrowser().getHeartbeatGraph().getChildrenAndParents(
-                                                            cphi).isEmpty()) {
-                oneIsNew = true;
+            for (final ConstraintPHInfo cphi : constraintPHInfos) {
+                if (cphi.getService().isNew()
+                    && !getBrowser().getHeartbeatGraph().getChildrenAndParents(
+                                                             cphi).isEmpty()) {
+                    oneIsNew = true;
+                }
             }
+        } finally {
+            mConstraintPHLock.unlock();
         }
-        mConstraintPHLock.release();
         return super.checkResourceFieldsChanged(param, params) || oneIsNew;
     }
 

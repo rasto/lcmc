@@ -84,8 +84,11 @@ import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 import java.lang.reflect.InvocationTargetException;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class holds info data for one hearteat service and allows to enter
@@ -119,9 +122,14 @@ public class ServiceInfo extends EditableInfo {
     /** Combo box with same as operations option. */
     private GuiComboBox sameAsOperationsCB = null;
     /** Saved operations lock. */
-    private final Mutex mSavedOperationsLock = new Mutex();
+    private final Lock mSavedOperationsLock = new ReentrantLock();
     /** Operations combo box hash lock. */
-    private final Mutex mOperationsComboBoxHashLock = new Mutex();
+    private final ReadWriteLock mOperationsComboBoxHashLock =
+                                                  new ReentrantReadWriteLock();
+    private final Lock mOperationsComboBoxHashReadLock =
+                                        mOperationsComboBoxHashLock.readLock();
+    private final Lock mOperationsComboBoxHashWriteLock =
+                                       mOperationsComboBoxHashLock.writeLock();
     /** A map from operation to its combo box. */
     private final MultiKeyMap operationsComboBoxHash = new MultiKeyMap();
     /** Cache for the info panel. */
@@ -129,8 +137,6 @@ public class ServiceInfo extends EditableInfo {
     /** Group info object of the group this service is in or null, if it is
      * not in any group. */
     private GroupInfo groupInfo = null;
-    /** Clone info object lock. */
-    private final Mutex mCloneInfo = new Mutex();
     /** Master/Slave info object, if is null, it is not master/slave
      * resource. */
     private volatile CloneInfo cloneInfo = null;
@@ -732,11 +738,7 @@ public class ServiceInfo extends EditableInfo {
         if (refCRMId == null) {
             refCRMId = getService().getHeartbeatId();
         }
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param
                           : getBrowser().getCRMOperationParams(op)) {
@@ -807,15 +809,11 @@ public class ServiceInfo extends EditableInfo {
                     if (!value.equals(savedOperation.get(op, param))) {
                         savedOperation.put(op, param, value);
                         if (infoPanelOk) {
-                            try {
-                                mOperationsComboBoxHashLock.acquire();
-                            } catch (InterruptedException ie) {
-                                Thread.currentThread().interrupt();
-                            }
+                            mOperationsComboBoxHashReadLock.lock();
                             final GuiComboBox cb =
                                (GuiComboBox) operationsComboBoxHash.get(op,
                                                                         param);
-                            mOperationsComboBoxHashLock.release();
+                            mOperationsComboBoxHashReadLock.unlock();
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override public void run() {
                                     cb.setEnabled(operationIdRef == null);
@@ -829,7 +827,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
         getService().setAvailable();
         if (cs.isOrphaned(getHeartbeatId(false))) {
             getService().setOrphaned(true);
@@ -1236,11 +1234,7 @@ public class ServiceInfo extends EditableInfo {
     private boolean checkOperationFieldsChanged() {
         boolean changed = false;
         boolean allAreDefaultValues = true;
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
@@ -1251,16 +1245,12 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
-                try {
-                    mOperationsComboBoxHashLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+                mOperationsComboBoxHashReadLock.lock();
                 final GuiComboBox cb =
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashLock.release();
+                mOperationsComboBoxHashReadLock.unlock();
                 if (cb == null) {
-                    mSavedOperationsLock.release();
+                    mSavedOperationsLock.unlock();
                     continue;
                 }
                 final Object[] defaultValueE = Tools.extractUnit(defaultValue);
@@ -1321,7 +1311,7 @@ public class ServiceInfo extends EditableInfo {
             }
             sameAsOperationsCB.processAccessMode();
         }
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
         return changed;
     }
 
@@ -1729,13 +1719,9 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns selected operations id reference. */
     private Info getSameServiceOpIdRef() {
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
         return savedOpIdRef;
     }
 
@@ -1874,11 +1860,7 @@ public class ServiceInfo extends EditableInfo {
             || OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
             sameAs = false;
         }
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param : getBrowser().getCRMOperationParams(op)) {
                 String defaultValue =
@@ -1889,14 +1871,10 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
-                try {
-                    mOperationsComboBoxHashLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+                mOperationsComboBoxHashReadLock.lock();
                 final GuiComboBox cb =
                           (GuiComboBox) operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashLock.release();
+                mOperationsComboBoxHashReadLock.unlock();
                 final Object oldValue = cb.getValue();
                 cb.setEnabled(!sameAs || nothingSelected);
                 if (!nothingSelected) {
@@ -1920,7 +1898,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
     }
 
     /** Creates operations combo boxes with labels. */
@@ -1928,13 +1906,12 @@ public class ServiceInfo extends EditableInfo {
                                  final int leftWidth,
                                  final int rightWidth) {
         int rows = 0;
+        mOperationsComboBoxHashWriteLock.lock();
         try {
-            mOperationsComboBoxHashLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            operationsComboBoxHash.clear();
+        } finally {
+            mOperationsComboBoxHashWriteLock.unlock();
         }
-        operationsComboBoxHash.clear();
-        mOperationsComboBoxHashLock.release();
 
         final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
@@ -1971,11 +1948,7 @@ public class ServiceInfo extends EditableInfo {
                                         1, 1); // xPad, yPad
         sectionPanel.add(saPanel);
         boolean allAreDefaultValues = true;
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         final JPanel normalOpPanel = new JPanel(new SpringLayout());
         normalOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         int normalRows = 0;
@@ -2028,13 +2001,12 @@ public class ServiceInfo extends EditableInfo {
                                                    false));
                 cb.setEnabled(savedOpIdRef == null);
 
+                mOperationsComboBoxHashWriteLock.lock();
                 try {
-                    mOperationsComboBoxHashLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    operationsComboBoxHash.put(op, param, cb);
+                } finally {
+                    mOperationsComboBoxHashWriteLock.unlock();
                 }
-                operationsComboBoxHash.put(op, param, cb);
-                mOperationsComboBoxHashLock.release();
                 rows++;
                 final JLabel cbLabel = new JLabel(Tools.ucfirst(op)
                                                   + " / "
@@ -2065,7 +2037,7 @@ public class ServiceInfo extends EditableInfo {
         sectionPanel.add(normalOpPanel);
         sectionPanel.add(getMoreOptionsPanel(leftWidth + rightWidth + 4));
         sectionPanel.add(advancedOpPanel);
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
         if (allAreDefaultValues && savedOpIdRef == null) {
             sameAsOperationsCB.setValue(OPERATIONS_DEFAULT_VALUES_TEXT);
         }
@@ -2497,14 +2469,10 @@ public class ServiceInfo extends EditableInfo {
         if (dv == null) {
             return;
         }
-        try {
-            mOperationsComboBoxHashLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mOperationsComboBoxHashReadLock.lock();
         final GuiComboBox cb =
                     (GuiComboBox) operationsComboBoxHash.get(op, param);
-        mOperationsComboBoxHashLock.release();
+        mOperationsComboBoxHashReadLock.unlock();
         final String[] params = getParametersFromXML();
         cb.addListeners(
             new ItemListener() {
@@ -3007,14 +2975,10 @@ public class ServiceInfo extends EditableInfo {
                             || ClusterBrowser.HB_OP_PROMOTE.equals(op))) {
                         continue;
                     }
-                    try {
-                        mOperationsComboBoxHashLock.acquire();
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                    }
+                    mOperationsComboBoxHashReadLock.lock();
                     final GuiComboBox cb =
                         (GuiComboBox) operationsComboBoxHash.get(op, param);
-                    mOperationsComboBoxHashLock.release();
+                    mOperationsComboBoxHashReadLock.unlock();
                     String value;
                     if (cb == null) {
                         value = "0";
@@ -3248,11 +3212,7 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        try {
-            mSavedOperationsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSavedOperationsLock.lock();
         //if (sameAsOperationsCB != null
         //    && !Tools.areEqual(savedOpIdRef, sameAsOperationsCB.getValue())) {
         //    sameAsOperationsCB.setValue(savedOpIdRef);
@@ -3270,14 +3230,10 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
-                try {
-                    mOperationsComboBoxHashLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+                mOperationsComboBoxHashReadLock.lock();
                 final GuiComboBox cb =
                           (GuiComboBox) operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashLock.release();
+                mOperationsComboBoxHashReadLock.unlock();
                 String value = cb.getStringValue();
                 if (value == null || "".equals(value)) {
                     value = getOpDefaultsDefault(param);
@@ -3322,14 +3278,10 @@ public class ServiceInfo extends EditableInfo {
                 for (final String param
                               : getBrowser().getCRMOperationParams(op)) {
                     final Object value = savedOperation.get(op, param);
-                    try {
-                        mOperationsComboBoxHashLock.acquire();
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                    }
+                    mOperationsComboBoxHashReadLock.lock();
                     final GuiComboBox cb =
                             (GuiComboBox) operationsComboBoxHash.get(op, param);
-                    mOperationsComboBoxHashLock.release();
+                    mOperationsComboBoxHashReadLock.unlock();
                     if (cb != null) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override public void run() {
@@ -3343,7 +3295,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        mSavedOperationsLock.release();
+        mSavedOperationsLock.unlock();
     }
 
     /** Applies the changes to the service parameters. */
@@ -4462,13 +4414,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Sets this service as part of a clone set. */
     void setCloneInfo(final CloneInfo cloneInfo) {
-        try {
-            mCloneInfo.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
         this.cloneInfo = cloneInfo;
-        mCloneInfo.release();
     }
 
     /**
@@ -4484,14 +4430,7 @@ public class ServiceInfo extends EditableInfo {
      * or null, if it is not in such set.
      */
     CloneInfo getCloneInfo() {
-        try {
-            mCloneInfo.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        final CloneInfo ci = cloneInfo;
-        mCloneInfo.release();
-        return ci;
+        return cloneInfo;
     }
 
     /** Adds existing service menu item for every member of a group. */
@@ -4574,7 +4513,7 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Mutex mUpdateLock = new Mutex();
+            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -4601,13 +4540,12 @@ public class ServiceInfo extends EditableInfo {
             @Override public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override public void run() {
-                        try {
-                            if (mUpdateLock.attempt(0)) {
+                        if (mUpdateLock.tryLock()) {
+                            try {
                                 updateThread();
-                                mUpdateLock.release();
+                            } finally {
+                                mUpdateLock.unlock();
                             }
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
                         }
                     }
                 });
@@ -4898,7 +4836,7 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Mutex mUpdateLock = new Mutex();
+            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
@@ -4916,13 +4854,12 @@ public class ServiceInfo extends EditableInfo {
             @Override public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override public void run() {
-                        try {
-                            if (mUpdateLock.attempt(0)) {
+                        if (mUpdateLock.tryLock()) {
+                            try {
                                 updateThread();
-                                mUpdateLock.release();
+                            } finally {
+                                mUpdateLock.unlock();
                             }
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
                         }
                     }
                 });

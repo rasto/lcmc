@@ -92,9 +92,13 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.collections.map.LinkedMap;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -129,7 +133,7 @@ public final class ClusterBrowser extends Browser {
     /** Menu's drbd node. */
     private DefaultMutableTreeNode drbdNode;
     /** Update VMS lock. */
-    private final Mutex mUpdateVMSlock = new Mutex();
+    private final Lock mUpdateVMSlock = new ReentrantLock();
     /** Menu's VMs node. */
     private DefaultMutableTreeNode vmsNode = null;
     /** Common file systems on all cluster nodes. */
@@ -142,19 +146,19 @@ public final class ClusterBrowser extends Browser {
                                 new TreeMap<String, Map<String, ServiceInfo>>(
                                                 String.CASE_INSENSITIVE_ORDER);
     /** Name to service hash lock. */
-    private final Mutex mNameToServiceLock = new Mutex();
+    private final Lock mNameToServiceLock = new ReentrantLock();
     /** DRBD resource hash lock. */
-    private final Mutex mDrbdResHashLock = new Mutex();
+    private final Lock mDrbdResHashLock = new ReentrantLock();
     /** DRBD resource name string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdResHash =
                                 new HashMap<String, DrbdResourceInfo>();
     /** DRBD device hash lock. */
-    private final Mutex mDrbdDevHashLock = new Mutex();
+    private final Lock mDrbdDevHashLock = new ReentrantLock();
     /** DRBD resource device string to drbd resource info hash. */
     private final Map<String, DrbdResourceInfo> drbdDevHash =
                                 new HashMap<String, DrbdResourceInfo>();
     /** Heartbeat id to service lock. */
-    private final Mutex mHeartbeatIdToService = new Mutex();
+    private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
@@ -169,7 +173,9 @@ public final class ClusterBrowser extends Browser {
     /** Object that holds drbd status and data. */
     private DrbdXML drbdXML;
     /** VMS lock. */
-    private final Mutex mVMSLock = new Mutex();
+    private final ReadWriteLock mVMSLock = new ReentrantReadWriteLock();
+    private final Lock mVMSReadLock = mVMSLock.readLock();
+    private final Lock mVMSWriteLock = mVMSLock.writeLock();
     /** Object that hosts status of all VMs. */
     private final Map<Host, VMSXML> vmsXML = new HashMap<Host, VMSXML>();
     /** Object that has drbd test data. */
@@ -179,13 +185,13 @@ public final class ClusterBrowser extends Browser {
     /** Whether hb status was canceled by user. */
     private boolean clStatusCanceled = false;
     /** Global hb status lock. */
-    private final Mutex mClStatusLock = new Mutex();
+    private final Lock mClStatusLock = new ReentrantLock();
     /** Global drbd status lock. */
-    private final Mutex mDRBDStatusLock = new Mutex();
+    private final Lock mDRBDStatusLock = new ReentrantLock();
     /** Ptest lock. */
-    private final Mutex mPtestLock = new Mutex();
+    private final Lock mPtestLock = new ReentrantLock();
     /** DRBD test data lock. */
-    private final Mutex mDRBDtestdataLock = new Mutex();
+    private final Lock mDRBDtestdataLock = new ReentrantLock();
     /** Can be used to cancel server status. */
     private volatile boolean serverStatus = true;
     /** last dc host detected. */
@@ -500,37 +506,29 @@ public final class ClusterBrowser extends Browser {
 
     /** Returns whether there is at least one drbddisk resource. */
     public boolean atLeastOneDrbddisk() {
-        try {
-            mHeartbeatIdToService.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHeartbeatIdToServiceLock();
         for (final String id : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             if (si.getResourceAgent().isDrbddisk()) {
-                mHeartbeatIdToService.release();
+                mHeartbeatIdToServiceUnlock();
                 return true;
             }
         }
-        mHeartbeatIdToService.release();
+        mHeartbeatIdToServiceUnlock();
         return false;
     }
 
     /** Returns whether there is at least one drbddisk resource. */
     public boolean isOneLinbitDrbd() {
-        try {
-            mHeartbeatIdToService.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHeartbeatIdToServiceLock();
         for (final String id : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             if (si.getResourceAgent().isLinbitDrbd()) {
-                mHeartbeatIdToService.release();
+                mHeartbeatIdToServiceUnlock();
                 return true;
             }
         }
-        mHeartbeatIdToService.release();
+        mHeartbeatIdToServiceUnlock();
         return false;
     }
 
@@ -858,26 +856,24 @@ public final class ClusterBrowser extends Browser {
     public void periodicalVMSUpdate(final Host host) {
         final VMSXML newVMSXML = new VMSXML(host);
         if (newVMSXML.update()) {
+            mVMSWriteLock.lock();
             try {
-                mVMSLock.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                vmsXML.put(host, newVMSXML);
+            } finally {
+                mVMSWriteLock.unlock();
             }
-            vmsXML.put(host, newVMSXML);
-            mVMSLock.release();
             updateVMS();
         }
     }
 
     /** Adds new vmsxml object to the hash. */
     public void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
+        mVMSWriteLock.lock();
         try {
-            mVMSLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            vmsXML.put(host, newVMSXML);
+        } finally {
+            mVMSWriteLock.unlock();
         }
-        vmsXML.put(host, newVMSXML);
-        mVMSLock.release();
     }
 
     /** Cancels the server status. */
@@ -1428,12 +1424,8 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates VM nodes. */
     void updateVMS() {
-        try {
-            if (!mUpdateVMSlock.attempt(0)) {
-                return;
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        if (!mUpdateVMSlock.tryLock()) {
+            return;
         }
         Tools.debug(this, "VM status update", 1);
         final Set<String> domainNames = new TreeSet<String>();
@@ -1477,7 +1469,7 @@ public final class ClusterBrowser extends Browser {
         }
 
         if (vmsNode == null) {
-            mUpdateVMSlock.release();
+            mUpdateVMSlock.unlock();
             return;
         }
         for (final String domainName : domainNames) {
@@ -1531,7 +1523,7 @@ public final class ClusterBrowser extends Browser {
         if (vmsi != null) {
             vmsi.updateTable(VMSInfo.MAIN_TABLE);
         }
-        mUpdateVMSlock.release();
+        mUpdateVMSlock.unlock();
     }
 
     /** Returns vmsinfo object. */
@@ -1724,30 +1716,22 @@ public final class ClusterBrowser extends Browser {
 
     /** clStatusLock global lock. */
     public void clStatusLock() {
-        try {
-            mClStatusLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mClStatusLock.lock();
     }
 
     /** clStatusLock global unlock. */
     public void clStatusUnlock() {
-        mClStatusLock.release();
+        mClStatusLock.unlock();
     }
 
     /** drbdStatusLock global lock. */
     public void drbdStatusLock() {
-        try {
-            mDRBDStatusLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mDRBDStatusLock.lock();
     }
 
     /** drbdStatusLock global unlock. */
     public void drbdStatusUnlock() {
-        mDRBDStatusLock.release();
+        mDRBDStatusLock.unlock();
     }
 
     /** Highlights drbd node. */
@@ -1767,28 +1751,20 @@ public final class ClusterBrowser extends Browser {
 
     /** Returns ServiceInfo object from crm id. */
     public ServiceInfo getServiceInfoFromCRMId(final String crmId) {
-        try {
-            mHeartbeatIdToService.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHeartbeatIdToServiceLock();
         final ServiceInfo si = heartbeatIdToServiceInfo.get(crmId);
-        mHeartbeatIdToService.release();
+        mHeartbeatIdToServiceUnlock();
         return si;
     }
 
     /** Locks heartbeatIdToServiceInfo hash. */
     public void mHeartbeatIdToServiceLock() {
-        try {
-            mHeartbeatIdToService.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHeartbeatIdToService.lock();
     }
 
     /** Unlocks heartbeatIdToServiceInfo hash. */
     public void mHeartbeatIdToServiceUnlock() {
-        mHeartbeatIdToService.release();
+        mHeartbeatIdToService.unlock();
     }
 
     /** Returns heartbeatIdToServiceInfo hash. You have to lock it. */
@@ -1799,19 +1775,15 @@ public final class ClusterBrowser extends Browser {
     /** Returns ServiceInfo object identified by name and id. */
     public ServiceInfo getServiceInfoFromId(final String name,
                                             final String id) {
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash =
                                                nameToServiceInfoHash.get(name);
         if (idToInfoHash == null) {
-            mNameToServiceLock.release();
+            unlockNameToServiceInfo();
             return null;
         }
         final ServiceInfo si = idToInfoHash.get(id);
-        mNameToServiceLock.release();
+        unlockNameToServiceInfo();
         return si;
     }
 
@@ -1822,27 +1794,19 @@ public final class ClusterBrowser extends Browser {
 
     /** Locks the nameToServiceInfoHash. */
     public void lockNameToServiceInfo() {
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mNameToServiceLock.lock();
     }
 
     /** Unlocks the nameToServiceInfoHash. */
     public void unlockNameToServiceInfo() {
-        mNameToServiceLock.release();
+        mNameToServiceLock.unlock();
     }
 
     /** Returns 'existing service' list for graph popup menu. */
     public List<ServiceInfo> getExistingServiceList(final ServiceInfo p) {
         final List<ServiceInfo> existingServiceList =
                                                   new ArrayList<ServiceInfo>();
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        lockNameToServiceInfo();
         for (final String name : nameToServiceInfoHash.keySet()) {
             final Map<String, ServiceInfo> idHash =
                                             nameToServiceInfoHash.get(name);
@@ -1863,7 +1827,7 @@ public final class ClusterBrowser extends Browser {
                 }
             }
         }
-        mNameToServiceLock.release();
+        unlockNameToServiceInfo();
         return existingServiceList;
     }
 
@@ -1877,17 +1841,13 @@ public final class ClusterBrowser extends Browser {
     public void removeFromServiceInfoHash(final ServiceInfo serviceInfo) {
         // TODO: it comes here twice sometimes
         final Service service = serviceInfo.getService();
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash =
                                  nameToServiceInfoHash.get(service.getName());
         if (idToInfoHash != null) {
             idToInfoHash.remove(service.getId());
         }
-        mNameToServiceLock.release();
+        unlockNameToServiceInfo();
     }
 
     /** Returns nameToServiceInfoHash for the specified service.
@@ -1932,23 +1892,15 @@ public final class ClusterBrowser extends Browser {
                 newPmId = pmId + id;
                 si.getService().setHeartbeatId(newPmId);
             }
-            try {
-                mHeartbeatIdToService.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mHeartbeatIdToServiceLock();
             heartbeatIdToServiceInfo.put(newPmId, si);
-            mHeartbeatIdToService.release();
+            mHeartbeatIdToServiceUnlock();
         } else {
-            try {
-                mHeartbeatIdToService.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mHeartbeatIdToServiceLock();
             if (heartbeatIdToServiceInfo.get(pmId) == null) {
                 heartbeatIdToServiceInfo.put(pmId, si);
             }
-            mHeartbeatIdToService.release();
+            mHeartbeatIdToServiceUnlock();
         }
     }
 
@@ -1957,18 +1909,14 @@ public final class ClusterBrowser extends Browser {
      * This is usefull if something have changed.
      */
     public void resetFilesystems() {
-        try {
-            mHeartbeatIdToService.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mHeartbeatIdToServiceLock();
         for (String hbId : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
             if (si.getName().equals("Filesystem")) {
                 si.setInfoPanel(null);
             }
         }
-        mHeartbeatIdToService.release();
+        mHeartbeatIdToServiceUnlock();
     }
 
     /**
@@ -1979,11 +1927,7 @@ public final class ClusterBrowser extends Browser {
     public void addNameToServiceInfoHash(final ServiceInfo serviceInfo) {
         /* add to the hash with service name and id as keys */
         final Service service = serviceInfo.getService();
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        lockNameToServiceInfo();
         Map<String, ServiceInfo> idToInfoHash =
                                 nameToServiceInfoHash.get(service.getName());
         String csPmId = null;
@@ -2045,7 +1989,7 @@ public final class ClusterBrowser extends Browser {
         }
         idToInfoHash.put(service.getId(), serviceInfo);
         nameToServiceInfoHash.put(service.getName(), idToInfoHash);
-        mNameToServiceLock.release();
+        unlockNameToServiceInfo();
     }
 
     /**
@@ -2301,30 +2245,22 @@ public final class ClusterBrowser extends Browser {
 
     /** Acquire ptest lock. */
     public void ptestLockAcquire() {
-        try {
-            mPtestLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mPtestLock.lock();
     }
 
     /** Release ptest lock. */
     public void ptestLockRelease() {
-        mPtestLock.release();
+        mPtestLock.unlock();
     }
 
     /** Acquire drbd test data lock. */
     protected void drbdtestdataLockAcquire() {
-        try {
-            mDRBDtestdataLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mDRBDtestdataLock.lock();
     }
 
     /** Release drbd test data lock. */
     protected void drbdtestdataLockRelease() {
-        mDRBDtestdataLock.release();
+        mDRBDtestdataLock.unlock();
     }
 
     /** Returns xml from cluster manager. */
@@ -2371,17 +2307,13 @@ public final class ClusterBrowser extends Browser {
      * Returns a hash from drbd device to drbd resource info. putDrbdDevHash
      * must follow after you're done. */
     public Map<String, DrbdResourceInfo> getDrbdDevHash() {
-        try {
-            mDrbdDevHashLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mDrbdDevHashLock.lock();
         return drbdDevHash;
     }
 
     /** Unlock drbd dev hash. */
     public void putDrbdDevHash() {
-        mDrbdDevHashLock.release();
+        mDrbdDevHashLock.unlock();
     }
 
     /**
@@ -2389,17 +2321,13 @@ public final class ClusterBrowser extends Browser {
      * Get locks the hash and put unlocks it
      */
     public Map<String, DrbdResourceInfo> getDrbdResHash() {
-        try {
-            mDrbdResHashLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mDrbdResHashLock.lock();
         return drbdResHash;
     }
 
     /** Done using drbdResHash. */
     public void putDrbdResHash() {
-        mDrbdResHashLock.release();
+        mDrbdResHashLock.unlock();
     }
 
     /** Returns (shallow) copy of all drbdresource info objects. */
@@ -2412,11 +2340,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Reloads all combo boxes that need to be reloaded. */
     public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
-        try {
-            mNameToServiceLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        lockNameToServiceInfo();
         for (final String name : nameToServiceInfoHash.keySet()) {
             final Map<String, ServiceInfo> idToInfoHash =
                                              nameToServiceInfoHash.get(name);
@@ -2427,18 +2351,14 @@ public final class ClusterBrowser extends Browser {
                 }
             }
         }
-        mNameToServiceLock.release();
+        unlockNameToServiceInfo();
     }
 
     /** Returns object that holds data of all VMs. */
     public VMSXML getVMSXML(final Host host) {
-        try {
-            mVMSLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mVMSReadLock.lock();
         final VMSXML vxml = vmsXML.get(host);
-        mVMSLock.release();
+        mVMSReadLock.unlock();
         return vxml;
     }
 
@@ -2559,13 +2479,9 @@ public final class ClusterBrowser extends Browser {
         promoted. */
     public boolean isOneMaster(final List<String> rscs) {
         for (final String id : rscs) {
-            try {
-                mHeartbeatIdToService.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mHeartbeatIdToServiceLock();
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
-            mHeartbeatIdToService.release();
+            mHeartbeatIdToServiceUnlock();
             if (si.getService().isMaster()) {
                 return true;
             }

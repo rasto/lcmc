@@ -40,7 +40,9 @@ import javax.swing.tree.TreePath;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -84,7 +86,7 @@ public class Browser {
     static final Color EXTRA_PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Status.Background");
     /** DRBD test lock. */
-    private final Mutex mDRBDtestLock = new Mutex();
+    private final Lock mDRBDtestLock = new ReentrantLock();
 
     /** Sets the top of the menu tree. */
     protected final void setTreeTop() {
@@ -280,16 +282,12 @@ public class Browser {
 
     /** Acquire drbd test lock. */
     public final void drbdtestLockAcquire() {
-        try {
-            mDRBDtestLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mDRBDtestLock.lock();
     }
 
     /** Release drbd test lock. */
     public final void drbdtestLockRelease() {
-        mDRBDtestLock.release();
+        mDRBDtestLock.unlock();
     }
 
     /** Selects specified path. */

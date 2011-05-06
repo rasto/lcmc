@@ -50,7 +50,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -110,11 +113,18 @@ public final class HostBrowser extends Browser {
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconLeftSmall"));
     /** Block device infos lock. */
-    private final Mutex mBlockDevInfosLock = new Mutex();
+    private final ReadWriteLock mBlockDevInfosLock =
+                                                  new ReentrantReadWriteLock();
+    private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
+    private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
     /** Net Interface infos lock. */
-    private final Mutex mNetInfosLock = new Mutex();
+    private final ReadWriteLock mNetInfosLock = new ReentrantReadWriteLock();
+    private final Lock mNetInfosReadLock = mNetInfosLock.readLock();
+    private final Lock mNetInfosWriteLock = mNetInfosLock.writeLock();
     /** File system list lock. */
-    private final Mutex mFileSystemsLock = new Mutex();
+    private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
+    private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
+    private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
 
     /**
      * Prepares a new <code>HostBrowser</code> object.
@@ -186,89 +196,85 @@ public final class HostBrowser extends Browser {
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces =
                                                         getNetInterfacesMap();
+        mNetInfosWriteLock.lock();
         try {
-            mNetInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        netInterfacesNode.removeAllChildren();
-        for (final NetInterface ni : nis) {
-            NetInfo nii;
-            if (oldNetInterfaces.containsKey(ni)) {
-                nii = oldNetInterfaces.get(ni);
-            } else {
-                nii = new NetInfo(ni.getName(), ni, this);
+            netInterfacesNode.removeAllChildren();
+            for (final NetInterface ni : nis) {
+                NetInfo nii;
+                if (oldNetInterfaces.containsKey(ni)) {
+                    nii = oldNetInterfaces.get(ni);
+                } else {
+                    nii = new NetInfo(ni.getName(), ni, this);
+                }
+                resource = new DefaultMutableTreeNode(nii);
+                setNode(resource);
+                netInterfacesNode.add(resource);
             }
-            resource = new DefaultMutableTreeNode(nii);
-            setNode(resource);
-            netInterfacesNode.add(resource);
+            reload(netInterfacesNode, false);
+        } finally {
+            mNetInfosWriteLock.unlock();
         }
-        reload(netInterfacesNode, false);
-        mNetInfosLock.release();
 
         /* block devices */
         final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
                                                           getBlockDevicesMap();
+        mBlockDevInfosWriteLock.lock();
         try {
-            mBlockDevInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        blockDevicesNode.removeAllChildren();
-        for (final BlockDevice bd : bds) {
-            BlockDevInfo bdi;
-            if (oldBlockDevices.containsKey(bd)) {
-                bdi = oldBlockDevices.get(bd);
-                bdi.updateInfo();
-            } else {
-                bdi = new BlockDevInfo(bd.getName(), bd, this);
+            blockDevicesNode.removeAllChildren();
+            for (final BlockDevice bd : bds) {
+                BlockDevInfo bdi;
+                if (oldBlockDevices.containsKey(bd)) {
+                    bdi = oldBlockDevices.get(bd);
+                    bdi.updateInfo();
+                } else {
+                    bdi = new BlockDevInfo(bd.getName(), bd, this);
+                }
+                resource = new DefaultMutableTreeNode(bdi);
+                //setNode(resource);
+                blockDevicesNode.add(resource);
             }
-            resource = new DefaultMutableTreeNode(bdi);
-            //setNode(resource);
-            blockDevicesNode.add(resource);
+            reload(blockDevicesNode, false);
+        } finally {
+            mBlockDevInfosWriteLock.unlock();
         }
-        reload(blockDevicesNode, false);
-        mBlockDevInfosLock.release();
 
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
+        mFileSystemsWriteLock.lock();
         try {
-            mFileSystemsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        fileSystemsNode.removeAllChildren();
-        for (final String fs : fss) {
-            FSInfo fsi;
-            if (oldFilesystems.containsKey(fs)) {
-                fsi = oldFilesystems.get(fs);
-            } else {
-                fsi = new FSInfo(fs, this);
+            fileSystemsNode.removeAllChildren();
+            for (final String fs : fss) {
+                FSInfo fsi;
+                if (oldFilesystems.containsKey(fs)) {
+                    fsi = oldFilesystems.get(fs);
+                } else {
+                    fsi = new FSInfo(fs, this);
+                }
+                resource = new DefaultMutableTreeNode(fsi);
+                setNode(resource);
+                fileSystemsNode.add(resource);
             }
-            resource = new DefaultMutableTreeNode(fsi);
-            setNode(resource);
-            fileSystemsNode.add(resource);
+            reload(fileSystemsNode, false);
+        } finally {
+            mFileSystemsWriteLock.unlock();
         }
-        reload(fileSystemsNode, false);
-        mFileSystemsLock.release();
     }
 
     /** Return list of block device info objects. */
     public Set<BlockDevInfo> getBlockDevInfos() {
         final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
+        mBlockDevInfosReadLock.lock();
         try {
-            mBlockDevInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        final Enumeration e = blockDevicesNode.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode bdNode =
+            final Enumeration e = blockDevicesNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode bdNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-            final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
-            blockDevInfos.add(bdi);
+                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
+                blockDevInfos.add(bdi);
+            }
+        } finally {
+            mBlockDevInfosReadLock.unlock();
         }
-        mBlockDevInfosLock.release();
         return blockDevInfos;
     }
 
@@ -278,19 +284,18 @@ public final class HostBrowser extends Browser {
     Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
         final Map<BlockDevice, BlockDevInfo> blockDevices =
                                       new HashMap<BlockDevice, BlockDevInfo>();
+        mBlockDevInfosReadLock.lock();
         try {
-            mBlockDevInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        final Enumeration e = blockDevicesNode.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode bdNode =
+            final Enumeration e = blockDevicesNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode bdNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-            final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
-            blockDevices.put(bdi.getBlockDevice(), bdi);
+                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
+                blockDevices.put(bdi.getBlockDevice(), bdi);
+            }
+        } finally {
+            mBlockDevInfosReadLock.unlock();
         }
-        mBlockDevInfosLock.release();
         return blockDevices;
     }
 
@@ -298,38 +303,36 @@ public final class HostBrowser extends Browser {
     Map<NetInterface, NetInfo> getNetInterfacesMap() {
         final Map<NetInterface, NetInfo> netInterfaces =
                                           new HashMap<NetInterface, NetInfo>();
+        mNetInfosReadLock.lock();
         try {
-            mNetInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        final Enumeration e = netInterfacesNode.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode niNode =
+            final Enumeration e = netInterfacesNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode niNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-            final NetInfo nii = (NetInfo) niNode.getUserObject();
-            netInterfaces.put(nii.getNetInterface(), nii);
+                final NetInfo nii = (NetInfo) niNode.getUserObject();
+                netInterfaces.put(nii.getNetInterface(), nii);
+            }
+        } finally {
+            mNetInfosReadLock.unlock();
         }
-        mNetInfosLock.release();
         return netInterfaces;
     }
 
     /** Returns map of file systems its file system info objects. */
     Map<String, FSInfo> getFilesystemsMap() {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
+        mFileSystemsReadLock.lock();
         try {
-            mFileSystemsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        final Enumeration e = fileSystemsNode.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode fsiNode =
+            final Enumeration e = fileSystemsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode fsiNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-            final FSInfo fsi = (FSInfo) fsiNode.getUserObject();
-            filesystems.put(fsi.getName(), fsi);
+                final FSInfo fsi = (FSInfo) fsiNode.getUserObject();
+                filesystems.put(fsi.getName(), fsi);
+            }
+        } finally {
+            mFileSystemsReadLock.unlock();
         }
-        mFileSystemsLock.release();
         return filesystems;
     }
 
@@ -569,17 +572,13 @@ public final class HostBrowser extends Browser {
     }
 
     /** Lock block dev info objects. */
-    public void lockBlockDevInfos() {
-        try {
-            mBlockDevInfosLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    public void lockBlockDevInfosRead() {
+        mBlockDevInfosReadLock.lock();
     }
 
     /** Unlock block dev info objects. */
-    public void unlockBlockDevInfos() {
-        mBlockDevInfosLock.release();
+    public void unlockBlockDevInfosRead() {
+        mBlockDevInfosReadLock.unlock();
     }
 
     /** Returns block devices node from the menu. */

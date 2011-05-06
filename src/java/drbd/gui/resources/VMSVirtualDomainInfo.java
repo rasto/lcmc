@@ -84,10 +84,9 @@ import java.awt.geom.Point2D;
 
 import org.w3c.dom.Node;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
-
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
@@ -119,7 +118,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Progress indicator when starting or stopping. */
     private final StringBuilder progress = new StringBuilder("-");
     /** Disk to info hash lock. */
-    private final Mutex mDiskToInfoLock = new Mutex();
+    private final Lock mDiskToInfoLock = new ReentrantLock();
     /** Map from key to vms disk info object. */
     private final Map<String, VMSDiskInfo> diskToInfo =
                                            new HashMap<String, VMSDiskInfo>();
@@ -128,7 +127,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private volatile Map<String, VMSDiskInfo> diskKeyToInfo =
                                            new HashMap<String, VMSDiskInfo>();
     /** Interface to info hash lock. */
-    private final Mutex mInterfaceToInfoLock = new Mutex();
+    private final Lock mInterfaceToInfoLock = new ReentrantLock();
     /** Map from key to vms interface info object. */
     private final Map<String, VMSInterfaceInfo> interfaceToInfo =
                                        new HashMap<String, VMSInterfaceInfo>();
@@ -136,7 +135,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private volatile Map<String, VMSInterfaceInfo> interfaceKeyToInfo =
                                        new HashMap<String, VMSInterfaceInfo>();
     /** Input device to info hash lock. */
-    private final Mutex mInputDevToInfoLock = new Mutex();
+    private final Lock mInputDevToInfoLock = new ReentrantLock();
     /** Map from key to vms input device info object. */
     private final Map<String, VMSInputDevInfo> inputDevToInfo =
                                        new HashMap<String, VMSInputDevInfo>();
@@ -145,7 +144,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSInputDevInfo>();
 
     /** Graphics device to info hash lock. */
-    private final Mutex mGraphicsToInfoLock = new Mutex();
+    private final Lock mGraphicsToInfoLock = new ReentrantLock();
     /** Map from key to vms graphics device info object. */
     private final Map<String, VMSGraphicsInfo> graphicsToInfo =
                                        new HashMap<String, VMSGraphicsInfo>();
@@ -154,7 +153,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSGraphicsInfo>();
 
     /** Sound device to info hash lock. */
-    private final Mutex mSoundToInfoLock = new Mutex();
+    private final Lock mSoundToInfoLock = new ReentrantLock();
     /** Map from key to vms sound device info object. */
     private final Map<String, VMSSoundInfo> soundToInfo =
                                        new HashMap<String, VMSSoundInfo>();
@@ -163,7 +162,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSSoundInfo>();
 
     /** Serial device to info hash lock. */
-    private final Mutex mSerialToInfoLock = new Mutex();
+    private final Lock mSerialToInfoLock = new ReentrantLock();
     /** Map from key to vms serial device info object. */
     private final Map<String, VMSSerialInfo> serialToInfo =
                                        new HashMap<String, VMSSerialInfo>();
@@ -172,7 +171,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSSerialInfo>();
 
     /** Parallel device to info hash lock. */
-    private final Mutex mParallelToInfoLock = new Mutex();
+    private final Lock mParallelToInfoLock = new ReentrantLock();
     /** Map from key to vms parallel device info object. */
     private final Map<String, VMSParallelInfo> parallelToInfo =
                                        new HashMap<String, VMSParallelInfo>();
@@ -181,7 +180,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSParallelInfo>();
 
     /** Video device to info hash lock. */
-    private final Mutex mVideoToInfoLock = new Mutex();
+    private final Lock mVideoToInfoLock = new ReentrantLock();
     /** Map from key to vms video device info object. */
     private final Map<String, VMSVideoInfo> videoToInfo =
                                        new HashMap<String, VMSVideoInfo>();
@@ -672,23 +671,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (diskNames.contains(vmsdi.getName())) {
                 /* keeping */
                 diskNames.remove(vmsdi.getName());
+                mDiskToInfoLock.lock();
                 try {
-                    mDiskToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    diskToInfo.put(vmsdi.getName(), vmsdi);
+                } finally {
+                    mDiskToInfoLock.unlock();
                 }
-                diskToInfo.put(vmsdi.getName(), vmsdi);
-                mDiskToInfoLock.release();
                 vmsdi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mDiskToInfoLock.lock();
                 try {
-                    mDiskToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    diskToInfo.remove(vmsdi.getName());
+                } finally {
+                    mDiskToInfoLock.unlock();
                 }
-                diskToInfo.remove(vmsdi.getName());
-                mDiskToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -722,13 +719,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             /* add new vm disk */
             final VMSDiskInfo vmsdi =
                                 new VMSDiskInfo(disk, getBrowser(), this);
+            mDiskToInfoLock.lock();
             try {
-                mDiskToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                diskToInfo.put(disk, vmsdi);
+            } finally {
+                mDiskToInfoLock.unlock();
             }
-            diskToInfo.put(disk, vmsdi);
-            mDiskToInfoLock.release();
             vmsdi.updateParameters();
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmsdi);
@@ -771,13 +767,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmsii.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mInterfaceToInfoLock.lock();
                 try {
-                    mInterfaceToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    interfaceToInfo.remove(vmsii.getName());
+                } finally {
+                    mInterfaceToInfoLock.unlock();
                 }
-                interfaceToInfo.remove(vmsii.getName());
-                mInterfaceToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -827,13 +822,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmsii.setName(interf);
                 emptySlot = null;
             }
+            mInterfaceToInfoLock.lock();
             try {
-                mInterfaceToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                interfaceToInfo.put(interf, vmsii);
+            } finally {
+                mInterfaceToInfoLock.unlock();
             }
-            interfaceToInfo.put(interf, vmsii);
-            mInterfaceToInfoLock.release();
             vmsii.updateParameters();
         }
         return nodeChanged;
@@ -868,13 +862,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmsid.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mInputDevToInfoLock.lock();
                 try {
-                    mInputDevToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    inputDevToInfo.remove(vmsid.getName());
+                } finally {
+                    mInputDevToInfoLock.unlock();
                 }
-                inputDevToInfo.remove(vmsid.getName());
-                mInputDevToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -919,13 +912,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
             nodeChanged = true;
+            mInputDevToInfoLock.lock();
             try {
-                mInputDevToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                inputDevToInfo.put(inputDev, vmsid);
+            } finally {
+                mInputDevToInfoLock.unlock();
             }
-            inputDevToInfo.put(inputDev, vmsid);
-            mInputDevToInfoLock.release();
             vmsid.updateParameters();
         }
         /* Sort it. */
@@ -984,23 +976,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (graphicsNames.contains(vmsgi.getName())) {
                 /* keeping */
                 graphicsNames.remove(vmsgi.getName());
+                mGraphicsToInfoLock.lock();
                 try {
-                    mGraphicsToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    graphicsToInfo.put(vmsgi.getName(), vmsgi);
+                } finally {
+                    mGraphicsToInfoLock.unlock();
                 }
-                graphicsToInfo.put(vmsgi.getName(), vmsgi);
-                mGraphicsToInfoLock.release();
                 vmsgi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mGraphicsToInfoLock.lock();
                 try {
-                    mGraphicsToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    graphicsToInfo.remove(vmsgi.getName());
+                } finally {
+                    mGraphicsToInfoLock.unlock();
                 }
-                graphicsToInfo.remove(vmsgi.getName());
-                mGraphicsToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1046,13 +1036,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
             nodeChanged = true;
+            mGraphicsToInfoLock.lock();
             try {
-                mGraphicsToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                graphicsToInfo.put(graphicDisplay, vmsgi);
+            } finally {
+                mGraphicsToInfoLock.unlock();
             }
-            graphicsToInfo.put(graphicDisplay, vmsgi);
-            mGraphicsToInfoLock.release();
             vmsgi.updateParameters();
         }
         return nodeChanged;
@@ -1084,23 +1073,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (soundNames.contains(vmssi.getName())) {
                 /* keeping */
                 soundNames.remove(vmssi.getName());
+                mSoundToInfoLock.lock();
                 try {
-                    mSoundToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    soundToInfo.put(vmssi.getName(), vmssi);
+                } finally {
+                    mSoundToInfoLock.unlock();
                 }
-                soundToInfo.put(vmssi.getName(), vmssi);
-                mSoundToInfoLock.release();
                 vmssi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mSoundToInfoLock.lock();
                 try {
-                    mSoundToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    soundToInfo.remove(vmssi.getName());
+                } finally {
+                    mSoundToInfoLock.unlock();
                 }
-                soundToInfo.remove(vmssi.getName());
-                mSoundToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1146,13 +1133,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
             nodeChanged = true;
+            mSoundToInfoLock.lock();
             try {
-                mSoundToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                soundToInfo.put(sound, vmssi);
+            } finally {
+                mSoundToInfoLock.unlock();
             }
-            soundToInfo.put(sound, vmssi);
-            mSoundToInfoLock.release();
             vmssi.updateParameters();
         }
         return nodeChanged;
@@ -1189,13 +1175,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmssi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mSerialToInfoLock.lock();
                 try {
-                    mSerialToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    serialToInfo.remove(vmssi.getName());
+                } finally {
+                    mSerialToInfoLock.unlock();
                 }
-                serialToInfo.remove(vmssi.getName());
-                mSerialToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1249,13 +1234,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmssi.setName(serial);
                 emptySlot = null;
             }
+            mSerialToInfoLock.lock();
             try {
-                mSerialToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                serialToInfo.put(serial, vmssi);
+            } finally {
+                mSerialToInfoLock.unlock();
             }
-            serialToInfo.put(serial, vmssi);
-            mSerialToInfoLock.release();
             vmssi.updateParameters();
         }
         return nodeChanged;
@@ -1293,13 +1277,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmspi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mParallelToInfoLock.lock();
                 try {
-                    mParallelToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    parallelToInfo.remove(vmspi.getName());
+                } finally {
+                    mParallelToInfoLock.unlock();
                 }
-                parallelToInfo.remove(vmspi.getName());
-                mParallelToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1354,13 +1337,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 vmspi.setName(parallel);
                 emptySlot = null;
             }
+            mParallelToInfoLock.lock();
             try {
-                mParallelToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                parallelToInfo.put(parallel, vmspi);
+            } finally {
+                mParallelToInfoLock.unlock();
             }
-            parallelToInfo.put(parallel, vmspi);
-            mParallelToInfoLock.release();
             vmspi.updateParameters();
         }
         return nodeChanged;
@@ -1391,23 +1373,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else if (videoNames.contains(vmsvi.getName())) {
                 /* keeping */
                 videoNames.remove(vmsvi.getName());
+                mVideoToInfoLock.lock();
                 try {
-                    mVideoToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    videoToInfo.put(vmsvi.getName(), vmsvi);
+                } finally {
+                    mVideoToInfoLock.unlock();
                 }
-                videoToInfo.put(vmsvi.getName(), vmsvi);
-                mVideoToInfoLock.release();
                 vmsvi.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
+                mVideoToInfoLock.lock();
                 try {
-                    mVideoToInfoLock.acquire();
-                } catch (final InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    videoToInfo.remove(vmsvi.getName());
+                } finally {
+                    mVideoToInfoLock.unlock();
                 }
-                videoToInfo.remove(vmsvi.getName());
-                mVideoToInfoLock.release();
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1456,13 +1436,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             getBrowser().setNode(resource);
             getNode().insert(resource, i);
             nodeChanged = true;
+            mVideoToInfoLock.lock();
             try {
-                mVideoToInfoLock.acquire();
-            } catch (final InterruptedException ie) {
-                Thread.currentThread().interrupt();
+                videoToInfo.put(video, vmspi);
+            } finally {
+                mVideoToInfoLock.unlock();
             }
-            videoToInfo.put(video, vmspi);
-            mVideoToInfoLock.release();
             vmspi.updateParameters();
         }
         return nodeChanged;
@@ -3463,13 +3442,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         target.append(" : /dev/");
         target.append(targetDev);
         if (dkti != null) {
-            try {
-                mDiskToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mDiskToInfoLock.lock();
             final VMSDiskInfo vdi = diskToInfo.get(targetDev);
-            mDiskToInfoLock.release();
+            mDiskToInfoLock.unlock();
             dkti.put(target.toString(), vdi);
         }
         final MyButton targetDevLabel = new MyButton(
@@ -3525,13 +3500,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mDiskToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mDiskToInfoLock.lock();
         diskKeyToInfo = dkti;
-        mDiskToInfoLock.release();
+        mDiskToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3758,13 +3729,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mInputDevToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mInputDevToInfoLock.lock();
         inputDevKeyToInfo = iToInfo;
-        mInputDevToInfoLock.release();
+        mInputDevToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3783,13 +3750,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mGraphicsToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mGraphicsToInfoLock.lock();
         graphicsKeyToInfo = iToInfo;
-        mGraphicsToInfoLock.release();
+        mGraphicsToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3808,13 +3771,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mSoundToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSoundToInfoLock.lock();
         soundKeyToInfo = iToInfo;
-        mSoundToInfoLock.release();
+        mSoundToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3833,13 +3792,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mSerialToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mSerialToInfoLock.lock();
         serialKeyToInfo = iToInfo;
-        mSerialToInfoLock.release();
+        mSerialToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3858,13 +3813,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mParallelToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mParallelToInfoLock.lock();
         parallelKeyToInfo = iToInfo;
-        mParallelToInfoLock.release();
+        mParallelToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3883,13 +3834,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mVideoToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mVideoToInfoLock.lock();
         videoKeyToInfo = iToInfo;
-        mVideoToInfoLock.release();
+        mVideoToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -3986,13 +3933,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 rows.add(row);
             }
         }
-        try {
-            mInterfaceToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mInterfaceToInfoLock.lock();
         interfaceKeyToInfo = iToInfo;
-        mInterfaceToInfoLock.release();
+        mInterfaceToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4012,13 +3955,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             });
             thread.start();
         } else if (DISK_TABLE.equals(tableName)) {
-            try {
-                mDiskToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mDiskToInfoLock.lock();
             final VMSDiskInfo vdi = diskKeyToInfo.get(key);
-            mDiskToInfoLock.release();
+            mDiskToInfoLock.unlock();
             if (vdi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4032,13 +3971,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (INTERFACES_TABLE.equals(tableName)) {
-            try {
-                mInterfaceToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mInterfaceToInfoLock.lock();
             final VMSInterfaceInfo vii = interfaceKeyToInfo.get(key);
-            mInterfaceToInfoLock.release();
+            mInterfaceToInfoLock.unlock();
             if (vii != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4052,13 +3987,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
-            try {
-                mInputDevToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mInputDevToInfoLock.lock();
             final VMSInputDevInfo vidi = inputDevKeyToInfo.get(key);
-            mInputDevToInfoLock.release();
+            mInputDevToInfoLock.unlock();
             if (vidi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4072,13 +4003,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (GRAPHICS_TABLE.equals(tableName)) {
-            try {
-                mGraphicsToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mGraphicsToInfoLock.lock();
             final VMSGraphicsInfo vgi = graphicsKeyToInfo.get(key);
-            mGraphicsToInfoLock.release();
+            mGraphicsToInfoLock.unlock();
             if (vgi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4092,13 +4019,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (SOUND_TABLE.equals(tableName)) {
-            try {
-                mSoundToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mSoundToInfoLock.lock();
             final VMSSoundInfo vsi = soundKeyToInfo.get(key);
-            mSoundToInfoLock.release();
+            mSoundToInfoLock.unlock();
             if (vsi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4112,13 +4035,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (SERIAL_TABLE.equals(tableName)) {
-            try {
-                mSerialToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mSerialToInfoLock.lock();
             final VMSSerialInfo vsi = serialKeyToInfo.get(key);
-            mSerialToInfoLock.release();
+            mSerialToInfoLock.unlock();
             if (vsi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4132,13 +4051,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (PARALLEL_TABLE.equals(tableName)) {
-            try {
-                mParallelToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mParallelToInfoLock.lock();
             final VMSParallelInfo vpi = parallelKeyToInfo.get(key);
-            mParallelToInfoLock.release();
+            mParallelToInfoLock.unlock();
             if (vpi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4152,13 +4067,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 thread.start();
             }
         } else if (VIDEO_TABLE.equals(tableName)) {
-            try {
-                mVideoToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mVideoToInfoLock.lock();
             final VMSVideoInfo vvi = videoKeyToInfo.get(key);
-            mVideoToInfoLock.release();
+            mVideoToInfoLock.unlock();
             if (vvi != null) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -4199,13 +4110,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (HEADER_TABLE.equals(tableName)) {
             return this;
         } else if (DISK_TABLE.equals(tableName)) {
-            try {
-                mDiskToInfoLock.acquire();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            mDiskToInfoLock.lock();
             final Info info = diskToInfo.get(key);
-            mDiskToInfoLock.release();
+            mDiskToInfoLock.unlock();
             return info;
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return interfaceToInfo.get(key);
@@ -4227,13 +4134,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns whether the devices exists. */
     protected boolean isDevice(final String dev) {
-        try {
-            mDiskToInfoLock.acquire();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mDiskToInfoLock.lock();
         final boolean is = diskToInfo.containsKey(dev);
-        mDiskToInfoLock.release();
+        mDiskToInfoLock.unlock();
         return is;
     }
 

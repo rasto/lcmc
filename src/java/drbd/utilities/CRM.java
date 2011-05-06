@@ -83,11 +83,8 @@ public final class CRM {
                                              final boolean outputVisible,
                                              final boolean testOnly) {
         M_PTEST_WRITELOCK.lock();
-        try {
-            ptestOutput = null;
-        } finally {
-            M_PTEST_WRITELOCK.unlock();
-        }
+        ptestOutput = null;
+        M_PTEST_WRITELOCK.unlock();
         if (testOnly) {
             final String testCmd =
              "if [ ! -e " + DRBD_MC_TEST_FILE + " ]; "

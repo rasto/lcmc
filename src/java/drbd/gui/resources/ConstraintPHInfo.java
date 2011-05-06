@@ -42,8 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.List;
 
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
-
 /**
  * Object that holds an order constraint information.
  */
@@ -66,9 +64,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
     private boolean reversedOrd = false;
     /** Resource set info object for this placeholder. More placeholders can
      * have on resource set info object. */
-    private PcmkRscSetsInfo pcmkRscSetsInfo = null;
-    /** Rsc set info object lock. */
-    private final Mutex mPcmkRscSetsLock = new Mutex();
+    private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
 
     /** Prepares a new <code>ConstraintPHInfo</code> object. */
     ConstraintPHInfo(final Browser browser,
@@ -330,13 +326,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Return information panel. */
     @Override public JComponent getInfoPanel() {
-        try {
-            mPcmkRscSetsLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
         final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
-        mPcmkRscSetsLock.release();
         return prsi.getInfoPanel(this);
     }
 
@@ -839,39 +829,18 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Sets rsc sets info object. */
     void setPcmkRscSetsInfo(final PcmkRscSetsInfo pcmkRscSetsInfo) {
-        try {
-            mPcmkRscSetsLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        if (this.pcmkRscSetsInfo != pcmkRscSetsInfo) {
-            this.pcmkRscSetsInfo = pcmkRscSetsInfo;
-        }
-        mPcmkRscSetsLock.release();
+        this.pcmkRscSetsInfo = pcmkRscSetsInfo;
     }
 
     /** Gets rsc sets info object. */
     PcmkRscSetsInfo getPcmkRscSetsInfo() {
-        try {
-            mPcmkRscSetsLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
-        mPcmkRscSetsLock.release();
-        return prsi;
+        return pcmkRscSetsInfo;
     }
 
     /** Hide/Show advanced panels. */
     @Override public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        try {
-            mPcmkRscSetsLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
         final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
-        mPcmkRscSetsLock.release();
         if (prsi != null) {
             prsi.updateAdvancedPanels();
         }

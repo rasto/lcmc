@@ -46,7 +46,9 @@ import java.awt.Component;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
@@ -74,7 +76,7 @@ public final class ClustersPanel extends JPanel {
     /** Upgrade check text. */
     private String upgradeCheck;
     /** Upgrade check lock. */
-    private final Mutex mUpgradeLock = new Mutex();
+    private final Lock mUpgradeLock = new ReentrantLock();
     /** Upgrade check text fields. */
     private final List<JEditorPane> upgradeTextFields =
                                                new ArrayList<JEditorPane>();
@@ -274,11 +276,7 @@ public final class ClustersPanel extends JPanel {
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
                 final String latestVersion = Tools.getLatestVersion();
-                try {
-                    mUpgradeLock.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                mUpgradeLock.lock();
                 if (latestVersion == null) {
                     upgradeCheck =
                              Tools.getString("MainPanel.UpgradeCheckFailed");
@@ -294,7 +292,7 @@ public final class ClustersPanel extends JPanel {
                     }
                 }
                 final String text = upgradeCheck;
-                mUpgradeLock.release();
+                mUpgradeLock.unlock();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
                         for (final JEditorPane field : upgradeTextFields) {
@@ -337,26 +335,18 @@ public final class ClustersPanel extends JPanel {
             }
         });
         upgradeField.setBackground(Color.WHITE);
-        try {
-            mUpgradeLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mUpgradeLock.lock();
         upgradeTextFields.add(upgradeField);
         final String text = upgradeCheck;
-        mUpgradeLock.release();
+        mUpgradeLock.unlock();
         upgradeField.setText(text);
         return upgradeField;
     }
 
     /** Unregister upgrade text field. */
     void unregisterUpgradeTextField(final JEditorPane field) {
-        try {
-            mUpgradeLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mUpgradeLock.lock();
         upgradeTextFields.remove(field);
-        mUpgradeLock.release();
+        mUpgradeLock.unlock();
     }
 }

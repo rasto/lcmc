@@ -50,7 +50,9 @@ import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SwingUtilities;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds clone service info object.
@@ -704,7 +706,7 @@ final class CloneInfo extends ServiceInfo {
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     false)) {
             private static final long serialVersionUID = 1L;
-            private final Mutex mUpdateLock = new Mutex();
+            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override public String enablePredicate() {
                 return null;
@@ -713,13 +715,12 @@ final class CloneInfo extends ServiceInfo {
             public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override public void run() {
-                        try {
-                            if (mUpdateLock.attempt(0)) {
+                        if (mUpdateLock.tryLock()) {
+                            try {
                                 updateThread();
-                                mUpdateLock.release();
+                            } finally {
+                                mUpdateLock.unlock();
                             }
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
                         }
                     }
                 });

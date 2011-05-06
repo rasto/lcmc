@@ -94,9 +94,11 @@ import java.awt.font.FontRenderContext;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.TransformerUtils;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class creates graph and provides methods for scaling etc.,
@@ -130,7 +132,7 @@ public abstract class ResourceGraph {
     /** Empty shape for arrows. (to not show an arrow). */
     private static final Area EMPTY_SHAPE = new Area();
     /** Graph lock. */
-    private final Mutex mGraphLock = new Mutex();
+    private final Lock mGraphLock = new ReentrantLock();
     /** The graph object. */
     private Graph<Vertex, Edge> graph;
     /** Visualization viewer object. */
@@ -140,7 +142,7 @@ public abstract class ResourceGraph {
     /** The graph's scroll pane. */
     private GraphZoomScrollPane scrollPane;
     /** The vertex locations lock. */
-    private final Mutex mVertexLocationsLock = new Mutex();
+    private final Lock mVertexLocationsLock = new ReentrantLock();
     /** The vertex locations object. */
     private final Map<Vertex, Point2D> vertexLocations =
                                                 new HashMap<Vertex, Point2D>();
@@ -149,16 +151,16 @@ public abstract class ResourceGraph {
     /** List with resources that should be animated. */
     private final List<Info> animationList = new ArrayList<Info>();
     /** This mutex is for protecting the animation list. */
-    private final Mutex mAnimationListLock = new Mutex();
+    private final Lock mAnimationListLock = new ReentrantLock();
     /** List with resources that should be animated for test view. */
     private final List<JComponent> testAnimationList =
                                                    new ArrayList<JComponent>();
     /** This mutex is for protecting the test animation list. */
-    private final Mutex mTestAnimationListLock = new Mutex();
+    private final Lock mTestAnimationListLock = new ReentrantLock();
     /** Animation thread. */
     private volatile Thread animationThread = null;
     /** This mutex is for protecting the animation thread. */
-    private final Mutex mAnimationThreadLock = new Mutex();
+    private final Lock mAnimationThreadLock = new ReentrantLock();
     /** Map from vertex to its width. */
     private final Map<Vertex, Integer> vertexWidth =
                                                new HashMap<Vertex, Integer>();
@@ -171,17 +173,17 @@ public abstract class ResourceGraph {
     /** Whether only test or real thing should show. */
     private volatile boolean testOnlyFlag = false;
     /** This mutex is for protecting the testOnlyFlag. */
-    private final Mutex mTestOnlyFlag = new Mutex();
+    private final Lock mTestOnlyFlag = new ReentrantLock();
     /** Test animation thread. */
     private volatile Thread testAnimationThread = null;
     /** This mutex is for protecting the test animation thread. */
-    private final Mutex mTestAnimationThreadLock = new Mutex();
+    private final Lock mTestAnimationThreadLock = new ReentrantLock();
     /** List of edges that are made only during test. */
     private volatile Edge testEdge = null;
     /** List of edges that are being tested during test. */
     private volatile Edge existingTestEdge = null;
     /** Lock for test edge list. */
-    private final Mutex mTestEdgeLock = new Mutex();
+    private final Lock mTestEdgeLock = new ReentrantLock();
     /** Interval beetween two animation frames. */
     private final int animInterval =
                              (int) (1000 / Tools.getConfigData().getAnimFPS());
@@ -215,18 +217,10 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
-        try {
-            mAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mAnimationListLock.lock();
         if (animationList.isEmpty()) {
             /* start animation thread */
-            try {
-                mAnimationThreadLock.acquire();
-            } catch (java.lang.InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mAnimationThreadLock.lock();
             if (animationThread == null) {
                 animationThread = new Thread(new Runnable() {
                     @Override public void run() {
@@ -237,71 +231,50 @@ public abstract class ResourceGraph {
                                 Thread.currentThread().interrupt();
                             }
 
-                            try {
-                                mAnimationListLock.acquire();
-                            } catch (java.lang.InterruptedException ie) {
-                                Thread.currentThread().interrupt();
-                            }
+                            mAnimationListLock.lock();
                             if (animationList.isEmpty()) {
-                                mAnimationListLock.release();
+                                mAnimationListLock.unlock();
                                 repaint();
-                                try {
-                                    mAnimationThreadLock.acquire();
-                                } catch (java.lang.InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
-                                }
+                                mAnimationThreadLock.lock();
                                 animationThread = null;
-                                mAnimationThreadLock.release();
+                                mAnimationThreadLock.unlock();
                                 break;
                             }
                             for (final Info info : animationList) {
                                 info.incAnimationIndex();
                             }
-                            mAnimationListLock.release();
+                            mAnimationListLock.unlock();
                             repaint();
                         }
                     }
                 });
                 animationThread.start();
             }
-            mAnimationThreadLock.release();
+            mAnimationThreadLock.unlock();
         }
         animationList.add(info);
-        mAnimationListLock.release();
+        mAnimationListLock.unlock();
     }
 
     /** Stops the animation. */
     public final void stopAnimation(final Info info) {
+        mAnimationListLock.lock();
         try {
-            mAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            animationList.remove(info);
+        } finally {
+            mAnimationListLock.unlock();
         }
-        animationList.remove(info);
-        mAnimationListLock.release();
     }
 
     /** Starts the animation if vertex is being tested. */
     public final void startTestAnimation(final JComponent component,
                                          final CountDownLatch startTestLatch) {
-        try {
-            mTestAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        try {
-            mTestOnlyFlag.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mTestAnimationListLock.lock();
+        mTestOnlyFlag.lock();
         testOnlyFlag = false;
-        mTestOnlyFlag.release();
+        mTestOnlyFlag.unlock();
         if (testAnimationList.isEmpty()) {
-            try {
-                mTestAnimationThreadLock.acquire();
-            } catch (java.lang.InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mTestAnimationThreadLock.lock();
             if (testAnimationThread == null) {
                 /* start test animation thread */
                 testAnimationThread = new Thread(new Runnable() {
@@ -312,14 +285,10 @@ public abstract class ResourceGraph {
                             } catch (InterruptedException ignored) {
                                 Thread.currentThread().interrupt();
                             }
-                            try {
-                                mTestOnlyFlag.acquire();
-                            } catch (java.lang.InterruptedException ie) {
-                                Thread.currentThread().interrupt();
-                            }
+                            mTestOnlyFlag.lock();
                             testOnlyFlag = !testOnlyFlag;
                             final boolean testOnlyFlagLast = testOnlyFlag;
-                            mTestOnlyFlag.release();
+                            mTestOnlyFlag.unlock();
                             Tools.setMenuOpaque(component,
                                                 false);
                             repaint();
@@ -328,47 +297,31 @@ public abstract class ResourceGraph {
                                 sleep = 1200;
                             }
                             for (int s = 0; s < sleep; s += animInterval) {
-                                try {
-                                    mTestOnlyFlag.acquire();
-                                } catch (java.lang.InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
-                                }
+                                mTestOnlyFlag.lock();
                                 if (testOnlyFlag == testOnlyFlagLast) {
-                                    mTestOnlyFlag.release();
+                                    mTestOnlyFlag.unlock();
                                 } else {
-                                    mTestOnlyFlag.release();
+                                    mTestOnlyFlag.unlock();
                                     repaint();
                                 }
                                 if (!component.isShowing()) {
                                     stopTestAnimation(component);
                                 }
-                                try {
-                                    mTestAnimationListLock.acquire();
-                                } catch (java.lang.InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
-                                }
+                                mTestAnimationListLock.lock();
 
                                 if (testAnimationList.isEmpty()) {
                                     Tools.setMenuOpaque(component, true);
-                                    mTestAnimationListLock.release();
-                                    try {
-                                        mTestOnlyFlag.acquire();
-                                    } catch (java.lang.InterruptedException i) {
-                                        Thread.currentThread().interrupt();
-                                    }
+                                    mTestAnimationListLock.unlock();
+                                    mTestOnlyFlag.lock();
                                     testOnlyFlag = false;
-                                    mTestOnlyFlag.release();
+                                    mTestOnlyFlag.unlock();
                                     repaint();
-                                    try {
-                                        mTestAnimationThreadLock.acquire();
-                                    } catch (java.lang.InterruptedException i) {
-                                        Thread.currentThread().interrupt();
-                                    }
+                                    mTestAnimationThreadLock.lock();
                                     testAnimationThread = null;
-                                    mTestAnimationThreadLock.release();
+                                    mTestAnimationThreadLock.unlock();
                                     break FOREVER;
                                 }
-                                mTestAnimationListLock.release();
+                                mTestAnimationListLock.unlock();
                                 Tools.sleep(animInterval);
                             }
                         }
@@ -376,21 +329,20 @@ public abstract class ResourceGraph {
                 });
                 testAnimationThread.start();
             }
-            mTestAnimationThreadLock.release();
+            mTestAnimationThreadLock.unlock();
         }
         testAnimationList.add(component);
-        mTestAnimationListLock.release();
+        mTestAnimationListLock.unlock();
     }
 
     /** Stops the test animation. */
     public final void stopTestAnimation(final JComponent component) {
+        mTestAnimationListLock.lock();
         try {
-            mTestAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            testAnimationList.remove(component);
+        } finally {
+            mTestAnimationListLock.unlock();
         }
-        testAnimationList.remove(component);
-        mTestAnimationListLock.release();
         removeExistingTestEdge();
         removeTestEdge();
         Tools.setMenuOpaque(component, true);
@@ -399,13 +351,12 @@ public abstract class ResourceGraph {
     /** Is test animation running. */
     final boolean isTestAnimation() {
         boolean running;
+        mTestAnimationListLock.lock();
         try {
-            mTestAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            running = !testAnimationList.isEmpty();
+        } finally {
+            mTestAnimationListLock.unlock();
         }
-        running = !testAnimationList.isEmpty();
-        mTestAnimationListLock.release();
         return running;
     }
 
@@ -531,17 +482,13 @@ public abstract class ResourceGraph {
     /** Returns the vertex locations function and locks them. Must be followed
         by putVertexLocations. */
     protected final Map<Vertex, Point2D> getVertexLocations() {
-        try {
-            mVertexLocationsLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mVertexLocationsLock.lock();
         return vertexLocations;
     }
 
     /** Puts vertex locations. */
     protected final void putVertexLocations() {
-        mVertexLocationsLock.release();
+        mVertexLocationsLock.unlock();
     }
 
     /** Returns the layout object. */
@@ -714,16 +661,15 @@ public abstract class ResourceGraph {
         /** Sets direction of the edge. */
         void setDirection(final Vertex from, final Vertex to) {
             if (mFrom != from || mTo != to) {
+                mGraphLock.lock();
                 try {
-                    mGraphLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
+                    getGraph().removeEdge(this);
+                    mFrom = from;
+                    mTo   = to;
+                    getGraph().addEdge(this, mFrom, mTo);
+                } finally {
+                    mGraphLock.unlock();
                 }
-                getGraph().removeEdge(this);
-                mFrom = from;
-                mTo   = to;
-                getGraph().addEdge(this, mFrom, mTo);
-                mGraphLock.release();
             }
         }
 
@@ -889,19 +835,18 @@ public abstract class ResourceGraph {
 
     /** Updates all popup menus. */
     public final void updatePopupMenus() {
+        mGraphLock.lock();
         try {
-            mGraphLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            for (final Vertex v : graph.getVertices()) {
+                vertexToMenus.remove(v);
+            }
+            for (final Edge e : graph.getEdges()) {
+                edgeToMenus.remove(e);
+                updatePopupEdge(e);
+            }
+        } finally {
+            mGraphLock.unlock();
         }
-        for (final Vertex v : graph.getVertices()) {
-            vertexToMenus.remove(v);
-        }
-        for (final Edge e : graph.getEdges()) {
-            edgeToMenus.remove(e);
-            updatePopupEdge(e);
-        }
-        mGraphLock.release();
     }
 
     /** Updates edge popup. */
@@ -1017,57 +962,76 @@ public abstract class ResourceGraph {
 
     /** Removes info from the graph. */
     protected void removeInfo(final Info i) {
+        mGraphLock.lock();
         try {
-            mGraphLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
+            graph.removeVertex(getVertex(i));
+        } finally {
+            mGraphLock.unlock();
         }
-        graph.removeVertex(getVertex(i));
-        mGraphLock.release();
     }
 
     /** Picks and highlights vertex with Info i in the graph. */
     void pickInfo(final Info i) {
-        final Vertex v = getVertex(i);
-        final PickedState<Edge> psEdge =
+        mGraphLock.lock();
+        try {
+            final Vertex v = getVertex(i);
+            final PickedState<Edge> psEdge =
                                     vv.getRenderContext().getPickedEdgeState();
-        final PickedState<Vertex> psVertex =
+            final PickedState<Vertex> psVertex =
                                   vv.getRenderContext().getPickedVertexState();
-        psEdge.clear();
-        psVertex.clear();
-        psVertex.pick(v, true);
+            psEdge.clear();
+            psVertex.clear();
+            psVertex.pick(v, true);
+        } finally {
+            mGraphLock.unlock();
+        }
     }
 
     /** Picks edge e. */
     final void pickEdge(final Edge e) {
-        final PickedState<Edge> psEdge =
+        mGraphLock.lock();
+        try {
+            final PickedState<Edge> psEdge =
                                    vv.getRenderContext().getPickedEdgeState();
-        final PickedState<Vertex> psVertex =
+            final PickedState<Vertex> psVertex =
                                  vv.getRenderContext().getPickedVertexState();
-        psEdge.clear();
-        psVertex.clear();
-        psEdge.pick(e, true);
+            psEdge.clear();
+            psVertex.clear();
+            psEdge.pick(e, true);
+        } finally {
+            mGraphLock.unlock();
+        }
     }
 
     /** Picks vertex v. */
     final void pickVertex(final Vertex v) {
-        final PickedState<Edge> psEdge =
-              vv.getRenderContext().getPickedEdgeState();
-        final PickedState<Vertex> psVertex =
-              vv.getRenderContext().getPickedVertexState();
-        psEdge.clear();
-        psVertex.clear();
-        psVertex.pick(v, true);
+        mGraphLock.lock();
+        try {
+            final PickedState<Edge> psEdge =
+                  vv.getRenderContext().getPickedEdgeState();
+            final PickedState<Vertex> psVertex =
+                  vv.getRenderContext().getPickedVertexState();
+            psEdge.clear();
+            psVertex.clear();
+            psVertex.pick(v, true);
+        } finally {
+            mGraphLock.unlock();
+        }
     }
 
     /** Picks background. */
     public final void pickBackground() {
-        final PickedState<Edge> psEdge =
+        mGraphLock.lock();
+        try {
+            final PickedState<Edge> psEdge =
                                    vv.getRenderContext().getPickedEdgeState();
-        final PickedState<Vertex> psVertex =
+            final PickedState<Vertex> psVertex =
                                  vv.getRenderContext().getPickedVertexState();
-        psEdge.clear();
-        psVertex.clear();
+            psEdge.clear();
+            psVertex.clear();
+        } finally {
+            mGraphLock.unlock();
+        }
     }
 
     /** Is called when vertex is released. */
@@ -1559,15 +1523,11 @@ public abstract class ResourceGraph {
             }
 
             final Info info = getInfo((Vertex) v);
-            try {
-                mAnimationListLock.acquire();
-            } catch (java.lang.InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            mAnimationListLock.lock();
             if (animationList.contains(info)) {
                 /* update animation */
                 final double i = info.getAnimationIndex();
-                mAnimationListLock.release();
+                mAnimationListLock.unlock();
                 final int barPos =
                            (int) (i * (shapeWidth) / 100);
                 g2d.setColor(new Color(250, 133, 34,
@@ -1584,7 +1544,7 @@ public abstract class ResourceGraph {
                                  shapeHeight);
                 }
             } else {
-                mAnimationListLock.release();
+                mAnimationListLock.unlock();
             }
         }
     }
@@ -1602,31 +1562,30 @@ public abstract class ResourceGraph {
                                              final boolean testOnly);
     /** Returns positions of the vertices (by value). */
     final void getPositions(final Map<String, Point2D> positions) {
+        mGraphLock.lock();
         try {
-            mGraphLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        for (final Vertex v : graph.getVertices()) {
-            final Info info = getInfo(v);
-            final Point2D p = new Point2D.Double();
-            final Point2D loc = layout.transform(v);
-            if (loc == null) {
-                continue;
-            }
-            p.setLocation(loc);
-            p.setLocation(p.getX() + (getDefaultVertexWidth(v)
-                                      - getVertexWidth(v)) / 2,
-                          p.getY() + (getDefaultVertexHeight(v)
-                                      - getVertexHeight(v)) / 2);
-            if (info != null) {
-                final String id = getId(info);
-                if (id != null) {
-                    positions.put(id, p);
+            for (final Vertex v : graph.getVertices()) {
+                final Info info = getInfo(v);
+                final Point2D p = new Point2D.Double();
+                final Point2D loc = layout.transform(v);
+                if (loc == null) {
+                    continue;
+                }
+                p.setLocation(loc);
+                p.setLocation(p.getX() + (getDefaultVertexWidth(v)
+                                          - getVertexWidth(v)) / 2,
+                              p.getY() + (getDefaultVertexHeight(v)
+                                          - getVertexHeight(v)) / 2);
+                if (info != null) {
+                    final String id = getId(info);
+                    if (id != null) {
+                        positions.put(id, p);
+                    }
                 }
             }
+        } finally {
+            mGraphLock.unlock();
         }
-        mGraphLock.release();
     }
 
     /** Returns id that is used for saving of the vertex positions to a file. */
@@ -1697,138 +1656,89 @@ public abstract class ResourceGraph {
 
     /** Returns if it is testOnly. */
     protected final boolean isTestOnly() {
-        try {
-            mTestOnlyFlag.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mTestOnlyFlag.lock();
         final boolean tof = testOnlyFlag;
-        mTestOnlyFlag.release();
+        mTestOnlyFlag.unlock();
         return tof;
     }
 
     /** Returns if it test animation is running. */
     protected final boolean isTestOnlyAnimation() {
-        try {
-            mTestAnimationListLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mTestAnimationListLock.lock();
         final boolean empty = testAnimationList.isEmpty();
-        mTestAnimationListLock.release();
+        mTestAnimationListLock.unlock();
         return !empty;
     }
 
     /** Removes test edges. */
     protected final void removeTestEdge() {
-        try {
-            mTestEdgeLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        try {
-            if (testEdge != null) {
-                try {
-                    mGraphLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+        mTestEdgeLock.lock();
+        if (testEdge != null) {
+            mGraphLock.lock();
+            try {
                 getGraph().removeEdge(testEdge);
-                mGraphLock.release();
-                testEdge = null;
+            } finally {
+                mGraphLock.unlock();
             }
-        } catch (final Exception ignore) {
-            /* ignore */
+            testEdge = null;
         }
-        mTestEdgeLock.release();
+        mTestEdgeLock.unlock();
     }
 
     /** Creates a test edge. */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
-        boolean gotlock = false;
-        try {
-            gotlock = mTestEdgeLock.attempt(0);
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        if (!gotlock) {
+        if (!mTestEdgeLock.tryLock()) {
             return;
         }
         if (testEdge != null) {
+            mGraphLock.lock();
             try {
-                try {
-                    mGraphLock.acquire();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
                 getGraph().removeEdge(testEdge);
-                mGraphLock.release();
-            } catch (final Exception e) {
-                mGraphLock.release();
-                /* ignore */
+            } finally {
+                mGraphLock.unlock();
             }
         }
         if (!isTestAnimation()) {
-            mTestEdgeLock.release();
+            mTestEdgeLock.unlock();
             return;
         }
+        final Edge edge = new Edge(vP, v);
+        mGraphLock.lock();
         try {
-            final Edge edge = new Edge(vP, v);
-            try {
-                mGraphLock.acquire();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
             getGraph().addEdge(edge, vP, v);
-            mGraphLock.release();
-            testEdge = edge;
-        } catch (final Exception e) {
-            mGraphLock.release();
-            /* ignore */
+        } finally {
+            mGraphLock.unlock();
         }
-        mTestEdgeLock.release();
+        testEdge = edge;
+        mTestEdgeLock.unlock();
     }
 
     /** Adds an existing edge to the test edges. */
     protected final void addExistingTestEdge(final Edge edge) {
-        boolean gotlock = false;
-        try {
-            gotlock = mTestEdgeLock.attempt(0);
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
-        if (!gotlock) {
+        if (!mTestEdgeLock.tryLock()) {
             return;
         }
         if (!isTestAnimation()) {
             existingTestEdge = null;
-            mTestEdgeLock.release();
+            mTestEdgeLock.unlock();
             return;
         }
         existingTestEdge = edge;
-        mTestEdgeLock.release();
+        mTestEdgeLock.unlock();
     }
 
     /** Removes existing test edges. */
     protected final void removeExistingTestEdge() {
-        try {
-            mTestEdgeLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mTestEdgeLock.lock();
         existingTestEdge = null;
-        mTestEdgeLock.release();
+        mTestEdgeLock.unlock();
     }
 
     /** Returns whether the edge is a test edge. */
     protected final boolean isTestEdge(final Edge e) {
-        try {
-            mTestEdgeLock.acquire();
-        } catch (java.lang.InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mTestEdgeLock.lock();
         final boolean is = testEdge == e || existingTestEdge == e;
-        mTestEdgeLock.release();
+        mTestEdgeLock.unlock();
         return is;
     }
 
@@ -1870,16 +1780,12 @@ public abstract class ResourceGraph {
 
     /** Locking graph's vertex and edge lists. */
     protected final void lockGraph() {
-        try {
-            mGraphLock.acquire();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        mGraphLock.lock();
     }
 
     /** Unlocking graph's vertex and edge lists. */
     protected final void unlockGraph() {
-        mGraphLock.release();
+        mGraphLock.unlock();
     }
 
     /** Scale function. */

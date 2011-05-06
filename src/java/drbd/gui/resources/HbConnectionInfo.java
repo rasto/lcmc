@@ -54,7 +54,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import EDU.oswego.cs.dl.util.concurrent.Mutex;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -67,7 +70,9 @@ public class HbConnectionInfo extends EditableInfo {
     private final List<HbConstraintInterface> constraints =
                                    new ArrayList<HbConstraintInterface>();
     /** constraints lock. */
-    private final Mutex mConstraintsLock = new Mutex();
+    private final ReadWriteLock mConstraintsLock = new ReentrantReadWriteLock();
+    private final Lock mConstraintsReadLock = mConstraintsLock.readLock();
+    private final Lock mConstraintsWriteLock = mConstraintsLock.writeLock();
     /** Resource 1 in colocation constraint (the last one). */
     private ServiceInfo lastServiceInfoRsc = null;
     /** Resource 2 in colocation constraint (the last one). */
@@ -239,15 +244,14 @@ public class HbConnectionInfo extends EditableInfo {
         waitForInfoPanel();
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
+        mConstraintsReadLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            for (final HbConstraintInterface c : constraints) {
+                constraintsCopy.add(c);
+            }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        for (final HbConstraintInterface c : constraints) {
-            constraintsCopy.add(c);
-        }
-        mConstraintsLock.release();
         for (final HbConstraintInterface c : constraintsCopy) {
             c.apply(dcHost, testOnly);
         }
@@ -257,45 +261,43 @@ public class HbConnectionInfo extends EditableInfo {
     @Override boolean checkResourceFieldsCorrect(final String param,
                                                  final String[] params) {
         boolean correct = true;
+        mConstraintsReadLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        for (final HbConstraintInterface c : constraints) {
-            final boolean cor = c.checkResourceFieldsCorrect(
-                                                  param,
-                                                  c.getParametersFromXML(),
-                                                  true);
-            if (!cor) {
-                correct = false;
-                break;
+            for (final HbConstraintInterface c : constraints) {
+                final boolean cor = c.checkResourceFieldsCorrect(
+                                                      param,
+                                                      c.getParametersFromXML(),
+                                                      true);
+                if (!cor) {
+                    correct = false;
+                    break;
+                }
             }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsLock.release();
         return correct;
     }
 
     /** Check order and colocation constraints. */
     @Override public boolean checkResourceFieldsChanged(final String param,
                                                         final String[] params) {
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
         boolean changed = false;
-        for (final HbConstraintInterface c : constraints) {
-            final boolean chg = c.checkResourceFieldsChanged(
-                                              param,
-                                              c.getParametersFromXML(),
-                                              true);
-            if (chg) {
-                changed = true;
-                break;
+        mConstraintsReadLock.lock();
+        try {
+            for (final HbConstraintInterface c : constraints) {
+                final boolean chg = c.checkResourceFieldsChanged(
+                                                  param,
+                                                  c.getParametersFromXML(),
+                                                  true);
+                if (chg) {
+                    changed = true;
+                    break;
+                }
             }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsLock.release();
         return changed;
     }
 
@@ -432,26 +434,25 @@ public class HbConnectionInfo extends EditableInfo {
 
         /* params */
         EditableInfo firstConstraint = null;
+        mConstraintsReadLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        for (final HbConstraintInterface c : constraints) {
-            if (firstConstraint == null) {
-                firstConstraint = (EditableInfo) c;
-            }
-            final String[] params = c.getParametersFromXML();
-            final JPanel panel = getLabels(c);
+            for (final HbConstraintInterface c : constraints) {
+                if (firstConstraint == null) {
+                    firstConstraint = (EditableInfo) c;
+                }
+                final String[] params = c.getParametersFromXML();
+                final JPanel panel = getLabels(c);
 
-            optionsPanel.add(panel);
-            c.addParams(optionsPanel,
-                        params,
-                        ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH,
-                        null);
+                optionsPanel.add(panel);
+                c.addParams(optionsPanel,
+                            params,
+                            ClusterBrowser.SERVICE_LABEL_WIDTH,
+                            ClusterBrowser.SERVICE_FIELD_WIDTH,
+                            null);
+            }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsLock.release();
         getApplyButton().addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {
@@ -723,26 +724,25 @@ public class HbConnectionInfo extends EditableInfo {
         final List<HbConstraintInterface> constraintsToRemove =
                                     new ArrayList<HbConstraintInterface>();
         boolean changed = false;
+        mConstraintsWriteLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        for (final HbConstraintInterface c : constraints) {
-            if (c.isOrder() == isOrder) {
-                constraintsToRemove.add(c);
-                changed = true;
+            for (final HbConstraintInterface c : constraints) {
+                if (c.isOrder() == isOrder) {
+                    constraintsToRemove.add(c);
+                    changed = true;
+                }
             }
+            for (final HbConstraintInterface c : constraintsToRemove) {
+               if (isOrder) {
+                   orderIds.remove(c.getService().getHeartbeatId());
+               } else {
+                   colocationIds.remove(c.getService().getHeartbeatId());
+               }
+               constraints.remove(c);
+            }
+        } finally {
+            mConstraintsWriteLock.unlock();
         }
-        for (final HbConstraintInterface c : constraintsToRemove) {
-           if (isOrder) {
-               orderIds.remove(c.getService().getHeartbeatId());
-           } else {
-               colocationIds.remove(c.getService().getHeartbeatId());
-           }
-           constraints.remove(c);
-        }
-        mConstraintsLock.release();
         infoPanel = null;
         if (changed) {
             selectMyself();
@@ -786,13 +786,12 @@ public class HbConnectionInfo extends EditableInfo {
         orderIds.put(ordId, oi);
         oi.getService().setHeartbeatId(ordId);
         oi.setParameters();
+        mConstraintsWriteLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            constraints.add(oi);
+        } finally {
+            mConstraintsWriteLock.unlock();
         }
-        constraints.add(oi);
-        mConstraintsLock.release();
         infoPanel = null;
         selectMyself();
     }
@@ -824,13 +823,12 @@ public class HbConnectionInfo extends EditableInfo {
         colocationIds.put(colId, ci);
         ci.getService().setHeartbeatId(colId);
         ci.setParameters();
+        mConstraintsWriteLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            constraints.add(ci);
+        } finally {
+            mConstraintsWriteLock.unlock();
         }
-        constraints.add(ci);
-        mConstraintsLock.release();
         infoPanel = null;
         selectMyself();
     }
@@ -937,24 +935,19 @@ public class HbConnectionInfo extends EditableInfo {
     /** Hide/Show advanced panels. */
     @Override public final void updateAdvancedPanels() {
         super.updateAdvancedPanels();
+        mConstraintsReadLock.lock();
         try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            for (final HbConstraintInterface c : constraints) {
+                c.updateAdvancedPanels();
+            }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        for (final HbConstraintInterface c : constraints) {
-            c.updateAdvancedPanels();
-        }
-        mConstraintsLock.release();
     }
 
     /** Returns whether this resource is resource 1 in colocation constraint. */
     public final boolean isWithRsc(final ServiceInfo si) {
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mConstraintsReadLock.lock();
         for (final HbConstraintInterface c : constraints) {
             if (!c.isOrder()) {
                 ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
@@ -963,12 +956,12 @@ public class HbConnectionInfo extends EditableInfo {
                     rsc2 = gi;
                 }
                 if (rsc2.equals(si)) {
-                    mConstraintsLock.release();
+                    mConstraintsReadLock.unlock();
                     return true;
                 }
             }
         }
-        mConstraintsLock.release();
+        mConstraintsReadLock.unlock();
         return true;
     }
 
@@ -979,11 +972,7 @@ public class HbConnectionInfo extends EditableInfo {
     private boolean isTwoDirections(final boolean isOrder) {
         ServiceInfo allRsc1 = null;
         ServiceInfo allRsc2 = null;
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mConstraintsReadLock.lock();
         for (final HbConstraintInterface c : constraints) {
             if (c.isOrder() == isOrder) {
                 ServiceInfo rsc1 = c.getRscInfo1();
@@ -999,18 +988,18 @@ public class HbConnectionInfo extends EditableInfo {
                 if (allRsc1 == null) {
                     allRsc1 = rsc1;
                 } else if (!rsc1.equals(allRsc1)) {
-                    mConstraintsLock.release();
+                    mConstraintsReadLock.unlock();
                     return true;
                 }
                 if (allRsc2 == null) {
                     allRsc2 = rsc2;
                 } else if (!rsc2.equals(allRsc2)) {
-                    mConstraintsLock.release();
+                    mConstraintsReadLock.unlock();
                     return true;
                 }
             }
         }
-        mConstraintsLock.release();
+        mConstraintsReadLock.unlock();
         return false;
     }
 
@@ -1026,20 +1015,16 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns whether this service has a colocation or order. */
     final boolean hasColocationOrOrder(final ServiceInfo si) {
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mConstraintsReadLock.lock();
         for (final HbConstraintInterface c : constraints) {
             final ServiceInfo rsc1 = c.getRscInfo1();
             final ServiceInfo rsc2 = c.getRscInfo2();
             if (si.equals(rsc1) || si.equals(rsc2)) {
-                mConstraintsLock.release();
+                mConstraintsReadLock.unlock();
                 return true;
             }
         }
-        mConstraintsLock.release();
+        mConstraintsReadLock.unlock();
         return false;
     }
 
@@ -1066,15 +1051,11 @@ public class HbConnectionInfo extends EditableInfo {
         super.revert();
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
-        try {
-            mConstraintsLock.acquire();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        mConstraintsReadLock.lock();
         for (final HbConstraintInterface c : constraints) {
             constraintsCopy.add(c);
         }
-        mConstraintsLock.release();
+        mConstraintsReadLock.unlock();
         for (final HbConstraintInterface c : constraintsCopy) {
             c.revert();
         }
