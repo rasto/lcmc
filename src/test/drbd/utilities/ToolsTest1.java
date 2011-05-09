@@ -1305,7 +1305,37 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public static boolean testVersionBeforePacemaker() {
-        TODO
+    public void testVersionBeforePacemaker() {
+        final Host host = new Host();
+        host.setPacemakerVersion("1.1.5");
+        host.setHeartbeatVersion(null);
+        assertFalse(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion(null);
+        host.setHeartbeatVersion("2.1.4");
+        assertTrue(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion(null);
+        host.setHeartbeatVersion("2.1.3");
+        assertTrue(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion(null);
+        host.setHeartbeatVersion(null);
+        assertFalse(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion("1.0.9");
+        host.setHeartbeatVersion("3.0.2");
+        assertFalse(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion("1.0.9");
+        host.setHeartbeatVersion("2.99.0");
+        assertFalse(Tools.versionBeforePacemaker(host));
+
+        host.setPacemakerVersion("1.0.9");
+        host.setHeartbeatVersion(null);
+        assertFalse(Tools.versionBeforePacemaker(host));
+        for (final Host h : TestSuite1.getHosts()) {
+            Tools.versionBeforePacemaker(h);
+        }
     }
 }
