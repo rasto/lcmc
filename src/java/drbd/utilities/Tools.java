@@ -1435,18 +1435,45 @@ public final class Tools {
      */
     public static int compareVersions(final String version1,
                                       final String version2) {
-        if (version1 == null
-            || version2 == null) {
+        if (version1 == null || version2 == null) {
             return -100;
         }
-        final String[] v1a = version1.split("\\.");
-        final String[] v2a = version2.split("\\.");
+        final Pattern p = Pattern.compile("(.*\\d+)rc(\\d+)$");
+        final Matcher m1 = p.matcher(version1);
+        String version1a;
+        int rc1 = Integer.MAX_VALUE;
+        if (m1.matches()) {
+            version1a = m1.group(1);
+            try {
+                rc1 = Integer.parseInt(m1.group(2));
+            } catch (java.lang.NumberFormatException e) {
+                e.printStackTrace();
+            }
+        } else {
+            version1a = version1;
+        }
+
+        final Matcher m2 = p.matcher(version2);
+        String version2a;
+        int rc2 = Integer.MAX_VALUE;
+        if (m2.matches()) {
+            version2a = m2.group(1);
+            try {
+                rc2 = Integer.parseInt(m2.group(2));
+            } catch (java.lang.NumberFormatException e) {
+                e.printStackTrace();
+            }
+        } else {
+            version2a = version2;
+        }
+        final String[] v1a = version1a.split("\\.");
+        final String[] v2a = version2a.split("\\.");
         if (v1a.length < 1 || v2a.length < 1) {
             return -100;
         }
         int i = 0;
         while (true) {
-            if (i == v1a.length && i == v2a.length) {
+            if (i >= v1a.length && i >= v2a.length) {
                 break;
             }
             int v1i = 0;
@@ -1475,6 +1502,11 @@ public final class Tools {
                 return 1;
             }
             i++;
+        }
+        if (rc1 < rc2) {
+            return -1;
+        } else if (rc1 > rc2) {
+            return 1;
         }
         return 0;
     }

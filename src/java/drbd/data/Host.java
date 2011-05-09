@@ -647,42 +647,6 @@ public final class Host {
                                     new String [availableDrbdVersions.size()]);
     }
 
-    /** Returns whether version v1 is greater than version 2. */
-    boolean versionGreater(final String v1, final String v2) {
-        final Pattern p = Pattern.compile("^(\\d+)rc(\\d+)$");
-        String[] v1a = (v1 + ".999999").split("\\.");
-        String[] v2a = (v2 + ".999999").split("\\.");
-        if (v1a.length != 4 || v2a.length != 4) {
-            Tools.appWarning("wrong versions: " + v1 + ", " + v2);
-            return false;
-        }
-
-        /* release candidate */
-        final Matcher m = p.matcher(v1a[2]);
-        if (m.matches()) {
-            v1a[2] = m.group(1);
-            v1a[3] = m.group(2);
-        }
-
-        final Matcher m2 = p.matcher(v2a[2]);
-        if (m2.matches()) {
-            v2a[2] = m2.group(1);
-            v2a[3] = m2.group(2);
-        }
-
-        int i = 0;
-        for (String v1p : v1a) {
-            final String v2p = v2a[i];
-            if (Integer.valueOf(v1p) > Integer.valueOf(v2p)) {
-                return true;
-            } else if (Integer.valueOf(v1p) < Integer.valueOf(v2p)) {
-                return false;
-            }
-            i++;
-        }
-        return false;
-    }
-
     /** Returns whether there is a drbd upgrade available. */
     public boolean isDrbdUpgradeAvailable(final String versionString) {
         if (availableDrbdVersions == null) {
@@ -690,7 +654,7 @@ public final class Host {
         }
         final String version = versionString.split(" ")[0];
         for (final String v : availableDrbdVersions) {
-            if (versionGreater(v, version)) {
+            if (Tools.compareVersions(v, version) > 0) {
                 return true;
             }
         }

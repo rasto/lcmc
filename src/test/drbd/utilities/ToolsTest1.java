@@ -755,6 +755,7 @@ public final class ToolsTest1 extends TestCase {
         assertEquals(1, Tools.compareVersions("2.1.3", "2.1"));
         assertEquals(1, Tools.compareVersions("2.1.3", "2"));
         assertEquals(1, Tools.compareVersions("2.1", "2"));
+        assertEquals(0, Tools.compareVersions("8.3", "8.3.0"));
 
         assertEquals(-100, Tools.compareVersions("", ""));
         assertEquals(-100, Tools.compareVersions(null, null));
@@ -764,6 +765,30 @@ public final class ToolsTest1 extends TestCase {
         assertEquals(-100, Tools.compareVersions("2.1.3", null));
         assertEquals(-100, Tools.compareVersions("2.1.3", "2.1.a"));
         assertEquals(-100, Tools.compareVersions("a.1.3", "2.1.3"));
+
+        assertEquals(1, Tools.compareVersions("8.3.10rc1", "8.3.9"));
+        assertEquals(1, Tools.compareVersions("8.3.10rc2", "8.3.10rc1"));
+        assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc2"));
+        assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc99999999"));
+
+        assertEquals(0, Tools.compareVersions("8.3.10rc1", "8.3.10rc1"));
+        assertEquals(0, Tools.compareVersions("8.3rc1", "8.3rc1"));
+        assertEquals(0, Tools.compareVersions("8rc1", "8rc1"));
+
+        assertEquals(-100, Tools.compareVersions("rc1", "8rc1"));
+        assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
+        assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
+        assertEquals(-100, Tools.compareVersions("8rc", "8rc1"));
+        assertEquals(-100, Tools.compareVersions("8rc1", "rc"));
+        assertEquals(-100, Tools.compareVersions("rc", "8rc1"));
+        assertEquals(-100, Tools.compareVersions("8r1", "8.3.1rc1"));
+        assertEquals(-100, Tools.compareVersions("8.3.1", "8.3rc1.1"));
+        assertEquals(-100, Tools.compareVersions("8.3rc1.1", "8.3.1"));
+        
+        assertEquals(-1, Tools.compareVersions("8.3.9", "8.3.10rc1"));
+        assertEquals(-1, Tools.compareVersions("8.3.10rc1", "8.3.10rc2"));
+        assertEquals(-1, Tools.compareVersions("8.3.10rc2", "8.3.10"));
+        assertEquals(-1, Tools.compareVersions("8.3rc2", "8.3.0"));
     }
 
     @Test
@@ -1046,10 +1071,10 @@ public final class ToolsTest1 extends TestCase {
         if (TestSuite1.CONNECT_LINBIT) {
             final Set<String> list = Tools.getPluginList();
             final String[] array = list.toArray(new String[list.size()]);
-            Assert.assertArrayEquals(new String[]{"Beta_Plugins:LVM_Create",
-                                                  "Beta_Plugins:LVM_Remove",
-                                                  "Beta_Plugins:LVM_Resize",
-                                                  "Beta_Plugins:LVM_Snapshot"},
+            Assert.assertArrayEquals(new String[]{"LVM:LVM_Create",
+                                                  "LVM:LVM_Remove",
+                                                  "LVM:LVM_Resize",
+                                                  "LVM:LVM_Snapshot"},
                                      array);
         }
     }
