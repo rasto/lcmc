@@ -25,6 +25,7 @@ package drbd.gui;
 import drbd.data.Clusters;
 import drbd.data.Cluster;
 import drbd.utilities.Tools;
+import drbd.Exceptions;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
@@ -282,13 +283,18 @@ public final class ClustersPanel extends JPanel {
                              Tools.getString("MainPanel.UpgradeCheckFailed");
                 } else {
                     final String release = Tools.getRelease();
-                    if (Tools.compareVersions(release, latestVersion) < 0) {
+                    try {
+                        if (Tools.compareVersions(release, latestVersion) < 0) {
+                            upgradeCheck =
+                                Tools.getString("MainPanel.UpgradeAvailable")
+                                        .replaceAll("@LATEST@", latestVersion);
+                        } else {
+                            upgradeCheck =
+                               Tools.getString("MainPanel.NoUpgradeAvailable");
+                        }
+                    } catch (Exceptions.IllegalVersionException e) {
                         upgradeCheck =
-                            Tools.getString("MainPanel.UpgradeAvailable")
-                                     .replaceAll("@LATEST@", latestVersion);
-                    } else {
-                        upgradeCheck =
-                                Tools.getString("MainPanel.NoUpgradeAvailable");
+                             Tools.getString("MainPanel.UpgradeCheckFailed");
                     }
                 }
                 final String text = upgradeCheck;

@@ -68,6 +68,7 @@ import drbd.gui.resources.RscDefaultsInfo;
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
 import drbd.utilities.ButtonCallback;
+import drbd.Exceptions;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -387,11 +388,7 @@ public final class ClusterBrowser extends Browser {
         // TODO: need two monitors for role='Slave' and 'Master' in
         // master/slave resources
         final Host dcHost = getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             crmOperationParams.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
                                             Arrays.asList(HB_PAR_TIMEOUT,
@@ -2008,12 +2005,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Returns whether drbddisk RA is preferred. */
     public boolean isDrbddiskPreferred() {
-        final Host dcHost = getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        return (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0);
+        return Tools.versionBeforePacemaker(getDCHost());
     }
 
     /**
@@ -2068,11 +2060,7 @@ public final class ClusterBrowser extends Browser {
             } else {
                 h = menuHost;
             }
-            final String hbV = h.getHeartbeatVersion();
-            final String pmV = h.getPacemakerVersion();
-            if (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            if (Tools.versionBeforePacemaker(h)) {
                 return false;
             }
             return true;

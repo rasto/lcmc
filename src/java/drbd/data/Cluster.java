@@ -27,6 +27,7 @@ import drbd.gui.SSHGui;
 import drbd.data.resources.BlockDevice;
 import drbd.data.resources.Network;
 import drbd.utilities.Tools;
+import drbd.Exceptions;
 
 import java.util.Set;
 import java.util.LinkedHashSet;
@@ -330,10 +331,14 @@ public final class Cluster {
                 /* not installed */
                 continue;
             }
-            if (minVersion == null) {
-                minVersion = version;
-            } else if (Tools.compareVersions(version, minVersion) < 0) {
-                minVersion = version;
+            try {
+                if (minVersion == null) {
+                    minVersion = version;
+                } else if (Tools.compareVersions(version, minVersion) < 0) {
+                    minVersion = version;
+                }
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
             }
         }
         return minVersion;

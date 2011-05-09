@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import java.net.InetAddress;
 import drbd.TestSuite1;
+import drbd.Exceptions;
 import drbd.data.Host;
 
 public final class ToolsTest1 extends TestCase {
@@ -734,61 +735,253 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testCompareVersions() {
-        assertEquals(-1, Tools.compareVersions("2.1.3", "2.1.4"));
-        assertEquals(-1, Tools.compareVersions("2.1.3", "3.1.2"));
-        assertEquals(-1, Tools.compareVersions("2.1.3", "2.2.2"));
-        assertEquals(-1, Tools.compareVersions("2.1.3", "2.1.3.1"));
-        assertEquals(-1, Tools.compareVersions("2.1.3.1", "2.1.4"));
-        assertEquals(-1, Tools.compareVersions("2.1", "2.1.3"));
-        assertEquals(-1, Tools.compareVersions("2", "2.1.3"));
-        assertEquals(-1, Tools.compareVersions("2", "2.1"));
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1.3", "2.1.4"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1.3", "3.1.2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1.3", "2.2.2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1.3", "2.1.3.1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1.3.1", "2.1.4"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2.1", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("2", "2.1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
 
-        assertEquals(0, Tools.compareVersions("2.1.3", "2.1.3"));
-        assertEquals(0, Tools.compareVersions("2.1", "2.1"));
-        assertEquals(0, Tools.compareVersions("2", "2"));
+        try {
+            assertEquals(0, Tools.compareVersions("2.1.3", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("2.1", "2.1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("2", "2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
 
-        assertEquals(1, Tools.compareVersions("2.1.4", "2.1.3"));
-        assertEquals(1, Tools.compareVersions("3.1.2", "2.1.3"));
-        assertEquals(1, Tools.compareVersions("2.2.2", "2.1.3"));
-        assertEquals(1, Tools.compareVersions("2.1.3.1", "2.1.3"));
-        assertEquals(1, Tools.compareVersions("2.1.4", "2.1.3.1"));
-        assertEquals(1, Tools.compareVersions("2.1.3", "2.1"));
-        assertEquals(1, Tools.compareVersions("2.1.3", "2"));
-        assertEquals(1, Tools.compareVersions("2.1", "2"));
-        assertEquals(0, Tools.compareVersions("8.3", "8.3.0"));
+        try {
+            assertEquals(1, Tools.compareVersions("2.1.4", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("3.1.2", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.2.2", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.1.3.1", "2.1.3"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.1.4", "2.1.3.1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.1.3", "2.1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.1.3", "2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("2.1", "2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("8.3", "8.3.0"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
 
-        assertEquals(-100, Tools.compareVersions("", ""));
-        assertEquals(-100, Tools.compareVersions(null, null));
-        assertEquals(-100, Tools.compareVersions("", "2.1.3"));
-        assertEquals(-100, Tools.compareVersions("2.1.3", ""));
-        assertEquals(-100, Tools.compareVersions(null, "2.1.3"));
-        assertEquals(-100, Tools.compareVersions("2.1.3", null));
-        assertEquals(-100, Tools.compareVersions("2.1.3", "2.1.a"));
-        assertEquals(-100, Tools.compareVersions("a.1.3", "2.1.3"));
+        try {
+            assertEquals(-100, Tools.compareVersions("", ""));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions(null, null));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("", "2.1.3"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("2.1.3", ""));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions(null, "2.1.3"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("2.1.3", null));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("2.1.3", "2.1.a"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("a.1.3", "2.1.3"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
 
-        assertEquals(1, Tools.compareVersions("8.3.10rc1", "8.3.9"));
-        assertEquals(1, Tools.compareVersions("8.3.10rc2", "8.3.10rc1"));
-        assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc2"));
-        assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc99999999"));
+        try {
+            assertEquals(-100, Tools.compareVersions("rc1", "8rc1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8rc", "8rc1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8rc1", "rc"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("rc", "8rc1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8r1", "8.3.1rc1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8.3.1", "8.3rc1.1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
+        try {
+            assertEquals(-100, Tools.compareVersions("8.3rc1.1", "8.3.1"));
+            assertFalse(true);
+        } catch (Exceptions.IllegalVersionException e) {
+        }
 
-        assertEquals(0, Tools.compareVersions("8.3.10rc1", "8.3.10rc1"));
-        assertEquals(0, Tools.compareVersions("8.3rc1", "8.3rc1"));
-        assertEquals(0, Tools.compareVersions("8rc1", "8rc1"));
+        try {
+            assertEquals(1, Tools.compareVersions("8.3.10rc1", "8.3.9"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("8.3.10rc2", "8.3.10rc1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc99999999"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
 
-        assertEquals(-100, Tools.compareVersions("rc1", "8rc1"));
-        assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
-        assertEquals(-100, Tools.compareVersions("8rc1", "8rc"));
-        assertEquals(-100, Tools.compareVersions("8rc", "8rc1"));
-        assertEquals(-100, Tools.compareVersions("8rc1", "rc"));
-        assertEquals(-100, Tools.compareVersions("rc", "8rc1"));
-        assertEquals(-100, Tools.compareVersions("8r1", "8.3.1rc1"));
-        assertEquals(-100, Tools.compareVersions("8.3.1", "8.3rc1.1"));
-        assertEquals(-100, Tools.compareVersions("8.3rc1.1", "8.3.1"));
+        try {
+            assertEquals(0, Tools.compareVersions("8.3.10rc1", "8.3.10rc1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("8.3rc1", "8.3rc1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("8rc1", "8rc1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
         
-        assertEquals(-1, Tools.compareVersions("8.3.9", "8.3.10rc1"));
-        assertEquals(-1, Tools.compareVersions("8.3.10rc1", "8.3.10rc2"));
-        assertEquals(-1, Tools.compareVersions("8.3.10rc2", "8.3.10"));
-        assertEquals(-1, Tools.compareVersions("8.3rc2", "8.3.0"));
+        try {
+            assertEquals(-1, Tools.compareVersions("8.3.9", "8.3.10rc1"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("8.3.10rc1", "8.3.10rc2"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("8.3.10rc2", "8.3.10"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("8.3rc2", "8.3.0"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
     }
 
     @Test
@@ -856,8 +1049,12 @@ public final class ToolsTest1 extends TestCase {
         if (TestSuite1.CONNECT_LINBIT) {
             final String latestVersion = Tools.getLatestVersion();
             assertNotNull(latestVersion);
-            assertEquals(-1, Tools.compareVersions(latestVersion,
+            try {
+                assertEquals(-1, Tools.compareVersions(latestVersion,
                                                    Tools.getRelease()));
+            } catch (Exceptions.IllegalVersionException e) {
+                assertFalse(true);
+            }
         }
     }
 
@@ -1105,5 +1302,10 @@ public final class ToolsTest1 extends TestCase {
             assertTrue(comps.size() == TestSuite1.getHosts().size());
             assertTrue(comps.containsKey(host));
         }
+    }
+
+    @Test
+    public static boolean testVersionBeforePacemaker() {
+        TODO
     }
 }

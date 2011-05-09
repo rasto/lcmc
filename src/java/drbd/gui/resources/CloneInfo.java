@@ -422,11 +422,7 @@ final class CloneInfo extends ServiceInfo {
     /** Returns whether service is started. */
     @Override boolean isStarted(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             return super.isStarted(testOnly);
         } else {
             final ServiceInfo cs = containedService;
@@ -440,11 +436,7 @@ final class CloneInfo extends ServiceInfo {
     /** Returns whether service is started. */
     @Override public boolean isStopped(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             return super.isStopped(testOnly);
         } else {
             final ServiceInfo cs = containedService;
@@ -458,11 +450,7 @@ final class CloneInfo extends ServiceInfo {
     /** Returns whether service is managed. */
     @Override public boolean isManaged(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             return super.isManaged(testOnly);
         } else {
             final ServiceInfo cs = containedService;
@@ -481,11 +469,7 @@ final class CloneInfo extends ServiceInfo {
         }
         final ServiceInfo cs = containedService;
         if (cs != null) {
-            final String hbV = dcHost.getHeartbeatVersion();
-            final String pmV = dcHost.getPacemakerVersion();
-            if (pmV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+            if (Tools.versionBeforePacemaker(dcHost)) {
                 for (int i = 0;
                      i < getBrowser().getClusterHosts().length; i++) {
                     CRM.cleanupResource(dcHost,
@@ -505,11 +489,7 @@ final class CloneInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             super.startResource(dcHost, testOnly);
         } else {
             final ServiceInfo cs = containedService;
@@ -619,11 +599,7 @@ final class CloneInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             super.stopResource(dcHost, testOnly);
         } else {
             final ServiceInfo cs = containedService;
@@ -673,11 +649,7 @@ final class CloneInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             super.setManaged(isManaged, dcHost, testOnly);
         } else {
             final ServiceInfo cs = containedService;

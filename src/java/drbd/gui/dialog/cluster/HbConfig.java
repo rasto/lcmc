@@ -39,6 +39,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
 import drbd.gui.ProgressBar;
 import drbd.gui.dialog.WizardDialog;
+import drbd.Exceptions;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -299,11 +300,16 @@ final class HbConfig extends DialogCluster {
                                         final String hbV =
                                                     h.getHeartbeatVersion();
                                         boolean wa = false;
-                                        if (hbV != null
-                                            && Tools.compareVersions(
+                                        try {
+                                            if (hbV != null
+                                                && Tools.compareVersions(
                                                             hbV,
                                                             "3.0.2") <= 0) {
-                                            wa = true;
+                                                wa = true;
+                                            }
+                                        } catch (
+                                         Exceptions.IllegalVersionException e) {
+                                            Tools.appWarning(e.getMessage(), e);
                                         }
                                         Heartbeat.enableDopd(h, wa);
                                     }

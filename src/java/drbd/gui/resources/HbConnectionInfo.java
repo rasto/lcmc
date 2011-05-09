@@ -349,11 +349,7 @@ public class HbConnectionInfo extends EditableInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                final String pmV = dcHost.getPacemakerVersion();
-                final String hbV = dcHost.getHeartbeatVersion();
-                if (pmV == null
-                    && hbV != null
-                    && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                if (Tools.versionBeforePacemaker(dcHost)) {
                     return false;
                 }
                 return true;

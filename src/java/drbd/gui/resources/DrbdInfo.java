@@ -199,8 +199,13 @@ public final class DrbdInfo extends DrbdGuiInfo {
             boolean makeBackup;
             String preCommand;
             final String drbdV = host.getDrbdVersion();
-            boolean bigDRBDConf = Tools.getConfigData().getBigDRBDConf()
+            boolean bigDRBDConf = true;
+            try {
+                bigDRBDConf = Tools.getConfigData().getBigDRBDConf()
                                   || Tools.compareVersions(drbdV, "8.3.0") < 0;
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
+            }
             if (testOnly) {
                 dir = "/var/lib/drbd/";
                 configName = "drbd.conf-drbd-mc-test";
@@ -358,11 +363,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                final String pmV = dcHost.getPacemakerVersion();
-                final String hbV = dcHost.getHeartbeatVersion();
-                if (pmV == null
-                    && hbV != null
-                    && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                if (Tools.versionBeforePacemaker(dcHost)) {
                     return false;
                 }
                 return true;

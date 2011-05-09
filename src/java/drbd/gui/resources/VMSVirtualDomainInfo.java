@@ -46,6 +46,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.VIRSH;
 import drbd.utilities.Unit;
 import drbd.utilities.MyButton;
+import drbd.Exceptions;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -4157,7 +4158,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         if (REQUIRED_VERSION.containsKey(param)) {
             final String rv = REQUIRED_VERSION.get(param);
-            if (Tools.compareVersions(rv, libvirtVersion) > 0) {
+            try {
+                if (Tools.compareVersions(rv, libvirtVersion) > 0) {
+                    return Tools.getString(
+                                    "VMSVirtualDomainInfo.AvailableInVersion")
+                                        .replace("@VERSION@", rv);
+                }
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
                 return Tools.getString(
                                 "VMSVirtualDomainInfo.AvailableInVersion")
                                     .replace("@VERSION@", rv);

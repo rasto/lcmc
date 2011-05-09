@@ -33,6 +33,7 @@ import drbd.gui.resources.ServiceInfo;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GUIData;
 import drbd.gui.dialog.ConfirmDialog;
+import drbd.Exceptions;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -1431,12 +1432,13 @@ public final class Tools {
     /**
      * Returns -1 if version1 is smaller that version2, 0 if version1 equals
      * version2 and 1 if version1 is bigger than version2.
-     * -100 if version is in bad form.
+     * @Throws Exceptions.IllegalVersionException
      */
     public static int compareVersions(final String version1,
-                                      final String version2) {
+                                      final String version2) 
+                                  throws Exceptions.IllegalVersionException {
         if (version1 == null || version2 == null) {
-            return -100;
+            throw new Exceptions.IllegalVersionException(version1, version2);
         }
         final Pattern p = Pattern.compile("(.*\\d+)rc(\\d+)$");
         final Matcher m1 = p.matcher(version1);
@@ -1469,7 +1471,7 @@ public final class Tools {
         final String[] v1a = version1a.split("\\.");
         final String[] v2a = version2a.split("\\.");
         if (v1a.length < 1 || v2a.length < 1) {
-            return -100;
+            throw new Exceptions.IllegalVersionException(version1, version2);
         }
         int i = 0;
         while (true) {
@@ -1482,7 +1484,7 @@ public final class Tools {
                 try {
                     v1i = Integer.parseInt(v1);
                 } catch (java.lang.NumberFormatException e) {
-                    return -100;
+                    throw new Exceptions.IllegalVersionException(version1);
                 }
             }
 
@@ -1492,7 +1494,7 @@ public final class Tools {
                 try {
                     v2i = Integer.parseInt(v2);
                 } catch (java.lang.NumberFormatException e) {
-                    return -100;
+                    throw new Exceptions.IllegalVersionException(version2);
                 }
             }
 
@@ -1826,8 +1828,13 @@ public final class Tools {
                 final Matcher m = vp.matcher(line);
                 if (m.matches()) {
                     final String v = m.group(1);
-                    if (version == null || compareVersions(v, version) > 0) {
-                        version = v;
+                    try {
+                        if (version == null
+                            || compareVersions(v, version) > 0) {
+                            version = v;
+                        }
+                    } catch (Exceptions.IllegalVersionException e) {
+                        Tools.appWarning(e.getMessage(), e);
                     }
                 }
             } while (true);
@@ -2628,5 +2635,22 @@ public final class Tools {
             components.put(host, button);
         }
         return components;
+    }
+
+    /**
+     * Returns true if the hb version on the host is smaller or equal
+     * Heartbeat 2.1.4.
+     */
+    public static boolean versionBeforePacemaker(final Host host) {
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        try {
+            return pcmkV == null
+                   && hbV != null
+                   && Tools.compareVersions(hbV, "2.99.0") < 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+            return false;
+        }
     }
 }

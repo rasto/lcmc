@@ -38,6 +38,7 @@ import drbd.gui.ResourceGraph;
 import drbd.data.resources.NetInterface;
 import drbd.data.resources.BlockDevice;
 import drbd.configs.DistResource;
+import drbd.Exceptions;
 import java.awt.geom.Point2D;
 
 import java.awt.Color;
@@ -654,8 +655,12 @@ public final class Host {
         }
         final String version = versionString.split(" ")[0];
         for (final String v : availableDrbdVersions) {
-            if (Tools.compareVersions(v, version) > 0) {
-                return true;
+            try {
+                if (Tools.compareVersions(v, version) > 0) {
+                    return true;
+                }
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
             }
         }
         return false;

@@ -46,6 +46,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.pacemaker.ServiceLogs;
+import drbd.Exceptions;
 
 import java.awt.Color;
 import java.awt.event.MouseListener;
@@ -901,9 +902,7 @@ public class ServiceInfo extends EditableInfo {
         final String hbV = dcHost.getHeartbeatVersion();
         final String pmV = dcHost.getPacemakerVersion();
         String targetRoleString = "target-role";
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             targetRoleString = "target_role";
         }
         String crmId = getHeartbeatId(testOnly);
@@ -925,12 +924,8 @@ public class ServiceInfo extends EditableInfo {
     /** Returns whether service is stopped. */
     public boolean isStopped(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
         String targetRoleString = "target-role";
-        if (pmV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+        if (Tools.versionBeforePacemaker(dcHost)) {
             targetRoleString = "target_role";
         }
         String crmId = getHeartbeatId(testOnly);
@@ -1738,11 +1733,7 @@ public class ServiceInfo extends EditableInfo {
                               META_ATTRS_DEFAULT_VALUES,
                               getBrowser()));
         final Host dcHost = getBrowser().getDCHost();
-        final String pmV = dcHost.getPacemakerVersion();
-        final String hbV = dcHost.getHeartbeatVersion();
-
-        if (isMetaAttrReferenced()
-            || (pmV == null && Tools.compareVersions(hbV, "2.1.4") <= 0)) {
+        if (isMetaAttrReferenced() || Tools.versionBeforePacemaker(dcHost)) {
             return sl.toArray(new Info[sl.size()]);
         }
         getBrowser().lockNameToServiceInfo();
@@ -1799,8 +1790,7 @@ public class ServiceInfo extends EditableInfo {
         final Host dcHost = getBrowser().getDCHost();
         final String pmV = dcHost.getPacemakerVersion();
         final String hbV = dcHost.getHeartbeatVersion();
-        if (isOperationReferenced()
-            || (pmV == null && Tools.compareVersions(hbV, "2.1.4") <= 0)) {
+        if (isOperationReferenced() || Tools.versionBeforePacemaker(dcHost)) {
             return sl.toArray(new Info[sl.size()]);
         }
         getBrowser().lockNameToServiceInfo();
@@ -2598,11 +2588,7 @@ public class ServiceInfo extends EditableInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                final String pmV = dcHost.getPacemakerVersion();
-                final String hbV = dcHost.getHeartbeatVersion();
-                if (pmV == null
-                    && hbV != null
-                    && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                if (Tools.versionBeforePacemaker(dcHost)) {
                     return false;
                 }
                 return true;

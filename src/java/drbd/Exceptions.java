@@ -44,4 +44,23 @@ public final class Exceptions {
             super(msg);
         }
     }
+
+    /**
+     * This class defines wrong version exception, when comparing versions.
+     */
+    public static class IllegalVersionException extends Exception {
+        /** Serial version UID. */
+        private static final long serialVersionUID = 1L;
+
+        /** Prepares a new <code>IllegalVersionException</code> object. */
+        public IllegalVersionException(final String v1) {
+            super("illegal version: " + v1);
+        }
+
+        /** Prepares a new <code>IllegalVersionException</code> object. */
+        public IllegalVersionException(final String v1,
+                                       final String v2) {
+            super("illegal version: " + v1 + ", " + v2);
+        }
+    }
 }

@@ -24,6 +24,7 @@ package drbd.data;
 import drbd.utilities.Tools;
 import drbd.utilities.ConvertCmdCallback;
 import drbd.utilities.SSH;
+import drbd.Exceptions;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -510,8 +511,6 @@ public final class CRMXML extends XML {
         super();
         this.host = host;
         String command = null;
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
@@ -551,23 +550,31 @@ public final class CRMXML extends XML {
                              metaAttrParams.get(metaAttr),
                              false);
         }
-
-        if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
-            command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
-                                          (ConvertCmdCallback) null);
-            if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
-                command = null;
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        try {
+            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
+                command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
+                                              (ConvertCmdCallback) null);
+                if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
+                    command = null;
+                }
             }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
         }
-
-        if ((command == null || "".equals(command))
-            && pcmkV == null
-            && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-            command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
-                                          (ConvertCmdCallback) null);
-            if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
-                command = null;
+        try {
+            if ((command == null || "".equals(command))
+                && pcmkV == null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
+                                              (ConvertCmdCallback) null);
+                if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
+                    command = null;
+                }
             }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
         }
 
         if (command == null || "".equals(command)) {
@@ -731,108 +738,120 @@ public final class CRMXML extends XML {
         paramGlobalDefaultMap.put("default-resource-failure-stickiness", "0");
         globalRequiredParams.add("default-resource-failure-stickiness");
 
-
-        if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
-            String clusterRecheckInterval = "cluster-recheck-interval";
-            String dcDeadtime = "dc-deadtime";
-            String electionTimeout = "election-timeout";
-            String shutdownEscalation = "shutdown-escalation";
-            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                clusterRecheckInterval = "cluster_recheck_interval";
-                dcDeadtime = "dc_deadtime";
-                electionTimeout = "election_timeout";
-                shutdownEscalation = "shutdown_escalation";
-            }
-            final String[] params = {
-                "stonith-action",
-                "is-managed-default",
-                "cluster-delay",
-                "batch-limit",
-                "stop-orphan-resources",
-                "stop-orphan-actions",
-                "remove-after-stop",
-                "pe-error-series-max",
-                "pe-warn-series-max",
-                "pe-input-series-max",
-                "startup-fencing",
-                "start-failure-is-fatal",
-                dcDeadtime,
-                clusterRecheckInterval,
-                electionTimeout,
-                shutdownEscalation,
-                "crmd-integration-timeout",
-                "crmd-finalization-timeout"
-            };
-            globalParams.add("dc-version");
-            paramGlobalShortDescMap.put("dc-version", "DC Version");
-            paramGlobalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
-            paramGlobalAccessTypes.put("dc-version",
-                                       ConfigData.AccessType.NEVER);
-            globalParams.add("cluster-infrastructure");
-            paramGlobalShortDescMap.put("cluster-infrastructure",
-                                        "Cluster Infrastructure");
-            paramGlobalTypeMap.put("cluster-infrastructure", PARAM_TYPE_LABEL);
-            paramGlobalAccessTypes.put("cluster-infrastructure",
-                                       ConfigData.AccessType.NEVER);
-
-            globalNotAdvancedParams.add("no-quorum-policy");
-            globalNotAdvancedParams.add("maintenance-mode");
-            paramGlobalAccessTypes.put("maintenance-mode",
-                                       ConfigData.AccessType.OP);
-            globalNotAdvancedParams.add(clusterRecheckInterval);
-
-            for (String param : params) {
-                globalParams.add(param);
-                String[] parts = param.split("[-_]");
-                for (int i = 0; i < parts.length; i++) {
-                    if ("dc".equals(parts[i])) {
-                        parts[i] = "DC";
-                    }
-                    if ("crmd".equals(parts[i])) {
-                        parts[i] = "CRMD";
-                    } else {
-                        parts[i] = Tools.ucfirst(parts[i]);
-                    }
+        try {
+            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
+                String clusterRecheckInterval = "cluster-recheck-interval";
+                String dcDeadtime = "dc-deadtime";
+                String electionTimeout = "election-timeout";
+                String shutdownEscalation = "shutdown-escalation";
+                if (Tools.versionBeforePacemaker(host)) {
+                    clusterRecheckInterval = "cluster_recheck_interval";
+                    dcDeadtime = "dc_deadtime";
+                    electionTimeout = "election_timeout";
+                    shutdownEscalation = "shutdown_escalation";
                 }
-                final String name = Tools.join(" ", parts);
-                paramGlobalShortDescMap.put(param, name);
-                paramGlobalLongDescMap.put(param, name);
-                paramGlobalTypeMap.put(param, PARAM_TYPE_STRING);
-                paramGlobalDefaultMap.put(param, "");
+                final String[] params = {
+                    "stonith-action",
+                    "is-managed-default",
+                    "cluster-delay",
+                    "batch-limit",
+                    "stop-orphan-resources",
+                    "stop-orphan-actions",
+                    "remove-after-stop",
+                    "pe-error-series-max",
+                    "pe-warn-series-max",
+                    "pe-input-series-max",
+                    "startup-fencing",
+                    "start-failure-is-fatal",
+                    dcDeadtime,
+                    clusterRecheckInterval,
+                    electionTimeout,
+                    shutdownEscalation,
+                    "crmd-integration-timeout",
+                    "crmd-finalization-timeout"
+                };
+                globalParams.add("dc-version");
+                paramGlobalShortDescMap.put("dc-version", "DC Version");
+                paramGlobalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
+                paramGlobalAccessTypes.put("dc-version",
+                                           ConfigData.AccessType.NEVER);
+                globalParams.add("cluster-infrastructure");
+                paramGlobalShortDescMap.put("cluster-infrastructure",
+                                            "Cluster Infrastructure");
+                paramGlobalTypeMap.put("cluster-infrastructure",
+                                       PARAM_TYPE_LABEL);
+                paramGlobalAccessTypes.put("cluster-infrastructure",
+                                           ConfigData.AccessType.NEVER);
+
+                globalNotAdvancedParams.add("no-quorum-policy");
+                globalNotAdvancedParams.add("maintenance-mode");
+                paramGlobalAccessTypes.put("maintenance-mode",
+                                           ConfigData.AccessType.OP);
+                globalNotAdvancedParams.add(clusterRecheckInterval);
+
+                for (String param : params) {
+                    globalParams.add(param);
+                    String[] parts = param.split("[-_]");
+                    for (int i = 0; i < parts.length; i++) {
+                        if ("dc".equals(parts[i])) {
+                            parts[i] = "DC";
+                        }
+                        if ("crmd".equals(parts[i])) {
+                            parts[i] = "CRMD";
+                        } else {
+                            parts[i] = Tools.ucfirst(parts[i]);
+                        }
+                    }
+                    final String name = Tools.join(" ", parts);
+                    paramGlobalShortDescMap.put(param, name);
+                    paramGlobalLongDescMap.put(param, name);
+                    paramGlobalTypeMap.put(param, PARAM_TYPE_STRING);
+                    paramGlobalDefaultMap.put(param, "");
+                }
+                paramGlobalDefaultMap.put("stonith-action", "reboot");
+                paramGlobalPossibleChoices.put("stonith-action",
+                                               new String[]{"reboot",
+                                                            "poweroff"});
+
+                paramGlobalTypeMap.put("is-managed-default",
+                                       PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("is-managed-default", hbBooleanFalse);
+                paramGlobalPossibleChoices.put("is-managed-default",
+                                               booleanValues);
+
+                paramGlobalTypeMap.put("stop-orphan-resources",
+                                       PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("stop-orphan-resources",
+                                          hbBooleanFalse);
+                paramGlobalPossibleChoices.put("stop-orphan-resources",
+                                               booleanValues);
+
+                paramGlobalTypeMap.put("stop-orphan-actions",
+                                       PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("stop-orphan-actions",
+                                          hbBooleanFalse);
+                paramGlobalPossibleChoices.put("stop-orphan-actions",
+                                               booleanValues);
+
+                paramGlobalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("remove-after-stop", hbBooleanFalse);
+                paramGlobalPossibleChoices.put("remove-after-stop",
+                                               booleanValues);
+
+                paramGlobalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("startup-fencing", hbBooleanFalse);
+                paramGlobalPossibleChoices.put("startup-fencing",
+                                               booleanValues);
+
+                paramGlobalTypeMap.put("start-failure-is-fatal",
+                                       PARAM_TYPE_BOOLEAN);
+                paramGlobalDefaultMap.put("start-failure-is-fatal",
+                                          hbBooleanFalse);
+                paramGlobalPossibleChoices.put("start-failure-is-fatal",
+                                               booleanValues);
             }
-            paramGlobalDefaultMap.put("stonith-action", "reboot");
-            paramGlobalPossibleChoices.put("stonith-action",
-                                           new String[]{"reboot", "poweroff"});
-
-            paramGlobalTypeMap.put("is-managed-default", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("is-managed-default", hbBooleanFalse);
-            paramGlobalPossibleChoices.put("is-managed-default", booleanValues);
-
-            paramGlobalTypeMap.put("stop-orphan-resources", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("stop-orphan-resources",
-                                                            hbBooleanFalse);
-            paramGlobalPossibleChoices.put("stop-orphan-resources",
-                                           booleanValues);
-
-            paramGlobalTypeMap.put("stop-orphan-actions", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("stop-orphan-actions", hbBooleanFalse);
-            paramGlobalPossibleChoices.put("stop-orphan-actions",
-                                           booleanValues);
-
-            paramGlobalTypeMap.put("remove-after-stop", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("remove-after-stop", hbBooleanFalse);
-            paramGlobalPossibleChoices.put("remove-after-stop", booleanValues);
-
-            paramGlobalTypeMap.put("startup-fencing", PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("startup-fencing", hbBooleanFalse);
-            paramGlobalPossibleChoices.put("startup-fencing", booleanValues);
-
-            paramGlobalTypeMap.put("start-failure-is-fatal",
-                                   PARAM_TYPE_BOOLEAN);
-            paramGlobalDefaultMap.put("start-failure-is-fatal",
-                                      hbBooleanFalse);
-            paramGlobalPossibleChoices.put("start-failure-is-fatal",
-                                           booleanValues);
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
         }
 
         /* Hardcoding colocation params */
@@ -951,8 +970,6 @@ public final class CRMXML extends XML {
                 return new String[]{"True", "False"};
             }
         }
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
         return PCMK_BOOLEAN_VALUES.clone();
     }
 
@@ -1486,11 +1503,7 @@ public final class CRMXML extends XML {
             return metaAttrParams;
         }
         metaAttrParams = new LinkedHashMap<String, String>();
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-        if (pcmkV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (Tools.versionBeforePacemaker(host)) {
             metaAttrParams.put("target_role", TARGET_ROLE_META_ATTR);
             metaAttrParams.put("is_managed", IS_MANAGED_META_ATTR);
         } else {
@@ -1501,9 +1514,15 @@ public final class CRMXML extends XML {
         metaAttrParams.put(PRIORITY_META_ATTR, null);
         metaAttrParams.put(MULTIPLE_ACTIVE_META_ATTR, null);
         metaAttrParams.put(ALLOW_MIGRATE_META_ATTR, null);
-        if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
-            metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
-            metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        try {
+            if (pcmkV != null || Tools.compareVersions(hbV, "2.1.4") >= 0) {
+                metaAttrParams.put(RESOURCE_STICKINESS_META_ATTR, null);
+                metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
         }
         return metaAttrParams;
     }
@@ -1517,11 +1536,7 @@ public final class CRMXML extends XML {
             return rscDefaultsMetaAttrs;
         }
         rscDefaultsMetaAttrs = new LinkedHashMap<String, String>();
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-        if (pcmkV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (Tools.versionBeforePacemaker(host)) {
             /* no rsc defaults in older versions. */
             return rscDefaultsMetaAttrs;
         }
@@ -1545,9 +1560,6 @@ public final class CRMXML extends XML {
     /** Parses the parameters. */
     private void parseParameters(final ResourceAgent ra,
                                  final Node parametersNode) {
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-
         final NodeList parameters = parametersNode.getChildNodes();
 
         for (int i = 0; i < parameters.getLength(); i++) {
@@ -1889,11 +1901,9 @@ public final class CRMXML extends XML {
         String rscDefaultsId = null;
         if (metaAttrsNode != null) {
             rscDefaultsId = getAttribute(metaAttrsNode, "id");
-            /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
-            final String hbV = host.getHeartbeatVersion();
-            final String pcmkV = host.getPacemakerVersion();
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
+                /* <attributtes> only til 2.1.4 */
                 final Node attrsNode =
                                   getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
@@ -1931,9 +1941,7 @@ public final class CRMXML extends XML {
         if (metaAttrsNode != null) {
             /* <attributtes> only til 2.1.4 */
             NodeList nvpairsMA;
-            final String hbV = host.getHeartbeatVersion();
-            final String pcmkV = host.getPacemakerVersion();
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
                 final Node attrsNode =
                                   getChildNode(metaAttrsNode, "attributes");
                 nvpairsMA = attrsNode.getChildNodes();
@@ -1972,8 +1980,6 @@ public final class CRMXML extends XML {
         parametersMap.put(crmId, params);
         final Map<String, String> nvpairIds = new HashMap<String, String>();
         parametersNvpairsIdsMap.put(crmId, nvpairIds);
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(resourceNode,
                                                    "instance_attributes");
@@ -1982,9 +1988,7 @@ public final class CRMXML extends XML {
             final String iAId = getAttribute(instanceAttrNode, "id");
             resourceInstanceAttrIdMap.put(crmId, iAId);
             NodeList nvpairsRes;
-            if (pcmkV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -2056,9 +2060,9 @@ public final class CRMXML extends XML {
                 metaAttrsIdToCRMId.put(metaAttrsId, crmId);
                 /* <attributtes> only til 2.1.4 */
                 NodeList nvpairsMA;
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (Tools.versionBeforePacemaker(host)) {
                     final Node attrsNode =
-                                      getChildNode(metaAttrsNode, "attributes");
+                                 getChildNode(metaAttrsNode, "attributes");
                     nvpairsMA = attrsNode.getChildNodes();
                 } else {
                     nvpairsMA = metaAttrsNode.getChildNodes();
@@ -2103,8 +2107,6 @@ public final class CRMXML extends XML {
                 final Map<String, String> metaAttrsIdToCRMId) {
         final NodeList primitives = groupNode.getChildNodes();
         final String groupId = getAttribute(groupNode, "id");
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
         final Map<String, String> params =
                                         new HashMap<String, String>();
         parametersMap.put(groupId, params);
@@ -2151,9 +2153,9 @@ public final class CRMXML extends XML {
                 metaAttrsIdToCRMId.put(metaAttrsId, groupId);
                 /* <attributtes> only til 2.1.4 */
                 NodeList nvpairsMA;
-                if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+                if (Tools.versionBeforePacemaker(host)) {
                     final Node attrsNode =
-                                      getChildNode(metaAttrsNode, "attributes");
+                                 getChildNode(metaAttrsNode, "attributes");
                     nvpairsMA = attrsNode.getChildNodes();
                 } else {
                     nvpairsMA = metaAttrsNode.getChildNodes();
@@ -2347,7 +2349,7 @@ public final class CRMXML extends XML {
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             NodeList nvpairsRes;
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -2399,11 +2401,7 @@ public final class CRMXML extends XML {
         /* <nvpair...> */
         if (instanceAttrNode != null) {
             NodeList nvpairsRes;
-            final String hbV = host.getHeartbeatVersion();
-            final String pcmkV = host.getPacemakerVersion();
-            if (pcmkV == null
-                && hbV != null
-                && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
                 /* <attributtes> only til 2.1.4 */
                 final Node attrNode = getChildNode(instanceAttrNode,
                                                    "attributes");
@@ -2592,20 +2590,14 @@ public final class CRMXML extends XML {
             return cibQueryData;
         }
         NodeList nvpairs;
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-        if (pcmkV == null
-            && hbV != null
-            && Tools.compareVersions(hbV, "2.99.0") < 0) {
+        if (Tools.versionBeforePacemaker(host)) {
             /* <attributtes> only til 2.1.4 */
-            final Node attrNode = getChildNode(cpsNode,
-                                               "attributes");
+            final Node attrNode = getChildNode(cpsNode, "attributes");
             nvpairs = attrNode.getChildNodes();
         } else {
             nvpairs = cpsNode.getChildNodes();
         }
-        final Map<String, String> crmConfMap =
-                                            new HashMap<String, String>();
+        final Map<String, String> crmConfMap = new HashMap<String, String>();
         /*              <nvpair...> */
         for (int i = 0; i < nvpairs.getLength(); i++) {
             final Node optionNode = nvpairs.item(i);
@@ -2846,7 +2838,7 @@ public final class CRMXML extends XML {
             String thenString        = "then";
             String firstActionString = "first-action";
             String thenActionString  = "then-action";
-            if (hbV != null && Tools.compareVersions(hbV, "2.99.0") < 0) {
+            if (Tools.versionBeforePacemaker(host)) {
                 rscString         = "from";
                 rscRoleString     = "from_role";
                 withRscString     = "to";
@@ -3029,6 +3021,7 @@ public final class CRMXML extends XML {
         final Node statusNode = getChildNode(cibNode, "status");
         final Set<String> nodePending = new HashSet<String>();
         if (statusNode != null) {
+            final String hbV = host.getHeartbeatVersion();
             /* <node_state ...> */
             final NodeList nodes = statusNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
