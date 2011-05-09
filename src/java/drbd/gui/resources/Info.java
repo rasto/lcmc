@@ -757,7 +757,9 @@ public class Info implements Comparable {
 
     /** Returns units. */
     protected Unit[] getUnits() {
-        return null; } 
+        return null;
+    }
+
     /** Returns units. */
     protected Unit[] getTimeUnits() {
         return new Unit[]{

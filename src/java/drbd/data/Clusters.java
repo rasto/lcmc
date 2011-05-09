@@ -43,8 +43,7 @@ public final class Clusters {
     /** Set of cluster objects. */
     private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
     /** Clusters set lock. */
-    private final ReadWriteLock mClustersLock =
-                                               new ReentrantReadWriteLock();
+    private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();
     private final Lock mClustersReadLock = mClustersLock.readLock();
     private final Lock mClustersWriteLock = mClustersLock.writeLock();
 
