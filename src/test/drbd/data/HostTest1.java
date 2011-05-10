@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.awt.Color;
@@ -63,8 +64,7 @@ public final class HostTest1 extends TestCase {
     public void testSetClStatus() {
         for (final Host host : TestSuite1.getHosts()) {
             host.setClStatus(false);
-            Tools.sleep(500);
-            host.setClStatus(true);
+            Tools.sleep(500); host.setClStatus(true);
             Tools.sleep(500);
         }
     }
@@ -307,4 +307,114 @@ public final class HostTest1 extends TestCase {
             assertFalse(host.isDrbdUpgradeAvailable("21.1.1"));
         }
     }
+
+    @Test
+    public void testGetDrbdVersion() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertNotNull(host.getDrbdVersion());
+            assertEquals(host.getDrbdVersion(), host.getDrbdModuleVersion());
+        }
+    }
+
+    @Test
+    public void testGetDistFromDistVersion() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertEquals(host.getDistFromDistVersion("ubuntu-lucid"), "ubuntu");
+            assertEquals(host.getDistFromDistVersion("fc"), "fedora");
+            assertEquals(host.getDistFromDistVersion("rhel"), "rhel");
+            assertEquals(host.getDistFromDistVersion("centos"), "rhel");
+            assertEquals(host.getDistFromDistVersion("xy"), null);
+        }
+    }
+
+    @Test
+    public void testGetKernelName() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertEquals(host.getKernelName(), "Linux");
+        }
+    }
+
+    @Test
+    public void testGetKernelVersion() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue(host.getKernelVersion().indexOf("2.6") == 0);
+        }
+    }
+
+    @Test
+    public void testGetDetectedKernelVersion() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue(host.getDetectedKernelVersion().indexOf("2.6") == 0);
+        }
+    }
+
+    @Test
+    public void testGetHeartbeatLibPath() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue(host.getHeartbeatLibPath().indexOf("/usr/") == 0);
+        }
+    }
+
+    @Test
+    public void testGetDist() {
+        final Set<String> values = new HashSet<String>(
+                Arrays.asList("suse",
+                             "redhat",
+                             "redhatenterpriseserver",
+                             "rhel",
+                             "fedora",
+                             "debian",
+                             "ubuntu"));
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue("unknown: " + host.getDist(),
+                       values.contains(host.getDist()));
+        }
+    }
+
+    @Test
+    public void testGetDistVersion() {
+        final Set<String> values = new HashSet<String>(
+                Arrays.asList("debian-squeeze",
+                              "debian-lenny",
+                              "rhel5",
+                              "rhel6",
+                              "rhel7"));
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue("unknown: " + host.getDistVersion(),
+                       values.contains(host.getDistVersion()));
+        }
+    }
+
+    @Test
+    public void testGetDistVersionString() {
+        final Set<String> values = new HashSet<String>(
+                Arrays.asList("SQUEEZE",
+                              "LENNY",
+                              "5",
+                              "6",
+                              "7"));
+        for (final Host host : TestSuite1.getHosts()) {
+            assertTrue("unknown: " + host.getDistVersionString(),
+                       values.contains(host.getDistVersionString()));
+        }
+    }
+
+    @Test
+    public void testDisconnect() {
+        for (final Host host : TestSuite1.getHosts()) {
+            host.disconnect();
+            assertFalse(host.isConnected());
+            host.connect(null, null, null);
+        }
+        for (final Host host : TestSuite1.getHosts()) {
+            for (int i = 0; i < 10; i++) {
+                if (host.isConnected()) {
+                    break;
+                }
+                Tools.sleep(1000);
+            }
+            assertTrue(host.isConnected());
+        }
+    }
+
 }

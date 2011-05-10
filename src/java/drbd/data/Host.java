@@ -822,6 +822,7 @@ public final class Host {
      * not when it is detected.
      * The conversion rules for distributions are defined in DistResource.java,
      * with 'dist:' prefix.
+     * TODO: remove it?
      */
     String getDistFromDistVersion(final String dV) {
         /* remove numbers */
