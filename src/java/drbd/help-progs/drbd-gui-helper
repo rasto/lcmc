@@ -671,7 +671,7 @@ sub get_drbd_events {
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
 		print "empty\n";
-		exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
+		exec("/sbin/drbdsetup /dev/drbd0 events");
 	#} else {
 	#	sleep 20;
 	#	kill("TERM", $pid);
@@ -1159,7 +1159,7 @@ sub get_drbd_xml {
 	my $from = "";
 
 	for my $section ("global", "handlers", "startup") {
-		my ($part) = $manpage=~/^\\fB$section\\fR$(.*?)\.[TP]P/sm;
+		my ($part) = $manpage=~/^\\fB$section\\fR$(.*?)\.[TPs][Pp]/sm;
 		my @options = map {s/\\-/-/g;$_} $part =~ /\\fB(.*?)\\fR(?!\()/g;
 		push @missing, $section;
 		$missing{$section} = \@options;
@@ -1278,7 +1278,14 @@ sub get_drbd_xml {
 		print "</command>\n";
 	}
 
-	for ("net", "disk", "syncer") {
+	my ($v1, $v2, $v3) = `echo|/sbin/drbdadm help 2>/dev/null`
+					=~ /Version:\s+(\d+)\.(\d+)\.(\d+)/;
+	my @sections = ("net-options", "disk-options");
+	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) {
+		@sections = ("net", "disk", "syncer");
+	}
+	    
+	for (@sections) {
 		my $xml = `/sbin/drbdsetup xml $_`;
 		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
 		print $xml;
