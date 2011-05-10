@@ -1643,7 +1643,7 @@ public final class RoboTest {
         final int gx = 235;
         final int gy = 255;
         disableStonith(robot, host);
-        for (int i = 20; i > 0; i--) {
+        for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
 
             checkTest(host, "testA", 1);
@@ -1675,6 +1675,7 @@ public final class RoboTest {
             sleep(6000);
             checkTest(host, "testA", 3);
             removeResource(robot, gx, gy, 0);
+            resetTerminalAreas(host);
         }
         System.gc();
     }
@@ -1685,7 +1686,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, host);
-        for (int i = 20; i > 0; i--) {
+        for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "testB", 1);
             /* create dummy */
@@ -1697,6 +1698,7 @@ public final class RoboTest {
             checkTest(host, "testB", 3);
             sleep(5000);
             removeResource(robot, dummy1X, dummy1Y, -15);
+            resetTerminalAreas(host);
         }
         System.gc();
     }
@@ -1706,7 +1708,7 @@ public final class RoboTest {
         final int statefulX = 500;
         final int statefulY = 255;
         disableStonith(robot, host);
-        for (int i = 20; i > 0; i--) {
+        for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(host, "testC", 1);
             /** Add m/s Stateful resource */
@@ -1742,6 +1744,7 @@ public final class RoboTest {
             checkTest(host, "testC", 2);
             sleep(5000);
             removeResource(robot, statefulX, statefulY, -20);
+            resetTerminalAreas(host);
         }
     }
 
