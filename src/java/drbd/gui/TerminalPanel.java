@@ -723,6 +723,9 @@ public final class TerminalPanel extends JScrollPane {
             try {
                 final MyDocument doc =
                                 (MyDocument) terminalArea.getStyledDocument();
+                commandOffset = 0;
+                pos = 0;
+                maxPos = 0;
                 doc.removeForced(0, doc.getLength());
                 return;
             } catch (BadLocationException e) {
