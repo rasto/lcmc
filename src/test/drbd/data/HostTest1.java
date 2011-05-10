@@ -11,6 +11,9 @@ import java.util.Map;
 import java.awt.Color;
 import drbd.TestSuite1;
 import drbd.utilities.Tools;
+import drbd.utilities.SSH;
+import drbd.utilities.ExecCallback;
+import drbd.utilities.SSH.ExecCommandThread;
 
 public final class HostTest1 extends TestCase {
     @Before
@@ -235,6 +238,73 @@ public final class HostTest1 extends TestCase {
     public void testGetAvailableDrbdVersions() {
         for (final Host host : TestSuite1.getHosts()) {
             assertNull(host.getAvailableDrbdVersions());
+        }
+    }
+
+    @Test
+    public void testIsDrbdUpgradeAvailable() {
+        for (final Host host : TestSuite1.getHosts()) {
+            assertFalse(host.isDrbdUpgradeAvailable("8.3.1"));
+
+            final ExecCommandThread t = host.execCommandCache(
+                          "DrbdAvailVersions",
+                          null, /* ProgressBar */
+                          new ExecCallback() {
+                            @Override public void done(final String ans) {
+                                final String[] items = ans.split("\\r?\\n");
+                                host.setDrbdVersionToInstall(
+                                                        Tools.shellList(items));
+                            }
+                            @Override public void doneError(
+                                                          final String ans,
+                                                          final int exitCode) {
+                                Tools.info("error");
+                            }
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
+            try {
+                t.join(0);
+            } catch (java.lang.InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            final ExecCommandThread t2 = host.execCommandCache(
+                          "DrbdAvailVersionsForDist",
+                          null, /* ProgressBar */
+                          new ExecCallback() {
+                            @Override public void done(final String ans) {
+                                host.setAvailableDrbdVersions(
+                                                         ans.split("\\r?\\n"));
+                            }
+
+                            @Override public void doneError(
+                                                       final String ans,
+                                                       final int exitCode) {
+                                Tools.info("error");
+                            }
+                          },
+                          null,   /* ConvertCmdCallback */
+                          false,  /* outputVisible */
+                          SSH.DEFAULT_COMMAND_TIMEOUT);
+            try {
+                t2.join(0);
+            } catch (java.lang.InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            assertTrue(host.isDrbdUpgradeAvailable("8.3.1"));
+            assertTrue(host.isDrbdUpgradeAvailable("8.2.100"));
+            assertTrue(host.isDrbdUpgradeAvailable("7.100.1"));
+
+            assertTrue(host.isDrbdUpgradeAvailable("7"));
+            assertTrue(host.isDrbdUpgradeAvailable("7.1"));
+            assertTrue(host.isDrbdUpgradeAvailable("7.1.1"));
+
+            assertFalse(host.isDrbdUpgradeAvailable("100.1.1"));
+            assertFalse(host.isDrbdUpgradeAvailable(null));
+            assertFalse(host.isDrbdUpgradeAvailable("21"));
+            assertFalse(host.isDrbdUpgradeAvailable("21.1"));
+            assertFalse(host.isDrbdUpgradeAvailable("21.1.1"));
         }
     }
 }

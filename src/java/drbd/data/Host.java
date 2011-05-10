@@ -650,7 +650,7 @@ public final class Host {
 
     /** Returns whether there is a drbd upgrade available. */
     public boolean isDrbdUpgradeAvailable(final String versionString) {
-        if (availableDrbdVersions == null) {
+        if (availableDrbdVersions == null || versionString == null) {
             return false;
         }
         final String version = versionString.split(" ")[0];
