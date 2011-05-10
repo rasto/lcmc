@@ -301,6 +301,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     } else if ("2".equals(index)) {
@@ -314,6 +315,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     } else if ("3".equals(index)) {
@@ -443,6 +445,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     } else if ("2".equals(index)) {
@@ -456,6 +459,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     } else if ("3".equals(index) || "x3".equals(index)) {
@@ -469,6 +473,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     }
@@ -484,6 +489,7 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
                         }
                     }
@@ -2338,6 +2344,7 @@ public final class RoboTest {
             stopEverything(robot);
             checkTest(host, "test3", 3);
             removeEverything(robot);
+            resetTerminalAreas(host);
         }
         System.gc();
     }
@@ -2823,4 +2830,9 @@ public final class RoboTest {
         System.exit(0);
     }
 
+    private static void resetTerminalAreas(final Host host) {
+        for (final Host h : host.getCluster().getHosts()) {
+            h.getTerminalPanel().resetTerminalArea();
+        }
+    }
 }

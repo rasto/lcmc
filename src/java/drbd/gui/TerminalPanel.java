@@ -44,6 +44,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultCaret;
 import javax.swing.SwingUtilities;
+import javax.swing.text.Document;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Dimension;
@@ -714,5 +715,19 @@ public final class TerminalPanel extends JScrollPane {
             RoboTest.registerMovement();
         }
         nextCommand();
+    }
+
+    /** Reset the terminal are. */
+    public void resetTerminalArea() {
+        for (int i = 0; i < 10; i++) { /* try 10 times */
+            try {
+                final MyDocument doc =
+                                (MyDocument) terminalArea.getStyledDocument();
+                doc.removeForced(0, doc.getLength());
+                return;
+            } catch (BadLocationException e) {
+                continue;
+            }
+        }
     }
 }
