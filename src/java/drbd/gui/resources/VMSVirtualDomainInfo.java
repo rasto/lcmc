@@ -3259,7 +3259,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         final VMSHardwareInfo vmshi =
                                         (VMSHardwareInfo) node.getUserObject();
                         if (vmshi != null) {
-                            vmshi.getApplyButton().setVisible(true);
+                            final MyButton mb = vmshi.getApplyButton();
+                            if (mb != null) {
+                                mb.setVisible(true);
+                            }
                         }
                     }
                 }
