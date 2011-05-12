@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.File;
 import drbd.utilities.Tools;
 import ch.ethz.ssh2.KnownHosts;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -134,7 +134,8 @@ public final class ConfigData {
     /** Clusters that have auto options. */
     private final List<String> autoClusters = new ArrayList<String>();
     /** Auto options, that make automatic actions in the gui. */
-    private final MultiKeyMap autoOptions = new MultiKeyMap();
+    private final MultiKeyMap<String, String> autoOptions =
+                                            new MultiKeyMap<String, String>();
     /** Name of the Heartbeat comm stack. */
     public static final String HEARTBEAT_NAME = "Heartbeat";
     /** Name of the Corosync/Openais comm stack. */
@@ -506,7 +507,7 @@ public final class ConfigData {
 
     /** Returns an auto option for gui testing. */
     String getAutoOption(final String hostOrCluster, final String option) {
-        return (String) autoOptions.get(hostOrCluster, option);
+        return autoOptions.get(hostOrCluster, option);
     }
 
     /** Returns an auto option for the first host in the list. */
@@ -514,7 +515,7 @@ public final class ConfigData {
         if (autoHosts.isEmpty()) {
             return null;
         }
-        return (String) autoOptions.get(autoHosts.get(0), option);
+        return autoOptions.get(autoHosts.get(0), option);
     }
 
     /** Returns an auto option for first cluster in the list. */
@@ -522,12 +523,12 @@ public final class ConfigData {
         if (autoClusters.isEmpty()) {
             return null;
         }
-        return (String) autoOptions.get(autoClusters.get(0), option);
+        return autoOptions.get(autoClusters.get(0), option);
     }
 
     /** Returns a global option. */
     public String getAutoOptionGlobal(final String option) {
-        return (String) autoOptions.get("global", option);
+        return autoOptions.get("global", option);
     }
 
     /** Returns remote port offset when making ssh tunnel for vnc. */

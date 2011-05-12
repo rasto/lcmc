@@ -59,7 +59,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info
@@ -325,9 +325,11 @@ public abstract class EditableInfo extends Info {
         if (params == null) {
             return;
         }
-        final MultiKeyMap panelPartsMap = new MultiKeyMap();
+        final MultiKeyMap<String, JPanel> panelPartsMap =
+                                            new MultiKeyMap<String, JPanel>();
         final List<PanelPart> panelPartsList = new ArrayList<PanelPart>();
-        final MultiKeyMap panelPartRowsMap = new MultiKeyMap();
+        final MultiKeyMap<String, Integer> panelPartRowsMap =
+                                            new MultiKeyMap<String, Integer>();
 
         for (final String param : params) {
             final GuiComboBox paramCb = getParamComboBox(param,
@@ -336,16 +338,22 @@ public abstract class EditableInfo extends Info {
             /* sub panel */
             final String section = getSection(param);
             JPanel panel;
-            final boolean advanced = isAdvanced(param);
             final ConfigData.AccessType accessType = getAccessType(param);
-            if (panelPartsMap.containsKey(section, accessType, advanced)) {
-                panel = (JPanel) panelPartsMap.get(section,
-                                                   accessType,
-                                                   advanced);
-                panelPartRowsMap.put(section, accessType, advanced,
-                                 (Integer) panelPartRowsMap.get(section,
-                                                                accessType,
-                                                                advanced) + 1);
+            final String accessTypeString = accessType.toString();
+            final Boolean advanced = isAdvanced(param);
+            final String advancedString = advanced.toString();
+            if (panelPartsMap.containsKey(section,
+                                          accessTypeString,
+                                          advancedString)) {
+                panel = panelPartsMap.get(section,
+                                          accessTypeString,
+                                          advancedString);
+                panelPartRowsMap.put(section,
+                                     accessTypeString,
+                                     advancedString,
+                                 panelPartRowsMap.get(section,
+                                                      accessTypeString,
+                                                      advancedString) + 1);
             } else {
                 panel = new JPanel(new SpringLayout());
                 panel.setBackground(Browser.PANEL_BACKGROUND);
@@ -359,11 +367,17 @@ public abstract class EditableInfo extends Info {
                         }
                     });
                 }
-                panelPartsMap.put(section, accessType, advanced, panel);
+                panelPartsMap.put(section,
+                                  accessTypeString,
+                                  advancedString,
+                                  panel);
                 panelPartsList.add(new PanelPart(section,
                                                  accessType,
                                                  advanced));
-                panelPartRowsMap.put(section, accessType, advanced, 1);
+                panelPartRowsMap.put(section,
+                                     accessTypeString,
+                                     advancedString,
+                                     1);
             }
 
             /* label */
@@ -468,14 +482,16 @@ public abstract class EditableInfo extends Info {
         for (final PanelPart panelPart : panelPartsList) {
             final String section = panelPart.getSection();
             final ConfigData.AccessType accessType = panelPart.getAccessType();
-            final boolean advanced = panelPart.isAdvanced();
+            final String accessTypeString = accessType.toString();
+            final Boolean advanced = panelPart.isAdvanced();
+            final String advancedString = advanced.toString();
 
-            final JPanel panel = (JPanel) panelPartsMap.get(section,
-                                                            accessType,
-                                                            advanced);
-            final int rows = (Integer) panelPartRowsMap.get(section,
-                                                            accessType,
-                                                            advanced);
+            final JPanel panel = panelPartsMap.get(section,
+                                                   accessTypeString,
+                                                   advancedString);
+            final int rows = panelPartRowsMap.get(section,
+                                                  accessTypeString,
+                                                  advancedString);
             final int columns = 2;
             SpringUtilities.makeCompactGrid(panel, rows, columns,
                                             1, 1,  // initX, initY

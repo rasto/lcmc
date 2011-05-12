@@ -85,7 +85,7 @@ import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -113,7 +113,8 @@ public class ServiceInfo extends EditableInfo {
     /** A map from operation to the stored value. First key is
      * operation name like "start" and second key is parameter like
      * "timeout". */
-    private final MultiKeyMap savedOperation = new MultiKeyMap();
+    private final MultiKeyMap<String, String> savedOperation =
+                                             new MultiKeyMap<String, String>();
     /** Whether id-ref for meta-attributes is used. */
     private ServiceInfo savedMetaAttrInfoRef = null;
     /** Combo box with same as operations option. */
@@ -132,7 +133,8 @@ public class ServiceInfo extends EditableInfo {
     private final Lock mOperationsComboBoxHashWriteLock =
                                        mOperationsComboBoxHashLock.writeLock();
     /** A map from operation to its combo box. */
-    private final MultiKeyMap operationsComboBoxHash = new MultiKeyMap();
+    private final MultiKeyMap<String, GuiComboBox> operationsComboBoxHash =
+                                        new MultiKeyMap<String, GuiComboBox>();
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Group info object of the group this service is in or null, if it is
@@ -812,7 +814,7 @@ public class ServiceInfo extends EditableInfo {
                         if (infoPanelOk) {
                             mOperationsComboBoxHashReadLock.lock();
                             final GuiComboBox cb =
-                               (GuiComboBox) operationsComboBoxHash.get(op,
+                                             operationsComboBoxHash.get(op,
                                                                         param);
                             mOperationsComboBoxHashReadLock.unlock();
                             SwingUtilities.invokeLater(new Runnable() {
@@ -1241,8 +1243,7 @@ public class ServiceInfo extends EditableInfo {
                     defaultValue = "";
                 }
                 mOperationsComboBoxHashReadLock.lock();
-                final GuiComboBox cb =
-                        (GuiComboBox) operationsComboBoxHash.get(op, param);
+                final GuiComboBox cb = operationsComboBoxHash.get(op, param);
                 mOperationsComboBoxHashReadLock.unlock();
                 if (cb == null) {
                     mSavedOperationsLock.unlock();
@@ -1256,7 +1257,7 @@ public class ServiceInfo extends EditableInfo {
                 if (!Tools.areEqual(value, defaultValueE)) {
                     allAreDefaultValues = false;
                 }
-                final String savedOp = (String) savedOperation.get(op, param);
+                final String savedOp = savedOperation.get(op, param);
                 final Object[] savedOpE = Tools.extractUnit(savedOp);
                 if (savedOp == null) {
                     if (!Tools.areEqual(value, defaultValueE)) {
@@ -1862,15 +1863,14 @@ public class ServiceInfo extends EditableInfo {
                     defaultValue = "";
                 }
                 mOperationsComboBoxHashReadLock.lock();
-                final GuiComboBox cb =
-                          (GuiComboBox) operationsComboBoxHash.get(op, param);
+                final GuiComboBox cb = operationsComboBoxHash.get(op, param);
                 mOperationsComboBoxHashReadLock.unlock();
                 final Object oldValue = cb.getValue();
                 cb.setEnabled(!sameAs || nothingSelected);
                 if (!nothingSelected) {
                     if (sameAs) {
                         /* same as some other service */
-                        defaultValue = (String)
+                        defaultValue =
                           ((ServiceInfo) info).getSavedOperation().get(op,
                                                                        param);
                     }
@@ -1964,7 +1964,7 @@ public class ServiceInfo extends EditableInfo {
                 if (defaultValue == null) {
                     defaultValue = "0";
                 }
-                String savedValue = (String) savedOperation.get(op, param);
+                String savedValue = savedOperation.get(op, param);
                 if (!getService().isNew()
                     && (savedValue == null || "".equals(savedValue))) {
                     savedValue = getOpDefaultsDefault(param);
@@ -2460,8 +2460,7 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         mOperationsComboBoxHashReadLock.lock();
-        final GuiComboBox cb =
-                    (GuiComboBox) operationsComboBoxHash.get(op, param);
+        final GuiComboBox cb = operationsComboBoxHash.get(op, param);
         mOperationsComboBoxHashReadLock.unlock();
         final String[] params = getParametersFromXML();
         cb.addListeners(
@@ -2963,7 +2962,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     mOperationsComboBoxHashReadLock.lock();
                     final GuiComboBox cb =
-                        (GuiComboBox) operationsComboBoxHash.get(op, param);
+                                        operationsComboBoxHash.get(op, param);
                     mOperationsComboBoxHashReadLock.unlock();
                     String value;
                     if (cb == null) {
@@ -3217,8 +3216,7 @@ public class ServiceInfo extends EditableInfo {
                     defaultValue = "";
                 }
                 mOperationsComboBoxHashReadLock.lock();
-                final GuiComboBox cb =
-                          (GuiComboBox) operationsComboBoxHash.get(op, param);
+                final GuiComboBox cb = operationsComboBoxHash.get(op, param);
                 mOperationsComboBoxHashReadLock.unlock();
                 String value = cb.getStringValue();
                 if (value == null || "".equals(value)) {
@@ -3263,10 +3261,10 @@ public class ServiceInfo extends EditableInfo {
             for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param
                               : getBrowser().getCRMOperationParams(op)) {
-                    final Object value = savedOperation.get(op, param);
+                    final String value = savedOperation.get(op, param);
                     mOperationsComboBoxHashReadLock.lock();
                     final GuiComboBox cb =
-                            (GuiComboBox) operationsComboBoxHash.get(op, param);
+                                        operationsComboBoxHash.get(op, param);
                     mOperationsComboBoxHashReadLock.unlock();
                     if (cb != null) {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -6019,7 +6017,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns hash with saved operations. */
-    MultiKeyMap getSavedOperation() {
+    MultiKeyMap<String, String> getSavedOperation() {
         return savedOperation;
     }
 

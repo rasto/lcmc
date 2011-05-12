@@ -22,11 +22,12 @@
 package drbd.utilities;
 
 import drbd.data.Host;
+import drbd.configs.DistResource;
+import drbd.Exceptions;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Map;
 import java.util.HashMap;
-import drbd.configs.DistResource;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
@@ -460,11 +461,22 @@ public final class DRBD {
                                        final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(RESOURCE_PH, resource);
-        final String command = host.getDistCommand("DRBD.forcePrimary",
-                                                   replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, execCallback, true, testOnly);
-        return ret.getExitCode() == 0;
+        try {
+            String command;
+            final String drbdV = host.getDrbdVersion();
+            if (Tools.compareVersions(host.getDrbdVersion(), "8.3.7") <= 0) {
+                command = host.getDistCommand("DRBD.forcePrimary.8.3.7",
+                                              replaceHash);
+            } else {
+                command = host.getDistCommand("DRBD.forcePrimary", replaceHash);
+            }
+            final SSH.SSHOutput ret =
+                      execCommand(host, command, execCallback, true, testOnly);
+            return ret.getExitCode() == 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+            return false;
+        }
     }
 
     /** Executes the drbdadm invalidate on the specified host and resource. */

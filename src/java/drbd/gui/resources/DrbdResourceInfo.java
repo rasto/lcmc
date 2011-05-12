@@ -64,6 +64,9 @@ import javax.swing.JScrollPane;
  */
 public final class DrbdResourceInfo extends DrbdGuiInfo
                                     implements CommonDeviceInterface {
+    /** Volumes volume nr - list of blockdevices. */
+    private final Map<String, List<BlockDevInfo>> volumes =
+                            new LinkedHashMap<String, List<BlockDevInfo>>();
     /** BlockDevInfo object of the first block device. */
     private final BlockDevInfo blockDevInfo1;
     /** BlockDevInfo object of the second block device. */
@@ -1112,8 +1115,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns meta-disk device for the specified host. */
-    public String getMetaDiskForHost(final Host host) {
-        return getBrowser().getDrbdXML().getMetaDisk(host.getName(), getName());
+    public String getMetaDiskForHost(final Host host,
+                                     final String volumeNr) {
+        return getBrowser().getDrbdXML().getMetaDisk(host.getName(),
+                                                     getName(),
+                                                     volumeNr);
     }
 
     /** Returns tool tip when mouse is over the resource edge. */
@@ -1316,5 +1322,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             bdi2.setDialogStarted(dialogStarted);
         }
         super.setDialogStarted(dialogStarted);
+    }
+
+    /** Returns volume number of the block device. */
+    String getVolumeNr(final BlockDevInfo bdi) {
+        // TODO:
+        return "0";
     }
 }

@@ -85,6 +85,7 @@ final class CreateMD extends DrbdConfig {
                                 getDrbdResourceInfo().getFirstBlockDevInfo(),
                                 getDrbdResourceInfo().getSecondBlockDevInfo()
                                     };
+        final String volumeNr = "0";
         for (int i = 0; i < 2; i++) {
             final int index = i;
             thread[i] = new Thread(
@@ -111,7 +112,8 @@ final class CreateMD extends DrbdConfig {
                         };
                     String drbdMetaDisk =
                         getDrbdResourceInfo().getMetaDiskForHost(
-                                                    bdis[index].getHost());
+                                                        bdis[index].getHost(),
+                                                        volumeNr);
                     if ("internal".equals(drbdMetaDisk)) {
                         drbdMetaDisk = bdis[index].getName();
                     }

@@ -1438,6 +1438,10 @@ public final class HeartbeatGraph extends ResourceGraph {
         final ServiceInfo siWithRsc = hbci.getLastServiceInfoWithRsc();
         mHbConnectionReadLock.lock();
         final Edge edge = hbconnectionToEdgeMap.get(hbci);
+        if (edge == null) {
+            mHbConnectionReadLock.unlock();
+            return;
+        }
         mHbConnectionReadLock.unlock();
         if (edgeIsColocationList.contains(edge)) {
             if (!testOnly) {

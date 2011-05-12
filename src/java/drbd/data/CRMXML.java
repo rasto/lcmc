@@ -47,7 +47,7 @@ import java.util.Locale;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class parses ocf crm xml, stores information like
@@ -175,7 +175,8 @@ public final class CRMXML extends XML {
     /** Mapfrom heartbeat service defined by name and class to the hearbeat
      * service object.
      */
-    private final MultiKeyMap serviceToResourceAgentMap = new MultiKeyMap();
+    private final MultiKeyMap<String, ResourceAgent> serviceToResourceAgentMap =
+                                    new MultiKeyMap<String, ResourceAgent>();
     /** Whether drbddisk ra is present. */
     private boolean drbddiskPresent;
     /** Whether linbit::drbd ra is present. */
@@ -1852,10 +1853,9 @@ public final class CRMXML extends XML {
     public ResourceAgent getResourceAgent(final String serviceName,
                                           final String provider,
                                           final String raClass) {
-        final ResourceAgent ra =
-               (ResourceAgent) serviceToResourceAgentMap.get(serviceName,
-                                                             provider,
-                                                             raClass);
+        final ResourceAgent ra = serviceToResourceAgentMap.get(serviceName,
+                                                               provider,
+                                                               raClass);
         if (ra == null) {
             Tools.appWarning(raClass + ":" + provider + ":" + serviceName
                              + " RA does not exist");
@@ -1967,7 +1967,7 @@ public final class CRMXML extends XML {
               final Map<String, Map<String, String>> parametersMap,
               final Map<String, Map<String, String>> parametersNvpairsIdsMap,
               final Map<String, String> resourceInstanceAttrIdMap,
-              final MultiKeyMap operationsMap,
+              final MultiKeyMap<String, String> operationsMap,
               final Map<String, String> metaAttrsIdMap,
               final Map<String, String> operationsIdMap,
               final Map<String, Map<String, String>> resOpIdsMap,
@@ -2097,7 +2097,7 @@ public final class CRMXML extends XML {
                 final Map<String, ResourceAgent> resourceTypeMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
-                final MultiKeyMap operationsMap,
+                final MultiKeyMap<String, String> operationsMap,
                 final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
@@ -2192,7 +2192,7 @@ public final class CRMXML extends XML {
                 final Map<String, Map<String, String>> parametersMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
-                final MultiKeyMap operationsMap,
+                final MultiKeyMap<String, String> operationsMap,
                 final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
@@ -2339,7 +2339,7 @@ public final class CRMXML extends XML {
     private void parseTransientAttributes(
                               final String uname,
                               final Node transientAttrNode,
-                              final MultiKeyMap failedMap,
+                              final MultiKeyMap<String, String> failedMap,
                               final Map<String, Set<String>> failedClonesMap,
                               final Map<String, String> pingCountMap,
                               final String hbV) {
@@ -2394,7 +2394,7 @@ public final class CRMXML extends XML {
     /** Parses node, to get info like if it is in stand by. */
     void parseNode(final String node,
                    final Node nodeNode,
-                   final MultiKeyMap nodeParametersMap) {
+                   final MultiKeyMap<String, String> nodeParametersMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(nodeNode,
                                                    "instance_attributes");
@@ -2613,7 +2613,8 @@ public final class CRMXML extends XML {
         /* xml node with cluster node make stupid variable names, but let's
          * keep the convention. */
         String dc = null;
-        final MultiKeyMap nodeParametersMap = new MultiKeyMap();
+        final MultiKeyMap<String, String> nodeParametersMap =
+                                            new MultiKeyMap<String, String>();
         final Node nodesNode = getChildNode(confNode, "nodes");
         final Map<String, String> nodeOnline = new HashMap<String, String>();
         if (nodesNode != null) {
@@ -2653,7 +2654,8 @@ public final class CRMXML extends XML {
         final Set<String> orphanedList = new LinkedHashSet<String>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
-        final MultiKeyMap operationsMap = new MultiKeyMap();
+        final MultiKeyMap<String, String> operationsMap =
+                                            new MultiKeyMap<String, String>();
         final Map<String, String> metaAttrsIdMap =
                                                 new HashMap<String, String>();
         final Map<String, String> operationsIdMap =
@@ -2667,7 +2669,8 @@ public final class CRMXML extends XML {
         final Map<String, String> cloneToResourceMap =
                                                  new HashMap<String, String>();
         final List<String> masterList = new ArrayList<String>();
-        final MultiKeyMap failedMap = new MultiKeyMap();
+        final MultiKeyMap<String, String> failedMap =
+                                            new MultiKeyMap<String, String>();
         final Map<String, Set<String>> failedClonesMap =
                                      new LinkedHashMap<String, Set<String>>();
         final Map<String, String> pingCountMap = new HashMap<String, String>();
@@ -2823,7 +2826,8 @@ public final class CRMXML extends XML {
                                            new HashMap<String, HostLocation>();
         final Map<String, List<String>> locationsIdMap =
                                            new HashMap<String, List<String>>();
-        final MultiKeyMap resHostToLocIdMap = new MultiKeyMap();
+        final MultiKeyMap<String, String> resHostToLocIdMap =
+                                             new MultiKeyMap<String, String>();
 
         final Map<String, String> resPingToLocIdMap =
                                                new HashMap<String, String>();

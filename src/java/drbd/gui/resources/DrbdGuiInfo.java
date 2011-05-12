@@ -289,7 +289,9 @@ abstract class DrbdGuiInfo extends EditableInfo {
         final StringBuilder config = new StringBuilder("");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String[] sections = dxml.getSections();
-        for (final String section : sections) {
+        for (final String sectionString : sections) {
+            /* remove -options */
+            final String section = sectionString.replaceAll("-options$", "");
             if ("resource".equals(section)
                 || DrbdXML.GLOBAL_SECTION.equals(section)) {
                 continue;

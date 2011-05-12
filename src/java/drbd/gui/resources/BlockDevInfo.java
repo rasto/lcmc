@@ -138,10 +138,11 @@ public final class BlockDevInfo extends EditableInfo {
      * to this block device.
      */
     public BlockDevInfo getOtherBlockDevInfo() {
-        if (drbdResourceInfo == null) {
+        final DrbdResourceInfo dri = drbdResourceInfo;
+        if (dri == null) {
             return null;
         }
-        return drbdResourceInfo.getOtherBlockDevInfo(this);
+        return dri.getOtherBlockDevInfo(this);
     }
 
 
@@ -1619,8 +1620,9 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns how much of the block device is used. */
     @Override public int getUsed() {
-        if (drbdResourceInfo != null) {
-            return drbdResourceInfo.getUsed();
+        final DrbdResourceInfo dri = drbdResourceInfo;
+        if (dri != null) {
+            return dri.getUsed();
         }
         return getBlockDevice().getUsed();
     }
@@ -1754,17 +1756,22 @@ public final class BlockDevInfo extends EditableInfo {
         if (clusterBrowser == null) {
             return;
         }
+        final DrbdResourceInfo dri = drbdResourceInfo;
+        if (dri == null) {
+            return;
+        }
         final DrbdXML dxml = clusterBrowser.getDrbdXML();
         final String hostName = getHost().getName();
         final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
         String value = null;
+        final String volumeNr = dri.getVolumeNr(this);
         for (final String param : getParametersFromXML()) {
             if (DRBD_NI_PORT_PARAM.equals(param)) {
                 value = dxml.getVirtualInterfacePort(hostName, resName);
             } else if (DRBD_NI_PARAM.equals(param)) {
                 value = dxml.getVirtualInterface(hostName, resName);
             } else if (DRBD_MD_PARAM.equals(param)) {
-                value = dxml.getMetaDisk(hostName, resName);
+                value = dxml.getMetaDisk(hostName, resName, volumeNr);
                 if (!"internal".equals(value)) {
                     final BlockDevInfo mdI =
                                    drbdGraph.findBlockDevInfo(hostName, value);
@@ -1773,7 +1780,7 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                 }
             } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-                value = dxml.getMetaDiskIndex(hostName, resName);
+                value = dxml.getMetaDiskIndex(hostName, resName, volumeNr);
             }
             final String defaultValue = getParamDefault(param);
             if (value == null) {

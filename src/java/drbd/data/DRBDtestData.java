@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds data that were retrieved while running drbdadm -d commands.
@@ -44,13 +44,17 @@ public final class DRBDtestData {
     private static final Pattern DRBD_D_PATTERN =
           Pattern.compile(".*drbdsetup\\s+(\\d+)\\s+(\\S+).*");
     /** Hash with host and drbd resource, that will be connected. */
-    private final MultiKeyMap connectedHash = new MultiKeyMap();
+    private final MultiKeyMap<String, Integer> connectedHash =
+                                            new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be disconnected. */
-    private final MultiKeyMap disconnectedHash = new MultiKeyMap();
+    private final MultiKeyMap<String, Integer> disconnectedHash =
+                                            new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be attached. */
-    private final MultiKeyMap attachedHash = new MultiKeyMap();
+    private final MultiKeyMap<String, Integer> attachedHash =
+                                            new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be dettached. */
-    private final MultiKeyMap disklessHash = new MultiKeyMap();
+    private final MultiKeyMap<String, Integer> disklessHash =
+                                            new MultiKeyMap<String, Integer>();
 
     /** Prepares a new <code>DRBDtestData</code> object. */
     public DRBDtestData(final Map<Host, String> testOutput) {
@@ -74,13 +78,13 @@ public final class DRBDtestData {
                     final String res = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(host, "/dev/drbd" + res, 1);
+                        disconnectedHash.put(host.getName(), "/dev/drbd" + res, 1);
                     } else if ("net".equals(action)) {
-                        connectedHash.put(host, "/dev/drbd" + res, 1);
+                        connectedHash.put(host.getName(), "/dev/drbd" + res, 1);
                     } else if ("detach".equals(action)) {
-                        disklessHash.put(host, "/dev/drbd" + res, 1);
+                        disklessHash.put(host.getName(), "/dev/drbd" + res, 1);
                     } else if ("disk".equals(action)) {
-                        attachedHash.put(host, "/dev/drbd" + res, 1);
+                        attachedHash.put(host.getName(), "/dev/drbd" + res, 1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -107,21 +111,21 @@ public final class DRBDtestData {
 
     /** Returns whether the device will be disconnected on the host. */
     public boolean isDisconnected(final Host host, final String dev) {
-        return disconnectedHash.get(host, dev) != null;
+        return disconnectedHash.get(host.getName(), dev) != null;
     }
 
     /** Returns whether the device will be connected on the host. */
     public boolean isConnected(final Host host, final String dev) {
-        return connectedHash.get(host, dev) != null;
+        return connectedHash.get(host.getName(), dev) != null;
     }
 
     /** Returns whether the drbd device is diskless on the host. */
     public boolean isDiskless(final Host host, final String dev) {
-        return disklessHash.get(host, dev) != null;
+        return disklessHash.get(host.getName(), dev) != null;
     }
 
     /** Returns whether the drbd device is diskless on the host. */
     public boolean isAttached(final Host host, final String dev) {
-        return attachedHash.get(host, dev) != null;
+        return attachedHash.get(host.getName(), dev) != null;
     }
 }

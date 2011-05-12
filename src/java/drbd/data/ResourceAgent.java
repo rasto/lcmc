@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.Arrays;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class describes a resource agent with its name and class.
@@ -93,7 +93,8 @@ public final class ResourceAgent {
     private final String menuName;
     /** Map that holds default values for operations. The keys are the name and
      * parameter. */
-    private final MultiKeyMap opToDefault = new MultiKeyMap();
+    private final MultiKeyMap<String, String> opToDefault =
+                                            new MultiKeyMap<String, String>();
     /** Names of the operations, with some of them predefined. */
     private final Set<String> operations = new LinkedHashSet<String>();
     /** Whether the service is probably master/slave resource. */
@@ -487,7 +488,7 @@ public final class ResourceAgent {
 
     /** Returns the default value of operation parameter. */
     public String getOperationDefault(final String name, final String param) {
-        return (String) opToDefault.get(name, param);
+        return opToDefault.get(name, param);
     }
 
     /** Returns name of all operations. */
