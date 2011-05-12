@@ -128,16 +128,21 @@ public class Browser {
     /** Reloads the node. */
     public final void reload(final DefaultMutableTreeNode node,
                              final boolean select) {
+        final JTree t = tree;
+        TreePath p = null;
+        if (t != null) {
+            p = t.getSelectionPath();
+        }
+        final TreePath path = p;
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
-                TreePath path = null;
-                final JTree t = tree;
-                if (t != null) {
-                    path = t.getSelectionPath();
-                }
                 if (node != null) {
                     treeModel.reload(node);
                 }
+            }
+        });
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
                 if (!select && t != null && path != null) {
                     /* if don't want to select, we reselect the old path. */
                     t.setSelectionPath(path);
