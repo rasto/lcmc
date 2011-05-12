@@ -207,6 +207,7 @@ public final class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
+        Tools.printStackTrace("expand: " + buttonNo);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 final int height = (int)

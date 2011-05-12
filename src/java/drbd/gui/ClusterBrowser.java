@@ -1477,7 +1477,9 @@ public final class ClusterBrowser extends Browser {
                                      (DefaultMutableTreeNode) e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
+                final String name = vmsvdi.getName();
                 if (domainName != null
+                    && name != null
                     && domainName.compareTo(vmsvdi.getName()) < 0) {
                     break;
                 }
@@ -1535,13 +1537,18 @@ public final class ClusterBrowser extends Browser {
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
+        final String volumeNr = "0"; //TODO
         for (int i = 0; i < drbdResources.length; i++) {
             final String resName = drbdResources[i];
-            final String drbdDev = dxml.getDrbdDevice(resName);
+            final String drbdDev = dxml.getDrbdDevice(resName, volumeNr);
             final Map<String, String> hostDiskMap =
-                                                dxml.getHostDiskMap(resName);
+                                                dxml.getHostDiskMap(resName,
+                                                                    volumeNr);
             BlockDevInfo bd1 = null;
             BlockDevInfo bd2 = null;
+            if (hostDiskMap == null) {
+                continue;
+            }
             for (String hostName : hostDiskMap.keySet()) {
                 if (!cluster.contains(hostName)) {
                     continue;

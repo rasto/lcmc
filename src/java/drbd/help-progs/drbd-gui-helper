@@ -671,7 +671,12 @@ sub get_drbd_events {
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
 		print "empty\n";
-		exec("/sbin/drbdsetup /dev/drbd0 events");
+		my ($v1, $v2, $v3) = get_drbd_version();
+		if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
+			exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
+		} else {
+			exec("/sbin/drbdsetup ALL events");
+		}
 	#} else {
 	#	sleep 20;
 	#	kill("TERM", $pid);
@@ -1278,10 +1283,9 @@ sub get_drbd_xml {
 		print "</command>\n";
 	}
 
-	my ($v1, $v2, $v3) = `echo|/sbin/drbdadm help 2>/dev/null`
-					=~ /Version:\s+(\d+)\.(\d+)\.(\d+)/;
+	my ($v1, $v2, $v3) = get_drbd_version();
 	my @sections = ("net-options", "disk-options");
-	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) {
+	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
 		@sections = ("net", "disk", "syncer");
 	}
 	    
@@ -1290,6 +1294,12 @@ sub get_drbd_xml {
 		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
 		print $xml;
 	}
+}
+
+sub get_drbd_version {
+	my (@version) = `echo|/sbin/drbdadm help 2>/dev/null`
+					=~ /Version:\s+(\d+)\.(\d+)\.(\d+)/;
+	return @version;
 }
 
 #

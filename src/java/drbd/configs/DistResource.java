@@ -320,6 +320,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          + " echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
         {"DRBD.createMD",
          "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RESOURCE@"},
+
         {"DRBD.forcePrimary",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RESOURCE@"},
 

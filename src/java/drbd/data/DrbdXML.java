@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import java.math.BigInteger;
-
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -112,15 +112,18 @@ public final class DrbdXML extends XML {
     /** List with drbd resources. */
     private final List<String> resourceList = new ArrayList<String>();
     /** Map from drbd resource name to the drbd device. */
-    private final Map<String, String> resourceDeviceMap =
-                                                new HashMap<String, String>();
+    private final MultiKeyMap<String, String> resourceDeviceMap =
+                                  new MultiKeyMap<String, String>();
     /** Map from drbd device to the drbd resource name. */
     private final Map<String, String> deviceResourceMap =
                                                 new HashMap<String, String>();
+    /** Map from drbd device to the drbd volume. */
+    private final Map<String, String> deviceVolumeMap =
+                                                new HashMap<String, String>();
 
     /** Map from drbd resource name and the host to the block device. */
-    private final Map<String, Map<String, String>> resourceHostDiskMap =
-                                    new HashMap<String, Map<String, String>>();
+    private final MultiKeyMap<String, Map<String, String>> resourceHostDiskMap =
+                                new MultiKeyMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the ip. */
     private final Map<String, Map<String, String>> resourceHostIpMap =
                                     new HashMap<String, Map<String, String>>();
@@ -128,12 +131,13 @@ public final class DrbdXML extends XML {
     private final Map<String, Map<String, String>> resourceHostPortMap =
                                     new HashMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the meta disk. */
-    private final Map<String, Map<String, String>> resourceHostMetaDiskMap =
-                                    new HashMap<String, Map<String, String>>();
+    private final MultiKeyMap<String, Map<String, String>>
+                        resourceHostMetaDiskMap =
+                                new MultiKeyMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the meta disk index. */
-    private final Map<String, Map<String, String>>
-                resourceHostMetaDiskIndexMap =
-                                    new HashMap<String, Map<String, String>>();
+    private final MultiKeyMap<String, Map<String, String>>
+                        resourceHostMetaDiskIndexMap =
+                                new MultiKeyMap<String, Map<String, String>>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
@@ -738,26 +742,12 @@ public final class DrbdXML extends XML {
     /** Parses host node in the drbd config. */
     private void parseHostConfig(final String resName, final Node hostNode) {
         final String hostName = getAttribute(hostNode, "name");
+        parseVolumeConfig(hostName, resName, hostNode); /* before 8.4 */
         final NodeList options = hostNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("device")) {
-                String device = getText(option);
-                if (device != null && "".equals(device)) {
-                    final String minor = getAttribute(option, "minor");
-                    device = "/dev/drbd" + minor;
-                }
-                resourceDeviceMap.put(resName, device);
-                deviceResourceMap.put(device, resName);
-            } else if (option.getNodeName().equals("disk")) {
-                final String disk = getText(option);
-                Map<String, String> hostDiskMap =
-                                            resourceHostDiskMap.get(resName);
-                if (hostDiskMap == null) {
-                    hostDiskMap = new HashMap<String, String>();
-                    resourceHostDiskMap.put(resName, hostDiskMap);
-                }
-                hostDiskMap.put(hostName, disk);
+            if (option.getNodeName().equals("volume")) {
+                parseVolumeConfig(hostName, resName, option);
             } else if (option.getNodeName().equals("address")) {
                 final String ip = getText(option);
                 final String port = getAttribute(option, "port");
@@ -776,6 +766,36 @@ public final class DrbdXML extends XML {
                     resourceHostPortMap.put(resName, hostPortMap);
                 }
                 hostPortMap.put(hostName, port);
+            }
+        }
+    }
+
+    /** Parses host node in the drbd config. */
+    private void parseVolumeConfig(final String hostName,
+                                   final String resName,
+                                   final Node volumeNode) {
+        final String volumeNr = getAttribute(volumeNode, "vnr");
+        final NodeList options = volumeNode.getChildNodes();
+        for (int i = 0; i < options.getLength(); i++) {
+            final Node option = options.item(i);
+            if (option.getNodeName().equals("device")) {
+                String device = getText(option);
+                if (device != null && "".equals(device)) {
+                    final String minor = getAttribute(option, "minor");
+                    device = "/dev/drbd" + minor;
+                }
+                resourceDeviceMap.put(resName, volumeNr, device);
+                deviceResourceMap.put(device, resName);
+                deviceVolumeMap.put(device, volumeNr);
+            } else if (option.getNodeName().equals("disk")) {
+                final String disk = getText(option);
+                Map<String, String> hostDiskMap =
+                                    resourceHostDiskMap.get(resName, volumeNr);
+                if (hostDiskMap == null) {
+                    hostDiskMap = new HashMap<String, String>();
+                    resourceHostDiskMap.put(resName, volumeNr, hostDiskMap);
+                }
+                hostDiskMap.put(hostName, disk);
             } else if (option.getNodeName().equals("meta-disk")
                        || option.getNodeName().equals("flexible-meta-disk")) {
                 final boolean flexible =
@@ -792,29 +812,52 @@ public final class DrbdXML extends XML {
                 }
                 /* meta-disk */
                 Map<String, String> hostMetaDiskMap =
-                                        resourceHostMetaDiskMap.get(resName);
+                                resourceHostMetaDiskMap.get(resName, volumeNr);
                 if (hostMetaDiskMap == null) {
                     hostMetaDiskMap = new HashMap<String, String>();
-                    resourceHostMetaDiskMap.put(resName, hostMetaDiskMap);
+                    resourceHostMetaDiskMap.put(resName,
+                                                volumeNr,
+                                                hostMetaDiskMap);
                 }
                 hostMetaDiskMap.put(hostName, metaDisk);
 
                 /* meta-disk index */
                 Map<String, String> hostMetaDiskIndexMap =
-                                    resourceHostMetaDiskIndexMap.get(resName);
+                           resourceHostMetaDiskIndexMap.get(resName, volumeNr);
                 if (hostMetaDiskIndexMap == null) {
                     hostMetaDiskIndexMap = new HashMap<String, String>();
                     resourceHostMetaDiskIndexMap.put(resName,
+                                                     volumeNr,
                                                      hostMetaDiskIndexMap);
                 }
                 hostMetaDiskIndexMap.put(hostName, metaDiskIndex);
+            } else if (option.getNodeName().equals("address")) {
+                /* since 8.4, it's outside of volume */
+                final String ip = getText(option);
+                final String port = getAttribute(option, "port");
+                /* ip */
+                Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
+                if (hostIpMap == null) {
+                    hostIpMap = new HashMap<String, String>();
+                    resourceHostIpMap.put(resName, hostIpMap);
+                }
+                hostIpMap.put(hostName, ip);
+                /* port */
+                Map<String, String> hostPortMap =
+                                            resourceHostPortMap.get(resName);
+                if (hostPortMap == null) {
+                    hostPortMap = new HashMap<String, String>();
+                    resourceHostPortMap.put(resName, hostPortMap);
+                }
+                hostPortMap.put(hostName, port);
             }
         }
     }
 
     /** Returns map with hosts as keys and disks as values. */
-    public Map<String, String> getHostDiskMap(final String resName) {
-        return resourceHostDiskMap.get(resName);
+    public Map<String, String> getHostDiskMap(final String resName,
+                                              final String volumeNr) {
+        return resourceHostDiskMap.get(resName, volumeNr);
     }
 
     /** Returns map with hosts as keys and ips as values. */
@@ -841,9 +884,13 @@ public final class DrbdXML extends XML {
     }
 
     /** Gets meta-disk block device for a host and a resource. */
-    public String getMetaDisk(final String hostName, final String resName) {
-        if (resourceHostMetaDiskMap.containsKey(resName)) {
-            return resourceHostMetaDiskMap.get(resName).get(hostName);
+    public String getMetaDisk(final String hostName,
+                              final String resName,
+                              final String volumeNr) {
+        final Map<String, String> hostMetaDiskMap =
+                                resourceHostMetaDiskMap.get(resName, volumeNr);
+        if (hostMetaDiskMap != null) {
+            return hostMetaDiskMap.get(hostName);
         }
         return null;
     }
@@ -854,9 +901,12 @@ public final class DrbdXML extends XML {
      * will be generated in the config.
      */
     public String getMetaDiskIndex(final String hostName,
-                                   final String resName) {
-        if (resourceHostMetaDiskIndexMap.containsKey(resName)) {
-            return resourceHostMetaDiskIndexMap.get(resName).get(hostName);
+                                   final String resName,
+                                   final String volumeNr) {
+        final Map<String, String> hostMetaDiskIndexMap =
+                           resourceHostMetaDiskIndexMap.get(resName, volumeNr);
+        if (hostMetaDiskIndexMap != null) {
+            return hostMetaDiskIndexMap.get(hostName);
         }
         return null;
     }
@@ -1009,8 +1059,8 @@ public final class DrbdXML extends XML {
      * Returns drbd device of the resource. Although there can be different
      * drbd devices on different hosts. We do not allow that.
      */
-    public String getDrbdDevice(final String res) {
-        return resourceDeviceMap.get(res);
+    public String getDrbdDevice(final String res, final String volumeNr) {
+        return resourceDeviceMap.get(res, volumeNr);
     }
 
     /** Gets block device object from device number. Can return null. */
@@ -1020,9 +1070,10 @@ public final class DrbdXML extends XML {
         BlockDevInfo bdi = null;
         final String device = "/dev/drbd" + devNr;
         final String resName = deviceResourceMap.get(device);
+        final String volumeNr = deviceVolumeMap.get(device);
         if (resName != null) {
             final Map<String, String> hostDiskMap =
-                                            resourceHostDiskMap.get(resName);
+                                    resourceHostDiskMap.get(resName, volumeNr);
             if (hostDiskMap != null) {
                 final String disk = hostDiskMap.get(hostName);
                 if (disk != null) {
@@ -1047,8 +1098,8 @@ public final class DrbdXML extends XML {
      * command and stores the values in the BlockDevice object.
      */
     public boolean parseDrbdEvent(final String hostName,
-                                            final DrbdGraph drbdGraph,
-                                            final String rawOutput) {
+                                  final DrbdGraph drbdGraph,
+                                  final String rawOutput) {
         if (rawOutput == null || hostName == null) {
             return false;
         }
@@ -1068,22 +1119,35 @@ public final class DrbdXML extends XML {
         } else {
             hostDrbdLoadedMap.put(hostName, true);
         }
-        /* since drbd 8.3 there is ro: instead of st:
-         */
+        /* since drbd 8.3 there is ro: instead of st: */
+        /* since drbd 8.4 there is ro: instead of st: */
         Pattern p =
             Pattern.compile(
-                "^(\\d+)\\s+ST\\s+(\\d+)\\s+\\{\\s+cs:(\\S+)\\s+"
+                "^(\\d+)\\s+ST\\s+(\\S+)\\s+\\{\\s+cs:(\\S+)\\s+"
                 + "(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
         Matcher m = p.matcher(output);
+        final Pattern pDev = Pattern.compile("^(\\d+),(\\S+)\\[(\\d+)\\]$");
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */
-            final String devNr        = m.group(2);
+            final String devNrString  = m.group(2);
             final String cs           = m.group(3);
             final String ro1          = m.group(4);
             final String ro2          = m.group(5);
             final String ds1          = m.group(6);
             final String ds2          = m.group(7);
             final String flags        = m.group(8);
+
+            final Matcher mDev = pDev.matcher(devNrString);
+            String devNr = devNrString;
+            String res = ""; // TODO: unused */
+            String volumeNr = "0";
+            if (mDev.matches()) { /* since 8.4 */
+                devNr = mDev.group(1);
+                res = mDev.group(2);
+                volumeNr = mDev.group(3);
+            }
+            System.out.println("dev nr: " +  devNr + " res: " + res     
+                               + " vnr: " + volumeNr);
             /* get blockdevice object from device */
             final BlockDevInfo bdi =
                                   getBlockDevInfo(devNr, hostName, drbdGraph);
@@ -1102,12 +1166,24 @@ public final class DrbdXML extends XML {
             return false;
         }
         /* 19 SP 0 16.9 */
-        p = Pattern.compile("^(\\d+)\\s+SP\\s+(\\d+)\\s(\\d+\\.\\d+).*");
+        p = Pattern.compile("^(\\d+)\\s+SP\\s+(\\S+)\\s(\\d+\\.\\d+).*");
         m = p.matcher(output);
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */
-            final String devNr        = m.group(2);
-            final String synced       = m.group(3);
+            final String devNrString = m.group(2);
+            final String synced = m.group(3);
+
+            final Matcher mDev = pDev.matcher(devNrString);
+            String devNr = devNrString;
+            String res = ""; // TODO: unused */
+            String volumeNr = "0";
+            if (mDev.matches()) { /* since 8.4 */
+                devNr = mDev.group(1);
+                res = mDev.group(2);
+                volumeNr = mDev.group(3);
+            }
+            System.out.println("dev nr: " +  devNr + " res: " + res     
+                               + " vnr: " + volumeNr);
             final BlockDevInfo bdi =
                                    getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null && bdi.getBlockDevice().isDrbd()) {
@@ -1123,12 +1199,23 @@ public final class DrbdXML extends XML {
             return false;
         }
         /* 19 UH 1 split-brain */
-        p = Pattern.compile("^(\\d+)\\s+UH\\s+(\\d+)\\s([a-z-]+).*");
+        p = Pattern.compile("^(\\d+)\\s+UH\\s+(\\S+)\\s([a-z-]+).*");
         m = p.matcher(output);
         if (m.matches()) {
             /* String counter      = m.group(1); // not used */
-            final String devNr        = m.group(2);
-            final String what         = m.group(3);
+            final String devNrString = m.group(2);
+            final String what = m.group(3);
+            final Matcher mDev = pDev.matcher(devNrString);
+            String devNr = devNrString;
+            String res = ""; // TODO: unused */
+            String volumeNr = "0";
+            if (mDev.matches()) { /* since 8.4 */
+                devNr = mDev.group(1);
+                res = mDev.group(2);
+                volumeNr = mDev.group(3);
+            }
+            System.out.println("dev nr: " +  devNr + " res: " + res     
+                               + " vnr: " + volumeNr);
             Tools.debug(this, "drbd event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
                 final BlockDevInfo bdi = getBlockDevInfo(devNr,
