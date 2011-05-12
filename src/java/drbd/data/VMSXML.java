@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPath;
@@ -84,7 +84,8 @@ public final class VMSXML extends XML {
     private final Map<String, String> netNamesConfigsMap =
                                             new HashMap<String, String>();
     /** Map from parameters to values. */
-    private final MultiKeyMap parameterValues = new MultiKeyMap();
+    private final MultiKeyMap<String, String> parameterValues =
+                                             new MultiKeyMap<String, String>();
     /** Hash of domains and their remote ports. */
     private final Map<String, Integer> remotePorts =
                                                 new HashMap<String, Integer>();
@@ -1752,7 +1753,7 @@ public final class VMSXML extends XML {
 
     /** Returns value. */
     public String getValue(final String name, final String param) {
-        return (String) parameterValues.get(name, param);
+        return parameterValues.get(name, param);
     }
 
     /** Returns disk data. */

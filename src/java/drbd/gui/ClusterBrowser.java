@@ -93,8 +93,9 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
-import org.apache.commons.collections.map.MultiKeyMap;
-import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.keyvalue.MultiKey;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -317,8 +318,9 @@ public final class ClusterBrowser extends Browser {
     private final Map<String, List<String>> crmOperationParams =
                                      new LinkedHashMap<String, List<String>>();
     /** Not advanced operations. */
-    private final MultiKeyMap hbOpNotAdvanced = MultiKeyMap.decorate(
-                                                              new LinkedMap());
+    private final MultiKeyMap<String, Integer> hbOpNotAdvanced =
+                          MultiKeyMap.decorate(
+                                 new LinkedMap<MultiKey<String>, Integer>());
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
     public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,

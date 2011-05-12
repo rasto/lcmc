@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds data that were parsed from cib xml. This is not used in old
@@ -76,7 +76,7 @@ final class CibQuery {
     private List<CRMXML.RscSetConnectionData> rscSetConnections =
                                   new ArrayList<CRMXML.RscSetConnectionData>();
     /** Node parameters map. */
-    private MultiKeyMap nodeParameters;
+    private MultiKeyMap<String, String> nodeParameters;
     /** Location map. */
     private Map<String, Map<String, HostLocation>> location =
                               new HashMap<String, Map<String, HostLocation>>();
@@ -90,11 +90,13 @@ final class CibQuery {
     private Map<String, HostLocation> idToLocation =
                                            new HashMap<String, HostLocation>();
     /** Map from resource and host to location id. */
-    private MultiKeyMap resHostToLocId = new MultiKeyMap();
+    private MultiKeyMap<String, String> resHostToLocId =
+                                             new MultiKeyMap<String, String>();
     /** Map from resource to location id for ping. */
     private Map<String, String> resPingToLocId = new HashMap<String, String>();
     /** Operations map. */
-    private MultiKeyMap operations = new MultiKeyMap();
+    private MultiKeyMap<String, String> operations =
+                                            new MultiKeyMap<String, String>();
     /** Operations refs map. */
     private Map<String, String> operationsRefs = new HashMap<String, String>();
     /** Meta attrs id map. */
@@ -123,7 +125,8 @@ final class CibQuery {
     /** Designated co-ordinator. */
     private String dc = null;
     /** Map from nodename and resource to the fail-count. */
-    private MultiKeyMap failed = new MultiKeyMap();
+    private MultiKeyMap<String, String> failed =
+                                             new MultiKeyMap<String, String>();
     /** Map from rsc id to list of clone ids for failed clones. */
     private Map<String, Set<String>> failedClones =
                                       new LinkedHashMap<String, Set<String>>();
@@ -299,12 +302,12 @@ final class CibQuery {
     }
 
     /** Sets node parameters map. */
-    void setNodeParameters(final MultiKeyMap nodeParameters) {
+    void setNodeParameters(final MultiKeyMap<String, String> nodeParameters) {
         this.nodeParameters = nodeParameters;
     }
 
     /** Gets node parameters map. */
-    MultiKeyMap getNodeParameters() {
+    MultiKeyMap<String, String> getNodeParameters() {
         return nodeParameters;
     }
 
@@ -349,12 +352,12 @@ final class CibQuery {
     }
 
     /** Sets map from resource and host to the location id. */
-    void setResHostToLocId(final MultiKeyMap resHostToLocId) {
+    void setResHostToLocId(final MultiKeyMap<String, String> resHostToLocId) {
         this.resHostToLocId = resHostToLocId;
     }
 
     /** Returns map from resource and host to the location id. */
-    MultiKeyMap getResHostToLocId() {
+    MultiKeyMap<String, String> getResHostToLocId() {
         return resHostToLocId;
     }
 
@@ -370,7 +373,7 @@ final class CibQuery {
 
 
     /** Sets operations map. */
-    void setOperations(final MultiKeyMap operations) {
+    void setOperations(final MultiKeyMap<String, String> operations) {
         this.operations = operations;
     }
 
@@ -401,7 +404,7 @@ final class CibQuery {
 
 
     /** Returns operations map. */
-    MultiKeyMap getOperations() {
+    MultiKeyMap<String, String> getOperations() {
         return operations;
     }
 
@@ -503,12 +506,12 @@ final class CibQuery {
     }
 
     /** Sets failed map. */
-    void setFailed(final MultiKeyMap failed) {
+    void setFailed(final MultiKeyMap<String, String> failed) {
         this.failed = failed;
     }
 
     /** Returns failed map. */
-    MultiKeyMap getFailed() {
+    MultiKeyMap<String, String> getFailed() {
         return failed;
     }
 
@@ -534,7 +537,7 @@ final class CibQuery {
 
     /** Returns fail-count. It can be "INFINITY" */
     String getFailCount(final String node, final String res) {
-        return (String) failed.get(node, res);
+        return failed.get(node, res);
     }
 
     /** Returns ping count. */

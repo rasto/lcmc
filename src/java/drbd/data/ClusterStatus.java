@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information
@@ -350,11 +350,11 @@ public final class ClusterStatus {
                                 final boolean testOnly) {
         /* node should not have to be in lower case. */
         if (testOnly && ptestData != null) {
-            return (String) shadowCibQueryMap.getResHostToLocId().get(
+            return shadowCibQueryMap.getResHostToLocId().get(
                                                 rsc,
                                                 node.toLowerCase(Locale.US));
         } else {
-            return (String) cibQueryMap.getResHostToLocId().get(
+            return cibQueryMap.getResHostToLocId().get(
                                                 rsc,
                                                 node.toLowerCase(Locale.US));
         }
@@ -380,7 +380,7 @@ public final class ClusterStatus {
     public String getOperation(final String hbId,
                                final String op,
                                final String param) {
-        return (String) cibQueryMap.getOperations().get(hbId, op, param);
+        return cibQueryMap.getOperations().get(hbId, op, param);
     }
 
     /** Returns id from operations tag. */
@@ -548,7 +548,7 @@ public final class ClusterStatus {
     public String getNodeParameter(final String node,
                                    final String param,
                                    final boolean testOnly) {
-        final MultiKeyMap nodeParams;
+        final MultiKeyMap<String, String> nodeParams;
         if (testOnly && ptestData != null) {
             nodeParams = shadowCibQueryMap.getNodeParameters();
         } else {
@@ -557,7 +557,7 @@ public final class ClusterStatus {
         if (nodeParams == null) {
             return null;
         } else {
-            return (String) nodeParams.get(node.toLowerCase(Locale.US), param);
+            return nodeParams.get(node.toLowerCase(Locale.US), param);
         }
     }
 
