@@ -176,7 +176,7 @@ public final class GUIData  {
         final Component oldTerminalPanel =
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeAndWait(new Runnable() {
                 @Override public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
@@ -207,7 +207,6 @@ public final class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
-        Tools.printStackTrace("expand: " + buttonNo);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 final int height = (int)
