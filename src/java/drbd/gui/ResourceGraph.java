@@ -1075,6 +1075,8 @@ public abstract class ResourceGraph {
 
         /** Graph was pressed. */
         @Override public void graphPressed(final V v, final MouseEvent me) {
+            final Thread t = new Thread(new Runnable() {
+                public void run() {
             final PickedState<Vertex> psVertex =
                                   vv.getRenderContext().getPickedVertexState();
             if ((me.getModifiers() & MouseEvent.CTRL_MASK) != 0) {
@@ -1083,6 +1085,9 @@ public abstract class ResourceGraph {
             } else if (psVertex.getPicked().size() == 1) {
                 oneVertexPressed((Vertex) v);
             }
+                }
+            });
+            t.start();
         }
     }
 

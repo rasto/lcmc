@@ -776,6 +776,8 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
+                Tools.getGUIData().setTerminalPanel(
+                                              hi.getHost().getTerminalPanel());
                 getClusterBrowser().setRightComponentInView(hi);
             }
         } else if (vertexToConstraintPHMap.containsKey(v)) {

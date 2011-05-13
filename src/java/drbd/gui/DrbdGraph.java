@@ -629,6 +629,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Is called when one block device vertex was pressed. */
     @Override protected void oneVertexPressed(final Vertex v) {
         if (isVertexBlockDevice(v)) {
+            pickHost(v);
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             drbdInfo.setSelectedNode(bdi);
             drbdInfo.selectMyself();

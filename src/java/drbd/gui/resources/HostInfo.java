@@ -153,7 +153,6 @@ public final class HostInfo extends Info {
 
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
-        Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         final JTextArea ta = new JTextArea();
         ta.setFont(f);

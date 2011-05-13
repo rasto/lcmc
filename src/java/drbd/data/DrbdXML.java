@@ -1146,8 +1146,6 @@ public final class DrbdXML extends XML {
                 res = mDev.group(2);
                 volumeNr = mDev.group(3);
             }
-            System.out.println("dev nr: " +  devNr + " res: " + res     
-                               + " vnr: " + volumeNr);
             /* get blockdevice object from device */
             final BlockDevInfo bdi =
                                   getBlockDevInfo(devNr, hostName, drbdGraph);
@@ -1182,8 +1180,6 @@ public final class DrbdXML extends XML {
                 res = mDev.group(2);
                 volumeNr = mDev.group(3);
             }
-            System.out.println("dev nr: " +  devNr + " res: " + res     
-                               + " vnr: " + volumeNr);
             final BlockDevInfo bdi =
                                    getBlockDevInfo(devNr, hostName, drbdGraph);
             if (bdi != null && bdi.getBlockDevice().isDrbd()) {
@@ -1214,8 +1210,6 @@ public final class DrbdXML extends XML {
                 res = mDev.group(2);
                 volumeNr = mDev.group(3);
             }
-            System.out.println("dev nr: " +  devNr + " res: " + res     
-                               + " vnr: " + volumeNr);
             Tools.debug(this, "drbd event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
                 final BlockDevInfo bdi = getBlockDevInfo(devNr,
