@@ -23,9 +23,9 @@ package drbd;
 
 import drbd.utilities.Tools;
 
-import drbd.gui.dialog.drbdConfig.DrbdConfig;
+import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.drbdConfig.Start;
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdInfo;
 
 /**
  * AddDrbdConfigDialog.
@@ -39,34 +39,34 @@ public final class AddDrbdConfigDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
-    private final DrbdResourceInfo dri;
+    private final DrbdInfo drbdInfo;
 
     /** Prepares new <code>AddDrbdConfigDialog</code> object. */
-    public AddDrbdConfigDialog(final DrbdResourceInfo dri) {
-        this.dri = dri;
+    public AddDrbdConfigDialog(final DrbdInfo drbdInfo) {
+        this.drbdInfo = drbdInfo;
     }
 
     /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
-        dri.setDialogStarted(true);
-        DrbdConfig dialog = new Start(null, dri);
+        //dri.setDialogStarted(true);
+        WizardDialog dialog = new Start(null, drbdInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
-            final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
+            final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                dri.getBrowser().reloadAllComboBoxes(null);
-                dri.setDialogStarted(false);
+                //dri.getBrowser().reloadAllComboBoxes(null);
+                //dri.setDialogStarted(false);
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
-        dri.setDialogStarted(false);
-        dri.getBrowser().reloadAllComboBoxes(null);
+        //dri.setDialogStarted(false);
+        //dri.getBrowser().reloadAllComboBoxes(null);
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
     }

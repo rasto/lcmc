@@ -702,10 +702,13 @@ public final class DrbdInfo extends DrbdGuiInfo {
             if (bd2 != null) {
                 bd2.getBlockDevice().setNew(true);
             }
+            final DrbdInfo thisClass = this;
             final Thread thread = new Thread(new Runnable() {
                 @Override public void run() {
+                    // TODO: dri, driF not used
                     getBrowser().reload(drbdResourceNode, true);
-                    AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(driF);
+                    AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(
+                                                                    thisClass);
                     adrd.showDialogs();
                     /* remove wizard parameters from hashes. */
                     for (final String p : bd1.getParametersFromXML()) {

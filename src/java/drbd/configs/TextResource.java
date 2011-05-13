@@ -913,6 +913,19 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.Cluster.Finish.Save",
          "Save"},
 
+        {"Dialog.DrbdConfig.Start.Title",
+         "Configure DRBD Volumes"},
+
+        {"Dialog.DrbdConfig.Start.Description",
+         "Choose whether a new DRBD resource should be created or add a volume"
+         + " to the existing DRBD resource."},
+
+        {"Dialog.DrbdConfig.Start.DrbdResource",
+         "DRBD Resource"},
+
+        {"Dialog.DrbdConfig.Start.NewDrbdResource",
+         "New DRBD Resource"},
+
         {"Dialog.DrbdConfig.Resource.Title",
          "Configure DRBD Resource"},
 

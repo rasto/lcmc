@@ -24,17 +24,27 @@ package drbd.gui.dialog.drbdConfig;
 
 import drbd.utilities.Tools;
 import drbd.gui.resources.DrbdInfo;
+import drbd.gui.resources.Info;
+import drbd.gui.resources.StringInfo;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.dialog.WizardDialog;
+import drbd.gui.SpringUtilities;
+import drbd.gui.GuiComboBox;
+import drbd.data.ConfigData;
+import drbd.data.AccessMode;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+import javax.swing.SpringLayout;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.awt.Component;
 import java.awt.Dimension;
 
@@ -46,75 +56,44 @@ import java.awt.Dimension;
  * @version $Id$
  *
  */
-public final class Start extends DrbdConfig {
+public final class Start extends WizardDialog {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    ///** Wfc timeout option string. */
-    //private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
-    ///** Degr wfc timeout option string. */
-    //private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
-
-    ///** cram-hmac-alg option string. */
-    //private static final String CRAM_HMAC_ALG = "cram-hmac-alg";
-    ///** shared-secret option string. */
-    //private static final String SHARED_SECRET = "shared-secret";
-    ///** on-io-error option string. */
-    //private static final String ON_IO_ERROR = "on-io-error";
-    ///** Common configuration options. */
-    //private static final String[] COMMON_PARAMS = {CRAM_HMAC_ALG,
-    //                                               SHARED_SECRET,
-    //                                               WFC_TIMEOUT_PARAM,
-    //                                               DEGR_WFC_TIMEOUT_PARAM,
-    //                                               ON_IO_ERROR};
-    ///** Configuration options of the drbd resource. */
-    //private static final String[] PARAMS = {"name",
-    //                                        "device",
-    //                                        "protocol",
-    //                                        CRAM_HMAC_ALG,
-    //                                        SHARED_SECRET,
-    //                                        WFC_TIMEOUT_PARAM,
-    //                                        DEGR_WFC_TIMEOUT_PARAM,
-    //                                        ON_IO_ERROR};
-    ///** Length of the secret string. */
-    //private static final int SECRET_STRING_LENGTH = 32;
+    /** DRBD resource pulldown menu. */
+    private GuiComboBox drbdResourceCB;
+    /** Width of the combo boxes. */
+    private static final int COMBOBOX_WIDTH = 250;
+    /** DRBD info object. */
+    private DrbdInfo drbdInfo;
+    /** DRBD resource info object. */
+    private DrbdResourceInfo drbdResourceInfo;
 
     /** Prepares a new <code>Start</code> object. */
     public Start(final WizardDialog previousDialog,
-                 final DrbdResourceInfo dri) {
-        super(previousDialog, dri);
+                 final DrbdInfo drbdInfo) {
+        super(previousDialog);
+        this.drbdInfo = drbdInfo;
     }
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
-        //final DrbdResourceInfo dri = getDrbdResourceInfo();
-        //final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        //if (drbdInfo.getDrbdResources().size() <= 1) {
-        //    for (final String commonP : COMMON_PARAMS) {
-        //        final String value = dri.getComboBoxValue(commonP);
-        //        drbdInfo.getResource().setValue(commonP, value);
-        //        drbdInfo.paramComboBoxGet(commonP, null).setValue(value);
-        //    }
-        //}
-        //Tools.waitForSwing();
-        //drbdInfo.apply(false);
-        //dri.apply(false);
-        return new Resource(this, getDrbdResourceInfo());
+        return new Resource(this, drbdResourceInfo);
     }
 
     /**
      * Returns the title of the dialog. It is defined as
-     * Dialog.DrbdConfig.Resource.Title in TextResources.
+     * Dialog.DrbdConfig.Start.Title in TextResources.
      */
     @Override protected String getDialogTitle() {
-        return Tools.getString("Dialog.DrbdConfig.Resource.Title");
+        return Tools.getString("Dialog.DrbdConfig.Start.Title");
     }
 
     /**
      * Returns the description of the dialog. It is defined as
-     * Dialog.DrbdConfig.Resource.Description in TextResources.
+     * Dialog.DrbdConfig.Start.Description in TextResources.
      */
     @Override protected String getDescription() {
-        return Tools.getString("Dialog.DrbdConfig.Resource.Description");
+        return Tools.getString("Dialog.DrbdConfig.Start.Description");
     }
 
     /** Inits dialog. */
@@ -133,74 +112,43 @@ public final class Start extends DrbdConfig {
 
     /** Returns input pane where user can configure a drbd resource. */
     @Override protected JComponent getInputPane() {
-        //final DrbdResourceInfo dri = getDrbdResourceInfo();
-        //final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        //dri.waitForInfoPanel();
-        //Tools.waitForSwing();
-        final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
+        final JPanel pane = new JPanel(new SpringLayout());
+        final JPanel inputPane = new JPanel(new SpringLayout());
 
-        final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        ///* common options */
-        //final Map<String, String> commonPreferredValue =
-        //                                        new HashMap<String, String>();
-        //commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, "0");
-        //commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
-        //commonPreferredValue.put(SHARED_SECRET, getRandomSecret());
-        //commonPreferredValue.put(ON_IO_ERROR, "detach");
-        //if (drbdInfo.getDrbdResources().size() <= 1) {
-        //    for (final String commonP : COMMON_PARAMS) {
-        //        /* for the first resource set common options. */
-        //        final String commonValue =
-        //                              drbdInfo.getResource().getValue(commonP);
-        //        if (commonPreferredValue.containsKey(commonP)) {
-        //            final String defaultValue =
-        //                       drbdInfo.getParamDefault(commonP);
-        //            if ((defaultValue == null && "".equals(commonValue))
-        //                || (defaultValue != null
-        //                    && defaultValue.equals(commonValue))) {
-        //                drbdInfo.paramComboBoxGet(commonP, null).setValue(
-        //                                    commonPreferredValue.get(commonP));
-        //                dri.getResource().setValue(
-        //                                    commonP,
-        //                                    commonPreferredValue.get(commonP));
-        //            } else {
-        //                dri.getResource().setValue(commonP, commonValue);
-        //            }
-        //        }
-        //    }
-        //} else {
-        //    /* resource options, if not defined in common section. */
-        //    for (final String commonP : COMMON_PARAMS) {
-        //        final String commonValue =
-        //                              drbdInfo.getResource().getValue(commonP);
-        //        if ("".equals(commonValue)
-        //            && commonPreferredValue.containsKey(commonP)) {
-        //            dri.getResource().setValue(
-        //                                    commonP,
-        //                                    commonPreferredValue.get(commonP));
-        //        }
-        //    }
-        //}
+        /* Drbd Resource */
+        final JLabel drbdResourceLabel = new JLabel(
+                    Tools.getString("Dialog.DrbdConfig.Start.DrbdResource"));
+        final String newDrbdResource =
+                    Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
+        final List<Info> choices = new ArrayList<Info>();
+        choices.add(new StringInfo(newDrbdResource, null, null));
+        for (final DrbdResourceInfo dri : drbdInfo.getDrbdResources()) {
+            choices.add(dri);
+        }
+        drbdResourceCB = new GuiComboBox(null,
+                                         choices.toArray(
+                                                    new Info[choices.size()]),
+                                         null, /* units */
+                                         GuiComboBox.Type.COMBOBOX,
+                                         null, /* regexp */
+                                         COMBOBOX_WIDTH,
+                                         null, /* abbrv */
+                                         new AccessMode(
+                                                  ConfigData.AccessType.RO,
+                                                  false)); /* only adv. mode */
+        inputPane.add(drbdResourceLabel);
+        inputPane.add(drbdResourceCB);
+        SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols
+                                                   1, 1,  // initX, initY
+                                                   1, 1); // xPad, yPad
 
+        pane.add(inputPane);
+        pane.add(getProgressBarPane(null));
+        pane.add(getAnswerPane(""));
+        SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
+                                              0, 0,  // initX, initY
+                                              0, 0); // xPad, yPad
 
-        //dri.addWizardParams(
-        //          optionsPanel,
-        //          PARAMS,
-        //          buttonClass(nextButton()),
-        //          Tools.getDefaultInt("Dialog.DrbdConfig.Resource.LabelWidth"),
-        //          Tools.getDefaultInt("Dialog.DrbdConfig.Resource.FieldWidth"),
-        //          null);
-
-        inputPane.add(optionsPanel);
-        //final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
-        //final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
-        //buttonClass(nextButton()).setEnabled(ch && cor);
-        final JScrollPane sp = new JScrollPane(inputPane);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        return sp;
+        return pane;
     }
 }
