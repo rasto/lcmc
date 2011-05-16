@@ -27,6 +27,7 @@ import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.StringInfo;
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
 import drbd.gui.GuiComboBox;
@@ -65,18 +66,32 @@ public final class Start extends WizardDialog {
     private static final int COMBOBOX_WIDTH = 250;
     /** DRBD info object. */
     private DrbdInfo drbdInfo;
+    /** The first block device info object. */
+    private BlockDevInfo blockDevInfo1;
+    /** The second block device info object. */
+    private BlockDevInfo blockDevInfo2;
     /** DRBD resource info object. */
     private DrbdResourceInfo drbdResourceInfo;
 
     /** Prepares a new <code>Start</code> object. */
     public Start(final WizardDialog previousDialog,
-                 final DrbdInfo drbdInfo) {
+                 final DrbdInfo drbdInfo,
+                 final BlockDevInfo blockDevInfo1,
+                 final BlockDevInfo blockDevInfo2) {
         super(previousDialog);
         this.drbdInfo = drbdInfo;
+        this.blockDevInfo1 = blockDevInfo1;
+        this.blockDevInfo2 = blockDevInfo2;
     }
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
+        if (drbdResourceInfo == null) {
+            System.out.println("new drbd resource");
+            drbdResourceInfo = drbdInfo.getNewDrbdResource(blockDevInfo1,
+                                                           blockDevInfo2);
+            drbdInfo.addDrbdResource(drbdResourceInfo);
+        }
         return new Resource(this, drbdResourceInfo);
     }
 

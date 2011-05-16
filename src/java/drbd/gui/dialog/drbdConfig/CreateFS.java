@@ -74,8 +74,8 @@ final class CreateFS extends DrbdConfig {
 
     /** Prepares a new <code>CreateFS</code> object. */
     CreateFS(final WizardDialog previousDialog,
-             final DrbdResourceInfo dri) {
-        super(previousDialog, dri);
+             final DrbdVolumeInfo drbdVolumeInfo) {
+        super(previousDialog, drbdVolumeInfo);
     }
 
     /**
@@ -236,9 +236,8 @@ final class CreateFS extends DrbdConfig {
         /* host */
         final String[] hostNames = new String[3];
         hostNames[0] = NO_HOST_STRING;
-        final Host[] hosts = getDrbdResourceInfo().getHosts();
         int i = 1;
-        for (Host host : hosts) {
+        for (final Host host : getDrbdResourceInfo().getHosts()) {
             hostNames[i] = host.getName();
             i++;
         }

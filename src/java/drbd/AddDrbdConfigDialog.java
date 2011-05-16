@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.drbdConfig.Start;
 import drbd.gui.resources.DrbdInfo;
+import drbd.gui.resources.BlockDevInfo;
 
 /**
  * AddDrbdConfigDialog.
@@ -40,16 +41,27 @@ public final class AddDrbdConfigDialog {
     private boolean canceled = false;
     /** Drbd resource info object. */
     private final DrbdInfo drbdInfo;
+    /** The first block device. */
+    private final BlockDevInfo blockDevInfo1;
+    /** The second block device. */
+    private final BlockDevInfo blockDevInfo2;
 
     /** Prepares new <code>AddDrbdConfigDialog</code> object. */
-    public AddDrbdConfigDialog(final DrbdInfo drbdInfo) {
+    public AddDrbdConfigDialog(final DrbdInfo drbdInfo,
+                               final BlockDevInfo blockDevInfo1,
+                               final BlockDevInfo blockDevInfo2) {
         this.drbdInfo = drbdInfo;
+        this.blockDevInfo1 = blockDevInfo1;
+        this.blockDevInfo2 = blockDevInfo2;
     }
 
     /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
         //dri.setDialogStarted(true);
-        WizardDialog dialog = new Start(null, drbdInfo);
+        WizardDialog dialog = new Start(null,
+                                        drbdInfo,
+                                        blockDevInfo1,
+                                        blockDevInfo2);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();

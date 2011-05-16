@@ -65,12 +65,8 @@ import javax.swing.JScrollPane;
 public final class DrbdResourceInfo extends DrbdGuiInfo
                                     implements CommonDeviceInterface {
     /** Volumes volume nr - list of blockdevices. */
-    private final Map<String, List<BlockDevInfo>> volumes =
-                            new LinkedHashMap<String, List<BlockDevInfo>>();
-    /** BlockDevInfo object of the first block device. */
-    private final BlockDevInfo blockDevInfo1;
-    /** BlockDevInfo object of the second block device. */
-    private final BlockDevInfo blockDevInfo2;
+    private final Map<String, DRBDVolumeInfo> drbdVolumes =
+                                new LinkedHashMap<String, DRBDVolumeInfo>();
     /**
      * Whether the block device is used by heartbeat via Filesystem service.
      */
@@ -97,16 +93,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
      */
     DrbdResourceInfo(final String name,
                      final String drbdDev,
-                     final BlockDevInfo blockDevInfo1,
-                     final BlockDevInfo blockDevInfo2,
+                     final DrbdVolumeInfo drbdVolume,
                      final Browser browser) {
         super(name, browser);
-        setResource(new DrbdResource(name, null)); // TODO: ?
-        setResource(new DrbdResource(name, drbdDev)); // TODO: ?
-        // TODO: drbdresource
+        setResource(new DrbdResource(name, drbdDev));
         getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
-        this.blockDevInfo1 = blockDevInfo1;
-        this.blockDevInfo2 = blockDevInfo2;
+        drbdVolumes.add(drbdVolume);
     }
 
     /** Returns device name, like /dev/drbd0. */
@@ -115,29 +107,38 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns other block device in the drbd cluster. */
-    public BlockDevInfo getOtherBlockDevInfo(final BlockDevInfo bdi) {
-        if (bdi.equals(blockDevInfo1)) {
-            return blockDevInfo2;
-        } else if (bdi.equals(blockDevInfo2)) {
-            return blockDevInfo1;
-        } else {
-            return null;
+    public BlockDevInfo getOtherBlockDevInfo(final DrbdVolumeInfo volume,
+                                             final BlockDevInfo thisBDI) {
+        if (thisBDI.equals(volume.get(0))) {
+            return volume.getBlockDevices().get(1);
         }
+        for (final BlockDevInfo bdi : volume.getBlockDevices()) {
+            if (bdi == volume.getBlockDevices().get(0)) {
+                /* skip first */
+                continue;
+            }
+            if (thisBDI.equals(bdi)) {
+                return volume.getBlockDevices().get(0);
+            }
+
+        }
+        return null;
     }
 
     /** Returns first block dev info. */
-    public BlockDevInfo getFirstBlockDevInfo() {
-        return blockDevInfo1;
+    public BlockDevInfo getFirstBlockDevInfo(final DrbdVolumeInfo volume) {
+        return volume.getBlockDevices().get(0);
     }
 
     /** Returns second block dev info. */
     public BlockDevInfo getSecondBlockDevInfo() {
-        return blockDevInfo2;
+        return volume.getBlockDevices().get(1);
     }
 
     /** Returns true if this is first block dev info. */
-    public boolean isFirstBlockDevInfo(final BlockDevInfo bdi) {
-        return blockDevInfo1 == bdi;
+    public boolean isFirstBlockDevInfo(final DrbdVolumeInfo volume,
+                                       final BlockDevInfo bdi) {
+        return volume.getBlockDevices().get(0) == bdi;
     }
 
     /** Creates and returns drbd config for resources. */
@@ -171,9 +172,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             throw dce;
         }
         /* startup disk syncer net */
-        config.append(blockDevInfo1.drbdNodeConfig(getName(), getDevice()));
-        config.append('\n');
-        config.append(blockDevInfo2.drbdNodeConfig(getName(), getDevice()));
+        // TODO:
+        //config.append(blockDevInfo1.drbdNodeConfig(getName(), getDevice()));
+        //config.append('\n');
+        //config.append(blockDevInfo2.drbdNodeConfig(getName(), getDevice()));
         config.append('}');
         return config.toString();
     }
@@ -184,40 +186,55 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns sync progress in percent. */
-    public String getSyncedProgress() {
-        return blockDevInfo1.getBlockDevice().getSyncedProgress();
+    public String getSyncedProgress(final DrbdVolumeInfo drbdVolume) {
+        return drbdVolumes.getBlockDevices(0).getBlockDevice()
+                                                        .getSyncedProgress();
     }
 
     /** Returns whether the cluster is syncing. */
-    public boolean isSyncing() {
-        return blockDevInfo1.getBlockDevice().isSyncing()
-               || blockDevInfo2.getBlockDevice().isSyncing();
+    public boolean isSyncing(final DrbdVolumeInfo drbdVolume) {
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
+            if (bdi.getBlockDevice().isSyncing()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Returns whether the cluster is being verified. */
-    public boolean isVerifying() {
-        return blockDevInfo1.getBlockDevice().isVerifying()
-               || blockDevInfo2.getBlockDevice().isVerifying();
+    public boolean isVerifying(final DrbdVolumeInfo drbdVolume) {
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
+            if (bdi.getBlockDevice().isVerifying()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Connect block device from the specified host. */
     public void connect(final Host host, final boolean testOnly) {
-        if (blockDevInfo1.getHost() == host
-            && !blockDevInfo1.isConnectedOrWF(false)) {
-            blockDevInfo1.connect(testOnly);
-        } else if (blockDevInfo2.getHost() == host
-                   && !blockDevInfo2.isConnectedOrWF(false)) {
-            blockDevInfo2.connect(testOnly);
-        }
+        // TODO
+        //if (blockDevInfo1.getHost() == host
+        //    && !blockDevInfo1.isConnectedOrWF(false)) {
+        //    blockDevInfo1.connect(testOnly);
+        //} else if (blockDevInfo2.getHost() == host
+        //           && !blockDevInfo2.isConnectedOrWF(false)) {
+        //    blockDevInfo2.connect(testOnly);
+        //}
     }
 
     /**
      * Returns whether the resources is connected, meaning both devices are
      * connected.
      */
-    public boolean isConnected(final boolean testOnly) {
-        return blockDevInfo1.isConnected(testOnly)
-               && blockDevInfo2.isConnected(testOnly);
+    public boolean isConnected(final DrbdVolumeInfo drbdVolume,
+                               final boolean testOnly) {
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
+            if (!bdi.isConnected(testOnly)) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -225,8 +242,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
      * paused-sync state.
      */
     boolean isPausedSync() {
-        return blockDevInfo1.getBlockDevice().isPausedSync()
-               || blockDevInfo2.getBlockDevice().isPausedSync();
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
+            if (bdi.getBlockDevice().isPausedSync()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -234,8 +255,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
      * split-brain.
      */
     public boolean isSplitBrain() {
-        return blockDevInfo1.getBlockDevice().isSplitBrain()
-               || blockDevInfo2.getBlockDevice().isSplitBrain();
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
+            if (bdi.getBlockDevice().isSplitBrain()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Returns drbd graphical view. */
@@ -456,16 +481,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
     /** Set all apply buttons. */
     void setAllApplyButtons() {
-        final BlockDevInfo bdi1 = blockDevInfo1;
-        if (bdi1 != null) {
-            bdi1.storeComboBoxValues(bdi1.getParametersFromXML());
-            bdi1.setApplyButtons(null, bdi1.getParametersFromXML());
-        }
-
-        final BlockDevInfo bdi2 = blockDevInfo2;
-        if (bdi2 != null) {
-            bdi2.storeComboBoxValues(bdi2.getParametersFromXML());
-            bdi2.setApplyButtons(null, bdi2.getParametersFromXML());
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi != null) {
+                    bdi.storeComboBoxValues(bdi.getParametersFromXML());
+                    bdi.setApplyButtons(null, bdi.getParametersFromXML());
+                }
+            }
         }
         setApplyButtons(null, getParametersFromXML());
     }
@@ -654,8 +676,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         getBrowser().putDrbdResHash();
         getBrowser().getDrbdDevHash().remove(getDevice());
         getBrowser().putDrbdDevHash();
-        blockDevInfo1.removeFromDrbd();
-        blockDevInfo2.removeFromDrbd();
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                bdi.removeFromDrbd();
+            }
+        }
     }
 
     /**
@@ -680,10 +705,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         getBrowser().getDrbdDevHash().remove(getDevice());
         getBrowser().putDrbdDevHash();
-        blockDevInfo1.removeFromDrbd();
-        blockDevInfo2.removeFromDrbd();
-        blockDevInfo1.removeMyself(testOnly);
-        blockDevInfo2.removeMyself(testOnly);
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                bdi.removeFromDrbd();
+                bdi.removeMyself(testOnly);
+            }
+        }
         getBrowser().updateCommonBlockDevices();
 
         try {
@@ -847,14 +874,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
-    public Host[] getHosts() {
-        final Host h1 = blockDevInfo1.getHost();
-        final Host h2 = blockDevInfo2.getHost();
-        if (h1.getName().compareToIgnoreCase(h2.getName()) < 0) {
-            return new Host[]{h1, h2};
-        } else {
-            return new Host[]{h2, h1};
+    public Set<Host> getHosts() {
+        final TreeSet<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
+            @Override public int compare(final Host h1, final String h2) {
+                return h1.getName().compareToIgnoreCase(h2.getName());
+            }
+        });
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                hosts.add(bdi.getHost());
+            }
         }
+        return hosts;
     }
 
     /** Starts resolve split brain dialog. */
@@ -864,15 +895,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Starts online verification. */
-    void verify(final boolean testOnly) {
-        blockDevInfo1.verify(testOnly);
+    void verify(final DrbdVolumeInfo drbdVolume, final boolean testOnly) {
+        drbdVolume.getBlockDevices().get(0).verify(testOnly);
     }
 
     /** Returns whether the specified host has this drbd resource. */
     boolean resourceInHost(final Host host) {
-        if (blockDevInfo1.getHost() == host
-            || blockDevInfo2.getHost() == host) {
-            return true;
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi.getHost() == host) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -1123,15 +1157,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     }
 
     /** Returns tool tip when mouse is over the resource edge. */
-    @Override public String getToolTipForGraph(final boolean testOnly) {
+    @Override public String getToolTipForGraph(final DrbdVolumeInfo drbdVolume,
+                                               final boolean testOnly) {
         final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>");
         s.append(getName());
         s.append("</b><br>");
         if (isSyncing()) {
             final String spString = getSyncedProgress();
-            final String bsString =
-                                blockDevInfo1.getBlockDevice().getBlockSize();
+            final String bsString = drbdVolume.getBlockDevices().get(0)
+                                            .getBlockDevice().getBlockSize();
             final String rateString = getResource().getValue("rate");
             if (spString != null && bsString != null && rateString != null) {
                 final double sp = Double.parseDouble(spString);
@@ -1177,10 +1212,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
 
     /** Returns how much diskspace is used on the primary. */
     @Override public int getUsed() {
-        if (blockDevInfo1.getBlockDevice().isPrimary()) {
-            return blockDevInfo1.getBlockDevice().getUsed();
-        } else if (blockDevInfo2.getBlockDevice().isPrimary()) {
-            return blockDevInfo2.getBlockDevice().getUsed();
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi.getBlockDevice().isPrimary()) {
+                    return bdi.getBlockDevice().getUsed();
+                }
+            }
         }
         return -1;
     }
@@ -1234,22 +1271,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             di.setApplyButtons(null, di.getParametersFromXML());
         }
         boolean changed = false;
-        final BlockDevInfo bdi1 = blockDevInfo1;
-        if (bdi1 != null
-            && bdi1.checkResourceFieldsChanged(param,
-                                               bdi1.getParametersFromXML(),
-                                               fromDrbdInfo,
-                                               true)) {
-            changed = true;
-        }
-
-        final BlockDevInfo bdi2 = blockDevInfo2;
-        if (bdi2 != null
-            && bdi2.checkResourceFieldsChanged(param,
-                                               bdi2.getParametersFromXML(),
-                                               fromDrbdInfo,
-                                               true)) {
-            changed = true;
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi != null
+                    && bdi.checkResourceFieldsChanged(
+                                                  param,
+                                                  bdi.getParametersFromXML(),
+                                                  fromDrbdInfo,
+                                                  true)) {
+                    changed = true;
+                }
+            }
         }
         return super.checkResourceFieldsChanged(param, params) || changed;
     }
@@ -1276,24 +1308,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                                        final boolean fromDrbdInfo) {
         final DrbdInfo di = getDrbdInfo();
         boolean correct = true;
-        final BlockDevInfo bdi1 = blockDevInfo1;
-        if (bdi1 != null
-            && !bdi1.getBlockDevice().isNew()
-            && !bdi1.checkResourceFieldsCorrect(param,
-                                                bdi1.getParametersFromXML(),
-                                                fromDrbdInfo,
-                                                true)) {
-            correct = false;
-        }
-
-        final BlockDevInfo bdi2 = blockDevInfo2;
-        if (bdi2 != null
-            && !bdi2.getBlockDevice().isNew()
-            && !bdi2.checkResourceFieldsCorrect(param,
-                                                bdi2.getParametersFromXML(),
-                                                fromDrbdInfo,
-                                                true)) {
-            correct = false;
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi != null
+                    && !bdi.getBlockDevice().isNew()
+                    && !bdi.checkResourceFieldsCorrect(
+                                                    param,
+                                                    bdi.getParametersFromXML(),
+                                                    fromDrbdInfo,
+                                                    true)) {
+                    correct = false;
+                }
+            }
         }
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
@@ -1301,32 +1327,37 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Revert all values. */
     @Override public void revert() {
         super.revert();
-        final BlockDevInfo bdi1 = blockDevInfo1;
-        if (bdi1 != null) {
-            bdi1.revert();
-        }
-        final BlockDevInfo bdi2 = blockDevInfo2;
-        if (bdi2 != null) {
-            bdi2.revert();
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi != null) {
+                    bdi.revert();
+                }
+            }
         }
     }
 
     /** Sets if dialog was started. It disables the apply button. */
     @Override public void setDialogStarted(final boolean dialogStarted) {
-        final BlockDevInfo bdi1 = blockDevInfo1;
-        if (bdi1 != null) {
-            bdi1.setDialogStarted(dialogStarted);
-        }
-        final BlockDevInfo bdi2 = blockDevInfo2;
-        if (bdi2 != null) {
-            bdi2.setDialogStarted(dialogStarted);
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi != null) {
+                    bdi.setDialogStarted(dialogStarted);
+                }
+            }
         }
         super.setDialogStarted(dialogStarted);
     }
 
     /** Returns volume number of the block device. */
-    String getVolumeNr(final BlockDevInfo bdi) {
-        // TODO:
-        return "0";
+    String getVolumeNr(final BlockDevInfo thisBDI) {
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+                if (bdi == thisBDI) {
+                    return dvi.getName();
+                }
+            }
+        }
+        Tools.appWarning("could not get volume nr for: " + bdi.getName());
+        return null;
     }
 }

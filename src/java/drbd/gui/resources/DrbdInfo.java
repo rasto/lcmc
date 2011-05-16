@@ -569,22 +569,151 @@ public final class DrbdInfo extends DrbdGuiInfo {
         return index + 1;
     }
 
+    /** Add drbd volume. */
+    public void addDrbdVolume(final BlockDevInfo bd1,
+                              final BlockDevInfo bd2,
+                              final boolean interactive,
+                              final boolean testOnly) {
+        if (interactive) {
+            if (bd1 != null) {
+                bd1.getBlockDevice().setNew(true);
+            }
+            if (bd2 != null) {
+                bd2.getBlockDevice().setNew(true);
+            }
+            final DrbdInfo thisClass = this;
+            final Thread thread = new Thread(new Runnable() {
+                @Override public void run() {
+                    //getBrowser().reload(drbdResourceNode, true);
+                    AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(
+                                                                    thisClass,
+                                                                    bd1,
+                                                                    bd2);
+                    adrd.showDialogs();
+                    /* remove wizard parameters from hashes. */
+                    for (final String p : bd1.getParametersFromXML()) {
+                        bd1.paramComboBoxRemove(p, "wizard");
+                        bd2.paramComboBoxRemove(p, "wizard");
+                    }
+                    if (adrd.isCanceled()) {
+                        getBrowser().getDrbdGraph().stopAnimation(bd1);
+                        getBrowser().getDrbdGraph().stopAnimation(bd2);
+                        return;
+                    }
+
+                    getBrowser().updateCommonBlockDevices();
+                    final DrbdXML newDrbdXML =
+                        new DrbdXML(getBrowser().getCluster().getHostsArray());
+                    final String configString1 =
+                                    newDrbdXML.getConfig(bd1.getHost());
+                    newDrbdXML.update(configString1);
+                    final String configString2 =
+                                    newDrbdXML.getConfig(bd2.getHost());
+                    newDrbdXML.update(configString2);
+                    getBrowser().setDrbdXML(newDrbdXML);
+                    getBrowser().resetFilesystems();
+                }
+            });
+            thread.start();
+        } else {
+            getBrowser().resetFilesystems();
+        }
+    }
+
+    /** Return new DRBD resoruce info object. */
+    public DrbdResourceInfo getNewDrbdResource(final BlockDevInfo bd1,
+                                               final BlockDevInfo bd2) {
+        int index = getNewDrbdResourceIndex();
+        String name = "r" + Integer.toString(index);
+        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
+
+        /* search for next available drbd device */
+        final Map<String, DrbdResourceInfo> drbdDevHash =
+                                             getBrowser().getDrbdDevHash();
+        while (drbdDevHash.containsKey(drbdDevStr)) {
+            index++;
+            drbdDevStr = "/dev/drbd" + Integer.toString(index);
+        }
+        getBrowser().putDrbdDevHash();
+        return new DrbdResourceInfo(name,
+                                    drbdDevStr,
+                                    bd1,
+                                    bd2,
+                                    getBrowser());
+    }
+
+    /** Add DRBD resource. */
+    public void addDrbdResource(final DrbdResourceInfo dri) {
+        /* We want next port number on both devices to be the same,
+         * although other port numbers may not be the same on both. */
+        final BlockDevInfo bd1 = dri.getFirstBlockDevInfo();
+        final BlockDevInfo bd2 = dri.getSecondBlockDevInfo();
+        final String name = dri.getName();
+        final String drbdDevStr = dri.getDevice();
+        final int viPort1 = bd1.getNextVIPort();
+        final int viPort2 = bd2.getNextVIPort();
+        final int viPort;
+        if (viPort1 > viPort2) {
+            viPort = viPort1;
+        } else {
+            viPort = viPort2;
+        }
+        bd1.setDefaultVIPort(viPort + 1);
+        bd2.setDefaultVIPort(viPort + 1);
+
+        dri.getDrbdResource().setDefaultValue(
+                                        DrbdResourceInfo.DRBD_RES_PARAM_NAME,
+                                        name);
+        dri.getDrbdResource().setDefaultValue(
+                                        DrbdResourceInfo.DRBD_RES_PARAM_DEV,
+                                        drbdDevStr);
+        getBrowser().getDrbdResHash().put(name, dri);
+        getBrowser().putDrbdResHash();
+        getBrowser().getDrbdDevHash().put(drbdDevStr, dri);
+        getBrowser().putDrbdDevHash();
+
+        if (bd1 != null) {
+            bd1.setDrbd(true);
+            bd1.setDrbdResourceInfo(dri);
+            bd1.cleanup();
+            bd1.setInfoPanel(null); /* reload panel */
+            bd1.getInfoPanel();
+        }
+        if (bd2 != null) {
+            bd2.setDrbd(true);
+            bd2.setDrbdResourceInfo(dri);
+            bd2.cleanup();
+            bd2.setInfoPanel(null); /* reload panel */
+            bd2.getInfoPanel();
+        }
+
+        final DefaultMutableTreeNode drbdResourceNode =
+                                           new DefaultMutableTreeNode(dri);
+        dri.setNode(drbdResourceNode);
+
+        getBrowser().getDrbdNode().add(drbdResourceNode);
+
+        final DefaultMutableTreeNode drbdBDNode1 =
+                                           new DefaultMutableTreeNode(bd1);
+        bd1.setNode(drbdBDNode1);
+        final DefaultMutableTreeNode drbdBDNode2 =
+                                           new DefaultMutableTreeNode(bd2);
+        bd2.setNode(drbdBDNode2);
+        drbdResourceNode.add(drbdBDNode1);
+        drbdResourceNode.add(drbdBDNode2);
+
+        getBrowser().getDrbdGraph().addDrbdResource(dri, bd1, bd2);
+        dri.getInfoPanel();
+        getBrowser().reload(drbdResourceNode, true);
+        getBrowser().resetFilesystems();
+    }
+
     /**
      * Adds drbd resource. If resource name and drbd device are null.
      * They will be created with first unused index. E.g. r0, r1 ...
      * /dev/drbd0, /dev/drbd1 ... etc.
-     *
-     * @param name
-     *              resource name.
-     * @param drbdDevStr
-     *              drbd device like /dev/drbd0
-     * @param bd1
-     *              block device
-     * @param bd2
-     *              block device
-     * @param interactive
-     *              whether dialog box will be displayed
      */
+    @Deprecated
     public boolean addDrbdResource(String name,
                                    String drbdDevStr,
                                    final BlockDevInfo bd1,
@@ -707,23 +836,23 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 @Override public void run() {
                     // TODO: dri, driF not used
                     getBrowser().reload(drbdResourceNode, true);
-                    AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(
-                                                                    thisClass);
-                    adrd.showDialogs();
-                    /* remove wizard parameters from hashes. */
-                    for (final String p : bd1.getParametersFromXML()) {
-                        bd1.paramComboBoxRemove(p, "wizard");
-                        bd2.paramComboBoxRemove(p, "wizard");
-                    }
-                    for (final String p : driF.getParametersFromXML()) {
-                        driF.paramComboBoxRemove(p, "wizard");
-                    }
-                    if (adrd.isCanceled()) {
-                        driF.removeMyselfNoConfirm(testOnly);
-                        getBrowser().getDrbdGraph().stopAnimation(bd1);
-                        getBrowser().getDrbdGraph().stopAnimation(bd2);
-                        return;
-                    }
+                    //AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(
+                    //                                                thisClass);
+                    //adrd.showDialogs();
+                    ///* remove wizard parameters from hashes. */
+                    //for (final String p : bd1.getParametersFromXML()) {
+                    //    bd1.paramComboBoxRemove(p, "wizard");
+                    //    bd2.paramComboBoxRemove(p, "wizard");
+                    //}
+                    //for (final String p : driF.getParametersFromXML()) {
+                    //    driF.paramComboBoxRemove(p, "wizard");
+                    //}
+                    //if (adrd.isCanceled()) {
+                    //    driF.removeMyselfNoConfirm(testOnly);
+                    //    getBrowser().getDrbdGraph().stopAnimation(bd1);
+                    //    getBrowser().getDrbdGraph().stopAnimation(bd2);
+                    //    return;
+                    //}
 
                     getBrowser().updateCommonBlockDevices();
                     final DrbdXML newDrbdXML =

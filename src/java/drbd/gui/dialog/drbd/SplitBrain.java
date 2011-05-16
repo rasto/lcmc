@@ -145,11 +145,11 @@ public final class SplitBrain extends DrbdConfig {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */
-        final Host[] hosts = getDrbdResourceInfo().getHosts();
+        final Set<Host> hosts = getDrbdResourceInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
         hostCB = new GuiComboBox(null, /* selected value */
-                                 hosts,
+                                 hosts.toArray(new Host[hosts.size()]),
                                  null, /* units */
                                  GuiComboBox.Type.COMBOBOX,
                                  null, /* regexp */

@@ -22,12 +22,12 @@
 
 package drbd.gui.dialog.drbdConfig;
 
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.drbdVolumeInfo;
 import drbd.gui.dialog.WizardDialog;
 
 /**
  * DrbdConfig super class from which all the drbd config wizards can be
- * extended. It just adds DrbdResourceInfo field.
+ * extended. It just adds DrbdVolumeInfo field.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -36,17 +36,17 @@ public abstract class DrbdConfig extends WizardDialog {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Drbd resource info object. */
-    private final DrbdResourceInfo dri;
+    private final DrbdVolumeInfo drbdVolumeInfo;
 
     /** Prepares a new <code>DrbdConfig</code> object. */
     public DrbdConfig(final WizardDialog previousDialog,
-                      final DrbdResourceInfo dri) {
+                      final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog);
-        this.dri = dri;
+        this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
     /** Returns drbd resource info object. */
-    protected final DrbdResourceInfo getDrbdResourceInfo() {
+    protected final DrbdVolumeInfo getDrbdVolumeInfo() {
         return dri;
     }
 }

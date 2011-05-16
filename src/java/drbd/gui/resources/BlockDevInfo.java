@@ -1072,12 +1072,10 @@ public final class BlockDevInfo extends EditableInfo {
                 setInfoPanel(null);
                 oBdi.cleanup();
                 oBdi.setInfoPanel(null);
-                drbdInfo.addDrbdResource(null,
-                                         null,
-                                         thisClass,
-                                         oBdi,
-                                         true,
-                                         testOnly);
+                drbdInfo.addDrbdVolume(thisClass,
+                                       oBdi,
+                                       true,
+                                       testOnly);
             }
         };
     }
