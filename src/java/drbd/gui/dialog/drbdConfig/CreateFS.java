@@ -29,6 +29,7 @@ import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.StringInfo;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
@@ -92,8 +93,8 @@ final class CreateFS extends DrbdConfig {
 
     /** Returns the primary block device. */
     protected BlockDevInfo getPrimaryBD() {
-        final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
-        final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
+        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
+        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String h = hostCB.getStringValue();
         if (h.equals(bdi1.getHost().getName())) {
             return bdi1;
@@ -106,8 +107,8 @@ final class CreateFS extends DrbdConfig {
 
     /** Returns the secondary block device. */
     protected BlockDevInfo getSecondaryBD() {
-        final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
-        final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
+        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
+        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String h = hostCB.getStringValue();
         if (h.equals(bdi1.getHost().getName())) {
             return bdi2;
@@ -138,9 +139,9 @@ final class CreateFS extends DrbdConfig {
                 bdiPri.forcePrimary(testOnly);
                 final String fs = filesystemCB.getStringValue();
                 bdiPri.makeFilesystem(fs, testOnly);
-                if (bdiPri.getDrbdResourceInfo() != null) {
+                if (bdiPri.getDrbdVolumeInfo() != null) {
                     /* could be canceled */
-                    getDrbdResourceInfo().setCreatedFs(fs);
+                    getDrbdVolumeInfo().setCreatedFs(fs);
                     bdiPri.setSecondary(testOnly);
                     hostCB.setValue(NO_HOST_STRING);
                     filesystemCB.setValue(NO_FILESYSTEM_STRING);
@@ -237,7 +238,7 @@ final class CreateFS extends DrbdConfig {
         final String[] hostNames = new String[3];
         hostNames[0] = NO_HOST_STRING;
         int i = 1;
-        for (final Host host : getDrbdResourceInfo().getHosts()) {
+        for (final Host host : getDrbdVolumeInfo().getHosts()) {
             hostNames[i] = host.getName();
             i++;
         }
@@ -282,7 +283,8 @@ final class CreateFS extends DrbdConfig {
             defaultValue = "ext3";
         }
         final StringInfo[] filesystems =
-                    getDrbdResourceInfo().getCommonFileSystems(defaultValue);
+            getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
+                                                                defaultValue);
 
         filesystemCB = new GuiComboBox(defaultValue,
                                        filesystems,

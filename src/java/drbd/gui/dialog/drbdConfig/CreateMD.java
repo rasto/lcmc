@@ -26,6 +26,7 @@ import drbd.utilities.Tools;
 import drbd.utilities.ExecCallback;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
@@ -67,8 +68,8 @@ final class CreateMD extends DrbdConfig {
 
     /** Prepares a new <code>CreateMD</code> object. */
     CreateMD(final WizardDialog previousDialog,
-                       final DrbdResourceInfo dri) {
-        super(previousDialog, dri);
+                       final DrbdVolumeInfo dli) {
+        super(previousDialog, dli);
     }
 
     /** Creates meta-data and checks the results. */
@@ -82,10 +83,9 @@ final class CreateMD extends DrbdConfig {
         final String[] answer = new String[2];
         final Integer[] returnCode = new Integer[2];
         final BlockDevInfo[] bdis = {
-                                getDrbdResourceInfo().getFirstBlockDevInfo(),
-                                getDrbdResourceInfo().getSecondBlockDevInfo()
+                                getDrbdVolumeInfo().getFirstBlockDevInfo(),
+                                getDrbdVolumeInfo().getSecondBlockDevInfo()
                                     };
-        final String volumeNr = "0";
         for (int i = 0; i < 2; i++) {
             final int index = i;
             thread[i] = new Thread(
@@ -111,23 +111,24 @@ final class CreateMD extends DrbdConfig {
 
                         };
                     String drbdMetaDisk =
-                        getDrbdResourceInfo().getMetaDiskForHost(
-                                                        bdis[index].getHost(),
-                                                        volumeNr);
+                        getDrbdVolumeInfo().getMetaDiskForHost(
+                                                        bdis[index].getHost());
                     if ("internal".equals(drbdMetaDisk)) {
                         drbdMetaDisk = bdis[index].getName();
                     }
                     final boolean testOnly = false;
                     if (destroyData) {
                         DRBD.createMDDestroyData(
-                                            bdis[index].getHost(),
-                                            getDrbdResourceInfo().getName(),
-                                            drbdMetaDisk,
-                                            execCallback,
-                                            testOnly);
+                                    bdis[index].getHost(),
+                                    getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                       .getName(),
+                                    drbdMetaDisk,
+                                    execCallback,
+                                    testOnly);
                     } else {
                         DRBD.createMD(bdis[index].getHost(),
-                                      getDrbdResourceInfo().getName(),
+                                      getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                         .getName(),
                                       drbdMetaDisk,
                                       execCallback,
                                       testOnly);
@@ -181,12 +182,14 @@ final class CreateMD extends DrbdConfig {
      * returns the drbd config create fs dialog.
      */
     @Override public WizardDialog nextDialog() {
-        final BlockDevInfo bdi1 = getDrbdResourceInfo().getFirstBlockDevInfo();
-        final BlockDevInfo bdi2 = getDrbdResourceInfo().getSecondBlockDevInfo();
+        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
+        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
-        DRBD.up(bdi1.getHost(), getDrbdResourceInfo().getName(), testOnly);
-        DRBD.up(bdi2.getHost(), getDrbdResourceInfo().getName(), testOnly);
-        return new CreateFS(this, getDrbdResourceInfo());
+        DRBD.up(bdi1.getHost(),
+                getDrbdVolumeInfo().getDrbdResourceInfo().getName(), testOnly);
+        DRBD.up(bdi2.getHost(),
+                getDrbdVolumeInfo().getDrbdResourceInfo().getName(), testOnly);
+        return new CreateFS(this, getDrbdVolumeInfo());
     }
 
     /**
@@ -210,7 +213,7 @@ final class CreateMD extends DrbdConfig {
         super.initDialog();
         makeMDButton.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        if (getDrbdResourceInfo().isHaveToCreateMD()) {
+        if (getDrbdVolumeInfo().getDrbdResourceInfo().isHaveToCreateMD()) {
             enableComponentsLater(new JComponent[]{});
         } else {
             enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
@@ -239,7 +242,7 @@ final class CreateMD extends DrbdConfig {
                     "Dialog.DrbdConfig.CreateMD.CreateNewMetadata");
         final String createNewMetadataDestroyData = Tools.getString(
                     "Dialog.DrbdConfig.CreateMD.CreateNewMetadataDestroyData");
-        if (getDrbdResourceInfo().isHaveToCreateMD()) {
+        if (getDrbdVolumeInfo().getDrbdResourceInfo().isHaveToCreateMD()) {
             final String[] choices = {createNewMetadata,
                                       createNewMetadataDestroyData};
             makeMDButton.setEnabled(true);

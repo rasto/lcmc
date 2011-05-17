@@ -25,6 +25,7 @@ package drbd.gui.dialog.drbdConfig;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
@@ -57,12 +58,12 @@ final class BlockDev extends DrbdConfig {
 
     /** Prepares a new <code>BlockDev</code> object. */
     BlockDev(final WizardDialog previousDialog,
-             final DrbdResourceInfo dri,
+             final DrbdVolumeInfo dli,
              final BlockDevInfo blockDevInfo) {
-        super(previousDialog, dri);
+        super(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
-        dri.getDrbdInfo().setSelectedNode(blockDevInfo);
-        dri.getDrbdInfo().selectMyself();
+        dli.getDrbdResourceInfo().getDrbdInfo().setSelectedNode(blockDevInfo);
+        dli.getDrbdResourceInfo().getDrbdInfo().selectMyself();
     }
 
     /** Applies the changes to the blockDevInfo object. */
@@ -75,7 +76,7 @@ final class BlockDev extends DrbdConfig {
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
         final int err = DRBD.adjust(bdi.getHost(),
-                                    bdi.getDrbdResourceInfo().getName(),
+                                    bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                                     testOnly);
         if (err == DRBD_NO_METADATA_RC) {
             return false;
@@ -89,32 +90,32 @@ final class BlockDev extends DrbdConfig {
      * is called.
      */
     @Override public WizardDialog nextDialog() {
-        if (getDrbdResourceInfo().isFirstBlockDevInfo(blockDevInfo)) {
+        if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi =
-                    getDrbdResourceInfo().getOtherBlockDevInfo(blockDevInfo);
-            return new BlockDev(this, getDrbdResourceInfo(), oBdi);
+                    getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
+            return new BlockDev(this, getDrbdVolumeInfo(), oBdi);
         } else {
             final BlockDevInfo oBdi =
-                    getDrbdResourceInfo().getOtherBlockDevInfo(blockDevInfo);
+                    getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
                 // TODO: check this
                 final boolean testOnly = false;
-                getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
                 if (adjust(blockDevInfo) && adjust(oBdi)) {
                     DRBD.down(blockDevInfo.getHost(),
-                              getDrbdResourceInfo().getName(),
+                              getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                               testOnly);
                     DRBD.down(oBdi.getHost(),
-                              getDrbdResourceInfo().getName(),
+                              getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                               testOnly);
                 } else {
-                    getDrbdResourceInfo().setHaveToCreateMD(true);
+                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(true);
                 }
-                getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
             } catch (Exceptions.DrbdConfigException dce) {
                 Tools.appError("config failed", dce);
             }
-            return new CreateMD(this, getDrbdResourceInfo());
+            return new CreateMD(this, getDrbdVolumeInfo());
         }
     }
 

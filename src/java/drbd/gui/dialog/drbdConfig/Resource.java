@@ -25,6 +25,7 @@ package drbd.gui.dialog.drbdConfig;
 import drbd.utilities.Tools;
 import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -80,8 +81,8 @@ public final class Resource extends DrbdConfig {
 
     /** Prepares a new <code>Resource</code> object. */
     public Resource(final WizardDialog previousDialog,
-                    final DrbdResourceInfo dri) {
-        super(previousDialog, dri);
+                    final DrbdVolumeInfo dvi) {
+        super(previousDialog, dvi);
     }
 
     /** Returns a string with SECRET_STRING_LENGTH random characters. */
@@ -91,7 +92,7 @@ public final class Resource extends DrbdConfig {
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
-        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
@@ -103,7 +104,9 @@ public final class Resource extends DrbdConfig {
         Tools.waitForSwing();
         drbdInfo.apply(false);
         dri.apply(false);
-        return new BlockDev(this, dri, dri.getFirstBlockDevInfo());
+        return new BlockDev(this,
+                            getDrbdVolumeInfo(),
+                            getDrbdVolumeInfo().getFirstBlockDevInfo());
     }
 
     /**
@@ -138,7 +141,7 @@ public final class Resource extends DrbdConfig {
 
     /** Returns input pane where user can configure a drbd resource. */
     @Override protected JComponent getInputPane() {
-        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         dri.waitForInfoPanel();
         Tools.waitForSwing();

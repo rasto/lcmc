@@ -27,18 +27,15 @@ import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.GuiComboBox;
 import drbd.gui.HeartbeatGraph;
-import drbd.gui.dialog.cluster.DrbdLogs;
 import drbd.data.resources.DrbdResource;
 import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.DRBDtestData;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
-import drbd.utilities.UpdatableItem;
 import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
-import drbd.utilities.MyMenuItem;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -48,9 +45,13 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
@@ -62,84 +63,38 @@ import javax.swing.JScrollPane;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-public final class DrbdResourceInfo extends DrbdGuiInfo
-                                    implements CommonDeviceInterface {
+public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Volumes volume nr - list of blockdevices. */
-    private final Map<String, DRBDVolumeInfo> drbdVolumes =
-                                new LinkedHashMap<String, DRBDVolumeInfo>();
-    /**
-     * Whether the block device is used by heartbeat via Filesystem service.
-     */
-    private ServiceInfo isUsedByCRM;
+    private final Set<DrbdVolumeInfo> drbdVolumes =
+                                        new LinkedHashSet<DrbdVolumeInfo>();
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
     /** Whether the meta-data has to be created or not. */
     private boolean haveToCreateMD = false;
-    /** Last created filesystem. */
-    private String createdFs = null;
     /** Name of the drbd resource name parameter. */
     static final String DRBD_RES_PARAM_NAME = "name";
-    /** Name of the drbd device parameter. */
-    static final String DRBD_RES_PARAM_DEV = "device";
-    /** String that is displayed as a tool tip if a menu item is used by CRM. */
-    static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
-    /** String that is displayed as a tool tip for disabled menu item. */
-    static final String IS_SYNCING_STRING = "it is being full-synced";
-    /** String that is displayed as a tool tip for disabled menu item. */
-    static final String IS_VERIFYING_STRING = "it is being verified";
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
      */
     DrbdResourceInfo(final String name,
                      final String drbdDev,
-                     final DrbdVolumeInfo drbdVolume,
                      final Browser browser) {
         super(name, browser);
         setResource(new DrbdResource(name, drbdDev));
-        getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
+        //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
+    }
+
+    /** Add a drbd volume. */
+    public void addDrbdVolume(final DrbdVolumeInfo drbdVolume) {
         drbdVolumes.add(drbdVolume);
     }
 
-    /** Returns device name, like /dev/drbd0. */
-    @Override public String getDevice() {
-        return getDrbdResource().getDevice();
-    }
 
-    /** Returns other block device in the drbd cluster. */
-    public BlockDevInfo getOtherBlockDevInfo(final DrbdVolumeInfo volume,
-                                             final BlockDevInfo thisBDI) {
-        if (thisBDI.equals(volume.get(0))) {
-            return volume.getBlockDevices().get(1);
-        }
-        for (final BlockDevInfo bdi : volume.getBlockDevices()) {
-            if (bdi == volume.getBlockDevices().get(0)) {
-                /* skip first */
-                continue;
-            }
-            if (thisBDI.equals(bdi)) {
-                return volume.getBlockDevices().get(0);
-            }
-
-        }
-        return null;
-    }
-
-    /** Returns first block dev info. */
-    public BlockDevInfo getFirstBlockDevInfo(final DrbdVolumeInfo volume) {
-        return volume.getBlockDevices().get(0);
-    }
-
-    /** Returns second block dev info. */
-    public BlockDevInfo getSecondBlockDevInfo() {
-        return volume.getBlockDevices().get(1);
-    }
-
-    /** Returns true if this is first block dev info. */
-    public boolean isFirstBlockDevInfo(final DrbdVolumeInfo volume,
-                                       final BlockDevInfo bdi) {
-        return volume.getBlockDevices().get(0) == bdi;
-    }
+    ///** Returns device name, like /dev/drbd0. */
+    //@Override public String getDevice() {
+    //    return getDrbdResource().getDevice();
+    //}
 
     /** Creates and returns drbd config for resources. */
     String drbdResourceConfig() throws Exceptions.DrbdConfigException {
@@ -149,9 +104,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
                                                                    "resource");
         for (String param : params) {
-            if (DRBD_RES_PARAM_DEV.equals(param)) {
-                continue;
-            }
+            //if (DRBD_RES_PARAM_DEV.equals(param)) {
+            //    continue;
+            //}
             final String value = getComboBoxValue(param);
             if (value != null && value.equals(getParamDefault(param))) {
                 continue;
@@ -183,84 +138,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Clears info panel cache. */
     @Override public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
-    }
-
-    /** Returns sync progress in percent. */
-    public String getSyncedProgress(final DrbdVolumeInfo drbdVolume) {
-        return drbdVolumes.getBlockDevices(0).getBlockDevice()
-                                                        .getSyncedProgress();
-    }
-
-    /** Returns whether the cluster is syncing. */
-    public boolean isSyncing(final DrbdVolumeInfo drbdVolume) {
-        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
-            if (bdi.getBlockDevice().isSyncing()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Returns whether the cluster is being verified. */
-    public boolean isVerifying(final DrbdVolumeInfo drbdVolume) {
-        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
-            if (bdi.getBlockDevice().isVerifying()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Connect block device from the specified host. */
-    public void connect(final Host host, final boolean testOnly) {
-        // TODO
-        //if (blockDevInfo1.getHost() == host
-        //    && !blockDevInfo1.isConnectedOrWF(false)) {
-        //    blockDevInfo1.connect(testOnly);
-        //} else if (blockDevInfo2.getHost() == host
-        //           && !blockDevInfo2.isConnectedOrWF(false)) {
-        //    blockDevInfo2.connect(testOnly);
-        //}
-    }
-
-    /**
-     * Returns whether the resources is connected, meaning both devices are
-     * connected.
-     */
-    public boolean isConnected(final DrbdVolumeInfo drbdVolume,
-                               final boolean testOnly) {
-        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
-            if (!bdi.isConnected(testOnly)) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns whether any of the sides in the drbd resource are in
-     * paused-sync state.
-     */
-    boolean isPausedSync() {
-        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
-            if (bdi.getBlockDevice().isPausedSync()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns whether any of the sides in the drbd resource are in
-     * split-brain.
-     */
-    public boolean isSplitBrain() {
-        for (final BlockDevInfo bdi : drbdVolume.getBlockDevices()) {
-            if (bdi.getBlockDevice().isSplitBrain()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /** Returns drbd graphical view. */
@@ -304,8 +181,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
         if (getDrbdResource().isCommited()
-            && (DRBD_RES_PARAM_NAME.equals(param)
-                || DRBD_RES_PARAM_DEV.equals(param))) {
+            && DRBD_RES_PARAM_NAME.equals(param)) {
             return "";
         }
         return null;
@@ -335,58 +211,58 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
                                            isEnabledOnlyInAdvancedMode(param)));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
-        } else if (DRBD_RES_PARAM_DEV.equals(param)) {
-            final List<String> drbdDevices = new ArrayList<String>();
-            if (getParamSaved(DRBD_RES_PARAM_DEV) == null) {
-                final String defaultItem =
-                        getDrbdResource().getDefaultValue(DRBD_RES_PARAM_DEV);
-                drbdDevices.add(defaultItem);
-                int i = 0;
-                int index = 0;
-                while (i < 11) {
-                    final String drbdDevStr = "/dev/drbd"
-                                              + Integer.toString(index);
-                    final Map<String, DrbdResourceInfo> drbdDevHash =
-                                                  getBrowser().getDrbdDevHash();
-                    if (!drbdDevHash.containsKey(drbdDevStr)) {
-                        drbdDevices.add(drbdDevStr);
-                        i++;
-                    }
-                    getBrowser().putDrbdDevHash();
-                    index++;
-                }
-                paramCb = new GuiComboBox(defaultItem,
-                                          drbdDevices.toArray(
-                                               new String[drbdDevices.size()]),
-                                          null, /* units */
-                                          null, /* type */
-                                          null, /* regexp */
-                                          width,
-                                          null, /* abbrv */
-                                          new AccessMode(
-                                           getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)));
-                paramCb.setEditable(true);
-            } else {
-                final String defaultItem = getDevice();
-                String regexp = null;
-                if (isInteger(param)) {
-                    regexp = "^-?\\d*$";
-                }
-                paramCb = new GuiComboBox(
-                                       defaultItem,
-                                       getResource().getPossibleChoices(param),
-                                       null, /* units */
-                                       null, /* type */
-                                       regexp,
-                                       width,
-                                       null, /* abbrv */
-                                       new AccessMode(
-                                           getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)));
-            }
-            paramCb.setEnabled(!getDrbdResource().isCommited());
-            paramComboBoxAdd(param, prefix, paramCb);
+        //} else if (DRBD_RES_PARAM_DEV.equals(param)) {
+        //    final List<String> drbdDevices = new ArrayList<String>();
+        //    if (getParamSaved(DRBD_RES_PARAM_DEV) == null) {
+        //        final String defaultItem =
+        //                getDrbdResource().getDefaultValue(DRBD_RES_PARAM_DEV);
+        //        drbdDevices.add(defaultItem);
+        //        int i = 0;
+        //        int index = 0;
+        //        while (i < 11) {
+        //            final String drbdDevStr = "/dev/drbd"
+        //                                      + Integer.toString(index);
+        //            final Map<String, DrbdResourceInfo> drbdDevHash =
+        //                                          getBrowser().getDrbdDevHash();
+        //            if (!drbdDevHash.containsKey(drbdDevStr)) {
+        //                drbdDevices.add(drbdDevStr);
+        //                i++;
+        //            }
+        //            getBrowser().putDrbdDevHash();
+        //            index++;
+        //        }
+        //        paramCb = new GuiComboBox(defaultItem,
+        //                                  drbdDevices.toArray(
+        //                                       new String[drbdDevices.size()]),
+        //                                  null, /* units */
+        //                                  null, /* type */
+        //                                  null, /* regexp */
+        //                                  width,
+        //                                  null, /* abbrv */
+        //                                  new AccessMode(
+        //                                   getAccessType(param),
+        //                                   isEnabledOnlyInAdvancedMode(param)));
+        //        paramCb.setEditable(true);
+        //    } else {
+        //        final String defaultItem = getDevice();
+        //        String regexp = null;
+        //        if (isInteger(param)) {
+        //            regexp = "^-?\\d*$";
+        //        }
+        //        paramCb = new GuiComboBox(
+        //                               defaultItem,
+        //                               getResource().getPossibleChoices(param),
+        //                               null, /* units */
+        //                               null, /* type */
+        //                               regexp,
+        //                               width,
+        //                               null, /* abbrv */
+        //                               new AccessMode(
+        //                                   getAccessType(param),
+        //                                   isEnabledOnlyInAdvancedMode(param)));
+        //    }
+        //    paramCb.setEnabled(!getDrbdResource().isCommited());
+        //    paramComboBoxAdd(param, prefix, paramCb);
         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
             // TODO: has to be reloaded
             final List<Info> l = new ArrayList<Info>();
@@ -398,14 +274,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             l.add(di);
             final Map<String, DrbdResourceInfo> drbdResHash =
                                                 getBrowser().getDrbdResHash();
-            if (defaultItem == null || "-1".equals(defaultItem)) {
-                defaultItem = Tools.getString("ClusterBrowser.None");
-            } else if (defaultItem != null) {
-                final DrbdResourceInfo dri = drbdResHash.get(defaultItem);
-                if (dri != null) {
-                    defaultItem = dri.getDevice();
-                }
-            }
+            //if (defaultItem == null || "-1".equals(defaultItem)) {
+            //    defaultItem = Tools.getString("ClusterBrowser.None");
+            //} else if (defaultItem != null) {
+            //    final DrbdResourceInfo dri = drbdResHash.get(defaultItem);
+            //    if (dri != null) {
+            //        defaultItem = dri.getDevice();
+            //    }
+            //}
 
             for (final String drbdRes : drbdResHash.keySet()) {
                 final DrbdResourceInfo r = drbdResHash.get(drbdRes);
@@ -459,20 +335,20 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
             waitForInfoPanel();
             getBrowser().getDrbdResHash().remove(getName());
             getBrowser().putDrbdResHash();
-            getBrowser().getDrbdDevHash().remove(getDevice());
-            getBrowser().putDrbdDevHash();
+            //getBrowser().getDrbdDevHash().remove(getDevice());
+            //getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
 
             final String name = getParamSaved(DRBD_RES_PARAM_NAME);
-            final String drbdDevStr = getParamSaved(DRBD_RES_PARAM_DEV);
+            //final String drbdDevStr = getParamSaved(DRBD_RES_PARAM_DEV);
             getDrbdResource().setName(name);
             setName(name);
-            getDrbdResource().setDevice(drbdDevStr);
+            //getDrbdResource().setDevice(drbdDevStr);
 
             getBrowser().getDrbdResHash().put(name, this);
             getBrowser().putDrbdResHash();
-            getBrowser().getDrbdDevHash().put(drbdDevStr, this);
-            getBrowser().putDrbdDevHash();
+            //getBrowser().getDrbdDevHash().put(drbdDevStr, this);
+            //getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdResource().setCommited(true);
             getDrbdInfo().setAllApplyButtons();
@@ -482,7 +358,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Set all apply buttons. */
     void setAllApplyButtons() {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null) {
                     bdi.storeComboBoxValues(bdi.getParametersFromXML());
                     bdi.setApplyButtons(null, bdi.getParametersFromXML());
@@ -584,7 +460,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         /* resource name */
         getResource().setValue(DRBD_RES_PARAM_NAME,
                                getDrbdResource().getName());
-        getResource().setValue(DRBD_RES_PARAM_DEV, getDevice());
+        //getResource().setValue(DRBD_RES_PARAM_DEV, getDevice());
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
@@ -656,76 +532,22 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         return infoPanel;
     }
 
-    /** Removes this drbd resource with confirmation dialog. */
-    @Override public void removeMyself(final boolean testOnly) {
-        String desc = Tools.getString(
-                       "ClusterBrowser.confirmRemoveDrbdResource.Description");
-        desc = desc.replaceAll("@RESOURCE@", getName());
-        if (Tools.confirmDialog(
-              Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
-              desc,
-              Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Yes"),
-              Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.No"))) {
-            removeMyselfNoConfirm(testOnly);
-        }
-    }
-
     /** Remove myself from all hashes. */
     public void removeFromHashes() {
         getBrowser().getDrbdResHash().remove(getName());
         getBrowser().putDrbdResHash();
-        getBrowser().getDrbdDevHash().remove(getDevice());
-        getBrowser().putDrbdDevHash();
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
-                bdi.removeFromDrbd();
-            }
+            removeDrbdVolumeFromHashes(dvi);
         }
     }
 
-    /**
-     * removes this object from jtree and from list of drbd resource
-     * infos without confirmation dialog.
-     */
-    void removeMyselfNoConfirm(final boolean testOnly) {
-        getBrowser().drbdStatusLock();
-        getBrowser().getDrbdXML().removeResource(getName());
-        getBrowser().getDrbdGraph().removeDrbdResource(this);
-        final Host[] hosts = getCluster().getHostsArray();
-        for (final Host host : hosts) {
-            DRBD.down(host, getName(), testOnly);
-        }
-        super.removeMyself(testOnly);
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        final DrbdResourceInfo dri = drbdResHash.get(getName());
-        drbdResHash.remove(getName());
-        getBrowser().putDrbdResHash();
-        dri.setName(null);
-        getBrowser().reload(getBrowser().getDrbdNode(), true);
-        getBrowser().getDrbdDevHash().remove(getDevice());
+    /** Remove drbd volume from all hashes. */
+    public void removeDrbdVolumeFromHashes(final DrbdVolumeInfo drbdVolume) {
+        getBrowser().getDrbdDevHash().remove(drbdVolume.getDevice());
         getBrowser().putDrbdDevHash();
-        for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
-                bdi.removeFromDrbd();
-                bdi.removeMyself(testOnly);
-            }
+        for (final BlockDevInfo bdi : drbdVolume.getBlockDevInfos()) {
+            bdi.removeFromDrbd();
         }
-        getBrowser().updateCommonBlockDevices();
-
-        try {
-            getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
-                                                                     testOnly);
-        } catch (Exceptions.DrbdConfigException dce) {
-            getBrowser().drbdStatusUnlock();
-            Tools.appError("config failed", dce);
-            return;
-        }
-        getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(null);
-        getBrowser().getDrbdGraph().getDrbdInfo().selectMyself();
-        getBrowser().getDrbdGraph().updatePopupMenus();
-        getBrowser().resetFilesystems();
-        getBrowser().drbdStatusUnlock();
     }
 
     /** Returns string of the drbd resource. */
@@ -742,397 +564,44 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         if (value == null) {
             return false;
         }
-        if (Tools.isStringClass(value)) {
-            return getDrbdResource().getValue(DRBD_RES_PARAM_DEV).equals(
-                                                             value.toString());
-        } else {
+        //if (Tools.isStringClass(value)) {
+        //    return getDrbdResource().getValue(DRBD_RES_PARAM_DEV).equals(
+        //                                                     value.toString());
+        //} else {
             if (toString() == null) {
                 return false;
             }
             return toString().equals(value.toString());
-        }
+        //}
     }
 
     //@Override int hashCode() {
     //    return toString().hashCode();
     //}
 
-    /**
-     * Returns the device name that is used as the string value of
-     * the device in the filesystem resource.
-     */
-    @Override public String getStringValue() {
-        return getDevice();
-    }
-
-    /** Adds old style drbddisk service in the heartbeat and graph. */
-    void addDrbdDisk(final FilesystemInfo fi,
-                            final Host dcHost,
-                            final boolean testOnly) {
-        final Point2D p = null;
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        final DrbddiskInfo di =
-            (DrbddiskInfo) getBrowser().getServicesInfo().addServicePanel(
-                                    getBrowser().getCRMXML().getHbDrbddisk(),
-                                    p,
-                                    true,
-                                    null,
-                                    null,
-                                    testOnly);
-        di.setGroupInfo(fi.getGroupInfo());
-        getBrowser().addToHeartbeatIdList(di);
-        fi.setDrbddiskInfo(di);
-        final GroupInfo giFi = fi.getGroupInfo();
-        if (giFi == null) {
-            hg.addColocation(null, fi, di);
-            hg.addOrder(null, di, fi);
-        } else {
-            hg.addColocation(null, giFi, di);
-            hg.addOrder(null, di, giFi);
-        }
-        di.waitForInfoPanel();
-        di.paramComboBoxGet("1", null).setValueAndWait(getName());
-        di.apply(dcHost, testOnly);
-    }
-
-    /**
-     * Adds linbit::drbd service in the pacemaker graph.
-     *
-     * @param fi
-     *              File system before which this drbd info should be
-     *              started
-     */
-    void addLinbitDrbd(final FilesystemInfo fi,
-                       final Host dcHost,
-                       final boolean testOnly) {
-        final Point2D p = null;
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        final LinbitDrbdInfo ldi =
-         (LinbitDrbdInfo) getBrowser().getServicesInfo().addServicePanel(
-                                     getBrowser().getCRMXML().getHbLinbitDrbd(),
-                                     p,
-                                     true,
-                                     null,
-                                     null,
-                                     testOnly);
-        Tools.waitForSwing();
-        ldi.setGroupInfo(fi.getGroupInfo());
-        getBrowser().addToHeartbeatIdList(ldi);
-        fi.setLinbitDrbdInfo(ldi);
-        /* it adds coloation only to the graph. */
-        final CloneInfo ci = ldi.getCloneInfo();
-        final GroupInfo giFi = fi.getGroupInfo();
-        if (giFi == null) {
-            hg.addColocation(null, fi, ci);
-            hg.addOrder(null, ci, fi);
-        } else {
-            hg.addColocation(null, giFi, ci);
-            hg.addOrder(null, ci, giFi);
-        }
-        /* this must be executed after the getInfoPanel is executed. */
-        ldi.waitForInfoPanel();
-        ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(getName());
-        /* apply gets parents from graph and adds colocations. */
-        Tools.waitForSwing();
-        ldi.apply(dcHost, testOnly);
-    }
-
-
-    /** Remove drbddisk heartbeat service. */
-    void removeDrbdDisk(final FilesystemInfo fi,
-                        final Host dcHost,
-                        final boolean testOnly) {
-        final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
-        if (drbddiskInfo != null) {
-            drbddiskInfo.removeMyselfNoConfirm(dcHost, testOnly);
-        }
-    }
-
-    /** Remove drbddisk heartbeat service. */
-    void removeLinbitDrbd(final FilesystemInfo fi,
-                          final Host dcHost,
-                          final boolean testOnly) {
-        final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
-        if (linbitDrbdInfo != null) {
-            linbitDrbdInfo.removeMyselfNoConfirm(dcHost, testOnly);
-        }
-    }
-
-    /** Sets that this drbd resource is used by hb. */
-    @Override public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
-        this.isUsedByCRM = isUsedByCRM;
-    }
-
-    /** Returns whether this drbd resource is used by crm. */
-    @Override public boolean isUsedByCRM() {
-        return isUsedByCRM != null && isUsedByCRM.isManaged(false);
-    }
+    ///**
+    // * Returns the device name that is used as the string value of
+    // * the device in the filesystem resource.
+    // */
+    //@Override public String getStringValue() {
+    //    return getDevice();
+    //}
 
     /** Returns common file systems. */
     public StringInfo[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
     }
 
-    /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
-    public Set<Host> getHosts() {
-        final TreeSet<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
-            @Override public int compare(final Host h1, final String h2) {
-                return h1.getName().compareToIgnoreCase(h2.getName());
-            }
-        });
-        for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
-                hosts.add(bdi.getHost());
-            }
-        }
-        return hosts;
-    }
-
-    /** Starts resolve split brain dialog. */
-    void resolveSplitBrain() {
-        final AddDrbdSplitBrainDialog adrd = new AddDrbdSplitBrainDialog(this);
-        adrd.showDialogs();
-    }
-
-    /** Starts online verification. */
-    void verify(final DrbdVolumeInfo drbdVolume, final boolean testOnly) {
-        drbdVolume.getBlockDevices().get(0).verify(testOnly);
-    }
-
     /** Returns whether the specified host has this drbd resource. */
     boolean resourceInHost(final Host host) {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi.getHost() == host) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    /** Returns the list of items for the popup menu for drbd resource. */
-    @Override public List<UpdatableItem> createPopup() {
-        final boolean testOnly = false;
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final DrbdResourceInfo thisClass = this;
-
-        final MyMenuItem connectMenu = new MyMenuItem(
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect"),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
-
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect"),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            new AccessMode(ConfigData.AccessType.OP, true),
-            new AccessMode(ConfigData.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override public boolean predicate() {
-                return !isConnected(testOnly);
-            }
-
-            @Override public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
-                    return IS_USED_BY_CRM_STRING;
-                }
-                if (isSyncing()) {
-                    return IS_SYNCING_STRING;
-                }
-                return null;
-            }
-
-            @Override public void action() {
-                BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(Tools.getString(
-                                    "ClusterBrowser.Drbd.ResourceConnect"))) {
-                    if (!destBDI.isConnectedOrWF(testOnly)) {
-                        destBDI.connect(testOnly);
-                    }
-                    if (!sourceBDI.isConnectedOrWF(testOnly)) {
-                        sourceBDI.connect(testOnly);
-                    }
-                } else {
-                    destBDI.disconnect(testOnly);
-                    sourceBDI.disconnect(testOnly);
-                }
-            }
-        };
-        final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-               getBrowser().new DRBDMenuItemCallback(connectMenu, null) {
-            @Override public void action(final Host host) {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                BlockDevInfo bdi;
-                if (sourceBDI.getHost() == host) {
-                    bdi = sourceBDI;
-                } else if (destBDI.getHost() == host) {
-                    bdi = destBDI;
-                } else {
-                    return;
-                }
-                if (sourceBDI.isConnected(false)
-                    && destBDI.isConnected(false)) {
-                    bdi.disconnect(true);
-                } else {
-                    bdi.connect(true);
-                }
-            }
-        };
-        addMouseOverListener(connectMenu, connectItemCallback);
-        items.add(connectMenu);
-
-        final MyMenuItem resumeSync = new MyMenuItem(
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync.ToolTip"),
-
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           new AccessMode(ConfigData.AccessType.OP, false),
-           new AccessMode(ConfigData.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override public boolean predicate() {
-                return isPausedSync();
-            }
-
-            @Override public String enablePredicate() {
-                if (!isSyncing()) {
-                    return "it is not syncing";
-                }
-                return null;
-            }
-            @Override public void action() {
-                BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(Tools.getString(
-                            "ClusterBrowser.Drbd.ResourceResumeSync"))) {
-                    if (destBDI.getBlockDevice().isPausedSync()) {
-                        destBDI.resumeSync(testOnly);
-                    }
-                    if (sourceBDI.getBlockDevice().isPausedSync()) {
-                        sourceBDI.resumeSync(testOnly);
-                    }
-                } else {
-                    sourceBDI.pauseSync(testOnly);
-                    destBDI.pauseSync(testOnly);
-                }
-            }
-        };
-        items.add(resumeSync);
-
-        /* resolve split-brain */
-        final MyMenuItem splitBrainMenu = new MyMenuItem(
-                Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
-                null,
-                Tools.getString(
-                            "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override public String enablePredicate() {
-                if (isSplitBrain()) {
-                    return null;
-                } else {
-                    return "";
-                }
-            }
-
-            @Override public void action() {
-                resolveSplitBrain();
-            }
-        };
-        items.add(splitBrainMenu);
-
-        /* start online verification */
-        final MyMenuItem verifyMenu = new MyMenuItem(
-                Tools.getString("ClusterBrowser.Drbd.Verify"),
-                null,
-                Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override public String enablePredicate() {
-                if (!isConnected(testOnly)) {
-                    return "not connected";
-                }
-                if (isSyncing()) {
-                    return IS_SYNCING_STRING;
-                }
-                if (isVerifying()) {
-                    return IS_VERIFYING_STRING;
-                }
-                return null;
-            }
-
-            @Override public void action() {
-                verify(testOnly);
-            }
-        };
-        items.add(verifyMenu);
-        /* remove resource */
-        final MyMenuItem removeResMenu = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
-                        ClusterBrowser.REMOVE_ICON,
-                        Tools.getString(
-                                "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-            @Override public void action() {
-                /* this drbdResourceInfo remove myself and this calls
-                   removeDrbdResource in this class, that removes the edge
-                   in the graph. */
-                removeMyself(testOnly);
-            }
-
-            @Override public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
-                    return IS_USED_BY_CRM_STRING;
-                }
-                return null;
-            }
-        };
-        items.add(removeResMenu);
-
-        /* view log */
-        final MyMenuItem viewLogMenu = new MyMenuItem(
-                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                           LOGFILE_ICON,
-                           null,
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override public String enablePredicate() {
-                return null;
-            }
-
-            @Override public void action() {
-                hidePopup();
-                final String device = getDevice();
-                DrbdLogs l = new DrbdLogs(getCluster(), device);
-                l.showDialog();
-            }
-        };
-        items.add(viewLogMenu);
-        return items;
     }
 
     /**
@@ -1148,89 +617,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         return haveToCreateMD;
     }
 
-    /** Returns meta-disk device for the specified host. */
-    public String getMetaDiskForHost(final Host host,
-                                     final String volumeNr) {
-        return getBrowser().getDrbdXML().getMetaDisk(host.getName(),
-                                                     getName(),
-                                                     volumeNr);
-    }
-
-    /** Returns tool tip when mouse is over the resource edge. */
-    @Override public String getToolTipForGraph(final DrbdVolumeInfo drbdVolume,
-                                               final boolean testOnly) {
-        final StringBuilder s = new StringBuilder(50);
-        s.append("<html><b>");
-        s.append(getName());
-        s.append("</b><br>");
-        if (isSyncing()) {
-            final String spString = getSyncedProgress();
-            final String bsString = drbdVolume.getBlockDevices().get(0)
-                                            .getBlockDevice().getBlockSize();
-            final String rateString = getResource().getValue("rate");
-            if (spString != null && bsString != null && rateString != null) {
-                final double sp = Double.parseDouble(spString);
-                final double bs = Double.parseDouble(bsString);
-                final Object[] rateObj = Tools.extractUnit(rateString);
-                double rate = Double.parseDouble((String) rateObj[0]);
-                if ("k".equalsIgnoreCase((String) rateObj[1])) {
-                } else if ("m".equalsIgnoreCase((String) rateObj[1])) {
-                    rate *= 1024;
-                } else if ("g".equalsIgnoreCase((String) rateObj[1])) {
-                    rate *= 1024 * 1024;
-                } else if ("".equalsIgnoreCase((String) rateObj[1])) {
-                    rate /= 1024;
-                } else {
-                    rate = 0;
-                }
-                if (rate > 0) {
-                    s.append("\nremaining at least: ");
-                    final double seconds = ((100 - sp) / 100 * bs) / rate;
-                    if (seconds < 60 * 5) {
-                        s.append((int) seconds);
-                        s.append(" Seconds");
-                    } else {
-                        s.append((int) (seconds / 60));
-                        s.append(" Minutes");
-                    }
-                }
-            }
-        }
-        s.append("</html>");
-        return s.toString();
-    }
-
-    /** Returns the last created filesystem. */
-    @Override public String getCreatedFs() {
-        return createdFs;
-    }
-
-    /** Sets the last created filesystem. */
-    public void setCreatedFs(final String createdFs) {
-        this.createdFs = createdFs;
-    }
-
-    /** Returns how much diskspace is used on the primary. */
-    @Override public int getUsed() {
-        for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
-                if (bdi.getBlockDevice().isPrimary()) {
-                    return bdi.getBlockDevice().getUsed();
-                }
-            }
-        }
-        return -1;
-    }
-
     /** Sets stored parameters. */
     public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
         for (String section : dxml.getSections()) {
             for (final String param : dxml.getSectionParams(section)) {
-                if (DRBD_RES_PARAM_DEV.equals(param)) {
-                    continue;
-                }
+                //if (DRBD_RES_PARAM_DEV.equals(param)) {
+                //    continue;
+                //}
                 String value = dxml.getConfigValue(resName, section, param);
                 final String defaultValue = getParamDefault(param);
                 final String oldValue = getParamSaved(param);
@@ -1272,7 +667,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         }
         boolean changed = false;
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null
                     && bdi.checkResourceFieldsChanged(
                                                   param,
@@ -1309,7 +704,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
         final DrbdInfo di = getDrbdInfo();
         boolean correct = true;
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null
                     && !bdi.getBlockDevice().isNew()
                     && !bdi.checkResourceFieldsCorrect(
@@ -1328,7 +723,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     @Override public void revert() {
         super.revert();
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null) {
                     bdi.revert();
                 }
@@ -1339,7 +734,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Sets if dialog was started. It disables the apply button. */
     @Override public void setDialogStarted(final boolean dialogStarted) {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null) {
                     bdi.setDialogStarted(dialogStarted);
                 }
@@ -1351,13 +746,26 @@ public final class DrbdResourceInfo extends DrbdGuiInfo
     /** Returns volume number of the block device. */
     String getVolumeNr(final BlockDevInfo thisBDI) {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevices()) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi == thisBDI) {
                     return dvi.getName();
                 }
             }
         }
-        Tools.appWarning("could not get volume nr for: " + bdi.getName());
+        Tools.appWarning("could not get volume nr for: " + thisBDI.getName());
         return null;
+    }
+
+    /** Update panels and fields of all volumes and block devices. */
+    public void updateAllVolumes() {
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
+                if (bdi != null) {
+                    bdi.checkResourceFieldsChanged(null,
+                                                   bdi.getParametersFromXML());
+                    bdi.updateAdvancedPanels();
+                }
+            }
+        }
     }
 }

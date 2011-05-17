@@ -42,6 +42,7 @@ import drbd.data.resources.Service;
 import drbd.data.resources.Network;
 
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.HbCategoryInfo;
 import drbd.gui.resources.HbConnectionInfo;
 import drbd.gui.resources.Info;
@@ -157,8 +158,8 @@ public final class ClusterBrowser extends Browser {
     /** DRBD device hash lock. */
     private final Lock mDrbdDevHashLock = new ReentrantLock();
     /** DRBD resource device string to drbd resource info hash. */
-    private final Map<String, DrbdResourceInfo> drbdDevHash =
-                                new HashMap<String, DrbdResourceInfo>();
+    private final Map<String, DrbdVolumeInfo> drbdDevHash =
+                                new HashMap<String, DrbdVolumeInfo>();
     /** Heartbeat id to service lock. */
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
@@ -1579,17 +1580,18 @@ public final class ClusterBrowser extends Browser {
             }
             if (bd1 != null
                 && bd2 != null) {
-                final boolean added = drbdInfo.addDrbdResource(resName,
-                                                               drbdDev,
-                                                               bd1,
-                                                               bd2,
-                                                               false,
-                                                               testOnly);
-                if (added) {
-                    atLeastOneAdded = true;
-                } else {
-                    bd1.getDrbdResourceInfo().setParameters();
-                }
+                System.out.println("add drbd resource not impl.");
+                //final boolean added = drbdInfo.addDrbdResource(resName,
+                //                                               drbdDev,
+                //                                               bd1,
+                //                                               bd2,
+                //                                               false,
+                //                                               testOnly);
+                //if (added) {
+                //    atLeastOneAdded = true;
+                //} else {
+                //    bd1.getDrbdVolumeInfo().getDrbdResourceInfo().setParameters();
+                //}
             }
         }
         if (atLeastOneAdded) {
@@ -2301,9 +2303,9 @@ public final class ClusterBrowser extends Browser {
     }
 
     /**
-     * Returns a hash from drbd device to drbd resource info. putDrbdDevHash
+     * Returns a hash from drbd device to drbd volume info. putDrbdDevHash
      * must follow after you're done. */
-    public Map<String, DrbdResourceInfo> getDrbdDevHash() {
+    public Map<String, DrbdVolumeInfo> getDrbdDevHash() {
         mDrbdDevHashLock.lock();
         return drbdDevHash;
     }
@@ -2425,18 +2427,7 @@ public final class ClusterBrowser extends Browser {
         for (final DrbdResourceInfo dri : getDrbdResHashValues()) {
             dri.checkResourceFieldsChanged(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
-            final BlockDevInfo bdi1 = dri.getFirstBlockDevInfo();
-            if (bdi1 != null) {
-                bdi1.checkResourceFieldsChanged(null,
-                                                bdi1.getParametersFromXML());
-                bdi1.updateAdvancedPanels();
-            }
-            final BlockDevInfo bdi2 = dri.getSecondBlockDevInfo();
-            if (bdi2 != null) {
-                bdi2.checkResourceFieldsChanged(null,
-                                                bdi2.getParametersFromXML());
-                bdi2.updateAdvancedPanels();
-            }
+            dri.updateAllVolumes();
         }
 
         if (vmsNode != null) {

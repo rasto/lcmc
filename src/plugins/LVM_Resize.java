@@ -25,7 +25,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
@@ -255,15 +255,15 @@ public final class LVM_Resize implements RemotePlugin {
         /** Check if it is DRBD device and if it could be resized. */
         private boolean checkDRBD() {
             if (blockDevInfo.getBlockDevice().isDrbd()) {
-                final DrbdResourceInfo dri = blockDevInfo.getDrbdResourceInfo();
+                final DrbdVolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
                 final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
-                if (!dri.isConnected(false)) {
+                if (!dvi.isConnected(false)) {
                     printErrorAndRetry(
                                     "Not resizing. DRBD resource is not connected.");
                     sizeCB.setEnabled(false);
                     resizeButton.setEnabled(false);
                     return false;
-                } else if (dri.isSyncing()) {
+                } else if (dvi.isSyncing()) {
                     printErrorAndRetry(
                                     "Not resizing. DRBD resource is syncing.");
                     sizeCB.setEnabled(false);
@@ -575,12 +575,12 @@ public final class LVM_Resize implements RemotePlugin {
                     if (dRet) {
                         answerPaneAddText(
                              "DRBD resource "
-                             + blockDevInfo.getDrbdResourceInfo().getName()
+                             + blockDevInfo.getDrbdVolumeInfo().getName()
                              + " was successfully resized.");
                     } else {
                         answerPaneAddTextError(
                              "DRBD resource "
-                             + blockDevInfo.getDrbdResourceInfo().getName()
+                             + blockDevInfo.getDrbdVolumeInfo().getName()
                              + " resizing failed.");
                     }
                 }

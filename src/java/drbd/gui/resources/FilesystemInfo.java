@@ -225,7 +225,7 @@ final class FilesystemInfo extends ServiceInfo {
                                                      final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
-            final DrbdResourceInfo selectedInfo =
+            final DrbdVolumeInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
             getBrowser().putDrbdDevHash();
@@ -351,16 +351,16 @@ final class FilesystemInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override protected void removeMyselfNoConfirm(final Host dcHost,
                                                    final boolean testOnly) {
-        final DrbdResourceInfo oldDri =
+        final DrbdVolumeInfo oldDvi =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
         getBrowser().putDrbdDevHash();
         super.removeMyselfNoConfirm(dcHost, testOnly);
-        if (oldDri != null && !testOnly) {
-            oldDri.setUsedByCRM(null);
+        if (oldDvi != null && !testOnly) {
+            oldDvi.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
                 @Override public void run() {
-                    oldDri.updateMenus(null);
+                    oldDvi.updateMenus(null);
                 }
             });
             t.start();
@@ -377,19 +377,19 @@ final class FilesystemInfo extends ServiceInfo {
             // TODO: disabled for now
             return;
         }
-        final DrbdResourceInfo oldDri =
+        final DrbdVolumeInfo oldDvi =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
         getBrowser().putDrbdDevHash();
-        if (oldDri != null) {
+        if (oldDvi != null) {
             // TODO: disabled because it does not work well at the moment.
             return;
         }
-        final DrbdResourceInfo newDri =
+        final DrbdVolumeInfo newDvi =
                     getBrowser().getDrbdDevHash().get(
                                         getComboBoxValue(FS_RES_PARAM_DEV));
         getBrowser().putDrbdDevHash();
-        if (newDri == null || newDri.equals(oldDri)) {
+        if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
         boolean oldDrbddisk = false;
@@ -398,23 +398,23 @@ final class FilesystemInfo extends ServiceInfo {
         } else {
             oldDrbddisk = true;
         }
-        if (oldDri != null) {
+        if (oldDvi != null) {
             if (oldDrbddisk) {
-                oldDri.removeDrbdDisk(this, dcHost, testOnly);
+                oldDvi.removeDrbdDisk(this, dcHost, testOnly);
             } else {
-                oldDri.removeLinbitDrbd(this, dcHost, testOnly);
+                oldDvi.removeLinbitDrbd(this, dcHost, testOnly);
             }
-            oldDri.setUsedByCRM(null);
+            oldDvi.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
                 @Override public void run() {
-                    oldDri.updateMenus(null);
+                    oldDvi.updateMenus(null);
                 }
             });
             t.start();
-            //oldDri.setUsedByCRM(false);
+            //oldDvi.setUsedByCRM(false);
             //final Thread t = new Thread(new Runnable() {
             //    @Override public void run() {
-            //        oldDri.updateMenus(null);
+            //        oldDvi.updateMenus(null);
             //    }
             //});
             if (oldDrbddisk) {
@@ -423,18 +423,18 @@ final class FilesystemInfo extends ServiceInfo {
                 setLinbitDrbdInfo(null);
             }
         }
-        if (newDri != null) {
-            //newDri.setUsedByCRM(true);
+        if (newDvi != null) {
+            //newDvi.setUsedByCRM(true);
             //final Thread t = new Thread(new Runnable() {
             //    @Override public void run() {
-            //        newDri.updateMenus(null);
+            //        newDvi.updateMenus(null);
             //    }
             //});
             //t.start();
             if (oldDrbddisk) {
-                newDri.addDrbdDisk(this, dcHost, testOnly);
+                newDvi.addDrbdDisk(this, dcHost, testOnly);
             } else {
-                newDri.addLinbitDrbd(this, dcHost, testOnly);
+                newDvi.addLinbitDrbd(this, dcHost, testOnly);
             }
         }
     }
@@ -466,7 +466,7 @@ final class FilesystemInfo extends ServiceInfo {
     /** Reload combo boxes. */
     @Override public void reloadComboBoxes() {
         super.reloadComboBoxes();
-        final DrbdResourceInfo selectedInfo =
+        final DrbdVolumeInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
         getBrowser().putDrbdDevHash();

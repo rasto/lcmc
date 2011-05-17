@@ -27,6 +27,7 @@ import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.StringInfo;
 import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
@@ -46,6 +47,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.awt.Component;
 import java.awt.Dimension;
 
@@ -88,11 +90,20 @@ public final class Start extends WizardDialog {
     @Override public WizardDialog nextDialog() {
         if (drbdResourceInfo == null) {
             System.out.println("new drbd resource");
-            drbdResourceInfo = drbdInfo.getNewDrbdResource(blockDevInfo1,
-                                                           blockDevInfo2);
-            drbdInfo.addDrbdResource(drbdResourceInfo);
+            drbdResourceInfo = drbdInfo.getNewDrbdResource();
+            drbdInfo.addDrbdResource(drbdResourceInfo,
+                                     blockDevInfo1,
+                                     blockDevInfo2);
         }
-        return new Resource(this, drbdResourceInfo);
+        final DrbdVolumeInfo dvi =
+             new DrbdVolumeInfo("0",
+                                drbdResourceInfo,
+                                new ArrayList<BlockDevInfo>(Arrays.asList(
+                                                              blockDevInfo1,
+                                                              blockDevInfo2)),
+                                drbdInfo.getBrowser());
+        drbdResourceInfo.addDrbdVolume(dvi);
+        return new Resource(this, dvi);
     }
 
     /**

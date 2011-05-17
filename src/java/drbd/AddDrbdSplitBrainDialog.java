@@ -26,7 +26,7 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.drbdConfig.DrbdConfig;
 import drbd.gui.dialog.drbd.SplitBrain;
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 
 /**
  * AddDrbdSplitBrainDialog.
@@ -40,16 +40,16 @@ public final class AddDrbdSplitBrainDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
-    private final DrbdResourceInfo dri;
+    private final DrbdVolumeInfo dvi;
 
     /** Prepares a new <code>AddDrbdSplitBrainDialog</code> object. */
-    public AddDrbdSplitBrainDialog(final DrbdResourceInfo dri) {
-        this.dri = dri;
+    public AddDrbdSplitBrainDialog(final DrbdVolumeInfo dvi) {
+        this.dvi = dvi;
     }
 
     /** Shows step by step dialogs that resolve a drbd split-brain. */
     public void showDialogs() {
-        DrbdConfig dialog = new SplitBrain(null, dri);
+        DrbdConfig dialog = new SplitBrain(null, dvi);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();

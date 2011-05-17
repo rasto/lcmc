@@ -22,7 +22,7 @@
 
 package drbd.gui.dialog.drbdConfig;
 
-import drbd.gui.resources.drbdVolumeInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.dialog.WizardDialog;
 
 /**
@@ -47,6 +47,6 @@ public abstract class DrbdConfig extends WizardDialog {
 
     /** Returns drbd resource info object. */
     protected final DrbdVolumeInfo getDrbdVolumeInfo() {
-        return dri;
+        return drbdVolumeInfo;
     }
 }

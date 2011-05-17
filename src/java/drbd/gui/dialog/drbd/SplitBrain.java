@@ -28,7 +28,7 @@ import drbd.data.Host;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.gui.SpringUtilities;
-import drbd.gui.resources.DrbdResourceInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.drbdConfig.DrbdConfig;
@@ -41,6 +41,8 @@ import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import java.util.Set;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -63,14 +65,14 @@ public final class SplitBrain extends DrbdConfig {
 
     /** Prepares a new <code>SplitBrain</code> object. */
     public SplitBrain(final WizardDialog previousDialog,
-               final DrbdResourceInfo dri) {
-        super(previousDialog, dri);
+               final DrbdVolumeInfo dvi) {
+        super(previousDialog, dvi);
     }
 
     /** Resolves the split brain. */
     protected void resolve() {
-        final Host h1 = getDrbdResourceInfo().getFirstBlockDevInfo().getHost();
-        final Host h2 = getDrbdResourceInfo().getSecondBlockDevInfo().getHost();
+        final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
+        final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo().getHost();
         final String h = hostCB.getStringValue();
 
         final Runnable runnable = new Runnable() {
@@ -91,15 +93,15 @@ public final class SplitBrain extends DrbdConfig {
                 resolveButton.setEnabled(false);
                 final boolean testOnly = false;
                 DRBD.setSecondary(hostSec,
-                                  getDrbdResourceInfo().getName(),
+                                  getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                                   testOnly);
                 DRBD.disconnect(hostSec,
-                                getDrbdResourceInfo().getName(),
+                                getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                                 testOnly);
                 DRBD.discardData(hostSec,
-                                 getDrbdResourceInfo().getName(),
+                                 getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                                  testOnly);
-                getDrbdResourceInfo().connect(hostPri, testOnly);
+                getDrbdVolumeInfo().connect(hostPri, testOnly);
                 buttonClass(finishButton()).setEnabled(true);
                 buttonClass(cancelButton()).setEnabled(false);
             }
@@ -145,7 +147,7 @@ public final class SplitBrain extends DrbdConfig {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */
-        final Set<Host> hosts = getDrbdResourceInfo().getHosts();
+        final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
         hostCB = new GuiComboBox(null, /* selected value */
