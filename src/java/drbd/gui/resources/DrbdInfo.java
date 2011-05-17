@@ -41,8 +41,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.concurrent.CountDownLatch;
@@ -643,13 +641,30 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Add DRBD resource. */
-    public void addDrbdResource(final DrbdResourceInfo dri,
-                                final BlockDevInfo bdi1,
-                                final BlockDevInfo bdi2) {
+    public void addDrbdResource(final DrbdResourceInfo dri) {
+        final String name = dri.getName();
+        dri.getDrbdResource().setDefaultValue(
+                                        DrbdResourceInfo.DRBD_RES_PARAM_NAME,
+                                        name);
+        getBrowser().getDrbdResHash().put(name, dri);
+        getBrowser().putDrbdResHash();
+
+        final DefaultMutableTreeNode drbdResourceNode =
+                                           new DefaultMutableTreeNode(dri);
+        dri.setNode(drbdResourceNode);
+
+        getBrowser().getDrbdNode().add(drbdResourceNode);
+        dri.getInfoPanel();
+        //getBrowser().reload(drbdResourceNode, true);
+    }
+
+    /** Add DRBD volume. */
+    public void addDrbdVolume(final DrbdVolumeInfo dvi) {
         /* We want next port number on both devices to be the same,
          * although other port numbers may not be the same on both. */
-        final String name = dri.getName();
-        //final String drbdDevStr = dri.getDevice();
+        final String drbdDevStr = dvi.getDevice();
+        final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
+        final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
         final int viPort1 = bdi1.getNextVIPort();
         final int viPort2 = bdi2.getNextVIPort();
         final int viPort;
@@ -661,37 +676,32 @@ public final class DrbdInfo extends DrbdGuiInfo {
         bdi1.setDefaultVIPort(viPort + 1);
         bdi2.setDefaultVIPort(viPort + 1);
 
-        dri.getDrbdResource().setDefaultValue(
-                                        DrbdResourceInfo.DRBD_RES_PARAM_NAME,
-                                        name);
         //dri.getDrbdResource().setDefaultValue(
         //                                DrbdResourceInfo.DRBD_RES_PARAM_DEV,
         //                                drbdDevStr);
-        getBrowser().getDrbdResHash().put(name, dri);
-        getBrowser().putDrbdResHash();
-        //getBrowser().getDrbdDevHash().put(drbdDevStr, dri);
-        //getBrowser().putDrbdDevHash();
+        getBrowser().getDrbdDevHash().put(drbdDevStr, dvi);
+        getBrowser().putDrbdDevHash();
 
         if (bdi1 != null) {
             bdi1.setDrbd(true);
-            //bdi1.setDrbdResourceInfo(dri);
+            bdi1.setDrbdVolumeInfo(dvi);
             bdi1.cleanup();
             bdi1.setInfoPanel(null); /* reload panel */
             bdi1.getInfoPanel();
         }
         if (bdi2 != null) {
             bdi2.setDrbd(true);
-            //bdi2.setDrbdResourceInfo(dri);
+            bdi2.setDrbdVolumeInfo(dvi);
             bdi2.cleanup();
             bdi2.setInfoPanel(null); /* reload panel */
             bdi2.getInfoPanel();
         }
 
-        final DefaultMutableTreeNode drbdResourceNode =
-                                           new DefaultMutableTreeNode(dri);
-        dri.setNode(drbdResourceNode);
+        final DefaultMutableTreeNode drbdVolumeNode =
+                                           new DefaultMutableTreeNode(dvi);
+        dvi.setNode(drbdVolumeNode);
 
-        getBrowser().getDrbdNode().add(drbdResourceNode);
+        dvi.getDrbdResourceInfo().getNode().add(drbdVolumeNode);
 
         final DefaultMutableTreeNode drbdBDNode1 =
                                            new DefaultMutableTreeNode(bdi1);
@@ -699,12 +709,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final DefaultMutableTreeNode drbdBDNode2 =
                                            new DefaultMutableTreeNode(bdi2);
         bdi2.setNode(drbdBDNode2);
-        drbdResourceNode.add(drbdBDNode1);
-        drbdResourceNode.add(drbdBDNode2);
+        drbdVolumeNode.add(drbdBDNode1);
+        drbdVolumeNode.add(drbdBDNode2);
 
-        //getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        dri.getInfoPanel();
-        getBrowser().reload(drbdResourceNode, true);
+        getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
+        getBrowser().reload(drbdVolumeNode, true);
         getBrowser().resetFilesystems();
     }
 

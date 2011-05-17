@@ -37,19 +37,13 @@ import drbd.data.AccessMode;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
-import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.awt.Component;
-import java.awt.Dimension;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
@@ -91,9 +85,7 @@ public final class Start extends WizardDialog {
         if (drbdResourceInfo == null) {
             System.out.println("new drbd resource");
             drbdResourceInfo = drbdInfo.getNewDrbdResource();
-            drbdInfo.addDrbdResource(drbdResourceInfo,
-                                     blockDevInfo1,
-                                     blockDevInfo2);
+            drbdInfo.addDrbdResource(drbdResourceInfo);
         }
         final DrbdVolumeInfo dvi =
              new DrbdVolumeInfo("0",
@@ -103,6 +95,7 @@ public final class Start extends WizardDialog {
                                                               blockDevInfo2)),
                                 drbdInfo.getBrowser());
         drbdResourceInfo.addDrbdVolume(dvi);
+        drbdInfo.addDrbdVolume(dvi);
         return new Resource(this, dvi);
     }
 

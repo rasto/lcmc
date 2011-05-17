@@ -41,23 +41,13 @@ import drbd.Exceptions;
 import drbd.AddDrbdSplitBrainDialog;
 import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
-import drbd.gui.GuiComboBox;
 import drbd.gui.HeartbeatGraph;
-import drbd.data.resources.DrbdResource;
 import drbd.data.Host;
-import drbd.data.DrbdXML;
-import drbd.data.DRBDtestData;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.utilities.Tools;
-import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.List;
@@ -65,15 +55,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
 
 
 /**
@@ -738,5 +721,20 @@ public final class DrbdVolumeInfo extends Info
         return getBrowser().getDrbdXML().getMetaDisk(host.getName(),
                                                      getDrbdResourceInfo().getName(),
                                                      getName());
+    }
+
+    /** Returns string of the drbd volume. */
+    @Override public String toString() {
+        String resName = getDrbdResourceInfo().getName();
+        String name = getName();
+        if (resName == null || name == null || "".equals(name)) {
+            name = Tools.getString("ClusterBrowser.DrbdResUnconfigured");
+        }
+        return resName + "/" + name;
+    }
+
+    /** Returns drbd graphical view. */
+    @Override public JPanel getGraphicalView() {
+        return getBrowser().getDrbdGraph().getGraphPanel();
     }
 }
