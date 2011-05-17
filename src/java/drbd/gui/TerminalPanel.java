@@ -44,7 +44,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultCaret;
 import javax.swing.SwingUtilities;
-import javax.swing.text.Document;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Dimension;

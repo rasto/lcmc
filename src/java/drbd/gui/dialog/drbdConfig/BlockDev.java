@@ -24,7 +24,6 @@ package drbd.gui.dialog.drbdConfig;
 
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
-import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.DrbdVolumeInfo;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.dialog.WizardDialog;

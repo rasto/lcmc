@@ -69,7 +69,6 @@ import drbd.gui.resources.RscDefaultsInfo;
 import drbd.data.ResourceAgent;
 import drbd.utilities.ComponentWithTest;
 import drbd.utilities.ButtonCallback;
-import drbd.Exceptions;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;

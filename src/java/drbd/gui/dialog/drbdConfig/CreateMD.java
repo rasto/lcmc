@@ -27,7 +27,6 @@ import drbd.utilities.ExecCallback;
 import drbd.gui.SpringUtilities;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdVolumeInfo;
-import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.GuiComboBox;
 import drbd.gui.dialog.WizardDialog;
 import drbd.utilities.MyButton;

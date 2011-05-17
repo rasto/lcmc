@@ -46,7 +46,6 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.pacemaker.ServiceLogs;
-import drbd.Exceptions;
 
 import java.awt.Color;
 import java.awt.event.MouseListener;

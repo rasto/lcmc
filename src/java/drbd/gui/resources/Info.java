@@ -48,7 +48,6 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.JTable;
-import javax.swing.RowSorter;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
 
@@ -75,9 +74,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 
 /**

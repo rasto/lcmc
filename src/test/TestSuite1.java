@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 import junit.framework.TestSuite;
-import junit.framework.TestResult;
 import junit.framework.TestCase;
 
 import drbd.utilities.Tools;
