@@ -566,6 +566,9 @@ public class ServiceInfo extends EditableInfo {
 
     /** Sets service parameters with values from resourceNode hash. */
     void setParameters(final Map<String, String> resourceNode) {
+        if (resourceNode == null) {
+            return;
+        }
         final boolean infoPanelOk = isInfoPanelOk();
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {

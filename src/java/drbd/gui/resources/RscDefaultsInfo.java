@@ -56,6 +56,9 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Sets default parameters with values from resourceNode hash. */
     public void setParameters(final Map<String, String> resourceNode) {
+        if (resourceNode == null) {
+            return;
+        }
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
             Tools.appError("crmXML is null");
