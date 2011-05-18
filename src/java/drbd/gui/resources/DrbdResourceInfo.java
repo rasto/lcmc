@@ -72,10 +72,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * Prepares a new <code>DrbdResourceInfo</code> object.
      */
     DrbdResourceInfo(final String name,
-                     final String drbdDev,
                      final Browser browser) {
         super(name, browser);
-        setResource(new DrbdResource(name, drbdDev));
+        setResource(new DrbdResource(name));
         //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
     }
 
@@ -83,12 +82,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void addDrbdVolume(final DrbdVolumeInfo drbdVolume) {
         drbdVolumes.add(drbdVolume);
     }
-
-
-    ///** Returns device name, like /dev/drbd0. */
-    //@Override public String getDevice() {
-    //    return getDrbdResource().getDevice();
-    //}
 
     /** Creates and returns drbd config for resources. */
     String drbdResourceConfig() throws Exceptions.DrbdConfigException {

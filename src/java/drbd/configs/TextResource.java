@@ -933,14 +933,19 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Configure the new DRBD resource. Enter the <b>name</b> of the "
          + "resource. "
          + "You can call it whatever you want as long it is unique. "
-         + "The same applies for DRBD device. "
-         + "This <b>device</b> should be in the form /dev/drbdX. "
          + "Choose a <b>protocol</b> that the DRBD should use for replication. "
          + "You can learn more about protocols -- a.k.a replication "
          + "modes -- in <a href=\"http://www.drbd.org/docs/introduction/\">"
          + "DRBD User's Guide: Introduction to DRBD</a>. After you changed "
          + "the fields, or you are satisfied with the defaults, press "
          + "<b>Next</b> to continue."},
+
+        {"Dialog.DrbdConfig.Volume.Title",
+         "Configure DRBD Volume"},
+
+        {"Dialog.DrbdConfig.Volume.Description",
+         "Configure a new DRBD volume. "
+         + "The <b>device</b> should be in the form /dev/drbdX. "},
 
         {"Dialog.DrbdConfig.BlockDev.Title",
          "Configure DRBD Block Device"},

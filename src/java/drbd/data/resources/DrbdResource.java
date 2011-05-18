@@ -29,40 +29,18 @@ package drbd.data.resources;
  * @version $Id$
  *
  */
-public final class DrbdResource extends Resource
-implements ClusterBlockDeviceInterface {
+public final class DrbdResource extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Drbd device. */
-    private String device;
     /** Whether the config for this resource was already written at least once.
      */
     private boolean commited = false;
 
     /**
      * Prepares a new <code>DrbdResource</code> object.
-     *
-     * @param name
-     *          drbd resource name
-     * @param device
-     *          drbd device
      */
-    public DrbdResource(final String name,
-                        final String device) {
+    public DrbdResource(final String name) {
         super(name);
-        this.device = device;
-        setValue("device", device);
-    }
-
-    /** Returns drbd device. */
-    @Override public String getDevice() {
-        return device;
-    }
-
-    /** Sets drbd device. */
-    public void setDevice(final String device) {
-        this.device = device;
-        setValue("device", device);
     }
 
     /**

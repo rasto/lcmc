@@ -35,6 +35,7 @@ import drbd.utilities.MyMenuItem;
 import drbd.utilities.DRBD;
 import drbd.data.AccessMode;
 import drbd.data.ConfigData;
+import drbd.data.resources.DrbdVolume;
 import drbd.data.Host;
 import drbd.gui.dialog.cluster.DrbdLogs;
 import drbd.Exceptions;
@@ -44,9 +45,11 @@ import drbd.gui.ClusterBrowser;
 import drbd.gui.HeartbeatGraph;
 import drbd.data.Host;
 import drbd.data.ConfigData;
+import drbd.data.DRBDtestData;
 import drbd.data.AccessMode;
 import drbd.utilities.Tools;
 import drbd.utilities.DRBD;
+import drbd.utilities.ButtonCallback;
 
 import java.awt.geom.Point2D;
 import java.util.Map;
@@ -58,12 +61,31 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
+
 
 /**
  * This class holds info data of a DRBD volume.
  */
-public final class DrbdVolumeInfo extends Info
-                                    implements CommonDeviceInterface {
+public final class DrbdVolumeInfo extends EditableInfo
+                                  implements CommonDeviceInterface {
     /** Drbd resource in which is this volume defined. */
     private final DrbdResourceInfo drbdResourceInfo;
     /** Block devices that are in this DRBD volume. */
@@ -76,18 +98,22 @@ public final class DrbdVolumeInfo extends Info
      * Whether the block device is used by heartbeat via Filesystem service.
      */
     private ServiceInfo isUsedByCRM;
-    /** Volume icon. */
-    private static final ImageIcon VOLUME_ICON =
-                    Tools.createImageIcon(
-                            Tools.getDefault("ClusterBrowser.NetworkIcon"));
+    /** Cache for getInfoPanel method. */
+    private JComponent infoPanel = null;
     /** Name of the drbd device parameter. */
-    static final String DRBD_RES_PARAM_DEV = "device";
+    static final String DRBD_VOL_PARAM_DEV = "device";
+    /** Name of the drbd volume number parameter. */
+    static final String DRBD_VOL_PARAM_NUMBER = "number";
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
     static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String IS_SYNCING_STRING = "it is being full-synced";
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String IS_VERIFYING_STRING = "it is being verified";
+    /** Parameters. */
+    static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
+    /** Section name */
+    static final String SECTION_STRING = "Volume";
 
     /** Prepares a new <code>DrbdVolumeInfo</code> object. */
     public DrbdVolumeInfo(final String name,
@@ -100,17 +126,172 @@ public final class DrbdVolumeInfo extends Info
 
         this.drbdResourceInfo = drbdResourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
-        device = "test";
+        setResource(new DrbdVolume(name));
+        getResource().setValue(DRBD_VOL_PARAM_DEV, device);
     }
 
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
-        return drbdResourceInfo.getInfoPanel();
-    }
+        getBrowser().getDrbdGraph().pickInfo(this);
+        if (infoPanel != null) {
+            return infoPanel;
+        }
+        final ButtonCallback buttonCallback = new ButtonCallback() {
+            private volatile boolean mouseStillOver = false;
+            /**
+             * Whether the whole thing should be enabled.
+             */
+            @Override public boolean isEnabled() {
+                return true;
+            }
 
-    /** Returns menu icon. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
-        return VOLUME_ICON;
+            @Override public void mouseOut() {
+                if (!isEnabled()) {
+                    return;
+                }
+                mouseStillOver = false;
+                getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
+                getApplyButton().setToolTipText(null);
+            }
+
+            @Override public void mouseOver() {
+                if (!isEnabled()) {
+                    return;
+                }
+                mouseStillOver = true;
+                getApplyButton().setToolTipText(
+                       Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                                "ClusterBrowser.Test.Tooltip.Background"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                getBrowser().getDrbdGraph().startTestAnimation(getApplyButton(),
+                                                               startTestLatch);
+                getBrowser().drbdtestLockAcquire();
+                getBrowser().setDRBDtestData(null);
+                final Map<Host, String> testOutput =
+                                            new LinkedHashMap<Host, String>();
+                try {
+                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
+                    for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
+                        DRBD.adjust(h, "all", true);
+                        testOutput.put(h, DRBD.getDRBDtest());
+                    }
+                } catch (Exceptions.DrbdConfigException dce) {
+                    getBrowser().drbdtestLockRelease();
+                    return;
+                }
+                final DRBDtestData dtd = new DRBDtestData(testOutput);
+                getApplyButton().setToolTipText(dtd.getToolTip());
+                getBrowser().setDRBDtestData(dtd);
+                getBrowser().drbdtestLockRelease();
+                startTestLatch.countDown();
+            }
+        };
+        initApplyButton(buttonCallback,
+                        Tools.getString("Browser.ApplyDRBDResource"));
+
+        final JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        final JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setMinimumSize(new Dimension(0, 50));
+        buttonPanel.setPreferredSize(new Dimension(0, 50));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+
+        final JPanel optionsPanel = new JPanel();
+        optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        mainPanel.add(buttonPanel);
+
+        /* Actions */
+        final JMenuBar mb = new JMenuBar();
+        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        final JMenu serviceCombo = getActionsMenu();
+        mb.add(serviceCombo);
+        buttonPanel.add(mb, BorderLayout.EAST);
+
+        /* resource name */
+        getResource().setValue(DRBD_VOL_PARAM_NUMBER,
+                               getResource().getName());
+        getResource().setValue(DRBD_VOL_PARAM_DEV, getDevice());
+
+        final String[] params = getParametersFromXML();
+        addParams(optionsPanel,
+                  params,
+                  Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
+                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
+                  null);
+
+        getApplyButton().addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override public void run() {
+                        Tools.invokeAndWait(new Runnable() {
+                            @Override public void run() {
+                                getApplyButton().setEnabled(false);
+                                getRevertButton().setEnabled(false);
+                            }
+                        });
+                        getBrowser().drbdStatusLock();
+                        try {
+                            getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
+                            for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
+                                DRBD.adjust(h, "all", false);
+                            }
+                        } catch (Exceptions.DrbdConfigException dce) {
+                            getBrowser().drbdStatusUnlock();
+                            Tools.appError("config failed");
+                            return;
+                        }
+                        apply(false);
+                        getBrowser().drbdStatusUnlock();
+                    }
+                });
+                thread.start();
+            }
+        });
+
+        getRevertButton().addActionListener(
+            new ActionListener() {
+                @Override public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override public void run() {
+                            getBrowser().drbdStatusLock();
+                            revert();
+                            getBrowser().drbdStatusUnlock();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
+
+
+        addApplyButton(buttonPanel);
+        addRevertButton(buttonPanel);
+
+        mainPanel.add(optionsPanel);
+
+        final JPanel newPanel = new JPanel();
+        newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.add(buttonPanel);
+        newPanel.add(getMoreOptionsPanel(
+              Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
+              + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
+        newPanel.add(new JScrollPane(mainPanel));
+        infoPanel = newPanel;
+        infoPanelDone();
+        return infoPanel;
     }
 
     /** Return the first block devices. */
@@ -593,13 +774,6 @@ public final class DrbdVolumeInfo extends Info
         getFirstBlockDevInfo().verify(testOnly);
     }
 
-
-
-    /** Returns browser object of this info. */
-    @Override public final ClusterBrowser getBrowser() {
-        return (ClusterBrowser) super.getBrowser();
-    }
-
     /** Remove drbddisk heartbeat service. */
     void removeDrbdDisk(final FilesystemInfo fi,
                         final Host dcHost,
@@ -736,5 +910,71 @@ public final class DrbdVolumeInfo extends Info
     /** Returns drbd graphical view. */
     @Override public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
+    }
+
+    /** Returns all parameters. */
+    @Override public String[] getParametersFromXML() {
+        return PARAMS;
+    }
+
+    @Override public boolean checkResourceFieldsCorrect(final String param,
+                                                        final String[] params) {
+        return super.checkResourceFieldsCorrect(param, params);
+    }
+
+    @Override public boolean checkResourceFieldsChanged(final String param,
+                                                        final String[] params) {
+        return super.checkResourceFieldsChanged(param, params);
+    }
+
+    /** Applies changes that user made to the drbd volume fields. */
+    public void apply(final boolean testOnly) {
+        if (!testOnly) {
+            final String[] params = getParametersFromXML();
+            Tools.invokeAndWait(new Runnable() {
+                @Override public void run() {
+                    getApplyButton().setEnabled(false);
+                    getRevertButton().setEnabled(false);
+                }
+            });
+            getInfoPanel();
+            waitForInfoPanel();
+            getBrowser().getDrbdDevHash().remove(getDevice());
+            getBrowser().putDrbdDevHash();
+            storeComboBoxValues(params);
+
+            final String drbdDevStr = getParamSaved(DRBD_VOL_PARAM_DEV);
+            //getDrbdResource().setDevice(drbdDevStr);
+
+            getBrowser().getDrbdDevHash().put(drbdDevStr, this);
+            getBrowser().putDrbdDevHash();
+            getBrowser().getDrbdGraph().repaint();
+            //getDrbdResource().setCommited(true);
+            //getDrbdInfo().setAllApplyButtons();
+        }
+    }
+
+    /** Returns section to which this drbd parameter belongs. */
+    @Override protected String getSection(final String param) {
+        return SECTION_STRING;
+    }
+
+    @Override protected boolean isInteger(final String param) {
+        if (DRBD_VOL_PARAM_NUMBER.equals(param)) {
+            return true;
+        }
+        return false;
+    }
+
+    /** Returns browser object of this info. */
+    @Override public final ClusterBrowser getBrowser() {
+        return (ClusterBrowser) super.getBrowser();
+    }
+    
+    /**
+     * Returns a long description of the parameter that is used for tool tip.
+     */
+    @Override protected final String getParamLongDesc(final String param) {
+        return LONG_DESC.get(param);
     }
 }

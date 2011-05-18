@@ -104,9 +104,7 @@ public final class Resource extends DrbdConfig {
         Tools.waitForSwing();
         drbdInfo.apply(false);
         dri.apply(false);
-        return new BlockDev(this,
-                            getDrbdVolumeInfo(),
-                            getDrbdVolumeInfo().getFirstBlockDevInfo());
+        return new Volume(this, getDrbdVolumeInfo());
     }
 
     /**

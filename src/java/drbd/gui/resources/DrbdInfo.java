@@ -624,19 +624,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public DrbdResourceInfo getNewDrbdResource() {
         int index = getNewDrbdResourceIndex();
         String name = "r" + Integer.toString(index);
-        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
 
         /* search for next available drbd device */
-        final Map<String, DrbdVolumeInfo> drbdDevHash =
-                                             getBrowser().getDrbdDevHash();
-        while (drbdDevHash.containsKey(drbdDevStr)) {
-            index++;
-            drbdDevStr = "/dev/drbd" + Integer.toString(index);
-        }
-        getBrowser().putDrbdDevHash();
-        final DrbdResourceInfo dri = new DrbdResourceInfo(name,
-                                    drbdDevStr,
-                                    getBrowser());
+        final DrbdResourceInfo dri = new DrbdResourceInfo(name, getBrowser());
          return dri;
     }
 
@@ -662,7 +652,15 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void addDrbdVolume(final DrbdVolumeInfo dvi) {
         /* We want next port number on both devices to be the same,
          * although other port numbers may not be the same on both. */
-        final String drbdDevStr = dvi.getDevice();
+        final Map<String, DrbdVolumeInfo> drbdDevHash =
+                                             getBrowser().getDrbdDevHash();
+        int index = 0;
+        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
+        while (drbdDevHash.containsKey(drbdDevStr)) {
+            index++;
+            drbdDevStr = "/dev/drbd" + Integer.toString(index);
+        }
+        getBrowser().putDrbdDevHash();
         final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
         final int viPort1 = bdi1.getNextVIPort();

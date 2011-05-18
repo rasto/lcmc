@@ -111,8 +111,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
     }
 
     /**
-     * Returns a long description of the parameter that is used for tool
-     * tip.
+     * Returns a long description of the parameter that is used for tool tip.
      */
     @Override protected final String getParamLongDesc(final String param) {
         return getBrowser().getDrbdXML().getParamLongDesc(param);
@@ -124,7 +123,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected final boolean isAdvanced(final String param) {
+    @Override protected boolean isAdvanced(final String param) {
         if (!Tools.areEqual(getParamDefault(param),
                             getParamSaved(param))) {
             /* it changed, show it */

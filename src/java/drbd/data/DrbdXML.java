@@ -184,7 +184,6 @@ public final class DrbdXML extends XML {
     public DrbdXML(final Host[] hosts) {
         super();
         addSpecialParameter("resource", "name", true);
-        addSpecialParameter("resource", "device", true);
         addParameter("resource", "protocol", PROTOCOL_C, PROTOCOLS, true);
         for (Host host : hosts) {
             final String command =
