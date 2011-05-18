@@ -1123,7 +1123,7 @@ public final class RoboTest {
             removeEverything(robot);
         }
         if (!aborted) {
-            Tools.sleep(240000);
+            Tools.sleep(20000);
         }
         checkTest(host, "test1", 1);
     }
@@ -1413,7 +1413,7 @@ public final class RoboTest {
             removeEverything(robot);
         }
         if (!aborted) {
-            Tools.sleep(240000);
+            Tools.sleep(20000);
         }
         checkTest(host, "test2", 16);
     }
