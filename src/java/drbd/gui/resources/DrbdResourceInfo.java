@@ -113,12 +113,26 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } catch (Exceptions.DrbdConfigException dce) {
             throw dce;
         }
-        /* startup disk syncer net */
-        // TODO:
-        //config.append(blockDevInfo1.drbdNodeConfig(getName(), getDevice()));
-        //config.append('\n');
-        //config.append(blockDevInfo2.drbdNodeConfig(getName(), getDevice()));
-        config.append('}');
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+        /*
+            <host name="alpha">
+                <volume vnr="0">
+                    <device minor="0"></device>
+                    <disk>/dev/foo</disk>
+                    <flexible-meta-disk>/dev/bar</flexible-meta-disk>
+                </volume>
+                <volume vnr="1">
+
+                    <device minor="1"></device>
+                    <disk>/dev/foo1</disk>
+                    <flexible-meta-disk>/dev/bar1</flexible-meta-disk>
+                </volume>
+                <address family="ipv4" port="7793">192.168.23.21</address>
+            </host>
+        */
+
+            config.append(dvi.drbdVolumeConfig());
+        }
         return config.toString();
     }
 
@@ -754,5 +768,20 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
+    }
+
+    /** Returns the last volume number + 1 */
+    public String getAvailVolumeNumber() {
+        int maxNr = -1;
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            final String nrString = dvi.getName();
+            if (Tools.isNumber(nrString)) {
+                int nr = Integer.parseInt(nrString);
+                if (nr > maxNr) {
+                    maxNr = nr;
+                }
+            }
+        }
+        return Integer.toString(maxNr + 1);
     }
 }

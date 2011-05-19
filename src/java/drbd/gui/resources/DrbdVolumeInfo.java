@@ -25,7 +25,6 @@ import drbd.gui.Browser;
 import drbd.gui.ClusterBrowser;
 import drbd.utilities.Tools;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import java.util.List;
 import java.util.ArrayList;
@@ -40,25 +39,16 @@ import drbd.data.Host;
 import drbd.gui.dialog.cluster.DrbdLogs;
 import drbd.Exceptions;
 import drbd.AddDrbdSplitBrainDialog;
-import drbd.gui.Browser;
-import drbd.gui.ClusterBrowser;
 import drbd.gui.HeartbeatGraph;
-import drbd.data.Host;
-import drbd.data.ConfigData;
 import drbd.data.DRBDtestData;
-import drbd.data.AccessMode;
-import drbd.utilities.Tools;
-import drbd.utilities.DRBD;
 import drbd.utilities.ButtonCallback;
 
 import java.awt.geom.Point2D;
 import java.util.Map;
-import java.util.List;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.ArrayList;
-import javax.swing.JComponent;
+import java.util.HashMap;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
@@ -66,15 +56,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -114,18 +97,55 @@ public final class DrbdVolumeInfo extends EditableInfo
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
     /** Section name */
     static final String SECTION_STRING = "Volume";
+    /** Long descriptions for parameters. */
+    private static final Map<String, String> LONG_DESC =
+                Collections.unmodifiableMap(new HashMap<String, String>() {
+                    private static final long serialVersionUID = 1L;
+                {
+                    put(DRBD_VOL_PARAM_DEV, "DRBD device.");
+                    put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
+                }});
+    /** Short descriptions for parameters. */
+    private static final Map<String, String> SHORT_DESC =
+            Collections.unmodifiableMap(new HashMap<String, String>() {
+                private static final long serialVersionUID = 1L;
+            {
+                put(DRBD_VOL_PARAM_DEV, "DRBD device.");
+                put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
+            }});
+
+    /** Short descriptions for parameters. */
+    private static final Map<String, Object[]> POSSIBLE_CHOICES =
+                Collections.unmodifiableMap(new HashMap<String, Object[]>() {
+                    private static final long serialVersionUID = 1L;
+                {
+                    put(DRBD_VOL_PARAM_DEV, new String[]{"/dev/drbd0",
+                                                         "/dev/drbd1",
+                                                         "/dev/drbd2",
+                                                         "/dev/drbd3",
+                                                         "/dev/drbd4",
+                                                         "/dev/drbd5",
+                                                         "/dev/drbd6",
+                                                         "/dev/drbd7",
+                                                         "/dev/drbd8",
+                                                         "/dev/drbd9"});
+                    put(DRBD_VOL_PARAM_NUMBER,
+                        new String[]{"0", "1", "2", "3", "4", "5"});
+                }});
 
     /** Prepares a new <code>DrbdVolumeInfo</code> object. */
-    public DrbdVolumeInfo(final String name,
-                          final DrbdResourceInfo drbdResourceInfo,
-                          final List<BlockDevInfo> blockDevInfos,
-                          final Browser browser) {
+    DrbdVolumeInfo(final String name,
+                   final String device,
+                   final DrbdResourceInfo drbdResourceInfo,
+                   final List<BlockDevInfo> blockDevInfos,
+                   final Browser browser) {
         super(name, browser);
         assert(drbdResourceInfo != null);
         assert(blockDevInfos.size() >= 2);
 
         this.drbdResourceInfo = drbdResourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
+        this.device = device;
         setResource(new DrbdVolume(name));
         getResource().setValue(DRBD_VOL_PARAM_DEV, device);
     }
@@ -976,5 +996,116 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     @Override protected final String getParamLongDesc(final String param) {
         return LONG_DESC.get(param);
+    }
+
+    /**
+     * Returns the short description of the drbd parameter that is used as
+     * a label.
+     */
+    @Override protected final String getParamShortDesc(final String param) {
+        return SHORT_DESC.get(param);
+    }
+
+    /** Returns the preferred value for the drbd parameter. */
+    @Override protected final String getParamPreferred(final String param) {
+        return null;
+    }
+
+    /** Returns default value of the parameter. */
+    @Override public String getParamDefault(final String param) {
+        return null;
+    }
+
+    /**
+     * Checks the new value of the parameter if it is conforms to its type
+     * and other constraints.
+     */
+    @Override protected boolean checkParam(final String param,
+                                       final String newValue) {
+        return getBrowser().getDrbdXML().checkParam(param, newValue);
+    }
+
+    /** Returns the possible values for the pulldown menus, if applicable. */
+    @Override protected final Object[] getParamPossibleChoices(
+                                                        final String param) {
+        return POSSIBLE_CHOICES.get(param);
+    }
+
+    /** Returns the type of the parameter (like boolean). */
+    @Override protected final String getParamType(final String param) {
+        return null;
+    }
+
+    /**
+     * Returns whether the parameter is of the boolean type and needs the
+     * checkbox.
+     */
+    @Override protected final boolean isCheckBox(final String param) {
+        return false;
+    }
+
+    /** Returns whether this drbd parameter is of time type. */
+    @Override protected final boolean isTimeType(final String param) {
+        return false;
+    }
+
+    /** Returns whether this drbd parameter is of label type. */
+    @Override protected final boolean isLabel(final String param) {
+        return false;
+    }
+
+    /** Whether the parameter should be enabled only in advanced mode. */
+    @Override protected final boolean isEnabledOnlyInAdvancedMode(
+                                                         final String param) {
+        return false;
+    }
+
+    /** Returns access type of this parameter. */
+    @Override protected final ConfigData.AccessType getAccessType(
+                                                         final String param) {
+        return ConfigData.AccessType.ADMIN;
+    }
+
+    /** Whether the parameter should be enabled. */
+    @Override protected String isEnabled(final String param) {
+        return null;
+    }
+
+    /** Returns whether this parameter is advanced. */
+    @Override protected boolean isAdvanced(final String param) {
+        return false;
+    }
+
+    /** Returns whether this drbd parameter is required parameter. */
+    @Override protected final boolean isRequired(final String param) {
+        return true;
+    }
+
+    /** Creates and returns drbd config for volumes. */
+    String drbdVolumeConfig() throws Exceptions.DrbdConfigException {
+        final StringBuilder config = new StringBuilder(50);
+        boolean volumesAvailable = false;
+        //final String drbdV = host.getDrbdVersion();
+        //try {
+        //    volumesAvailable = Tools.getConfigData().getBigDRBDConf()
+        //                      || Tools.compareVersions(drbdV, "8.4.0") >= 0;
+        //} catch (Exceptions.IllegalVersionException e) {
+        //    Tools.appWarning(e.getMessage(), e);
+        //}
+        if (volumesAvailable) {
+            for (final BlockDevInfo bdi : blockDevInfos) {
+                config.append("\t");
+                config.append(bdi.drbdNodeConfig(getName(), getDevice()));
+                config.append('\n');
+            }
+            config.append('}');
+        } else {
+            for (final BlockDevInfo bdi : blockDevInfos) {
+                config.append(bdi.drbdNodeConfig(getName(), getDevice()));
+                config.append('\n');
+            }
+            config.append('}');
+        }
+        return config.toString();
     }
 }

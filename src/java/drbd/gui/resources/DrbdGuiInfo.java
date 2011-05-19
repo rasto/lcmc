@@ -154,24 +154,18 @@ abstract class DrbdGuiInfo extends EditableInfo {
         return getBrowser().getDrbdXML().isLabel(param);
     }
 
-    /**
-     * Returns whether this drbd parameter is of time type.
-     */
+    /** Returns whether this drbd parameter is of time type. */
     @Override protected final boolean isTimeType(final String param) {
         /* not required */
         return false;
     }
 
-    /**
-     * Returns whether this parameter has a unit prefix.
-     */
+    /** Returns whether this parameter has a unit prefix. */
     @Override protected final boolean hasUnitPrefix(final String param) {
         return getBrowser().getDrbdXML().hasUnitPrefix(param);
     }
 
-    /**
-     * Returns the long unit name.
-     */
+    /** Returns the long unit name. */
     protected final String getUnitLong(final String param) {
         return getBrowser().getDrbdXML().getUnitLong(param);
     }
@@ -198,9 +192,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
         return false;
     }
 
-    /**
-     * Returns the type of the parameter (like boolean).
-     */
+    /** Returns the type of the parameter (like boolean). */
     @Override protected final String getParamType(final String param) {
         return getBrowser().getDrbdXML().getParamType(param);
     }

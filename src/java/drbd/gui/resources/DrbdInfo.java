@@ -41,6 +41,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.Map;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.concurrent.CountDownLatch;
@@ -630,6 +631,30 @@ public final class DrbdInfo extends DrbdGuiInfo {
          return dri;
     }
 
+    /** Return new DRBD volume info object. */
+    public DrbdVolumeInfo getNewDrbdVolume(
+                                    final DrbdResourceInfo dri,
+                                    final List<BlockDevInfo> blockDevInfos) {
+        final Map<String, DrbdVolumeInfo> drbdDevHash =
+                                                getBrowser().getDrbdDevHash();
+        int index = 0;
+        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
+
+        while (drbdDevHash.containsKey(drbdDevStr)) {
+            index++;
+            drbdDevStr = "/dev/drbd" + Integer.toString(index);
+        }
+        getBrowser().putDrbdDevHash();
+        final String volumeNr = dri.getAvailVolumeNumber();
+        final DrbdVolumeInfo dvi =
+             new DrbdVolumeInfo(volumeNr,
+                                drbdDevStr,
+                                dri,
+                                blockDevInfos,
+                                getBrowser());
+        return dvi;
+    }
+
     /** Add DRBD resource. */
     public void addDrbdResource(final DrbdResourceInfo dri) {
         final String name = dri.getName();
@@ -652,15 +677,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void addDrbdVolume(final DrbdVolumeInfo dvi) {
         /* We want next port number on both devices to be the same,
          * although other port numbers may not be the same on both. */
-        final Map<String, DrbdVolumeInfo> drbdDevHash =
-                                             getBrowser().getDrbdDevHash();
-        int index = 0;
-        String drbdDevStr = "/dev/drbd" + Integer.toString(index);
-        while (drbdDevHash.containsKey(drbdDevStr)) {
-            index++;
-            drbdDevStr = "/dev/drbd" + Integer.toString(index);
-        }
-        getBrowser().putDrbdDevHash();
         final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
         final int viPort1 = bdi1.getNextVIPort();
@@ -677,7 +693,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         //dri.getDrbdResource().setDefaultValue(
         //                                DrbdResourceInfo.DRBD_RES_PARAM_DEV,
         //                                drbdDevStr);
-        getBrowser().getDrbdDevHash().put(drbdDevStr, dvi);
+        getBrowser().getDrbdDevHash().put(dvi.getDevice(), dvi);
         getBrowser().putDrbdDevHash();
 
         if (bdi1 != null) {

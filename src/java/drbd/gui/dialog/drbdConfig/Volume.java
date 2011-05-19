@@ -34,8 +34,6 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.awt.Component;
 import java.awt.Dimension;
 
