@@ -535,10 +535,14 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override public final void action() {
-                getBrowser().getHeartbeatGraph().removeConnection(
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       testOnly);
+                    }
+                });
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
@@ -548,10 +552,14 @@ public class HbConnectionInfo extends EditableInfo {
             }
             @Override public void action(final Host dcHost) {
                 if (!isNew()) {
-                    getBrowser().getHeartbeatGraph().removeConnection(
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       dcHost,
                                                       true);
+                        }
+                    });
                 }
             }
         };
@@ -585,10 +593,14 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public final void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
-                    getBrowser().getHeartbeatGraph().removeOrder(
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getBrowser().getHeartbeatGraph().removeOrder(
                                                      thisClass,
                                                      getBrowser().getDCHost(),
                                                      testOnly);
+                        }
+                    });
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
@@ -611,10 +623,14 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public void action(final Host dcHost) {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
-                        getBrowser().getHeartbeatGraph().removeOrder(
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getBrowser().getHeartbeatGraph().removeOrder(
                                                      thisClass,
                                                      dcHost,
                                                      true);
+                            }
+                        });
                     } else {
                         /* there is colocation constraint so let's get the
                          * endpoints from it. */
@@ -662,10 +678,14 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public final void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
-                    getBrowser().getHeartbeatGraph().removeColocation(
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getBrowser().getHeartbeatGraph().removeColocation(
                                                    thisClass,
                                                    getBrowser().getDCHost(),
                                                    testOnly);
+                        }
+                    });
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -691,10 +711,14 @@ public class HbConnectionInfo extends EditableInfo {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isColocation(
                                                                 thisClass)) {
-                        getBrowser().getHeartbeatGraph().removeColocation(
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                getBrowser().getHeartbeatGraph().removeColocation(
                                                        thisClass,
                                                        dcHost,
                                                        true);
+                            }
+                        });
                     } else {
                         /* add colocation */
                         /* there is order constraint so let's get the endpoints
