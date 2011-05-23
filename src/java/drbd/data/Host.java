@@ -1025,8 +1025,7 @@ public final class Host {
                                newOutputCallback,
                                outputVisible,
                                true,
-                               commandTimeout,
-                               false); /* cache */
+                               commandTimeout);
     }
 
     /**
@@ -1163,6 +1162,7 @@ public final class Host {
      * is finished callback.done function will be called. In case of error,
      * callback.doneError is called.
      */
+    @Deprecated
     public ExecCommandThread execCommandCache(
                                final String commandString,
                                final ProgressBar progressBar,
@@ -1183,8 +1183,7 @@ public final class Host {
                                callback,
                                outputVisible,
                                true,
-                               commandTimeout,
-                               false); /* cache */
+                               commandTimeout);
     }
 
     /** Executes connection status command. */
@@ -1202,8 +1201,7 @@ public final class Host {
                                     null,
                                     false,
                                     false,
-                                    10000,
-                                    false); /* cache */
+                                    10000);
             try {
                 connectionStatusThread.join(0);
             } catch (java.lang.InterruptedException e) {
@@ -1236,8 +1234,7 @@ public final class Host {
                                     outputCallback,
                                     false,
                                     false,
-                                    0,
-                                    false); /* cache */
+                                    0);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
@@ -1282,8 +1279,7 @@ public final class Host {
                                 outputCallback,
                                 false,
                                 false,
-                                0,
-                                false); /* cache */
+                                0);
         } else {
             Tools.appWarning("trying to start started hb status");
         }

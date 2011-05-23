@@ -68,9 +68,6 @@ public final class SSH {
     private volatile ConnectionThread connectionThread = null;
     /** Progress bar object. */
     private ProgressBar progressBar = null;
-    /** Cache for the commands. */
-    private final Map<String, String> commandCache =
-                                                new HashMap<String, String>();
     /** Connection failed flag. */
     private boolean connectionFailed;
     /** Whether we are disconnected manually and should not reconnect. */
@@ -340,8 +337,6 @@ public final class SSH {
         private Session sess = null;
         /** Timeout for ssh command. */
         private final int sshCommandTimeout;
-        /** Whether to cache this command. */
-        private final boolean cacheIt;
 
        /**
         * Executes command on the host.
@@ -547,12 +542,6 @@ public final class SSH {
             } catch (IOException e) {
                 exitCode = ERROR_EXIT_CODE;
             }
-            if (cacheIt && exitCode == 0) {
-                if (!commandCache.containsKey(command)) {
-                    System.out.println("command cache: " + command);
-                }
-                commandCache.put(command, res.toString());
-            }
             return new SSHOutput(res.toString(), exitCode);
         }
 
@@ -574,8 +563,8 @@ public final class SSH {
                           final NewOutputCallback newOutputCallback,
                           final boolean outputVisible,
                           final boolean commandVisible,
-                          final int sshCommandTimeout,
-                          final boolean cacheIt) throws java.io.IOException {
+                          final int sshCommandTimeout)
+        throws java.io.IOException {
             super();
             this.command = command;
             this.execCallback = execCallback;
@@ -583,7 +572,6 @@ public final class SSH {
             this.outputVisible = outputVisible;
             this.commandVisible = commandVisible;
             this.sshCommandTimeout = sshCommandTimeout;
-            this.cacheIt = cacheIt;
             if (command.length() > 9
                 && command.substring(0, 9).equals("NOOUTPUT:")) {
                 this.outputVisible = false;
@@ -725,8 +713,7 @@ public final class SSH {
                             null,
                             outputVisible,
                             commandVisible,
-                            sshCommandTimeout,
-                            false); /* cache it */
+                            sshCommandTimeout);
         } catch (java.io.IOException e) {
             Tools.appError("Can not execute command: " + command, "", e);
             return new SSHOutput("", 102);
@@ -749,8 +736,6 @@ public final class SSH {
      *          command that is to be executed.
      * @param execCallback
      *          callback that implements ExecCallback interface.
-     * @param cacheIt
-     *          whether the output of the command should be cached
      * @param outputVisible
      *          whether the output of the command should be visible
      *
@@ -760,17 +745,12 @@ public final class SSH {
                                          final ExecCallback execCallback,
                                          final boolean outputVisible,
                                          final boolean commandVisible,
-                                         final int sshCommandTimeout,
-                                         final boolean cacheIt) {
+                                         final int sshCommandTimeout) {
         if (host == null) {
             return null;
         }
         final String realCommand = host.replaceVars(command);
         Tools.debug(this, "real command: " + realCommand, 2);
-        if (cacheIt && commandCache.containsKey(realCommand)) {
-            execCallback.done(commandCache.get(realCommand));
-            return null;
-        }
         ExecCommandThread execCommandThread;
         try {
             execCommandThread = new ExecCommandThread(realCommand,
@@ -778,8 +758,7 @@ public final class SSH {
                                                       null,
                                                       outputVisible,
                                                       commandVisible,
-                                                      sshCommandTimeout,
-                                                      cacheIt);
+                                                      sshCommandTimeout);
         } catch (java.io.IOException e) {
             Tools.appError("Can not execute command: " + realCommand, "", e);
             return null;
@@ -787,35 +766,6 @@ public final class SSH {
         execCommandThread.setPriority(Thread.MIN_PRIORITY);
         execCommandThread.start();
         return execCommandThread;
-    }
-
-    /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished execCallback.done function will be called. In case of error,
-     * execCallback.doneError is called.
-     *
-     * @param command
-     *          command that is to be executed.
-     * @param execCallback
-     *          callback that implements ExecCallback interface.
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     * @param commandVisible
-     *          whether the command should be visible
-     *
-     * @return thread
-     */
-    public ExecCommandThread execCommand(final String command,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
-        return execCommand(command,
-                           execCallback,
-                           outputVisible,
-                           commandVisible,
-                           sshCommandTimeout,
-                           false);
     }
 
     /**
@@ -843,8 +793,7 @@ public final class SSH {
                                final NewOutputCallback newOutputCallback,
                                final boolean outputVisible,
                                final boolean commandVisible,
-                               final int sshCommandTimeout,
-                               final boolean cacheIt) {
+                               final int sshCommandTimeout) {
         final String realCommand = host.replaceVars(command);
         ExecCommandThread execCommandThread;
         try {
@@ -853,8 +802,7 @@ public final class SSH {
                                                       newOutputCallback,
                                                       outputVisible,
                                                       commandVisible,
-                                                      sshCommandTimeout,
-                                                      cacheIt);
+                                                      sshCommandTimeout);
         } catch (java.io.IOException e) {
             Tools.appError("Can not execute command: " + realCommand, "", e);
             return null;
@@ -875,8 +823,6 @@ public final class SSH {
      *
      * @param execCallback
      *          callback that implements ExecCallback interface.
-     * @param cacheIt
-     *          whether the output of the command should be cached
      * @param outputVisible
      *          whether the output of the command should be visible
      * @param commandVisible
@@ -889,8 +835,7 @@ public final class SSH {
                                          final ExecCallback execCallback,
                                          final boolean outputVisible,
                                          final boolean commandVisible,
-                                         final int sshCommandTimeout,
-                                         final boolean cacheIt) {
+                                         final int sshCommandTimeout) {
         Tools.debug(this, "execCommand with progress bar", 2);
         this.progressBar = progressBar;
         if (progressBar != null) {
@@ -901,41 +846,7 @@ public final class SSH {
                            execCallback,
                            outputVisible,
                            commandVisible,
-                           sshCommandTimeout,
-                           cacheIt);
-    }
-
-    /**
-     * Executes command and manages a progress bar. Command is executed in a
-     * new thread, after command is finished execCallback.done function will
-     * be called. In case of error, execCallback.doneError is called.
-     *
-     * @param command
-     *          command that is to be executed.
-     * @param progressBar
-     *
-     * @param execCallback
-     *          callback that implements ExecCallback interface.
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     * @param commandVisible
-     *          whether the command should be visible
-     *
-     * @return command thread
-     */
-    public ExecCommandThread execCommand(final String command,
-                                         final ProgressBar pB,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
-        return execCommand(command,
-                           pB,
-                           execCallback,
-                           outputVisible,
-                           commandVisible,
-                           sshCommandTimeout,
-                           false); /* cache it */
+                           sshCommandTimeout);
     }
 
     /**
@@ -1745,8 +1656,7 @@ public final class SSH {
                             },
                             false,
                             false,
-                            10000, /* smaller timeout */
-                            false); /* cache it */
+                            10000); /* smaller timeout */
         try {
             t.join();
         } catch (java.lang.InterruptedException e) {
