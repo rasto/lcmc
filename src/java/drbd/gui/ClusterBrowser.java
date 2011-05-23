@@ -1504,11 +1504,7 @@ public final class ClusterBrowser extends Browser {
             nodeChanged = true;
         }
         if (nodeChanged) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    reload(vmsNode, false);
-                }
-            });
+            reload(vmsNode, false);
         }
         for (final ServiceInfo si : getExistingServiceList(null)) {
             final VMSVirtualDomainInfo vmsvdi = si.connectWithVMS();
