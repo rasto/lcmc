@@ -113,7 +113,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } catch (Exceptions.DrbdConfigException dce) {
             throw dce;
         }
-        for (final DrbdVolumeInfo dvi : drbdVolumes) {
         /*
             <host name="alpha">
                 <volume vnr="0">
@@ -130,9 +129,32 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 <address family="ipv4" port="7793">192.168.23.21</address>
             </host>
         */
-
-            config.append(dvi.drbdVolumeConfig());
+        for (final Host host : getCluster().getHostsArray()) {
+            final List<String> volumeConfigs = new ArrayList<String>();
+            boolean volumesAvailable = false;
+            final String drbdV = host.getDrbdVersion();
+            try {
+                volumesAvailable = Tools.compareVersions(drbdV, "8.4.0rc1") >= 0;
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
+            }
+            for (final DrbdVolumeInfo dvi : drbdVolumes) {
+                final String volumeConfig = dvi.drbdVolumeConfig(
+                                                             host,
+                                                             volumesAvailable);
+                if (!"".equals(volumeConfig)) {
+                    volumeConfigs.add(volumeConfig);
+                }
+            }
+            if (volumeConfigs.size() > 0) {
+                config.append("\ton ");
+                config.append(host.getName());
+                config.append(" {\n\t\t");
+                config.append(Tools.join("\n", volumeConfigs));
+                config.append("\n\t}\n");
+            }
         }
+        config.append("}");
         return config.toString();
     }
 

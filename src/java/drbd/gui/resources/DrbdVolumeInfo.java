@@ -1082,30 +1082,23 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Creates and returns drbd config for volumes. */
-    String drbdVolumeConfig() throws Exceptions.DrbdConfigException {
+    String drbdVolumeConfig(final Host host, final boolean volumesAvailable)
+                                        throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder(50);
-        boolean volumesAvailable = false;
-        //final String drbdV = host.getDrbdVersion();
-        //try {
-        //    volumesAvailable = Tools.getConfigData().getBigDRBDConf()
-        //                      || Tools.compareVersions(drbdV, "8.4.0") >= 0;
-        //} catch (Exceptions.IllegalVersionException e) {
-        //    Tools.appWarning(e.getMessage(), e);
-        //}
-        if (volumesAvailable) {
-            for (final BlockDevInfo bdi : blockDevInfos) {
-                config.append("\t");
-                config.append(bdi.drbdNodeConfig(getName(), getDevice()));
+        for (final BlockDevInfo bdi : blockDevInfos) {
+            if (bdi.getHost() == host) {
+                if (volumesAvailable) {
+                    config.append("volume " + getName() + " {\n");
+                }
+                config.append(bdi.drbdBDConfig(getName(),
+                              getDevice(),
+                              volumesAvailable));
                 config.append('\n');
+                if (volumesAvailable) {
+                    config.append("\t\t}");
+                }
             }
-            config.append('}');
-        } else {
-            for (final BlockDevInfo bdi : blockDevInfos) {
-                config.append(bdi.drbdNodeConfig(getName(), getDevice()));
-                config.append('\n');
-            }
-            config.append('}');
         }
-        return config.toString();
+        return config.toString().trim();
     }
 }

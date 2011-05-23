@@ -275,8 +275,9 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Creates config for one node. */
-    String drbdNodeConfig(final String resource,
-                          final String drbdDevice)
+    String drbdBDConfig(final String resource,
+                        final String drbdDevice,
+                        final boolean volumesAvailable)
             throws Exceptions.DrbdConfigException {
 
         if (drbdDevice == null) {
@@ -299,21 +300,25 @@ public final class BlockDevInfo extends EditableInfo {
         }
 
         final StringBuilder config = new StringBuilder(120);
-        config.append("\ton ");
-        config.append(getHost().getName());
-        config.append(" {\n\t\tdevice\t");
+        String tabs;
+        if (volumesAvailable) {
+            tabs = "\t\t\t";
+        } else {
+            tabs = "\t\t";
+        }
+        config.append(tabs + "device\t\t");
         config.append(drbdDevice);
-        config.append(";\n\t\tdisk\t");
+        config.append(";\n" + tabs + "disk\t\t");
         config.append(getBlockDevice().getName());
-        config.append(";\n\t\taddress\t");
+        config.append(";\n" + tabs + "address\t\t");
         config.append(getBlockDevice().getDrbdNetInterfaceWithPort(
                                         getComboBoxValue(DRBD_NI_PARAM),
                                         getComboBoxValue(DRBD_NI_PORT_PARAM)));
-        config.append(";\n\t\t");
+        config.append(";\n" + tabs);
         config.append(getBlockDevice().getMetaDiskString(
                                        getComboBoxValue(DRBD_MD_PARAM),
                                        getComboBoxValue(DRBD_MD_INDEX_PARAM)));
-        config.append(";\n\t}\n");
+        config.append(';');
         return config.toString();
     }
 
