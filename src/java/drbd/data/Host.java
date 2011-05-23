@@ -1025,7 +1025,8 @@ public final class Host {
                                newOutputCallback,
                                outputVisible,
                                true,
-                               commandTimeout);
+                               commandTimeout,
+                               false); /* cache */
     }
 
     /**
@@ -1180,10 +1181,10 @@ public final class Host {
                                                     false), /* in bash */
                                progressBar,
                                callback,
-                               true,
                                outputVisible,
                                true,
-                               commandTimeout);
+                               commandTimeout,
+                               false); /* cache */
     }
 
     /** Executes connection status command. */
@@ -1201,7 +1202,8 @@ public final class Host {
                                     null,
                                     false,
                                     false,
-                                    10000);
+                                    10000,
+                                    false); /* cache */
             try {
                 connectionStatusThread.join(0);
             } catch (java.lang.InterruptedException e) {
@@ -1234,7 +1236,8 @@ public final class Host {
                                     outputCallback,
                                     false,
                                     false,
-                                    0);
+                                    0,
+                                    false); /* cache */
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
@@ -1279,7 +1282,8 @@ public final class Host {
                                 outputCallback,
                                 false,
                                 false,
-                                0);
+                                0,
+                                false); /* cache */
         } else {
             Tools.appWarning("trying to start started hb status");
         }
