@@ -1248,7 +1248,6 @@ public class ServiceInfo extends EditableInfo {
                 final GuiComboBox cb = operationsComboBoxHash.get(op, param);
                 mOperationsComboBoxHashReadLock.unlock();
                 if (cb == null) {
-                    mSavedOperationsLock.unlock();
                     continue;
                 }
                 final Object[] defaultValueE = Tools.extractUnit(defaultValue);
