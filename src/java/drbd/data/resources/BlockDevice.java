@@ -52,8 +52,6 @@ public final class BlockDevice extends Resource {
     private boolean drbd = false;
     /** Whether this block device is used by crm in Filesystem service. */
     private boolean isUsedByCRM;
-    /** Drbd net interface of this block device. */
-    private NetInterface netInterface;
     /** Drbd meta disk of this block device. */
     private BlockDevice metaDisk = null;
     /** Block device of which this block device is a meta disk. */
@@ -199,7 +197,6 @@ public final class BlockDevice extends Resource {
             diskState             = null;
             syncedProgress        = null;
             drbdFlags             = null;
-            netInterface          = null;
             if (metaDisk != null) {
                 metaDisk.removeMetadiskOfBlockDevice(this);
                 metaDisk              = null;
@@ -237,11 +234,6 @@ public final class BlockDevice extends Resource {
         }
     }
 
-    /** Sets net interface. */
-    void setNetInterface(final NetInterface netInterface) {
-        this.netInterface = netInterface;
-    }
-
     /** Sets meta disk. */
     public void setMetaDisk(final BlockDevice metaDisk) {
         this.metaDisk = metaDisk;
@@ -259,32 +251,6 @@ public final class BlockDevice extends Resource {
     /** Returns meta-disk. */
     public BlockDevice getMetaDisk() {
         return metaDisk;
-    }
-
-    /** Returns net interface object. */
-    NetInterface getNetInterface() {
-        return netInterface;
-    }
-
-    /**
-     * Returns stored net interface and port concanated with ':'
-     * It can return null if net interface or port are not defined.
-     */
-    public String getDrbdNetInterfaceWithPort(final String ni,
-                                              final String nip) {
-        if (ni == null || nip == null) {
-            return null;
-        }
-        return ni + ":" + nip;
-    }
-
-    /**
-     * Returns stored net interface and port concanated with ':'
-     * It can return null if net interface or port are not defined.
-     */
-    public String getDrbdNetInterfaceWithPort() {
-        return getDrbdNetInterfaceWithPort(getValue("DrbdNetInterface"),
-                                           getValue("DrbdNetInterfacePort"));
     }
 
     /** Sets drbd connection state as it is in /proc/drbd. */
@@ -534,17 +500,7 @@ public final class BlockDevice extends Resource {
 
     /** Returns section by which the parameter is grouped in the views. */
     public String getSection(final String parameter) {
-        if ("DrbdNetInterface".equals(parameter)) {
-            return "Drbd";
-        } else if ("DrbdNetInterfacePort".equals(parameter)) {
-            return "More";
-        } else if ("DrbdMetaDisk".equals(parameter)) {
-            return "Drbd";
-        } else if ("DrbdMetaDiskIndex".equals(parameter)) {
-            return "More";
-        } else {
-            return "";
-        }
+        return Tools.getString("BlockDevice.MetaDiskSection");
     }
 
     /** Returns whether the block device is swap. */

@@ -96,13 +96,14 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Parameters. */
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
     /** Section name */
-    static final String SECTION_STRING = "Volume";
+    static final String SECTION_STRING =
+                               Tools.getString("DrbdVolumeInfo.VolumeSection");
     /** Long descriptions for parameters. */
     private static final Map<String, String> LONG_DESC =
                 Collections.unmodifiableMap(new HashMap<String, String>() {
                     private static final long serialVersionUID = 1L;
                 {
-                    put(DRBD_VOL_PARAM_DEV, "DRBD device.");
+                    put(DRBD_VOL_PARAM_DEV, "DRBD device");
                     put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
                 }});
     /** Short descriptions for parameters. */
@@ -110,8 +111,10 @@ public final class DrbdVolumeInfo extends EditableInfo
             Collections.unmodifiableMap(new HashMap<String, String>() {
                 private static final long serialVersionUID = 1L;
             {
-                put(DRBD_VOL_PARAM_DEV, "DRBD device.");
-                put(DRBD_VOL_PARAM_NUMBER, "DRBD Volume number");
+                put(DRBD_VOL_PARAM_DEV,
+                    Tools.getString("DrbdVolumeInfo.Device"));
+                put(DRBD_VOL_PARAM_NUMBER,
+                    Tools.getString("DrbdVolumeInfo.Number"));
             }});
 
     /** Short descriptions for parameters. */
@@ -622,12 +625,12 @@ public final class DrbdVolumeInfo extends EditableInfo
             DRBD.down(host, getName(), testOnly);
         }
         super.removeMyself(testOnly);
-        final Map<String, DrbdResourceInfo> drbdResHash =
-                                                getBrowser().getDrbdResHash();
-        final DrbdResourceInfo dri = drbdResHash.get(getName());
-        drbdResHash.remove(getName());
-        getBrowser().putDrbdResHash();
-        dri.setName(null);
+        //final Map<String, DrbdResourceInfo> drbdResHash =
+        //                                        getBrowser().getDrbdResHash();
+        //final DrbdResourceInfo dri = drbdResHash.get(getName());
+        //drbdResHash.remove(getName());
+        //getBrowser().putDrbdResHash();
+        //dri.setName(null);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         getBrowser().getDrbdDevHash().remove(getDevice());
         getBrowser().putDrbdDevHash();

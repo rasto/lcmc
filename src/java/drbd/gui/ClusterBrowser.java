@@ -1573,9 +1573,9 @@ public final class ClusterBrowser extends Browser {
                     bd2 = bdi;
                 }
             }
-            if (bd1 != null
-                && bd2 != null) {
+            if (bd1 != null && bd2 != null) {
                 System.out.println("add drbd resource not impl.");
+                // addDrbdVolume
                 //final boolean added = drbdInfo.addDrbdResource(resName,
                 //                                               drbdDev,
                 //                                               bd1,

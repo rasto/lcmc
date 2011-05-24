@@ -23,6 +23,7 @@
 package drbd.gui.dialog.drbdConfig;
 
 import drbd.utilities.Tools;
+import drbd.gui.ClusterBrowser;
 import drbd.gui.resources.DrbdInfo;
 import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.DrbdVolumeInfo;
@@ -141,6 +142,7 @@ public final class Resource extends DrbdConfig {
     @Override protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        dri.selectMyself();
         dri.waitForInfoPanel();
         Tools.waitForSwing();
         final JPanel inputPane = new JPanel();
@@ -192,6 +194,11 @@ public final class Resource extends DrbdConfig {
         }
 
 
+        /* address combo boxes */
+        dri.addHostAddresses(optionsPanel,
+                             ClusterBrowser.SERVICE_LABEL_WIDTH,
+                             ClusterBrowser.SERVICE_FIELD_WIDTH,
+                             true);
         dri.addWizardParams(
                   optionsPanel,
                   PARAMS,

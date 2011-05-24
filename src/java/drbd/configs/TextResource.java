@@ -1995,13 +1995,13 @@ public final class TextResource extends java.util.ListResourceBundle {
          "DRBD network interface"},
 
         {"DrbdMetaDisk",
-         "DRBD meta disk"},
+         "Meta Disk"},
 
         {"DrbdMetaDisk.Long",
          "DRBD meta disk"},
 
         {"DrbdNetInterfacePort",
-         "DRBD net interface port"},
+         "Port"},
 
         {"DrbdNetInterfacePort.Long",
          "DRBD network interface port"},
@@ -2348,5 +2348,26 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdInfo.CommonSection",
          "common "},
+
+        {"DrbdResourceInfo.HostAddresses",
+         "Net Interface"},
+
+        {"DrbdResourceInfo.AddressOnHost",
+         "on "},
+
+        {"DrbdResourceInfo.NetInterfacePort",
+         "Port"},
+
+        {"BlockDevice.MetaDiskSection",
+         "DRBD Meta Disk"},
+
+        {"DrbdVolumeInfo.VolumeSection",
+         "DRBD Volume"},
+
+        {"DrbdVolumeInfo.Number",
+         "Number"},
+
+        {"DrbdVolumeInfo.Device",
+         "Device"},
     };
 }

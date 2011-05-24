@@ -652,7 +652,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Stores values in the combo boxes in the component c. */
-    protected final void storeComboBoxValues(final String[] params) {
+    protected void storeComboBoxValues(final String[] params) {
         for (String param : params) {
             final String value = getComboBoxValue(param);
             getResource().setValue(param, value);

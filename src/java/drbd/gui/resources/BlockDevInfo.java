@@ -89,10 +89,6 @@ public final class BlockDevInfo extends EditableInfo {
     private static final String DRBD_MD_PARAM         = "DrbdMetaDisk";
     /** Internal parameter name of drbd meta-disk index. */
     private static final String DRBD_MD_INDEX_PARAM   = "DrbdMetaDiskIndex";
-    /** Internal parameter name of drbd network interface. */
-    private static final String DRBD_NI_PARAM         = "DrbdNetInterface";
-    /** Internal parameter name of drbd network interface port. */
-    private static final String DRBD_NI_PORT_PARAM    = "DrbdNetInterfacePort";
     /** Large harddisk icon. */
     public static final ImageIcon HARDDISK_ICON_LARGE = Tools.createImageIcon(
                            Tools.getDefault("BlockDevInfo.HarddiskIconLarge"));
@@ -162,8 +158,6 @@ public final class BlockDevInfo extends EditableInfo {
      * TODO: check this
      */
     @Override public void removeMyself(final boolean testOnly) {
-        getBlockDevice().setValue(DRBD_NI_PARAM, null);
-        getBlockDevice().setValue(DRBD_NI_PORT_PARAM, null);
         getBlockDevice().setValue(DRBD_MD_PARAM, null);
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(testOnly);
@@ -286,12 +280,6 @@ public final class BlockDevInfo extends EditableInfo {
                                     + getHost().getName()
                                     + " (" + resource + ")");
         }
-        if (getBlockDevice().getDrbdNetInterfaceWithPort() == null) {
-            throw new Exceptions.DrbdConfigException(
-                                    "Net interface not defined for host "
-                                    + getHost().getName()
-                                    + " (" + resource + ")");
-        }
         if (getBlockDevice().getName() == null) {
             throw new Exceptions.DrbdConfigException(
                                     "Block device not defined for host "
@@ -310,10 +298,6 @@ public final class BlockDevInfo extends EditableInfo {
         config.append(drbdDevice);
         config.append(";\n" + tabs + "disk\t\t");
         config.append(getBlockDevice().getName());
-        config.append(";\n" + tabs + "address\t\t");
-        config.append(getBlockDevice().getDrbdNetInterfaceWithPort(
-                                        getComboBoxValue(DRBD_NI_PARAM),
-                                        getComboBoxValue(DRBD_NI_PORT_PARAM)));
         config.append(";\n" + tabs);
         config.append(getBlockDevice().getMetaDiskString(
                                        getComboBoxValue(DRBD_MD_PARAM),
@@ -342,71 +326,12 @@ public final class BlockDevInfo extends EditableInfo {
         return "<select>";
     }
 
-    /** Returns next network interface port. TODO: VI? */
-    int getNextVIPort() {
-        int port = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort") - 1;
-        for (final String portString : getBrowser().getDrbdVIPortList()) {
-            final int p = Integer.valueOf(portString);
-            if (p > port) {
-                port = p;
-            }
-        }
-        return port;
-    }
-
-    /** Sets network interface port. TODO: VI? */
-    void setDefaultVIPort(final int port) {
-        final String value = Integer.toString(port);
-        getBlockDevice().setValue(DRBD_NI_PORT_PARAM, value);
-        getBrowser().getDrbdVIPortList().add(value);
-    }
-
     /** Returns combobox for this parameter. */
     @Override protected GuiComboBox getParamComboBox(final String param,
                                                      final String prefix,
                                                      final int width) {
         GuiComboBox paramCb;
-        if (DRBD_NI_PORT_PARAM.equals(param)) {
-            final List<String> drbdVIPorts = new ArrayList<String>();
-            String defaultPort = getBlockDevice().getValue(param);
-            if (defaultPort == null) {
-                defaultPort = getBlockDevice().getDefaultValue(param);
-            }
-            drbdVIPorts.add(defaultPort);
-            int i = 0;
-            int index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
-            while (i < 10) {
-                final String port = Integer.toString(index);
-                if (!getBrowser().getDrbdVIPortList().contains(port)) {
-                    drbdVIPorts.add(port);
-                    i++;
-                }
-                index++;
-            }
-            String regexp = null;
-            if (isInteger(param)) {
-                regexp = "^\\d*$";
-            }
-            final GuiComboBox gcb = new GuiComboBox(
-                       defaultPort,
-                       drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
-                       null, /* units */
-                       null, /* type */
-                       regexp,
-                       width,
-                       null, /* abbrv */
-                       new AccessMode(getAccessType(param),
-                                      isEnabledOnlyInAdvancedMode(param)));
-            paramCb = gcb;
-            //gcb.setValue(defaultPort);
-            paramComboBoxAdd(param, prefix, gcb);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    gcb.setEnabled(true);
-                    gcb.setAlwaysEditable(true);
-                }
-            });
-        } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
+        if (DRBD_MD_INDEX_PARAM.equals(param)) {
             final GuiComboBox gcb =
                                 super.getParamComboBox(param, prefix, width);
             paramCb = gcb;
@@ -466,16 +391,6 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                 }
             }
-        } else if (DRBD_NI_PORT_PARAM.equals(param)) {
-            if (getBrowser().getDrbdVIPortList().contains(value)
-                && !value.equals(getBlockDevice().getValue(param))) {
-                ret = false;
-            }
-            final Pattern p = Pattern.compile(".*\\D.*");
-            final Matcher m = p.matcher(value);
-            if (m.matches()) {
-                ret = false;
-            }
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
             if (getBrowser().getDrbdVIPortList().contains(value)
                 && !value.equals(getBlockDevice().getValue(param))) {
@@ -521,9 +436,6 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns whether this type is integer. */
     @Override protected boolean isInteger(final String param) {
-        if (DRBD_NI_PORT_PARAM.equals(param)) {
-            return true;
-        }
         return false;
     }
 
@@ -555,25 +467,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns possible choices for the parameter. */
     @Override protected Object[] getParamPossibleChoices(final String param) {
-        if (DRBD_NI_PARAM.equals(param)) {
-            /* net interfaces */
-            StringInfo defaultNetInterface = null;
-            String netInterfaceString =
-                                    getBlockDevice().getValue(DRBD_NI_PARAM);
-            if (netInterfaceString == null
-                || netInterfaceString.equals("")) {
-                defaultNetInterface =
-                    new StringInfo(
-                        Tools.getString("HostBrowser.DrbdNetInterface.Select"),
-                        null,
-                        getBrowser());
-                netInterfaceString = defaultNetInterface.toString();
-                getBlockDevice().setDefaultValue(DRBD_NI_PARAM, null);
-//                                                 netInterfaceString);
-            }
-            return getNetInterfaces(defaultNetInterface,
-                                getBrowser().getNetInterfacesNode().children());
-        } else if (DRBD_MD_PARAM.equals(param)) {
+        if (DRBD_MD_PARAM.equals(param)) {
             /* meta disk */
             final StringInfo internalMetaDisk =
                     new StringInfo(Tools.getString(
@@ -641,23 +535,6 @@ public final class BlockDevInfo extends EditableInfo {
             return false;
         }
         return cv.booleanValue();
-    }
-
-    /** Ruturns all net interfaces. */
-    protected Object[] getNetInterfaces(final Info defaultValue,
-                                        final Enumeration e) {
-        final List<Object> list = new ArrayList<Object>();
-
-        if (defaultValue != null) {
-            list.add(defaultValue);
-        }
-
-        while (e.hasMoreElements()) {
-            final Info i =
-              (Info) ((DefaultMutableTreeNode) e.nextElement()).getUserObject();
-            list.add(i);
-        }
-        return list.toArray(new Object[list.size()]);
     }
 
     /** Returns block devices that are available for drbd meta-disk. */
@@ -807,8 +684,6 @@ public final class BlockDevInfo extends EditableInfo {
     /** Returns all parameters. */
     @Override public String[] getParametersFromXML() {
         final String[] params = {
-                            DRBD_NI_PARAM,
-                            DRBD_NI_PORT_PARAM,
                             DRBD_MD_PARAM,
                             DRBD_MD_INDEX_PARAM,
                           };
@@ -831,14 +706,9 @@ public final class BlockDevInfo extends EditableInfo {
                 getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(
                                                              getBlockDevice());
             }
-            getBrowser().getDrbdVIPortList().remove(
-                               getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
-
             getBlockDevice().setNew(false);
             storeComboBoxValues(params);
 
-            getBrowser().getDrbdVIPortList().add(
-                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
             final Object o = paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
             if (Tools.isStringInfoClass(o)) {
                 getBlockDevice().setMetaDisk(null); /* internal */
@@ -1015,6 +885,7 @@ public final class BlockDevInfo extends EditableInfo {
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
         infoPanelDone();
+        setApplyButtons(null, getParametersFromXML());
         return infoPanel;
     }
 
@@ -1040,8 +911,6 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Removes this block device from drbd data structures. */
     void removeFromDrbd() {
-        getBrowser().getDrbdVIPortList().remove(
-                                getBlockDevice().getValue(DRBD_NI_PORT_PARAM));
         setDrbd(false);
         setDrbdVolumeInfo(null);
     }
@@ -1766,11 +1635,7 @@ public final class BlockDevInfo extends EditableInfo {
         String value = null;
         final String volumeNr = dvi.getName();
         for (final String param : getParametersFromXML()) {
-            if (DRBD_NI_PORT_PARAM.equals(param)) {
-                value = dxml.getVirtualInterfacePort(hostName, resName);
-            } else if (DRBD_NI_PARAM.equals(param)) {
-                value = dxml.getVirtualInterface(hostName, resName);
-            } else if (DRBD_MD_PARAM.equals(param)) {
+            if (DRBD_MD_PARAM.equals(param)) {
                 value = dxml.getMetaDisk(hostName, resName, volumeNr);
                 if (!"internal".equals(value)) {
                     final BlockDevInfo mdI =
@@ -1820,10 +1685,13 @@ public final class BlockDevInfo extends EditableInfo {
                                    final String[] params,
                                    final boolean fromDrbdInfo,
                                    final boolean fromDrbdResourceInfo) {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        if (dri != null && !fromDrbdResourceInfo) {
-            if (!fromDrbdInfo) {
-                dri.setApplyButtons(null, dri.getParametersFromXML());
+        final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+        if (dvi != null) {
+            final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
+            if (dri != null && !fromDrbdResourceInfo) {
+                if (!fromDrbdInfo) {
+                    dri.setApplyButtons(null, dri.getParametersFromXML());
+                }
             }
         }
         return super.checkResourceFieldsChanged(param, params);
