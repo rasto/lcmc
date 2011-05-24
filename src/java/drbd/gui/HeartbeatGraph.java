@@ -911,6 +911,9 @@ public final class HeartbeatGraph extends ResourceGraph {
         final boolean edgeIsColocation =
                                     edgeIsColocationList.contains(e);
         final Pair<Vertex> p = getGraph().getEndpoints(e);
+        if (p == null) {
+            return "";
+        }
         final ServiceInfo s1 = (ServiceInfo) getInfo(p.getSecond());
         final ServiceInfo s2 = (ServiceInfo) getInfo(p.getFirst());
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
