@@ -1531,13 +1531,12 @@ public final class ClusterBrowser extends Browser {
     /** Updates drbd resources. */
     private void updateDrbdResources() {
         final DrbdXML dxml = drbdXML;
-        final String[] drbdResources = dxml.getResources();
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
-        final String volumeNr = "0"; //TODO
-        for (int i = 0; i < drbdResources.length; i++) {
-            final String resName = drbdResources[i];
+        for (final Object k : dxml.getResourceDeviceMap().keySet()) {
+            final String resName = (String) ((MultiKey) k).getKey(0);
+            final String volumeNr = (String) ((MultiKey) k).getKey(1);
             final String drbdDev = dxml.getDrbdDevice(resName, volumeNr);
             final Map<String, String> hostDiskMap =
                                                 dxml.getHostDiskMap(resName,
@@ -1574,19 +1573,27 @@ public final class ClusterBrowser extends Browser {
                 }
             }
             if (bd1 != null && bd2 != null) {
-                System.out.println("add drbd resource not impl.");
-                // addDrbdVolume
-                //final boolean added = drbdInfo.addDrbdResource(resName,
-                //                                               drbdDev,
-                //                                               bd1,
-                //                                               bd2,
-                //                                               false,
-                //                                               testOnly);
-                //if (added) {
-                //    atLeastOneAdded = true;
-                //} else {
-                //    bd1.getDrbdVolumeInfo().getDrbdResourceInfo().setParameters();
-                //}
+                /* add DRBD resource */
+                DrbdResourceInfo dri = getDrbdResHash().get(resName);
+                putDrbdResHash();
+                if (dri == null) {
+                    dri = drbdInfo.addDrbdResource(resName, testOnly);
+                    atLeastOneAdded = true;
+                } else {
+                    dri.setParameters();
+                }
+                final DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
+                if (dvi == null) {
+                    drbdInfo.addDrbdVolume(dri,
+                                           volumeNr,
+                                           drbdDev,
+                                           new ArrayList<BlockDevInfo>(
+                                                      Arrays.asList(bd1, bd2)),
+                                           testOnly);
+                    atLeastOneAdded = true;
+                } else {
+                    //dvi.setParameters(); TODO
+                }
             }
         }
         if (atLeastOneAdded) {

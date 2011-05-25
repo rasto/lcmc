@@ -75,7 +75,9 @@ final class BlockDev extends DrbdConfig {
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
         final int err = DRBD.adjust(bdi.getHost(),
-                                    bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                                    bdi.getDrbdVolumeInfo()
+                                       .getDrbdResourceInfo().getName(),
+                                    bdi.getDrbdVolumeInfo().getName(),
                                     testOnly);
         if (err == DRBD_NO_METADATA_RC) {
             return false;
@@ -102,10 +104,14 @@ final class BlockDev extends DrbdConfig {
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
                 if (adjust(blockDevInfo) && adjust(oBdi)) {
                     DRBD.down(blockDevInfo.getHost(),
-                              getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                              getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                 .getName(),
+                              getDrbdVolumeInfo().getName(),
                               testOnly);
                     DRBD.down(oBdi.getHost(),
-                              getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                              getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                 .getName(),
+                              getDrbdVolumeInfo().getName(),
                               testOnly);
                 } else {
                     getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(true);

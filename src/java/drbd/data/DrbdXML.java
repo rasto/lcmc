@@ -1062,6 +1062,10 @@ public final class DrbdXML extends XML {
         return resourceDeviceMap.get(res, volumeNr);
     }
 
+    public MultiKeyMap<String, String> getResourceDeviceMap() {
+        return resourceDeviceMap;
+    }
+
     /** Gets block device object from device number. Can return null. */
     private BlockDevInfo getBlockDevInfo(final String devNr,
                                          final String hostName,

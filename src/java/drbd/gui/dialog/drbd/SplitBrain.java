@@ -92,14 +92,19 @@ public final class SplitBrain extends DrbdConfig {
                 buttonClass(finishButton()).setEnabled(false);
                 resolveButton.setEnabled(false);
                 final boolean testOnly = false;
+                final String resName =
+                          getDrbdVolumeInfo().getDrbdResourceInfo().getName();
                 DRBD.setSecondary(hostSec,
-                                  getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                                  resName,
+                                  getDrbdVolumeInfo().getName(),
                                   testOnly);
                 DRBD.disconnect(hostSec,
-                                getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                                resName,
+                                getDrbdVolumeInfo().getName(),
                                 testOnly);
                 DRBD.discardData(hostSec,
-                                 getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                                 resName,
+                                 getDrbdVolumeInfo().getName(),
                                  testOnly);
                 getDrbdVolumeInfo().connect(hostPri, testOnly);
                 buttonClass(finishButton()).setEnabled(true);

@@ -121,6 +121,7 @@ final class CreateMD extends DrbdConfig {
                                     bdis[index].getHost(),
                                     getDrbdVolumeInfo().getDrbdResourceInfo()
                                                        .getName(),
+                                    getDrbdVolumeInfo().getName(),
                                     drbdMetaDisk,
                                     execCallback,
                                     testOnly);
@@ -128,6 +129,7 @@ final class CreateMD extends DrbdConfig {
                         DRBD.createMD(bdis[index].getHost(),
                                       getDrbdVolumeInfo().getDrbdResourceInfo()
                                                          .getName(),
+                                      getDrbdVolumeInfo().getName(),
                                       drbdMetaDisk,
                                       execCallback,
                                       testOnly);
@@ -185,9 +187,13 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
         DRBD.up(bdi1.getHost(),
-                getDrbdVolumeInfo().getDrbdResourceInfo().getName(), testOnly);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                getDrbdVolumeInfo().getName(),
+                testOnly);
         DRBD.up(bdi2.getHost(),
-                getDrbdVolumeInfo().getDrbdResourceInfo().getName(), testOnly);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                getDrbdVolumeInfo().getName(),
+                testOnly);
         return new CreateFS(this, getDrbdVolumeInfo());
     }
 

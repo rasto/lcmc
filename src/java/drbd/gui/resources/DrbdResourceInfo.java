@@ -484,7 +484,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 try {
                     getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", true);
+                        DRBD.adjust(h, "all", null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -556,7 +556,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getCluster().getHostsArray()) {
-                                DRBD.adjust(h, "all", false);
+                                DRBD.adjust(h, "all", null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -1226,9 +1226,23 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             });
     }
+
     /** Stores values in the combo boxes in the component c. */
-    protected final void storeComboBoxValues(final String[] params) {
+    protected void storeComboBoxValues(final String[] params) {
         super.storeComboBoxValues(params);
         storeHostAddresses();
+    }
+
+    /** Returns true if volume exists. */
+    public DrbdVolumeInfo getDrbdVolumeInfo(final String volumeNr) {
+        if (volumeNr == null) {
+            return null;
+        }
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            if (volumeNr.equals(dvi.getName())) {
+                return dvi;
+            }
+        }
+        return null;
     }
 }

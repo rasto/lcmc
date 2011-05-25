@@ -78,7 +78,7 @@ public final class DRBDtestData {
                     final String res = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(host.getName(), "/dev/drbd" + res, 1);
+                        disconnectedHash.put(host.getName(), res, 1);
                     } else if ("net".equals(action)) {
                         connectedHash.put(host.getName(), "/dev/drbd" + res, 1);
                     } else if ("detach".equals(action)) {
@@ -110,8 +110,8 @@ public final class DRBDtestData {
     }
 
     /** Returns whether the device will be disconnected on the host. */
-    public boolean isDisconnected(final Host host, final String dev) {
-        return disconnectedHash.get(host.getName(), dev) != null;
+    public boolean isDisconnected(final Host host, final String resource) {
+        return disconnectedHash.get(host.getName(), resource) != null;
     }
 
     /** Returns whether the device will be connected on the host. */

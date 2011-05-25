@@ -345,7 +345,10 @@ public final class DrbdGraph extends ResourceGraph {
                 });
             }
 
-            final StringBuilder l = new StringBuilder(dvi.getName());
+            final StringBuilder l =
+                        new StringBuilder(dvi.getDrbdResourceInfo().getName());
+            l.append('/');
+            l.append(dvi.getName());
             if (l != null) {
                 final Map<Vertex, Point2D> vl = getVertexLocations();
                 final Point2D sp = vl.get(source);

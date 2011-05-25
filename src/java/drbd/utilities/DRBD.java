@@ -43,7 +43,7 @@ public final class DRBD {
     /** Device placeholder. */
     private static final String DEVICE_PH     = "@DEVICE@";
     /** Drbd resource placeholder. */
-    private static final String RESOURCE_PH   = "@RESOURCE@";
+    private static final String RESOURCE_VOLUME_PH   = "@RES-VOL@";
     /** Drbd device placeholder. */
     private static final String DRBDDEV_PH    = "@DRBDDEV@";
     /** Filesystem placeholder. */
@@ -132,8 +132,22 @@ public final class DRBD {
     /** Executes the drbdadm attach on the specified host and resource. */
     public static boolean attach(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final boolean testOnly) {
-        return attach(host, resource, null, testOnly);
+        return attach(host, resource, volume, null, testOnly);
+    }
+
+    /** Returns hash that replaces placeholder in commands. */
+    private static Map<String, String> getResVolReplaceHash(
+                                                      final String resource,
+                                                      final String volume) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        if (volume == null) {
+            replaceHash.put(RESOURCE_VOLUME_PH, resource);
+        } else {
+            replaceHash.put(RESOURCE_VOLUME_PH, resource + "/" + volume);
+        }
+        return replaceHash;
     }
 
     /**
@@ -142,12 +156,14 @@ public final class DRBD {
      */
     public static boolean attach(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final ExecCallback execCallback,
                                  final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
+        
         final String command = host.getDistCommand("DRBD.attach",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -156,8 +172,9 @@ public final class DRBD {
     /** Executes the drbdadm detach on the specified host and resource. */
     public static boolean detach(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final boolean testOnly) {
-        return detach(host, resource, null, testOnly);
+        return detach(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -166,12 +183,13 @@ public final class DRBD {
      */
     public static boolean detach(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final ExecCallback execCallback,
                                  final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.detach",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -180,8 +198,9 @@ public final class DRBD {
     /** Executes the drbdadm connect on the specified host and resource. */
     public static boolean connect(final Host host,
                                   final String resource,
+                                  final String volume,
                                   final boolean testOnly) {
-        return connect(host, resource, null, testOnly);
+        return connect(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -190,12 +209,13 @@ public final class DRBD {
      */
     public static boolean connect(final Host host,
                                   final String resource,
+                                  final String volume,
                                   final ExecCallback execCallback,
                                   final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.connect",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -204,8 +224,9 @@ public final class DRBD {
     /** Executes the drbdadm disconnect on the specified host and resource. */
     public static boolean disconnect(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final boolean testOnly) {
-        return disconnect(host, resource, null, testOnly);
+        return disconnect(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -214,12 +235,13 @@ public final class DRBD {
      */
     public static boolean disconnect(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final ExecCallback execCallback,
                                      final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.disconnect",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -228,8 +250,9 @@ public final class DRBD {
     /** Executes the drbdadm pause-sync on the specified host and resource. */
     public static boolean pauseSync(final Host host,
                                     final String resource,
+                                    final String volume,
                                     final boolean testOnly) {
-        return pauseSync(host, resource, null, testOnly);
+        return pauseSync(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -238,12 +261,13 @@ public final class DRBD {
      */
     public static boolean pauseSync(final Host host,
                                     final String resource,
+                                    final String volume,
                                     final ExecCallback execCallback,
                                     final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.pauseSync",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -252,8 +276,9 @@ public final class DRBD {
     /** Executes the drbdadm resume-sync on the specified host and resource. */
     public static boolean resumeSync(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final boolean testOnly) {
-        return resumeSync(host, resource, null, testOnly);
+        return resumeSync(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -262,12 +287,13 @@ public final class DRBD {
      */
     public static boolean resumeSync(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final ExecCallback execCallback,
                                      final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.resumeSync",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -276,8 +302,9 @@ public final class DRBD {
     /** Executes the drbdadm primary on the specified host and resource. */
     public static boolean setPrimary(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final boolean testOnly) {
-        return setPrimary(host, resource, null, testOnly);
+        return setPrimary(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -286,12 +313,13 @@ public final class DRBD {
      */
     public static boolean setPrimary(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final ExecCallback execCallback,
                                      final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.setPrimary",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -300,8 +328,9 @@ public final class DRBD {
     /** Executes the drbdadm secondary on the specified host and resource. */
     public static boolean setSecondary(final Host host,
                                        final String resource,
+                                       final String volume,
                                        final boolean testOnly) {
-        return setSecondary(host, resource, null, testOnly);
+        return setSecondary(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -310,12 +339,13 @@ public final class DRBD {
      */
     public static boolean setSecondary(final Host host,
                                        final String resource,
+                                       final String volume,
                                        final ExecCallback execCallback,
                                        final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.setSecondary",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                 execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -327,8 +357,9 @@ public final class DRBD {
      */
     public static boolean initDrbd(final Host host,
                                    final String resource,
+                                   final String volume,
                                    final boolean testOnly) {
-        return initDrbd(host, resource, null, testOnly);
+        return initDrbd(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -337,12 +368,13 @@ public final class DRBD {
      */
     public static boolean initDrbd(final Host host,
                                    final String resource,
+                                   final String volume,
                                    final ExecCallback execCallback,
                                    final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.initDrbd",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                  resource,
+                                                                  volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -354,9 +386,10 @@ public final class DRBD {
      */
     public static boolean createMD(final Host host,
                                    final String resource,
+                                   final String volume,
                                    final String device,
                                    final boolean testOnly) {
-        return createMD(host, resource, device, null, testOnly);
+        return createMD(host, resource, volume, device, null, testOnly);
     }
 
     /**
@@ -365,11 +398,12 @@ public final class DRBD {
      */
     public static boolean createMD(final Host host,
                                    final String resource,
+                                   final String volume,
                                    final String device,
                                    final ExecCallback execCallback,
                                    final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
+        final Map<String, String> replaceHash = getResVolReplaceHash(resource,
+                                                                     volume);
         replaceHash.put(DEVICE_PH, device);
         final String command = host.getDistCommand("DRBD.createMD",
                                                    replaceHash);
@@ -384,9 +418,15 @@ public final class DRBD {
      */
     public static boolean createMDDestroyData(final Host host,
                                               final String resource,
+                                              final String volume,
                                               final String device,
                                               final boolean testOnly) {
-        return createMDDestroyData(host, resource, device, null, testOnly);
+        return createMDDestroyData(host,
+                                   resource,
+                                   volume,
+                                   device,
+                                   null,
+                                   testOnly);
     }
 
     /**
@@ -396,11 +436,12 @@ public final class DRBD {
      */
     public static boolean createMDDestroyData(final Host host,
                                               final String resource,
+                                              final String volume,
                                               final String device,
                                               final ExecCallback execCallback,
                                               final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
+        final Map<String, String> replaceHash = getResVolReplaceHash(resource,
+                                                                     volume);
         replaceHash.put(DEVICE_PH, device);
         final String command = host.getDistCommand("DRBD.createMDDestroyData",
                                                    replaceHash);
@@ -447,8 +488,9 @@ public final class DRBD {
      */
     public static boolean forcePrimary(final Host host,
                                        final String resource,
+                                       final String volume,
                                        final boolean testOnly) {
-        return forcePrimary(host, resource, null, testOnly);
+        return forcePrimary(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -457,18 +499,22 @@ public final class DRBD {
      */
     public static boolean forcePrimary(final Host host,
                                        final String resource,
+                                       final String volume,
                                        final ExecCallback execCallback,
                                        final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         try {
             String command;
             final String drbdV = host.getDrbdVersion();
             if (Tools.compareVersions(host.getDrbdVersion(), "8.3.7") <= 0) {
                 command = host.getDistCommand("DRBD.forcePrimary.8.3.7",
-                                              replaceHash);
+                                              getResVolReplaceHash(
+                                                             resource,
+                                                             volume));
             } else {
-                command = host.getDistCommand("DRBD.forcePrimary", replaceHash);
+                command = host.getDistCommand("DRBD.forcePrimary",
+                                              getResVolReplaceHash(
+                                                             resource,
+                                                             volume));
             }
             final SSH.SSHOutput ret =
                       execCommand(host, command, execCallback, true, testOnly);
@@ -482,8 +528,9 @@ public final class DRBD {
     /** Executes the drbdadm invalidate on the specified host and resource. */
     public static boolean invalidate(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final boolean testOnly) {
-        return invalidate(host, resource, null, testOnly);
+        return invalidate(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -492,12 +539,13 @@ public final class DRBD {
      */
     public static boolean invalidate(final Host host,
                                      final String resource,
+                                     final String volume,
                                      final ExecCallback execCallback,
                                      final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.invalidate",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -509,8 +557,9 @@ public final class DRBD {
      */
     public static boolean discardData(final Host host,
                                       final String resource,
+                                      final String volume,
                                       final boolean testOnly) {
-        return discardData(host, resource, null, testOnly);
+        return discardData(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -519,12 +568,13 @@ public final class DRBD {
      */
     public static boolean discardData(final Host host,
                                       final String resource,
+                                      final String volume,
                                       final ExecCallback execCallback,
                                       final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.discardData",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -533,8 +583,9 @@ public final class DRBD {
     /** Executes the drbdadm resize on the specified host and resource. */
     public static boolean resize(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final boolean testOnly) {
-        return resize(host, resource, null, testOnly);
+        return resize(host, resource, volume, null, testOnly);
     }
 
 
@@ -543,13 +594,14 @@ public final class DRBD {
      * calls the callback function.
      */
     public static boolean resize(final Host host,
-                              final String resource,
-                              final ExecCallback execCallback,
-                              final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
+                                 final String resource,
+                                 final String volume,
+                                 final ExecCallback execCallback,
+                                 final boolean testOnly) {
         final String command = host.getDistCommand("DRBD.resize",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -558,11 +610,12 @@ public final class DRBD {
     /** Executes the drbdadm verify on the specified host and resource. */
     public static boolean verify(final Host host,
                                  final String resource,
+                                 final String volume,
                                  final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.verify",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                         execCommand(host, command, null, true, testOnly);
         return ret.getExitCode() == 0;
@@ -571,8 +624,9 @@ public final class DRBD {
     /** Executes the drbdadm adjust on the specified host and resource. */
     public static int adjust(final Host host,
                              final String resource,
+                             final String volume,
                              final boolean testOnly) {
-        return adjust(host, resource, null, testOnly);
+        return adjust(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -581,12 +635,13 @@ public final class DRBD {
      */
     public static int adjust(final Host host,
                              final String resource,
+                             final String volume,
                              final ExecCallback execCallback,
                              final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.adjust",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret = execCommand(host,
                                               command,
                                               execCallback,
@@ -608,8 +663,10 @@ public final class DRBD {
      * adjust with -d option to catch possible changes.
      * TODO: obsolete
      */
-    public static void adjustDryrun(final Host host, final String resource) {
-        adjustDryrun(host, resource, null);
+    public static void adjustDryrun(final Host host,
+                                    final String resource,
+                                    final String volume) {
+        adjustDryrun(host, resource, volume, null);
     }
 
     /**
@@ -619,11 +676,12 @@ public final class DRBD {
      */
     public static void adjustDryrun(final Host host,
                                     final String resource,
+                                    final String volume,
                                     final ExecCallback execCallback) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.adjust.dryrun",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         execCommand(host, command, execCallback, true, false);
 
     }
@@ -631,8 +689,9 @@ public final class DRBD {
     /** Executes the drbdadm down on the specified host and resource. */
     public static boolean down(final Host host,
                                final String resource,
+                               final String volume,
                                final boolean testOnly) {
-        return down(host, resource, null, testOnly);
+        return down(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -641,12 +700,13 @@ public final class DRBD {
      */
     public static boolean down(final Host host,
                                final String resource,
+                               final String volume,
                                final ExecCallback execCallback,
                                final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.down",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
@@ -655,8 +715,9 @@ public final class DRBD {
     /** Executes the drbdadm up on the specified host and resource. */
     public static boolean up(final Host host,
                              final String resource,
+                             final String volume,
                              final boolean testOnly) {
-        return up(host, resource, null, testOnly);
+        return up(host, resource, volume, null, testOnly);
     }
 
     /**
@@ -665,12 +726,13 @@ public final class DRBD {
      */
     public static boolean up(final Host host,
                              final String resource,
+                             final String volume,
                              final ExecCallback execCallback,
                              final boolean testOnly) {
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(RESOURCE_PH, resource);
         final String command = host.getDistCommand("DRBD.up",
-                                                   replaceHash);
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      volume));
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;

@@ -246,7 +246,7 @@ public final class HostTest1 extends TestCase {
         for (final Host host : TestSuite1.getHosts()) {
             assertFalse(host.isDrbdUpgradeAvailable("8.3.1"));
 
-            final ExecCommandThread t = host.execCommandCache(
+            final ExecCommandThread t = host.execCommand(
                           "DrbdAvailVersions",
                           null, /* ProgressBar */
                           new ExecCallback() {
@@ -269,7 +269,7 @@ public final class HostTest1 extends TestCase {
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            final ExecCommandThread t2 = host.execCommandCache(
+            final ExecCommandThread t2 = host.execCommand(
                           "DrbdAvailVersionsForDist",
                           null, /* ProgressBar */
                           new ExecCallback() {

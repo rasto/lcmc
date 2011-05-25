@@ -201,7 +201,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 try {
                     getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", true);
+                        DRBD.adjust(h, "all", null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -268,7 +268,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                                DRBD.adjust(h, "all", false);
+                                DRBD.adjust(h, "all", null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -572,7 +572,9 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns tool tip when mouse is over the volume edge. */
     @Override public String getToolTipForGraph(final boolean testOnly) {
         final StringBuilder s = new StringBuilder(50);
-        s.append("<html><b>");
+        s.append("<html><b>Resource: ");
+        s.append(getDrbdResourceInfo().getName());
+        s.append("volume: ");
         s.append(getName());
         s.append("</b><br>");
         if (isSyncing()) {
@@ -622,7 +624,10 @@ public final class DrbdVolumeInfo extends EditableInfo
         getBrowser().getDrbdGraph().removeDrbdVolume(this);
         final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
         for (final Host host : hosts) {
-            DRBD.down(host, getName(), testOnly);
+            DRBD.down(host,
+                      getDrbdResourceInfo().getName(),
+                      getName(),
+                      testOnly);
         }
         super.removeMyself(testOnly);
         //final Map<String, DrbdResourceInfo> drbdResHash =
@@ -734,8 +739,8 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     public boolean isConnected(final boolean testOnly) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (!bdi.isConnected(testOnly)) {
-                return false;
+            if (bdi.isConnected(testOnly)) {
+                return true;
             }
         }
         return false;
