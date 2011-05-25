@@ -93,7 +93,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdKernelDirCombo.setEnabled(false);
         drbdArchCombo.setEnabled(false);
         getProgressBar().start(20000);
-        final ExecCommandThread t = getHost().execCommandCache(
+        final ExecCommandThread t = getHost().execCommand(
                           "DrbdAvailVersions",
                           null, /* ProgressBar */
                           new ExecCallback() {
@@ -129,7 +129,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                 drbdArchCombo.setEnabled(false);
             }
         });
-        final ExecCommandThread t = getHost().execCommandCache(
+        final ExecCommandThread t = getHost().execCommand(
                           "DrbdAvailDistributions",
                           null, /* ProgressBar */
                           new ExecCallback() {
@@ -176,7 +176,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             availArchs();
             return;
         }
-        final ExecCommandThread t = getHost().execCommandCache(
+        final ExecCommandThread t = getHost().execCommand(
                           "DrbdAvailKernels",
                           null, /* ProgressBar */
                           new ExecCallback() {
@@ -230,7 +230,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             allDone(null);
             return;
         }
-        final ExecCommandThread t = getHost().execCommandCache(
+        final ExecCommandThread t = getHost().execCommand(
                           "DrbdAvailArchs",
                           null, /* ProgressBar */
                           new ExecCallback() {
@@ -271,7 +271,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Checks what are the avail drbd versions for this distribution. */
     protected final void availVersionsForDist() {
-        final ExecCommandThread t = getHost().execCommandCache(
+        final ExecCommandThread t = getHost().execCommand(
                           "DrbdAvailVersionsForDist",
                           null, /* ProgressBar */
                           new ExecCallback() {

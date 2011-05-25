@@ -98,7 +98,7 @@ public class DrbdAvailFiles extends DialogHost {
 
     /** Finds abailable builds. */
     protected final void availBuilds() {
-        getHost().execCommandCache(
+        getHost().execCommand(
                           "DrbdAvailBuilds",
                           null, /* ProgresBar */
                           new ExecCallback() {
@@ -159,7 +159,7 @@ public class DrbdAvailFiles extends DialogHost {
     /** Finds available files. */
     protected final void availFiles() {
         drbdBuildCombo.setEnabled(true);
-        getHost().execCommandCache("DrbdAvailFiles",
+        getHost().execCommand("DrbdAvailFiles",
                       null, /* ProgresBar */
                       new ExecCallback() {
                         @Override public void done(final String ans) {

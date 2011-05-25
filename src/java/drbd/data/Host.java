@@ -998,37 +998,6 @@ public final class Host {
     }
 
     /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished execCallback.done function will be called. In case of error,
-     * callback.doneError is called. After every line of output
-     * newOutputCallback.output function is called. Use this function for
-     * commands that do not return, but run in the background and occasionaly
-     * print a line to the stdout.
-     */
-    public ExecCommandThread execCommand(
-                                   final String commandString,
-                                   final ExecCallback execCallback,
-                                   final ConvertCmdCallback convertCmdCallback,
-                                   final NewOutputCallback newOutputCallback,
-                                   final boolean outputVisible,
-                                   final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    false), /* in bash */
-                               execCallback,
-                               newOutputCallback,
-                               outputVisible,
-                               true,
-                               commandTimeout);
-    }
-
-    /**
      * Executes command. Command is not converted for different distributions
      * and is executed in a new thread, after command is finished callback.done
      * function will be called. In case of error, callback.doneError is called.
@@ -1045,35 +1014,6 @@ public final class Host {
                                callback,
                                outputVisible,
                                commandVisible,
-                               commandTimeout);
-    }
-
-    /**
-     * Executes command with parameters. Command is executed in a new thread,
-     * after command is finished callback.done function will be called.
-     * In case of error, callback.doneError is called.
-     * Parameters will be passed directly as they are to the command.
-     */
-    public ExecCommandThread execCommand(
-                               final String commandString,
-                               final String params,
-                               final ExecCallback callback,
-                               final ConvertCmdCallback convertCmdCallback,
-                               final boolean outputVisible,
-                               final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    false) /* in bash */
-                               + params,
-                               callback,
-                               outputVisible,
-                               true,
                                commandTimeout);
     }
 
@@ -1153,36 +1093,6 @@ public final class Host {
                                execCallback,
                                outputVisible,
                                commandVisible,
-                               commandTimeout);
-    }
-
-    /**
-     * Executes command or return output from cache if it was alread run.
-     * Command is executed in a new thread, after command
-     * is finished callback.done function will be called. In case of error,
-     * callback.doneError is called.
-     */
-    @Deprecated
-    public ExecCommandThread execCommandCache(
-                               final String commandString,
-                               final ProgressBar progressBar,
-                               final ExecCallback callback,
-                               final ConvertCmdCallback convertCmdCallback,
-                               final boolean outputVisible,
-                               final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    false), /* in bash */
-                               progressBar,
-                               callback,
-                               outputVisible,
-                               true,
                                commandTimeout);
     }
 

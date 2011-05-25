@@ -79,7 +79,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
 
     /** Finds abailable tarballs. */
     protected void availTarballs() {
-        getHost().execCommandCache(
+        getHost().execCommand(
               "DrbdAvailVersionsSource",
               null, /* ProgresBar */
               new ExecCallback() {
