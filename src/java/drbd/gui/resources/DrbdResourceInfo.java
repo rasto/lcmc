@@ -36,6 +36,7 @@ import drbd.data.ConfigData;
 import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
+import drbd.utilities.MyButton;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -95,6 +96,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBox = null;
     /** Port combo box wizard. */
     private GuiComboBox portComboBoxWizard = null;
+    /** Default port. */
+    private String defaultPort = null;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -536,6 +539,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                          ClusterBrowser.SERVICE_LABEL_WIDTH,
                          ClusterBrowser.SERVICE_FIELD_WIDTH,
                          false);
+        addHostAddressListeners(false, getApplyButton());
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
@@ -835,6 +839,46 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
+        final String port = portComboBox.getStringValue();
+        final GuiComboBox pcb = portComboBox;
+        final GuiComboBox pwizardCb = portComboBoxWizard;
+        if (Tools.isNumber(port)) {
+            long p = Long.parseLong(port);
+            if (p >= 0 && p < 65536) {
+                pcb.setBackground(null, null, true);
+                if (pwizardCb != null) {
+                    pwizardCb.setBackground(null, null, true);
+                }
+            } else {
+                correct = false;
+                pcb.wrongValue();
+                if (pwizardCb != null) {
+                    pwizardCb.wrongValue();
+                }
+            }
+        } else {
+            correct = false;
+            pcb.wrongValue();
+            if (pwizardCb != null) {
+                pwizardCb.wrongValue();
+            }
+        }
+        for (final Host host : addressComboBoxHash.keySet()) {
+            final GuiComboBox cb = addressComboBoxHash.get(host);
+            final GuiComboBox wizardCb = addressComboBoxHashWizard.get(host);
+            if (cb.getValue() == null) {
+                correct = false;
+                cb.wrongValue();
+                if (wizardCb != null) {
+                    wizardCb.wrongValue();
+                }
+            } else {
+                cb.setBackground(null, null, true);
+                if (wizardCb != null) {
+                    wizardCb.setBackground(null, null, true);
+                }
+            }
+        }
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
 
@@ -846,6 +890,27 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (bdi != null) {
                     bdi.revert();
                 }
+            }
+        }
+        for (final Host host : addressComboBoxHash.keySet()) {
+            final GuiComboBox cb = addressComboBoxHash.get(host);
+            if (cb.getValue() != GuiComboBox.NOTHING_SELECTED) {
+                final GuiComboBox wizardCb =
+                                         addressComboBoxHashWizard.get(host);
+                if (wizardCb == null) {
+                    cb.setValue(null);
+                } else {
+                    wizardCb.setValue(null);
+                }
+            }
+        }
+        final GuiComboBox pcb = portComboBox;
+        if (!pcb.getStringValue().equals(defaultPort)) {
+            final GuiComboBox wizardCb = portComboBoxWizard;
+            if (wizardCb == null) {
+                pcb.setValue(defaultPort);
+            } else {
+                wizardCb.setValue(defaultPort);
             }
         }
     }
@@ -964,13 +1029,26 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
         /* Port */
         final List<String> drbdVIPorts = new ArrayList<String>();
-        String defaultPort = savedPort;
+        String dp = savedPort;
         int i = 0;
-        int index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
-        if (defaultPort == null) {
-            defaultPort = Integer.toString(index);
+        int index = -1;
+        for (final Host host : getBrowser().getClusterHosts()) {
+            for (final String port : host.getBrowser().getDrbdVIPortList()) {
+                if (Tools.isNumber(port)) {
+                    int p = Integer.parseInt(port);
+                    if (index < 0 || p < index) {
+                        index = p;
+                    }
+                }
+            }
+        }
+        if (index < 0) {
+            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+        }
+        if (dp == null) {
+            dp = Integer.toString(index);
         } else {
-            drbdVIPorts.add(defaultPort);
+            drbdVIPorts.add(dp);
         }
         for (final Host host : getBrowser().getClusterHosts()) {
             while (i < 10) {
@@ -982,6 +1060,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 index++;
             }
         }
+        defaultPort = dp;
         final GuiComboBox pcb = new GuiComboBox(
                    defaultPort,
                    drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
@@ -1013,7 +1092,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
-        addHostAddressListeners(wizard);
     }
 
     /** Ruturns all net interfaces. */
@@ -1082,7 +1160,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Adds host address listeners. */
-    protected void addHostAddressListeners(final boolean wizard) {
+    public void addHostAddressListeners(final boolean wizard,
+                                           final MyButton thisApplyButton) {
         final String[] params = getParametersFromXML();
         for (final Host host : getBrowser().getClusterHosts()) {
             GuiComboBox cb;
@@ -1102,19 +1181,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
                             final Thread thread = new Thread(new Runnable() {
                                 @Override public void run() {
-                                    if (realComboBox != null) {
-                                        SwingUtilities.invokeLater(
-                                                            new Runnable() {
-                                            @Override public void run() {
-                                                final Object value =
-                                                      comboBox.getStringValue();
-                                                realComboBox.setValueAndWait(
-                                                                        value);
-                                            }
-                                        });
-                                        Tools.waitForSwing();
+                                    if (e.getStateChange()
+                                        == ItemEvent.SELECTED) {
+                                        checkParameterFields(comboBox,
+                                                             realComboBox,
+                                                             null,
+                                                             null,
+                                                             thisApplyButton);
                                     }
-                                    setApplyButtons(null, params);
                                 }
                             });
                             thread.start();
@@ -1126,17 +1200,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     private void check() {
                         final Thread thread = new Thread(new Runnable() {
                             @Override public void run() {
-                                if (realComboBox != null) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
-                                            final Object value =
-                                                   comboBox.getStringValue();
-                                            realComboBox.setValueAndWait(value);
-                                        }
-                                    });
-                                    Tools.waitForSwing();
-                                }
-                                setApplyButtons(null, params);
+                                checkParameterFields(comboBox,
+                                                     realComboBox,
+                                                     null,
+                                                     null,
+                                                     thisApplyButton);
                             }
                         });
                         thread.start();
@@ -1173,19 +1241,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
                             @Override public void run() {
-                                if (realComboBox != null) {
-                                    SwingUtilities.invokeLater(
-                                                        new Runnable() {
-                                        @Override public void run() {
-                                            final Object value =
-                                                   comboBox.getStringValue();
-                                            realComboBox.setValueAndWait(
-                                                                    value);
-                                        }
-                                    });
-                                    Tools.waitForSwing();
+                                if (e.getStateChange() == ItemEvent.SELECTED) {
+                                    checkParameterFields(comboBox,
+                                                         realComboBox,
+                                                         null,
+                                                         null,
+                                                         thisApplyButton);
                                 }
-                                setApplyButtons(null, params);
                             }
                         });
                         thread.start();
@@ -1197,17 +1259,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 private void check() {
                     final Thread thread = new Thread(new Runnable() {
                         @Override public void run() {
-                            if (realComboBox != null) {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
-                                        final Object value =
-                                                   comboBox.getStringValue();
-                                        realComboBox.setValueAndWait(value);
-                                    }
-                                });
-                                Tools.waitForSwing();
-                            }
-                            setApplyButtons(null, params);
+                            checkParameterFields(comboBox,
+                                                 realComboBox,
+                                                 null,
+                                                 null,
+                                                 thisApplyButton);
                         }
                     });
                     thread.start();
@@ -1244,5 +1300,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
         }
         return null;
+    }
+
+    /** Remove drbd volume. */
+    public void removeDrbdVolume(final DrbdVolumeInfo dvi) {
+        drbdVolumes.remove(dvi);
     }
 }

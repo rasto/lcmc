@@ -90,7 +90,21 @@ public final class Volume extends DrbdConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        enableComponents();
+        final boolean ch =
+                  getDrbdVolumeInfo().checkResourceFieldsChanged(null, PARAMS);
+        final boolean cor =
+                  getDrbdVolumeInfo().checkResourceFieldsCorrect(null, PARAMS);
+        if (cor) {
+            enableComponents();
+        } else {
+            /* don't enable */
+            enableComponents(new JComponent[]{buttonClass(nextButton())});
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                makeDefaultButton(buttonClass(nextButton()));
+            }
+        });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
@@ -122,9 +136,6 @@ public final class Volume extends DrbdConfig {
                   null);
 
         inputPane.add(optionsPanel);
-        final boolean ch = getDrbdVolumeInfo().checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = getDrbdVolumeInfo().checkResourceFieldsCorrect(null, PARAMS);
-        buttonClass(nextButton()).setEnabled(ch && cor);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

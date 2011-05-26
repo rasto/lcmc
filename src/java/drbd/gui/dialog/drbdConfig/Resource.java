@@ -128,7 +128,20 @@ public final class Resource extends DrbdConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        enableComponents();
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
+        final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
+        if (cor) {
+            enableComponents();
+        } else {
+            /* don't enable */
+            enableComponents(new JComponent[]{buttonClass(nextButton())});
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                makeDefaultButton(buttonClass(nextButton()));
+            }
+        });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
@@ -199,6 +212,7 @@ public final class Resource extends DrbdConfig {
                              ClusterBrowser.SERVICE_LABEL_WIDTH,
                              ClusterBrowser.SERVICE_FIELD_WIDTH,
                              true);
+        dri.addHostAddressListeners(true, buttonClass(nextButton()));
         dri.addWizardParams(
                   optionsPanel,
                   PARAMS,
@@ -208,9 +222,6 @@ public final class Resource extends DrbdConfig {
                   null);
 
         inputPane.add(optionsPanel);
-        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
-        buttonClass(nextButton()).setEnabled(ch && cor);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

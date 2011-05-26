@@ -410,7 +410,9 @@ public abstract class EditableInfo extends Info {
                 final GuiComboBox rpcb0 = rpcb;
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
-                        if (paramCb.getValue() == null) {
+                        if (paramCb.getValue() == null
+                            || paramCb.getValue()
+                               == GuiComboBox.NOTHING_SELECTED) {
                             rpcb0.setValueAndWait(null);
                         } else {
                             final Object value = paramCb.getStringValue();
@@ -595,8 +597,14 @@ public abstract class EditableInfo extends Info {
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {
-                            final Object value = paramCb.getStringValue();
-                            realParamCb.setValueAndWait(value);
+                            if (paramCb.getValue() == null
+                                || paramCb.getValue()
+                                   == GuiComboBox.NOTHING_SELECTED) {
+                                realParamCb.setValueAndWait(null);
+                            } else {
+                                final Object value = paramCb.getStringValue();
+                                realParamCb.setValueAndWait(value);
+                            }
                         }
                     });
                     Tools.waitForSwing();

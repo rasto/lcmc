@@ -82,15 +82,14 @@ public final class Start extends WizardDialog {
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
-        final Object value = drbdResourceCB.getValue();
-        System.out.println("value: " + value);
         //boolean newResource = false;
-        if (value == null) {
+        final Info i = (Info) drbdResourceCB.getValue();
+        if (i.getStringValue() == null) {
             drbdResourceInfo = drbdInfo.getNewDrbdResource();
             drbdInfo.addDrbdResource(drbdResourceInfo);
         //    newResource = true;
         } else {
-            drbdResourceInfo = (DrbdResourceInfo) value;
+            drbdResourceInfo = (DrbdResourceInfo) i;
         }
         final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
                                 drbdResourceInfo,

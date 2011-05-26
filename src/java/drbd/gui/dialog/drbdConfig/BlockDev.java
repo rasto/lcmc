@@ -103,16 +103,16 @@ final class BlockDev extends DrbdConfig {
                 final boolean testOnly = false;
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
                 if (adjust(blockDevInfo) && adjust(oBdi)) {
-                    DRBD.down(blockDevInfo.getHost(),
-                              getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                 .getName(),
-                              getDrbdVolumeInfo().getName(),
-                              testOnly);
-                    DRBD.down(oBdi.getHost(),
-                              getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                 .getName(),
-                              getDrbdVolumeInfo().getName(),
-                              testOnly);
+                    DRBD.detach(blockDevInfo.getHost(),
+                                getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                   .getName(),
+                                getDrbdVolumeInfo().getName(),
+                                testOnly);
+                    DRBD.detach(oBdi.getHost(),
+                                getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                   .getName(),
+                                getDrbdVolumeInfo().getName(),
+                                testOnly);
                 } else {
                     getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(true);
                 }
@@ -139,12 +139,16 @@ final class BlockDev extends DrbdConfig {
     /** Inits the dialog. */
     @Override protected void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();
-        buttonClass(nextButton()).setEnabled(
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(nextButton()).setEnabled(
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
+            }
+        });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {

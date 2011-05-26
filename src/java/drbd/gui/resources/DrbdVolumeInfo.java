@@ -574,7 +574,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>Resource: ");
         s.append(getDrbdResourceInfo().getName());
-        s.append("volume: ");
+        s.append(" volume: ");
         s.append(getName());
         s.append("</b><br>");
         if (isSyncing()) {
@@ -624,10 +624,15 @@ public final class DrbdVolumeInfo extends EditableInfo
         getBrowser().getDrbdGraph().removeDrbdVolume(this);
         final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
         for (final Host host : hosts) {
-            DRBD.down(host,
-                      getDrbdResourceInfo().getName(),
-                      getName(),
-                      testOnly);
+            DRBD.disconnect(host, // TODO: probably DRBD 8.4 bug
+                                  // don't need to disconnect
+                            getDrbdResourceInfo().getName(),
+                            null,
+                            testOnly);
+            DRBD.detach(host,
+                        getDrbdResourceInfo().getName(),
+                        getName(),
+                        testOnly);
         }
         super.removeMyself(testOnly);
         //final Map<String, DrbdResourceInfo> drbdResHash =
@@ -644,6 +649,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             bdi.removeMyself(testOnly);
         }
         getBrowser().updateCommonBlockDevices();
+        getDrbdResourceInfo().removeDrbdVolume(this);
 
         try {
             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
@@ -664,7 +670,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     @Override public void removeMyself(final boolean testOnly) {
         String desc = Tools.getString(
                        "ClusterBrowser.confirmRemoveDrbdResource.Description");
-        desc = desc.replaceAll("@RESOURCE@", getName());
+        desc = desc.replaceAll("@RESOURCE@",
+                               getDrbdResourceInfo() + "/" + getName());
         if (Tools.confirmDialog(
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
               desc,

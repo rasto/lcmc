@@ -1209,7 +1209,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Cancel"},
 
         {"ClusterBrowser.confirmRemoveDrbdResource.Title",
-         "Remove DRBD Resource"},
+         "Remove DRBD Volume"},
 
         {"ClusterBrowser.confirmRemoveDrbdResource.Description",
          "DRBD Resource @RESOURCE@ will be removed. Are you sure?"},
@@ -1526,10 +1526,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "updating cluster status..."},
 
         {"ClusterBrowser.Drbd.RemoveEdge",
-         "Remove DRBD Resource"},
+         "Remove DRBD Volume"},
 
         {"ClusterBrowser.Drbd.RemoveEdge.ToolTip",
-         "Remove DRBD Resource"},
+         "Remove DRBD Volume"},
 
         {"ClusterBrowser.Drbd.ResourceConnect",
          "Connect"},
@@ -1630,7 +1630,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Add Mirrored Disk"},
 
         {"HostBrowser.Drbd.RemoveDrbdResource",
-         "Remove DRBD Resource"},
+         "Remove DRBD Volume"},
 
         {"HostBrowser.Drbd.SetPrimary",
          "Promote To Primary"},
@@ -1651,10 +1651,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Detach underlying disk and make this DRBD device diskless"},
 
         {"HostBrowser.Drbd.Connect",
-         "Connect To Peer"},
+         "Connect Resource To Peer"},
 
         {"HostBrowser.Drbd.Disconnect",
-         "Disconnect From Peer"},
+         "Disconnect Resource From Peer"},
 
         {"HostBrowser.Drbd.SetSecondary",
          "Demote To Secondary"},
