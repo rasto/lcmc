@@ -72,7 +72,7 @@ import javax.swing.event.DocumentEvent;
  * for a drbd resource.
  */
 public final class DrbdResourceInfo extends DrbdGuiInfo {
-    /** Volumes volume nr - list of blockdevices. */
+    /** List of volumes. */
     private final Set<DrbdVolumeInfo> drbdVolumes =
                                         new LinkedHashSet<DrbdVolumeInfo>();
     /** Cache for getInfoPanel method. */
@@ -282,58 +282,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                            isEnabledOnlyInAdvancedMode(param)));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
-        //} else if (DRBD_RES_PARAM_DEV.equals(param)) {
-        //    final List<String> drbdDevices = new ArrayList<String>();
-        //    if (getParamSaved(DRBD_RES_PARAM_DEV) == null) {
-        //        final String defaultItem =
-        //                getDrbdResource().getDefaultValue(DRBD_RES_PARAM_DEV);
-        //        drbdDevices.add(defaultItem);
-        //        int i = 0;
-        //        int index = 0;
-        //        while (i < 11) {
-        //            final String drbdDevStr = "/dev/drbd"
-        //                                      + Integer.toString(index);
-        //            final Map<String, DrbdResourceInfo> drbdDevHash =
-        //                                          getBrowser().getDrbdDevHash();
-        //            if (!drbdDevHash.containsKey(drbdDevStr)) {
-        //                drbdDevices.add(drbdDevStr);
-        //                i++;
-        //            }
-        //            getBrowser().putDrbdDevHash();
-        //            index++;
-        //        }
-        //        paramCb = new GuiComboBox(defaultItem,
-        //                                  drbdDevices.toArray(
-        //                                       new String[drbdDevices.size()]),
-        //                                  null, /* units */
-        //                                  null, /* type */
-        //                                  null, /* regexp */
-        //                                  width,
-        //                                  null, /* abbrv */
-        //                                  new AccessMode(
-        //                                   getAccessType(param),
-        //                                   isEnabledOnlyInAdvancedMode(param)));
-        //        paramCb.setEditable(true);
-        //    } else {
-        //        final String defaultItem = getDevice();
-        //        String regexp = null;
-        //        if (isInteger(param)) {
-        //            regexp = "^-?\\d*$";
-        //        }
-        //        paramCb = new GuiComboBox(
-        //                               defaultItem,
-        //                               getResource().getPossibleChoices(param),
-        //                               null, /* units */
-        //                               null, /* type */
-        //                               regexp,
-        //                               width,
-        //                               null, /* abbrv */
-        //                               new AccessMode(
-        //                                   getAccessType(param),
-        //                                   isEnabledOnlyInAdvancedMode(param)));
-        //    }
-        //    paramCb.setEnabled(!getDrbdResource().isCommited());
-        //    paramComboBoxAdd(param, prefix, paramCb);
         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
             // TODO: has to be reloaded
             final List<Info> l = new ArrayList<Info>();
@@ -345,15 +293,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             l.add(di);
             final Map<String, DrbdResourceInfo> drbdResHash =
                                                 getBrowser().getDrbdResHash();
-            //if (defaultItem == null || "-1".equals(defaultItem)) {
-            //    defaultItem = Tools.getString("ClusterBrowser.None");
-            //} else if (defaultItem != null) {
-            //    final DrbdResourceInfo dri = drbdResHash.get(defaultItem);
-            //    if (dri != null) {
-            //        defaultItem = dri.getDevice();
-            //    }
-            //}
-
             for (final String drbdRes : drbdResHash.keySet()) {
                 final DrbdResourceInfo r = drbdResHash.get(drbdRes);
                 DrbdResourceInfo odri = r;
@@ -406,20 +345,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             waitForInfoPanel();
             getBrowser().getDrbdResHash().remove(getName());
             getBrowser().putDrbdResHash();
-            //getBrowser().getDrbdDevHash().remove(getDevice());
-            //getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
 
             final String name = getParamSaved(DRBD_RES_PARAM_NAME);
-            //final String drbdDevStr = getParamSaved(DRBD_RES_PARAM_DEV);
             getDrbdResource().setName(name);
             setName(name);
-            //getDrbdResource().setDevice(drbdDevStr);
 
             getBrowser().getDrbdResHash().put(name, this);
             getBrowser().putDrbdResHash();
-            //getBrowser().getDrbdDevHash().put(drbdDevStr, this);
-            //getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdResource().setCommited(true);
             getDrbdInfo().setAllApplyButtons();
@@ -429,19 +362,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Set all apply buttons. */
     void setAllApplyButtons() {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
-                if (bdi != null) {
-                    bdi.storeComboBoxValues(bdi.getParametersFromXML());
-                    bdi.setApplyButtons(null, bdi.getParametersFromXML());
-                }
-            }
+            dvi.setAllApplyButtons();
         }
         setApplyButtons(null, getParametersFromXML());
     }
 
     /** Returns panel with form to configure a drbd resource. */
     @Override public JComponent getInfoPanel() {
-        getBrowser().getDrbdGraph().pickInfo(this);
+        //getBrowser().getDrbdGraph().pickInfo(this);
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -531,8 +459,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* resource name */
         getResource().setValue(DRBD_RES_PARAM_NAME,
                                getDrbdResource().getName());
-        //getResource().setValue(DRBD_RES_PARAM_DEV, getDevice());
-
         final String[] params = getParametersFromXML();
         /* address combo boxes */
         addHostAddresses(optionsPanel,
@@ -656,14 +582,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     //    return toString().hashCode();
     //}
 
-    ///**
-    // * Returns the device name that is used as the string value of
-    // * the device in the filesystem resource.
-    // */
-    //@Override public String getStringValue() {
-    //    return getDevice();
-    //}
-
     /** Returns common file systems. */
     public StringInfo[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
@@ -781,21 +699,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     boolean checkResourceFieldsChanged(final String param,
                                        final String[] params,
                                        final boolean fromDrbdInfo) {
-        final DrbdInfo di = getDrbdInfo();
-        if (di != null && !fromDrbdInfo) {
-            di.setApplyButtons(null, di.getParametersFromXML());
-        }
         boolean changed = false;
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
-                if (bdi != null
-                    && bdi.checkResourceFieldsChanged(
-                                                  param,
-                                                  bdi.getParametersFromXML(),
-                                                  fromDrbdInfo,
-                                                  true)) {
-                    changed = true;
-                }
+            if (dvi.checkResourceFieldsChanged(param,
+                                               dvi.getParametersFromXML(),
+                                               fromDrbdInfo,
+                                               true)) {
+                changed = true;
             }
         }
         if (checkHostAddressesFieldsChanged()) {
@@ -827,16 +737,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final DrbdInfo di = getDrbdInfo();
         boolean correct = true;
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
-                if (bdi != null
-                    && !bdi.getBlockDevice().isNew()
-                    && !bdi.checkResourceFieldsCorrect(
-                                                    param,
-                                                    bdi.getParametersFromXML(),
-                                                    fromDrbdInfo,
-                                                    true)) {
-                    correct = false;
-                }
+            if (!dvi.checkResourceFieldsCorrect(param,
+                                                dvi.getParametersFromXML(),
+                                                fromDrbdInfo,
+                                                true)) {
+                correct = false;
             }
         }
         final String port = portComboBox.getStringValue();
@@ -845,9 +750,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (Tools.isNumber(port)) {
             long p = Long.parseLong(port);
             if (p >= 0 && p < 65536) {
-                pcb.setBackground(null, null, true);
+                pcb.setBackground(null, savedPort, true);
                 if (pwizardCb != null) {
-                    pwizardCb.setBackground(null, null, true);
+                    pwizardCb.setBackground(null, savedPort, true);
                 }
             } else {
                 correct = false;
@@ -873,9 +778,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     wizardCb.wrongValue();
                 }
             } else {
-                cb.setBackground(null, null, true);
+                cb.setBackground(null, savedHostAddresses.get(host), true);
                 if (wizardCb != null) {
-                    wizardCb.setBackground(null, null, true);
+                    wizardCb.setBackground(null,
+                                           savedHostAddresses.get(host),
+                                           true);
                 }
             }
         }
@@ -894,23 +801,24 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         for (final Host host : addressComboBoxHash.keySet()) {
             final GuiComboBox cb = addressComboBoxHash.get(host);
-            if (cb.getValue() != GuiComboBox.NOTHING_SELECTED) {
+            final String haSaved = savedHostAddresses.get(host);
+            if (!Tools.areEqual(cb.getValue(), haSaved)) {
                 final GuiComboBox wizardCb =
                                          addressComboBoxHashWizard.get(host);
                 if (wizardCb == null) {
-                    cb.setValue(null);
+                    cb.setValue(haSaved);
                 } else {
-                    wizardCb.setValue(null);
+                    wizardCb.setValue(haSaved);
                 }
             }
         }
         final GuiComboBox pcb = portComboBox;
-        if (!pcb.getStringValue().equals(defaultPort)) {
+        if (!pcb.getStringValue().equals(savedPort)) {
             final GuiComboBox wizardCb = portComboBoxWizard;
             if (wizardCb == null) {
-                pcb.setValue(defaultPort);
+                pcb.setValue(savedPort);
             } else {
-                wizardCb.setValue(defaultPort);
+                wizardCb.setValue(savedPort);
             }
         }
     }
@@ -1118,8 +1026,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 continue;
             }
             final String haSaved = savedHostAddresses.get(host);
-            if (!Tools.areEqual(haSaved, cb.getStringValue())
-                || (haSaved != null  && !"".equals(haSaved))) {
+            final Object value = cb.getValue();
+            if (!Tools.areEqual(haSaved, value)) {
                 changed = true;
             }
             cb.setBackground(null, haSaved, false);

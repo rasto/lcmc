@@ -675,7 +675,7 @@ sub get_drbd_events {
 		if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
 			exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
 		} else {
-			exec("/sbin/drbdsetup ALL events");
+			exec("/sbin/drbdsetup all events");
 		}
 	#} else {
 	#	sleep 20;
