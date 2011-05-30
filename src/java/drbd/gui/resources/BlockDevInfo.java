@@ -1718,7 +1718,7 @@ public final class BlockDevInfo extends EditableInfo {
      */
     @Override public boolean checkResourceFieldsChanged(final String param,
                                                         final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false);
+        return checkResourceFieldsChanged(param, params, false, false, false);
     }
 
     /**
@@ -1730,15 +1730,14 @@ public final class BlockDevInfo extends EditableInfo {
                                    final String param,
                                    final String[] params,
                                    final boolean fromDrbdInfo,
-                                   final boolean fromDrbdResourceInfo) {
+                                   final boolean fromDrbdResourceInfo,
+                                   final boolean fromDrbdVolumeInfo) {
         final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
-        if (dvi != null) {
-            final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
-            if (dri != null && !fromDrbdResourceInfo) {
-                if (!fromDrbdInfo) {
-                    dri.setApplyButtons(null, dri.getParametersFromXML());
-                }
-            }
+        if (dvi != null
+            && !fromDrbdVolumeInfo
+            && !fromDrbdResourceInfo
+            && !fromDrbdInfo) {
+            dvi.setApplyButtons(null, dvi.getParametersFromXML());
         }
         return super.checkResourceFieldsChanged(param, params);
     }
@@ -1751,7 +1750,7 @@ public final class BlockDevInfo extends EditableInfo {
      */
     @Override public boolean checkResourceFieldsCorrect(final String param,
                                                         final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false);
+        return checkResourceFieldsCorrect(param, params, false, false, false);
     }
 
     /**
@@ -1763,7 +1762,8 @@ public final class BlockDevInfo extends EditableInfo {
     boolean checkResourceFieldsCorrect(final String param,
                                        final String[] params,
                                        final boolean fromDrbdInfo,
-                                       final boolean fromDrbdResourceInfo) {
+                                       final boolean fromDrbdResourceInfo,
+                                       final boolean fromDrbdVolumeInfo) {
         return super.checkResourceFieldsCorrect(param, params);
     }
 

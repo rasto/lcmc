@@ -152,9 +152,17 @@ public final class DrbdVolumeInfo extends EditableInfo
         setResource(new DrbdVolume(name));
         getResource().setValue(DRBD_VOL_PARAM_DEV, device);
     }
-
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
+        getBrowser().getDrbdGraph().pickInfo(this);
+        final JComponent driPanel = getDrbdResourceInfo().getInfoPanel();
+        getInfoPanelVolume();
+        infoPanelDone();
+        return driPanel;
+    }
+
+    /** Returns volume info panel. */
+    private JComponent getInfoPanelVolume() {
         getBrowser().getDrbdGraph().pickInfo(this);
         if (infoPanel != null) {
             return infoPanel;
@@ -952,12 +960,70 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     @Override public boolean checkResourceFieldsCorrect(final String param,
                                                         final String[] params) {
-        return super.checkResourceFieldsCorrect(param, params);
+        return checkResourceFieldsCorrect(param, params, false, false);
+    }
+
+    /**
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
+     */
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params,
+                                       final boolean fromDrbdInfo,
+                                       final boolean fromDrbdResourceInfo) {
+        boolean correct = true;
+        for (final BlockDevInfo bdi : getBlockDevInfos()) {
+            if (bdi != null
+                && !bdi.getBlockDevice().isNew()
+                && !bdi.checkResourceFieldsCorrect(
+                                                param,
+                                                bdi.getParametersFromXML(),
+                                                fromDrbdInfo,
+                                                fromDrbdResourceInfo,
+                                                true)) {
+                correct = false;
+            }
+        }
+        return super.checkResourceFieldsCorrect(param, params) && correct;
     }
 
     @Override public boolean checkResourceFieldsChanged(final String param,
                                                         final String[] params) {
-        return super.checkResourceFieldsChanged(param, params);
+        return checkResourceFieldsChanged(param, params, false, false);
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    boolean checkResourceFieldsChanged(final String param,
+                                       final String[] params,
+                                       final boolean fromDrbdInfo,
+                                       final boolean fromDrbdResourceInfo) {
+        final DrbdInfo di = getDrbdResourceInfo().getDrbdInfo();
+        if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
+            di.setApplyButtons(null, di.getParametersFromXML());
+        }
+        //final DrbdResourceInfo dri = getDrbdResourceInfo();
+        //if (dri != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
+        //    dri.setApplyButtons(null, dri.getParametersFromXML());
+        //}
+        boolean changed = false;
+        for (final BlockDevInfo bdi : getBlockDevInfos()) {
+            if (bdi != null
+                && bdi.checkResourceFieldsChanged(
+                                              param,
+                                              bdi.getParametersFromXML(),
+                                              fromDrbdInfo,
+                                              fromDrbdResourceInfo,
+                                              true)) {
+                changed = true;
+            }
+        }
+        return super.checkResourceFieldsChanged(param, params) || changed;
     }
 
     /** Applies changes that user made to the drbd volume fields. */
@@ -1081,7 +1147,11 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
-        return null;
+        if (getResource().isNew()) {
+            return null;
+        } else {
+            return ""; /* disabled */
+        }
     }
 
     /** Returns whether this parameter is advanced. */
@@ -1113,5 +1183,16 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
         }
         return config.toString().trim();
+    }
+
+    /** Set all apply buttons. */
+    void setAllApplyButtons() {
+        for (final BlockDevInfo bdi : getBlockDevInfos()) {
+            if (bdi != null) {
+                bdi.storeComboBoxValues(bdi.getParametersFromXML());
+                bdi.setApplyButtons(null, bdi.getParametersFromXML());
+            }
+        }
+        setApplyButtons(null, getParametersFromXML());
     }
 }
