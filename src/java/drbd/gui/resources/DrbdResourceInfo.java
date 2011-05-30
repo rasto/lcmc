@@ -1048,6 +1048,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Stores addresses for host. */
     private void storeHostAddresses() {
         savedHostAddresses.clear();
+        /* port */
+        savedPort = portComboBox.getStringValue();
+        /* addresses */
         for (final Host host : getBrowser().getClusterHosts()) {
             final GuiComboBox cb = addressComboBoxHash.get(host);
             final String address = cb.getStringValue();
@@ -1056,9 +1059,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             } else {
                 savedHostAddresses.put(host, address);
             }
+            host.getBrowser().getDrbdVIPortList().add(savedPort);
         }
-        /* port */
-        savedPort = portComboBox.getStringValue();
     }
 
     /** Return net interface with port as they appear in the drbd config. */
@@ -1220,6 +1222,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
+        for (final Host host : getCluster().getHostsArray()) {
+            DRBD.delConnection(host, getName(), testOnly);
+            host.getBrowser().getDrbdVIPortList().remove(savedPort);
+        }
         //DRBD.disconnect(host,
         //                getName(),
         //                null,

@@ -74,7 +74,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Block devices that are in this DRBD volume. */
     private final List<BlockDevInfo> blockDevInfos;
     /** Device name. TODO: */
-    final String device;
+    String device;
     /** Last created filesystem. */
     private String createdFs = null;
     /**
@@ -151,6 +151,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         this.device = device;
         setResource(new DrbdVolume(name));
         getResource().setValue(DRBD_VOL_PARAM_DEV, device);
+        getResource().setNew(true);
     }
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
@@ -638,11 +639,6 @@ public final class DrbdVolumeInfo extends EditableInfo
                         getName(),
                         testOnly);
             DRBD.delMinor(host, getDevice(), testOnly);
-            if (lastVolume) {
-                DRBD.delConnection(host,
-                                   getDrbdResourceInfo().getName(),
-                                   testOnly);
-            }
         }
         super.removeMyself(testOnly);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
@@ -694,7 +690,6 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns device name, like /dev/drbd0. */
     @Override public String getDevice() {
-        // TODO: make it part of block device
         return device;
     }
 
@@ -1042,14 +1037,17 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
 
+            final String volumeNr = getParamSaved(DRBD_VOL_PARAM_NUMBER);
+            setName(volumeNr);
             final String drbdDevStr = getParamSaved(DRBD_VOL_PARAM_DEV);
+            device = drbdDevStr;
             //getDrbdResource().setDevice(drbdDevStr);
 
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
             //getDrbdResource().setCommited(true);
-            //getDrbdInfo().setAllApplyButtons();
+            getDrbdResourceInfo().getDrbdInfo().setAllApplyButtons();
         }
     }
 

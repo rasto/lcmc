@@ -681,11 +681,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
         final DefaultMutableTreeNode drbdResourceNode =
                                            new DefaultMutableTreeNode(dri);
+        getBrowser().reload(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-
         getBrowser().getDrbdNode().add(drbdResourceNode);
         dri.getInfoPanel();
-        //getBrowser().reload(drbdResourceNode, true);
+        getBrowser().reload(drbdResourceNode, true);
     }
 
     /** Add DRBD volume. */
