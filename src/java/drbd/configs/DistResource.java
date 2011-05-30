@@ -351,6 +351,11 @@ public final class DistResource extends java.util.ListResourceBundle {
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ up @RES-VOL@"},
         {"DRBD.makeFilesystem",
          SUDO + "/sbin/mkfs.@FILESYSTEM@ @DRBDDEV@"},
+        {"DRBD.delMinor",
+         SUDO + "/sbin/drbdsetup @DRYRUN@ @DRBDDEV@ del-minor"},
+
+        {"DRBD.resDelConnection",
+         SUDO + "/sbin/drbdsetup @DRYRUN@ @RES-VOL@ del-connection"},
 
         {"DRBD.getProcDrbd",   "cat /proc/drbd"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},

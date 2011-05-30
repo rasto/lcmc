@@ -620,27 +620,23 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     void removeMyselfNoConfirm(final boolean testOnly) {
         getBrowser().drbdStatusLock();
-        getBrowser().getDrbdXML().removeResource(getName());
         getBrowser().getDrbdGraph().removeDrbdVolume(this);
         final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
+        final boolean lastVolume =
+                                getDrbdResourceInfo().removeDrbdVolume(this);
         for (final Host host : hosts) {
-            DRBD.disconnect(host, // TODO: probably DRBD 8.4 bug
-                                  // don't need to disconnect
-                            getDrbdResourceInfo().getName(),
-                            null,
-                            testOnly);
             DRBD.detach(host,
                         getDrbdResourceInfo().getName(),
                         getName(),
                         testOnly);
+            DRBD.delMinor(host, getDevice(), testOnly);
+            if (lastVolume) {
+                DRBD.delConnection(host,
+                                   getDrbdResourceInfo().getName(),
+                                   testOnly);
+            }
         }
         super.removeMyself(testOnly);
-        //final Map<String, DrbdResourceInfo> drbdResHash =
-        //                                        getBrowser().getDrbdResHash();
-        //final DrbdResourceInfo dri = drbdResHash.get(getName());
-        //drbdResHash.remove(getName());
-        //getBrowser().putDrbdResHash();
-        //dri.setName(null);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         getBrowser().getDrbdDevHash().remove(getDevice());
         getBrowser().putDrbdDevHash();
@@ -648,8 +644,10 @@ public final class DrbdVolumeInfo extends EditableInfo
             bdi.removeFromDrbd();
             bdi.removeMyself(testOnly);
         }
+        if (lastVolume) {
+            getDrbdResourceInfo().removeMyself(testOnly);
+        }
         getBrowser().updateCommonBlockDevices();
-        getDrbdResourceInfo().removeDrbdVolume(this);
 
         try {
             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(

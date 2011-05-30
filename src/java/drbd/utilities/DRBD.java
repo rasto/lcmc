@@ -776,4 +776,30 @@ public final class DRBD {
                     execCommand(host, command, execCallback, true, testOnly);
         return ret.getExitCode() == 0;
     }
+
+    /** Delete minor, from DRBD 8.4. */
+    public static boolean delMinor(final Host host,
+                                   final String blockDevice,
+                                   final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(DRBDDEV_PH, blockDevice);
+        final String command = host.getDistCommand("DRBD.delMinor",
+                                                   replaceHash);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, null, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Delete connection, from DRBD 8.4. */
+    public static boolean delConnection(final Host host,
+                                        final String resource,
+                                        final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.resDelConnection",
+                                                   getResVolReplaceHash(
+                                                                      resource,
+                                                                      null));
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, null, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
 }

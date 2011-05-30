@@ -1302,8 +1302,26 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return null;
     }
 
-    /** Remove drbd volume. */
-    public void removeDrbdVolume(final DrbdVolumeInfo dvi) {
+    /** Remove drbd volume. Returns true if there are no more volumes. */
+    public boolean removeDrbdVolume(final DrbdVolumeInfo dvi) {
         drbdVolumes.remove(dvi);
+        return drbdVolumes.size() == 0;
+    }
+
+    /** Removes this object. */
+    public void removeMyself(final boolean testOnly) {
+        super.removeMyself(testOnly);
+        getBrowser().getDrbdXML().removeResource(getName());
+        //DRBD.disconnect(host,
+        //                getName(),
+        //                null,
+        //                testOnly);
+
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                                getBrowser().getDrbdResHash();
+        final DrbdResourceInfo dri = drbdResHash.get(getName());
+        drbdResHash.remove(getName());
+        getBrowser().putDrbdResHash();
+        dri.setName(null);
     }
 }
