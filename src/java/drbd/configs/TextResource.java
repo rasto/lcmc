@@ -1703,7 +1703,13 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Attach All Detached"},
 
         {"HostBrowser.Drbd.LoadDrbd",
-         "Load DRBD"},
+         "Load DRBD Module"},
+
+        {"HostBrowser.Drbd.AdjustAllDrbd",
+         "Load DRBD Config (Adjust)"},
+
+        {"HostBrowser.Drbd.AdjustAllDrbd.ToolTip",
+         "Load DRBD Config into the DRBD Module (drbdadm adjust all)"},
 
         {"HostBrowser.Drbd.UpAll",
          "Start All DRBDs"},

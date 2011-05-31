@@ -415,7 +415,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 try {
                     getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", null, true);
+                        DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -486,7 +486,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getCluster().getHostsArray()) {
-                                DRBD.adjust(h, "all", null, false);
+                                DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();

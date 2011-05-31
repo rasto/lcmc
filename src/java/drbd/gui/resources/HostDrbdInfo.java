@@ -28,6 +28,7 @@ import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.gui.DrbdGraph;
 import drbd.gui.SpringUtilities;
+import drbd.gui.ClusterBrowser;
 import drbd.data.Host;
 import drbd.data.Subtext;
 import drbd.data.ConfigData;
@@ -271,6 +272,42 @@ public final class HostDrbdInfo extends Info {
                 }
             };
         items.add(loadItem);
+
+        /* load DRBD config / adjust all */
+        final MyMenuItem adjustAllItem =
+            new MyMenuItem(
+                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
+                   null,
+                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override public String enablePredicate() {
+                    if (getHost().isConnected()) {
+                        return null;
+                    } else {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                }
+
+                @Override public void action() {
+                    DRBD.adjust(getHost(), DRBD.ALL, null, testOnly);
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        items.add(adjustAllItem);
+        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
+                            cb.new DRBDMenuItemCallback(adjustAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.adjust(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(adjustAllItem, adjustAllItemCallback);
+        }
 
         /* start drbd */
         final MyMenuItem upAllItem =
