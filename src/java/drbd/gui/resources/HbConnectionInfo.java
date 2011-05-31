@@ -535,14 +535,10 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override public final void action() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getBrowser().getHeartbeatGraph().removeConnection(
+                getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       testOnly);
-                    }
-                });
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
@@ -552,14 +548,10 @@ public class HbConnectionInfo extends EditableInfo {
             }
             @Override public void action(final Host dcHost) {
                 if (!isNew()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getBrowser().getHeartbeatGraph().removeConnection(
-                                                      thisClass,
-                                                      dcHost,
-                                                      true);
-                        }
-                    });
+                    getBrowser().getHeartbeatGraph().removeConnection(
+                                                                  thisClass,
+                                                                  dcHost,
+                                                                  true);
                 }
             }
         };
@@ -593,14 +585,10 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public final void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getBrowser().getHeartbeatGraph().removeOrder(
+                    getBrowser().getHeartbeatGraph().removeOrder(
                                                      thisClass,
                                                      getBrowser().getDCHost(),
                                                      testOnly);
-                        }
-                    });
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
@@ -623,14 +611,10 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public void action(final Host dcHost) {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getBrowser().getHeartbeatGraph().removeOrder(
-                                                     thisClass,
-                                                     dcHost,
-                                                     true);
-                            }
-                        });
+                        getBrowser().getHeartbeatGraph().removeOrder(
+                                                                 thisClass,
+                                                                 dcHost,
+                                                                 true);
                     } else {
                         /* there is colocation constraint so let's get the
                          * endpoints from it. */
@@ -678,14 +662,10 @@ public class HbConnectionInfo extends EditableInfo {
             @Override public final void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getBrowser().getHeartbeatGraph().removeColocation(
+                    getBrowser().getHeartbeatGraph().removeColocation(
                                                    thisClass,
                                                    getBrowser().getDCHost(),
                                                    testOnly);
-                        }
-                    });
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -711,14 +691,10 @@ public class HbConnectionInfo extends EditableInfo {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isColocation(
                                                                 thisClass)) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                getBrowser().getHeartbeatGraph().removeColocation(
+                        getBrowser().getHeartbeatGraph().removeColocation(
                                                        thisClass,
                                                        dcHost,
                                                        true);
-                            }
-                        });
                     } else {
                         /* add colocation */
                         /* there is order constraint so let's get the endpoints
@@ -864,6 +840,9 @@ public class HbConnectionInfo extends EditableInfo {
         boolean minusInf = false;
         for (final String colId : colocationIds.keySet()) {
             final HbColocationInfo hbci = colocationIds.get(colId);
+            if (hbci == null) {
+                continue;
+            }
             if ((rsc1 != null && rsc2 != null)
                 && (hbci.getRscInfo1() != rsc1 || hbci.getRscInfo2() != rsc2)
                 && (hbci.getRscInfo1() != rsc2 || hbci.getRscInfo2() != rsc1)) {

@@ -46,7 +46,7 @@ import java.awt.Rectangle;
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
-public class MyMenuItem extends JMenuItem
+public abstract class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -234,9 +234,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * This method can be overriden to define an action that should be taken
      * after the item is selected.
      */
-    public void action() {
-        Tools.appError("No action defined.");
-    }
+    abstract public void action();
 
     /** Returns false if the alternate menu item text etc. should be shown. */
     public boolean predicate() {

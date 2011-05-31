@@ -660,16 +660,21 @@ public abstract class ResourceGraph {
 
         /** Sets direction of the edge. */
         void setDirection(final Vertex from, final Vertex to) {
+            final Edge thisEdge = this;
             if (mFrom != from || mTo != to) {
-                mGraphLock.lock();
-                try {
-                    getGraph().removeEdge(this);
-                    mFrom = from;
-                    mTo   = to;
-                    getGraph().addEdge(this, mFrom, mTo);
-                } finally {
-                    mGraphLock.unlock();
-                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        mGraphLock.lock();
+                        try {
+                            getGraph().removeEdge(thisEdge);
+                            mFrom = from;
+                            mTo   = to;
+                            getGraph().addEdge(thisEdge, mFrom, mTo);
+                        } finally {
+                            mGraphLock.unlock();
+                        }
+                    }
+                });
             }
         }
 
@@ -1677,45 +1682,53 @@ public abstract class ResourceGraph {
 
     /** Removes test edges. */
     protected final void removeTestEdge() {
-        mTestEdgeLock.lock();
         if (testEdge != null) {
-            mGraphLock.lock();
-            try {
-                getGraph().removeEdge(testEdge);
-            } finally {
-                mGraphLock.unlock();
-            }
-            testEdge = null;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    mTestEdgeLock.lock();
+                    mGraphLock.lock();
+                    try {
+                        getGraph().removeEdge(testEdge);
+                    } finally {
+                        mGraphLock.unlock();
+                    }
+                    testEdge = null;
+                    mTestEdgeLock.unlock();
+                }
+            });
         }
-        mTestEdgeLock.unlock();
     }
 
     /** Creates a test edge. */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
-        if (!mTestEdgeLock.tryLock()) {
-            return;
-        }
-        if (testEdge != null) {
-            mGraphLock.lock();
-            try {
-                getGraph().removeEdge(testEdge);
-            } finally {
-                mGraphLock.unlock();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!mTestEdgeLock.tryLock()) {
+                    return;
+                }
+                if (testEdge != null) {
+                    mGraphLock.lock();
+                    try {
+                        getGraph().removeEdge(testEdge);
+                    } finally {
+                        mGraphLock.unlock();
+                    }
+                }
+                if (!isTestAnimation()) {
+                    mTestEdgeLock.unlock();
+                    return;
+                }
+                final Edge edge = new Edge(vP, v);
+                mGraphLock.lock();
+                try {
+                    getGraph().addEdge(edge, vP, v);
+                } finally {
+                    mGraphLock.unlock();
+                }
+                testEdge = edge;
+                mTestEdgeLock.unlock();
             }
-        }
-        if (!isTestAnimation()) {
-            mTestEdgeLock.unlock();
-            return;
-        }
-        final Edge edge = new Edge(vP, v);
-        mGraphLock.lock();
-        try {
-            getGraph().addEdge(edge, vP, v);
-        } finally {
-            mGraphLock.unlock();
-        }
-        testEdge = edge;
-        mTestEdgeLock.unlock();
+        });
     }
 
     /** Adds an existing edge to the test edges. */

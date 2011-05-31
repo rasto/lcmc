@@ -414,45 +414,51 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (v == null || vP == null) {
             return;
         }
+        final Vertex vP0 = vP;
+        final Vertex v0 = v;
 
-        mHbConnectionWriteLock.lock();
-        Edge edge = null;
-        try {
-            lockGraph();
-            edge = getGraph().findEdge(vP, v);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                mHbConnectionWriteLock.lock();
+                Edge edge = null;
+                try {
+                    lockGraph();
+                    edge = getGraph().findEdge(vP0, v0);
 
-            if (edge == null) {
-                edge = getGraph().findEdge(v, vP);
-                unlockGraph();
-                if (edge != null) {
-                    edge.reverse();
+                    if (edge == null) {
+                        edge = getGraph().findEdge(v0, vP0);
+                        unlockGraph();
+                        if (edge != null) {
+                            edge.reverse();
+                        }
+                    } else {
+                        unlockGraph();
+                        edge.reset();
+                    }
+                } catch (final Exception e) {
+                    unlockGraph();
                 }
-            } else {
-                unlockGraph();
-                edge.reset();
+                HbConnectionInfo hbci;
+                if (edge == null) {
+                    hbci = getClusterBrowser().getNewHbConnectionInfo();
+                    edge = new Edge(vP0, v0);
+                    lockGraph();
+                    getGraph().addEdge(edge, vP0, v0);
+                    unlockGraph();
+                    edgeToHbconnectionMap.put(edge, hbci);
+                    hbconnectionToEdgeMap.put(hbci, edge);
+                } else {
+                    hbci = edgeToHbconnectionMap.get(edge);
+                }
+                mHbConnectionWriteLock.unlock();
+                if (hbci != null) {
+                    hbci.addOrder(ordId, parent, serviceInfo);
+                    if (!edgeIsOrderList.contains(edge)) {
+                        edgeIsOrderList.add(edge);
+                    }
+                }
             }
-        } catch (final Exception e) {
-            unlockGraph();
-        }
-        HbConnectionInfo hbci;
-        if (edge == null) {
-            hbci = getClusterBrowser().getNewHbConnectionInfo();
-            edge = new Edge(vP, v);
-            lockGraph();
-            getGraph().addEdge(edge, vP, v);
-            unlockGraph();
-            edgeToHbconnectionMap.put(edge, hbci);
-            hbconnectionToEdgeMap.put(hbci, edge);
-        } else {
-            hbci = edgeToHbconnectionMap.get(edge);
-        }
-        mHbConnectionWriteLock.unlock();
-        if (hbci != null) {
-            hbci.addOrder(ordId, parent, serviceInfo);
-            if (!edgeIsOrderList.contains(edge)) {
-                edgeIsOrderList.add(edge);
-            }
-        }
+        });
     }
 
     /** Reverse the edge. */
@@ -546,37 +552,44 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (vWithRsc == null || vRsc == null) {
             return;
         }
-        mHbConnectionWriteLock.lock();
-        Edge edge = null;
-        try {
-            lockGraph();
-            edge = getGraph().findEdge(vWithRsc, vRsc);
-            if (edge == null) {
-                edge = getGraph().findEdge(vRsc, vWithRsc);
+        final Vertex vWithRsc0 = vWithRsc;
+        final Vertex vRsc0 = vRsc;
+        final ServiceInfo withRsc0 = withRsc;
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                mHbConnectionWriteLock.lock();
+                Edge edge = null;
+                try {
+                    lockGraph();
+                    edge = getGraph().findEdge(vWithRsc0, vRsc0);
+                    if (edge == null) {
+                        edge = getGraph().findEdge(vRsc0, vWithRsc0);
+                    }
+                    unlockGraph();
+                } catch (final Exception e) {
+                    /* ignore */
+                }
+                HbConnectionInfo hbci;
+                if (edge == null) {
+                    hbci = getClusterBrowser().getNewHbConnectionInfo();
+                    edge = new Edge(vWithRsc0, vRsc0);
+                    lockGraph();
+                    getGraph().addEdge(edge, vWithRsc0, vRsc0);
+                    unlockGraph();
+                    edgeToHbconnectionMap.put(edge, hbci);
+                    hbconnectionToEdgeMap.put(hbci, edge);
+                } else {
+                    hbci = edgeToHbconnectionMap.get(edge);
+                }
+                mHbConnectionWriteLock.unlock();
+                if (hbci != null) {
+                    hbci.addColocation(colId, rsc, withRsc0);
+                    if (!edgeIsColocationList.contains(edge)) {
+                        edgeIsColocationList.add(edge);
+                    }
+                }
             }
-            unlockGraph();
-        } catch (final Exception e) {
-            /* ignore */
-        }
-        HbConnectionInfo hbci;
-        if (edge == null) {
-            hbci = getClusterBrowser().getNewHbConnectionInfo();
-            edge = new Edge(vWithRsc, vRsc);
-            lockGraph();
-            getGraph().addEdge(edge, vWithRsc, vRsc);
-            unlockGraph();
-            edgeToHbconnectionMap.put(edge, hbci);
-            hbconnectionToEdgeMap.put(hbci, edge);
-        } else {
-            hbci = edgeToHbconnectionMap.get(edge);
-        }
-        mHbConnectionWriteLock.unlock();
-        if (hbci != null) {
-            hbci.addColocation(colId, rsc, withRsc);
-            if (!edgeIsColocationList.contains(edge)) {
-                edgeIsColocationList.add(edge);
-            }
-        }
+        });
     }
 
     /** Removes items from order list. */
@@ -1115,24 +1128,29 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** Removes edge if it is not in the list of constraints. */
     private void removeEdge(final Edge e, final boolean testOnly) {
-        if (!edgeIsOrderList.contains(e)
-            && !edgeIsColocationList.contains(e)) {
-            e.reset();
-            lockGraph();
-            getGraph().removeEdge(e);
-            unlockGraph();
-            mHbConnectionWriteLock.lock();
-            try {
-                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-                edgeToHbconnectionMap.remove(e);
-                if (hbci != null) {
-                    hbconnectionToEdgeMap.remove(hbci);
-                    hbci.removeMyself(testOnly);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if (!edgeIsOrderList.contains(e)
+                    && !edgeIsColocationList.contains(e)) {
+                    e.reset();
+                    lockGraph();
+                    getGraph().removeEdge(e);
+                    unlockGraph();
+                    mHbConnectionWriteLock.lock();
+                    try {
+                        final HbConnectionInfo hbci =
+                                                edgeToHbconnectionMap.get(e);
+                        edgeToHbconnectionMap.remove(e);
+                        if (hbci != null) {
+                            hbconnectionToEdgeMap.remove(hbci);
+                            hbci.removeMyself(testOnly);
+                        }
+                    } finally {
+                        mHbConnectionWriteLock.unlock();
+                    }
                 }
-            } finally {
-                mHbConnectionWriteLock.unlock();
             }
-        }
+        });
     }
 
     /** Remove vertices that were marked as not present. */

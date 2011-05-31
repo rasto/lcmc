@@ -36,7 +36,6 @@ import drbd.utilities.UpdatableItem;
 import drbd.utilities.MyMenuItem;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -397,12 +396,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        getBrowser().getHeartbeatGraph().killRemovedVertices();
-                        getService().doneRemoving();
-                    }
-                });
+                getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getService().doneRemoving();
             }
         } else {
             if (rscSetConnectionDataOrd != null) {
@@ -421,12 +416,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 setUpdated(true);
                 getService().setRemoved(true);
                 getBrowser().removeFromServiceInfoHash(this);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        getBrowser().getHeartbeatGraph().killRemovedVertices();
-                        getService().doneRemoving();
-                    }
-                });
+                getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getService().doneRemoving();
             }
         }
     }

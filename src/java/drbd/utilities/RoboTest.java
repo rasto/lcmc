@@ -1004,7 +1004,6 @@ public final class RoboTest {
         addConstraint(robot, gx, gy - 30, 9, true, -1);
         sleep(5000);
         checkTest(host, "test1", 11.8);
-
         /** Add m/s Stateful resource */
         moveTo(robot, statefulX, statefulY);
         rightClick(robot); /* popup */
@@ -1033,15 +1032,19 @@ public final class RoboTest {
         moveTo(robot, 812, 179);
         sleep(1000);
         leftClick(robot); /* apply */
-        sleep(4000);
+        checkTest(host, "test1", 11.9);
+        sleep(3000);
         /* set clone max to 1 */
         moveTo(robot, 978, 381);
         sleep(3000);
         leftClick(robot); /* Clone Max */
         sleep(3000);
+        leftClick(robot);
+        sleep(3000);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(3000);
         press(robot, KeyEvent.VK_1);
+        sleep(3000);
         setTimeouts(robot, false);
         moveTo(robot, 812, 179);
         sleep(3000);
@@ -1051,6 +1054,7 @@ public final class RoboTest {
         stopResource(robot, statefulX, statefulY, 0);
         sleep(3000);
         checkTest(host, "test1", 13);
+
         startResource(robot, statefulX, statefulY, 0);
         sleep(10000);
         checkTest(host, "test1", 14);

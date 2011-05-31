@@ -4036,6 +4036,7 @@ public class ServiceInfo extends EditableInfo {
                                                          colocationOnly,
                                                          orderOnly,
                                                          testOnly)) {
+            Tools.waitForSwing();
             /* edge added */
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
                 final ConstraintPHInfo cphi;
