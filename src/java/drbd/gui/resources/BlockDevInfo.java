@@ -582,7 +582,7 @@ public final class BlockDevInfo extends EditableInfo {
     void connect(final boolean testOnly) {
         DRBD.connect(getHost(),
                      drbdVolumeInfo.getDrbdResourceInfo().getName(),
-                     null, //drbdVolumeInfo.getName(),
+                     null,
                      testOnly);
     }
 
@@ -590,7 +590,7 @@ public final class BlockDevInfo extends EditableInfo {
     void disconnect(final boolean testOnly) {
         DRBD.disconnect(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
-                        null, //drbdVolumeInfo.getName(),
+                        null,
                         testOnly);
     }
 

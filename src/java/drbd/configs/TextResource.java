@@ -1700,7 +1700,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "View Logs"},
 
         {"HostBrowser.Drbd.AttachAll",
-         "Attach All Detached"},
+         "Attach All"},
+
+        {"HostBrowser.Drbd.DetachAll",
+         "Detach All"},
 
         {"HostBrowser.Drbd.LoadDrbd",
          "Load DRBD Module"},
@@ -1712,7 +1715,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Load DRBD Config into the DRBD Module (drbdadm adjust all)"},
 
         {"HostBrowser.Drbd.UpAll",
-         "Start All DRBDs"},
+         "Start All DRBDs (up)"},
 
         {"HostBrowser.Drbd.UpgradeDrbd",
          "Upgrade DRBD"},

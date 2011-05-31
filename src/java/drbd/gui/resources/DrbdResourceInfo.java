@@ -107,6 +107,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super(name, browser);
         setResource(new DrbdResource(name));
         //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
+        setParameters();
     }
 
     /** Add a drbd volume. */
@@ -185,18 +186,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final GuiComboBox pcb = portComboBox;
                 if (acb != null && pcb != null) {
                     final NetInfo ni = (NetInfo) acb.getValue();
-                    //final Object o = pcb.getValue();
-                    //String port = null;
-                    //if (o != null) {
-                    //    port = ((StringInfo) o).getStringValue();
-                    //}
-                    if (ni != null) {
-                        config.append(" {\n\t\taddress\t\t");
-                        config.append(getDrbdNetInterfaceWithPort(
-                                                ni.getNetInterface().getIp(),
-                                                pcb.getStringValue()));
-                        config.append(";\n\t\t");
+                    if (ni == null) {
+                        throw new Exceptions.DrbdConfigException(
+                                    "Address not defined in "
+                                    + getCluster().getName()
+                                    + " (" + getName() + ")");
                     }
+                    config.append(" {\n\t\taddress\t\t");
+                    config.append(getDrbdNetInterfaceWithPort(
+                                            ni.getNetInterface().getIp(),
+                                            pcb.getStringValue()));
+                    config.append(";\n\t\t");
 
                 }
                 config.append(Tools.join("\n", volumeConfigs));
@@ -614,6 +614,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Sets stored parameters. */
     public void setParameters() {
+        System.out.println("set parameters");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
         for (String section : dxml.getSections()) {
@@ -668,6 +669,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set port */
         if (!Tools.areEqual(hostPort, savedPort)) {
             savedPort = hostPort;
+            for (final Host host : getBrowser().getClusterHosts()) {
+                host.getBrowser().getDrbdVIPortList().add(savedPort);
+            }
             if (infoPanelOk) {
                 final GuiComboBox cb = portComboBox;
                 if (cb != null) {
@@ -938,7 +942,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* Port */
         final List<String> drbdVIPorts = new ArrayList<String>();
         String dp = savedPort;
-        int i = 0;
         int index = -1;
         for (final Host host : getBrowser().getClusterHosts()) {
             for (final String port : host.getBrowser().getDrbdVIPortList()) {
@@ -958,17 +961,23 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } else {
             drbdVIPorts.add(dp);
         }
-        for (final Host host : getBrowser().getClusterHosts()) {
-            while (i < 10) {
-                final String port = Integer.toString(index);
-                if (!host.getBrowser().getDrbdVIPortList().contains(port)) {
-                    drbdVIPorts.add(port);
-                    i++;
+        int i = 0;
+        while (i < 10) {
+            final String port = Integer.toString(index);
+            boolean contains = false;
+            for (final Host host : getBrowser().getClusterHosts()) {
+                if (host.getBrowser().getDrbdVIPortList().contains(port)) {
+                    contains = true;
                 }
-                index++;
             }
+            if (!contains) {
+                drbdVIPorts.add(port);
+                i++;
+            }
+            index++;
         }
-        defaultPort = dp;
+        defaultPort = drbdVIPorts.get(0);
+        System.out.println("default port: " + defaultPort);
         final GuiComboBox pcb = new GuiComboBox(
                    defaultPort,
                    drbdVIPorts.toArray(new String[drbdVIPorts.size()]),

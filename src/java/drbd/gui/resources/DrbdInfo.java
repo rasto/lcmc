@@ -694,20 +694,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
          * although other port numbers may not be the same on both. */
         final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
-        //final int viPort1 = bdi1.getNextVIPort();
-        //final int viPort2 = bdi2.getNextVIPort();
-        //final int viPort;
-        //if (viPort1 > viPort2) {
-        //    viPort = viPort1;
-        //} else {
-        //    viPort = viPort2;
-        //}
-        //bdi1.setDefaultVIPort(viPort + 1);
-        //bdi2.setDefaultVIPort(viPort + 1);
-
-        //dri.getDrbdResource().setDefaultValue(
-        //                                DrbdResourceInfo.DRBD_RES_PARAM_DEV,
-        //                                drbdDevStr);
         getBrowser().getDrbdDevHash().put(dvi.getDevice(), dvi);
         getBrowser().putDrbdDevHash();
 

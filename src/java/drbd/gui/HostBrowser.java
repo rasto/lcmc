@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import java.util.concurrent.locks.Lock;
@@ -74,7 +75,7 @@ public final class HostBrowser extends Browser {
     private DefaultMutableTreeNode fileSystemsNode;
 
     /** List of used network interface ports. */
-    private final List<String> drbdVIPortList = new ArrayList<String>();
+    private final Set<String> drbdVIPortList = new HashSet<String>();
     /** Host object. */
     private final Host host;
     /** Host info object of the host of this browser. */
@@ -567,7 +568,7 @@ public final class HostBrowser extends Browser {
     }
 
     /** Returns a list of used network interface ports. */
-    public List<String> getDrbdVIPortList() {
+    public Set<String> getDrbdVIPortList() {
         return drbdVIPortList;
     }
 

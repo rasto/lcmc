@@ -394,8 +394,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
                                 getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(Tools.getString(
-                                    "ClusterBrowser.Drbd.ResourceConnect"))) {
+                if (this.getText().equals(
+                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+                         + " " + getDrbdResourceInfo().getName())) {
                     if (!destBDI.isConnectedOrWF(testOnly)) {
                         destBDI.connect(testOnly);
                     }
