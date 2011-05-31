@@ -161,6 +161,16 @@ public final class TerminalPanel extends JScrollPane {
         TESTS.put("starttestx8", "x8");
         TESTS.put("starttestx9", "x9");
 
+        TESTS.put("starttesty1", "y1");
+        TESTS.put("starttesty2", "y2");
+        TESTS.put("starttesty3", "y3");
+        TESTS.put("starttesty4", "y4");
+        TESTS.put("starttesty5", "y5");
+        TESTS.put("starttesty6", "y6");
+        TESTS.put("starttesty7", "y7");
+        TESTS.put("starttesty8", "y8");
+        TESTS.put("starttesty9", "y9");
+
         TESTS.put("starttesta", "a");
         TESTS.put("starttestb", "b");
         TESTS.put("starttestc", "c");

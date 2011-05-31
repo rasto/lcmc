@@ -116,7 +116,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Creates and returns drbd config for resources. */
-    String drbdResourceConfig() throws Exceptions.DrbdConfigException {
+    String drbdResourceConfig(final String drbdVersion)
+    throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
         /* protocol... */
@@ -141,7 +142,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         /* section config */
         try {
-            config.append(drbdSectionsConfig());
+            config.append(drbdSectionsConfig(drbdVersion));
         } catch (Exceptions.DrbdConfigException dce) {
             throw dce;
         }
@@ -161,16 +162,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 <address family="ipv4" port="7793">192.168.23.21</address>
             </host>
         */
+        boolean volumesAvailable = false;
+        try {
+            volumesAvailable =
+                        Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (final Host host : getCluster().getHostsArray()) {
             final List<String> volumeConfigs = new ArrayList<String>();
-            boolean volumesAvailable = false;
-            final String drbdV = host.getDrbdVersion();
-            try {
-                volumesAvailable =
-                                Tools.compareVersions(drbdV, "8.4.0rc1") >= 0;
-            } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
-            }
             for (final DrbdVolumeInfo dvi : drbdVolumes) {
                 final String volumeConfig = dvi.drbdVolumeConfig(
                                                              host,
@@ -614,7 +614,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Sets stored parameters. */
     public void setParameters() {
-        System.out.println("set parameters");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
         for (String section : dxml.getSections()) {
@@ -977,7 +976,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             index++;
         }
         defaultPort = drbdVIPorts.get(0);
-        System.out.println("default port: " + defaultPort);
         final GuiComboBox pcb = new GuiComboBox(
                    defaultPort,
                    drbdVIPorts.toArray(new String[drbdVIPorts.size()]),

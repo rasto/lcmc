@@ -275,11 +275,18 @@ abstract class DrbdGuiInfo extends EditableInfo {
      * Creates drbd config for sections and returns it. Removes 'drbd: '
      * from the 'after' parameter.
      */
-    protected String drbdSectionsConfig()
+    protected String drbdSectionsConfig(final String drbdVersion)
                      throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder("");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String[] sections = dxml.getSections();
+        boolean volumesAvailable = false;
+        try {
+            volumesAvailable =
+                           Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (final String sectionString : sections) {
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
@@ -287,7 +294,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 || DrbdXML.GLOBAL_SECTION.equals(section)) {
                 continue;
             }
-            final String[] params = dxml.getSectionParams(section);
+            final String[] params = dxml.getSectionParams(sectionString);
 
             if (params.length != 0) {
                 final StringBuilder sectionConfig = new StringBuilder("");
@@ -297,9 +304,11 @@ abstract class DrbdGuiInfo extends EditableInfo {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
-                        if (isCheckBox(param)
-                            || "booleanhandler".equals(getParamType(param))) {
-                            if (value.equals(Tools.getString("Boolean.True"))) {
+                        if (!volumesAvailable
+                            && (isCheckBox(param)
+                                || "booleanhandler".equals(
+                                                        getParamType(param)))) {
+                            if (value.equals(DrbdXML.CONFIG_YES)) {
                                 /* boolean parameter */
                                 sectionConfig.append("\t\t" + param + ";\n");
                             }

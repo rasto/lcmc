@@ -317,7 +317,9 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override protected String getLabelForEdgeStringer(final Edge edge) {
         final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
-        if (dvi != null && dvi.getName() != null) {
+        if (dvi != null
+            && dvi.getName() != null
+            && dvi.getDrbdResourceInfo() != null) {
             final Vertex source = edge.getSource();
             final Vertex dest = edge.getDest();
             final BlockDevInfo sourceBDI = (BlockDevInfo) getInfo(source);
@@ -344,7 +346,6 @@ public final class DrbdGraph extends ResourceGraph {
                     }
                 });
             }
-
             final StringBuilder l =
                         new StringBuilder(dvi.getDrbdResourceInfo().getName());
             l.append('/');
