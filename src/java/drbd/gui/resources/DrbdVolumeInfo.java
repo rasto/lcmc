@@ -361,11 +361,13 @@ public final class DrbdVolumeInfo extends EditableInfo
         final DrbdVolumeInfo thisClass = this;
 
         final MyMenuItem connectMenu = new MyMenuItem(
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect"),
+            Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+            + " " + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
 
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect"),
+            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect")
+            + " " + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
             new AccessMode(ConfigData.AccessType.OP, true),

@@ -1608,7 +1608,8 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns whether this device will be disconnected. */
     boolean isConnectedTest(final DRBDtestData dtd) {
-        return dtd.isConnected(getHost(), drbdVolumeInfo.getDevice())
+        return dtd.isConnected(getHost(),
+                               drbdVolumeInfo.getDrbdResourceInfo().getName())
                || (!dtd.isDisconnected(
                                getHost(),
                                drbdVolumeInfo.getDrbdResourceInfo().getName())
