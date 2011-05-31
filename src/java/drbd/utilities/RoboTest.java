@@ -2550,7 +2550,7 @@ public final class RoboTest {
 
         moveTo(robot, 720, 570); /* block device */
         leftClick(robot); /* next */
-        sleep(10000);
+        sleep(6000);
         checkDRBDTest(host, drbdTest, 1.1);
 
         moveTo(robot, 720, 570); /* meta-data */
