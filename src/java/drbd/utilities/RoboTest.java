@@ -434,7 +434,9 @@ public final class RoboTest {
                         }
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
-                    if ("1".equals(index) || "x1".equals(index)) {
+                    if ("1".equals(index)
+                        || "x1".equals(index)
+                        || "y1".equals(index)) {
                         /* DRBD 1 link */
                         int i = 1;
                         while (!aborted) {
@@ -2515,32 +2517,42 @@ public final class RoboTest {
         moveTo(robot, 342, 321);
         moveTo(robot, 667, 322);
         leftClick(robot);
-        sleep(20000);
+        sleep(10000);
 
 
-        moveTo(robot, 720, 570);
+        moveTo(robot, 720, 570); /* new drbd resource */
         leftClick(robot); /* next */
-        sleep(20000);
+        sleep(10000);
 
-        moveTo(robot, 751, 402); /* interface */
+        moveTo(robot, 521, 372); /* interface 1 */
         leftClick(robot);
-        moveTo(robot, 716, 441);
+        moveTo(robot, 486, 411);
+        leftClick(robot);
+        sleep(1000);
+
+        moveTo(robot, 521, 402); /* interface 2 */
+        leftClick(robot);
+        moveTo(robot, 486, 441);
         leftClick(robot);
         sleep(1000);
 
         moveTo(robot, 720, 570);
         leftClick(robot); /* next */
-        sleep(20000);
+        sleep(10000);
 
-        moveTo(robot, 751, 402); /* interface again */
-        leftClick(robot);
-        moveTo(robot, 716, 441);
-        leftClick(robot);
-        sleep(1000);
-
-        moveTo(robot, 720, 570);
+        moveTo(robot, 720, 570); /* volume */
         leftClick(robot); /* next */
-        sleep(20000);
+        sleep(10000);
+
+        moveTo(robot, 720, 570); /* block device */
+        leftClick(robot); /* next */
+        sleep(10000);
+
+        moveTo(robot, 720, 570); /* block device */
+        leftClick(robot); /* next */
+        sleep(60000);
+        Tools.sleep(60000);
+        checkDRBDTest(host, drbdTest, 1.1);
 
         moveTo(robot, 720, 570); /* meta-data */
         leftClick(robot); /* next */
@@ -2559,6 +2571,62 @@ public final class RoboTest {
         confirmRemove(robot);
         checkDRBDTest(host, drbdTest, 2);
     }
+
+    ///** DRBD Test 1. */
+    //private static void startDRBDTest1(final String drbdTest,
+    //                                   final Robot robot,
+    //                                   final Host host) {
+    //    slowFactor = 0.2f;
+    //    aborted = false;
+    //    moveTo(robot, 334, 315); /* add drbd resource */
+    //    rightClick(robot);
+    //    moveTo(robot, 342, 321);
+    //    moveTo(robot, 667, 322);
+    //    leftClick(robot);
+    //    sleep(20000);
+
+
+    //    moveTo(robot, 720, 570);
+    //    leftClick(robot); /* next */
+    //    sleep(20000);
+
+    //    moveTo(robot, 751, 402); /* interface */
+    //    leftClick(robot);
+    //    moveTo(robot, 716, 441);
+    //    leftClick(robot);
+    //    sleep(1000);
+
+    //    moveTo(robot, 720, 570);
+    //    leftClick(robot); /* next */
+    //    sleep(20000);
+
+    //    moveTo(robot, 751, 402); /* interface again */
+    //    leftClick(robot);
+    //    moveTo(robot, 716, 441);
+    //    leftClick(robot);
+    //    sleep(1000);
+
+    //    moveTo(robot, 720, 570);
+    //    leftClick(robot); /* next */
+    //    sleep(20000);
+
+    //    moveTo(robot, 720, 570); /* meta-data */
+    //    leftClick(robot); /* next */
+    //    sleep(20000);
+
+    //    moveTo(robot, 820, 570); /* fs */
+    //    leftClick(robot); /* finish */
+    //    sleep(10000);
+
+    //    checkDRBDTest(host, drbdTest, 1);
+
+    //    moveTo(robot, 480, 250); /* rsc popup */
+    //    rightClick(robot); /* finish */
+    //    moveTo(robot, 555, 340); /* remove */
+    //    leftClick(robot);
+    //    confirmRemove(robot);
+    //    checkDRBDTest(host, drbdTest, 2);
+    //}
 
     /** DRBD Test 1. */
     private static void startDRBDTest2(final Robot robot, final Host host) {
