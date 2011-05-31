@@ -180,6 +180,11 @@ public final class DrbdXML extends XML {
         PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
     }
 
+    /** Yes / true drbd config value. */
+    public static final String CONFIG_YES = "yes";
+    /** No / false drbd config value. */
+    public static final String CONFIG_NO = "no";
+
     /** Prepares a new <code>DrbdXML</code> object. */
     public DrbdXML(final Host[] hosts) {
         super();
@@ -376,8 +381,8 @@ public final class DrbdXML extends XML {
                 correctValue = true;
             }
         } else if ("boolean".equals(type)) {
-            if (!value.equals(Tools.getString("Boolean.True"))
-                && !value.equals(Tools.getString("Boolean.False"))) {
+            if (!value.equals(CONFIG_YES)
+                && !value.equals(CONFIG_NO)) {
                 correctValue = false;
             }
         } else if ("numeric".equals(type)) {
@@ -567,7 +572,7 @@ public final class DrbdXML extends XML {
                 final String minorCount = getAttribute(option, "count");
                 nameValueMap.put(nodeName, minorCount);
             } else if ("disable-ip-verification".equals(nodeName)) {
-                nameValueMap.put(nodeName, Tools.getString("Boolean.True"));
+                nameValueMap.put(nodeName, CONFIG_YES);
             } else if ("usage-count".equals(nodeName)) {
                 /* does not come from drbdadm */
                 /* TODO: "count" is guessed. */
@@ -610,10 +615,10 @@ public final class DrbdXML extends XML {
                     paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
-                    l.add(Tools.getString("Boolean.True"));
-                    l.add(Tools.getString("Boolean.False"));
+                    l.add(CONFIG_YES);
+                    l.add(CONFIG_NO);
                     paramItemsMap.put(name, l);
-                    paramDefaultMap.put(name, Tools.getString("Boolean.False"));
+                    paramDefaultMap.put(name, CONFIG_NO);
                 }
                 if ("fence-peer".equals(name)) {
                     final List<Object> l = new ArrayList<Object>();
@@ -655,8 +660,7 @@ public final class DrbdXML extends XML {
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
                 paramDefaultMap.put("usage-count", "");
-                paramDefaultMap.put("disable-ip-verification",
-                                    Tools.getString("Boolean.False"));
+                paramDefaultMap.put("disable-ip-verification", CONFIG_NO);
                 for (int j = 0; j < optionInfos.getLength(); j++) {
                     final Node optionInfo = optionInfos.item(j);
                     final String tag = optionInfo.getNodeName();
@@ -721,7 +725,7 @@ public final class DrbdXML extends XML {
                 final String name = getAttribute(option, "name");
                 String value = getAttribute(option, "value");
                 if (value == null) { /* boolean option */
-                    value = Tools.getString("Boolean.True");
+                    value = CONFIG_YES;
                 } else if (hasUnitPrefix(name)) { /* with unit */
                     final Pattern p = Pattern.compile("\\d+([kmgs])");
                     final Matcher m = p.matcher(value);
@@ -976,8 +980,7 @@ public final class DrbdXML extends XML {
             optionsMap.put(GLOBAL_SECTION, globalNameValueMap);
         }
         globalNameValueMap.put("usage-count", "yes");
-        globalNameValueMap.put("disable-ip-verification",
-                               Tools.getString("Boolean.False"));
+        globalNameValueMap.put("disable-ip-verification", CONFIG_NO);
 
         for (int i = 0; i < resources.getLength(); i++) {
             final Node resourceNode = resources.item(i);

@@ -210,7 +210,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 try {
                     getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", null, true);
+                        DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -277,7 +277,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                                DRBD.adjust(h, "all", null, false);
+                                DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -361,11 +361,13 @@ public final class DrbdVolumeInfo extends EditableInfo
         final DrbdVolumeInfo thisClass = this;
 
         final MyMenuItem connectMenu = new MyMenuItem(
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect"),
+            Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+            + " " + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
 
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect"),
+            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect")
+            + " " + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
             new AccessMode(ConfigData.AccessType.OP, true),
@@ -392,8 +394,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
                                 getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(Tools.getString(
-                                    "ClusterBrowser.Drbd.ResourceConnect"))) {
+                if (this.getText().equals(
+                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+                         + " " + getDrbdResourceInfo().getName())) {
                     if (!destBDI.isConnectedOrWF(testOnly)) {
                         destBDI.connect(testOnly);
                     }

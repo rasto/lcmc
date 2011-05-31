@@ -1899,7 +1899,7 @@ sub gui_drbd_test {
 		open TEST, ">$testfile.error" or print "$!";
 		print TEST $conf;
 		close TEST;
-		my $diff = `diff -ub $testfile $testfile.error`;
+		my $diff = `diff -u $testfile $testfile.error`;
 		print "error\n";
 		print "-------------\n";
 		print $diff;
@@ -1911,7 +1911,7 @@ sub gui_drbd_test {
 		open STTEST, ">$statustestfile.error" or print "$!";
 		print STTEST $proc;
 		close STTEST;
-		my $diff = `diff -ub $statustestfile $statustestfile.error`;
+		my $diff = `diff -u $statustestfile $statustestfile.error`;
 		print "error\n";
 		print "-------------\n";
 		print $diff;

@@ -42,7 +42,7 @@ public final class DRBDtestData {
     private final String toolTip;
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
     private static final Pattern DRBD_D_PATTERN =
-          Pattern.compile(".*drbdsetup\\s+(\\d+)\\s+(\\S+).*");
+          Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
     /** Hash with host and drbd resource, that will be connected. */
     private final MultiKeyMap<String, Integer> connectedHash =
                                             new MultiKeyMap<String, Integer>();
@@ -75,16 +75,22 @@ public final class DRBDtestData {
             for (final String line : raw.split("\\r?\\n")) {
                 final Matcher m = DRBD_D_PATTERN.matcher(line);
                 if (m.matches()) {
-                    final String res = m.group(1);
+                    final String resOrVol = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(host.getName(), res, 1);
+                        disconnectedHash.put(host.getName(), resOrVol, 1);
                     } else if ("net".equals(action)) {
-                        connectedHash.put(host.getName(), "/dev/drbd" + res, 1);
+                        connectedHash.put(host.getName(),
+                                          "/dev/drbd" + resOrVol,
+                                          1);
                     } else if ("detach".equals(action)) {
-                        disklessHash.put(host.getName(), "/dev/drbd" + res, 1);
+                        disklessHash.put(host.getName(),
+                                         "/dev/drbd" + resOrVol,
+                                         1);
                     } else if ("disk".equals(action)) {
-                        attachedHash.put(host.getName(), "/dev/drbd" + res, 1);
+                        attachedHash.put(host.getName(),
+                                         "/dev/drbd" + resOrVol,
+                                         1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -115,8 +121,8 @@ public final class DRBDtestData {
     }
 
     /** Returns whether the device will be connected on the host. */
-    public boolean isConnected(final Host host, final String dev) {
-        return connectedHash.get(host.getName(), dev) != null;
+    public boolean isConnected(final Host host, final String resource) {
+        return connectedHash.get(host.getName(), resource) != null;
     }
 
     /** Returns whether the drbd device is diskless on the host. */

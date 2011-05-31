@@ -75,10 +75,9 @@ final class BlockDev extends DrbdConfig {
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
         final int err = DRBD.adjust(bdi.getHost(),
-                                    bdi.getDrbdVolumeInfo()
-                                       .getDrbdResourceInfo().getName(),
-                                    bdi.getDrbdVolumeInfo().getName(),
-                                    testOnly);
+                    bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                    null,
+                    testOnly);
         if (err == DRBD_NO_METADATA_RC) {
             return false;
         }
@@ -101,20 +100,37 @@ final class BlockDev extends DrbdConfig {
             try {
                 // TODO: check this
                 final boolean testOnly = false;
-                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfig(false);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
+                                                    .createDrbdConfig(false);
                 if (adjust(blockDevInfo) && adjust(oBdi)) {
-                    DRBD.detach(blockDevInfo.getHost(),
-                                getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                   .getName(),
-                                getDrbdVolumeInfo().getName(),
-                                testOnly);
-                    DRBD.detach(oBdi.getHost(),
-                                getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                   .getName(),
-                                getDrbdVolumeInfo().getName(),
-                                testOnly);
+                    int i = 0;
+                    while (!blockDevInfo.getBlockDevice().isAttached()
+                           && i < 10000) {
+                        Tools.sleep(500);
+                        i += 500;
+                    }
+                    while (!oBdi.getBlockDevice().isAttached()
+                           && i < 10000) {
+                        Tools.sleep(500);
+                        i += 500;
+                    }
+                    if (blockDevInfo.getBlockDevice().isAttached()) {
+                        DRBD.detach(blockDevInfo.getHost(),
+                                    getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                       .getName(),
+                                    getDrbdVolumeInfo().getName(),
+                                    testOnly);
+                    }
+                    if (oBdi.getBlockDevice().isAttached()) {
+                        DRBD.detach(oBdi.getHost(),
+                                    getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                       .getName(),
+                                    getDrbdVolumeInfo().getName(),
+                                    testOnly);
+                    }
                 } else {
-                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(true);
+                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
+                                                                          true);
                 }
                 getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
             } catch (Exceptions.DrbdConfigException dce) {

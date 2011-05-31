@@ -57,6 +57,8 @@ public final class DRBD {
                                                    M_DRBD_TEST_LOCK.readLock();
     private static final Lock M_DRBD_TEST_WRITELOCK =
                                                   M_DRBD_TEST_LOCK.writeLock();
+    /** "All resources" string for drbdadm commands. */
+    public static final String ALL = "all";
 
     /** Private constructor, cannot be instantiated. */
     private DRBD() {

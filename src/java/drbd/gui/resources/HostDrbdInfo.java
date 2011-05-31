@@ -28,6 +28,7 @@ import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.gui.DrbdGraph;
 import drbd.gui.SpringUtilities;
+import drbd.gui.ClusterBrowser;
 import drbd.data.Host;
 import drbd.data.Subtext;
 import drbd.data.ConfigData;
@@ -272,6 +273,42 @@ public final class HostDrbdInfo extends Info {
             };
         items.add(loadItem);
 
+        /* load DRBD config / adjust all */
+        final MyMenuItem adjustAllItem =
+            new MyMenuItem(
+                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
+                   null,
+                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override public String enablePredicate() {
+                    if (getHost().isConnected()) {
+                        return null;
+                    } else {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                }
+
+                @Override public void action() {
+                    DRBD.adjust(getHost(), DRBD.ALL, null, testOnly);
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        items.add(adjustAllItem);
+        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
+                            cb.new DRBDMenuItemCallback(adjustAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.adjust(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(adjustAllItem, adjustAllItemCallback);
+        }
+
         /* start drbd */
         final MyMenuItem upAllItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
@@ -289,17 +326,20 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                         : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && !bdi.isConnected(testOnly)
-                            && !bdi.getBlockDevice().isAttached()) {
-                            bdi.drbdUp(testOnly);
-                        }
-                    }
+                    DRBD.up(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
         items.add(upAllItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
+                            cb.new DRBDMenuItemCallback(upAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.up(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(upAllItem, upAllItemCallback);
+        }
 
         /* upgrade drbd */
         final MyMenuItem upgradeDrbdItem =
@@ -392,16 +432,20 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                         : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && !bdi.isConnectedOrWF(testOnly)) {
-                            bdi.connect(testOnly);
-                        }
-                    }
+                    DRBD.connect(getHost(), DRBD.ALL, null, true);
                 }
             };
         items.add(connectAllItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback connectAllItemCallback =
+                            cb.new DRBDMenuItemCallback(connectAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.connect(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(connectAllItem, connectAllItemCallback);
+        }
 
         /* disconnect all */
         final MyMenuItem disconnectAllItem =
@@ -421,16 +465,21 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                          : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && bdi.isConnectedOrWF(testOnly)) {
-                            bdi.disconnect(testOnly);
-                        }
-                    }
+                    DRBD.disconnect(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
         items.add(disconnectAllItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback
+                    disconnectAllItemCallback =
+                            cb.new DRBDMenuItemCallback(disconnectAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.disconnect(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(disconnectAllItem, disconnectAllItemCallback);
+        }
 
         /* attach dettached */
         final MyMenuItem attachAllItem =
@@ -450,16 +499,55 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                           : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && !bdi.getBlockDevice().isAttached()) {
-                            bdi.attach(testOnly);
-                        }
-                    }
+                    DRBD.attach(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
         items.add(attachAllItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback
+                    attachAllItemCallback =
+                            cb.new DRBDMenuItemCallback(attachAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.attach(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(attachAllItem, attachAllItemCallback);
+        }
+
+        /* detach */
+        final MyMenuItem detachAllItem =
+            new MyMenuItem(Tools.getString("HostBrowser.Drbd.DetachAll"),
+                           null,
+                           Tools.getString("HostBrowser.Drbd.DetachAll"),
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override public String enablePredicate() {
+                    if (getHost().isDrbdStatus()) {
+                        return null;
+                    } else {
+                        return NO_DRBD_STATUS_STRING;
+                    }
+                }
+
+                @Override public void action() {
+                    DRBD.detach(getHost(), DRBD.ALL, null, testOnly);
+                }
+            };
+        items.add(detachAllItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback
+                    detachAllItemCallback =
+                            cb.new DRBDMenuItemCallback(detachAllItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.detach(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(detachAllItem, detachAllItemCallback);
+        }
 
         /* set all primary */
         final MyMenuItem setAllPrimaryItem =
@@ -483,16 +571,21 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                          : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && bdi.getBlockDevice().isSecondary()) {
-                            bdi.setPrimary(testOnly);
-                        }
-                    }
+                    DRBD.setPrimary(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
         items.add(setAllPrimaryItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback
+                    setAllPrimaryItemCallback =
+                            cb.new DRBDMenuItemCallback(setAllPrimaryItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.setPrimary(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(setAllPrimaryItem, setAllPrimaryItemCallback);
+        }
 
         /* set all secondary */
         final MyMenuItem setAllSecondaryItem =
@@ -512,16 +605,21 @@ public final class HostDrbdInfo extends Info {
                 }
 
                 @Override public void action() {
-                    for (final BlockDevInfo bdi
-                                        : getBrowser().getBlockDevInfos()) {
-                        if (bdi.getBlockDevice().isDrbd()
-                            && bdi.getBlockDevice().isPrimary()) {
-                            bdi.setSecondary(testOnly);
-                        }
-                    }
+                    DRBD.setSecondary(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
         items.add(setAllSecondaryItem);
+        if (cb != null) {
+            final ClusterBrowser.DRBDMenuItemCallback
+                    setAllSecondaryItemCallback =
+                            cb.new DRBDMenuItemCallback(setAllSecondaryItem,
+                                                        getHost()) {
+                @Override public void action(final Host host) {
+                    DRBD.setSecondary(getHost(), DRBD.ALL, null, true);
+                }
+            };
+            addMouseOverListener(setAllSecondaryItem, setAllSecondaryItemCallback);
+        }
 
         /* remove host from gui */
         final MyMenuItem removeHostItem =

@@ -107,6 +107,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super(name, browser);
         setResource(new DrbdResource(name));
         //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
+        setParameters();
     }
 
     /** Add a drbd volume. */
@@ -115,7 +116,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Creates and returns drbd config for resources. */
-    String drbdResourceConfig() throws Exceptions.DrbdConfigException {
+    String drbdResourceConfig(final String drbdVersion)
+    throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
         /* protocol... */
@@ -140,7 +142,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         /* section config */
         try {
-            config.append(drbdSectionsConfig());
+            config.append(drbdSectionsConfig(drbdVersion));
         } catch (Exceptions.DrbdConfigException dce) {
             throw dce;
         }
@@ -160,16 +162,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 <address family="ipv4" port="7793">192.168.23.21</address>
             </host>
         */
+        boolean volumesAvailable = false;
+        try {
+            volumesAvailable =
+                        Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (final Host host : getCluster().getHostsArray()) {
             final List<String> volumeConfigs = new ArrayList<String>();
-            boolean volumesAvailable = false;
-            final String drbdV = host.getDrbdVersion();
-            try {
-                volumesAvailable =
-                                Tools.compareVersions(drbdV, "8.4.0rc1") >= 0;
-            } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
-            }
             for (final DrbdVolumeInfo dvi : drbdVolumes) {
                 final String volumeConfig = dvi.drbdVolumeConfig(
                                                              host,
@@ -185,18 +186,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final GuiComboBox pcb = portComboBox;
                 if (acb != null && pcb != null) {
                     final NetInfo ni = (NetInfo) acb.getValue();
-                    //final Object o = pcb.getValue();
-                    //String port = null;
-                    //if (o != null) {
-                    //    port = ((StringInfo) o).getStringValue();
-                    //}
-                    if (ni != null) {
-                        config.append(" {\n\t\taddress\t\t");
-                        config.append(getDrbdNetInterfaceWithPort(
-                                                ni.getNetInterface().getIp(),
-                                                pcb.getStringValue()));
-                        config.append(";\n\t\t");
+                    if (ni == null) {
+                        throw new Exceptions.DrbdConfigException(
+                                    "Address not defined in "
+                                    + getCluster().getName()
+                                    + " (" + getName() + ")");
                     }
+                    config.append(" {\n\t\taddress\t\t");
+                    config.append(getDrbdNetInterfaceWithPort(
+                                            ni.getNetInterface().getIp(),
+                                            pcb.getStringValue()));
+                    config.append(";\n\t\t");
 
                 }
                 config.append(Tools.join("\n", volumeConfigs));
@@ -415,7 +415,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 try {
                     getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", null, true);
+                        DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -486,7 +486,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getCluster().getHostsArray()) {
-                                DRBD.adjust(h, "all", null, false);
+                                DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -668,6 +668,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set port */
         if (!Tools.areEqual(hostPort, savedPort)) {
             savedPort = hostPort;
+            for (final Host host : getBrowser().getClusterHosts()) {
+                host.getBrowser().getDrbdVIPortList().add(savedPort);
+            }
             if (infoPanelOk) {
                 final GuiComboBox cb = portComboBox;
                 if (cb != null) {
@@ -938,7 +941,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* Port */
         final List<String> drbdVIPorts = new ArrayList<String>();
         String dp = savedPort;
-        int i = 0;
         int index = -1;
         for (final Host host : getBrowser().getClusterHosts()) {
             for (final String port : host.getBrowser().getDrbdVIPortList()) {
@@ -958,17 +960,22 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } else {
             drbdVIPorts.add(dp);
         }
-        for (final Host host : getBrowser().getClusterHosts()) {
-            while (i < 10) {
-                final String port = Integer.toString(index);
-                if (!host.getBrowser().getDrbdVIPortList().contains(port)) {
-                    drbdVIPorts.add(port);
-                    i++;
+        int i = 0;
+        while (i < 10) {
+            final String port = Integer.toString(index);
+            boolean contains = false;
+            for (final Host host : getBrowser().getClusterHosts()) {
+                if (host.getBrowser().getDrbdVIPortList().contains(port)) {
+                    contains = true;
                 }
-                index++;
             }
+            if (!contains) {
+                drbdVIPorts.add(port);
+                i++;
+            }
+            index++;
         }
-        defaultPort = dp;
+        defaultPort = drbdVIPorts.get(0);
         final GuiComboBox pcb = new GuiComboBox(
                    defaultPort,
                    drbdVIPorts.toArray(new String[drbdVIPorts.size()]),

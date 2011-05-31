@@ -582,7 +582,7 @@ public final class BlockDevInfo extends EditableInfo {
     void connect(final boolean testOnly) {
         DRBD.connect(getHost(),
                      drbdVolumeInfo.getDrbdResourceInfo().getName(),
-                     null, //drbdVolumeInfo.getName(),
+                     null,
                      testOnly);
     }
 
@@ -590,7 +590,7 @@ public final class BlockDevInfo extends EditableInfo {
     void disconnect(final boolean testOnly) {
         DRBD.disconnect(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
-                        null, //drbdVolumeInfo.getName(),
+                        null,
                         testOnly);
     }
 
@@ -818,7 +818,7 @@ public final class BlockDevInfo extends EditableInfo {
                     getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
                     for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                        DRBD.adjust(h, "all", null, true);
+                        DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -882,7 +882,7 @@ public final class BlockDevInfo extends EditableInfo {
                                               .createDrbdConfig(false);
                                 for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                                    DRBD.adjust(h, "all", null, false);
+                                    DRBD.adjust(h, DRBD.ALL, null, false);
                                 }
                             } catch (Exceptions.DrbdConfigException e) {
                                 getBrowser()
@@ -1608,7 +1608,8 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns whether this device will be disconnected. */
     boolean isConnectedTest(final DRBDtestData dtd) {
-        return dtd.isConnected(getHost(), drbdVolumeInfo.getDevice())
+        return dtd.isConnected(getHost(),
+                               drbdVolumeInfo.getDrbdResourceInfo().getName())
                || (!dtd.isDisconnected(
                                getHost(),
                                drbdVolumeInfo.getDrbdResourceInfo().getName())
