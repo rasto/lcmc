@@ -1289,13 +1289,13 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Don't Create"},
 
         {"ClusterBrowser.UpdatingServerInfo",
-         ": updating server info..."},
+         "updating server info..."},
 
         {"ClusterBrowser.UpdatingVMsStatus",
-         ": updating VMs status..."},
+         "updating VMs status..."},
 
         {"ClusterBrowser.UpdatingDrbdStatus",
-         ": updating drbd status..."},
+         "updating drbd status..."},
 
         /* Cluster Resource View */
         {"ClusterBrowser.AllHosts",
