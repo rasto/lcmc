@@ -120,7 +120,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
-        /* protocol... */
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
                                                                    "resource");
         for (String param : params) {
@@ -182,6 +181,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (volumeConfigs.size() > 0) {
                 config.append("\ton ");
                 config.append(host.getName());
+                config.append(" {\n\t\t");
+                config.append(Tools.join("\n", volumeConfigs));
                 final GuiComboBox acb = addressComboBoxHash.get(host);
                 final GuiComboBox pcb = portComboBox;
                 if (acb != null && pcb != null) {
@@ -192,14 +193,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                     + getCluster().getName()
                                     + " (" + getName() + ")");
                     }
-                    config.append(" {\n\t\taddress\t\t");
+                    config.append("\n\t\taddress\t\t");
                     config.append(getDrbdNetInterfaceWithPort(
                                             ni.getNetInterface().getIp(),
                                             pcb.getStringValue()));
-                    config.append(";\n\t\t");
+                    config.append(";");
 
                 }
-                config.append(Tools.join("\n", volumeConfigs));
                 config.append("\n\t}\n");
             }
         } config.append("}");
@@ -616,7 +616,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
-        for (String section : dxml.getSections()) {
+        for (final String sectionString : dxml.getSections()) {
+            /* remove -options */
+            final String section = sectionString.replaceAll("-options$", "");
             for (final String param : dxml.getSectionParams(section)) {
                 //if (DRBD_RES_PARAM_DEV.equals(param)) {
                 //    continue;

@@ -1170,7 +1170,7 @@ sub get_drbd_xml {
 		$missing{$section} = \@options;
 	}
 	
-	$missing{"resource"} = ["protocol", "device"];
+	#$missing{"resource"} = ["protocol", "device"];
 	push @missing, "resource";
 
 	my @a = $manpage =~/^\\fB(([^\n]*?)(?:\s+(?:\\fR\\fB)?\\fI|\\fR$).*?)\.[TP]P/msg;

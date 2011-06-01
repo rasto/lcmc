@@ -47,3 +47,24 @@ resource r0 {
 	}
 }
 --- r0.res ---
+--- r1.res ---
+resource r1 {
+
+	on host1 {
+		volume 0 {
+			device		/dev/drbd1;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7789;
+	}
+	on host2 {
+		volume 0 {
+			device		/dev/drbd1;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7789;
+	}
+}
+--- r1.res ---
