@@ -555,7 +555,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         final Vertex vWithRsc0 = vWithRsc;
         final Vertex vRsc0 = vRsc;
         final ServiceInfo withRsc0 = withRsc;
-        Tools.invokeAndWait(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 mHbConnectionWriteLock.lock();
                 Edge edge = null;

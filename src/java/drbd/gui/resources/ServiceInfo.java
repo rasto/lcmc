@@ -1271,7 +1271,7 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (sameAsOperationsCB != null) {
-            final Info info = (Info) sameAsOperationsCB.getValue();
+            final Info info = sameAsOperationsCBValue();
             final boolean defaultValues =
                     info != null
                     && OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
@@ -2038,8 +2038,7 @@ public class ServiceInfo extends EditableInfo {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
                             @Override public void run() {
-                                final Info info =
-                                     (Info) sameAsOperationsCB.getValue();
+                                final Info info = sameAsOperationsCBValue();
                                 setOperationsSameAs(info);
                                 final String[] params = getParametersFromXML();
                                 setApplyButtons(CACHED_FIELD, params);
@@ -2534,8 +2533,13 @@ public class ServiceInfo extends EditableInfo {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
                             @Override public void run() {
-                                final Info info =
-                                     (Info) sameAsMetaAttrsCB.getValue();
+                                Info i = null;
+                                final Object o =
+                                      sameAsMetaAttrsCB.getValue();
+                                if (o instanceof Info) {
+                                    i = (Info) o;
+                                }
+                                final Info info = i;
                                 setMetaAttrsSameAs(info);
                                 final String[] params =
                                                     getParametersFromXML();
@@ -3012,7 +3016,7 @@ public class ServiceInfo extends EditableInfo {
     protected String getOperationsRefId() {
         String operationsRefId = null;
         if (sameAsOperationsCB != null) {
-            final Info i = (Info) sameAsOperationsCB.getValue();
+            final Info i = sameAsOperationsCBValue();
             if (!GuiComboBox.NOTHING_SELECTED.equals(i.toString())
                 && !OPERATIONS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
                 final ServiceInfo si  = (ServiceInfo) i;
@@ -3200,7 +3204,7 @@ public class ServiceInfo extends EditableInfo {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         mSavedOperationsLock.lock();
         //if (sameAsOperationsCB != null
-        //    && !Tools.areEqual(savedOpIdRef, sameAsOperationsCB.getValue())) {
+        //    && !Tools.areEqual(savedOpIdRef, sameAsOperationsCBValue())) {
         //    sameAsOperationsCB.setValue(savedOpIdRef);
         //}
         boolean allAreDefaultValues = true;
@@ -3238,7 +3242,7 @@ public class ServiceInfo extends EditableInfo {
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
         //String refCRMId = cs.getOperationsRef(getService().getHeartbeatId());
         ServiceInfo operationIdRef = null;
-        final Info ref = (Info) sameAsOperationsCB.getValue();
+        final Info ref = sameAsOperationsCBValue();
         if (ref instanceof ServiceInfo) {
             operationIdRef = (ServiceInfo) ref;
         }
@@ -3384,6 +3388,16 @@ public class ServiceInfo extends EditableInfo {
             groupMetaAttrsRefIds = gInfo.getMetaAttrsRefId();
         }
 
+        final String refCRMId = getOperationsRefId();
+        savedOperationsId = refCRMId;
+        savedOperationIdRef = getBrowser().getServiceInfoFromCRMId(refCRMId);
+        final Info i = sameAsOperationsCBValue();
+        if (i == null || (i instanceof StringInfo)) {
+            savedOperationsId = null;
+        } else {
+            savedOperationIdRef = (ServiceInfo) i;
+            savedOperationsId = ((ServiceInfo) i).getService().getHeartbeatId();
+        }
         if (getService().isNew()) {
             if (clInfo != null) {
                 for (String param : cloneParams) {
@@ -3444,7 +3458,7 @@ public class ServiceInfo extends EditableInfo {
                               getMetaAttrsRefId(),
                               cloneMetaAttrsRefIds,
                               groupMetaAttrsRefIds,
-                              getOperationsRefId(),
+                              refCRMId,
                               resourceAgent.isStonith(),
                               testOnly);
             if (gInfo == null) {
@@ -3579,7 +3593,7 @@ public class ServiceInfo extends EditableInfo {
                         getMetaAttrsRefId(),
                         cloneMetaAttrsRefIds,
                         groupMetaAttrsRefIds,
-                        getOperationsRefId(),
+                        refCRMId,
                         resourceAgent.isStonith(),
                         testOnly);
             if (isFailed(testOnly)) {
@@ -3604,7 +3618,11 @@ public class ServiceInfo extends EditableInfo {
 
             getBrowser().reload(getNode(), false);
             getBrowser().getHeartbeatGraph().repaint();
-            setApplyButtons(null, params);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    setApplyButtons(null, params);
+                }
+            });
         }
         getBrowser().reload(getNode(), false);
     }
@@ -6027,7 +6045,7 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsCB != null) {
             String defaultOpIdRef = null;
-            final Info savedOpIdRef = (Info) sameAsOperationsCB.getValue();
+            final Info savedOpIdRef = sameAsOperationsCBValue();
             if (savedOpIdRef != null) {
                 defaultOpIdRef = savedOpIdRef.toString();
             }
@@ -6098,5 +6116,17 @@ public class ServiceInfo extends EditableInfo {
                                getHeartbeatId(testOnly),
                                testOnly);
         }
+    }
+
+    final Info sameAsOperationsCBValue() {
+        if (sameAsOperationsCB == null) {
+            return null;
+        }
+        Info i = null;
+        final Object o = sameAsOperationsCB.getValue();
+        if (o instanceof Info) {
+            i = (Info) o;
+        }
+        return i;
     }
 }

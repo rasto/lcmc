@@ -749,35 +749,38 @@ public final class RoboTest {
         moveTo(robot, 1100, 510);
         leftRelease(robot);
 
-        sleep(1000);
-        moveTo(robot, 1073, 360);
-        leftClick(robot);
-        sleep(1000);
-        moveTo(robot, 1073, 410);
-        sleep(1000);
-        leftClick(robot); /* choose another dummy */
-        sleep(1000);
-        moveTo(robot, 809, 192); /* ptest */
-        sleep(4000);
-        leftClick(robot); /* apply */
-        sleep(4000);
-        checkTest(host, "test1", 3.2); /* 3.2 */
+        for (int i = 0; i < 100; i++) {
+            sleep(1000);
+            moveTo(robot, 1073, 360);
+            leftClick(robot);
+            sleep(1000);
+            moveTo(robot, 1073, 410);
+            sleep(1000);
+            leftClick(robot); /* choose another dummy */
+            sleep(1000);
+            moveTo(robot, 809, 192); /* ptest */
+            sleep(4000);
+            leftClick(robot); /* apply */
+            sleep(4000);
+            checkTest(host, "test1", 3.2); /* 3.2 */
 
-        moveTo(robot, 1073 , 360);
-        leftClick(robot);
-        sleep(1000);
-        moveTo(robot, 1073 , 380);
-        leftClick(robot); /* choose "nothing selected */
-        sleep(1000);
-        moveTo(robot, 809, 192); /* ptest */
-        sleep(4000);
-        leftClick(robot); /* apply */
-        sleep(9000);
+            moveTo(robot, 1073 , 360);
+            leftClick(robot);
+            sleep(20000);
+            moveTo(robot, 1073 , 380);
+            leftClick(robot); /* choose "nothing selected */
+            sleep(1000);
+            moveTo(robot, 809, 192); /* ptest */
+            sleep(4000);
+            leftClick(robot); /* apply */
+            sleep(9000);
+            checkTest(host, "test1", 4); /* 4 */
+            sleep(20000);
+        }
         moveTo(robot, 1100, 298);
         leftPress(robot); /* scroll bar back */
         moveTo(robot, 1100, 150);
         leftRelease(robot);
-        checkTest(host, "test1", 4); /* 4 */
 
         /* locations */
         moveTo(robot, ipX + 20, ipY);
