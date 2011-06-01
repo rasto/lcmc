@@ -81,7 +81,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         for (final String param : getParametersFromXML()) {
-            final String section = dxml.getSection(param);
+            final String sectionString = dxml.getSection(param);
+            /* remove -options */
+            final String section = sectionString.replaceAll("-options$", "");
             String value;
             final String defaultValue = getParamDefault(param);
             if (DrbdXML.GLOBAL_SECTION.equals(section)) {
@@ -751,7 +753,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final DrbdResourceInfo dri = new DrbdResourceInfo(name, getBrowser());
         final String[] sections = dxml.getSections();
-        for (String section : sections) {
+        for (final String sectionString : sections) {
+            /* remove -options */
+            final String section = sectionString.replaceAll("-options$", "");
             final String[] params = dxml.getSectionParams(section);
             for (String param : params) {
                 String value = dxml.getConfigValue(name, section, param);

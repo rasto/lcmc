@@ -163,6 +163,7 @@ public final class DrbdXML extends XML {
                                                     new ArrayList<String>();
     static {
         NOT_ADVANCED_PARAMS.add("rate");
+        NOT_ADVANCED_PARAMS.add("protocol");
         NOT_ADVANCED_PARAMS.add("fence-peer");
         NOT_ADVANCED_PARAMS.add("wfc-timeout");
         NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
@@ -189,7 +190,7 @@ public final class DrbdXML extends XML {
     public DrbdXML(final Host[] hosts) {
         super();
         addSpecialParameter("resource", "name", true);
-        addParameter("resource", "protocol", PROTOCOL_C, PROTOCOLS, true);
+        /* addParameter("resource", "protocol", PROTOCOL_C, PROTOCOLS, true); */
         for (Host host : hosts) {
             final String command =
                                 host.getDistCommand("Drbd.getParameters",
@@ -609,8 +610,8 @@ public final class DrbdXML extends XML {
                     paramItemsMap.put(name, MODES);
                     paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
                     type = "booleanhandler";
-                } else if ("protocol".equals(name)) {
-                    type = "handler";
+                //} else if ("protocol".equals(name)) {
+                //    type = "handler";
                 } else if ("handler".equals(type)) {
                     paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {

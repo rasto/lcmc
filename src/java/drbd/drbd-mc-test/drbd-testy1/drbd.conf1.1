@@ -30,20 +30,20 @@ common {
 resource r0 {
 
 	on host1 {
-		address		IP:7788;
 		volume 0 {
 			device		/dev/drbd0;
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
+		address		IP:7788;
 	}
 	on host2 {
-		address		IP:7788;
 		volume 0 {
 			device		/dev/drbd0;
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
+		address		IP:7788;
 	}
 }
 --- r0.res ---

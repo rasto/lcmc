@@ -56,6 +56,8 @@ public final class Resource extends DrbdConfig {
     /** Degr wfc timeout option string. */
     private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
 
+    /** Protocol option string. */
+    private static final String PROTOCOL = "protocol";
     /** cram-hmac-alg option string. */
     private static final String CRAM_HMAC_ALG = "cram-hmac-alg";
     /** shared-secret option string. */
@@ -63,15 +65,15 @@ public final class Resource extends DrbdConfig {
     /** on-io-error option string. */
     private static final String ON_IO_ERROR = "on-io-error";
     /** Common configuration options. */
-    private static final String[] COMMON_PARAMS = {CRAM_HMAC_ALG,
+    private static final String[] COMMON_PARAMS = {PROTOCOL,
+                                                   CRAM_HMAC_ALG,
                                                    SHARED_SECRET,
                                                    WFC_TIMEOUT_PARAM,
                                                    DEGR_WFC_TIMEOUT_PARAM,
                                                    ON_IO_ERROR};
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
-                                            "device",
-                                            "protocol",
+                                            PROTOCOL,
                                             CRAM_HMAC_ALG,
                                             SHARED_SECRET,
                                             WFC_TIMEOUT_PARAM,
@@ -167,6 +169,7 @@ public final class Resource extends DrbdConfig {
         /* common options */
         final Map<String, String> commonPreferredValue =
                                                 new HashMap<String, String>();
+        commonPreferredValue.put(PROTOCOL, "C");
         commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, "0");
         commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
         commonPreferredValue.put(SHARED_SECRET, getRandomSecret());

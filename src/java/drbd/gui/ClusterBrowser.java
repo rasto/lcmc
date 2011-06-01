@@ -816,9 +816,10 @@ public final class ClusterBrowser extends Browser {
                                                        heartbeatGraph});
             }
             drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
-            drbdStatusLock();
-            updateDrbdResources();
-            drbdStatusUnlock();
+            if (mDRBDStatusLock.tryLock()) {
+                updateDrbdResources();
+                drbdStatusUnlock();
+            }
             if (host.isServerStatusLatch()) {
                 Tools.stopProgressIndicator(
                         hostName,

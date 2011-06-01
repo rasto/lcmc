@@ -464,7 +464,9 @@ public final class RoboTest {
                             resetTerminalAreas(host);
                             i++;
                         }
-                    } else if ("3".equals(index) || "x3".equals(index)) {
+                    } else if ("3".equals(index)
+                               || "x3".equals(index)
+                               || "y3".equals(index)) {
                         /* DRBD 2 links */
                         int i = 1;
                         while (!aborted) {
@@ -2555,7 +2557,7 @@ public final class RoboTest {
         moveTo(robot, 720, 570); /* block device */
         leftClick(robot); /* next */
         sleep(6000);
-        checkDRBDTest(host, drbdTest, 1.1);
+        checkDRBDTest(host, drbdTest, 1);
 
         moveTo(robot, 720, 570); /* meta-data */
         leftClick(robot); /* next */
@@ -2565,7 +2567,7 @@ public final class RoboTest {
         leftClick(robot); /* finish */
         sleep(10000);
 
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(host, drbdTest, 1.1);
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot); /* finish */
@@ -2648,7 +2650,7 @@ public final class RoboTest {
         sleep(20000);
     }
 
-    /** DRBD Test 4. */
+    /** DRBD Test 3. */
     private static void startDRBDTest3(final String drbdTest,
                                        final Robot robot,
                                        final Host host) {
@@ -2664,37 +2666,51 @@ public final class RoboTest {
             leftClick(robot);
             sleep(20000);
 
-
-            moveTo(robot, 720, 570);
+            moveTo(robot, 720, 570); /* new drbd resource */
             leftClick(robot); /* next */
-            sleep(20000);
+            sleep(10000);
 
-            moveTo(robot, 751, 402); /* interface */
+            moveTo(robot, 521, 372); /* interface 1 */
             leftClick(robot);
-            moveTo(robot, 716, 441);
+            moveTo(robot, 486, 411);
+            leftClick(robot);
+            sleep(1000);
+
+            moveTo(robot, 521, 402); /* interface 2 */
+            leftClick(robot);
+            moveTo(robot, 486, 441);
             leftClick(robot);
             sleep(1000);
 
             moveTo(robot, 720, 570);
             leftClick(robot); /* next */
-            sleep(20000);
+            sleep(10000);
 
-            moveTo(robot, 751, 402); /* interface again */
-            leftClick(robot);
-            moveTo(robot, 716, 441);
-            leftClick(robot);
-            sleep(1000);
-
-            moveTo(robot, 720, 570);
+            moveTo(robot, 720, 570); /* volume */
             leftClick(robot); /* next */
-            sleep(20000);
+            sleep(10000);
+
+            moveTo(robot, 720, 570); /* block device */
+            leftClick(robot); /* next */
+            sleep(10000);
+
+            moveTo(robot, 720, 570); /* block device */
+            leftClick(robot); /* next */
+            sleep(6000);
+            if (offset == 0) {
+                checkDRBDTest(host, drbdTest, 1.1);
+            } else {
+                checkDRBDTest(host, drbdTest, 1.2);
+            }
 
             moveTo(robot, 720, 570); /* meta-data */
             leftClick(robot); /* next */
             sleep(20000);
+
             moveTo(robot, 820, 570); /* fs */
             leftClick(robot); /* finish */
             sleep(10000);
+
             if (offset == 0) {
                 checkDRBDTest(host, drbdTest, 1);
             }
@@ -2706,23 +2722,23 @@ public final class RoboTest {
         leftClick(robot);
         sleep(2000);
         leftClick(robot);
-        moveTo(robot, 1073, 317); /* select protocol */
+        moveTo(robot, 1073, 447); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, 350); /* protocol b */
-        sleep(2000);
-        leftClick(robot);
-        sleep(2000);
-
-        moveTo(robot, 1075, 372); /* select fence peer */
-        leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1075, 410); /* select dopd */
+        moveTo(robot, 1070, 480); /* protocol b */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
 
-        moveTo(robot, 970, 420); /* wfc timeout */
+        moveTo(robot, 1075, 564); /* select fence peer */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1075, 612); /* select dopd */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 970, 620); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -2743,19 +2759,20 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        moveTo(robot, 970, 380); /* wfc timeout */
+        moveTo(robot, 970, 383); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
         press(robot, KeyEvent.VK_3);
         sleep(2000);
+
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply/disables tooltip */
         sleep(2000); /* test */
         leftClick(robot); /* apply */
         checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
-        moveTo(robot, 970, 380); /* wfc timeout */
+        moveTo(robot, 970, 383); /* wfc timeout */
         sleep(6000);
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
@@ -2782,15 +2799,15 @@ public final class RoboTest {
         leftClick(robot);
         sleep(2000);
 
-        moveTo(robot, 1075, 372); /* select fence peer */
+        moveTo(robot, 1075, 562); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 390); /* deselect dopd */
+        moveTo(robot, 1075, 680); /* deselect dopd */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
 
-        moveTo(robot, 970, 420); /* wfc timeout */
+        moveTo(robot, 970, 620); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -2802,7 +2819,7 @@ public final class RoboTest {
         leftClick(robot); /* apply */
         checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
 
-        moveTo(robot, 970, 420); /* wfc timeout */
+        moveTo(robot, 970, 620); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -2827,6 +2844,186 @@ public final class RoboTest {
         confirmRemove(robot);
         checkDRBDTest(host, drbdTest, 4);
     }
+
+    ///** DRBD Test 3. */
+    //private static void startDRBDTest3(final String drbdTest,
+    //                                   final Robot robot,
+    //                                   final Host host) {
+    //    /* Two drbds. */
+    //    slowFactor = 0.2f;
+    //    aborted = false;
+    //    int offset = 0;
+    //    for (int i = 0; i < 2; i++) {
+    //        moveTo(robot, 334, 315 + offset); /* add drbd resource */
+    //        rightClick(robot);
+    //        moveTo(robot, 342, 321 + offset);
+    //        moveTo(robot, 667, 322 + offset);
+    //        leftClick(robot);
+    //        sleep(20000);
+
+
+    //        moveTo(robot, 720, 570);
+    //        leftClick(robot); /* next */
+    //        sleep(20000);
+
+    //        moveTo(robot, 751, 402); /* interface */
+    //        leftClick(robot);
+    //        moveTo(robot, 716, 441);
+    //        leftClick(robot);
+    //        sleep(1000);
+
+    //        moveTo(robot, 720, 570);
+    //        leftClick(robot); /* next */
+    //        sleep(20000);
+
+    //        moveTo(robot, 751, 402); /* interface again */
+    //        leftClick(robot);
+    //        moveTo(robot, 716, 441);
+    //        leftClick(robot);
+    //        sleep(1000);
+
+    //        moveTo(robot, 720, 570);
+    //        leftClick(robot); /* next */
+    //        sleep(20000);
+
+    //        moveTo(robot, 720, 570); /* meta-data */
+    //        leftClick(robot); /* next */
+    //        sleep(20000);
+    //        moveTo(robot, 820, 570); /* fs */
+    //        leftClick(robot); /* finish */
+    //        sleep(10000);
+    //        if (offset == 0) {
+    //            checkDRBDTest(host, drbdTest, 1);
+    //        }
+    //        offset += 40;
+    //    }
+    //    checkDRBDTest(host, drbdTest, 2);
+
+    //    moveTo(robot, 480, 250); /* select r0 */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    leftClick(robot);
+    //    moveTo(robot, 1073, 317); /* select protocol */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    moveTo(robot, 1070, 350); /* protocol b */
+    //    sleep(2000);
+    //    leftClick(robot);
+    //    sleep(2000);
+
+    //    moveTo(robot, 1075, 372); /* select fence peer */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    moveTo(robot, 1075, 410); /* select dopd */
+    //    sleep(2000);
+    //    leftClick(robot);
+    //    sleep(2000);
+
+    //    moveTo(robot, 970, 420); /* wfc timeout */
+    //    leftClick(robot);
+    //    press(robot, KeyEvent.VK_BACK_SPACE);
+    //    sleep(1000);
+    //    press(robot, KeyEvent.VK_9);
+    //    sleep(2000);
+
+    //    moveTo(robot, 814, 189);
+    //    sleep(6000); /* test */
+    //    leftClick(robot); /* apply/disables tooltip */
+    //    sleep(2000); /* test */
+    //    leftClick(robot); /* apply */
+    //    checkDRBDTest(host, drbdTest, 2.1); /* 2.1 */
+
+
+    //    /* common */
+    //    moveTo(robot, 500, 390); /* select background */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    leftClick(robot);
+
+    //    moveTo(robot, 970, 380); /* wfc timeout */
+    //    leftClick(robot);
+    //    press(robot, KeyEvent.VK_BACK_SPACE);
+    //    sleep(1000);
+    //    press(robot, KeyEvent.VK_3);
+    //    sleep(2000);
+    //    moveTo(robot, 814, 189);
+    //    sleep(6000); /* test */
+    //    leftClick(robot); /* apply/disables tooltip */
+    //    sleep(2000); /* test */
+    //    leftClick(robot); /* apply */
+    //    checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
+    //    moveTo(robot, 970, 380); /* wfc timeout */
+    //    sleep(6000);
+    //    leftClick(robot);
+    //    press(robot, KeyEvent.VK_BACK_SPACE);
+    //    sleep(1000);
+    //    press(robot, KeyEvent.VK_0);
+    //    sleep(2000);
+    //    moveTo(robot, 814, 189);
+    //    sleep(6000); /* test */
+    //    leftClick(robot); /* apply/disables tooltip */
+    //    sleep(2000); /* test */
+    //    leftClick(robot); /* apply */
+
+    //    /* resource */
+    //    moveTo(robot, 480, 250); /* select r0 */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    leftClick(robot);
+
+    //    moveTo(robot, 1073, 317); /* select protocol */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    moveTo(robot, 1070, 372); /* protocol c */
+    //    sleep(2000);
+    //    leftClick(robot);
+    //    sleep(2000);
+
+    //    moveTo(robot, 1075, 372); /* select fence peer */
+    //    leftClick(robot);
+    //    sleep(2000);
+    //    moveTo(robot, 1075, 390); /* deselect dopd */
+    //    sleep(2000);
+    //    leftClick(robot);
+    //    sleep(2000);
+
+    //    moveTo(robot, 970, 420); /* wfc timeout */
+    //    leftClick(robot);
+    //    press(robot, KeyEvent.VK_BACK_SPACE);
+    //    sleep(1000);
+    //    press(robot, KeyEvent.VK_5);
+    //    sleep(2000);
+
+    //    moveTo(robot, 814, 189);
+    //    sleep(6000); /* test */
+    //    leftClick(robot); /* apply */
+    //    checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
+
+    //    moveTo(robot, 970, 420); /* wfc timeout */
+    //    leftClick(robot);
+    //    press(robot, KeyEvent.VK_BACK_SPACE);
+    //    sleep(1000);
+    //    press(robot, KeyEvent.VK_0);
+    //    sleep(2000);
+
+    //    moveTo(robot, 814, 189);
+    //    sleep(6000); /* test */
+    //    leftClick(robot); /* apply */
+    //    checkDRBDTest(host, drbdTest, 2.3); /* 2.3 */
+
+    //    moveTo(robot, 480, 250); /* rsc popup */
+    //    rightClick(robot);
+    //    moveTo(robot, 555, 340); /* remove */
+    //    leftClick(robot);
+    //    confirmRemove(robot);
+    //    checkDRBDTest(host, drbdTest, 3);
+    //    moveTo(robot, 480, 250); /* rsc popup */
+    //    rightClick(robot);
+    //    moveTo(robot, 555, 340); /* remove */
+    //    leftClick(robot);
+    //    confirmRemove(robot);
+    //    checkDRBDTest(host, drbdTest, 4);
+    //}
 
     /** VM Test 1. */
     private static void startVMTest1(final String vmTest,
