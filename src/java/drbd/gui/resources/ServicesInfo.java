@@ -594,8 +594,8 @@ public final class ServicesInfo extends EditableInfo {
                               testOnly);
         }
 
-        hg.clearColocationList();
-        hg.clearOrderList();
+        hg.clearKeepColocationList();
+        hg.clearKeepOrderList();
         /* resource sets */
         final List<CRMXML.RscSetConnectionData> rscSetConnections =
                                                clStatus.getRscSetConnections();

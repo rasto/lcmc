@@ -76,8 +76,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public final class HeartbeatGraph extends ResourceGraph {
     /** List with edges that are order constraints. */
     private final List<Edge> edgeIsOrderList = new ArrayList<Edge>();
+    /** List with edges that should be kept as order constraints. */
+    private final List<Edge> keepEdgeIsOrderList = new ArrayList<Edge>();
     /** List with edges that are colocation constraints. */
     private final List<Edge> edgeIsColocationList = new ArrayList<Edge>();
+    /** List with edges that should be kept as colocation constraints. */
+    private final List<Edge> keepEdgeIsColocationList = new ArrayList<Edge>();
     /** Vertex is present lock. */
     private final Lock mVertexIsPresentListLock = new ReentrantLock();
     /** List with vertices that are present. */
@@ -455,6 +459,7 @@ public final class HeartbeatGraph extends ResourceGraph {
                     hbci.addOrder(ordId, parent, serviceInfo);
                     if (!edgeIsOrderList.contains(edge)) {
                         edgeIsOrderList.add(edge);
+                        keepEdgeIsOrderList.add(edge);
                     }
                 }
             }
@@ -586,6 +591,7 @@ public final class HeartbeatGraph extends ResourceGraph {
                     hbci.addColocation(colId, rsc, withRsc0);
                     if (!edgeIsColocationList.contains(edge)) {
                         edgeIsColocationList.add(edge);
+                        keepEdgeIsColocationList.add(edge);
                     }
                 }
             }
@@ -593,26 +599,26 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Removes items from order list. */
-    public void clearOrderList() {
+    public void clearKeepOrderList() {
         lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (hbci != null && !hbci.isNew()) {
                 /* don't remove the new ones. */
-                edgeIsOrderList.remove(edge);
+                keepEdgeIsOrderList.remove(edge);
             }
         }
         unlockGraph();
     }
 
     /** Removes items from colocation list. */
-    public void clearColocationList() {
+    public void clearKeepColocationList() {
         lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (hbci != null && !hbci.isNew()) {
                 /* don't remove the new ones. */
-                edgeIsColocationList.remove(edge);
+                keepEdgeIsColocationList.remove(edge);
             }
         }
         unlockGraph();
@@ -1109,14 +1115,16 @@ public final class HeartbeatGraph extends ResourceGraph {
                 || (s2.getService().isNew() && !s2.getService().isRemoved())) {
                 continue;
             }
-            if (!edgeIsOrderList.contains(e)) {
+            if (!keepEdgeIsOrderList.contains(e)) {
+                edgeIsOrderList.remove(e);
                 final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                 if (hbci != null) {
                     hbci.removeOrders();
                 }
             }
 
-            if (!edgeIsColocationList.contains(e)) {
+            if (!keepEdgeIsColocationList.contains(e)) {
+                edgeIsColocationList.remove(e);
                 final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                 if (hbci != null) {
                     hbci.removeColocations();
