@@ -406,25 +406,27 @@ public class Info implements Comparable {
     /** Cleanup. */
     void cleanup() {
         mActionMenuListLock.lock();
-        try {
-            if (actionMenuList != null) {
-                for (final UpdatableItem i : actionMenuList) {
-                    i.cleanup();
-                }
-            }
-        } finally {
+        if (actionMenuList == null) {
             mActionMenuListLock.unlock();
+        } else {
+            final List<UpdatableItem> actionMenuListCopy =
+                               new ArrayList<UpdatableItem>(actionMenuList);
+            mActionMenuListLock.unlock();
+            for (final UpdatableItem i : actionMenuListCopy) {
+                i.cleanup();
+            }
         }
 
         mMenuListLock.lock();
-        try {
-            if (menuList != null) {
-                for (final UpdatableItem i : menuList) {
-                    i.cleanup();
-                }
-            }
-        } finally {
+        if (menuList == null) {
             mMenuListLock.unlock();
+        } else {
+            final List<UpdatableItem> menuListCopy =
+                                   new ArrayList<UpdatableItem>(menuList);
+            mMenuListLock.unlock();
+            for (final UpdatableItem i : menuListCopy) {
+                i.cleanup();
+            }
         }
         paramComboBoxClear();
     }
@@ -715,28 +717,36 @@ public class Info implements Comparable {
 
     /** Update menus with positions and calles their update methods. */
     void updateMenus(final Point2D pos) {
-        if (menuList != null) {
-            mMenuListLock.lock();
-            for (final UpdatableItem i : menuList) {
+        mMenuListLock.lock();
+        if (menuList == null) {
+            mMenuListLock.unlock();
+        } else {
+            final List<UpdatableItem> menuListCopy =
+                                       new ArrayList<UpdatableItem>(menuList);
+            mMenuListLock.unlock();
+            for (final UpdatableItem i : menuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
-            final int size = menuList.size();
-            mMenuListLock.unlock();
+            final int size = menuListCopy.size();
             if (size > maxMenuList) {
                 maxMenuList = size;
                 Tools.debug(this, "menu list size: " + maxMenuList, 2);
             }
         }
 
-        if (actionMenuList != null) {
-            mActionMenuListLock.lock();
-            for (final UpdatableItem i : actionMenuList) {
+        mActionMenuListLock.lock();
+        if (actionMenuList == null) {
+            mActionMenuListLock.unlock();
+        } else {
+            final List<UpdatableItem> actionMenuListCopy =
+                               new ArrayList<UpdatableItem>(actionMenuList);
+            mActionMenuListLock.unlock();
+            for (final UpdatableItem i : actionMenuListCopy) {
                 i.setPos(pos);
                 i.update();
             }
-            final int aSize = actionMenuList.size();
-            mActionMenuListLock.unlock();
+            final int aSize = actionMenuListCopy.size();
             if (aSize > maxMenuList) {
                 maxMenuList = aSize;
                 Tools.debug(this, "action menu list size: " + maxMenuList, 2);
