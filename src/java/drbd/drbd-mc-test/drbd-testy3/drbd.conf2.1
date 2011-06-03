@@ -28,16 +28,16 @@ common {
 --- global_common.conf ---
 --- r0.res ---
 resource r0 {
-	net {
-		protocol	B;
-	}
-
 	handlers {
 		fence-peer	"LIBDIR/drbd-peer-outdater -t 5";
 	}
 
 	startup {
 		wfc-timeout	9;
+	}
+
+	net {
+		protocol	B;
 	}
 
 	on host1 {
@@ -60,7 +60,6 @@ resource r0 {
 --- r0.res ---
 --- r1.res ---
 resource r1 {
-
 	on host1 {
 		volume 0 {
 			device		/dev/drbd1;

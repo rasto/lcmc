@@ -28,7 +28,6 @@ common {
 --- global_common.conf ---
 --- r0.res ---
 resource r0 {
-
 	on host1 {
 		volume 0 {
 			device		/dev/drbd0;
@@ -49,7 +48,6 @@ resource r0 {
 --- r0.res ---
 --- r1.res ---
 resource r1 {
-
 	on host1 {
 		volume 0 {
 			device		/dev/drbd1;

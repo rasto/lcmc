@@ -2725,23 +2725,23 @@ public final class RoboTest {
         leftClick(robot);
         sleep(2000);
         leftClick(robot);
-        moveTo(robot, 1073, 447); /* select protocol */
+        moveTo(robot, 1073, 600); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, 480); /* protocol b */
-        sleep(2000);
-        leftClick(robot);
-        sleep(2000);
-
-        moveTo(robot, 1075, 564); /* select fence peer */
-        leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1075, 612); /* select dopd */
+        moveTo(robot, 1070, 632); /* protocol b */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
 
-        moveTo(robot, 970, 620); /* wfc timeout */
+        moveTo(robot, 1075, 423); /* select fence peer */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1075, 468); /* select dopd */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 970, 480); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -2794,23 +2794,23 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
 
-        moveTo(robot, 1073, 317); /* select protocol */
+        moveTo(robot, 1073, 600); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, 372); /* protocol c */
-        sleep(2000);
-        leftClick(robot);
-        sleep(2000);
-
-        moveTo(robot, 1075, 562); /* select fence peer */
-        leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1075, 680); /* deselect dopd */
+        moveTo(robot, 1070, 655); /* protocol c */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
 
-        moveTo(robot, 970, 620); /* wfc timeout */
+        moveTo(robot, 1075, 423); /* select fence peer */
+        leftClick(robot);
+        sleep(2000);
+        moveTo(robot, 1075, 443); /* deselect dopd */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 970, 480); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -2819,10 +2819,12 @@ public final class RoboTest {
 
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
+        leftClick(robot); /* apply/disables tooltip */
+        sleep(2000); /* test */
         leftClick(robot); /* apply */
         checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
 
-        moveTo(robot, 970, 620); /* wfc timeout */
+        moveTo(robot, 970, 480); /* wfc timeout */
         leftClick(robot);
         press(robot, KeyEvent.VK_BACK_SPACE);
         sleep(1000);
