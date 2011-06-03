@@ -850,4 +850,25 @@ public final class DrbdInfo extends DrbdGuiInfo {
         }
         return resources;
     }
+
+    /**
+     * Returns true, if all version on all connected hosts are higher are
+     * equal the specified version.
+     */
+    public boolean atLeastVersion(final String drbdVersion) {
+        for (final Host host : getBrowser().getCluster().getHostsArray()) {
+            final String hostDrbdVersion = host.getDrbdVersion();
+            if (hostDrbdVersion == null) {
+                continue;
+            }
+            try {
+                if (Tools.compareVersions(hostDrbdVersion, drbdVersion) < 0) {
+                    return false;
+                }
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning(e.getMessage(), e);
+            }
+        }
+        return true;
+    }
 }

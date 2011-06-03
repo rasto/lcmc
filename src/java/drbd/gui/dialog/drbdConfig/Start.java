@@ -82,12 +82,12 @@ public final class Start extends WizardDialog {
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
-        //boolean newResource = false;
+        boolean newResource = false;
         final Info i = (Info) drbdResourceCB.getValue();
         if (i.getStringValue() == null) {
             drbdResourceInfo = drbdInfo.getNewDrbdResource();
             drbdInfo.addDrbdResource(drbdResourceInfo);
-        //    newResource = true;
+            newResource = true;
         } else {
             drbdResourceInfo = (DrbdResourceInfo) i;
         }
@@ -98,12 +98,11 @@ public final class Start extends WizardDialog {
                                                               blockDevInfo2)));
         drbdResourceInfo.addDrbdVolume(dvi);
         drbdInfo.addDrbdVolume(dvi);
-        //if (newResource) {
-        //    return new Resource(this, dvi);
-        //} else {
-        //    return new Volume(this, dvi);
-        //}
-        return new Resource(this, dvi);
+        if (newResource) {
+            return new Resource(this, dvi);
+        } else {
+            return new Volume(this, dvi);
+        }
     }
 
     /**

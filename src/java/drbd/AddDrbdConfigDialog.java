@@ -25,8 +25,14 @@ import drbd.utilities.Tools;
 
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.dialog.drbdConfig.Start;
+import drbd.gui.dialog.drbdConfig.Resource;
 import drbd.gui.resources.DrbdInfo;
+import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.resources.DrbdVolumeInfo;
+
+import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * AddDrbdConfigDialog.
@@ -58,10 +64,23 @@ public final class AddDrbdConfigDialog {
     /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
         //dri.setDialogStarted(true);
-        WizardDialog dialog = new Start(null,
-                                        drbdInfo,
-                                        blockDevInfo1,
-                                        blockDevInfo2);
+        WizardDialog dialog;
+        if (!drbdInfo.getDrbdResources().isEmpty()
+            && drbdInfo.atLeastVersion("8.4.0rc1")) {
+            dialog = new Start(null, drbdInfo, blockDevInfo1, blockDevInfo2);
+        } else {
+            final DrbdResourceInfo drbdResourceInfo =
+                                                drbdInfo.getNewDrbdResource();
+            drbdInfo.addDrbdResource(drbdResourceInfo);
+            final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
+                                drbdResourceInfo,
+                                new ArrayList<BlockDevInfo>(Arrays.asList(
+                                                              blockDevInfo1,
+                                                              blockDevInfo2)));
+            drbdResourceInfo.addDrbdVolume(dvi);
+            drbdInfo.addDrbdVolume(dvi);
+            dialog = new Resource(null, dvi);
+        }
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();

@@ -216,7 +216,7 @@ public final class DrbdXML extends XML {
             final StringBuilder xml = new StringBuilder();
             String section = null;
 
-            for (String line : lines) {
+            for (final String line : lines) {
                 final Matcher m = bp.matcher(line);
                 if (m.matches()) {
                     section = m.group(1);
@@ -233,6 +233,14 @@ public final class DrbdXML extends XML {
                 }
             }
 //            update(host); // TODO: don't do this here.
+            if (!parametersList.contains("protocol")) {
+                /* prior 8.4 */
+                addParameter("resource",
+                             "protocol",
+                             PROTOCOL_C,
+                             PROTOCOLS,
+                             true);
+            }
         }
 
     }

@@ -628,6 +628,8 @@ public final class DRBD {
                              final String resource,
                              final String volume,
                              final boolean testOnly) {
+        disconnect(host, resource, volume, null, testOnly); //TODO!!! test only
+        detach(host, resource, volume, null, testOnly); //TODO!!! test only
         return adjust(host, resource, volume, null, testOnly);
     }
 
