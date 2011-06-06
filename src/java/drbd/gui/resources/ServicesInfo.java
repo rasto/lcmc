@@ -829,19 +829,23 @@ public final class ServicesInfo extends EditableInfo {
         hg.setServiceIsPresentList(serviceIsPresent);
         hg.killRemovedEdges();
         /** Set placeholders to "new", if they have no connections. */
-        final Map<String, ServiceInfo> idToInfoHash =
-           getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-        if (idToInfoHash != null) {
-            for (final String id : idToInfoHash.keySet()) {
-                final ConstraintPHInfo cphi =
-                               (ConstraintPHInfo) idToInfoHash.get(id);
-                if (!cphi.getService().isNew() && cphi.isEmpty()) {
-                    cphi.getService().setNew(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                final Map<String, ServiceInfo> idToInfoHash =
+                   getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+                if (idToInfoHash != null) {
+                    for (final String id : idToInfoHash.keySet()) {
+                        final ConstraintPHInfo cphi =
+                                       (ConstraintPHInfo) idToInfoHash.get(id);
+                        if (!cphi.getService().isNew() && cphi.isEmpty()) {
+                            cphi.getService().setNew(true);
+                        }
+                    }
                 }
+                hg.killRemovedVertices();
+                hg.scale();
             }
-        }
-        hg.killRemovedVertices();
-        hg.scale();
+        });
     }
 
     /** Clears the info panel cache, forcing it to reload. */

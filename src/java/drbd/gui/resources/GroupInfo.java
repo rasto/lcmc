@@ -709,15 +709,19 @@ public final class GroupInfo extends ServiceInfo {
         final StringBuilder services = new StringBuilder();
 
         final Enumeration e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo child = (ServiceInfo) n.getUserObject();
-            services.append(child.toString());
-            if (e.hasMoreElements()) {
-                services.append(", ");
+        try {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                services.append(child.toString());
+                if (e.hasMoreElements()) {
+                    services.append(", ");
+                }
             }
-
+        } catch (java.util.NoSuchElementException ele) {
+            Tools.info("removing aborted");
+            return;
         }
 
         desc  = desc.replaceAll("@GROUP@", "'" + toString() + "'");
@@ -742,12 +746,17 @@ public final class GroupInfo extends ServiceInfo {
         final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (!testOnly) {
             final Enumeration e = getNode().children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
+            try {
+                while (e.hasMoreElements()) {
+                    final DefaultMutableTreeNode n =
                                       (DefaultMutableTreeNode) e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                child.getService().setRemoved(true);
-                children.add(child);
+                    final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                    child.getService().setRemoved(true);
+                    children.add(child);
+                }
+            } catch (java.util.NoSuchElementException ele) {
+                Tools.info("removing aborted");
+                return;
             }
         }
         if (getService().isNew()) {
@@ -812,12 +821,16 @@ public final class GroupInfo extends ServiceInfo {
         sb.append("</b>");
 
         final Enumeration e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo child = (ServiceInfo) n.getUserObject();
-            sb.append("\n&nbsp;&nbsp;&nbsp;");
-            sb.append(child.getToolTipText(testOnly));
+        try {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                    (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                sb.append("\n&nbsp;&nbsp;&nbsp;");
+                sb.append(child.getToolTipText(testOnly));
+            }
+        } catch (java.util.NoSuchElementException ele) {
+            /* ignore */
         }
 
         return sb.toString();
@@ -1149,18 +1162,22 @@ public final class GroupInfo extends ServiceInfo {
                                                            fromCloneInfo,
                                                            true);
         final Enumeration e = gn.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-            if (gsi.checkResourceFieldsChanged(
-                                           null,
-                                           gsi.getParametersFromXML(),
-                                           fromServicesInfo,
-                                           fromCloneInfo,
-                                           true)) {
-                changed = true;
+        try {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+                if (gsi.checkResourceFieldsChanged(
+                                               null,
+                                               gsi.getParametersFromXML(),
+                                               fromServicesInfo,
+                                               fromCloneInfo,
+                                               true)) {
+                    changed = true;
+                }
             }
+        } catch (java.util.NoSuchElementException ele) {
+            return false;
         }
         return changed;
     }
@@ -1197,17 +1214,22 @@ public final class GroupInfo extends ServiceInfo {
             if (!e.hasMoreElements()) {
                 return false;
             }
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
+            try {
+                while (e.hasMoreElements()) {
+                    final DefaultMutableTreeNode n =
                                       (DefaultMutableTreeNode) e.nextElement();
-                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-                if (!gsi.checkResourceFieldsCorrect(null,
+                    final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+                    if (!gsi.checkResourceFieldsCorrect(
+                                                    null,
                                                     gsi.getParametersFromXML(),
                                                     fromServicesInfo,
                                                     fromCloneInfo,
                                                     true)) {
-                    cor = false;
+                        cor = false;
+                    }
                 }
+            } catch (java.util.NoSuchElementException ele) {
+                return false;
             }
         }
         return cor;
@@ -1274,18 +1296,22 @@ public final class GroupInfo extends ServiceInfo {
     @Override public void revert() {
         super.revert();
         final Enumeration e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                                  (DefaultMutableTreeNode) e.nextElement();
-            final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-            if (gsi != null && gsi.checkResourceFieldsChanged(
+        try {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
+                if (gsi != null && gsi.checkResourceFieldsChanged(
                                                   null,
                                                   gsi.getParametersFromXML(),
                                                   true,
                                                   false,
                                                   false)) {
-                gsi.revert();
+                    gsi.revert();
+                }
             }
+        } catch (java.util.NoSuchElementException ele) {
+            /* do nothing */
         }
     }
 }

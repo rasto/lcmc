@@ -881,6 +881,9 @@ public class HbConnectionInfo extends EditableInfo {
         int score = 0;
         for (final String ordId : orderIds.keySet()) {
             final HbOrderInfo hoi = orderIds.get(ordId);
+            if (hoi == null) {
+                continue;
+            }
             if (first != null && hoi.getRscInfo1() != first) {
                 continue;
             }

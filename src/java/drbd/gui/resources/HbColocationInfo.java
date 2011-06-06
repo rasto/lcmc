@@ -213,6 +213,9 @@ final class HbColocationInfo extends EditableInfo
             cphi = (ConstraintPHInfo) serviceInfoWithRsc;
             rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
         }
+        if (rscSet == null) {
+            return false;
+        }
         return getBrowser().isOneMaster(rscSet.getRscIds());
     }
 
