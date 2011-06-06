@@ -28,13 +28,15 @@ common {
 --- global_common.conf ---
 --- r0.res ---
 resource r0 {
-	startup {
-		wfc-timeout	5;
-	}
-
 	on host1 {
 		volume 0 {
 			device		/dev/drbd0;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+
+		volume 1 {
+			device		/dev/drbd1;
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
@@ -43,6 +45,12 @@ resource r0 {
 	on host2 {
 		volume 0 {
 			device		/dev/drbd0;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+
+		volume 1 {
+			device		/dev/drbd1;
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
@@ -50,23 +58,3 @@ resource r0 {
 	}
 }
 --- r0.res ---
---- r1.res ---
-resource r1 {
-	on host1 {
-		volume 0 {
-			device		/dev/drbd1;
-			disk		DISK;
-			flexible-meta-disk	internal;
-		}
-		address		IP:7789;
-	}
-	on host2 {
-		volume 0 {
-			device		/dev/drbd1;
-			disk		DISK;
-			flexible-meta-disk	internal;
-		}
-		address		IP:7789;
-	}
-}
---- r1.res ---

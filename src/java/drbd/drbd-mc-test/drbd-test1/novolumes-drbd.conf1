@@ -26,3 +26,19 @@ common {
 
 }
 --- global_common.conf ---
+--- r0.res ---
+resource r0 {
+	on host1 {
+		device		/dev/drbd0;
+		disk		DISK;
+		flexible-meta-disk	internal;
+		address		IP:7788;
+	}
+	on host2 {
+		device		/dev/drbd0;
+		disk		DISK;
+		flexible-meta-disk	internal;
+		address		IP:7788;
+	}
+}
+--- r0.res ---

@@ -15,6 +15,7 @@ common {
 	}
 
 	net {
+		protocol	C;
 		cram-hmac-alg	sha1;
 		shared-secret	SECRET;
 	}
@@ -27,39 +28,41 @@ common {
 --- global_common.conf ---
 --- r0.res ---
 resource r0 {
-	protocol	C;
-
 	on host1 {
-		device	/dev/drbd0;
-		disk	DISK;
-		address	IP:7788;
-		flexible-meta-disk	internal;
+		volume 0 {
+			device		/dev/drbd0;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7788;
 	}
-
 	on host2 {
-		device	/dev/drbd0;
-		disk	DISK;
-		address	IP:7788;
-		flexible-meta-disk	internal;
+		volume 0 {
+			device		/dev/drbd0;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7788;
 	}
 }
 --- r0.res ---
 --- r1.res ---
 resource r1 {
-	protocol	C;
-
 	on host1 {
-		device	/dev/drbd1;
-		disk	DISK;
-		address	IP:7789;
-		flexible-meta-disk	internal;
+		volume 0 {
+			device		/dev/drbd1;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7789;
 	}
-
 	on host2 {
-		device	/dev/drbd1;
-		disk	DISK;
-		address	IP:7789;
-		flexible-meta-disk	internal;
+		volume 0 {
+			device		/dev/drbd1;
+			disk		DISK;
+			flexible-meta-disk	internal;
+		}
+		address		IP:7789;
 	}
 }
 --- r1.res ---

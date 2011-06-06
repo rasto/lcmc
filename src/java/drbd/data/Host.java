@@ -2447,7 +2447,15 @@ public final class Host {
 
     /** This is part of testsuite, it checks DRBD. */
     public boolean checkDRBDTest(final String test, final double index) {
-        return checkTest("gui-drbd-test", test, index);
+        final StringBuilder testName = new StringBuilder(20);
+        if (Tools.getConfigData().getBigDRBDConf()) {
+            testName.append("big-");
+        }
+        if (!hasVolumes()) {
+            testName.append("novolumes-");
+        }
+        testName.append(test);
+        return checkTest("gui-drbd-test", testName.toString(), index);
     }
 
     /** This is part of testsuite, it checks VMs. */
@@ -2541,5 +2549,15 @@ public final class Host {
             allLVS.addAll(volumeGroupsLVS.get(vg));
         }
         return allLVS;
+    }
+
+    /** Returns whether DRBD has volume feature. */
+    public boolean hasVolumes() {
+        try {
+            return Tools.compareVersions(getDrbdVersion(), "8.4.0rc1") >= 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
+        return true;
     }
 }
