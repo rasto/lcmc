@@ -116,7 +116,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Creates and returns drbd config for resources. */
-    String drbdResourceConfig(final String drbdVersion)
+    String drbdResourceConfig(final Host configOnHost)
     throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
@@ -141,7 +141,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         /* section config */
         try {
-            config.append(drbdSectionsConfig(drbdVersion));
+            config.append(drbdSectionsConfig(configOnHost));
         } catch (Exceptions.DrbdConfigException dce) {
             throw dce;
         }
@@ -161,13 +161,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 <address family="ipv4" port="7793">192.168.23.21</address>
             </host>
         */
-        boolean volumesAvailable = false;
-        try {
-            volumesAvailable =
-                        Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
+        final boolean volumesAvailable = configOnHost.hasVolumes();
         for (final Host host : getCluster().getHostsArray()) {
             final List<String> volumeConfigs = new ArrayList<String>();
             for (final DrbdVolumeInfo dvi : drbdVolumes) {
@@ -182,7 +176,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 config.append("\ton ");
                 config.append(host.getName());
                 config.append(" {\n\t\t");
-                config.append(Tools.join("\n", volumeConfigs));
+                config.append(Tools.join("\n\n\t\t", volumeConfigs));
                 final GuiComboBox acb = addressComboBoxHash.get(host);
                 final GuiComboBox pcb = portComboBox;
                 if (acb != null && pcb != null) {
@@ -1232,13 +1226,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
         for (final Host host : getCluster().getHostsArray()) {
-            DRBD.delConnection(host, getName(), testOnly);
+            if (host.hasVolumes()) {
+                DRBD.delConnection(host, getName(), testOnly);
+            }
             host.getBrowser().getDrbdVIPortList().remove(savedPort);
         }
-        //DRBD.disconnect(host,
-        //                getName(),
-        //                null,
-        //                testOnly);
 
         final Map<String, DrbdResourceInfo> drbdResHash =
                                                 getBrowser().getDrbdResHash();
@@ -1246,5 +1238,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         drbdResHash.remove(getName());
         getBrowser().putDrbdResHash();
         dri.setName(null);
+    }
+
+    /** Returns DRBD volumes. */
+    public Set<DrbdVolumeInfo> getDrbdVolumes() {
+        return drbdVolumes;
     }
 }

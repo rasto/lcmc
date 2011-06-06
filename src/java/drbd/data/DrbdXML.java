@@ -190,7 +190,6 @@ public final class DrbdXML extends XML {
     public DrbdXML(final Host[] hosts) {
         super();
         addSpecialParameter("resource", "name", true);
-        /* addParameter("resource", "protocol", PROTOCOL_C, PROTOCOLS, true); */
         for (Host host : hosts) {
             final String command =
                                 host.getDistCommand("Drbd.getParameters",
@@ -232,7 +231,6 @@ public final class DrbdXML extends XML {
                     }
                 }
             }
-//            update(host); // TODO: don't do this here.
             if (!parametersList.contains("protocol")) {
                 /* prior 8.4 */
                 addParameter("resource",
@@ -786,7 +784,10 @@ public final class DrbdXML extends XML {
     private void parseVolumeConfig(final String hostName,
                                    final String resName,
                                    final Node volumeNode) {
-        final String volumeNr = getAttribute(volumeNode, "vnr");
+        String volumeNr = getAttribute(volumeNode, "vnr");
+        if (volumeNr == null) {
+            volumeNr = "0";
+        }
         final NodeList options = volumeNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
@@ -1085,7 +1086,10 @@ public final class DrbdXML extends XML {
         BlockDevInfo bdi = null;
         final String device = "/dev/drbd" + devNr;
         final String resName = deviceResourceMap.get(device);
-        final String volumeNr = deviceVolumeMap.get(device);
+        String volumeNr = deviceVolumeMap.get(device);
+        if (volumeNr == null) {
+            volumeNr = "0";
+        }
         if (resName != null) {
             final Map<String, String> hostDiskMap =
                                     resourceHostDiskMap.get(resName, volumeNr);

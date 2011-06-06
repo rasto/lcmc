@@ -97,8 +97,14 @@ public final class Resource extends DrbdConfig {
     @Override public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        final boolean protocolInNetSection =
+                                           drbdInfo.atLeastVersion("8.4.0rc1");
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
+                if (!protocolInNetSection
+                    && PROTOCOL.equals(commonP)) {
+                    continue;
+                }
                 final String value = dri.getComboBoxValue(commonP);
                 drbdInfo.getResource().setValue(commonP, value);
                 drbdInfo.paramComboBoxGet(commonP, null).setValue(value);

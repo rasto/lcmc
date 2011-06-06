@@ -115,6 +115,12 @@ final class BlockDev extends DrbdConfig {
                         i += 500;
                     }
                     if (blockDevInfo.getBlockDevice().isAttached()) {
+                        DRBD.setSecondary(
+                                    blockDevInfo.getHost(),
+                                    getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                       .getName(),
+                                    getDrbdVolumeInfo().getName(),
+                                    testOnly);
                         DRBD.detach(blockDevInfo.getHost(),
                                     getDrbdVolumeInfo().getDrbdResourceInfo()
                                                        .getName(),

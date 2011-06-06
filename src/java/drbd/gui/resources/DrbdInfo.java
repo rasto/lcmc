@@ -149,14 +149,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final String[] params =
                                 dxml.getSectionParams(DrbdXML.GLOBAL_SECTION);
             global.append("global {\n");
-            final String drbdVersion = host.getDrbdVersion();
-            boolean volumesAvailable = false;
-            try {
-                volumesAvailable =
-                           Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
-            } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
-            }
+            final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
                 String value = getComboBoxValue(param);
                 if ("usage-count".equals(param)
@@ -190,7 +183,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
 
             /* common section */
-            final String common = drbdSectionsConfig(drbdVersion);
+            final String common = drbdSectionsConfig(host);
             String commonSectionConfig = "";
             if (!"".equals(common)) {
                 commonSectionConfig = "\ncommon {\n" + common + "}";
@@ -203,7 +196,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 if (dri.resourceInHost(host)) {
                     try {
                         final String rConf =
-                                         dri.drbdResourceConfig(drbdVersion);
+                                         dri.drbdResourceConfig(host);
                         resConfigs.put(dri.getName(), rConf);
                     } catch (Exceptions.DrbdConfigException dce) {
                         throw dce;
@@ -217,8 +210,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
             boolean bigDRBDConf = true;
             try {
                 bigDRBDConf =
-                          Tools.getConfigData().getBigDRBDConf()
-                          || Tools.compareVersions(drbdVersion, "8.3.0") < 0;
+                  Tools.getConfigData().getBigDRBDConf()
+                  || Tools.compareVersions(host.getDrbdVersion(), "8.3.0") < 0;
             } catch (Exceptions.IllegalVersionException e) {
                 Tools.appWarning(e.getMessage(), e);
             }

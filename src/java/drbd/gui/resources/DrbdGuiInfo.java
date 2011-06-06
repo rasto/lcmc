@@ -29,6 +29,7 @@ import drbd.data.Cluster;
 import drbd.data.DrbdXML;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
+import drbd.data.Host;
 import drbd.utilities.Tools;
 import drbd.utilities.Unit;
 
@@ -275,18 +276,12 @@ abstract class DrbdGuiInfo extends EditableInfo {
      * Creates drbd config for sections and returns it. Removes 'drbd: '
      * from the 'after' parameter.
      */
-    protected String drbdSectionsConfig(final String drbdVersion)
+    protected String drbdSectionsConfig(final Host host)
                      throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder("");
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String[] sections = dxml.getSections();
-        boolean volumesAvailable = false;
-        try {
-            volumesAvailable =
-                           Tools.compareVersions(drbdVersion, "8.4.0rc1") >= 0;
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
+        final boolean volumesAvailable = host.hasVolumes();
         for (final String sectionString : sections) {
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");

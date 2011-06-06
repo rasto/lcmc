@@ -208,8 +208,10 @@ public final class DrbdVolumeInfo extends EditableInfo
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
-                    for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
+                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
+                                                                         true);
+                    for (final Host h
+                         : getDrbdResourceInfo().getCluster().getHostsArray()) {
                         DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
@@ -637,11 +639,23 @@ public final class DrbdVolumeInfo extends EditableInfo
         final boolean lastVolume =
                                 getDrbdResourceInfo().removeDrbdVolume(this);
         for (final Host host : hosts) {
+            DRBD.setSecondary(host,
+                              getDrbdResourceInfo().getName(),
+                              getName(),
+                              testOnly);
+            if (!host.hasVolumes()) {
+                DRBD.disconnect(host,
+                                getDrbdResourceInfo().getName(),
+                                null,
+                                testOnly);
+            }
             DRBD.detach(host,
                         getDrbdResourceInfo().getName(),
                         getName(),
                         testOnly);
-            DRBD.delMinor(host, getDevice(), testOnly);
+            if (host.hasVolumes()) {
+                DRBD.delMinor(host, getDevice(), testOnly);
+            }
         }
         super.removeMyself(testOnly);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
@@ -1148,6 +1162,11 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
+        if (DRBD_VOL_PARAM_NUMBER.equals(param)
+            && !getDrbdResourceInfo().getDrbdInfo().atLeastVersion(
+                                                                "8.4.0rc1")) {
+            return "available in DRBD 8.4";
+        }
         if (getResource().isNew()) {
             return null;
         } else {
@@ -1195,5 +1214,17 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
         }
         setApplyButtons(null, getParametersFromXML());
+    }
+
+    /** Returns name that is displayed in the graph. */
+    public String getNameForGraph() {
+        final StringBuilder n = new StringBuilder(20);
+        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        n.append(dri.getName());
+        if (dri.getDrbdVolumes().size() > 1) {
+            n.append('/');
+            n.append(getName());
+        }
+        return n.toString();
     }
 }
