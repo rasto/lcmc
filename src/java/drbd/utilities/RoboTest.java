@@ -3086,7 +3086,16 @@ public final class RoboTest {
         press(robot, KeyEvent.VK_S);
         sleep(200);
         press(robot, KeyEvent.VK_T);
-        sleep(5000);
+        sleep(2000);
+        for (int i = 0; i < 10; i++) {
+            moveTo(robot, 600, 375); /* disk/block device */
+            leftClick(robot);
+            sleep(1000);
+            moveTo(robot, 430, 375); /* image */
+            leftClick(robot);
+            sleep(1000);
+        }
+
         moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER);
@@ -3095,10 +3104,26 @@ public final class RoboTest {
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* storage */
         sleep(5000);
+        for (int i = 0; i < 10; i++) {
+            moveTo(robot, 600, 375); /* bridge */
+            leftClick(robot);
+            sleep(1000);
+            moveTo(robot, 430, 375); /* network */
+            leftClick(robot);
+            sleep(1000);
+        }
         moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* network */
         sleep(5000);
+        for (int i = 0; i < 10; i++) {
+            moveTo(robot, 600, 375); /* sdl */
+            leftClick(robot);
+            sleep(1000);
+            moveTo(robot, 430, 375); /* vnc */
+            leftClick(robot);
+            sleep(1000);
+        }
         moveTo(robot, 730, 570);
         leftClick(robot);
         //press(robot, KeyEvent.VK_ENTER); /* display */
@@ -3111,6 +3136,21 @@ public final class RoboTest {
         Tools.sleep(2000);
         moveTo(robot, 814, 570); /* finish */
         leftClick(robot);
+        Tools.sleep(5000);
+
+        moveTo(robot, 620, 480); /* number of cpus */
+        sleep(1000);
+        leftClick(robot);
+        sleep(500);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(500);
+        press(robot, KeyEvent.VK_2);
+        sleep(500);
+        moveTo(robot, 250, 190); /* apply */
+        sleep(1000);
+        leftClick(robot);
+        sleep(1000);
+        checkVMTest(host, vmTest, 3);
 
         Tools.sleep(2000);
         moveTo(robot, 1066, 284); /* remove */
