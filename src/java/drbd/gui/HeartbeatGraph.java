@@ -903,7 +903,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        final List<Vertex> vipl = getVertexIsPresentList();
+        final Set<Vertex> vipl = getVertexIsPresentList();
         putVertexIsPresentList();
         if (getClusterBrowser().allHostsDown()) {
             return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
@@ -1194,7 +1194,7 @@ public final class HeartbeatGraph extends ResourceGraph {
                 continue;
             }
             unlockGraph();
-            final List<Vertex> vipl = getVertexIsPresentList();
+            final Set<Vertex> vipl = getVertexIsPresentList();
             putVertexIsPresentList();
             if (vertexToConstraintPHMap.containsKey(v)) {
                 final ConstraintPHInfo cphi = (ConstraintPHInfo) getInfo(v);
@@ -1279,7 +1279,7 @@ public final class HeartbeatGraph extends ResourceGraph {
      * Returns vertex location list, it acquires mVertexIsPresentListLock and
      * must be followed by putVertexIsPresentList.
      */
-    List<Vertex> getVertexIsPresentList() {
+    Set<Vertex> getVertexIsPresentList() {
         mVertexIsPresentListLock.lock();
         return vertexIsPresentList;
     }
@@ -1291,7 +1291,7 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** Set vertex-is-present list. */
     public void setServiceIsPresentList(final List<ServiceInfo> sis) {
-        final List<Vertex> vipl = new ArrayList<Vertex>();
+        final Set<Vertex> vipl = new HashSet<Vertex>();
         for (final ServiceInfo si : sis) {
             final Vertex v = getVertex(si);
             if (v == null) {
