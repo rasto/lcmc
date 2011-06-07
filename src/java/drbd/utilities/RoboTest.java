@@ -765,7 +765,7 @@ public final class RoboTest {
         moveTo(robot, 1100, 510);
         leftRelease(robot);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 3; i++) {
             sleep(1000);
             moveTo(robot, 1073, 360);
             leftClick(robot);
@@ -842,6 +842,12 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE});
         sleep(3000);
         checkTest(host, "test1", 4.4); /* 4.4 */
+        for (int i = 0 ; i < 3; i++) {
+            removeConstraint(robot, popX, popY);
+            checkTest(host, "test1", 5); /* 5 */
+            addConstraint(robot, gx, gy - 30, 0, true, -1);
+            checkTest(host, "test1", 4.4); /* 4.4 */
+        }
 
         removeConstraint(robot, popX, popY);
         sleep(3000);
