@@ -34,7 +34,7 @@ resource r0 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		IP:7789;
+		address		IP:7788;
 	}
 	on host2 {
 		volume 1 {
@@ -42,7 +42,7 @@ resource r0 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		IP:7789;
+		address		IP:7788;
 	}
 }
 --- r0.res ---

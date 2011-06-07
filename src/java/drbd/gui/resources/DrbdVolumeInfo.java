@@ -279,7 +279,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                                DRBD.adjust(h, DRBD.ALL, null, false);
+                                DRBD.adjustTest(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -634,6 +634,9 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     void removeMyselfNoConfirm(final boolean testOnly) {
         getBrowser().drbdStatusLock();
+        getBrowser().getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
+                                               getDevice(),
+                                               getName());
         getBrowser().getDrbdGraph().removeDrbdVolume(this);
         final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
         final boolean lastVolume =
@@ -649,10 +652,17 @@ public final class DrbdVolumeInfo extends EditableInfo
                                 null,
                                 testOnly);
             }
-            DRBD.detach(host,
-                        getDrbdResourceInfo().getName(),
-                        getName(),
-                        testOnly);
+            for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                if (bdi.getHost() == host) {
+                    if (bdi.getBlockDevice().isAttached()) {
+                        DRBD.detach(host,
+                                    getDrbdResourceInfo().getName(),
+                                    getName(),
+                                    testOnly);
+                    }
+                    break;
+                }
+            }
             if (host.hasVolumes()) {
                 DRBD.delMinor(host, getDevice(), testOnly);
             }

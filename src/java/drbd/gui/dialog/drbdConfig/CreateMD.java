@@ -87,6 +87,7 @@ final class CreateMD extends DrbdConfig {
                                     };
         for (int i = 0; i < 2; i++) {
             final int index = i;
+            returnCode[index] = -1;
             thread[i] = new Thread(
             new Runnable() {
                 @Override public void run() {

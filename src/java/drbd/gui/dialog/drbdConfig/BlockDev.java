@@ -74,9 +74,9 @@ final class BlockDev extends DrbdConfig {
     /** Calls drbd adjust, returns false if there is no meta-data area. */
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
-        final int err = DRBD.adjust(bdi.getHost(),
+        final int err = DRBD.adjustTest2(bdi.getHost(),
                     bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                    null,
+                    bdi.getDrbdVolumeInfo().getName(),
                     testOnly);
         if (err == DRBD_NO_METADATA_RC) {
             return false;
@@ -102,15 +102,26 @@ final class BlockDev extends DrbdConfig {
                 final boolean testOnly = false;
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
                                                     .createDrbdConfig(false);
-                if (adjust(blockDevInfo) && adjust(oBdi)) {
-                    int i = 0;
+                final boolean ret1 = adjust(blockDevInfo);
+                final boolean ret2 = adjust(oBdi);
+                if (!ret1 || !ret2) {
+                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
+                                                                          true);
+                }
+                int i = 0;
+                if (ret1) {
+                    final int timeout = 20000;
                     while (!blockDevInfo.getBlockDevice().isAttached()
-                           && i < 10000) {
+                           && i < timeout) {
                         Tools.sleep(500);
                         i += 500;
                     }
-                    while (!oBdi.getBlockDevice().isAttached()
-                           && i < 10000) {
+                    while (!oBdi.getBlockDevice().isAttached() && i < timeout) {
+                        Tools.sleep(500);
+                        i += 500;
+                    }
+                    while (!getDrbdVolumeInfo().isConnected(false)
+                           && i < timeout) {
                         Tools.sleep(500);
                         i += 500;
                     }
@@ -127,16 +138,22 @@ final class BlockDev extends DrbdConfig {
                                     getDrbdVolumeInfo().getName(),
                                     testOnly);
                     }
+                }
+                if (ret2) {
                     if (oBdi.getBlockDevice().isAttached()) {
+                        DRBD.setSecondary(
+                                    oBdi.getHost(),
+                                    getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                       .getName(),
+                                    getDrbdVolumeInfo().getName(),
+                                    testOnly);
+                        Tools.sleep(1000);
                         DRBD.detach(oBdi.getHost(),
                                     getDrbdVolumeInfo().getDrbdResourceInfo()
                                                        .getName(),
                                     getDrbdVolumeInfo().getName(),
                                     testOnly);
                     }
-                } else {
-                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
-                                                                          true);
                 }
                 getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
             } catch (Exceptions.DrbdConfigException dce) {

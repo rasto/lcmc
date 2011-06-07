@@ -1254,4 +1254,13 @@ public final class DrbdXML extends XML {
     public void removeResource(final String res) {
         resourceList.remove(res);
     }
+
+    /** Removes the volume from hashes, so that it does not reappear. */
+    public void removeVolume(final String res,
+                             final String dev,
+                             final String volumeNr) {
+        resourceDeviceMap.remove(res, volumeNr);
+        deviceResourceMap.remove(dev);
+        deviceVolumeMap.remove(dev);
+    }
 }

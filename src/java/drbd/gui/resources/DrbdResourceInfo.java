@@ -480,7 +480,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getCluster().getHostsArray()) {
-                                DRBD.adjust(h, DRBD.ALL, null, false);
+                                DRBD.adjustTest(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
