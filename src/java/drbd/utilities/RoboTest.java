@@ -451,6 +451,10 @@ public final class RoboTest {
                                        + secs);
                             resetTerminalAreas(host);
                             i++;
+                            if (host.hasVolumes()) {
+                                Tools.getConfigData().setBigDRBDConf(
+                                      !Tools.getConfigData().getBigDRBDConf());
+                            }
                         }
                     } else if ("2".equals(index)) {
                         /* DRBD cancel */
@@ -479,6 +483,10 @@ public final class RoboTest {
                                        + secs);
                             resetTerminalAreas(host);
                             i++;
+                            if (host.hasVolumes()) {
+                                Tools.getConfigData().setBigDRBDConf(
+                                      !Tools.getConfigData().getBigDRBDConf());
+                            }
                         }
                     } else if ("4".equals(index)) {
                         /* DRBD 2 volumes */
@@ -493,6 +501,10 @@ public final class RoboTest {
                                        + secs);
                             resetTerminalAreas(host);
                             i++;
+                            if (host.hasVolumes()) {
+                                Tools.getConfigData().setBigDRBDConf(
+                                      !Tools.getConfigData().getBigDRBDConf());
+                            }
                         }
                     }
                 } else if ("VMs".equals(selected)) {
