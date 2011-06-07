@@ -77,9 +77,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public final class HeartbeatGraph extends ResourceGraph {
     /** List with edges that are order constraints. */
-    private final List<Edge> edgeIsOrderList = new ArrayList<Edge>();
+    private final Set<Edge> edgeIsOrderList = new HashSet<Edge>();
     /** List with edges that should be kept as order constraints. */
-    private final List<Edge> keepEdgeIsOrderList = new ArrayList<Edge>();
+    private final Set<Edge> keepEdgeIsOrderList = new HashSet<Edge>();
     /** List with edges that are colocation constraints. */
     private final Set<Edge> edgeIsColocationList = new HashSet<Edge>();
     /** List with edges that should be kept as colocation constraints. */
@@ -87,7 +87,7 @@ public final class HeartbeatGraph extends ResourceGraph {
     /** Vertex is present lock. */
     private final Lock mVertexIsPresentListLock = new ReentrantLock();
     /** List with vertices that are present. */
-    private List<Vertex> vertexIsPresentList = new ArrayList<Vertex>();
+    private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
     /** Map from vertex to 'Add service' menu. */
     private final Map<Vertex, JMenu> vertexToAddServiceMap =
                                                 new HashMap<Vertex, JMenu>();
@@ -646,7 +646,7 @@ public final class HeartbeatGraph extends ResourceGraph {
             if (si == null) {
                 return "";
             }
-            final List<Vertex> vipl = getVertexIsPresentList();
+            final Set<Vertex> vipl = getVertexIsPresentList();
             putVertexIsPresentList();
             if (si.getService().isRemoved()) {
                 str = Tools.getString("HeartbeatGraph.Removing");
@@ -1131,7 +1131,6 @@ public final class HeartbeatGraph extends ResourceGraph {
                 continue;
             }
             if (!keepEdgeIsOrderList.contains(e)) {
-                keepEdgeIsOrderList.remove(e);
                 final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                 if (hbci != null) {
                     hbci.removeOrders();
