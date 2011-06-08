@@ -1652,17 +1652,42 @@ public final class BlockDevInfo extends EditableInfo {
     @Override public int compareTo(final Object o) {
         String name;
         String oName;
+        int volume = 0;
+        int oVolume = 0;
         if (getBlockDevice().isDrbd()) {
-            name = getDrbdVolumeInfo().getDevice();
+            final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+            name = dvi.getDrbdResourceInfo().getName();
+            final String v = dvi.getName();
+            if (Tools.isNumber(v)) {
+                volume = Integer.parseInt(v);
+            }
         } else {
             name = getName();
         }
-        if (((BlockDevInfo) o).getBlockDevice().isDrbd()) {
-            oName = ((BlockDevInfo) o).getDrbdVolumeInfo().getDevice();
+        final BlockDevInfo obdi = (BlockDevInfo) o;
+        if (obdi.getBlockDevice().isDrbd()) {
+            final DrbdVolumeInfo odvi = obdi.getDrbdVolumeInfo();
+            oName = odvi.getDrbdResourceInfo().getName();
+            final String v = odvi.getName();
+            if (Tools.isNumber(v)) {
+                oVolume = Integer.parseInt(v);
+            }
         } else {
             oName = ((BlockDevInfo) o).getName();
         }
-        return name.compareToIgnoreCase(oName);
+        if (getBlockDevice().isDrbd()
+            && !obdi.getBlockDevice().isDrbd()) {
+            return -1;
+        }
+        if (!getBlockDevice().isDrbd()
+            && obdi.getBlockDevice().isDrbd()) {
+            return 1;
+        }
+        final int ret = name.compareToIgnoreCase(oName);
+        if (ret == 0) {
+            return volume - oVolume;
+        }
+        return ret;
     }
 
     /** Sets stored parameters. */
