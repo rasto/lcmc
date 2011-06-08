@@ -1027,18 +1027,14 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override public void update() {
                 super.update();
-                Tools.invokeAndWait(new Runnable() {
-                    @Override public void run() {
-                        removeAll();
-                    }
-                });
                 Cluster cluster = getHost().getCluster();
                 Host[] otherHosts = cluster.getHostsArray();
+                final List<MyMenu> hostMenus = new ArrayList<MyMenu>();
                 for (final Host oHost : otherHosts) {
                     if (oHost == getHost()) {
                         continue;
                     }
-                    MyMenu hostMenu = new MyMenu(oHost.getName(),
+                    final MyMenu hostMenu = new MyMenu(oHost.getName(),
                                                  new AccessMode(
                                                     ConfigData.AccessType.ADMIN,
                                                     false),
@@ -1093,8 +1089,16 @@ public final class BlockDevInfo extends EditableInfo {
                         }
                     };
                     hostMenu.update();
-                    add(hostMenu);
+                    hostMenus.add(hostMenu);
                 }
+                Tools.invokeAndWait(new Runnable() {
+                    @Override public void run() {
+                        removeAll();
+                        for (final MyMenu hostMenu : hostMenus) {
+                            add(hostMenu);
+                        }
+                    }
+                });
             }
         };
         items.add(repMenuItem);
