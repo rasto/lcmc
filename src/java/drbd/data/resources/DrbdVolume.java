@@ -35,6 +35,9 @@ implements ClusterBlockDeviceInterface {
     private static final long serialVersionUID = 1L;
     /** DRBD device. */
     private String device;
+    /** Whether the config for this volume was already written at least once.
+     */
+    private boolean commited = false;
 
     /**
      * Prepares a new <code>DrbdVolume</code> object.
@@ -55,4 +58,16 @@ implements ClusterBlockDeviceInterface {
         setValue("device", device);
     }
 
+    /**
+     * Sets commited flag. Resource is commited after the config
+     * was generated and device cannot be changed.
+     */
+    public void setCommited(final boolean commited) {
+        this.commited = commited;
+    }
+
+    /** Returns whether this resoure was commited. */
+    public boolean isCommited() {
+        return commited;
+    }
 }

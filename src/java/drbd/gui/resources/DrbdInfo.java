@@ -620,6 +620,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         bd2.paramComboBoxRemove(p, "wizard");
                     }
                     if (adrd.isCanceled()) {
+                        bd1.getDrbdVolumeInfo().removeMyself(testOnly);
                         getBrowser().getDrbdGraph().stopAnimation(bd1);
                         getBrowser().getDrbdGraph().stopAnimation(bd2);
                         return;

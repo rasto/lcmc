@@ -348,7 +348,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             getBrowser().getDrbdResHash().put(name, this);
             getBrowser().putDrbdResHash();
             getBrowser().getDrbdGraph().repaint();
-            getDrbdResource().setCommited(true);
             getDrbdInfo().setAllApplyButtons();
         }
     }
@@ -1226,7 +1225,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
         for (final Host host : getCluster().getHostsArray()) {
-            if (host.hasVolumes()) {
+            if (getDrbdResource().isCommited() && host.hasVolumes()) {
                 DRBD.delConnection(host, getName(), testOnly);
             }
             host.getBrowser().getDrbdVIPortList().remove(savedPort);

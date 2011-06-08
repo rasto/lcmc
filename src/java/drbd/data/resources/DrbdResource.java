@@ -45,8 +45,7 @@ public final class DrbdResource extends Resource {
 
     /**
      * Sets commited flag. Resource is commited after the config
-     * was generated and niether resource name nor drbd device can
-     * be changed.
+     * was generated and resource name cannot be changed.
      */
     public void setCommited(final boolean commited) {
         this.commited = commited;

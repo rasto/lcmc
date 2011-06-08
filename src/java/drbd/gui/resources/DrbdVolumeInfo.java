@@ -641,30 +641,32 @@ public final class DrbdVolumeInfo extends EditableInfo
         final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
         final boolean lastVolume =
                                 getDrbdResourceInfo().removeDrbdVolume(this);
-        for (final Host host : hosts) {
-            DRBD.setSecondary(host,
-                              getDrbdResourceInfo().getName(),
-                              getName(),
-                              testOnly);
-            if (!host.hasVolumes()) {
-                DRBD.disconnect(host,
-                                getDrbdResourceInfo().getName(),
-                                null,
-                                testOnly);
-            }
-            for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                if (bdi.getHost() == host) {
-                    if (bdi.getBlockDevice().isAttached()) {
-                        DRBD.detach(host,
+        if (getDrbdVolume().isCommited()) {
+            for (final Host host : hosts) {
+                DRBD.setSecondary(host,
+                                  getDrbdResourceInfo().getName(),
+                                  getName(),
+                                  testOnly);
+                if (!host.hasVolumes()) {
+                    DRBD.disconnect(host,
                                     getDrbdResourceInfo().getName(),
-                                    getName(),
+                                    null,
                                     testOnly);
-                    }
-                    break;
                 }
-            }
-            if (host.hasVolumes()) {
-                DRBD.delMinor(host, getDevice(), testOnly);
+                for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                    if (bdi.getHost() == host) {
+                        if (bdi.getBlockDevice().isAttached()) {
+                            DRBD.detach(host,
+                                        getDrbdResourceInfo().getName(),
+                                        getName(),
+                                        testOnly);
+                        }
+                        break;
+                    }
+                }
+                if (host.hasVolumes()) {
+                    DRBD.delMinor(host, getDevice(), testOnly);
+                }
             }
         }
         super.removeMyself(testOnly);
@@ -697,6 +699,10 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Removes this drbd resource with confirmation dialog. */
     @Override public void removeMyself(final boolean testOnly) {
+        if (!getDrbdVolume().isCommited()) {
+            removeMyselfNoConfirm(testOnly);
+            return;
+        }
         String desc = Tools.getString(
                        "ClusterBrowser.confirmRemoveDrbdResource.Description");
         desc = desc.replaceAll("@RESOURCE@",
@@ -1073,7 +1079,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
-            //getDrbdResource().setCommited(true);
+            getDrbdVolume().setCommited(true);
+            getDrbdResourceInfo().getDrbdResource().setCommited(true);
             getDrbdResourceInfo().getDrbdInfo().setAllApplyButtons();
         }
     }
@@ -1177,10 +1184,10 @@ public final class DrbdVolumeInfo extends EditableInfo
                                                                 "8.4.0rc1")) {
             return "available in DRBD 8.4";
         }
-        if (getResource().isNew()) {
-            return null;
-        } else {
+        if (getDrbdVolume().isCommited()) {
             return ""; /* disabled */
+        } else {
+            return null;
         }
     }
 
@@ -1236,5 +1243,10 @@ public final class DrbdVolumeInfo extends EditableInfo
             n.append(getName());
         }
         return n.toString();
+    }
+
+    /** Returns the DrbdVolume resource object of this drbd volume. */
+    DrbdVolume getDrbdVolume() {
+        return (DrbdVolume) getResource();
     }
 }
