@@ -141,6 +141,7 @@ public final class TerminalPanel extends JScrollPane {
     private static final Map<String, String> TESTS =
                                             new HashMap<String, String>();
     static {
+        TESTS.put("starttest0", "0");
         TESTS.put("starttest1", "1");
         TESTS.put("starttest2", "2");
         TESTS.put("starttest3", "3");
@@ -160,16 +161,6 @@ public final class TerminalPanel extends JScrollPane {
         TESTS.put("starttestx7", "x7");
         TESTS.put("starttestx8", "x8");
         TESTS.put("starttestx9", "x9");
-
-        TESTS.put("starttesty1", "y1");
-        TESTS.put("starttesty2", "y2");
-        TESTS.put("starttesty3", "y3");
-        TESTS.put("starttesty4", "y4");
-        TESTS.put("starttesty5", "y5");
-        TESTS.put("starttesty6", "y6");
-        TESTS.put("starttesty7", "y7");
-        TESTS.put("starttesty8", "y8");
-        TESTS.put("starttesty9", "y9");
 
         TESTS.put("starttesta", "a");
         TESTS.put("starttestb", "b");

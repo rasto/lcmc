@@ -290,7 +290,71 @@ public final class RoboTest {
                 if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
-                    if ("1".equals(index)) {
+                    if ("0".equals(index)) {
+                        /* all pacemaker tests */
+                        int i = 1;
+                        while (true) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest1(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest2(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest3(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest4(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest5(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest6(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest7(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTest8(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            //startTest9(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTestA(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTestB(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTestC(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            startTestD(robot, host);
+                            if (aborted) {
+                                break;
+                            }
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
+                    } else if ("1".equals(index)) {
                         /* pacemaker */
                         int i = 1;
                         while (!aborted) {
@@ -418,35 +482,50 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
-                    } else if ("9".equals(index)) {
-                        /* all pacemaker tests */
+                    }
+                } else if ("Storage (DRBD)".equals(selected)) {
+                    if ("0".equals(index)) {
+                        /* all DRBD tests */
                         int i = 1;
-                        while (true) {
+                        final int blockDevY = getBlockDevY();
+                        while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest1(robot, host);
-                            startTest2(robot, host);
+                            startDRBDTest1(robot, host, blockDevY);
+                            if (aborted) {
+                                break;
+                            }
+                            startDRBDTest2(robot, host, blockDevY);
+                            if (aborted) {
+                                break;
+                            }
+                            startDRBDTest3(robot, host, blockDevY);
+                            if (aborted) {
+                                break;
+                            }
+                            startDRBDTest4(robot, host, blockDevY);
+                            if (aborted) {
+                                break;
+                            }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
+                            resetTerminalAreas(host);
                             i++;
+                            if (host.hasVolumes()) {
+                                Tools.getConfigData().setBigDRBDConf(
+                                      !Tools.getConfigData().getBigDRBDConf());
+                            }
                         }
-                    }
-                } else if ("Storage (DRBD)".equals(selected)) {
-                    if ("1".equals(index)
-                        || "x1".equals(index)
-                        || "y1".equals(index)) {
+                    } else if ("1".equals(index)) {
                         /* DRBD 1 link */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest1("drbd-test" + index,
-                                           robot,
-                                           host,
-                                           blockDevY);
+                            startDRBDTest1(robot, host, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -480,10 +559,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest3("drbd-test" + index,
-                                           robot,
-                                           host,
-                                           blockDevY);
+                            startDRBDTest3(robot, host, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -502,10 +578,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest4("drbd-test" + index,
-                                           robot,
-                                           host,
-                                           blockDevY);
+                            startDRBDTest4(robot, host, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -2589,10 +2662,10 @@ public final class RoboTest {
     }
 
     /** DRBD Test 1. */
-    private static void startDRBDTest1(final String drbdTest,
-                                       final Robot robot,
+    private static void startDRBDTest1(final Robot robot,
                                        final Host host,
                                        final int blockDevY) {
+        final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
         moveTo(robot, 334, blockDevY); /* add drbd resource */
@@ -2658,6 +2731,7 @@ public final class RoboTest {
     private static void startDRBDTest2(final Robot robot,
                                        final Host host,
                                        final int blockDevY) {
+        final String drbdTest = "drbd-test2";
         slowFactor = 0.2f;
         aborted = false;
         moveTo(robot, 334, blockDevY); /* add drbd resource */
@@ -2674,11 +2748,11 @@ public final class RoboTest {
     }
 
     /** DRBD Test 3. */
-    private static void startDRBDTest3(final String drbdTest,
-                                       final Robot robot,
+    private static void startDRBDTest3(final Robot robot,
                                        final Host host,
                                        final int blockDevY) {
         /* Two drbds. */
+        final String drbdTest = "drbd-test3";
         slowFactor = 0.2f;
         aborted = false;
         int protocolY = 600;
@@ -2882,10 +2956,10 @@ public final class RoboTest {
     }
 
     /** DRBD Test 4. */
-    private static void startDRBDTest4(final String drbdTest,
-                                       final Robot robot,
+    private static void startDRBDTest4(final Robot robot,
                                        final Host host,
                                        final int blockDevY) {
+        final String drbdTest = "drbd-test4";
         /* Two drbds. */
         slowFactor = 0.2f;
         aborted = false;
