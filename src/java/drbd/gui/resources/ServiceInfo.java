@@ -3612,6 +3612,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (!testOnly) {
             storeComboBoxValues(params);
+            storeOperations();
             if (clInfo != null) {
                 clInfo.storeComboBoxValues(cloneParams);
             }
@@ -6128,5 +6129,24 @@ public class ServiceInfo extends EditableInfo {
             i = (Info) o;
         }
         return i;
+    }
+
+    /** Store operation values. */
+    final void storeOperations() {
+        mSavedOperationsLock.lock();
+        for (final String op : getResourceAgent().getOperationNames()) {
+            for (final String param : getBrowser().getCRMOperationParams(op)) {
+                final String defaultValue =
+                              resourceAgent.getOperationDefault(op, param);
+                if (defaultValue == null) {
+                    continue;
+                }
+                mOperationsComboBoxHashReadLock.lock();
+                final GuiComboBox cb = operationsComboBoxHash.get(op, param);
+                mOperationsComboBoxHashReadLock.unlock();
+                savedOperation.put(op, param, cb.getStringValue());
+            }
+        }
+        mSavedOperationsLock.unlock();
     }
 }

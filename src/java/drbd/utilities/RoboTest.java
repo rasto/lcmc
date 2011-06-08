@@ -80,8 +80,8 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 800
-                || Math.abs(p.getY() - prevP.getY()) > 600)) {
+            && (Math.abs(p.getX() - prevP.getX()) > 400
+                || Math.abs(p.getY() - prevP.getY()) > 400)) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
@@ -2437,7 +2437,7 @@ public final class RoboTest {
             return;
         }
         robot.mousePress(InputEvent.BUTTON1_MASK);
-        sleepNoFactor(400);
+        Tools.sleep(400);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
         sleepNoFactor(300);
     }
@@ -2453,10 +2453,10 @@ public final class RoboTest {
 
     /** Left release. */
     private static void leftRelease(final Robot robot)  {
+        robot.mouseRelease(InputEvent.BUTTON1_MASK);
         if (aborted) {
             return;
         }
-        robot.mouseRelease(InputEvent.BUTTON1_MASK);
         sleepNoFactor(300);
     }
 
