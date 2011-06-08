@@ -80,8 +80,8 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 200
-                || Math.abs(p.getY() - prevP.getY()) > 200)) {
+            && (Math.abs(p.getX() - prevP.getX()) > 800
+                || Math.abs(p.getY() - prevP.getY()) > 600)) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
@@ -141,7 +141,7 @@ public final class RoboTest {
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
-                Tools.sleep(10000);
+                sleepNoFactor(10000);
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
@@ -156,18 +156,18 @@ public final class RoboTest {
                 while (true) {
                     robot.mousePress(buttonMask);
                     if (lazy) {
-                        Tools.sleep(timeAfterClickLazy);
+                        sleepNoFactor(timeAfterClickLazy);
                     } else {
-                        Tools.sleep(timeAfterClick);
+                        sleepNoFactor(timeAfterClick);
                     }
                     robot.mouseRelease(buttonMask);
                     if (lazy) {
-                        Tools.sleep(timeAfterRelaseLazy);
+                        sleepNoFactor(timeAfterRelaseLazy);
                     } else {
-                        Tools.sleep(timeAfterRelase);
+                        sleepNoFactor(timeAfterRelase);
                     }
                     robot.keyPress(KeyEvent.VK_ESCAPE);
-                    Tools.sleep(100);
+                    sleepNoFactor(100);
                     robot.keyRelease(KeyEvent.VK_ESCAPE);
                     if (abortWithMouseMovement()) {
                         break;
@@ -176,7 +176,7 @@ public final class RoboTest {
                     if ((current - startTime) > duration * 60 * 1000) {
                         break;
                     }
-                    Tools.sleep(500);
+                    sleepNoFactor(500);
                 }
                 Tools.info("click test done");
             }
@@ -193,7 +193,7 @@ public final class RoboTest {
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
-                Tools.sleep(10000);
+                sleepNoFactor(10000);
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
@@ -212,7 +212,7 @@ public final class RoboTest {
                 final int origX = (int) (origP.getX() - locP.getX());
                 final int origY = (int) (origP.getY() - locP.getY());
                 Tools.info("move mouse to the end position");
-                Tools.sleep(5000);
+                sleepNoFactor(5000);
                 final Point2D endP = MouseInfo.getPointerInfo().getLocation();
                 final int endX = (int) (endP.getX() - locP.getX());
                 final int endY = (int) (endP.getY() - locP.getY());
@@ -228,7 +228,7 @@ public final class RoboTest {
                     }
                     if (withClicks) {
                         leftClick(robot);
-                        Tools.sleep(1000);
+                        sleepNoFactor(1000);
                     }
                     moveTo(robot, endX, endY);
                     if (abortWithMouseMovement()) {
@@ -236,7 +236,7 @@ public final class RoboTest {
                     }
                     if (withClicks) {
                         leftClick(robot);
-                        Tools.sleep(1000);
+                        sleepNoFactor(1000);
                     }
                     System.out.println("mouse move test: " + i);
                     i++;
@@ -274,7 +274,7 @@ public final class RoboTest {
         host.getSSH().installTestFiles();
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
-                Tools.sleep(3000);
+                sleepNoFactor(3000);
                 Robot robot = null;
                 try {
                     robot = new Robot(SCREEN_DEVICE);
@@ -439,12 +439,14 @@ public final class RoboTest {
                         || "y1".equals(index)) {
                         /* DRBD 1 link */
                         int i = 1;
+                        final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
                             startDRBDTest1("drbd-test" + index,
                                            robot,
-                                           host);
+                                           host,
+                                           blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -459,10 +461,11 @@ public final class RoboTest {
                     } else if ("2".equals(index)) {
                         /* DRBD cancel */
                         int i = 1;
+                        final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest2(robot, host);
+                            startDRBDTest2(robot, host, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -473,10 +476,14 @@ public final class RoboTest {
                     } else if ("3".equals(index)) {
                         /* DRBD 2 resoruces */
                         int i = 1;
+                        final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest3("drbd-test" + index, robot, host);
+                            startDRBDTest3("drbd-test" + index,
+                                           robot,
+                                           host,
+                                           blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -491,10 +498,14 @@ public final class RoboTest {
                     } else if ("4".equals(index)) {
                         /* DRBD 2 volumes */
                         int i = 1;
+                        final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest4("drbd-test" + index, robot, host);
+                            startDRBDTest4("drbd-test" + index,
+                                           robot,
+                                           host,
+                                           blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -757,13 +768,13 @@ public final class RoboTest {
             sleep(1000);
             moveTo(robot, 221, 493);
             leftClick(robot); /* move res 3 up */
-            Tools.sleep(10000);
+            sleepNoFactor(10000);
             checkTest(host, "test1", 3.11); /* 3.11 */
             moveTo(robot, 137, 328);
             rightClick(robot);
             moveTo(robot, 236, 515);
             leftClick(robot); /* move res 3 down */
-            Tools.sleep(10000);
+            sleepNoFactor(10000);
             checkTest(host, "test1", 3.12); /* 3.12 */
         }
 
@@ -1166,7 +1177,7 @@ public final class RoboTest {
             removeEverything(robot);
         }
         if (!aborted) {
-            Tools.sleep(20000);
+            sleepNoFactor(20000);
         }
         checkTest(host, "test1", 1);
     }
@@ -1456,7 +1467,7 @@ public final class RoboTest {
             removeEverything(robot);
         }
         if (!aborted) {
-            Tools.sleep(20000);
+            sleepNoFactor(20000);
         }
         checkTest(host, "test2", 16);
     }
@@ -1651,7 +1662,7 @@ public final class RoboTest {
         while (true) {
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
             if (!aborted) {
-                Tools.sleep(2000);
+                sleepNoFactor(2000);
             }
             removeConstraint(robot, dum1PopX, dum1PopY);
         }
@@ -1982,15 +1993,30 @@ public final class RoboTest {
         moveTo(robot, 1100, 150);
         leftRelease(robot);
     }
+    private static void sleepNoFactor(final double x) {
+        sleep(x / slowFactor);
+    }
 
     /** Sleep for x milliseconds * slowFactor + some random time. */
-    private static void sleep(final int x) {
+    private static void sleep(final double x) {
         if (abortWithMouseMovement()) {
             return;
         }
         if (!aborted) {
-            Tools.sleep((int) (x * slowFactor));
-            Tools.sleep((int) (x * slowFactor * Math.random()));
+            final double sleepTime = x * slowFactor
+                                     + x * slowFactor * Math.random();
+            final double step = 100;
+            double rest = sleepTime;
+            for (double i = step; i < sleepTime; i += step) {
+                Tools.sleep((int) step);
+                if (abortWithMouseMovement()) {
+                    return;
+                }
+                rest -= step;
+            }
+            if (rest > 0) {
+                Tools.sleep((int) rest);
+            }
         }
     }
 
@@ -2402,7 +2428,7 @@ public final class RoboTest {
         }
         robot.keyPress(ke);
         robot.keyRelease(ke);
-        Tools.sleep(200);
+        sleepNoFactor(200);
     }
 
     /** Left click. */
@@ -2411,9 +2437,9 @@ public final class RoboTest {
             return;
         }
         robot.mousePress(InputEvent.BUTTON1_MASK);
-        Tools.sleep(400);
+        sleepNoFactor(400);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
-        Tools.sleep(300);
+        sleepNoFactor(300);
     }
 
     /** Left press. */
@@ -2422,7 +2448,7 @@ public final class RoboTest {
             return;
         }
         robot.mousePress(InputEvent.BUTTON1_MASK);
-        Tools.sleep(300);
+        sleepNoFactor(300);
     }
 
     /** Left release. */
@@ -2431,7 +2457,7 @@ public final class RoboTest {
             return;
         }
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
-        Tools.sleep(300);
+        sleepNoFactor(300);
     }
 
     /** Right click. */
@@ -2439,9 +2465,9 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        Tools.sleep(1000);
+        sleepNoFactor(1000);
         robot.mousePress(InputEvent.BUTTON3_MASK);
-        Tools.sleep(500);
+        sleepNoFactor(500);
         robot.mouseRelease(InputEvent.BUTTON3_MASK);
         sleep(6000);
     }
@@ -2452,7 +2478,7 @@ public final class RoboTest {
             return;
         }
         rightClick(robot);
-        Tools.sleep(10000);
+        sleepNoFactor(10000);
     }
 
     /** Move to position. */
@@ -2515,7 +2541,7 @@ public final class RoboTest {
     /** Register movement. */
     public static void registerMovement() {
         Tools.info("start register movement in 3 seconds");
-        Tools.sleep(3000);
+        sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
                 Point2D prevP = new Point2D.Double(0, 0);
@@ -2528,7 +2554,7 @@ public final class RoboTest {
                     final Point2D newPos = new Point2D.Double(
                                                       pos.getX() - loc.getX(),
                                                       pos.getY() - loc.getY());
-                    Tools.sleep(2000);
+                    sleepNoFactor(2000);
                     if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
                         Tools.info("moveTo(robot, "
                                     + (int) newPos.getX()
@@ -2547,16 +2573,32 @@ public final class RoboTest {
         thread.start();
     }
 
+    /** Return vertical position of the blockdevices. */
+    private static int getBlockDevY() {
+        Tools.info("move to position, start in 10 seconds");
+        sleepNoFactor(10000);
+        final Point2D loc =
+           Tools.getGUIData().getMainFrame().getLocationOnScreen();
+        final Point2D pos =
+                          MouseInfo.getPointerInfo().getLocation();
+        final int y = (int) (pos.getY() - loc.getY());
+        if (y > 580) {
+            return 315;
+        }
+        return y;
+    }
+
     /** DRBD Test 1. */
     private static void startDRBDTest1(final String drbdTest,
                                        final Robot robot,
-                                       final Host host) {
+                                       final Host host,
+                                       final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
-        moveTo(robot, 334, 315); /* add drbd resource */
+        moveTo(robot, 334, blockDevY); /* add drbd resource */
         rightClick(robot);
-        moveTo(robot, 342, 321);
-        moveTo(robot, 667, 322);
+        moveTo(robot, 342, blockDevY + 6);
+        moveTo(robot, 667, blockDevY + 7);
         leftClick(robot);
         sleep(20000);
 
@@ -2613,13 +2655,15 @@ public final class RoboTest {
     }
 
     /** DRBD Test 1. */
-    private static void startDRBDTest2(final Robot robot, final Host host) {
+    private static void startDRBDTest2(final Robot robot,
+                                       final Host host,
+                                       final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
-        moveTo(robot, 334, 315); /* add drbd resource */
+        moveTo(robot, 334, blockDevY); /* add drbd resource */
         rightClick(robot);
-        moveTo(robot, 342, 321);
-        moveTo(robot, 667, 322);
+        moveTo(robot, 342, blockDevY + 6);
+        moveTo(robot, 667, blockDevY + 7);
         leftClick(robot);
         sleep(20000);
 
@@ -2632,22 +2676,23 @@ public final class RoboTest {
     /** DRBD Test 3. */
     private static void startDRBDTest3(final String drbdTest,
                                        final Robot robot,
-                                       final Host host) {
+                                       final Host host,
+                                       final int blockDevY) {
         /* Two drbds. */
         slowFactor = 0.2f;
         aborted = false;
-        int offset = 0;
         int protocolY = 600;
         int correctionY = 0;
         if (!host.hasVolumes()) {
             protocolY = 400;
             correctionY = 30;
         }
+        int offset = 0;
         for (int i = 0; i < 2; i++) {
-            moveTo(robot, 334, 315 + offset); /* add drbd resource */
+            moveTo(robot, 334, blockDevY + offset); /* add drbd resource */
             rightClick(robot);
-            moveTo(robot, 342, 321 + offset);
-            moveTo(robot, 667, 322 + offset);
+            moveTo(robot, 342, blockDevY + 6 + offset);
+            moveTo(robot, 667, blockDevY + 7 + offset);
             leftClick(robot);
             sleep(10000);
             if (i == 1 && host.hasVolumes()) {
@@ -2839,7 +2884,8 @@ public final class RoboTest {
     /** DRBD Test 4. */
     private static void startDRBDTest4(final String drbdTest,
                                        final Robot robot,
-                                       final Host host) {
+                                       final Host host,
+                                       final int blockDevY) {
         /* Two drbds. */
         slowFactor = 0.2f;
         aborted = false;
@@ -2851,10 +2897,10 @@ public final class RoboTest {
             correctionY = 30;
         }
         for (int i = 0; i < 2; i++) {
-            moveTo(robot, 334, 315 + offset); /* add drbd resource */
+            moveTo(robot, 334, blockDevY + offset); /* add drbd resource */
             rightClick(robot);
-            moveTo(robot, 342, 321 + offset);
-            moveTo(robot, 667, 322 + offset);
+            moveTo(robot, 342, blockDevY + 6 + offset);
+            moveTo(robot, 667, blockDevY + 7 + offset);
             leftClick(robot);
             sleep(20000);
             if (i == 0) {
@@ -3133,10 +3179,10 @@ public final class RoboTest {
 
         checkVMTest(host, vmTest, 2);
 
-        Tools.sleep(2000);
+        sleepNoFactor(2000);
         moveTo(robot, 814, 570); /* finish */
         leftClick(robot);
-        Tools.sleep(5000);
+        sleepNoFactor(5000);
 
         moveTo(robot, 620, 480); /* number of cpus */
         sleep(1000);
@@ -3152,18 +3198,18 @@ public final class RoboTest {
         sleep(1000);
         checkVMTest(host, vmTest, 3);
 
-        Tools.sleep(2000);
+        sleepNoFactor(2000);
         moveTo(robot, 1066, 284); /* remove */
         leftClick(robot);
-        Tools.sleep(2000);
+        sleepNoFactor(2000);
         moveTo(robot, 516, 480); /* confirm */
         leftClick(robot);
-        Tools.sleep(5000);
+        sleepNoFactor(5000);
     }
 
     private static void saveAndExit() {
         Tools.save(Tools.getConfigData().getSaveFile());
-        Tools.sleep(10000);
+        sleepNoFactor(10000);
         System.exit(0);
     }
 
