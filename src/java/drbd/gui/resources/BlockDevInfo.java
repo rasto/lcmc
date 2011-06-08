@@ -1803,4 +1803,18 @@ public final class BlockDevInfo extends EditableInfo {
         return getHost().getFreeInVolumeGroup(
                                            getBlockDevice().getVolumeGroup());
     }
+
+    /** Returns true if this is the first volume in the resource. Returns true
+     * if this is not a DRBD resource. */
+    public boolean isFirstDrbdVolume() {
+        if (!getBlockDevice().isDrbd()) {
+            return true;
+        }
+        final Set<DrbdVolumeInfo> drbdVolumes =
+                    getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdVolumes();
+        if (drbdVolumes == null || drbdVolumes.isEmpty()) {
+            return true;
+        }
+        return drbdVolumes.iterator().next() == getDrbdVolumeInfo();
+    }
 }

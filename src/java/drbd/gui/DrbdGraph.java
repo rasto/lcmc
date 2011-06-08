@@ -88,7 +88,7 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
-    private static final int BD_STEP_Y = 55;
+    private static final int BD_STEP_Y = 60;
     /** Y position of the host. */
     private static final int HOST_Y_POS = 40;
     /** Vertical step in pixels by which the hosts are drawn in the graph. */
@@ -216,6 +216,7 @@ public final class DrbdGraph extends ResourceGraph {
                 }
             }
         }
+        BlockDevInfo prevBdi = null;
         for (final BlockDevInfo bdi : blockDevInfos) {
             Vertex bdv = null;
             if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
@@ -233,21 +234,31 @@ public final class DrbdGraph extends ResourceGraph {
             if (bdv == null) {
                 bdv = blockDeviceToVertexMap.get(bdi.getBlockDevice());
             }
+            if (prevBdi != null
+                && (!bdi.getBlockDevice().isDrbd()
+                    || !prevBdi.getBlockDevice().isDrbd())) {
+                devYPos -= 4;
+            } else if (prevBdi != null
+                && bdi.getBlockDevice().isDrbd()
+                && prevBdi.getBlockDevice().isDrbd()
+                && bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
+                   == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
+                devYPos -= 6;
+            }
             Point2D pos = null; // getSavedPosition(bdi);
-            if (pos == null) {
                 pos = new Point2D.Double(
                     hostXPos + BD_X_OFFSET + VERTEX_SIZE_BD / 2,
                     devYPos);
-            }
+            devYPos += BD_STEP_Y;
             getVertexLocations().put(bdv, pos);
             putVertexLocations();
             getLayout().setLocation(bdv, pos);
-            devYPos += BD_STEP_Y;
             if (bdv != null) {
                 lockGraph();
                 getGraph().addVertex(bdv);
                 unlockGraph();
             }
+            prevBdi = bdi;
         }
     }
 
@@ -762,6 +773,22 @@ public final class DrbdGraph extends ResourceGraph {
             } else {
                 return Tools.getDefaultColor("DrbdGraph.FillPaintUnknown");
             }
+        }
+    }
+
+    /**
+     * Returns secondary gradient fill paint color for vertex v. If it is 
+     * a volume and there is previous volume don't show gradient.
+     */
+    @Override protected Color getVertexFillSecondaryColor(final Vertex v) {
+        if (!isVertexBlockDevice(v)) {
+            return Color.WHITE;
+        }
+        final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+        if (bdi.isFirstDrbdVolume()) {
+            return Color.WHITE;
+        } else {
+            return getVertexFillColor(v);
         }
     }
 
