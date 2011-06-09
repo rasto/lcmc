@@ -2671,8 +2671,7 @@ public final class RoboTest {
         sleep(20000);
     }
 
-    private static void newDrbdResource(final Robot robot,
-                                        final int blockDevY) {
+    private static void newDrbdResource(final Robot robot) {
         moveTo(robot, 720, 570); /* new drbd resource */
         leftClick(robot); /* next */
         sleep(10000);
@@ -2738,11 +2737,11 @@ public final class RoboTest {
         aborted = false;
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
         addBlockDevice(robot);
+        sleep(50000);
         checkDRBDTest(host, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
@@ -2765,95 +2764,89 @@ public final class RoboTest {
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
-        sleep(40000);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
-
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        sleep(40000);
-
-        addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
-        sleep(40000);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
-        sleep(40000);
+        confirmRemove(robot);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
-        sleep(40000);
+        confirmRemove(robot);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
         addBlockDevice(robot);
+        sleep(50000);
         checkDRBDTest(host, drbdTest, 1);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
         confirmRemove(robot);
-        sleep(40000);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
         addBlockDevice(robot);
+        sleep(50000);
         checkDRBDTest(host, drbdTest, 1);
         addMetaData(robot);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
         confirmRemove(robot);
-        sleep(40000);
+        sleep(60000);
 
         addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
         addBlockDevice(robot);
+        sleep(50000);
+        checkDRBDTest(host, drbdTest, 1);
+        addMetaData(robot);
+        addFileSystem(robot);
+        checkDRBDTest(host, drbdTest, 1.1);
+        sleep(20000);
+
+        moveTo(robot, 960, 570);
+        leftClick(robot); /* cancel */
+        confirmRemove(robot);
+        sleep(60000);
+
+        addDrbdResource(robot, blockDevY);
+        chooseDrbdResource(robot);
+        addDrbdVolume(robot);
+        addBlockDevice(robot);
+        addBlockDevice(robot);
+        sleep(50000);
         checkDRBDTest(host, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
         checkDRBDTest(host, drbdTest, 1.1);
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        confirmRemove(robot);
-        sleep(40000);
-
-        addDrbdResource(robot, blockDevY);
-        newDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
-        checkDRBDTest(host, drbdTest, 1);
-        addMetaData(robot);
-        addFileSystem(robot);
-        checkDRBDTest(host, drbdTest, 1.1);
         removeDrbdVolume(robot);
         checkDRBDTest(host, drbdTest, 2);
     }
@@ -2874,60 +2867,25 @@ public final class RoboTest {
         }
         int offset = 0;
         for (int i = 0; i < 2; i++) {
-            moveTo(robot, 334, blockDevY + offset); /* add drbd resource */
-            rightClick(robot);
-            moveTo(robot, 342, blockDevY + 6 + offset);
-            moveTo(robot, 667, blockDevY + 7 + offset);
-            leftClick(robot);
-            sleep(10000);
+            addDrbdResource(robot, blockDevY + offset);
             if (i == 1 && host.hasVolumes()) {
-                moveTo(robot, 720, 570); /* new drbd resource */
-                leftClick(robot); /* next */
-                sleep(10000);
+                newDrbdResource(robot);
             }
+            chooseDrbdResource(robot);
 
+            addDrbdVolume(robot);
+            addBlockDevice(robot);
+            addBlockDevice(robot);
+            sleep(50000);
 
-            moveTo(robot, 521, 372); /* interface 1 */
-            leftClick(robot);
-            moveTo(robot, 486, 411);
-            leftClick(robot);
-            sleep(10000);
-
-            moveTo(robot, 521, 402); /* interface 2 */
-            leftClick(robot);
-            moveTo(robot, 486, 441);
-            leftClick(robot);
-            sleep(10000);
-
-            moveTo(robot, 720, 570);
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 720, 570); /* volume */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 720, 570); /* block device */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 720, 570); /* block device */
-            leftClick(robot); /* next */
-            sleep(10000);
             if (offset == 0) {
                 checkDRBDTest(host, drbdTest, 1.1);
             } else {
                 checkDRBDTest(host, drbdTest, 1.2);
             }
             sleep(10000);
-
-            moveTo(robot, 720, 570); /* meta-data */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 820, 570); /* fs */
-            leftClick(robot); /* finish */
-            sleep(10000);
+            addMetaData(robot);
+            addFileSystem(robot);
 
             if (offset == 0) {
                 checkDRBDTest(host, drbdTest, 1);
@@ -3082,29 +3040,10 @@ public final class RoboTest {
             correctionY = 30;
         }
         for (int i = 0; i < 2; i++) {
-            moveTo(robot, 334, blockDevY + offset); /* add drbd resource */
-            rightClick(robot);
-            moveTo(robot, 342, blockDevY + 6 + offset);
-            moveTo(robot, 667, blockDevY + 7 + offset);
-            leftClick(robot);
-            sleep(20000);
+            addDrbdResource(robot, blockDevY + offset);
             if (i == 0) {
                 /* first one */
-                moveTo(robot, 521, 372); /* interface 1 */
-                leftClick(robot);
-                moveTo(robot, 486, 411);
-                leftClick(robot);
-                sleep(10000);
-
-                moveTo(robot, 521, 402); /* interface 2 */
-                leftClick(robot);
-                moveTo(robot, 486, 441);
-                leftClick(robot);
-                sleep(10000);
-
-                moveTo(robot, 720, 570);
-                leftClick(robot); /* next */
-                sleep(10000);
+                chooseDrbdResource(robot);
             } else {
                 /* existing drbd resource */
                 moveTo(robot, 460, 400);
@@ -3114,22 +3053,14 @@ public final class RoboTest {
                 moveTo(robot, 720, 570);
                 leftClick(robot); /* next */
                 sleep(10000);
-                moveTo(robot, 720, 570); /* volume */
-                leftClick(robot); /* next */
-                sleep(10000);
+
+                //addDrbdVolume(robot);
             }
+            addDrbdVolume(robot);
 
-            moveTo(robot, 720, 570); /* volume */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 720, 570); /* block device */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 720, 570); /* block device */
-            leftClick(robot); /* next */
-            sleep(10000);
+            addBlockDevice(robot);
+            addBlockDevice(robot);
+            sleep(50000);
             if (offset == 0) {
                 checkDRBDTest(host, drbdTest, 1.1);
             } else {
@@ -3137,13 +3068,8 @@ public final class RoboTest {
             }
             sleep(10000);
 
-            moveTo(robot, 720, 570); /* meta-data */
-            leftClick(robot); /* next */
-            sleep(10000);
-
-            moveTo(robot, 820, 570); /* fs */
-            leftClick(robot); /* finish */
-            sleep(10000);
+            addMetaData(robot);
+            addFileSystem(robot);
 
             if (offset == 0) {
                 checkDRBDTest(host, drbdTest, 1);
