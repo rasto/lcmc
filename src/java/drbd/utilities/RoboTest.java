@@ -404,7 +404,7 @@ public final class RoboTest {
                                    + secs);
                     } else if ("5".equals(index)) {
                         int i = 1;
-                        while (true) {
+                        while (!aborted) {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
@@ -417,7 +417,7 @@ public final class RoboTest {
                         }
                     } else if ("6".equals(index)) {
                         int i = 1;
-                        while (true) {
+                        while (!aborted) {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
@@ -503,9 +503,11 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest4(robot, host, blockDevY);
-                            if (aborted) {
-                                break;
+                            if (host.hasVolumes()) {
+                                startDRBDTest4(robot, host, blockDevY);
+                                if (aborted) {
+                                    break;
+                                }
                             }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
@@ -861,9 +863,10 @@ public final class RoboTest {
         moveTo(robot, 1100, 510);
         leftRelease(robot);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             sleep(1000);
             moveTo(robot, 1073, 360);
+            sleep(20000);
             leftClick(robot);
             sleep(1000);
             moveTo(robot, 1073, 410);
@@ -877,8 +880,9 @@ public final class RoboTest {
             checkTest(host, "test1", 3.2); /* 3.2 */
 
             moveTo(robot, 1073 , 360);
+            sleep(30000);
             leftClick(robot);
-            sleep(20000);
+            sleep(1000);
             moveTo(robot, 1073 , 380);
             leftClick(robot); /* choose "nothing selected */
             sleep(1000);
@@ -1627,14 +1631,14 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
 
-        final int dummy2X = 235;
-        final int dummy2Y = 500;
+        final int dummy2X = 500;
+        final int dummy2Y = 255;
 
-        final int ph1X = 315;
-        final int ph1Y = 394;
+        final int ph1X = 380;
+        final int ph1Y = 500;
 
 
-        //disableStonith(robot, host);
+        disableStonith(robot, host);
         /* create 2 dummies */
         checkTest(host, "test5", 1);
 
@@ -1663,46 +1667,31 @@ public final class RoboTest {
         checkTest(host, "test5", 3);
 
         leftClick(robot); /*  apply */
+        int dum1PopX = dummy1X + 80;
+        int dum1PopY = dummy1Y + 60;
+        removeConstraint(robot, dum1PopX, dum1PopY);
+        /* constraints */
+        for (int i = 1; i <=10; i++) {
+            addConstraint(robot, dummy1X, dummy1Y, 35, false, -1);
+
+            checkTest(host, "test5", 3.5);
+
+            removeConstraint(robot, dum1PopX, dum1PopY);
+            checkTest(host, "test5", 2);
+
+            addConstraint(robot, ph1X, ph1Y, 5, false, -1);
+
+            checkTest(host, "test5", 3);
+
+            removeConstraint(robot, dum1PopX, dum1PopY);
+            checkTest(host, "test5", 2);
+            Tools.info("i: " + i);
+        }
         stopEverything(robot);
         checkTest(host, "test5", 3.1);
         removeEverything(robot);
         sleep(5000);
-        checkTest(host, "test5", 4);
-        //int dum1PopX = dummy1X + 70;
-        //int dum1PopY = dummy1Y + 60;
-        ///* constraints */
-        //for (int i = 1; i <=10; i++) {
-        //    addConstraint(robot, dummy1X, dummy1Y, 5, false, -1);
-
-        //    moveTo(robot, ph1X , ph1Y);
-        //    sleep(2000);
-        //    leftClick(robot);
-        //    sleep(2000);
-        //    moveTo(robot, 809, 192); /* ptest */
-        //    sleep(2000);
-        //    leftClick(robot); /*  apply */
-
-        //    checkTest(host, "test5", 2);
-
-        //    removeConstraint(robot, dum1PopX, dum1PopY);
-        //    checkTest(host, "test5", 3);
-
-        //    addConstraint(robot, ph1X, ph1Y, 5, false, -1);
-
-        //    moveTo(robot, ph1X, ph1Y);
-        //    sleep(2000);
-        //    leftClick(robot);
-        //    sleep(2000);
-        //    moveTo(robot, 809, 192); /* ptest */
-        //    sleep(2000);
-        //    leftClick(robot); /*  apply */
-
-        //    checkTest(host, "test5", 4);
-
-        //    removeConstraint(robot, dum1PopX, dum1PopY);
-        //    checkTest(host, "test5", 3);
-        //    Tools.info("i: " + i);
-        //}
+        checkTest(host, "test5", 1);
     }
 
     /** TEST 6. */
@@ -1732,7 +1721,7 @@ public final class RoboTest {
         //checkTest(host, "test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
-        while (true) {
+        for (int i = 0; i < 20; i++) {
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
             if (!aborted) {
                 sleepNoFactor(2000);
