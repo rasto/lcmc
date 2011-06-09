@@ -666,6 +666,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }
                 if (host.hasVolumes()) {
                     DRBD.delMinor(host, getDevice(), testOnly);
+                    if (lastVolume) {
+                        DRBD.delConnection(host, getName(), testOnly);
+                    }
                 }
             }
         }
@@ -889,7 +892,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             hg.addOrder(null, di, giFi);
         }
         di.waitForInfoPanel();
-        di.paramComboBoxGet("1", null).setValueAndWait(getName());
+        di.paramComboBoxGet("1", null).setValueAndWait(
+                                            getDrbdResourceInfo().getName());
         di.apply(dcHost, testOnly);
     }
 
@@ -923,7 +927,8 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();
-        ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(getName());
+        ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(
+                                            getDrbdResourceInfo().getName());
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
         ldi.apply(dcHost, testOnly);
@@ -971,9 +976,9 @@ public final class DrbdVolumeInfo extends EditableInfo
         String resName = getDrbdResourceInfo().getName();
         String name = getName();
         if (resName == null || name == null || "".equals(name)) {
-            name = Tools.getString("ClusterBrowser.DrbdResUnconfigured");
+            return Tools.getString("ClusterBrowser.DrbdResUnconfigured");
         }
-        return resName + "/" + name;
+        return "DRBD: " + resName + "/" + name;
     }
 
     /** Returns drbd graphical view. */
@@ -1079,8 +1084,6 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
-            getDrbdVolume().setCommited(true);
-            getDrbdResourceInfo().getDrbdResource().setCommited(true);
             getDrbdResourceInfo().getDrbdInfo().setAllApplyButtons();
         }
     }
@@ -1248,5 +1251,18 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns the DrbdVolume resource object of this drbd volume. */
     DrbdVolume getDrbdVolume() {
         return (DrbdVolume) getResource();
+    }
+
+    /**
+     * Returns device name that is used as the string value of the device in
+     * the filesystem resource.
+     */
+    @Override public String getStringValue() {
+        return getDevice();
+    }
+
+    /** Sets stored parameters. */
+    public void setParameters() {
+        getDrbdVolume().setCommited(true);
     }
 }

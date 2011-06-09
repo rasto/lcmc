@@ -579,11 +579,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Adds existing drbd volume to the GUI. */
-    public void addDrbdVolume(final DrbdResourceInfo dri,
-                              final String volumeNr,
-                              final String drbdDevStr,
-                              final List<BlockDevInfo> blockDevInfos,
-                              final boolean testOnly) {
+    public DrbdVolumeInfo addDrbdVolume(final DrbdResourceInfo dri,
+                                        final String volumeNr,
+                                        final String drbdDevStr,
+                                        final List<BlockDevInfo> blockDevInfos,
+                                        final boolean testOnly) {
         final DrbdVolumeInfo dvi = new DrbdVolumeInfo(volumeNr,
                                                       drbdDevStr,
                                                       dri,
@@ -591,6 +591,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                                       getBrowser());
         dri.addDrbdVolume(dvi);
         addDrbdVolume(dvi);
+        return dvi;
     }
 
     /** Add drbd volume. */
@@ -620,7 +621,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         bd2.paramComboBoxRemove(p, "wizard");
                     }
                     if (adrd.isCanceled()) {
-                        bd1.getDrbdVolumeInfo().removeMyself(testOnly);
+                        final DrbdVolumeInfo dvi = bd1.getDrbdVolumeInfo();
+                        if (dvi != null) {
+                            dvi.removeMyself(testOnly);
+                        }
                         getBrowser().getDrbdGraph().stopAnimation(bd1);
                         getBrowser().getDrbdGraph().stopAnimation(bd2);
                         return;

@@ -1582,21 +1582,20 @@ public final class ClusterBrowser extends Browser {
                 if (dri == null) {
                     dri = drbdInfo.addDrbdResource(resName, testOnly);
                     atLeastOneAdded = true;
-                } else {
-                    dri.setParameters();
                 }
-                final DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
+                dri.setParameters();
+                DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
                 if (dvi == null) {
-                    drbdInfo.addDrbdVolume(dri,
+                    dvi = drbdInfo.addDrbdVolume(
+                                           dri,
                                            volumeNr,
                                            drbdDev,
                                            new ArrayList<BlockDevInfo>(
                                                       Arrays.asList(bd1, bd2)),
                                            testOnly);
                     atLeastOneAdded = true;
-                } else {
-                    //dvi.setParameters(); TODO
                 }
+                dvi.setParameters();
             }
         }
         if (atLeastOneAdded) {

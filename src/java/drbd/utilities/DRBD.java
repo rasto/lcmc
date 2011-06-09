@@ -653,11 +653,11 @@ public final class DRBD {
                                  final String resource,
                                  final String volume,
                                  final boolean testOnly) {
-        if (host.hasVolumes()) {
-            disconnect(host, resource, null, null, testOnly); //TODO!!! test only
-            detach(host, resource, null, null, testOnly); //TODO!!! test only
-        }
-        return adjust(host, resource, null, null, testOnly);
+        //if (host.hasVolumes()) {
+        //    disconnect(host, resource, null, null, testOnly); //TODO!!! test only
+        //    detach(host, resource, null, null, testOnly); //TODO!!! test only
+        //}
+        return adjust(host, resource, volume, testOnly);
     }
 
     @Deprecated // TODO: remove disconnect and detach
@@ -668,7 +668,7 @@ public final class DRBD {
         if (host.hasVolumes()) {
             //detach(host, resource, null, null, testOnly); //TODO!!! test only
         }
-        return adjust(host, resource, null, null, testOnly);
+        return adjust(host, resource, volume, testOnly);
     }
 
     /**

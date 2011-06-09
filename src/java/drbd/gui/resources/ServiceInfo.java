@@ -1386,9 +1386,16 @@ public class ServiceInfo extends EditableInfo {
         while (drbdResources.hasMoreElements()) {
             final DefaultMutableTreeNode n =
                       (DefaultMutableTreeNode) drbdResources.nextElement();
-            final CommonDeviceInterface drbdRes =
-                                (CommonDeviceInterface) n.getUserObject();
-            list.add((Info) drbdRes);
+            final DrbdResourceInfo drbdRes =
+                                        (DrbdResourceInfo) n.getUserObject();
+            final Enumeration drbdVolumes = drbdRes.getNode().children();
+            while (drbdVolumes.hasMoreElements()) {
+                final DefaultMutableTreeNode vn =
+                           (DefaultMutableTreeNode) drbdVolumes.nextElement();
+                final CommonDeviceInterface drbdVol =
+                                   (CommonDeviceInterface) vn.getUserObject();
+                list.add((Info) drbdVol);
+            }
         }
 
         /* block devices that are the same on all hosts */

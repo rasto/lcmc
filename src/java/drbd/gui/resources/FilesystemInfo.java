@@ -388,6 +388,7 @@ final class FilesystemInfo extends ServiceInfo {
         final DrbdVolumeInfo newDvi =
                     getBrowser().getDrbdDevHash().get(
                                         getComboBoxValue(FS_RES_PARAM_DEV));
+        System.out.println("new dvi: " + newDvi);
         getBrowser().putDrbdDevHash();
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;

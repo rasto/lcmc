@@ -107,7 +107,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super(name, browser);
         setResource(new DrbdResource(name));
         //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
-        setParameters();
     }
 
     /** Add a drbd volume. */
@@ -607,6 +606,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Sets stored parameters. */
     public void setParameters() {
+        getDrbdResource().setCommited(true);
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
         for (final String sectionString : dxml.getSections()) {
@@ -1225,9 +1225,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
         for (final Host host : getCluster().getHostsArray()) {
-            if (getDrbdResource().isCommited() && host.hasVolumes()) {
-                DRBD.delConnection(host, getName(), testOnly);
-            }
             host.getBrowser().getDrbdVIPortList().remove(savedPort);
         }
 

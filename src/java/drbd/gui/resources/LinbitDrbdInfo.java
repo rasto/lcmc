@@ -98,7 +98,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
         super.setParameters(resourceNode);
         final DrbdVolumeInfo dvi =
                         getBrowser().getDrbdDevHash().get(getResourceName());
-        getBrowser().putDrbdResHash();
+        getBrowser().putDrbdDevHash();
         if (dvi != null) {
             if (isManaged(false) && !getService().isOrphaned()) {
                 dvi.setUsedByCRM(this);
