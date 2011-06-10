@@ -74,7 +74,8 @@ final class BlockDev extends DrbdConfig {
     /** Calls drbd adjust, returns false if there is no meta-data area. */
     private boolean adjust(final BlockDevInfo bdi) {
         final boolean testOnly = false;
-        final int err = DRBD.adjustTest2(bdi.getHost(),
+        final int err = DRBD.adjust(
+                    bdi.getHost(),
                     bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     bdi.getDrbdVolumeInfo().getName(),
                     testOnly);

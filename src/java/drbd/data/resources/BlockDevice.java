@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -76,7 +80,29 @@ public final class BlockDevice extends Resource {
     private String volumeGroup = null;
     /** Logical volume. */
     private String logicalVolume = null;
+    /** States that means that we are connected. */
+    private static final Set<String> CONNECTED_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                           "Connected",
+                                                           "SyncTarget",
+                                                           "SyncSource",
+                                                           "StartingSyncS",
+                                                           "StartingSyncT",
+                                                           "WFBitMapS",
+                                                           "WFBitMapT",
+                                                           "WFSyncUUID",
+                                                           "PausedSyncS",
+                                                           "PausedSyncT",
+                                                           "VerifyS",
+                                                           "VerifyT",
+                                                           "WFReportParams")));
 
+    private static final Set<String> SYNCING_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            "SyncTarget",
+                                                            "SyncSource",
+                                                            "PausedSyncS",
+                                                            "PausedSyncT")));
     /**
      * Creates a new <code>BlockDevice</code> object.
      *
@@ -334,18 +360,7 @@ public final class BlockDevice extends Resource {
         if (connectionState == null) {
             return false;
         }
-        if ("Connected".equals(connectionState)
-            || "SyncTarget".equals(connectionState)
-            || "SyncSource".equals(connectionState)
-            || "StartingSyncS".equals(connectionState)
-            || "StartingSyncT".equals(connectionState)
-            || "WFBitMapS".equals(connectionState)
-            || "WFBitMapT".equals(connectionState)
-            || "WFSyncUUID".equals(connectionState)
-            || "PausedSyncS".equals(connectionState)
-            || "PausedSyncT".equals(connectionState)
-            || "VerifyS".equals(connectionState)
-            || "VerifyT".equals(connectionState)) {
+        if (CONNECTED_STATES.contains(connectionState)) {
             setSplitBrain(false);
             return true;
         }
@@ -412,10 +427,7 @@ public final class BlockDevice extends Resource {
             syncedProgress = null;
             return false;
         }
-        if ("SyncTarget".equals(connectionState)
-            || "SyncSource".equals(connectionState)
-            || "PausedSyncS".equals(connectionState)
-            || "PausedSyncT".equals(connectionState)) {
+        if (SYNCING_STATES.contains(connectionState)) {
             return true;
         }
         syncedProgress = null;

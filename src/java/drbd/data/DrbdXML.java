@@ -1146,9 +1146,7 @@ public final class DrbdXML extends XML {
                 + "(?:st|ro):(\\S+)/(\\S+)\\s+ds:(\\S+)/(\\S+)\\s+(\\S+).*?");
         Matcher m = p.matcher(output);
         final Pattern pDev = Pattern.compile("^(\\d+),(\\S+)\\[(\\d+)\\]$");
-        System.out.println("output: " + output);
         if (m.matches()) {
-            System.out.println("output: " + output + " matches");
             /* String counter      = m.group(1); // not used */
             final String devNrString  = m.group(2);
             final String cs           = m.group(3);
@@ -1170,9 +1168,6 @@ public final class DrbdXML extends XML {
             /* get blockdevice object from device */
             final BlockDevInfo bdi =
                                   getBlockDevInfo(devNr, hostName, drbdGraph);
-            System.out.println("bdi: " + bdi + " devnr: " + devNr
-                                + " hn: " + hostName + " res: " + res
-                                + " volumeNr: " + volumeNr);
             if (bdi != null) {
                 if (bdi.getBlockDevice().isDifferent(cs, ro1, ds1, flags)) {
                     bdi.getBlockDevice().setConnectionState(cs);
