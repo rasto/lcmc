@@ -626,7 +626,6 @@ public final class HeartbeatGraph extends ResourceGraph {
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
             if (hbci != null && !hbci.isNew()) {
                 /* don't remove the new ones. */
-                edgeIsColocationList.remove(edge);
                 keepEdgeIsColocationList.remove(edge);
             }
         }
@@ -1498,6 +1497,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         mHbConnectionReadLock.unlock();
         if (edgeIsColocationList.contains(edge)) {
             if (!testOnly) {
+                edgeIsColocationList.remove(edge);
                 keepEdgeIsColocationList.remove(edge);
             }
             siRsc.removeColocation(siWithRsc, dcHost, testOnly);

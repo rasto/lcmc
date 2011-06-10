@@ -387,10 +387,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 final HbConnectionInfo[] hbcis =
                        getBrowser().getHeartbeatGraph().getHbConnections(this);
                 for (final HbConnectionInfo hbci : hbcis) {
-                    getBrowser().getHeartbeatGraph().removeOrder(hbci,
-                                                                 dcHost,
-                                                                 testOnly);
-                    getBrowser().getHeartbeatGraph().removeColocation(hbci,
+                    getBrowser().getHeartbeatGraph().removeConnection(hbci,
                                                                       dcHost,
                                                                       testOnly);
                 }
