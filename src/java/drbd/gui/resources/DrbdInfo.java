@@ -474,7 +474,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                 createDrbdConfig(false);
                                 for (final Host h
                                        : getBrowser().getCluster().getHosts()) {
-                                    DRBD.adjustTest(h, DRBD.ALL, null, false);
+                                    DRBD.adjust(h, DRBD.ALL, null, false);
                                 }
                             } catch (
                                 final Exceptions.DrbdConfigException dce) {

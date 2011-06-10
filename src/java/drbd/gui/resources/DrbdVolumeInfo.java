@@ -279,7 +279,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
-                                DRBD.adjustTest(h, DRBD.ALL, null, false);
+                                DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
@@ -667,7 +667,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                 if (host.hasVolumes()) {
                     DRBD.delMinor(host, getDevice(), testOnly);
                     if (lastVolume) {
-                        DRBD.delConnection(host, getName(), testOnly);
+                        DRBD.delConnection(host,
+                                           getDrbdResourceInfo().getName(),
+                                           testOnly);
                     }
                 }
             }

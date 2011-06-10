@@ -647,30 +647,6 @@ public final class DRBD {
         return adjust(host, resource, null, null, testOnly);
     }
 
-    /** Executes the drbdadm adjust on the specified host and resource. */
-    @Deprecated // TODO: remove disconnect and detach
-    public static int adjustTest(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final boolean testOnly) {
-        //if (host.hasVolumes()) {
-        //    disconnect(host, resource, null, null, testOnly); //TODO!!! test only
-        //    detach(host, resource, null, null, testOnly); //TODO!!! test only
-        //}
-        return adjust(host, resource, volume, testOnly);
-    }
-
-    @Deprecated // TODO: remove disconnect and detach
-    public static int adjustTest2(final Host host,
-                                  final String resource,
-                                  final String volume,
-                                  final boolean testOnly) {
-        if (host.hasVolumes()) {
-            //detach(host, resource, null, null, testOnly); //TODO!!! test only
-        }
-        return adjust(host, resource, volume, testOnly);
-    }
-
     /**
      * Executes the drbdadm adjust on the specified host and resource and
      * calls the callback function.
