@@ -5,8 +5,9 @@ primitive res_Dummy_1 ocf:heartbeat:Dummy
 	op start interval="0" timeout="20" 
 	op stop interval="0" timeout="20" 
 	op monitor interval="10" timeout="20" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
+	op reload interval="0" timeout="20" 
+	op migrate_to interval="0" timeout="20" 
+	op migrate_from interval="0" timeout="20" 
 	meta target-role="stopped"
 clone cl_Dummy_1 res_Dummy_1 
 	meta clone-max="2" notify="true"
