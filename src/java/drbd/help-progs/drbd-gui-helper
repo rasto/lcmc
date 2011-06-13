@@ -828,6 +828,9 @@ sub get_cluster_events {
 					    or return "ERROR: Can't connect to "
 						      ."$cb_socket_name: $!";
 					$testcount = 10;
+					# don't close TESTCB immediately,
+					# cib doesn't like it.
+					sleep 1;
 				}
 				if ($cibevent > 0) {
 					my $info = get_cluster_info();
