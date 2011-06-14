@@ -788,8 +788,8 @@ sub get_cluster_events {
 		# register is needed for old pacemakers and heartbeats
 		# pcmk <= 0.6
 		cib_message($CB, "cib_op=register\n"
-				 ."cib_callback_token=ffj\n"
-				 ."cib_clientname=fdfd\n");
+				 ."cib_callback_token=$token\n"
+				 ."cib_clientname=$clientid\n");
 
 		cib_message($CB, "cib_op=cib_notify\n"
 				 ."cib_notify_type=cib_diff_notify\n"
@@ -827,7 +827,7 @@ sub get_cluster_events {
 				next;
 			}
 
-			next if select($rout=$rin, undef, undef, 10);
+			next if !select($rout=$rin, undef, undef, 10);
 
 			# timeout.
 			# check for "liveliness" or restart of cib
