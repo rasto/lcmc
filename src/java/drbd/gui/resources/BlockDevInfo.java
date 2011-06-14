@@ -1658,8 +1658,8 @@ public final class BlockDevInfo extends EditableInfo {
         String oName;
         int volume = 0;
         int oVolume = 0;
-        if (getBlockDevice().isDrbd()) {
-            final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+        final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+        if (getBlockDevice().isDrbd() && dvi != null) {
             name = dvi.getDrbdResourceInfo().getName();
             final String v = dvi.getName();
             if (Tools.isNumber(v)) {
@@ -1669,8 +1669,8 @@ public final class BlockDevInfo extends EditableInfo {
             name = getName();
         }
         final BlockDevInfo obdi = (BlockDevInfo) o;
-        if (obdi.getBlockDevice().isDrbd()) {
-            final DrbdVolumeInfo odvi = obdi.getDrbdVolumeInfo();
+        final DrbdVolumeInfo odvi = obdi.getDrbdVolumeInfo();
+        if (obdi.getBlockDevice().isDrbd() && odvi != null) {
             oName = odvi.getDrbdResourceInfo().getName();
             final String v = odvi.getName();
             if (Tools.isNumber(v)) {
