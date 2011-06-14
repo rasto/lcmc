@@ -3227,98 +3227,105 @@ public final class RoboTest {
         aborted = false;
         checkVMTest(host, vmTest, 1);
 
-        moveTo(robot, 56, 252); /* popup */
-        rightClick(robot);
-        moveTo(robot, 159, 271); /* new domain */
-        leftClick(robot);
-        moveTo(robot, 450, 380); /* domain name */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_D);
-        sleep(200);
-        press(robot, KeyEvent.VK_M);
-        sleep(200);
-        press(robot, KeyEvent.VK_C);
-        sleep(200);
-        moveTo(robot, 730, 570);
-        leftClick(robot);
-        //press(robot, KeyEvent.VK_ENTER);
+        final int count = 2;
+        for (int j = 0; j < count; j++) {
+            moveTo(robot, 56, 252); /* popup */
+            rightClick(robot);
+            moveTo(robot, 159, 271); /* new domain */
+            leftClick(robot);
+            moveTo(robot, 450, 380); /* domain name */
+            leftClick(robot);
+            press(robot, KeyEvent.VK_D);
+            sleep(200);
+            press(robot, KeyEvent.VK_M);
+            sleep(200);
+            press(robot, KeyEvent.VK_C);
+            sleep(200);
+            for (int k = 0; k < j; k++) {
+                press(robot, KeyEvent.VK_I); /* dmci, dmcii, etc. */
+                sleep(200);
+            }
+            moveTo(robot, 730, 570);
+            leftClick(robot);
+            //press(robot, KeyEvent.VK_ENTER);
 
-        moveTo(robot, 593, 440); /* source file */
-        sleep(2000);
-        leftClick(robot);
-        sleep(2000);
-        press(robot, KeyEvent.VK_T);
-        sleep(200);
-        press(robot, KeyEvent.VK_E);
-        sleep(200);
-        press(robot, KeyEvent.VK_S);
-        sleep(200);
-        press(robot, KeyEvent.VK_T);
-        sleep(2000);
-        for (int i = 0; i < 10; i++) {
-            moveTo(robot, 600, 375); /* disk/block device */
+            moveTo(robot, 593, 440); /* source file */
+            sleep(2000);
+            leftClick(robot);
+            sleep(2000);
+            press(robot, KeyEvent.VK_T);
+            sleep(200);
+            press(robot, KeyEvent.VK_E);
+            sleep(200);
+            press(robot, KeyEvent.VK_S);
+            sleep(200);
+            press(robot, KeyEvent.VK_T);
+            sleep(2000);
+            for (int i = 0; i < 3; i++) {
+                moveTo(robot, 600, 375); /* disk/block device */
+                leftClick(robot);
+                sleep(1000);
+                moveTo(robot, 430, 375); /* image */
+                leftClick(robot);
+                sleep(1000);
+            }
+
+            moveTo(robot, 730, 570);
+            leftClick(robot);
+            //press(robot, KeyEvent.VK_ENTER);
+            sleep(5000);
+            moveTo(robot, 730, 570);
+            leftClick(robot);
+            //press(robot, KeyEvent.VK_ENTER); /* storage */
+            sleep(5000);
+            for (int i = 0; i < 3; i++) {
+                moveTo(robot, 600, 375); /* bridge */
+                leftClick(robot);
+                sleep(1000);
+                moveTo(robot, 430, 375); /* network */
+                leftClick(robot);
+                sleep(1000);
+            }
+            moveTo(robot, 730, 570);
+            leftClick(robot);
+            //press(robot, KeyEvent.VK_ENTER); /* network */
+            sleep(5000);
+            for (int i = 0; i < 3; i++) {
+                moveTo(robot, 600, 375); /* sdl */
+                leftClick(robot);
+                sleep(1000);
+                moveTo(robot, 430, 375); /* vnc */
+                leftClick(robot);
+                sleep(1000);
+            }
+            moveTo(robot, 730, 570);
+            leftClick(robot);
+            //press(robot, KeyEvent.VK_ENTER); /* display */
+            sleep(5000);
+            moveTo(robot, 560, 410); /* create config */
+            leftClick(robot);
+
+            checkVMTest(host, vmTest, 2);
+
+            sleepNoFactor(2000);
+            moveTo(robot, 814, 570); /* finish */
+            leftClick(robot);
+            sleepNoFactor(5000);
+
+            moveTo(robot, 620, 480); /* number of cpus */
+            sleep(1000);
+            leftClick(robot);
+            sleep(500);
+            press(robot, KeyEvent.VK_BACK_SPACE);
+            sleep(500);
+            press(robot, KeyEvent.VK_2);
+            sleep(500);
+            moveTo(robot, 250, 190); /* apply */
+            sleep(1000);
             leftClick(robot);
             sleep(1000);
-            moveTo(robot, 430, 375); /* image */
-            leftClick(robot);
-            sleep(1000);
+            checkVMTest(host, vmTest, 3);
         }
-
-        moveTo(robot, 730, 570);
-        leftClick(robot);
-        //press(robot, KeyEvent.VK_ENTER);
-        sleep(5000);
-        moveTo(robot, 730, 570);
-        leftClick(robot);
-        //press(robot, KeyEvent.VK_ENTER); /* storage */
-        sleep(5000);
-        for (int i = 0; i < 10; i++) {
-            moveTo(robot, 600, 375); /* bridge */
-            leftClick(robot);
-            sleep(1000);
-            moveTo(robot, 430, 375); /* network */
-            leftClick(robot);
-            sleep(1000);
-        }
-        moveTo(robot, 730, 570);
-        leftClick(robot);
-        //press(robot, KeyEvent.VK_ENTER); /* network */
-        sleep(5000);
-        for (int i = 0; i < 10; i++) {
-            moveTo(robot, 600, 375); /* sdl */
-            leftClick(robot);
-            sleep(1000);
-            moveTo(robot, 430, 375); /* vnc */
-            leftClick(robot);
-            sleep(1000);
-        }
-        moveTo(robot, 730, 570);
-        leftClick(robot);
-        //press(robot, KeyEvent.VK_ENTER); /* display */
-        sleep(5000);
-        moveTo(robot, 560, 410); /* create config */
-        leftClick(robot);
-
-        checkVMTest(host, vmTest, 2);
-
-        sleepNoFactor(2000);
-        moveTo(robot, 814, 570); /* finish */
-        leftClick(robot);
-        sleepNoFactor(5000);
-
-        moveTo(robot, 620, 480); /* number of cpus */
-        sleep(1000);
-        leftClick(robot);
-        sleep(500);
-        press(robot, KeyEvent.VK_BACK_SPACE);
-        sleep(500);
-        press(robot, KeyEvent.VK_2);
-        sleep(500);
-        moveTo(robot, 250, 190); /* apply */
-        sleep(1000);
-        leftClick(robot);
-        sleep(1000);
-        checkVMTest(host, vmTest, 3);
 
         sleepNoFactor(2000);
         moveTo(robot, 1066, 284); /* remove */
