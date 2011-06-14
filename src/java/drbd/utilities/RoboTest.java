@@ -2771,12 +2771,14 @@ public final class RoboTest {
         slowFactor = 0.2f;
         aborted = false;
 
+        Tools.info(drbdTest + "/1");
         addDrbdResource(robot, blockDevY);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
         sleep(60000);
 
+        Tools.info(drbdTest + "/2");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
 
@@ -2784,6 +2786,7 @@ public final class RoboTest {
         leftClick(robot); /* cancel */
         sleep(60000);
 
+        Tools.info(drbdTest + "/3");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
@@ -2793,6 +2796,7 @@ public final class RoboTest {
         confirmRemove(robot);
         sleep(60000);
 
+        Tools.info(drbdTest + "/4");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
@@ -2803,6 +2807,7 @@ public final class RoboTest {
         confirmRemove(robot);
         sleep(60000);
 
+        Tools.info(drbdTest + "/5");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
@@ -2816,6 +2821,7 @@ public final class RoboTest {
         confirmRemove(robot);
         sleep(60000);
 
+        Tools.info(drbdTest + "/6");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
@@ -2830,6 +2836,7 @@ public final class RoboTest {
         confirmRemove(robot);
         sleep(60000);
 
+        Tools.info(drbdTest + "/7");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
@@ -2847,13 +2854,14 @@ public final class RoboTest {
         confirmRemove(robot);
         sleep(60000);
 
+        Tools.info(drbdTest + "/8");
         addDrbdResource(robot, blockDevY);
         chooseDrbdResource(robot);
         addDrbdVolume(robot);
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(host, drbdTest, 1.1);
         addMetaData(robot);
         addFileSystem(robot);
         checkDRBDTest(host, drbdTest, 1.1);
