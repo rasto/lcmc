@@ -803,7 +803,7 @@ sub get_cluster_events {
 
 		my $cibevent = 0;
 		my $prev_byte = "";
-		my $testcount = 10; # check every 10 seconds
+		my $testcount = 10; # check every 10th time
 		my $ctime = "";
 		while (1) {
 			my $len = sysread($CB, $byte, 1);
