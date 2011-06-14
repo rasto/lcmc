@@ -721,6 +721,20 @@ sub get_hb_lib_path {
 	return "/usr/lib/heartbeat";
 }
 
+sub get_message {
+	my $socket = shift;
+	my $msg = "";
+	while (<$socket>) {
+		if ($_ eq "<<<\n") {
+			return $msg;
+		}
+		if ($_ !~ />>>/) {
+			$msg .= $_;
+		}
+	}
+	die;
+}
+
 #
 # Prints heartbeat info.
 #
@@ -757,11 +771,25 @@ sub get_cluster_events {
 			print "---done---\n";
 			return;
 		}
+		socket(my $RW, PF_UNIX, SOCK_STREAM, 0);
+		connect($RW, sockaddr_un($rw_socket_name))
+		    or return "ERROR: Can't connect to $rw_socket_name: $!";
+		select($RW); $| = 1; select (STDOUT);
 		
 		socket(my $CB, PF_UNIX, SOCK_STREAM, 0);
 		connect($CB, sockaddr_un($cb_socket_name))
 		    or return "ERROR: Can't connect to $cb_socket_name: $!";
 		select($CB); $| = 1; select (STDOUT);
+		my $msg = get_message($RW);
+		close $RW;
+		my ($op, $clientid, $token) = split /\n/, $msg;
+		$clientid=~s/.*=//;
+		$token=~s/.*=//;
+		# register is needed for old pacemakers and heartbeats
+		# pcmk <= 0.6
+		cib_message($CB, "cib_op=register\n"
+				 ."cib_callback_token=ffj\n"
+				 ."cib_clientname=fdfd\n");
 
 		cib_message($CB, "cib_op=cib_notify\n"
 				 ."cib_notify_type=cib_diff_notify\n"
