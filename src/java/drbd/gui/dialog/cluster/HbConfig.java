@@ -96,6 +96,12 @@ final class HbConfig extends DialogCluster {
     private static final String CRM = "crm";
     /** Compression option. */
     private static final String COMPRESSION = "compression";
+    /** Compression threshold option. */
+    private static final String COMPRESSION_THRESHOLD =
+                                                    "compression_threshold";
+    /** Traditional compression threshold option. */
+    private static final String TRADITIONAL_COMPRESSION =
+                                                    "traditional_compression";
     /** Logfacility option. */
     private static final String LOGFACILITY = "logfacility";
     /** use_logd option. */
@@ -111,6 +117,8 @@ final class HbConfig extends DialogCluster {
                                              INITDEAD,
                                              CRM,
                                              COMPRESSION,
+                                             COMPRESSION_THRESHOLD,
+                                             TRADITIONAL_COMPRESSION,
                                              LOGFACILITY,
                                              USE_LOGD,
                                              AUTOJOIN,
@@ -136,6 +144,8 @@ final class HbConfig extends DialogCluster {
         OPTION_REGEXPS.put(CRM, "\\w*");
 
         OPTION_REGEXPS.put(COMPRESSION, "\\w*");
+        OPTION_REGEXPS.put(COMPRESSION_THRESHOLD, "\\d*");
+        OPTION_REGEXPS.put(TRADITIONAL_COMPRESSION, "\\w*");
         OPTION_REGEXPS.put(LOGFACILITY, "\\w*");
         OPTION_REGEXPS.put(USE_LOGD, "\\w*");
         OPTION_REGEXPS.put(AUTOJOIN, "\\w*");
@@ -146,6 +156,9 @@ final class HbConfig extends DialogCluster {
         OPTION_DEFAULTS.put(DEADTIME, "30");
         OPTION_DEFAULTS.put(INITDEAD, "30");
         OPTION_DEFAULTS.put(CRM, "respawn");
+        OPTION_DEFAULTS.put(COMPRESSION, "bz2");
+        OPTION_DEFAULTS.put(COMPRESSION_THRESHOLD, "20");
+        OPTION_DEFAULTS.put(TRADITIONAL_COMPRESSION, "on");
         /* sizes */
         OPTION_SIZES.put(CRM, 100);
         OPTION_SIZES.put(COMPRESSION, 80);
@@ -255,6 +268,8 @@ final class HbConfig extends DialogCluster {
         optionValues.put(NODE, new String[]{config.toString(), ""});
         optionValues.put(CRM, new String[]{"respawn", "on", "off"});
         optionValues.put(COMPRESSION, new String[]{"", "zlib", "bz2"});
+        optionValues.put(TRADITIONAL_COMPRESSION,
+                         new String[]{"", "on", "off"});
         optionValues.put(LOGFACILITY, new String[]{"local0",
                                                    "local1",
                                                    "local2",
