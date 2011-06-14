@@ -42,6 +42,7 @@ import drbd.gui.resources.CategoryInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -199,7 +200,11 @@ public final class HostBrowser extends Browser {
                                                         getNetInterfacesMap();
         mNetInfosWriteLock.lock();
         try {
-            netInterfacesNode.removeAllChildren();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    netInterfacesNode.removeAllChildren();
+                }
+            });
             for (final NetInterface ni : nis) {
                 NetInfo nii;
                 if (oldNetInterfaces.containsKey(ni)) {
@@ -209,7 +214,7 @@ public final class HostBrowser extends Browser {
                 }
                 resource = new DefaultMutableTreeNode(nii);
                 setNode(resource);
-                netInterfacesNode.add(resource);
+                addNode(netInterfacesNode, resource);
             }
             reload(netInterfacesNode, false);
         } finally {
@@ -221,7 +226,11 @@ public final class HostBrowser extends Browser {
                                                           getBlockDevicesMap();
         mBlockDevInfosWriteLock.lock();
         try {
-            blockDevicesNode.removeAllChildren();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    blockDevicesNode.removeAllChildren();
+                }
+            });
             for (final BlockDevice bd : bds) {
                 BlockDevInfo bdi;
                 if (oldBlockDevices.containsKey(bd)) {
@@ -232,7 +241,7 @@ public final class HostBrowser extends Browser {
                 }
                 resource = new DefaultMutableTreeNode(bdi);
                 //setNode(resource);
-                blockDevicesNode.add(resource);
+                addNode(blockDevicesNode, resource);
             }
             reload(blockDevicesNode, false);
         } finally {
@@ -243,7 +252,11 @@ public final class HostBrowser extends Browser {
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
         mFileSystemsWriteLock.lock();
         try {
-            fileSystemsNode.removeAllChildren();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    fileSystemsNode.removeAllChildren();
+                }
+            });
             for (final String fs : fss) {
                 FSInfo fsi;
                 if (oldFilesystems.containsKey(fs)) {
@@ -253,7 +266,7 @@ public final class HostBrowser extends Browser {
                 }
                 resource = new DefaultMutableTreeNode(fsi);
                 setNode(resource);
-                fileSystemsNode.add(resource);
+                addNode(fileSystemsNode, resource);
             }
             reload(fileSystemsNode, false);
         } finally {

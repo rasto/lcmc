@@ -587,14 +587,14 @@ public final class ClusterBrowser extends Browser {
                 Tools.getString("ClusterBrowser.availableServices"),
                 this));
         setNode(availableServicesNode);
-        heartbeatNode.add(availableServicesNode);
+        addNode(heartbeatNode, availableServicesNode);
 
         /* block devices / shared disks, TODO: */
         commonBlockDevicesNode = new DefaultMutableTreeNode(
             new HbCategoryInfo(
                 Tools.getString("ClusterBrowser.CommonBlockDevices"), this));
         setNode(commonBlockDevicesNode);
-        /* heartbeatNode.add(commonBlockDevicesNode); */
+        /* addNode(heartbeatNode, commonBlockDevicesNode); */
 
         /* resource defaults */
         rscDefaultsInfo = new RscDefaultsInfo("rsc_defaults", this);
@@ -604,7 +604,7 @@ public final class ClusterBrowser extends Browser {
                                  this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
         setNode(servicesNode);
-        heartbeatNode.add(servicesNode);
+        addNode(heartbeatNode, servicesNode);
         addVMSNode();
         selectPath(new Object[]{getTreeTop(), heartbeatNode});
     }
@@ -629,22 +629,30 @@ public final class ClusterBrowser extends Browser {
         /* all hosts */
         final Host[] allHosts =
                                Tools.getConfigData().getHosts().getHostsArray();
-        allHostsNode.removeAllChildren();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                allHostsNode.removeAllChildren();
+            }
+        });
         for (Host host : allHosts) {
             final HostBrowser hostBrowser = host.getBrowser();
             resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
             setNode(resource);
-            allHostsNode.add(resource);
+            addNode(allHostsNode, resource);
         }
         reload(allHostsNode, false);
 
         /* cluster hosts */
-        clusterHostsNode.removeAllChildren();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                clusterHostsNode.removeAllChildren();
+            }
+        });
         for (Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
             resource = hostBrowser.getTreeTop();
             setNode(resource);
-            clusterHostsNode.add(resource);
+            addNode(clusterHostsNode, resource);
             heartbeatGraph.addHost(hostBrowser.getHostInfo());
         }
 
@@ -1381,9 +1389,13 @@ public final class ClusterBrowser extends Browser {
             }
 
             /* remove nodes */
-            for (DefaultMutableTreeNode node : nodesToRemove) {
-                node.removeFromParent();
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    for (DefaultMutableTreeNode node : nodesToRemove) {
+                        node.removeFromParent();
+                    }
+                }
+            });
 
             /* block devices */
             for (String device : bd) {
@@ -1394,7 +1406,7 @@ public final class ClusterBrowser extends Browser {
                                           cluster.getHostBlockDevices(device),
                                           this));
                 setNode(resource);
-                commonBlockDevicesNode.add(resource);
+                addNode(commonBlockDevicesNode, resource);
             }
             reload(commonBlockDevicesNode, false);
         }
@@ -1404,7 +1416,11 @@ public final class ClusterBrowser extends Browser {
     private void updateAvailableServices() {
         DefaultMutableTreeNode resource;
         Tools.debug(this, "update available services");
-        availableServicesNode.removeAllChildren();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                availableServicesNode.removeAllChildren();
+            }
+        });
         for (final String cl : HB_CLASSES) {
             final ResourceAgentClassInfo raci =
                                           new ResourceAgentClassInfo(cl, this);
@@ -1417,10 +1433,10 @@ public final class ClusterBrowser extends Browser {
                 availableServiceMap.put(ra, asi);
                 resource = new DefaultMutableTreeNode(asi);
                 setNode(resource);
-                classNode.add(resource);
+                addNode(classNode, resource);
             }
             setNode(classNode);
-            availableServicesNode.add(classNode);
+            addNode(availableServicesNode, classNode);
         }
     }
 
@@ -1466,9 +1482,13 @@ public final class ClusterBrowser extends Browser {
         }
 
         /* remove nodes */
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                for (final DefaultMutableTreeNode node : nodesToRemove) {
+                    node.removeFromParent();
+                }
+            }
+        });
 
         if (vmsNode == null) {
             mUpdateVMSlock.unlock();
@@ -1613,14 +1633,18 @@ public final class ClusterBrowser extends Browser {
         if (networksNode != null) {
             DefaultMutableTreeNode resource;
             final Network[] networks = cluster.getCommonNetworks();
-            networksNode.removeAllChildren();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    networksNode.removeAllChildren();
+                }
+            });
             for (int i = 0; i < networks.length; i++) {
                 resource = new DefaultMutableTreeNode(
                                     new NetworkInfo(networks[i].getName(),
                                                     networks[i],
                                                     this));
                 setNode(resource);
-                networksNode.add(resource);
+                addNode(networksNode, resource);
             }
             reload(networksNode, false);
         }

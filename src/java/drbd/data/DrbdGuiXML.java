@@ -213,9 +213,9 @@ public final class DrbdGuiXML extends XML {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
+                        cluster.getClusterTab().addClusterView();
                         SwingUtilities.invokeLater(new Runnable() {
-                            @Override public void run() {
-                                cluster.getClusterTab().addClusterView();
+                            public void run() {
                                 cluster.getClusterTab().requestFocus();
                             }
                         });

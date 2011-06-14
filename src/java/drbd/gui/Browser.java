@@ -28,6 +28,7 @@ import drbd.gui.resources.CategoryInfo;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import javax.swing.SwingUtilities;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
@@ -297,11 +298,21 @@ public class Browser {
 
     /** Selects specified path. */
     protected void selectPath(final Object[] path) {
-        final TreePath tp = new TreePath(path);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                final TreePath tp = new TreePath(path);
                 getTree().expandPath(tp);
                 getTree().setSelectionPath(tp);
+            }
+        });
+    }
+
+    /** Add node. */
+    public final void addNode(final DefaultMutableTreeNode node,
+                              final DefaultMutableTreeNode child) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              node.add(child);
             }
         });
     }
