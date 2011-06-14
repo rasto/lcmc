@@ -126,17 +126,17 @@ public final class Host {
     private Map<String, NetInterface> netInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
     /** Available file systems. */
-    private final Set<String> fileSystems = new TreeSet<String>();
+    private Set<String> fileSystems = new TreeSet<String>();
     /** Available crypto modules. */
-    private final Set<String> cryptoModules = new TreeSet<String>();
+    private Set<String> cryptoModules = new TreeSet<String>();
     /** Available qemu keymaps. */
-    private final Set<String> qemuKeymaps = new TreeSet<String>();
+    private Set<String> qemuKeymaps = new TreeSet<String>();
     /** Available libvirt cpu models. */
-    private final Set<String> cpuMapModels = new TreeSet<String>();
+    private Set<String> cpuMapModels = new TreeSet<String>();
     /** Available libvirt cpu vendors. */
-    private final Set<String> cpuMapVendors = new TreeSet<String>();
+    private Set<String> cpuMapVendors = new TreeSet<String>();
     /** Mount points that exist in /mnt dir. */
-    private final Set<String> mountPoints = new TreeSet<String>();
+    private Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
     private Map<String, BlockDevice> blockDevices =
                                       new LinkedHashMap<String, BlockDevice>();
@@ -267,7 +267,7 @@ public final class Host {
         }
         browser = new HostBrowser(this);
         browser.initHostResources();
-        addMountPoint("/mnt/");
+        mountPoints.add("/mnt/");
     }
 
     /** Prepares a new <code>Host</code> object. */
@@ -574,19 +574,9 @@ public final class Host {
         return fileSystems;
     }
 
-    /** Adds file system to the list of file systems. */
-    void addFileSystem(final String fileSystem) {
-        fileSystems.add(fileSystem);
-    }
-
     /** Returns available crypto modules as a list of strings. */
     Set<String> getCryptoModules() {
         return cryptoModules;
-    }
-
-    /** Adds crypto module to the list of crypto modules. */
-    void addCryptoModule(final String cryptoModule) {
-        cryptoModules.add(cryptoModule);
     }
 
     /** Returns available qemu keymaps as a list of strings. */
@@ -594,19 +584,9 @@ public final class Host {
         return qemuKeymaps;
     }
 
-    /** Adds qemu keymap to the list of qemu keymaps. */
-    void addQemuKeymap(final String qemuKeymap) {
-        qemuKeymaps.add(qemuKeymap);
-    }
-
     /** Returns available libvirt's cpu map models. */
     public Set<String> getCPUMapModels() {
         return cpuMapModels;
-    }
-
-    /** Adds libvirt's cpu map models to the list. */
-    void addCPUMapModel(final String cpuMapModel) {
-        cpuMapModels.add(cpuMapModel);
     }
 
     /** Returns available libvirt's cpu map vendors. */
@@ -614,19 +594,9 @@ public final class Host {
         return cpuMapVendors;
     }
 
-    /** Adds libvirt's cpu map vendors to the list. */
-    void addCPUMapVendor(final String cpuMapVendor) {
-        cpuMapVendors.add(cpuMapVendor);
-    }
-
     /** Returns mount points as a list of strings. */
     Set<String> getMountPointsList() {
         return mountPoints;
-    }
-
-    /** Adds mount point to the list of mount points. */
-    private void addMountPoint(final String mountPoint) {
-        mountPoints.add(mountPoint);
     }
 
     /** Returns ips of this host. */
@@ -1791,9 +1761,17 @@ public final class Host {
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
         final Map<String, Long> newVolumeGroups =
-                                         new LinkedHashMap<String, Long>();
+                                     new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS =
-                                         new HashMap<String, Set<String>>();
+                                     new HashMap<String, Set<String>>();
+        final Set<String> newFileSystems = new TreeSet<String>();
+        final Set<String> newCryptoModules = new TreeSet<String>();
+        final Set<String> newQemuKeymaps = new TreeSet<String>();
+        final Set<String> newCpuMapModels = new TreeSet<String>();
+        final Set<String> newCpuMapVendors = new TreeSet<String>();
+        final Set<String> newMountPoints = new TreeSet<String>();
+        newMountPoints.add("/mnt/");
+
         final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
@@ -1861,17 +1839,17 @@ public final class Host {
                     Tools.appWarning("could not parse volume info: " + line);
                 }
             } else if ("filesystems-info".equals(type)) {
-                addFileSystem(line);
+                newFileSystems.add(line);
             } else if ("crypto-info".equals(type)) {
-                addCryptoModule(line);
+                newCryptoModules.add(line);
             } else if ("qemu-keymaps-info".equals(type)) {
-                addQemuKeymap(line);
+                newQemuKeymaps.add(line);
             } else if ("cpu-map-model-info".equals(type)) {
-                addCPUMapModel(line);
+                newCpuMapModels.add(line);
             } else if ("cpu-map-vendor-info".equals(type)) {
-                addCPUMapVendor(line);
+                newCpuMapVendors.add(line);
             } else if ("mount-points-info".equals(type)) {
-                addMountPoint(line);
+                newMountPoints.add(line);
             } else if ("gui-info".equals(type)) {
                 parseGuiInfo(line);
             } else if ("installation-info".equals(type)) {
@@ -1885,6 +1863,14 @@ public final class Host {
         netInterfaces = newNetInterfaces;
         volumeGroups = newVolumeGroups;
         volumeGroupsLVS = newVolumeGroupsLVS;
+
+        fileSystems = newFileSystems;
+        cryptoModules = newCryptoModules;
+        qemuKeymaps = newQemuKeymaps;
+        cpuMapModels = newCpuMapModels;
+        cpuMapVendors = newCpuMapVendors;
+        mountPoints = newMountPoints;
+
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
                                        getFileSystems());

@@ -279,13 +279,18 @@ public final class HostBrowser extends Browser {
         final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
         mBlockDevInfosReadLock.lock();
         try {
-            final Enumeration e = blockDevicesNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode bdNode =
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
+                    final Enumeration e = blockDevicesNode.children();
+                    while (e.hasMoreElements()) {
+                        final DefaultMutableTreeNode bdNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
-                blockDevInfos.add(bdi);
-            }
+                        final BlockDevInfo bdi =
+                                         (BlockDevInfo) bdNode.getUserObject();
+                        blockDevInfos.add(bdi);
+                    }
+                }
+            });
         } finally {
             mBlockDevInfosReadLock.unlock();
         }
@@ -300,13 +305,18 @@ public final class HostBrowser extends Browser {
                                       new HashMap<BlockDevice, BlockDevInfo>();
         mBlockDevInfosReadLock.lock();
         try {
-            final Enumeration e = blockDevicesNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode bdNode =
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
+                    final Enumeration e = blockDevicesNode.children();
+                    while (e.hasMoreElements()) {
+                        final DefaultMutableTreeNode bdNode =
                                       (DefaultMutableTreeNode) e.nextElement();
-                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
-                blockDevices.put(bdi.getBlockDevice(), bdi);
-            }
+                        final BlockDevInfo bdi =
+                                         (BlockDevInfo) bdNode.getUserObject();
+                        blockDevices.put(bdi.getBlockDevice(), bdi);
+                    }
+                }
+            });
         } finally {
             mBlockDevInfosReadLock.unlock();
         }
