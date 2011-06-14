@@ -699,20 +699,6 @@ sub is_smaller_v {
 	return 0;
 }
 
-sub get_message {
-	my $socket = shift;
-	my $msg = "";
-	while (<$socket>) {
-		if ($_ eq "<<<\n") {
-			return $msg;
-		}
-		if ($_ !~ />>>/) {
-			$msg .= $_;
-		}
-	}
-	die;
-}
-
 sub cib_message {
 	my $socket = shift;
 	my $msg = shift;
@@ -772,90 +758,68 @@ sub get_cluster_events {
 			return;
 		}
 		
-		socket(my $RW, PF_UNIX, SOCK_STREAM, 0);
-		connect($RW, sockaddr_un($rw_socket_name))
-		    or return "ERROR: Can't connect to $rw_socket_name: $!";
-		select($RW); $| = 1; select (STDOUT);
-
 		socket(my $CB, PF_UNIX, SOCK_STREAM, 0);
 		connect($CB, sockaddr_un($cb_socket_name))
 		    or return "ERROR: Can't connect to $cb_socket_name: $!";
 		select($CB); $| = 1; select (STDOUT);
-		my $msg = get_message($RW);
-		close $RW;
-		my ($op, $clientid, $token) = split /\n/, $msg;
-		$clientid=~s/.*=//;
-		$token=~s/.*=//;
-		cib_message($CB, "cib_op=register\n"
-				 ."cib_callback_token=$token\n"
-				 ."cib_clientname=$clientid\n");
 
 		cib_message($CB, "cib_op=cib_notify\n"
 				 ."cib_notify_type=cib_diff_notify\n"
 				 ."cib_notify_activate=1\n");
-		my $byte;
-		my $count = 0;
-
 		my $flags = fcntl($CB, F_GETFL, 0)
 		    or return "ERROR: Couldn't get flags for $cb_socket_name : $!\n";
 		fcntl($CB, F_SETFL, $flags | O_NONBLOCK)
 		    or return "ERROR: Couldn't set flags for $cb_socket_name: $!\n";
 
+		my $buf = '';
 		my $cibevent = 0;
-		my $prev_byte = "";
-		my $testcount = 10; # check every 10th time
-		my $ctime = "";
+		my $ctime;
+		my $TESTCB;
+		my $rin = '';
+		my $rout;
+		my $len = 0;
+		vec($rin, fileno($CB),1) = 1;
 		while (1) {
-			my $len = sysread($CB, $byte, 1);
-			if ($! == EAGAIN || $len != 1) {
-				sleep 1;
-				if ($testcount > 0) {
-					$testcount--;
-				} else {
-					my $new_ctime = `/usr/bin/stat -c "%y" "$cb_socket_name"`;
-					# pcmk could be restarted, and it
-					# would hang
-					if ($ctime && $ctime ne $new_ctime) {
-						return "ERROR: pcmk restart";
-					}
-					$ctime = $new_ctime;
-					socket(my $TESTCB,
-					       PF_UNIX,
-					       SOCK_STREAM,
-					       0);
-					connect($TESTCB,
-						sockaddr_un($cb_socket_name))
-					    or return "ERROR: Can't connect to "
-						      ."$cb_socket_name: $!";
-					$testcount = 10;
-					# don't close TESTCB immediately,
-					# cib doesn't like it.
-					sleep 1;
-				}
-				if ($cibevent > 0) {
-					my $info = get_cluster_info();
-					print "---start---\n";
-					print $info;
-					print "---done---\n";
-					$cibevent = 0;
-				}
+			$len = sysread($CB, $buf, 1024, length($buf));
+			$cibevent++ if ($buf && $buf =~ /(%|<){3}\n/);
+			$buf =~ s/^.*?([%<]*)\z/$1/s;
+
+			# watershed ... wait for it to become "idle",
+			# before calling get_cluster_info();
+			# FIXME in case this is "too busy" for "too long",
+			# call it anyways.
+			next if $len;
+
+			if ($cibevent > 0) {
+				my $info = get_cluster_info();
+				print "---start---\n";
+				print $info;
+				print "---done---\n";
+				$cibevent = 0;
 				next;
 			}
-			if ($prev_byte && $byte ne $prev_byte) {
-				$count = 0;
-				$prev_byte = "";
-			} elsif ($byte eq "%" || $byte eq "<") {
-				$prev_byte = $byte;
-				$count++;
-				if ($count == 3) {
-					$cibevent++;
-					$prev_byte = "";
-					$count = 0;
-				}
-			} else {
-				$count = 0;
-				$prev_byte = "";
+
+			next if select($rout=$rin, undef, undef, 10);
+
+			# timeout.
+			# check for "liveliness" or restart of cib
+			my $new_ctime = (stat $cb_socket_name)[10];
+			# pcmk could be restarted, and it
+			# would hang
+			if ($ctime && $ctime ne $new_ctime) {
+				return "ERROR: pcmk restart";
 			}
+			$ctime = $new_ctime;
+			socket($TESTCB,
+			       PF_UNIX,
+			       SOCK_STREAM,
+			       0);
+			connect($TESTCB,
+				sockaddr_un($cb_socket_name))
+			    or return "ERROR: Can't connect to "
+				      ."$cb_socket_name: $!";
+			# possibly: read the "welcome message",
+			# and close again.
 		}
 		return "";
 	} else {
