@@ -196,6 +196,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 config.append("\n\t}\n");
             }
         } config.append("}");
+        getDrbdResource().setCommited(true);
         return config.toString();
     }
 

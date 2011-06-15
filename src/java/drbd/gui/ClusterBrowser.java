@@ -759,11 +759,7 @@ public final class ClusterBrowser extends Browser {
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
 
                 updateDrbdResources();
-                //SwingUtilities.invokeLater(new Runnable() {
-                //    @Override public void run() {
-                //        drbdGraph.scale();
-                //    }
-                //});
+                //drbdGraph.scale();
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
                 //SwingUtilities.invokeLater(new Runnable() {
@@ -843,12 +839,7 @@ public final class ClusterBrowser extends Browser {
                         Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
 
             }
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    @Override public void run() {
-                        drbdGraph.scale(); // TODO: ?
-                    }
-                });
+            drbdGraph.scale();
             host.serverStatusLatchDone();
             try {
                 Thread.sleep(10000);
@@ -978,12 +969,7 @@ public final class ClusterBrowser extends Browser {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        drbdGraph.scale();
-                        drbdGraph.getDrbdInfo().selectMyself();
-                    }
-                });
+                drbdGraph.scale();
                 Tools.stopProgressIndicator(
                          hostName,
                          Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
@@ -1625,6 +1611,7 @@ public final class ClusterBrowser extends Browser {
                     drbdInfo.setAllApplyButtons();
                 }
             });
+            drbdGraph.scale();
         }
     }
 

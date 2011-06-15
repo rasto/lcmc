@@ -700,6 +700,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         getBrowser().getDrbdGraph().updatePopupMenus();
         getBrowser().resetFilesystems();
         getBrowser().drbdStatusUnlock();
+        getBrowser().getDrbdGraph().scale();
     }
 
     /** Removes this drbd resource with confirmation dialog. */
@@ -1224,6 +1225,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }
             }
         }
+        getDrbdVolume().setCommited(true);
         return config.toString().trim();
     }
 
