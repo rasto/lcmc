@@ -3245,6 +3245,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Node dn : domainNodesToSave.keySet()) {
             domainNodesToSave.get(dn).saveAndDefine(dn, getDomainName());
         }
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
         for (final VMSHardwareInfo hi : allHWP.keySet()) {
             hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
@@ -3274,9 +3277,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getResource().setNew(false);
         for (final Host host : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(host);
-        }
-        if (!testOnly) {
-            storeComboBoxValues(params);
         }
         updateParameters();
     }
