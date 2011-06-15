@@ -710,7 +710,7 @@ public final class TerminalPanel extends JScrollPane {
         } else if (DEBUG_DEC.equals(cheat)) {
             Tools.decrementDebugLevel();
         } else if (TESTS.containsKey(cheat)) {
-            RoboTest.startTest(TESTS.get(cheat), host);
+            RoboTest.startTest(TESTS.get(cheat), host.getCluster());
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
             RoboTest.registerMovement();
         }
