@@ -2429,9 +2429,11 @@ public final class Host {
             nameS = "";
         }
         if (i > 0) {
-            Tools.info(test + " " + index + nameS + " tries: " + (i + 1));
+            Tools.info(getName() + " "
+                       + test + " " + index + nameS + " tries: " + (i + 1));
         }
-        Tools.info(test + " " + index + nameS + " " + out.getOutput());
+        Tools.info(getName() + " "
+                   + test + " " + index + nameS + " " + out.getOutput());
         return out.getExitCode() == 0;
     }
 

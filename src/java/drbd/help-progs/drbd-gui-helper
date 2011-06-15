@@ -1760,6 +1760,8 @@ sub gui_vm_test {
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/$name/\@NAME@/gm;
+	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
+	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;
 
 	my $testfile = "/tmp/drbd-mc-test/$testname/domain.xml$index";
 	my $test = "";

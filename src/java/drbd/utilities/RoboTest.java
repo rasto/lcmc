@@ -22,6 +22,7 @@
 package drbd.utilities;
 
 import drbd.data.Host;
+import drbd.data.Cluster;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -270,10 +271,12 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final String index, final Host host) {
+    public static void startTest(final String index, final Cluster cluster) {
         aborted = false;
         Tools.info("start test " + index + " in 3 seconds");
-        host.getSSH().installTestFiles();
+        for (final Host host : cluster.getHosts()) {
+            host.getSSH().installTestFiles();
+        }
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
                 sleepNoFactor(3000);
@@ -287,8 +290,8 @@ public final class RoboTest {
                     return;
                 }
                 final String selected =
-                            host.getCluster().getBrowser().getTree()
-                                .getLastSelectedPathComponent().toString();
+                         cluster.getBrowser().getTree()
+                                   .getLastSelectedPathComponent().toString();
                 if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
@@ -298,55 +301,55 @@ public final class RoboTest {
                         while (true) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest1(robot, host);
+                            startTest1(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest2(robot, host);
+                            startTest2(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest3(robot, host);
+                            startTest3(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest4(robot, host);
+                            startTest4(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest5(robot, host);
+                            startTest5(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest6(robot, host);
+                            startTest6(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest7(robot, host);
+                            startTest7(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTest8(robot, host);
+                            startTest8(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            //startTest9(robot, host);
+                            //startTest9(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTestA(robot, host);
+                            startTestA(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTestB(robot, host);
+                            startTestB(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTestC(robot, host);
+                            startTestC(robot, cluster);
                             if (aborted) {
                                 break;
                             }
-                            startTestD(robot, host);
+                            startTestD(robot, cluster);
                             if (aborted) {
                                 break;
                             }
@@ -362,12 +365,12 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest1(robot, host);
+                            startTest1(robot, cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
                         }
                     } else if ("2".equals(index)) {
@@ -376,12 +379,12 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest2(robot, host);
+                            startTest2(robot, cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
                         }
                     } else if ("3".equals(index)) {
@@ -389,7 +392,7 @@ public final class RoboTest {
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
-                        startTest3(robot, host);
+                        startTest3(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
@@ -399,7 +402,7 @@ public final class RoboTest {
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index + " no " + i);
-                        startTest4(robot, host);
+                        startTest4(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + " no " + i + ", secs: "
@@ -410,7 +413,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest5(robot, host);
+                            startTest5(robot, cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -423,7 +426,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startTest6(robot, host);
+                            startTest6(robot, cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -434,7 +437,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTest7(robot, host);
+                        startTest7(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -443,7 +446,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTest8(robot, host);
+                        startTest8(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -452,7 +455,7 @@ public final class RoboTest {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTestA(robot, host);
+                        startTestA(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -461,7 +464,7 @@ public final class RoboTest {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTestB(robot, host);
+                        startTestB(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -470,7 +473,7 @@ public final class RoboTest {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTestC(robot, host);
+                        startTestC(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -479,7 +482,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
-                        startTestD(robot, host);
+                        startTestD(robot, cluster);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
@@ -493,20 +496,20 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest1(robot, host, blockDevY);
+                            startDRBDTest1(robot, cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest2(robot, host, blockDevY);
+                            startDRBDTest2(robot, cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest3(robot, host, blockDevY);
+                            startDRBDTest3(robot, cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            if (host.hasVolumes()) {
-                                startDRBDTest4(robot, host, blockDevY);
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
+                                startDRBDTest4(robot, cluster, blockDevY);
                                 if (aborted) {
                                     break;
                                 }
@@ -515,9 +518,9 @@ public final class RoboTest {
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
-                            if (host.hasVolumes()) {
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
@@ -529,14 +532,14 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest1(robot, host, blockDevY);
+                            startDRBDTest1(robot, cluster, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
-                            if (host.hasVolumes()) {
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
@@ -548,12 +551,12 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest2(robot, host, blockDevY);
+                            startDRBDTest2(robot, cluster, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
                         }
                     } else if ("3".equals(index)) {
@@ -563,14 +566,14 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest3(robot, host, blockDevY);
+                            startDRBDTest3(robot, cluster, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
-                            if (host.hasVolumes()) {
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
@@ -582,14 +585,14 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startDRBDTest4(robot, host, blockDevY);
+                            startDRBDTest4(robot, cluster, blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
-                            if (host.hasVolumes()) {
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
@@ -602,12 +605,12 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + index, robot, host);
+                            startVMTest1("vm-test" + index, robot, cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
                                        + secs);
-                            resetTerminalAreas(host);
+                            resetTerminalAreas(cluster);
                             i++;
                         }
                     }
@@ -619,35 +622,50 @@ public final class RoboTest {
     }
 
     /** Check test. */
-    private static void checkTest(final Host host,
+    private static void checkTest(final Cluster cluster,
                                   final String test,
                                   final double no) {
-        if (!aborted) {
-            host.checkPCMKTest(test, no);
+        for (final Host host: cluster.getHosts()) {
+            if (!aborted) {
+                host.checkPCMKTest(test, no);
+            }
         }
     }
 
     /** Check DRBD test. */
-    private static void checkDRBDTest(final Host host,
+    private static void checkDRBDTest(final Cluster cluster,
                                       final String test,
                                       final double no) {
-        if (!aborted) {
-            host.checkDRBDTest(test, no);
+        for (final Host host: cluster.getHosts()) {
+            if (!aborted) {
+                host.checkDRBDTest(test, no);
+            }
         }
     }
 
-    /** Check VM test. */
+    /** Check VM test on one host. */
     private static void checkVMTest(final Host host,
-                                      final String test,
-                                      final double no,
-                                      final String name) {
+                                    final String test,
+                                    final double no,
+                                    final String name) {
         if (!aborted) {
             host.checkVMTest(test, no, name);
         }
     }
+    /** Check VM test. */
+    private static void checkVMTest(final Cluster cluster,
+                                    final String test,
+                                    final double no,
+                                    final String name) {
+        for (final Host host: cluster.getHosts()) {
+            if (!aborted) {
+                host.checkVMTest(test, no, name);
+            }
+        }
+    }
 
     /** TEST 1. */
-    private static void startTest1(final Robot robot, final Host host) {
+    private static void startTest1(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
@@ -659,12 +677,12 @@ public final class RoboTest {
         final int popY = 305;
         final int statefulX = 500;
         final int statefulY = 255;
-        disableStonith(robot, host);
-        checkTest(host, "test1", 1);
-        enableStonith(robot, host);
-        checkTest(host, "test1", 1.1);
-        disableStonith(robot, host);
-        checkTest(host, "test1", 1);
+        disableStonith(robot, cluster);
+        checkTest(cluster, "test1", 1);
+        enableStonith(robot, cluster);
+        checkTest(cluster, "test1", 1.1);
+        disableStonith(robot, cluster);
+        checkTest(cluster, "test1", 1);
         moveTo(robot, ipX, ipY);
         rightClick(robot); /* popup */
         moveTo(robot, ipX + 57, ipY + 28);
@@ -693,7 +711,7 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* ptest */
         leftClick(robot); /* apply */
-        checkTest(host, "test1", 2); /* 2 */
+        checkTest(cluster, "test1", 2); /* 2 */
 
         /* pingd */
         moveTo(robot, 1100, 298);
@@ -708,7 +726,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot); /*  apply */
         sleep(2000);
-        checkTest(host, "test1", 2.1); /* 2.1 */
+        checkTest(cluster, "test1", 2.1); /* 2.1 */
 
         moveTo(robot, 1076, 387);
         leftClick(robot);
@@ -803,7 +821,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(robot); /* choose group */
         sleep(3000);
-        checkTest(host, "test1", 2); /* 2 */
+        checkTest(cluster, "test1", 2); /* 2 */
         rightClick(robot); /* group popup */
         moveTo(robot, gx + 80, gy + 20);
         moveTo(robot, gx + 84, gy + 22);
@@ -834,10 +852,10 @@ public final class RoboTest {
             sleep(1000);
         }
         sleep(4000);
-        checkTest(host, "test1", 3); /* 3 */
+        checkTest(cluster, "test1", 3); /* 3 */
         /* constraints */
         addConstraint(robot, gx, gy - 30, 0, true, -1);
-        checkTest(host, "test1", 3.1); /* 3.1 */
+        checkTest(cluster, "test1", 3.1); /* 3.1 */
 
         /* move up, move down */
         for (int i = 0; i < 2; i++) {
@@ -847,13 +865,13 @@ public final class RoboTest {
             moveTo(robot, 221, 493);
             leftClick(robot); /* move res 3 up */
             sleepNoFactor(10000);
-            checkTest(host, "test1", 3.11); /* 3.11 */
+            checkTest(cluster, "test1", 3.11); /* 3.11 */
             moveTo(robot, 137, 328);
             rightClick(robot);
             moveTo(robot, 236, 515);
             leftClick(robot); /* move res 3 down */
             sleepNoFactor(10000);
-            checkTest(host, "test1", 3.12); /* 3.12 */
+            checkTest(cluster, "test1", 3.12); /* 3.12 */
         }
 
         /* same as */
@@ -880,7 +898,7 @@ public final class RoboTest {
             sleep(4000);
             leftClick(robot); /* apply */
             sleep(4000);
-            checkTest(host, "test1", 3.2); /* 3.2 */
+            checkTest(cluster, "test1", 3.2); /* 3.2 */
 
             moveTo(robot, 1073 , 360);
             sleep(30000);
@@ -893,7 +911,7 @@ public final class RoboTest {
             sleep(4000);
             leftClick(robot); /* apply */
             sleep(9000);
-            checkTest(host, "test1", 4); /* 4 */
+            checkTest(cluster, "test1", 4); /* 4 */
             sleep(20000);
         }
         moveTo(robot, 1100, 298);
@@ -906,7 +924,7 @@ public final class RoboTest {
         leftClick(robot); /* choose ip */
         setLocation(robot, new Integer[]{KeyEvent.VK_I});
         sleep(3000);
-        checkTest(host, "test1", 4.1); /* 4.1 */
+        checkTest(cluster, "test1", 4.1); /* 4.1 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -919,7 +937,7 @@ public final class RoboTest {
                                          KeyEvent.VK_MINUS,
                                          KeyEvent.VK_I});
         sleep(3000);
-        checkTest(host, "test1", 4.2); /* 4.2 */
+        checkTest(cluster, "test1", 4.2); /* 4.2 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -932,7 +950,7 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_PLUS});
         sleep(3000);
-        checkTest(host, "test1", 4.3); /* 4.3 */
+        checkTest(cluster, "test1", 4.3); /* 4.3 */
 
         setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -944,196 +962,196 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE});
         sleep(3000);
-        checkTest(host, "test1", 4.4); /* 4.4 */
+        checkTest(cluster, "test1", 4.4); /* 4.4 */
         for (int i = 0 ; i < 3; i++) {
             removeConstraint(robot, popX, popY);
-            checkTest(host, "test1", 5); /* 5 */
+            checkTest(cluster, "test1", 5); /* 5 */
             addConstraint(robot, gx, gy - 30, 0, true, -1);
-            checkTest(host, "test1", 4.4); /* 4.4 */
+            checkTest(cluster, "test1", 4.4); /* 4.4 */
         }
 
         removeConstraint(robot, popX, popY);
         sleep(3000);
-        checkTest(host, "test1", 5); /* 5 */
+        checkTest(cluster, "test1", 5); /* 5 */
         sleep(1000);
 
         addConstraint(robot, gx, gy - 30, 9, true, -1);
         sleep(5000);
-        checkTest(host, "test1", 6); /* 6 */
+        checkTest(cluster, "test1", 6); /* 6 */
 
         removeOrder(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 7);
+        checkTest(cluster, "test1", 7);
 
         addOrder(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 8);
+        checkTest(cluster, "test1", 8);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 9);
+        checkTest(cluster, "test1", 9);
 
         addColocation(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 10);
+        checkTest(cluster, "test1", 10);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.1);
+        checkTest(cluster, "test1", 10.1);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.2);
+        checkTest(cluster, "test1", 10.2);
 
         addConstraintOrderOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
-        checkTest(host, "test1", 10.3);
+        checkTest(cluster, "test1", 10.3);
 
         addColocation(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 10.4);
+        checkTest(cluster, "test1", 10.4);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.5);
+        checkTest(cluster, "test1", 10.5);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.6);
+        checkTest(cluster, "test1", 10.6);
 
         addConstraintColocationOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
-        checkTest(host, "test1", 10.7);
+        checkTest(cluster, "test1", 10.7);
 
         addOrder(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 10.8);
+        checkTest(cluster, "test1", 10.8);
 
         removeConstraint(robot, popX, popY);
         sleep(4000);
-        checkTest(host, "test1", 10.9);
+        checkTest(cluster, "test1", 10.9);
 
         addConstraint(robot, ipX, ipY, 0, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 10.91);
+        checkTest(cluster, "test1", 10.91);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.92);
+        checkTest(cluster, "test1", 10.92);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.93);
+        checkTest(cluster, "test1", 10.93);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.94);
+        checkTest(cluster, "test1", 10.94);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.95);
+        checkTest(cluster, "test1", 10.95);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.96);
+        checkTest(cluster, "test1", 10.96);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.97);
+        checkTest(cluster, "test1", 10.97);
 
         addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 10.98);
+        checkTest(cluster, "test1", 10.98);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 10.99);
+        checkTest(cluster, "test1", 10.99);
 
         addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 11);
+        checkTest(cluster, "test1", 11);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.1);
+        checkTest(cluster, "test1", 11.1);
 
         removeConstraint(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.2);
+        checkTest(cluster, "test1", 11.2);
 
         addConstraint(robot, ipX, ipY, 60, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 11.3);
+        checkTest(cluster, "test1", 11.3);
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
-        checkTest(host, "test1", 11.4);
+        checkTest(cluster, "test1", 11.4);
         resetStartStopResource(robot, ipX, ipY);
         sleep(5000);
-        checkTest(host, "test1", 11.5);
+        checkTest(cluster, "test1", 11.5);
 
         moveTo(robot, ipX + 20, ipY + 10);
         leftClick(robot); /* choose ip */
         stopResource(robot, 1020, 180, 10); /* actions menu stop */
         sleep(5000);
-        checkTest(host, "test1", 11.501);
+        checkTest(cluster, "test1", 11.501);
 
         moveTo(robot, ipX + 20, ipY + 10);
         leftClick(robot); /* choose ip */
         startResource(robot, 1020, 180, 20); /* actions menu start */
         sleep(5000);
-        checkTest(host, "test1", 11.502);
+        checkTest(cluster, "test1", 11.502);
 
         resetStartStopResource(robot, ipX, ipY);
         sleep(5000);
-        checkTest(host, "test1", 11.5);
+        checkTest(cluster, "test1", 11.5);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.51);
+        checkTest(cluster, "test1", 11.51);
 
         addColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.52);
+        checkTest(cluster, "test1", 11.52);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.53);
+        checkTest(cluster, "test1", 11.53);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.54);
+        checkTest(cluster, "test1", 11.54);
 
         removeColocation(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.55);
+        checkTest(cluster, "test1", 11.55);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.56);
+        checkTest(cluster, "test1", 11.56);
 
         addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 11.57);
+        checkTest(cluster, "test1", 11.57);
 
         removeOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.58);
+        checkTest(cluster, "test1", 11.58);
 
         addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
-        checkTest(host, "test1", 11.59);
+        checkTest(cluster, "test1", 11.59);
 
         addOrder(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.6);
+        checkTest(cluster, "test1", 11.6);
 
         removeConstraint(robot, popX, popY);
         sleep(5000);
-        checkTest(host, "test1", 11.7);
+        checkTest(cluster, "test1", 11.7);
 
         addConstraint(robot, gx, gy - 30, 9, true, -1);
         sleep(5000);
-        checkTest(host, "test1", 11.8);
+        checkTest(cluster, "test1", 11.8);
         /** Add m/s Stateful resource */
         moveTo(robot, statefulX, statefulY);
         rightClick(robot); /* popup */
@@ -1162,7 +1180,7 @@ public final class RoboTest {
         moveTo(robot, 812, 179);
         sleep(1000);
         leftClick(robot); /* apply */
-        checkTest(host, "test1", 11.9);
+        checkTest(cluster, "test1", 11.9);
         sleep(3000);
         /* set clone max to 1 */
         moveTo(robot, 978, 381);
@@ -1180,62 +1198,62 @@ public final class RoboTest {
         sleep(3000);
         leftClick(robot); /* apply */
         sleep(3000);
-        checkTest(host, "test1", 12);
+        checkTest(cluster, "test1", 12);
         stopResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(host, "test1", 13);
+        checkTest(cluster, "test1", 13);
 
         startResource(robot, statefulX, statefulY, 0);
         sleep(10000);
-        checkTest(host, "test1", 14);
+        checkTest(cluster, "test1", 14);
         unmanageResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(host, "test1", 15);
+        checkTest(cluster, "test1", 15);
         manageResource(robot, statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(host, "test1", 16);
+        checkTest(cluster, "test1", 16);
 
         /* IP addr cont. */
         stopResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 17);
+        checkTest(cluster, "test1", 17);
         startResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 18);
+        checkTest(cluster, "test1", 18);
         unmanageResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 19);
+        checkTest(cluster, "test1", 19);
         manageResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 20);
+        checkTest(cluster, "test1", 20);
         migrateResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 21);
+        checkTest(cluster, "test1", 21);
         unmigrateResource(robot, ipX, ipY, 0);
         sleep(3000);
-        checkTest(host, "test1", 22);
+        checkTest(cluster, "test1", 22);
 
         /* Group cont. */
         stopResource(robot, gx, gy - 30, 15);
         sleep(10000);
-        checkTest(host, "test1", 23);
+        checkTest(cluster, "test1", 23);
         startResource(robot, gx, gy - 30, 15);
         sleep(8000);
-        checkTest(host, "test1", 24);
+        checkTest(cluster, "test1", 24);
         unmanageResource(robot, gx, gy - 30, 15);
         sleep(5000);
-        checkTest(host, "test1", 25);
+        checkTest(cluster, "test1", 25);
         manageResource(robot, gx, gy - 30, 15);
         sleep(5000);
-        checkTest(host, "test1", 26);
+        checkTest(cluster, "test1", 26);
         migrateResource(robot, gx, gy - 30, 25);
         sleep(5000);
         moveTo(robot, gx, gy);
         leftClick(robot);
-        checkTest(host, "test1", 27);
+        checkTest(cluster, "test1", 27);
         unmigrateResource(robot, 1020, 180, 55); /* actions menu unmigrate */
         sleep(5000);
-        checkTest(host, "test1", 28);
+        checkTest(cluster, "test1", 28);
         stopResource(robot, ipX, ipY, 0);
         sleep(5000);
         moveTo(robot, gx, gy);
@@ -1245,7 +1263,7 @@ public final class RoboTest {
         stopGroup(robot, statefulX, statefulY, 0);
         stopEverything(robot); /* to be sure */
         sleep(5000);
-        checkTest(host, "test1", 29);
+        checkTest(cluster, "test1", 29);
 
         if (true) {
             removeResource(robot, ipX, ipY, -15);
@@ -1259,7 +1277,7 @@ public final class RoboTest {
         if (!aborted) {
             sleepNoFactor(20000);
         }
-        checkTest(host, "test1", 1);
+        checkTest(cluster, "test1", 1);
     }
 
 
@@ -1305,10 +1323,11 @@ public final class RoboTest {
     }
 
     /** Enable stonith if it is enabled. */
-    private static void enableStonith(final Robot robot, final Host host) {
+    private static void enableStonith(final Robot robot,
+                                      final Cluster cluster) {
         moveTo(robot, 271, 250);
         leftClick(robot); /* global options */
-        final String stonith = host.getCluster().getBrowser()
+        final String stonith = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("stonith-enabled");
         if (stonith != null && "false".equals(stonith)) {
             moveTo(robot, 944, 298);
@@ -1320,10 +1339,11 @@ public final class RoboTest {
     }
 
     /** Disable stonith if it is enabled. */
-    private static void disableStonith(final Robot robot, final Host host) {
+    private static void disableStonith(final Robot robot,
+                                       final Cluster cluster) {
         moveTo(robot, 271, 250);
         leftClick(robot); /* global options */
-        final String stonith = host.getCluster().getBrowser()
+        final String stonith = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("stonith-enabled");
         if (stonith == null || "true".equals(stonith)) {
             moveTo(robot, 944, 298);
@@ -1339,7 +1359,7 @@ public final class RoboTest {
     }
 
     /** TEST 2. */
-    private static void startTest2(final Robot robot, final Host host) {
+    private static void startTest2(final Robot robot, final Cluster cluster) {
         slowFactor = 0.3f;
         aborted = false;
         final int dummy1X = 235;
@@ -1353,14 +1373,14 @@ public final class RoboTest {
         final int phX = 445;
         final int phY = 390;
 
-        disableStonith(robot, host);
-        checkTest(host, "test2", 1);
+        disableStonith(robot, cluster);
+        checkTest(cluster, "test2", 1);
         /* create 4 dummies */
         chooseDummy(robot, dummy1X, dummy1Y, false, true);
         chooseDummy(robot, dummy2X, dummy2Y, false, true);
         chooseDummy(robot, dummy3X, dummy3Y, false, true);
         chooseDummy(robot, dummy4X, dummy4Y, false, true);
-        checkTest(host, "test2", 2);
+        checkTest(cluster, "test2", 2);
 
         /* placeholder */
         moveTo(robot, phX, phY);
@@ -1369,7 +1389,7 @@ public final class RoboTest {
         moveTo(robot, phX + 30 , phY + 45);
         sleep(2000);
         leftClick(robot);
-        checkTest(host, "test2", 3);
+        checkTest(cluster, "test2", 3);
         /* constraints */
         addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 1 */
         sleep(2000);
@@ -1377,7 +1397,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot); /*  apply */
         sleep(5000);
-        checkTest(host, "test2", 4);
+        checkTest(cluster, "test2", 4);
 
         final int dum1PopX = dummy1X + 130;
         final int dum1PopY = dummy1Y + 50;
@@ -1385,24 +1405,24 @@ public final class RoboTest {
             removeOrder(robot, dum1PopX, dum1PopY);
             sleep(4000);
 
-            checkTest(host, "test2", 5);
+            checkTest(cluster, "test2", 5);
 
             addOrder(robot, dum1PopX, dum1PopY);
             sleep(4000);
-            checkTest(host, "test2", 6);
+            checkTest(cluster, "test2", 6);
 
             removeColocation(robot, dum1PopX, dum1PopY);
             sleep(5000);
-            checkTest(host, "test2", 7);
+            checkTest(cluster, "test2", 7);
 
             addColocation(robot, dum1PopX, dum1PopY);
             sleep(4000);
-            checkTest(host, "test2", 8);
+            checkTest(cluster, "test2", 8);
         }
 
         addConstraint(robot, dummy3X, dummy3Y, 80, false, -1); /* with ph */
         sleep(5000);
-        checkTest(host, "test2", 9);
+        checkTest(cluster, "test2", 9);
 
         final int dum3PopX = dummy3X + 165;
         final int dum3PopY = dummy3Y - 10;
@@ -1410,34 +1430,34 @@ public final class RoboTest {
             removeColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
 
-            checkTest(host, "test2", 9.1);
+            checkTest(cluster, "test2", 9.1);
 
             addColocation(robot, dum3PopX, dum3PopY);
             sleep(4000);
-            checkTest(host, "test2", 9.2);
+            checkTest(cluster, "test2", 9.2);
 
             removeOrder(robot, dum3PopX, dum3PopY);
             sleep(5000);
-            checkTest(host, "test2", 9.3);
+            checkTest(cluster, "test2", 9.3);
 
             addOrder(robot, dum3PopX, dum3PopY);
             sleep(4000);
-            checkTest(host, "test2", 9.4);
+            checkTest(cluster, "test2", 9.4);
         }
 
         addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 2 */
         sleep(5000);
-        checkTest(host, "test2", 10);
+        checkTest(cluster, "test2", 10);
         addConstraint(robot, dummy4X, dummy4Y, 80, false, -1); /* with ph */
         sleep(5000);
-        checkTest(host, "test2", 11);
+        checkTest(cluster, "test2", 11);
 
         /* ph -> dummy2 */
         final int dum2PopX = dummy2X - 10;
         final int dum2PopY = dummy2Y + 70;
         removeConstraint(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.1);
+        checkTest(cluster, "test2", 11.1);
         addConstraintOrderOnly(robot,
                                phX,
                                phY,
@@ -1447,10 +1467,10 @@ public final class RoboTest {
                                false,
                                -1); /* with dummy 2 */
         sleep(4000);
-        checkTest(host, "test2", 11.2);
+        checkTest(cluster, "test2", 11.2);
         removeOrder(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.3);
+        checkTest(cluster, "test2", 11.3);
         addConstraintColocationOnly(robot,
                                     phX,
                                     phY,
@@ -1460,17 +1480,17 @@ public final class RoboTest {
                                     false,
                                     -1); /* with dummy 2 */
         sleep(4000);
-        checkTest(host, "test2", 11.4);
+        checkTest(cluster, "test2", 11.4);
         addOrder(robot, dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.5);
+        checkTest(cluster, "test2", 11.5);
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
         final int dum4PopY = dummy4Y - 10;
         removeConstraint(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.6);
+        checkTest(cluster, "test2", 11.6);
         moveTo(robot, dummy4X + 20, dummy4Y + 5);
         sleep(1000);
         rightClick(robot); /* workaround for the next popup not working. */
@@ -1486,10 +1506,10 @@ public final class RoboTest {
                                     false,
                                     -1); /* with ph */
         sleep(4000);
-        checkTest(host, "test2", 11.7);
+        checkTest(cluster, "test2", 11.7);
         removeColocation(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.8);
+        checkTest(cluster, "test2", 11.8);
         moveTo(robot, dummy4X + 20, dummy4Y + 5);
         sleep(1000);
         rightClick(robot); /* workaround for the next popup not working. */
@@ -1503,17 +1523,17 @@ public final class RoboTest {
                                false,
                                -1); /* ph 2 */
         sleep(4000);
-        checkTest(host, "test2", 11.9);
+        checkTest(cluster, "test2", 11.9);
         addColocation(robot, dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(host, "test2", 11.91);
+        checkTest(cluster, "test2", 11.91);
         /* remove one dummy */
         stopResource(robot, dummy1X, dummy1Y, 0);
         sleep(5000);
-        checkTest(host, "test2", 11.92);
+        checkTest(cluster, "test2", 11.92);
         removeResource(robot, dummy1X, dummy1Y, -15);
         sleep(5000);
-        checkTest(host, "test2", 12);
+        checkTest(cluster, "test2", 12);
         stopResource(robot, dummy2X, dummy2Y, 0);
         sleep(10000);
         stopResource(robot, dummy3X, dummy3Y, 0);
@@ -1523,7 +1543,7 @@ public final class RoboTest {
         stopResource(robot, dummy4X, dummy4Y, 0);
         stopEverything(robot);
         sleep(10000);
-        checkTest(host, "test2", 12.5);
+        checkTest(cluster, "test2", 12.5);
         if (true) {
             /* remove placeholder */
             moveTo(robot, phX , phY);
@@ -1537,10 +1557,10 @@ public final class RoboTest {
             /* remove rest of the dummies */
             removeResource(robot, dummy2X, dummy2Y, -15);
             sleep(5000);
-            checkTest(host, "test2", 14);
+            checkTest(cluster, "test2", 14);
             removeResource(robot, dummy3X, dummy3Y, -15);
             sleep(5000);
-            checkTest(host, "test2", 15);
+            checkTest(cluster, "test2", 15);
             removeResource(robot, dummy4X, dummy4Y, -15);
             sleep(5000);
         } else {
@@ -1549,11 +1569,11 @@ public final class RoboTest {
         if (!aborted) {
             sleepNoFactor(20000);
         }
-        checkTest(host, "test2", 16);
+        checkTest(cluster, "test2", 16);
     }
 
     /** TEST 4. */
-    private static void startTest4(final Robot robot, final Host host) {
+    private static void startTest4(final Robot robot, final Cluster cluster) {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
@@ -1580,8 +1600,8 @@ public final class RoboTest {
         final int ph2X = 445;
         final int ph2Y = 473;
 
-        disableStonith(robot, host);
-        checkTest(host, "test4", 1);
+        disableStonith(robot, cluster);
+        checkTest(cluster, "test4", 1);
         /* create 6 dummies */
         chooseDummy(robot, dummy1X, dummy1Y, false, true);
         chooseDummy(robot, dummy2X, dummy2Y, false, true);
@@ -1590,7 +1610,7 @@ public final class RoboTest {
         chooseDummy(robot, dummy5X, dummy5Y, false, true);
         chooseDummy(robot, dummy6X, dummy6Y, false, true);
         Tools.sleep(90000);
-        checkTest(host, "test4", 2);
+        checkTest(cluster, "test4", 2);
 
         /* 2 placeholders */
         final int count = 3;
@@ -1608,7 +1628,7 @@ public final class RoboTest {
             moveTo(robot, ph2X + 30 , ph2Y + 45);
             sleep(2000);
             leftClick(robot);
-            checkTest(host, "test4", 2);
+            checkTest(cluster, "test4", 2);
 
             /* constraints */
             /* menu dummy 5 with ph2 */
@@ -1628,7 +1648,7 @@ public final class RoboTest {
 
             addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 1 */
             addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 2 */
-            checkTest(host, "test4", 3);
+            checkTest(cluster, "test4", 3);
 
             /* TEST test */
             if (i < count - 1) {
@@ -1637,11 +1657,11 @@ public final class RoboTest {
             }
         }
         Tools.sleep(90000);
-        checkTest(host, "test4", 3);
+        checkTest(cluster, "test4", 3);
     }
 
     /** TEST 5. */
-    private static void startTest5(final Robot robot, final Host host) {
+    private static void startTest5(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1654,9 +1674,9 @@ public final class RoboTest {
         final int ph1Y = 500;
 
 
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         /* create 2 dummies */
-        checkTest(host, "test5", 1);
+        checkTest(cluster, "test5", 1);
 
         /* placeholders */
         moveTo(robot, ph1X, ph1Y);
@@ -1668,11 +1688,11 @@ public final class RoboTest {
 
         chooseDummy(robot, dummy1X, dummy1Y, false, true);
         chooseDummy(robot, dummy2X, dummy2Y, false, true);
-        checkTest(host, "test5", 2);
+        checkTest(cluster, "test5", 2);
 
         addConstraint(robot, dummy2X, dummy2Y, 35, false, -1);
         sleep(20000);
-        checkTest(host, "test5", 2);
+        checkTest(cluster, "test5", 2);
         addConstraint(robot, ph1X, ph1Y, 5, false, -1);
 
         moveTo(robot, ph1X, ph1Y);
@@ -1682,39 +1702,39 @@ public final class RoboTest {
         moveTo(robot, 809, 192); /* ptest */
         sleep(2000);
         leftClick(robot); /*  apply */
-        checkTest(host, "test5", 2.1);
+        checkTest(cluster, "test5", 2.1);
 
         leftClick(robot); /*  apply */
         int dum1PopX = dummy1X + 80;
         int dum1PopY = dummy1Y + 60;
         removeConstraint(robot, dum1PopX, dum1PopY);
-        checkTest(host, "test5", 2.5);
+        checkTest(cluster, "test5", 2.5);
         /* constraints */
         for (int i = 1; i <=10; i++) {
             addConstraint(robot, dummy1X, dummy1Y, 35, false, -1);
 
-            checkTest(host, "test5", 3);
+            checkTest(cluster, "test5", 3);
 
             removeConstraint(robot, dum1PopX, dum1PopY);
-            checkTest(host, "test5", 2.5);
+            checkTest(cluster, "test5", 2.5);
 
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
 
-            checkTest(host, "test5", 3.5);
+            checkTest(cluster, "test5", 3.5);
 
             removeConstraint(robot, dum1PopX, dum1PopY);
-            checkTest(host, "test5", 2.5);
+            checkTest(cluster, "test5", 2.5);
             Tools.info("i: " + i);
         }
         stopEverything(robot);
-        checkTest(host, "test5", 3.1);
+        checkTest(cluster, "test5", 3.1);
         removeEverything(robot);
         sleep(5000);
-        checkTest(host, "test5", 1);
+        checkTest(cluster, "test5", 1);
     }
 
     /** TEST 6. */
-    private static void startTest6(final Robot robot, final Host host) {
+    private static void startTest6(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1724,9 +1744,9 @@ public final class RoboTest {
         final int ph1Y = 394;
 
 
-        //disableStonith(robot, host);
+        //disableStonith(robot, cluster);
         /* create 2 dummies */
-        //checkTest(host, "test5", 1);
+        //checkTest(cluster, "test5", 1);
 
         /* placeholders */
         moveTo(robot, ph1X, ph1Y);
@@ -1737,7 +1757,7 @@ public final class RoboTest {
         leftClick(robot);
 
         chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        //checkTest(host, "test5", 2);
+        //checkTest(cluster, "test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         for (int i = 0; i < 20; i++) {
@@ -1750,39 +1770,39 @@ public final class RoboTest {
 
     }
 
-    private static void startTest7(final Robot robot, final Host host) {
+    private static void startTest7(final Robot robot, final Cluster cluster) {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         for (int i = 30; i > 0; i--) {
             Tools.info("I: " + i);
-            checkTest(host, "test7", 1);
+            checkTest(cluster, "test7", 1);
             /* create dummy */
             sleep(5000);
             chooseDummy(robot, dummy1X, dummy1Y, false, true);
-            checkTest(host, "test7", 2);
+            checkTest(cluster, "test7", 2);
             sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
-            checkTest(host, "test7", 3);
+            checkTest(cluster, "test7", 3);
             sleep(5000);
             removeResource(robot, dummy1X, dummy1Y, -15);
         }
         System.gc();
     }
 
-    private static void startTest8(final Robot robot, final Host host) {
+    private static void startTest8(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
-        disableStonith(robot, host);
-        checkTest(host, "test8", 1);
+        disableStonith(robot, cluster);
+        checkTest(cluster, "test8", 1);
         final int count = 30;
         for (int i = count; i > 0; i--) {
             Tools.info("I: " + i);
-            //checkTest(host, "test7", 1);
+            //checkTest(cluster, "test7", 1);
             sleep(5000);
             chooseDummy(robot, dummy1X, dummy1Y, false, true);
             sleep(5000);
@@ -1791,24 +1811,24 @@ public final class RoboTest {
             moveTo(robot, 300, 250);
             leftRelease(robot);
         }
-        checkTest(host, "test8-" + count, 2);
+        checkTest(cluster, "test8-" + count, 2);
         stopEverything(robot);
-        checkTest(host, "test8-" + count, 3);
+        checkTest(cluster, "test8-" + count, 3);
         removeEverything(robot);
-        checkTest(host, "test8", 4);
-        resetTerminalAreas(host);
+        checkTest(cluster, "test8", 4);
+        resetTerminalAreas(cluster);
     }
 
-    private static void startTestA(final Robot robot, final Host host) {
+    private static void startTestA(final Robot robot, final Cluster cluster) {
         slowFactor = 0.5f;
         aborted = false;
         final int gx = 235;
         final int gy = 255;
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
 
-            checkTest(host, "testA", 1);
+            checkTest(cluster, "testA", 1);
             /* group with dummy resources */
             moveTo(robot, gx, gy);
             sleep(1000);
@@ -1832,47 +1852,47 @@ public final class RoboTest {
             sleep(6000);
             leftClick(robot); /* apply */
             sleep(6000);
-            checkTest(host, "testA", 2);
+            checkTest(cluster, "testA", 2);
             stopResource(robot, gx, gy, 0);
             sleep(6000);
-            checkTest(host, "testA", 3);
+            checkTest(cluster, "testA", 3);
             removeResource(robot, gx, gy, 0);
-            resetTerminalAreas(host);
+            resetTerminalAreas(cluster);
         }
         System.gc();
     }
 
-    private static void startTestB(final Robot robot, final Host host) {
+    private static void startTestB(final Robot robot, final Cluster cluster) {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
-            checkTest(host, "testB", 1);
+            checkTest(cluster, "testB", 1);
             /* create dummy */
             sleep(5000);
             chooseDummy(robot, dummy1X, dummy1Y, true, true);
-            checkTest(host, "testB", 2);
+            checkTest(cluster, "testB", 2);
             sleep(5000);
             stopResource(robot, dummy1X, dummy1Y, 0);
-            checkTest(host, "testB", 3);
+            checkTest(cluster, "testB", 3);
             sleep(5000);
             removeResource(robot, dummy1X, dummy1Y, -15);
-            resetTerminalAreas(host);
+            resetTerminalAreas(cluster);
         }
         System.gc();
     }
 
-    private static void startTestC(final Robot robot, final Host host) {
+    private static void startTestC(final Robot robot, final Cluster cluster) {
         slowFactor = 0.5f;
         final int statefulX = 500;
         final int statefulY = 255;
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         for (int i = 100; i > 0; i--) {
             Tools.info("I: " + i);
-            checkTest(host, "testC", 1);
+            checkTest(cluster, "testC", 1);
             /** Add m/s Stateful resource */
             moveTo(robot, statefulX, statefulY);
             rightClick(robot); /* popup */
@@ -1903,14 +1923,14 @@ public final class RoboTest {
             leftClick(robot); /* apply */
             sleep(4000);
             stopResource(robot, statefulX, statefulY, -20);
-            checkTest(host, "testC", 2);
+            checkTest(cluster, "testC", 2);
             sleep(5000);
             removeResource(robot, statefulX, statefulY, -20);
-            resetTerminalAreas(host);
+            resetTerminalAreas(cluster);
         }
     }
     /** Pacemaker Leak tests */
-    private static void startTestD(final Robot robot, final Host host) {
+    private static void startTestD(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         int count = 100;
@@ -2469,13 +2489,13 @@ public final class RoboTest {
     }
 
     /** TEST 3. */
-    private static void startTest3(final Robot robot, final Host host) {
+    private static void startTest3(final Robot robot, final Cluster cluster) {
         slowFactor = 0.3f;
         aborted = false;
-        disableStonith(robot, host);
+        disableStonith(robot, cluster);
         for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
-            checkTest(host, "test3", 1);
+            checkTest(cluster, "test3", 1);
             /* filesystem/drbd */
             moveTo(robot, 577, 253);
             rightClick(robot); /* popup */
@@ -2499,11 +2519,11 @@ public final class RoboTest {
             moveTo(robot, 815, 186);
             leftClick(robot); /* apply */
             sleep(2000);
-            checkTest(host, "test3", 2);
+            checkTest(cluster, "test3", 2);
             stopEverything(robot);
-            checkTest(host, "test3", 3);
+            checkTest(cluster, "test3", 3);
             removeEverything(robot);
-            resetTerminalAreas(host);
+            resetTerminalAreas(cluster);
         }
         System.gc();
     }
@@ -2744,7 +2764,7 @@ public final class RoboTest {
 
     /** DRBD Test 1. */
     private static void startDRBDTest1(final Robot robot,
-                                       final Host host,
+                                       final Cluster cluster,
                                        final int blockDevY) {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
@@ -2756,19 +2776,19 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(cluster, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
-        checkDRBDTest(host, drbdTest, 1.1);
+        checkDRBDTest(cluster, drbdTest, 1.1);
         removeDrbdVolume(robot);
-        checkDRBDTest(host, drbdTest, 2);
+        checkDRBDTest(cluster, drbdTest, 2);
 
-        checkDRBDTest(host, drbdTest, 2);
+        checkDRBDTest(cluster, drbdTest, 2);
     }
 
     /** DRBD Test 2. */
     private static void startDRBDTest2(final Robot robot,
-                                       final Host host,
+                                       final Cluster cluster,
                                        final int blockDevY) {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
@@ -2817,7 +2837,7 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(cluster, drbdTest, 1);
 
         moveTo(robot, 960, 570);
         leftClick(robot); /* cancel */
@@ -2831,7 +2851,7 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(cluster, drbdTest, 1);
         addMetaData(robot);
 
         moveTo(robot, 960, 570);
@@ -2846,10 +2866,10 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1);
+        checkDRBDTest(cluster, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
-        checkDRBDTest(host, drbdTest, 1.1);
+        checkDRBDTest(cluster, drbdTest, 1.1);
         sleep(20000);
 
         moveTo(robot, 960, 570);
@@ -2864,18 +2884,18 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(host, drbdTest, 1.1);
+        checkDRBDTest(cluster, drbdTest, 1.1);
         addMetaData(robot);
         addFileSystem(robot);
-        checkDRBDTest(host, drbdTest, 1.1);
+        checkDRBDTest(cluster, drbdTest, 1.1);
 
         removeDrbdVolume(robot);
-        checkDRBDTest(host, drbdTest, 2);
+        checkDRBDTest(cluster, drbdTest, 2);
     }
 
     /** DRBD Test 3. */
     private static void startDRBDTest3(final Robot robot,
-                                       final Host host,
+                                       final Cluster cluster,
                                        final int blockDevY) {
         /* Two drbds. */
         final String drbdTest = "drbd-test3";
@@ -2883,14 +2903,14 @@ public final class RoboTest {
         aborted = false;
         int protocolY = 600;
         int correctionY = 0;
-        if (!host.hasVolumes()) {
+        if (cluster.getHostsArray()[0].hasVolumes()) {
             protocolY = 400;
             correctionY = 30;
         }
         int offset = 0;
         for (int i = 0; i < 2; i++) {
             addDrbdResource(robot, blockDevY + offset);
-            if (i == 1 && host.hasVolumes()) {
+            if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
                 newDrbdResource(robot);
             }
             chooseDrbdResource(robot);
@@ -2901,20 +2921,20 @@ public final class RoboTest {
             sleep(50000);
 
             if (offset == 0) {
-                checkDRBDTest(host, drbdTest, 1.1);
+                checkDRBDTest(cluster, drbdTest, 1.1);
             } else {
-                checkDRBDTest(host, drbdTest, 1.2);
+                checkDRBDTest(cluster, drbdTest, 1.2);
             }
             sleep(10000);
             addMetaData(robot);
             addFileSystem(robot);
 
             if (offset == 0) {
-                checkDRBDTest(host, drbdTest, 1);
+                checkDRBDTest(cluster, drbdTest, 1);
             }
             offset += 40;
         }
-        checkDRBDTest(host, drbdTest, 2);
+        checkDRBDTest(cluster, drbdTest, 2);
 
         moveTo(robot, 480, 250); /* select r0 */
         leftClick(robot);
@@ -2948,7 +2968,7 @@ public final class RoboTest {
         leftClick(robot); /* apply/disables tooltip */
         sleep(2000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.1); /* 2.1 */
+        checkDRBDTest(cluster, drbdTest, 2.1); /* 2.1 */
 
 
         /* common */
@@ -2970,7 +2990,7 @@ public final class RoboTest {
         sleep(2000); /* test */
         leftClick(robot); /* apply */
         sleep(10000);
-        checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
+        checkDRBDTest(cluster, drbdTest, 2.11); /* 2.11 */
         moveTo(robot, 970, 383); /* wfc timeout */
         sleep(6000);
         leftClick(robot);
@@ -3018,7 +3038,7 @@ public final class RoboTest {
         leftClick(robot); /* apply/disables tooltip */
         sleep(2000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
+        checkDRBDTest(cluster, drbdTest, 2.2); /* 2.2 */
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
         leftClick(robot);
@@ -3030,25 +3050,25 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.3); /* 2.3 */
+        checkDRBDTest(cluster, drbdTest, 2.3); /* 2.3 */
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, drbdTest, 3);
+        checkDRBDTest(cluster, drbdTest, 3);
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, drbdTest, 4);
+        checkDRBDTest(cluster, drbdTest, 4);
     }
 
     /** DRBD Test 4. */
     private static void startDRBDTest4(final Robot robot,
-                                       final Host host,
+                                       final Cluster cluster,
                                        final int blockDevY) {
         final String drbdTest = "drbd-test4";
         /* Two drbds. */
@@ -3057,7 +3077,7 @@ public final class RoboTest {
         int offset = 0;
         int protocolY = 600;
         int correctionY = 0;
-        if (!host.hasVolumes()) {
+        if (cluster.getHostsArray()[0].hasVolumes()) {
             protocolY = 400;
             correctionY = 30;
         }
@@ -3084,9 +3104,9 @@ public final class RoboTest {
             addBlockDevice(robot);
             sleep(50000);
             if (offset == 0) {
-                checkDRBDTest(host, drbdTest, 1.1);
+                checkDRBDTest(cluster, drbdTest, 1.1);
             } else {
-                checkDRBDTest(host, drbdTest, 1.2);
+                checkDRBDTest(cluster, drbdTest, 1.2);
             }
             sleep(10000);
 
@@ -3094,11 +3114,11 @@ public final class RoboTest {
             addFileSystem(robot);
 
             if (offset == 0) {
-                checkDRBDTest(host, drbdTest, 1);
+                checkDRBDTest(cluster, drbdTest, 1);
             }
             offset += 40;
         }
-        checkDRBDTest(host, drbdTest, 2);
+        checkDRBDTest(cluster, drbdTest, 2);
 
         moveTo(robot, 480, 250); /* select r0 */
         leftClick(robot);
@@ -3132,7 +3152,7 @@ public final class RoboTest {
         leftClick(robot); /* apply/disables tooltip */
         sleep(2000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.1); /* 2.1 */
+        checkDRBDTest(cluster, drbdTest, 2.1); /* 2.1 */
 
 
         /* common */
@@ -3154,7 +3174,7 @@ public final class RoboTest {
         sleep(2000); /* test */
         leftClick(robot); /* apply */
         sleep(10000);
-        checkDRBDTest(host, drbdTest, 2.11); /* 2.11 */
+        checkDRBDTest(cluster, drbdTest, 2.11); /* 2.11 */
         moveTo(robot, 970, 383); /* wfc timeout */
         sleep(6000);
         leftClick(robot);
@@ -3202,7 +3222,7 @@ public final class RoboTest {
         leftClick(robot); /* apply/disables tooltip */
         sleep(2000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.2); /* 2.2 */
+        checkDRBDTest(cluster, drbdTest, 2.2); /* 2.2 */
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
         leftClick(robot);
@@ -3214,33 +3234,33 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* test */
         leftClick(robot); /* apply */
-        checkDRBDTest(host, drbdTest, 2.3); /* 2.3 */
+        checkDRBDTest(cluster, drbdTest, 2.3); /* 2.3 */
 
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, drbdTest, 3);
+        checkDRBDTest(cluster, drbdTest, 3);
         moveTo(robot, 480, 250); /* rsc popup */
         rightClick(robot);
         moveTo(robot, 555, 340); /* remove */
         leftClick(robot);
         confirmRemove(robot);
-        checkDRBDTest(host, drbdTest, 4);
+        checkDRBDTest(cluster, drbdTest, 4);
     }
 
     /** VM Test 1. */
     private static void startVMTest1(final String vmTest,
                                      final Robot robot,
-                                     final Host host) {
+                                     final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
         String name = "dmc";
         final int count = 20;
         final int count2 = 3;
         for (int j = 0; j < count; j++) {
-            checkVMTest(host, vmTest, 1, name);
+            checkVMTest(cluster, vmTest, 1, name);
             name += "i";
         }
         name = "dmc";
@@ -3320,17 +3340,43 @@ public final class RoboTest {
             leftClick(robot);
             //press(robot, KeyEvent.VK_ENTER); /* display */
             sleep(5000);
-            moveTo(robot, 560, 410); /* create config */
-            leftClick(robot);
 
-            checkVMTest(host, vmTest, 2, name);
+            final int yMoreHosts = 30 * (cluster.getHosts().size() - 1);
+            moveTo(robot, 530, 410 + yMoreHosts); /* create config */
+            leftClick(robot);
+            checkVMTest(cluster, vmTest, 2, name);
+
+            if (cluster.getHosts().size() > 1) {
+                /* two hosts */
+                moveTo(robot, 410, 370); /* deselect first */
+                leftClick(robot);
+                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
+                leftClick(robot);
+                checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
+                checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
+
+                moveTo(robot, 410, 370); /* select first */
+                leftClick(robot);
+                moveTo(robot, 410, 405); /* deselect second */
+                leftClick(robot);
+                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
+                leftClick(robot);
+                checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
+                checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
+
+                moveTo(robot, 410, 405); /* select second */
+                leftClick(robot);
+                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
+                leftClick(robot);
+                checkVMTest(cluster, vmTest, 2, name);
+            }
 
             sleepNoFactor(2000);
             moveTo(robot, 814, 570); /* finish */
             leftClick(robot);
             sleepNoFactor(5000);
 
-            moveTo(robot, 620, 480); /* number of cpus */
+            moveTo(robot, 620, 480 + yMoreHosts); /* number of cpus */
             sleep(1000);
             leftClick(robot);
             sleep(500);
@@ -3342,7 +3388,7 @@ public final class RoboTest {
             sleep(1000);
             leftClick(robot);
             sleep(1000);
-            checkVMTest(host, vmTest, 3, name);
+            checkVMTest(cluster, vmTest, 3, name);
 
             /* disk readonly */
             moveTo(robot, 1100, 298);
@@ -3350,24 +3396,34 @@ public final class RoboTest {
             moveTo(robot, 1100, 410);
             leftRelease(robot);
 
-            moveTo(robot, 400, 450); /* choose disk */
+            sleep(1000);
+            moveTo(robot, 400, 450 + yMoreHosts); /* choose disk */
+            sleep(1000);
             leftClick(robot);
+            sleep(1000);
 
             moveTo(robot, 390, 540); /* readonly */
+            sleep(1000);
             leftClick(robot);
+            sleep(1000);
             moveTo(robot, 250, 190); /* apply */
+            sleep(1000);
             leftClick(robot);
-            checkVMTest(host, vmTest, 3.1, name);
+            checkVMTest(cluster, vmTest, 3.1, name);
+            sleep(1000);
             moveTo(robot, 390, 645); /* readonly */
+            sleep(1000);
             leftClick(robot);
 
+            sleep(1000);
             moveTo(robot, 950, 180); /* host overview */
+            sleep(1000);
             leftClick(robot);
-
+            sleep(1000);
 
             moveTo(robot, 250, 190); /* host apply */
             leftClick(robot);
-            checkVMTest(host, vmTest, 3.2, name);
+            checkVMTest(cluster, vmTest, 3.2, name);
 
             /* remove interface */
 
@@ -3379,7 +3435,7 @@ public final class RoboTest {
 
             names.add(name);
             for (final String n : names) {
-                checkVMTest(host, vmTest, 3, n);
+                checkVMTest(cluster, vmTest, 3, n);
             }
             name += "i";
         }
@@ -3407,8 +3463,8 @@ public final class RoboTest {
         System.exit(0);
     }
 
-    private static void resetTerminalAreas(final Host host) {
-        for (final Host h : host.getCluster().getHosts()) {
+    private static void resetTerminalAreas(final Cluster cluster) {
+        for (final Host h : cluster.getHosts()) {
             h.getTerminalPanel().resetTerminalArea();
         }
     }
