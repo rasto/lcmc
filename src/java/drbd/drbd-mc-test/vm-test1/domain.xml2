@@ -1,5 +1,5 @@
 <domain type='kvm'>
-  <name>dmc</name>
+  <name>@NAME@</name>
   <uuid>UUID</uuid>
   <memory>524288</memory>
   <currentMemory>524288</currentMemory>
@@ -21,7 +21,7 @@
     <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source file='/var/lib/libvirt/images/dmc.img'/>
+      <source file='/var/lib/libvirt/images/@NAME@.img'/>
       <target dev='hda' bus='ide'/>
       <address type='drive' controller='0' bus='0' unit='0'/>
     </disk>

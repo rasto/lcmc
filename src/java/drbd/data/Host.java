@@ -2385,7 +2385,8 @@ public final class Host {
     /** This is part of testsuite. */
     boolean checkTest(final String checkCommand,
                       final String test,
-                      final double index) {
+                      final double index,
+                      final String name) {
         Tools.sleep(1500);
         final StringBuilder command = new StringBuilder(50);
         command.append(DistResource.SUDO + replaceVars("@GUI-HELPER@"));
@@ -2397,6 +2398,10 @@ public final class Host {
         final String indexString =
                             Double.toString(index).replaceFirst("\\.0+$", "");
         command.append(indexString);
+        if (name != null) {
+            command.append(' ');
+            command.append(name);
+        }
         int h = 1;
         for (final Host host : getCluster().getHosts()) {
             Tools.debug(this, "host" + h + " = " + host.getName(), 1);
@@ -2419,16 +2424,20 @@ public final class Host {
             i++;
             Tools.sleep(i * 2000);
         }
-        if (i > 0) {
-            Tools.info(test + " " + index + " tries: " + (i + 1));
+        String nameS = " " + name;
+        if (name == null) {
+            nameS = "";
         }
-        Tools.info(test + " " + index + " " + out.getOutput());
+        if (i > 0) {
+            Tools.info(test + " " + index + nameS + " tries: " + (i + 1));
+        }
+        Tools.info(test + " " + index + nameS + " " + out.getOutput());
         return out.getExitCode() == 0;
     }
 
     /** This is part of testsuite, it checks Pacemaker. */
     public boolean checkPCMKTest(final String test, final double index) {
-        return checkTest("gui-test", test, index);
+        return checkTest("gui-test", test, index, null);
     }
 
     /** This is part of testsuite, it checks DRBD. */
@@ -2441,12 +2450,14 @@ public final class Host {
             testName.append("novolumes-");
         }
         testName.append(test);
-        return checkTest("gui-drbd-test", testName.toString(), index);
+        return checkTest("gui-drbd-test", testName.toString(), index, null);
     }
 
     /** This is part of testsuite, it checks VMs. */
-    public boolean checkVMTest(final String test, final double index) {
-        return checkTest("gui-vm-test", test, index);
+    public boolean checkVMTest(final String test,
+                               final double index,
+                               final String name) {
+        return checkTest("gui-vm-test", test, index, name);
     }
 
     /** Returns color of this host. Null if it is default color. */

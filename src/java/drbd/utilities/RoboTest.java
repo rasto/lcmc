@@ -29,6 +29,8 @@ import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class is used to test the GUI.
@@ -637,9 +639,10 @@ public final class RoboTest {
     /** Check VM test. */
     private static void checkVMTest(final Host host,
                                       final String test,
-                                      final double no) {
+                                      final double no,
+                                      final String name) {
         if (!aborted) {
-            host.checkVMTest(test, no);
+            host.checkVMTest(test, no, name);
         }
     }
 
@@ -3233,9 +3236,15 @@ public final class RoboTest {
                                      final Host host) {
         slowFactor = 0.2f;
         aborted = false;
-        checkVMTest(host, vmTest, 1);
+        String name = "dmc";
+        final int count = 20;
+        for (int j = 0; j < count; j++) {
+            checkVMTest(host, vmTest, 1, name);
+            name += "i";
+        }
+        name = "dmc";
+        final List<String> names = new ArrayList<String>();
 
-        final int count = 2;
         for (int j = 0; j < count; j++) {
             moveTo(robot, 56, 252); /* popup */
             rightClick(robot);
@@ -3313,7 +3322,7 @@ public final class RoboTest {
             moveTo(robot, 560, 410); /* create config */
             leftClick(robot);
 
-            checkVMTest(host, vmTest, 2);
+            checkVMTest(host, vmTest, 2, name);
 
             sleepNoFactor(2000);
             moveTo(robot, 814, 570); /* finish */
@@ -3332,7 +3341,11 @@ public final class RoboTest {
             sleep(1000);
             leftClick(robot);
             sleep(1000);
-            checkVMTest(host, vmTest, 3);
+            names.add(name);
+            for (final String n : names) {
+                checkVMTest(host, vmTest, 3, n);
+            }
+            name += "i";
         }
 
         sleepNoFactor(2000);
@@ -3342,6 +3355,14 @@ public final class RoboTest {
         moveTo(robot, 516, 480); /* confirm */
         leftClick(robot);
         sleepNoFactor(5000);
+        for (int j = 1; j < count; j++) {
+            moveTo(robot, 1066, 225); /* remove */
+            leftClick(robot);
+            sleepNoFactor(2000);
+            moveTo(robot, 516, 480); /* confirm */
+            leftClick(robot);
+            sleepNoFactor(5000);
+        }
     }
 
     private static void saveAndExit() {

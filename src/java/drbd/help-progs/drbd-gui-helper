@@ -1755,10 +1755,11 @@ sub gui_test {
 sub gui_vm_test {
 	my $testname = shift;
 	my $index = shift;
-	my $name = "dmc";
+	my $name = shift;
 	my $xml = `virsh dumpxml $name 2>/dev/null`;
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
+	$xml =~ s/$name/\@NAME@/gm;
 
 	my $testfile = "/tmp/drbd-mc-test/$testname/domain.xml$index";
 	my $test = "";
