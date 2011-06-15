@@ -3238,6 +3238,7 @@ public final class RoboTest {
         aborted = false;
         String name = "dmc";
         final int count = 20;
+        final int count2 = 3;
         for (int j = 0; j < count; j++) {
             checkVMTest(host, vmTest, 1, name);
             name += "i";
@@ -3278,7 +3279,7 @@ public final class RoboTest {
             sleep(200);
             press(robot, KeyEvent.VK_T);
             sleep(2000);
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < count2; i++) {
                 moveTo(robot, 600, 375); /* disk/block device */
                 leftClick(robot);
                 sleep(1000);
@@ -3295,7 +3296,7 @@ public final class RoboTest {
             leftClick(robot);
             //press(robot, KeyEvent.VK_ENTER); /* storage */
             sleep(5000);
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < count2; i++) {
                 moveTo(robot, 600, 375); /* bridge */
                 leftClick(robot);
                 sleep(1000);
@@ -3307,7 +3308,7 @@ public final class RoboTest {
             leftClick(robot);
             //press(robot, KeyEvent.VK_ENTER); /* network */
             sleep(5000);
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < count2; i++) {
                 moveTo(robot, 600, 375); /* sdl */
                 leftClick(robot);
                 sleep(1000);
@@ -3341,6 +3342,41 @@ public final class RoboTest {
             sleep(1000);
             leftClick(robot);
             sleep(1000);
+            checkVMTest(host, vmTest, 3, name);
+
+            /* disk readonly */
+            moveTo(robot, 1100, 298);
+            leftPress(robot); /* scroll bar */
+            moveTo(robot, 1100, 410);
+            leftRelease(robot);
+
+            moveTo(robot, 400, 450); /* choose disk */
+            leftClick(robot);
+
+            moveTo(robot, 390, 540); /* readonly */
+            leftClick(robot);
+            moveTo(robot, 250, 190); /* apply */
+            leftClick(robot);
+            checkVMTest(host, vmTest, 3.1, name);
+            moveTo(robot, 390, 645); /* readonly */
+            leftClick(robot);
+
+            moveTo(robot, 950, 180); /* host overview */
+            leftClick(robot);
+
+
+            moveTo(robot, 250, 190); /* host apply */
+            leftClick(robot);
+            checkVMTest(host, vmTest, 3.2, name);
+
+            /* remove interface */
+
+            // ...
+            moveTo(robot, 1100, 410);
+            leftPress(robot); /* scroll bar back */
+            moveTo(robot, 1100, 200);
+            leftRelease(robot);
+
             names.add(name);
             for (final String n : names) {
                 checkVMTest(host, vmTest, 3, n);
