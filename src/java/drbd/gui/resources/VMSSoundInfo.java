@@ -194,7 +194,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         getInfoPanel();
         waitForInfoPanel();
         final Map<String, String> parameters =
-                                getHWParametersAndSave(getResource().isNew());
+                                    getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -217,14 +217,17 @@ final class VMSSoundInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        final String[] params = getParametersFromXML();
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
+        checkResourceFieldsChanged(null, params);
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                    final boolean allParams) {
-        final Map<String, String> params =
-                                      super.getHWParametersAndSave(allParams);
+        final Map<String, String> params = super.getHWParameters(allParams);
         setName(getParamSaved(SoundData.MODEL));
         return params;
     }

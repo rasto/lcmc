@@ -3275,6 +3275,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(host);
         }
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
         updateParameters();
     }
 
@@ -3288,7 +3291,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) e.nextElement();
             final VMSHardwareInfo hi = (VMSHardwareInfo) node.getUserObject();
-            allParamaters.put(hi, hi.getHWParametersAndSave(allParams));
+            allParamaters.put(hi, hi.getHWParameters(allParams));
         }
         return allParamaters;
     }

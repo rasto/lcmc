@@ -308,7 +308,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         getInfoPanel();
         waitForInfoPanel();
         final Map<String, String> parameters =
-                                getHWParametersAndSave(getResource().isNew());
+                                       getHWParameters(getResource().isNew());
 
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -332,11 +332,15 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        final String[] params = getParametersFromXML();
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
+        checkResourceFieldsChanged(null, params);
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                    final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -361,7 +365,6 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 } else {
                     parameters.put(param, value);
                 }
-                getResource().setValue(param, value);
             }
         }
         return parameters;

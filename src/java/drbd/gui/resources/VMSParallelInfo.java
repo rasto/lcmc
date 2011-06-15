@@ -175,10 +175,10 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                    final boolean allParams) {
         final Map<String, String> parameters =
-                                    super.getHWParametersAndSave(allParams);
+                                        super.getHWParameters(allParams);
         setName("parallel "
                 + getParamSaved(ParallelData.TARGET_PORT)
                 + " / "

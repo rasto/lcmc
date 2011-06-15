@@ -305,7 +305,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                    final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -336,7 +336,6 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                         parameters.put(GraphicsData.AUTOPORT, "no");
                     }
                 }
-                getResource().setValue(param, value);
             }
         }
         setName(VMSXML.graphicsDisplayName(
@@ -360,7 +359,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         getInfoPanel();
         waitForInfoPanel();
         final Map<String, String> parameters =
-                                 getHWParametersAndSave(getResource().isNew());
+                                     getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -384,6 +383,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
         checkResourceFieldsChanged(null, params);
     }
 

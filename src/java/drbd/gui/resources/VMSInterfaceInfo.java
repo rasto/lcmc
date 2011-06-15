@@ -267,7 +267,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                     final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -288,7 +288,6 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 } else {
                     parameters.put(param, value);
                 }
-                getResource().setValue(param, value);
             }
         }
         setName(getParamSaved(InterfaceData.MAC_ADDRESS));
@@ -319,7 +318,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         getInfoPanel();
         waitForInfoPanel();
 
-        final Map<String, String> parameters = getHWParametersAndSave(
+        final Map<String, String> parameters = getHWParameters(
                                                         getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -343,6 +342,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getRealParametersFromXML();
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
         checkResourceFieldsChanged(null, params);
     }
 

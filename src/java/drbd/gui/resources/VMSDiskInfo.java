@@ -347,7 +347,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParametersAndSave(
+    @Override protected Map<String, String> getHWParameters(
                                                    final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -360,7 +360,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             final String value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
                 parameters.put(param, value);
-                getResource().setValue(param, value);
             } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
                 if (value == null) {
                     parameters.put(DiskData.TARGET_BUS, null);
@@ -377,14 +376,12 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                          + value);
                     }
                 }
-                getResource().setValue(param, value);
             } else if (allParams) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
                     parameters.put(param, value);
                 }
-                getResource().setValue(param, value);
             } else if (!Tools.areEqual(getParamSaved(param), value)
                        || DiskData.SOURCE_FILE.equals(param)
                        || DiskData.SOURCE_DEVICE.equals(param)) {
@@ -393,7 +390,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 } else {
                     parameters.put(param, value);
                 }
-                getResource().setValue(param, value);
             }
         }
         parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
@@ -415,7 +411,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         getInfoPanel();
         waitForInfoPanel();
         final Map<String, String> parameters =
-                                getHWParametersAndSave(getResource().isNew());
+                                    getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -437,6 +433,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
+        if (!testOnly) {
+            storeComboBoxValues(params);
+        }
         checkResourceFieldsChanged(null, params);
     }
 
