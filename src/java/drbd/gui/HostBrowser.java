@@ -274,8 +274,28 @@ public final class HostBrowser extends Browser {
         }
     }
 
-    /** Return list of block device info objects. */
+    /** Return list of block device info objects. Must be called in
+     Swing thread. */
     public Set<BlockDevInfo> getBlockDevInfos() {
+        final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
+        mBlockDevInfosReadLock.lock();
+        try {
+            final Enumeration e = blockDevicesNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode bdNode =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
+                blockDevInfos.add(bdi);
+            }
+        } finally {
+            mBlockDevInfosReadLock.unlock();
+        }
+        return blockDevInfos;
+    }
+
+    /** Return list of block device info objects. Must NOT be called in
+     Swing thread. */
+    public Set<BlockDevInfo> getBlockDevInfosInSwing() {
         final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
         mBlockDevInfosReadLock.lock();
         try {
@@ -284,9 +304,9 @@ public final class HostBrowser extends Browser {
                     final Enumeration e = blockDevicesNode.children();
                     while (e.hasMoreElements()) {
                         final DefaultMutableTreeNode bdNode =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                                     (DefaultMutableTreeNode) e.nextElement();
                         final BlockDevInfo bdi =
-                                         (BlockDevInfo) bdNode.getUserObject();
+                                        (BlockDevInfo) bdNode.getUserObject();
                         blockDevInfos.add(bdi);
                     }
                 }

@@ -2496,7 +2496,7 @@ public final class ClusterBrowser extends Browser {
     List<BlockDevInfo> getAllBlockDevices() {
         final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
         for (final Host host : cluster.getHostsArray()) {
-            bdis.addAll(host.getBrowser().getBlockDevInfos());
+            bdis.addAll(host.getBrowser().getBlockDevInfosInSwing());
         }
         return bdis;
     }

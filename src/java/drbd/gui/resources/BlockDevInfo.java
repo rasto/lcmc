@@ -1063,7 +1063,7 @@ public final class BlockDevInfo extends EditableInfo {
                                 }
                             });
                             Set<BlockDevInfo> blockDevInfos =
-                                        oHost.getBrowser().getBlockDevInfos();
+                                  oHost.getBrowser().getBlockDevInfosInSwing();
                             List<BlockDevInfo> blockDevInfosS =
                                                 new ArrayList<BlockDevInfo>();
                             for (final BlockDevInfo oBdi : blockDevInfos) {
