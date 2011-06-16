@@ -117,15 +117,21 @@ public final class HostBrowser extends Browser {
     /** Block device infos lock. */
     private final ReadWriteLock mBlockDevInfosLock =
                                                   new ReentrantReadWriteLock();
+    /** Block device infos read lock. */
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
+    /** Block device infos write lock. */
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
     /** Net Interface infos lock. */
     private final ReadWriteLock mNetInfosLock = new ReentrantReadWriteLock();
+    /** Net Interface infos read lock. */
     private final Lock mNetInfosReadLock = mNetInfosLock.readLock();
+    /** Net Interface infos write lock. */
     private final Lock mNetInfosWriteLock = mNetInfosLock.writeLock();
     /** File system list lock. */
     private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
+    /** File system list read lock. */
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
+    /** File system list write lock. */
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
 
     /**

@@ -941,7 +941,8 @@ public final class ToolsTest1 extends TestCase {
             assertFalse(true);
         }
         try {
-            assertEquals(1, Tools.compareVersions("8.3.10", "8.3.10rc99999999"));
+            assertEquals(1, Tools.compareVersions("8.3.10",
+                                                  "8.3.10rc99999999"));
         } catch (Exceptions.IllegalVersionException e) {
             assertFalse(true);
         }
@@ -961,7 +962,6 @@ public final class ToolsTest1 extends TestCase {
         } catch (Exceptions.IllegalVersionException e) {
             assertFalse(true);
         }
-        
         try {
             assertEquals(-1, Tools.compareVersions("8.3.9", "8.3.10rc1"));
         } catch (Exceptions.IllegalVersionException e) {

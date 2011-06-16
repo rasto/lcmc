@@ -103,7 +103,9 @@ public final class HeartbeatGraph extends ResourceGraph {
     /** Pcmk connection lock. */
     private final ReadWriteLock mHbConnectionLock =
                                                   new ReentrantReadWriteLock();
+    /** Pcmk connection read lock. */
     private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
+    /** Pcmk connection write lock. */
     private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
     /** Map from the vertex to the host. */
     private final Map<Vertex, HostInfo> vertexToHostMap =
@@ -503,10 +505,8 @@ public final class HeartbeatGraph extends ResourceGraph {
             edge = getGraph().findEdge(v, vP);
         }
         unlockGraph();
-        if (edge != null) {
-            if (edgeIsColocationList.contains(edge)) {
-                return true;
-            }
+        if (edge != null && edgeIsColocationList.contains(edge)) {
+            return true;
         }
         return false;
     }
@@ -526,10 +526,8 @@ public final class HeartbeatGraph extends ResourceGraph {
             edge = getGraph().findEdge(v, vP);
         }
         unlockGraph();
-        if (edge != null) {
-            if (edgeIsOrderList.contains(edge)) {
-                return true;
-            }
+        if (edge != null && edgeIsOrderList.contains(edge)) {
+            return true;
         }
         return false;
     }

@@ -267,11 +267,10 @@ public final class ConfigData {
     public void setPluginLogin(final String pluginUser,
                                final String pluginPassword,
                                final boolean pluginLoginSave) {
-        //TODO: pluginLoginSave not used?
         this.pluginUser = pluginUser;
         this.pluginPassword = pluginPassword;
-        this.loginSave = loginSave;
-        if (loginSave) {
+        this.pluginLoginSave = pluginLoginSave;
+        if (pluginLoginSave) {
             savedPluginUser = pluginUser;
             savedPluginPassword = pluginPassword;
         } else {

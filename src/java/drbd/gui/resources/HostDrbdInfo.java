@@ -618,7 +618,8 @@ public final class HostDrbdInfo extends Info {
                     DRBD.setSecondary(getHost(), DRBD.ALL, null, true);
                 }
             };
-            addMouseOverListener(setAllSecondaryItem, setAllSecondaryItemCallback);
+            addMouseOverListener(setAllSecondaryItem,
+                                 setAllSecondaryItemCallback);
         }
 
         /* remove host from gui */

@@ -302,23 +302,6 @@ public final class ProgressIndicatorPanel extends JComponent
         mAnimatorLock.unlock();
     }
 
-    /**
-     * Interrupts the animation, whatever its state is. You
-     * can use it when you need to stop the animation without
-     * running the fade out phase.
-     * This methods sets the panel invisible at the end.
-     */
-    private void interrupt() {
-        if (animation != null) {
-            animation.interrupt();
-            animation = null;
-
-            removeMouseListener(this);
-            removeKeyListener(this);
-            setVisible(false);
-        }
-    }
-
     /** Paints the glass pane with info and progress indicator. */
     @Override protected void paintComponent(final Graphics g) {
         if (started) {
@@ -525,11 +508,6 @@ public final class ProgressIndicatorPanel extends JComponent
             started = false;
             barWidth = 10;
         }
-    }
-
-    /** Returns the animation thread. */
-    private Thread getThread() {
-        return animation;
     }
 
     /** Mouse clicked. */

@@ -189,8 +189,6 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Previous value of the type. */
-    private String prevType = null;
     /** Creates the VMSParallelSerialInfo object. */
     VMSParallelSerialInfo(final String name,
                           final Browser browser,
@@ -402,16 +400,14 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     @Override protected final boolean checkParam(final String param,
                                                  final String newValue) {
         if (ParallelSerialData.TYPE.equals(param)) {
-            if (!newValue.equals(prevType)) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        for (final String param : PARAMETERS) {
-                            paramComboBoxGet(param, null).setVisible(
-                                 PARAMETERS_MAP.get(newValue).contains(param));
-                        }
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override public void run() {
+                    for (final String param : PARAMETERS) {
+                        paramComboBoxGet(param, null).setVisible(
+                             PARAMETERS_MAP.get(newValue).contains(param));
                     }
-                });
-            }
+                }
+            });
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;

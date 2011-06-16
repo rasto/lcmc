@@ -47,7 +47,9 @@ public final class CRM {
     /** Ptest lock. */
     private static final ReadWriteLock M_PTEST_LOCK =
                                                 new ReentrantReadWriteLock();
+    /** Ptest read lock. */
     private static final Lock M_PTEST_READLOCK = M_PTEST_LOCK.readLock();
+    /** Ptest write lock. */
     private static final Lock M_PTEST_WRITELOCK = M_PTEST_LOCK.writeLock();
     /** Delimiter that delimits the ptest and test cib part. */
     public static final String PTEST_END_DELIM = "--- PTEST END ---";

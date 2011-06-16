@@ -1075,6 +1075,7 @@ public final class DrbdXML extends XML {
         return resourceDeviceMap.get(res, volumeNr);
     }
 
+    /** Returns map from res and volume to drbd device. */
     public MultiKeyMap<String, String> getResourceDeviceMap() {
         return resourceDeviceMap;
     }

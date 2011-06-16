@@ -345,7 +345,9 @@ public final class VMSXML extends XML {
 
     /** XML document lock. */
     private final ReadWriteLock mXMLDocumentLock = new ReentrantReadWriteLock();
+    /** XML document read lock. */
     private final Lock mXMLDocumentReadLock = mXMLDocumentLock.readLock();
+    /** XML document write lock. */
     private final Lock mXMLDocumentWriteLock = mXMLDocumentLock.writeLock();
     /** XML document. */
     private Document xmlDocument = null;

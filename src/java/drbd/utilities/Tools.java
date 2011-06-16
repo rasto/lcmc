@@ -1435,7 +1435,7 @@ public final class Tools {
      * @Throws Exceptions.IllegalVersionException
      */
     public static int compareVersions(final String version1,
-                                      final String version2) 
+                                      final String version2)
                                   throws Exceptions.IllegalVersionException {
         if (version1 == null || version2 == null) {
             throw new Exceptions.IllegalVersionException(version1, version2);

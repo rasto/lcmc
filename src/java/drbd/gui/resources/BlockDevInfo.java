@@ -815,7 +815,8 @@ public final class BlockDevInfo extends EditableInfo {
                 final Map<Host, String> testOutput =
                                          new LinkedHashMap<Host, String>();
                 try {
-                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(true);
+                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
+                                                                          true);
                     for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
                         DRBD.adjust(h, DRBD.ALL, null, true);

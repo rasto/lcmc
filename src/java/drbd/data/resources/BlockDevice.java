@@ -97,6 +97,7 @@ public final class BlockDevice extends Resource {
                                                            "VerifyT",
                                                            "WFReportParams")));
 
+    /** Syncing states. */
     private static final Set<String> SYNCING_STATES =
         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                                                             "SyncTarget",

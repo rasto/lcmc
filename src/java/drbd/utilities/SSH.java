@@ -26,9 +26,6 @@ import drbd.gui.SSHGui;
 import drbd.gui.ProgressBar;
 import drbd.configs.DistResource;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import javax.swing.SwingUtilities;
 
 import java.io.File;
@@ -1036,6 +1033,7 @@ public final class SSH {
             super(hostname, port);
         }
 
+        /** Cancel from application. */
         void dmcCancel() {
             /* public getChannelManager() { return cm }
                has to be added to the Connection.java till

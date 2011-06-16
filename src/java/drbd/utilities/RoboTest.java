@@ -69,10 +69,10 @@ public final class RoboTest {
         if (x > 1536 || x < -100) {
             int i = 0;
             while (x > 1536 || x < -100) {
-                if (i % 5 == 0) {
+                if (i % 10 == 0) {
                     Tools.info("sleep: " + x);
                 }
-                Tools.sleep(1000);
+                Tools.sleep(500);
                 if (MouseInfo.getPointerInfo() != null) {
                     p = MouseInfo.getPointerInfo().getLocation();
                     x = p.getX() - loc.getX();
@@ -83,8 +83,8 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 400
-                || Math.abs(p.getY() - prevP.getY()) > 400)) {
+            && prevP.getX() - p.getX() > 400
+            && p.getY() - prevP.getY() > 400) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
@@ -625,7 +625,10 @@ public final class RoboTest {
     private static void checkTest(final Cluster cluster,
                                   final String test,
                                   final double no) {
-        for (final Host host: cluster.getHosts()) {
+        for (final Host host : cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkPCMKTest(test, no);
             }
@@ -636,7 +639,10 @@ public final class RoboTest {
     private static void checkDRBDTest(final Cluster cluster,
                                       final String test,
                                       final double no) {
-        for (final Host host: cluster.getHosts()) {
+        for (final Host host : cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkDRBDTest(test, no);
             }
@@ -648,6 +654,9 @@ public final class RoboTest {
                                     final String test,
                                     final double no,
                                     final String name) {
+        if (abortWithMouseMovement()) {
+            return;
+        }
         if (!aborted) {
             host.checkVMTest(test, no, name);
         }
@@ -657,7 +666,10 @@ public final class RoboTest {
                                     final String test,
                                     final double no,
                                     final String name) {
-        for (final Host host: cluster.getHosts()) {
+        for (final Host host : cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkVMTest(test, no, name);
             }
@@ -988,7 +1000,7 @@ public final class RoboTest {
                                          KeyEvent.VK_BACK_SPACE});
         sleep(3000);
         checkTest(cluster, "test1", 4.4); /* 4.4 */
-        for (int i = 0 ; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             removeConstraint(robot, popX, popY);
             checkTest(cluster, "test1", 5); /* 5 */
             addConstraint(robot, gx, gy - 30, 0, true, -1);
@@ -1735,7 +1747,7 @@ public final class RoboTest {
         removeConstraint(robot, dum1PopX, dum1PopY);
         checkTest(cluster, "test5", 2.5);
         /* constraints */
-        for (int i = 1; i <=10; i++) {
+        for (int i = 1; i <= 10; i++) {
             addConstraint(robot, dummy1X, dummy1Y, 35, false, -1);
 
             checkTest(cluster, "test5", 3);
@@ -1786,13 +1798,18 @@ public final class RoboTest {
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         for (int i = 0; i < 20; i++) {
+            Tools.info("i: " + i);
             addConstraint(robot, ph1X, ph1Y, 5, false, -1);
             if (!aborted) {
                 sleepNoFactor(2000);
             }
             removeConstraint(robot, dum1PopX, dum1PopY);
         }
-
+        stopEverything(robot);
+        sleepNoFactor(20000);
+        removeEverything(robot);
+        sleepNoFactor(20000);
+        resetTerminalAreas(cluster);
     }
 
     private static void startTest7(final Robot robot, final Cluster cluster) {
@@ -1954,7 +1971,8 @@ public final class RoboTest {
             resetTerminalAreas(cluster);
         }
     }
-    /** Pacemaker Leak tests */
+
+    /** Pacemaker Leak tests. */
     private static void startTestD(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
@@ -3114,7 +3132,7 @@ public final class RoboTest {
             } else {
                 /* existing drbd resource */
                 moveTo(robot, 460, 400);
-                leftClick(robot); 
+                leftClick(robot);
                 moveTo(robot, 460, 440);
                 leftClick(robot); /* drbd: r0 */
                 moveTo(robot, 720, 570);

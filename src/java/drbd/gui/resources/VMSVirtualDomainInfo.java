@@ -106,7 +106,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private Color rowColor = Browser.PANEL_BACKGROUND;
     /** Transition between states lock. */
     private final ReadWriteLock mTransitionLock = new ReentrantReadWriteLock();
+    /** Transition between states read lock. */
     private final Lock mTransitionReadLock = mTransitionLock.readLock();
+    /** Transition between states write lock. */
     private final Lock mTransitionWriteLock = mTransitionLock.writeLock();
     /** Starting. */
     private final Set<String> starting = new HashSet<String>();

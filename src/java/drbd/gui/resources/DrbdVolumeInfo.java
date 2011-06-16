@@ -74,7 +74,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Block devices that are in this DRBD volume. */
     private final List<BlockDevInfo> blockDevInfos;
     /** Device name. TODO: */
-    String device;
+    private String device;
     /** Last created filesystem. */
     private String createdFs = null;
     /**
@@ -95,7 +95,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     static final String IS_VERIFYING_STRING = "it is being verified";
     /** Parameters. */
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
-    /** Section name */
+    /** Section name. */
     static final String SECTION_STRING =
                                Tools.getString("DrbdVolumeInfo.VolumeSection");
     /** Long descriptions for parameters. */
@@ -277,8 +277,11 @@ public final class DrbdVolumeInfo extends EditableInfo
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(false);
-                            for (final Host h : getDrbdResourceInfo().getCluster().getHostsArray()) {
+                            getBrowser().getDrbdGraph().getDrbdInfo()
+                                                     .createDrbdConfig(false);
+                            for (final Host h : getDrbdResourceInfo()
+                                                        .getCluster()
+                                                        .getHostsArray()) {
                                 DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
@@ -330,7 +333,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Return the first block devices. */
     public BlockDevInfo getFirstBlockDevInfo() {
-        if (blockDevInfos.size() > 0) {
+        if (!blockDevInfos.isEmpty()) {
             return blockDevInfos.get(0);
         } else {
             return null;
@@ -575,7 +578,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             @Override public void action() {
                 hidePopup();
                 final String device = getDevice();
-                DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(), device);
+                DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(),
+                                          device);
                 l.showDialog();
             }
         };
@@ -969,15 +973,16 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns meta-disk device for the specified host. */
     public String getMetaDiskForHost(final Host host) {
-        return getBrowser().getDrbdXML().getMetaDisk(host.getName(),
-                                                     getDrbdResourceInfo().getName(),
-                                                     getName());
+        return getBrowser().getDrbdXML().getMetaDisk(
+                                             host.getName(),
+                                             getDrbdResourceInfo().getName(),
+                                             getName());
     }
 
     /** Returns string of the drbd volume. */
     @Override public String toString() {
-        String resName = getDrbdResourceInfo().getName();
-        String name = getName();
+        final String resName = getDrbdResourceInfo().getName();
+        final String name = getName();
         if (resName == null || name == null || "".equals(name)) {
             return Tools.getString("ClusterBrowser.DrbdResUnconfigured");
         }
@@ -1104,14 +1109,14 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns browser object of this info. */
-    @Override public final ClusterBrowser getBrowser() {
+    @Override public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
-    
+
     /**
      * Returns a long description of the parameter that is used for tool tip.
      */
-    @Override protected final String getParamLongDesc(final String param) {
+    @Override protected String getParamLongDesc(final String param) {
         return LONG_DESC.get(param);
     }
 
@@ -1119,12 +1124,12 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns the short description of the drbd parameter that is used as
      * a label.
      */
-    @Override protected final String getParamShortDesc(final String param) {
+    @Override protected String getParamShortDesc(final String param) {
         return SHORT_DESC.get(param);
     }
 
     /** Returns the preferred value for the drbd parameter. */
-    @Override protected final String getParamPreferred(final String param) {
+    @Override protected String getParamPreferred(final String param) {
         return null;
     }
 
@@ -1143,13 +1148,12 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns the possible values for the pulldown menus, if applicable. */
-    @Override protected final Object[] getParamPossibleChoices(
-                                                        final String param) {
+    @Override protected Object[] getParamPossibleChoices(final String param) {
         return POSSIBLE_CHOICES.get(param);
     }
 
     /** Returns the type of the parameter (like boolean). */
-    @Override protected final String getParamType(final String param) {
+    @Override protected String getParamType(final String param) {
         return null;
     }
 
@@ -1157,28 +1161,28 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    @Override protected final boolean isCheckBox(final String param) {
+    @Override protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns whether this drbd parameter is of time type. */
-    @Override protected final boolean isTimeType(final String param) {
+    @Override protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns whether this drbd parameter is of label type. */
-    @Override protected final boolean isLabel(final String param) {
+    @Override protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected final boolean isEnabledOnlyInAdvancedMode(
+    @Override protected boolean isEnabledOnlyInAdvancedMode(
                                                          final String param) {
         return false;
     }
 
     /** Returns access type of this parameter. */
-    @Override protected final ConfigData.AccessType getAccessType(
+    @Override protected ConfigData.AccessType getAccessType(
                                                          final String param) {
         return ConfigData.AccessType.ADMIN;
     }
@@ -1203,7 +1207,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns whether this drbd parameter is required parameter. */
-    @Override protected final boolean isRequired(final String param) {
+    @Override protected boolean isRequired(final String param) {
         return true;
     }
 

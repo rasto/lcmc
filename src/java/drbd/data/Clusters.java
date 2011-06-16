@@ -44,7 +44,9 @@ public final class Clusters {
     private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
     /** Clusters set lock. */
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();
+    /** Clusters set read lock. */
     private final Lock mClustersReadLock = mClustersLock.readLock();
+    /** Clusters set write lock. */
     private final Lock mClustersWriteLock = mClustersLock.writeLock();
 
     /** Adds cluster to the set of clusters. */
