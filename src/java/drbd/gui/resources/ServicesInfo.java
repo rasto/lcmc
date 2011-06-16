@@ -523,11 +523,11 @@ public final class ServicesInfo extends EditableInfo {
             }
             final DefaultMutableTreeNode n = newSi.getNode();
             if (n != null) {
-                final int i = n.getParent().getIndex(n);
-                if (i > pos) {
-                    final int p = pos;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                final int p = pos;
+                Tools.invokeAndWait(new Runnable() {
+                    @Override public void run() {
+                        final int i = n.getParent().getIndex(n);
+                        if (i > p) {
                             final DefaultMutableTreeNode parent =
                                         (DefaultMutableTreeNode) n.getParent();
                             if (parent != null) {
@@ -536,8 +536,8 @@ public final class ServicesInfo extends EditableInfo {
                                 getBrowser().reload(parent, false);
                             }
                         }
-                    });
-                }
+                    }
+                });
                 pos++;
             }
         }
