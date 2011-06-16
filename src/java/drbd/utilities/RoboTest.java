@@ -711,6 +711,31 @@ public final class RoboTest {
         moveTo(robot, 814, 189);
         sleep(6000); /* ptest */
         leftClick(robot); /* apply */
+        /* CIDR netmask 24 */
+        sleep(10000);
+        moveTo(robot, 335, 129); /* advanced */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 960, 475); /* CIDR */
+        sleep(3000);
+        leftClick(robot);
+        sleep(2000);
+        press(robot, KeyEvent.VK_2);
+        sleep(200);
+        press(robot, KeyEvent.VK_4);
+        sleep(1000);
+
+        moveTo(robot, 335, 129); /* not advanced */
+        sleep(2000);
+        leftClick(robot);
+        sleep(2000);
+
+        moveTo(robot, 814, 189);
+        sleep(6000); /* ptest */
+        leftClick(robot); /* apply */
+
         checkTest(cluster, "test1", 2); /* 2 */
 
         /* pingd */
@@ -1825,7 +1850,7 @@ public final class RoboTest {
         final int gx = 235;
         final int gy = 255;
         disableStonith(robot, cluster);
-        for (int i = 100; i > 0; i--) {
+        for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
 
             checkTest(cluster, "testA", 1);
@@ -1868,7 +1893,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 255;
         disableStonith(robot, cluster);
-        for (int i = 100; i > 0; i--) {
+        for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(cluster, "testB", 1);
             /* create dummy */
@@ -1890,7 +1915,7 @@ public final class RoboTest {
         final int statefulX = 500;
         final int statefulY = 255;
         disableStonith(robot, cluster);
-        for (int i = 100; i > 0; i--) {
+        for (int i = 20; i > 0; i--) {
             Tools.info("I: " + i);
             checkTest(cluster, "testC", 1);
             /** Add m/s Stateful resource */
@@ -1933,7 +1958,7 @@ public final class RoboTest {
     private static void startTestD(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
-        int count = 100;
+        int count = 20;
         final int dummy1X = 540;
         final int dummy1Y = 250;
         for (int i = count; i > 0; i--) {
@@ -2903,7 +2928,7 @@ public final class RoboTest {
         aborted = false;
         int protocolY = 600;
         int correctionY = 0;
-        if (cluster.getHostsArray()[0].hasVolumes()) {
+        if (!cluster.getHostsArray()[0].hasVolumes()) {
             protocolY = 400;
             correctionY = 30;
         }
@@ -3077,7 +3102,7 @@ public final class RoboTest {
         int offset = 0;
         int protocolY = 600;
         int correctionY = 0;
-        if (cluster.getHostsArray()[0].hasVolumes()) {
+        if (!cluster.getHostsArray()[0].hasVolumes()) {
             protocolY = 400;
             correctionY = 30;
         }

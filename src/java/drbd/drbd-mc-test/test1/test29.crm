@@ -25,7 +25,7 @@ primitive res_Dummy_3 ocf:heartbeat:Dummy
 	op migrate_from interval="0" timeout="122" 
 	meta target-role="stopped" is-managed="true"
 primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 
-	params ip="192.168.122.100" 
+	params ip="192.168.122.100" cidr_netmask="24" 
 	operations $id="res_IPaddr2_1-operations" 
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
