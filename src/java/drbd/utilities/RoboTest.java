@@ -69,10 +69,10 @@ public final class RoboTest {
         if (x > 1536 || x < -100) {
             int i = 0;
             while (x > 1536 || x < -100) {
-                if (i % 5 == 0) {
+                if (i % 10 == 0) {
                     Tools.info("sleep: " + x);
                 }
-                Tools.sleep(1000);
+                Tools.sleep(500);
                 if (MouseInfo.getPointerInfo() != null) {
                     p = MouseInfo.getPointerInfo().getLocation();
                     x = p.getX() - loc.getX();
@@ -83,8 +83,8 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && (Math.abs(p.getX() - prevP.getX()) > 400
-                || Math.abs(p.getY() - prevP.getY()) > 400)) {
+            && prevP.getX() - p.getX() > 400
+            && p.getY() - prevP.getY() > 400) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
@@ -626,6 +626,9 @@ public final class RoboTest {
                                   final String test,
                                   final double no) {
         for (final Host host: cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkPCMKTest(test, no);
             }
@@ -637,6 +640,9 @@ public final class RoboTest {
                                       final String test,
                                       final double no) {
         for (final Host host: cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkDRBDTest(test, no);
             }
@@ -648,6 +654,9 @@ public final class RoboTest {
                                     final String test,
                                     final double no,
                                     final String name) {
+        if (abortWithMouseMovement()) {
+            return;
+        }
         if (!aborted) {
             host.checkVMTest(test, no, name);
         }
@@ -658,6 +667,9 @@ public final class RoboTest {
                                     final double no,
                                     final String name) {
         for (final Host host: cluster.getHosts()) {
+            if (abortWithMouseMovement()) {
+                return;
+            }
             if (!aborted) {
                 host.checkVMTest(test, no, name);
             }
