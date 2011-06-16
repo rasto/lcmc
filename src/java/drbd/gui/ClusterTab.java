@@ -26,7 +26,6 @@ import drbd.data.Cluster;
 import drbd.utilities.Tools;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,

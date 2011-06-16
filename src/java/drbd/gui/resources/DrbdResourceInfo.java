@@ -63,7 +63,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 

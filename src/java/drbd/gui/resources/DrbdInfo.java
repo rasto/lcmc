@@ -30,7 +30,6 @@ import drbd.data.Host;
 import drbd.data.DrbdXML;
 import drbd.data.resources.Resource;
 import drbd.data.DRBDtestData;
-import drbd.data.DrbdXML;
 import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
