@@ -393,8 +393,12 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                getBrowser().getHeartbeatGraph().killRemovedVertices();
-                getService().doneRemoving();
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getBrowser().getHeartbeatGraph().killRemovedVertices();
+                        getService().doneRemoving();
+                    }
+                });
             }
         } else {
             if (rscSetConnectionDataOrd != null) {
