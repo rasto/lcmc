@@ -95,8 +95,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBox = null;
     /** Port combo box wizard. */
     private GuiComboBox portComboBoxWizard = null;
-    /** Default port. */
-    private String defaultPort = null;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -170,7 +168,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     volumeConfigs.add(volumeConfig);
                 }
             }
-            if (volumeConfigs.size() > 0) {
+            if (!volumeConfigs.isEmpty()) {
                 config.append("\ton ");
                 config.append(host.getName());
                 config.append(" {\n\t\t");
@@ -278,7 +276,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
             // TODO: has to be reloaded
             final List<Info> l = new ArrayList<Info>();
-            String defaultItem = getParamSaved(DRBD_RES_PARAM_AFTER);
+            final String defaultItem = getParamSaved(DRBD_RES_PARAM_AFTER);
             final StringInfo di = new StringInfo(
                                         Tools.getString("ClusterBrowser.None"),
                                         "-1",
@@ -561,7 +559,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         //if (Tools.isStringClass(value)) {
         //    return getDrbdResource().getValue(DRBD_RES_PARAM_DEV).equals(
-        //                                                     value.toString());
+        //                                                   value.toString());
         //} else {
             if (toString() == null) {
                 return false;
@@ -746,7 +744,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final GuiComboBox pcb = portComboBox;
         final GuiComboBox pwizardCb = portComboBoxWizard;
         if (Tools.isNumber(port)) {
-            long p = Long.parseLong(port);
+            final long p = Long.parseLong(port);
             if (p >= 0 && p < 65536) {
                 pcb.setBackground(null, savedPort, true);
                 if (pwizardCb != null) {
@@ -859,13 +857,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
     }
 
-    /** Returns the last volume number + 1 */
+    /** Returns the last volume number + 1. */
     public String getAvailVolumeNumber() {
         int maxNr = -1;
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             final String nrString = dvi.getName();
             if (Tools.isNumber(nrString)) {
-                int nr = Integer.parseInt(nrString);
+                final int nr = Integer.parseInt(nrString);
                 if (nr > maxNr) {
                     maxNr = nr;
                 }
@@ -940,7 +938,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             for (final String port : host.getBrowser().getDrbdVIPortList()) {
                 if (Tools.isNumber(port)) {
-                    int p = Integer.parseInt(port);
+                    final int p = Integer.parseInt(port);
                     if (index < 0 || p < index) {
                         index = p;
                     }
@@ -970,7 +968,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
             index++;
         }
-        defaultPort = drbdVIPorts.get(0);
+        final String defaultPort = drbdVIPorts.get(0);
         final GuiComboBox pcb = new GuiComboBox(
                    defaultPort,
                    drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
@@ -1217,7 +1215,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Remove drbd volume. Returns true if there are no more volumes. */
     public boolean removeDrbdVolume(final DrbdVolumeInfo dvi) {
         drbdVolumes.remove(dvi);
-        return drbdVolumes.size() == 0;
+        return drbdVolumes.isEmpty();
     }
 
     /** Removes this object. */

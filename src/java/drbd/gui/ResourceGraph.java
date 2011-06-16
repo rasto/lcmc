@@ -616,6 +616,7 @@ public abstract class ResourceGraph {
 
     /** This class allows to change direction of the edge. */
     static class Vertex {
+        /** Create vertex. */
         Vertex() {
             super();
         }
@@ -790,9 +791,12 @@ public abstract class ResourceGraph {
     private final class MyVertexShapeSize<V, E>
                                     extends AbstractVertexShapeTransformer<V>
                                     implements Transformer<V, Shape>  {
+        /** Transformer. */
         private final Transformer<Vertex, Point2D> vlf;
+        /** Graph. */
         private final Graph<V, E> graph;
 
+        /** Constructor. */
         MyVertexShapeSize(final Graph<V, E> graphIn,
                           final Transformer<Vertex, Point2D> vlfIn) {
             this.graph = graphIn;
@@ -871,10 +875,12 @@ public abstract class ResourceGraph {
         /** Serial version ID. */
         private static final long serialVersionUID = 1L;
 
+        /** Constructor. */
         MyPopupGraphMousePlugin() {
             this(MouseEvent.BUTTON3_MASK);
         }
 
+        /** Constructor. */
         MyPopupGraphMousePlugin(final int modifiers) {
             super(modifiers);
         }

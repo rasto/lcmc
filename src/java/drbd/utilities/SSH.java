@@ -1033,6 +1033,7 @@ public final class SSH {
             super(hostname, port);
         }
 
+        /** Cancel from application. */
         void dmcCancel() {
             /* public getChannelManager() { return cm }
                has to be added to the Connection.java till

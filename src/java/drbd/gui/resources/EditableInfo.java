@@ -318,7 +318,7 @@ public abstract class EditableInfo extends Info {
     private void addParams(final JPanel optionsPanel,
                            final String prefix,
                            final String[] params,
-                           final MyButton thisApplyButton,//TODO: used for what?
+                           final MyButton thisApplyButton,
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, GuiComboBox> sameAsFields) {
@@ -918,10 +918,9 @@ public abstract class EditableInfo extends Info {
                     final Object o0 = ((Object[]) o)[0];
                     final Object o1 = ((Object[]) o)[1];
                     newValue = o0.toString();
-                    if (o1 != null) {
-                        if (o1 instanceof Unit) {
-                            newValue += ((Unit) o1).getShortName();
-                        }
+                    if (o1 != null
+                        && o1 instanceof Unit) {
+                        newValue += ((Unit) o1).getShortName();
                     }
                 } else {
                     newValue = ((Info) o).getStringValue();
@@ -1147,6 +1146,7 @@ public abstract class EditableInfo extends Info {
         advancedOnlySectionList.clear();
     }
 
+    /** Cleanup. */
     final void cleanup() {
         super.cleanup();
         clearPanelLists();

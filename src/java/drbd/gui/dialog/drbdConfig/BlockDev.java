@@ -156,7 +156,8 @@ final class BlockDev extends DrbdConfig {
                                     testOnly);
                     }
                 }
-                getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser().reloadAllComboBoxes(null);
+                getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser()
+                                                    .reloadAllComboBoxes(null);
             } catch (Exceptions.DrbdConfigException dce) {
                 Tools.appError("config failed", dce);
             }

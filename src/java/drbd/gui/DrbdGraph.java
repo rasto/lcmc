@@ -196,7 +196,8 @@ public final class DrbdGraph extends ResourceGraph {
                     final DrbdVolumeInfo dvi = bdi.getDrbdVolumeInfo();
                     if (dvi != null) {
                         removeDrbdVolume(dvi);
-                        dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(dvi);
+                        dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(
+                                                                          dvi);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {
@@ -777,7 +778,7 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /**
-     * Returns secondary gradient fill paint color for vertex v. If it is 
+     * Returns secondary gradient fill paint color for vertex v. If it is
      * a volume and there is previous volume don't show gradient.
      */
     @Override protected Color getVertexFillSecondaryColor(final Vertex v) {

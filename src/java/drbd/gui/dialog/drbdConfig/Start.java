@@ -61,11 +61,11 @@ public final class Start extends WizardDialog {
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
     /** DRBD info object. */
-    private DrbdInfo drbdInfo;
+    private final DrbdInfo drbdInfo;
     /** The first block device info object. */
-    private BlockDevInfo blockDevInfo1;
+    private final BlockDevInfo blockDevInfo1;
     /** The second block device info object. */
-    private BlockDevInfo blockDevInfo2;
+    private final BlockDevInfo blockDevInfo2;
     /** DRBD resource info object. */
     private DrbdResourceInfo drbdResourceInfo;
 

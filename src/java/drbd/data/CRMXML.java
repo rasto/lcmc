@@ -555,8 +555,9 @@ public final class CRMXML extends XML {
         final String pcmkV = host.getPacemakerVersion();
         try {
             if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
-                command = host.getDistCommand("Heartbeat.2.1.3.getOCFParameters",
-                                              (ConvertCmdCallback) null);
+                command = host.getDistCommand(
+                                            "Heartbeat.2.1.3.getOCFParameters",
+                                            (ConvertCmdCallback) null);
                 if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
                     command = null;
                 }
@@ -568,8 +569,9 @@ public final class CRMXML extends XML {
             if ((command == null || "".equals(command))
                 && pcmkV == null
                 && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                command = host.getDistCommand("Heartbeat.2.1.4.getOCFParameters",
-                                              (ConvertCmdCallback) null);
+                command = host.getDistCommand(
+                                           "Heartbeat.2.1.4.getOCFParameters",
+                                           (ConvertCmdCallback) null);
                 if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
                     command = null;
                 }
@@ -2341,8 +2343,7 @@ public final class CRMXML extends XML {
                               final Node transientAttrNode,
                               final MultiKeyMap<String, String> failedMap,
                               final Map<String, Set<String>> failedClonesMap,
-                              final Map<String, String> pingCountMap,
-                              final String hbV) {
+                              final Map<String, String> pingCountMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(transientAttrNode,
                                                    "instance_attributes");
@@ -3057,8 +3058,7 @@ public final class CRMXML extends XML {
                                                      nodeStateChild,
                                                      failedMap,
                                                      failedClonesMap,
-                                                     pingCountMap,
-                                                     hbV);
+                                                     pingCountMap);
                         }
                     }
                     final List<String> resList =
@@ -3615,7 +3615,9 @@ public final class CRMXML extends XML {
         private final List<String> rscIds;
         /** Resource ids lock. */
         private final ReadWriteLock mRscIdsLock = new ReentrantReadWriteLock();
+        /** Resource ids read lock. */
         private final Lock mRscIdsReadLock = mRscIdsLock.readLock();
+        /** Resource ids write lock. */
         private final Lock mRscIdsWriteLock = mRscIdsLock.writeLock();
         /** String whether the resource set is sequential or not. */
         private final String sequential;

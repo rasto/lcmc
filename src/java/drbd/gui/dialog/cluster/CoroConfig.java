@@ -597,6 +597,7 @@ final class CoroConfig extends DialogCluster {
                     label.addComponentListener(new ComponentListener() {
                         @Override public void componentHidden(
                                                     final ComponentEvent e) {
+                            /* do nothing */
                         }
 
                         @Override public void componentMoved(
@@ -616,10 +617,12 @@ final class CoroConfig extends DialogCluster {
 
                         @Override public void componentResized(
                                                       final ComponentEvent e) {
+                            /* do nothing */
                         }
 
                         @Override public void componentShown(
                                                       final ComponentEvent e) {
+                            /* do nothing */
                         }
                     });
                 }

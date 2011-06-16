@@ -176,7 +176,9 @@ public final class ClusterBrowser extends Browser {
     private DrbdXML drbdXML;
     /** VMS lock. */
     private final ReadWriteLock mVMSLock = new ReentrantReadWriteLock();
+    /** VMS read lock. */
     private final Lock mVMSReadLock = mVMSLock.readLock();
+    /** VMS write lock. */
     private final Lock mVMSWriteLock = mVMSLock.writeLock();
     /** Object that hosts status of all VMs. */
     private final Map<Host, VMSXML> vmsXML = new HashMap<Host, VMSXML>();

@@ -650,12 +650,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
     /** Return new DRBD resoruce info object. */
     public DrbdResourceInfo getNewDrbdResource() {
-        int index = getNewDrbdResourceIndex();
-        String name = "r" + Integer.toString(index);
-
+        final int index = getNewDrbdResourceIndex();
+        final String name = "r" + Integer.toString(index);
         /* search for next available drbd device */
-        final DrbdResourceInfo dri = new DrbdResourceInfo(name, getBrowser());
-        return dri;
+        return new DrbdResourceInfo(name, getBrowser());
     }
 
     /** Return new DRBD volume info object. */

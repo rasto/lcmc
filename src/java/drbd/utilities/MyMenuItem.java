@@ -234,7 +234,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * This method can be overriden to define an action that should be taken
      * after the item is selected.
      */
-    abstract public void action();
+    public abstract void action();
 
     /** Returns false if the alternate menu item text etc. should be shown. */
     public boolean predicate() {

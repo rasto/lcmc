@@ -127,8 +127,10 @@ public class ServiceInfo extends EditableInfo {
     /** Operations combo box hash lock. */
     private final ReadWriteLock mOperationsComboBoxHashLock =
                                                   new ReentrantReadWriteLock();
+    /** Operations combo box hash read lock. */
     private final Lock mOperationsComboBoxHashReadLock =
                                         mOperationsComboBoxHashLock.readLock();
+    /** Operations combo box hash write lock. */
     private final Lock mOperationsComboBoxHashWriteLock =
                                        mOperationsComboBoxHashLock.writeLock();
     /** A map from operation to its combo box. */
@@ -3684,10 +3686,8 @@ public class ServiceInfo extends EditableInfo {
                         final List<String> newRscIds =
                                               new ArrayList<String>();
                         newRscIds.addAll(rscSet.getRscIds());
-                        if (newRscIds.remove(idToRemove)) {
-                            if (!testOnly) {
-                                modifiedRscSet = rscSet;
-                            }
+                        if (newRscIds.remove(idToRemove) && !testOnly) {
+                            modifiedRscSet = rscSet;
                         }
                         if (!newRscIds.isEmpty()) {
                             final CRMXML.RscSet newRscSet =
@@ -3726,10 +3726,10 @@ public class ServiceInfo extends EditableInfo {
                               null,
                               rscSetsOrdAttrs,
                               attrs,
-                              testOnly)) {
-                if (modifiedRscSet != null) {
-                    modifiedRscSet.removeRscId(idToRemove);
-                }
+                              testOnly)
+                && modifiedRscSet != null) {
+
+                modifiedRscSet.removeRscId(idToRemove);
             }
         } else {
             final String rscFirstId = parent.getHeartbeatId(testOnly);
@@ -3862,10 +3862,8 @@ public class ServiceInfo extends EditableInfo {
                         final List<String> newRscIds =
                                               new ArrayList<String>();
                         newRscIds.addAll(rscSet.getRscIds());
-                        if (newRscIds.remove(idToRemove)) {
-                            if (!testOnly) {
-                                modifiedRscSet = rscSet;
-                            }
+                        if (newRscIds.remove(idToRemove) && !testOnly) {
+                            modifiedRscSet = rscSet;
                         }
                         if (!newRscIds.isEmpty()) {
                             final CRMXML.RscSet newRscSet =
@@ -3903,10 +3901,10 @@ public class ServiceInfo extends EditableInfo {
                               rscSetsColAttrs,
                               null,
                               attrs,
-                              testOnly)) {
-                if (modifiedRscSet != null) {
-                    modifiedRscSet.removeRscId(idToRemove);
-                }
+                              testOnly)
+                && modifiedRscSet != null) {
+
+                modifiedRscSet.removeRscId(idToRemove);
             }
         } else {
             final List<CRMXML.ColocationData> allData =
@@ -6126,6 +6124,9 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
+    /**
+     * Returns value of the same as drop down menu as an info object or null.
+     */
     final Info sameAsOperationsCBValue() {
         if (sameAsOperationsCB == null) {
             return null;

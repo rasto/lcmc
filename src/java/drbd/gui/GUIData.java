@@ -77,8 +77,10 @@ public final class GUIData  {
     /** 'Add Cluster" buttons list lock. */
     private final ReadWriteLock mAddClusterButtonListLock =
                                                 new ReentrantReadWriteLock();
+    /** 'Add Cluster" buttons list read lock. */
     private final Lock mAddClusterButtonListReadLock =
                                         mAddClusterButtonListLock.readLock();
+    /** 'Add Cluster" buttons list write lock. */
     private final Lock mAddClusterButtonListWriteLock =
                                         mAddClusterButtonListLock.writeLock();
     /** 'Add Cluster' buttons. */
@@ -87,8 +89,10 @@ public final class GUIData  {
     /** 'Add Host" buttons list lock. */
     private final ReadWriteLock mAddHostButtonListLock =
                                                 new ReentrantReadWriteLock();
+    /** 'Add Host" buttons list read lock. */
     private final Lock mAddHostButtonListReadLock =
                                         mAddHostButtonListLock.readLock();
+    /** 'Add Host" buttons list write lock. */
     private final Lock mAddHostButtonListWriteLock =
                                         mAddHostButtonListLock.writeLock();
     /** 'Add Host' buttons. */

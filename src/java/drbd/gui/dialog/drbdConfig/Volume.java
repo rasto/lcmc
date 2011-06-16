@@ -59,11 +59,7 @@ public final class Volume extends DrbdConfig {
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override public WizardDialog nextDialog() {
-        //final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        //final DrbdInfo drbdInfo = dri.getDrbdInfo();
         Tools.waitForSwing();
-        //drbdInfo.apply(false);
-        //dri.apply(false);
         getDrbdVolumeInfo().apply(false);
         return new BlockDev(this,
                             getDrbdVolumeInfo(),

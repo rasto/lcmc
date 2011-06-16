@@ -51,7 +51,7 @@ implements ClusterBlockDeviceInterface {
     @Override public String getDevice() {
         return device;
     }
-    
+
     /** Sets drbd device. */
     public void setDevice(final String device) {
         this.device = device;

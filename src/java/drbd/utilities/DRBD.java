@@ -53,8 +53,10 @@ public final class DRBD {
     /** DRBD test lock. */
     private static final ReadWriteLock M_DRBD_TEST_LOCK =
                                                   new ReentrantReadWriteLock();
+    /** DRBD test read lock. */
     private static final Lock M_DRBD_TEST_READLOCK =
                                                    M_DRBD_TEST_LOCK.readLock();
+    /** DRBD test write lock. */
     private static final Lock M_DRBD_TEST_WRITELOCK =
                                                   M_DRBD_TEST_LOCK.writeLock();
     /** "All resources" string for drbdadm commands. */
@@ -162,7 +164,6 @@ public final class DRBD {
                                  final String volume,
                                  final ExecCallback execCallback,
                                  final boolean testOnly) {
-        
         final String command = host.getDistCommand("DRBD.attach",
                                                    getResVolReplaceHash(
                                                                       host,
