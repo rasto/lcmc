@@ -232,9 +232,21 @@ public final class ClusterStatus {
         return cibQueryMap.getResourceType().get(hbId);
     }
 
-    /** Returns whether resource is an orphaned resource. */
-    public boolean isOrphaned(final String pcmkId) {
-        return cibQueryMap.getOrphaned().contains(pcmkId);
+    /** Returns whether the res is in LRM on host. */
+    public boolean isInLRMOnHost(final String hostName,
+                                 final String rscId,
+                                 final boolean testOnly) {
+        final Set<String> inLRMList =
+               cibQueryMap.getInLRM().get(hostName.toLowerCase(Locale.US));
+        if (inLRMList == null) {
+            return false;
+        }
+        return inLRMList.contains(rscId);
+    }
+
+    /** Returns whether the res is orphaned. */
+    public boolean isOrphaned(final String rscId) {
+        return cibQueryMap.getOrphaned().contains(rscId);
     }
 
     /** Returns instance_attributes id the service. */

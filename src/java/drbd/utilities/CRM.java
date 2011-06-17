@@ -824,6 +824,9 @@ public final class CRM {
                                           final String resId,
                                           final Host[] clusterHosts,
                                           final boolean testOnly) {
+        if (testOnly) {
+            return true;
+        }
         /* make cleanup on all cluster hosts. */
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);

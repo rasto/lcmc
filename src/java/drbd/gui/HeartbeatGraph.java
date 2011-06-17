@@ -1171,6 +1171,9 @@ public final class HeartbeatGraph extends ResourceGraph {
     private void removeEdge(final Edge e, final boolean testOnly) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                if (e == null) {
+                    return;
+                }
                 if (!edgeIsOrderList.contains(e)
                     && !edgeIsColocationList.contains(e)) {
                     e.reset();

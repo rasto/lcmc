@@ -228,8 +228,7 @@ public class ServiceInfo extends EditableInfo {
     static final String IS_BEING_REMOVED_STRING = "it is being removed";
 
     /** String that appears as a tooltip in menu items if item is orphan. */
-    static final String IS_ORPHANED_STRING =
-                                                 "cannot do that to an ophan";
+    static final String IS_ORPHANED_STRING = "cannot do that to an ophan";
     /** String that appears as a tooltip in menu items if item is new. */
     static final String IS_NEW_STRING = "it is not applied yet";
     /** Ping attributes. */
@@ -1084,6 +1083,12 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
+    /** Returns whether the resource is orphaned on the specified host. */
+    protected final boolean isInLRMOnHost(final String hostName,
+                                          final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        return cs.isInLRMOnHost(hostName, getHeartbeatId(testOnly), testOnly);
+    }
 
     /** Returns whether the resource failed on the specified host. */
     protected final boolean failedOnHost(final String hostName,
@@ -4277,7 +4282,10 @@ public class ServiceInfo extends EditableInfo {
         final List<Host> dirtyHosts = new ArrayList<Host>();
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (final Host host : getBrowser().getClusterHosts()) {
-            dirtyHosts.add(host);
+            if (isInLRMOnHost(host.getName(), testOnly)
+                || failedOnHost(host.getName(), testOnly)) {
+                dirtyHosts.add(host);
+            }
         }
         final String rscId = getHeartbeatId(testOnly);
         final Set<String> failedClones = cs.getFailedClones(rscId, testOnly);

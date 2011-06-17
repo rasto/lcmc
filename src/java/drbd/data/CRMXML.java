@@ -2652,7 +2652,10 @@ public final class CRMXML extends XML {
                                     new HashMap<String, Map<String, String>>();
         final Map<String, ResourceAgent> resourceTypeMap =
                                       new HashMap<String, ResourceAgent>();
-        final Set<String> orphanedList = new LinkedHashSet<String>();
+        final Set<String> orphanedList = new HashSet<String>();
+        /* host -> inLRMList list */
+        final Map<String, Set<String>> inLRMList =
+                                        new HashMap<String, Set<String>>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
         final MultiKeyMap<String, String> operationsMap =
@@ -3066,10 +3069,12 @@ public final class CRMXML extends XML {
                     for (int j = 0; j < nodeStates.getLength(); j++) {
                         final Node nodeStateChild = nodeStates.item(j);
                         if ("lrm".equals(nodeStateChild.getNodeName())) {
-                            parseLRM(nodeStateChild,
+                            parseLRM(uname.toLowerCase(Locale.US),
+                                     nodeStateChild,
                                      resList,
                                      resourceTypeMap,
                                      parametersMap,
+                                     inLRMList,
                                      orphanedList,
                                      failedClonesMap);
                         }
@@ -3082,6 +3087,7 @@ public final class CRMXML extends XML {
         cibQueryData.setParameters(parametersMap);
         cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);
+        cibQueryData.setInLRM(inLRMList);
         cibQueryData.setOrphaned(orphanedList);
         cibQueryData.setResourceInstanceAttrId(resourceInstanceAttrIdMap);
 
@@ -3430,10 +3436,12 @@ public final class CRMXML extends XML {
     }
 
     /** Get resources that were removed but are in LRM. */
-    void parseLRM(final Node lrmNode,
+    void parseLRM(final String unameLowerCase,
+                  final Node lrmNode,
                   final List<String> resList,
                   final Map<String, ResourceAgent> resourceTypeMap,
                   final Map<String, Map<String, String>> parametersMap,
+                  final Map<String, Set<String>> inLRMList,
                   final Set<String> orphanedList,
                   final Map<String, Set<String>> failedClonesMap) {
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
@@ -3456,22 +3464,27 @@ public final class CRMXML extends XML {
                 } else {
                     crmId = resId;
                 }
-                if (Tools.getConfigData().isAdvancedMode()
-                    && !resourceTypeMap.containsKey(crmId)) {
-                    /* it is orphaned */
+                if (!resourceTypeMap.containsKey(crmId)) {
                     final String raClass = getAttribute(rscNode, "class");
                     String provider = getAttribute(rscNode, "provider");
                     if (provider == null) {
                         provider = "heartbeat";
                     }
                     final String type = getAttribute(rscNode, "type");
-                    orphanedList.add(crmId);
                     resourceTypeMap.put(crmId, getResourceAgent(type,
                                                                 provider,
                                                                 raClass));
                     resList.add(crmId);
                     parametersMap.put(crmId, new HashMap<String, String>());
+                    orphanedList.add(crmId);
                 }
+                /* it is in LRM */
+                Set<String> inLRMOnHost = inLRMList.get(unameLowerCase);
+                if (inLRMOnHost == null) {
+                    inLRMOnHost = new HashSet<String>();
+                    inLRMList.put(unameLowerCase, inLRMOnHost);
+                }
+                inLRMOnHost.add(crmId);
             }
         }
     }

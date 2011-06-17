@@ -52,6 +52,8 @@ final class CibQuery {
     private Map<String, ResourceAgent> resourceType;
     /** List with orphaned resources. */
     private Set<String> orphanedList;
+    /** List with resources in LRM. */
+    private Map<String, Set<String>> inLRMList;
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
     /** Colocation rsc map. */
@@ -191,6 +193,11 @@ final class CibQuery {
         this.orphanedList = orphanedList;
     }
 
+    /** Sets the list with resources in LRM. */
+    void setInLRM(final Map<String, Set<String>> inLRMList) {
+        this.inLRMList = inLRMList;
+    }
+
     /** Returns the resource type map. */
     Map<String, ResourceAgent> getResourceType() {
         return resourceType;
@@ -199,6 +206,11 @@ final class CibQuery {
     /** Returns list with orphaned resources. */
     Set<String> getOrphaned() {
         return orphanedList;
+    }
+
+    /** Returns list with resources in LRM. */
+    Map<String, Set<String>> getInLRM() {
+        return inLRMList;
     }
 
     /** Sets the resource instance_attributes id map. */
