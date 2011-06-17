@@ -1,0 +1,55 @@
+node host1
+node host2
+primitive res_Dummy_1 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_1-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+primitive res_Dummy_2 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_2-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+primitive res_Dummy_3 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_3-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+primitive res_Dummy_4 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_4-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+primitive res_Dummy_5 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_5-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+primitive res_Dummy_6 ocf:heartbeat:Dummy 
+	operations $id="res_Dummy_6-operations" 
+	op start interval="0" timeout="200" 
+	op stop interval="0" timeout="192" 
+	op monitor interval="121" timeout="154" start-delay="0" 
+	op migrate_to interval="0" timeout="123" 
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="stopped"
+colocation c1 inf: ( res_Dummy_2 res_Dummy_1 ) ( res_Dummy_3 res_Dummy_4 ) ( res_Dummy_6 res_Dummy_5 )
+order o2 inf: ( res_Dummy_6 res_Dummy_5 ) ( res_Dummy_3 res_Dummy_4 ) ( res_Dummy_2 res_Dummy_1 )
+property $id="cib-bootstrap-options" 
+	stonith-enabled="false" 
+	no-quorum-policy="ignore"

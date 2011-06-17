@@ -399,14 +399,17 @@ public final class RoboTest {
                                    + secs);
                     } else if ("4".equals(index)) {
                         /* placeholders 6 dummies */
-                        final int i = 1;
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest4(robot, cluster);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTest4(robot, cluster);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     } else if ("5".equals(index)) {
                         int i = 1;
                         while (!aborted) {
@@ -1325,10 +1328,10 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 671, 568);
+        moveTo(robot, 700, 568);
         rightClick(robot); /* popup */
         sleep(3000);
-        moveTo(robot, 732, 644);
+        moveTo(robot, 760, 644);
         sleep(3000);
         leftClick(robot);
         moveTo(robot, 335, 129); /* not advanced */
@@ -1344,10 +1347,10 @@ public final class RoboTest {
         sleep(2000);
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 671, 568);
+        moveTo(robot, 700, 568);
         rightClick(robot); /* popup */
         sleep(3000);
-        moveTo(robot, 732, 674);
+        moveTo(robot, 760, 674);
         sleep(3000);
         leftClick(robot);
         confirmRemove(robot);
@@ -1646,11 +1649,10 @@ public final class RoboTest {
         chooseDummy(robot, dummy4X, dummy4Y, false, true);
         chooseDummy(robot, dummy5X, dummy5Y, false, true);
         chooseDummy(robot, dummy6X, dummy6Y, false, true);
-        Tools.sleep(90000);
         checkTest(cluster, "test4", 2);
 
         /* 2 placeholders */
-        final int count = 3;
+        final int count = 1;
         for (int i = 0; i < count; i++) {
             moveTo(robot, ph1X, ph1Y);
             rightClick(robot);
@@ -1693,8 +1695,14 @@ public final class RoboTest {
                 removePlaceHolder(robot, ph2X, ph2Y);
             }
         }
-        Tools.sleep(90000);
+        moveTo(robot, 809, 192); /* ptest */
+        sleep(2000);
+        leftClick(robot); /*  apply */
+
         checkTest(cluster, "test4", 3);
+        stopEverything(robot);
+        checkTest(cluster, "test4", 4);
+        removeEverything(robot);
     }
 
     /** TEST 5. */
@@ -2476,8 +2484,9 @@ public final class RoboTest {
                                          final int popX,
                                          final int popY) {
         moveTo(robot, popX, popY);
-        sleep(1000);
+        sleep(10000);
         rightClick(robot); /* constraint popup */
+        sleep(2000);
         moveTo(robot, popX + 70, popY + 20);
         sleep(6000); /* ptest */
         leftClick(robot); /* remove ord */
