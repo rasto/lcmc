@@ -151,6 +151,17 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="${jar.dir}"/>
 		<jar destfile="${jar.dir}/${ant.project.name}.jar"
+		     excludes="plugins/ drbd-mc-test.tar"
+		     basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="testjar" depends="compile">
+		<mkdir dir="${jar.dir}"/>
+		<jar destfile="${jar.dir}/${ant.project.name}.jar"
 		     excludes="plugins/"
 		     basedir="${classes.dir}">
 			<manifest>
@@ -159,7 +170,7 @@
 		</jar>
 	</target>
 	
-	<target name="runprof" depends="jar">
+	<target name="runprof" depends="testjar">
 		<java fork="true" classname="${main-class}">
 			<jvmarg value="-Xdebug"/>
 		  <!--  <jvmarg value="-verbose:gc"/>  -->
@@ -182,7 +193,7 @@
 		</java>
 	</target>
 	
-	<target name="runjmp" depends="jar">
+	<target name="runjmp" depends="testjar">
 		<java fork="true" classname="${main-class}">
 			<jvmarg value="-Xrunjmp"/>
 			<classpath>
@@ -191,7 +202,7 @@
 		</java>
 	</target>
 	
-	<target name="run" depends="jar">
+	<target name="run" depends="testjar">
 		<java fork="true"
 		      classname="${main-class}">
 		      	<arg value="--auto"/>
@@ -205,7 +216,7 @@
 		</java>
 	</target>
 
-	<target name="lowmem" depends="jar">
+	<target name="lowmem" depends="testjar">
 		<java fork="true"
 		      classname="${main-class}">
 		      	<arg value="--auto"/>
@@ -219,7 +230,7 @@
 		</java>
 	</target>
 
-	<target name="lowmem40" depends="jar">
+	<target name="lowmem40" depends="testjar">
 		<java fork="true"
 		      classname="${main-class}">
 		      	<arg value="--auto"/>
@@ -233,7 +244,7 @@
 		</java>
 	</target>
 
-	<target name="lowmem150" depends="jar">
+	<target name="lowmem150" depends="testjar">
 		<java fork="true"
 		      classname="${main-class}">
 		      	<arg value="--auto"/>
@@ -247,7 +258,7 @@
 		</java>
 	</target>
 
-	<target name="lowmem100" depends="jar">
+	<target name="lowmem100" depends="testjar">
 		<java fork="true"
 		      classname="${main-class}">
 		      	<arg value="--auto"/>
