@@ -840,7 +840,7 @@ public final class CRM {
                                     execCommand(host, command, true, testOnly);
             exitCode = ret.getExitCode();
         }
-        return exitCode == 0;
+        return true; /* always return true */
     }
 
     /** Starts resource. */

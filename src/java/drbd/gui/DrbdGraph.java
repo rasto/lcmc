@@ -190,6 +190,9 @@ public final class DrbdGraph extends ResourceGraph {
         if (oldVertexList != null) {
             for (final Vertex vertex : oldVertexList) {
                 final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);
+                if (bdi == null) {
+                    continue;
+                }
                 if (!blockDevInfos.contains(bdi)) {
                     /* removing */
                     final Vertex bdv = bdiToVertexMap.get(bdi);
@@ -301,6 +304,9 @@ public final class DrbdGraph extends ResourceGraph {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi == null) {
+                return icons;
+            }
             icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
             if (bdi.isDiskless(testOnly)) {
                 icons.add(BlockDevInfo.NO_HARDDISK_ICON_LARGE);
@@ -335,7 +341,13 @@ public final class DrbdGraph extends ResourceGraph {
             final Vertex source = edge.getSource();
             final Vertex dest = edge.getDest();
             final BlockDevInfo sourceBDI = (BlockDevInfo) getInfo(source);
+            if (sourceBDI == null) {
+                return "";
+            }
             final BlockDevInfo destBDI = (BlockDevInfo) getInfo(dest);
+            if (destBDI == null) {
+                return "";
+            }
             final BlockDevice sourceBD = sourceBDI.getBlockDevice();
             final BlockDevice destBD = destBDI.getBlockDevice();
             final boolean tOnly = isTestOnly();
@@ -478,9 +490,16 @@ public final class DrbdGraph extends ResourceGraph {
             String l;
             if (isVertexDrbd(v)) {
                 final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+                if (bdi == null) {
+                    return "";
+                }
                 l = bdi.getDrbdVolumeInfo().getDevice();
             } else {
-                l = getInfo(v).getName();
+                final Info info = getInfo(v);
+                if (info == null) {
+                    return "";
+                }
+                l = info.getName();
             }
             if (l.length() > MAX_VERTEX_STRING_LENGTH) {
                 l = "..." + l.substring(l.length()
@@ -506,15 +525,17 @@ public final class DrbdGraph extends ResourceGraph {
     protected JPopupMenu handlePopupVertex(final Vertex v, final Point2D p) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi == null) {
+                return null;
+            }
             return bdi.getPopup();
         } else {
             /* host */
             final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
             if (hi == null) {
                 return null;
-            } else {
-                return hi.getPopup();
             }
+            return hi.getPopup();
         }
     }
 
@@ -644,6 +665,9 @@ public final class DrbdGraph extends ResourceGraph {
         if (isVertexBlockDevice(v)) {
             pickHost(v);
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi == null) {
+                return;
+            }
             drbdInfo.setSelectedNode(bdi);
             drbdInfo.selectMyself();
             getClusterBrowser().setRightComponentInView(bdi);
@@ -786,6 +810,9 @@ public final class DrbdGraph extends ResourceGraph {
             return Color.WHITE;
         }
         final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+        if (bdi == null) {
+            return Color.WHITE;
+        }
         if (bdi.isFirstDrbdVolume()) {
             return Color.WHITE;
         } else {
@@ -823,6 +850,9 @@ public final class DrbdGraph extends ResourceGraph {
         }
         for (final Vertex v : hostBDVerticesMap.get(hi)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi == null) {
+                continue;
+            }
             if (bdi.getName().equals(disk)
                 || bdi.getBlockDevice().getReadlink().equals(disk)) {
                 return bdi;
@@ -834,6 +864,9 @@ public final class DrbdGraph extends ResourceGraph {
     /** Returns tool tip when mouse is over a block device vertex. */
     @Override String getVertexToolTip(final Vertex v) {
         final Info i = getInfo(v);
+        if (i == null) {
+            return null;
+        }
         return i.getToolTipForGraph(isTestOnly());
     }
 
@@ -940,6 +973,9 @@ public final class DrbdGraph extends ResourceGraph {
     protected int getUsed(final Vertex v) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
+            if (bdi == null) {
+                return 0;
+            }
             return bdi.getUsed();
         }
         final HostDrbdInfo hi = vertexToHostMap.get(v);
