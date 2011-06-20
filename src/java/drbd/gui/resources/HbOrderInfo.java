@@ -104,16 +104,17 @@ final class HbOrderInfo extends EditableInfo
             resourceNode.put("action", rscSet.getOrderAction());
         } else {
             final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+            if (orderData != null) {
+                final String score = orderData.getScore();
+                final String symmetrical = orderData.getSymmetrical();
+                final String firstAction = orderData.getFirstAction();
+                final String thenAction = orderData.getThenAction();
 
-            final String score = orderData.getScore();
-            final String symmetrical = orderData.getSymmetrical();
-            final String firstAction = orderData.getFirstAction();
-            final String thenAction = orderData.getThenAction();
-
-            resourceNode.put(CRMXML.SCORE_STRING, score);
-            resourceNode.put("symmetrical", symmetrical);
-            resourceNode.put("first-action", firstAction);
-            resourceNode.put("then-action", thenAction);
+                resourceNode.put(CRMXML.SCORE_STRING, score);
+                resourceNode.put("symmetrical", symmetrical);
+                resourceNode.put("first-action", firstAction);
+                resourceNode.put("then-action", thenAction);
+            }
         }
 
         final String[] params = getParametersFromXML();

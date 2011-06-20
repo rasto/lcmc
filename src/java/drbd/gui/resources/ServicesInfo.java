@@ -827,10 +827,10 @@ public final class ServicesInfo extends EditableInfo {
             g.updateMenus(null);
         }
         hg.setServiceIsPresentList(serviceIsPresent);
-        hg.killRemovedEdges();
         /** Set placeholders to "new", if they have no connections. */
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                hg.killRemovedEdges();
                 final Map<String, ServiceInfo> idToInfoHash =
                    getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
                 if (idToInfoHash != null) {
@@ -1611,6 +1611,12 @@ public final class ServicesInfo extends EditableInfo {
                      Tools.getString(
                          "ClusterBrowser.confirmRemoveAllServices.No"))) {
                     final Host dcHost = getBrowser().getDCHost();
+                    for (ServiceInfo si
+                            : getBrowser().getExistingServiceList(null)) {
+                        if (si.isConstraintPH()) {
+                            si.removeMyselfNoConfirm(dcHost, false);
+                        }
+                    }
                     for (ServiceInfo si
                             : getBrowser().getExistingServiceList(null)) {
                         if (si.getGroupInfo() == null) {

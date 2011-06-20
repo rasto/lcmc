@@ -107,16 +107,17 @@ final class HbColocationInfo extends EditableInfo
         } else {
             final CRMXML.ColocationData colocationData =
                             clStatus.getColocationData(colId);
+            if (colocationData != null) {
+                final String rsc = colocationData.getRsc();
+                final String withRsc = colocationData.getWithRsc();
+                final String score = colocationData.getScore();
+                final String rscRole = colocationData.getRscRole();
+                final String withRscRole = colocationData.getWithRscRole();
 
-            final String rsc = colocationData.getRsc();
-            final String withRsc = colocationData.getWithRsc();
-            final String score = colocationData.getScore();
-            final String rscRole = colocationData.getRscRole();
-            final String withRscRole = colocationData.getWithRscRole();
-
-            resourceNode.put(CRMXML.SCORE_STRING, score);
-            resourceNode.put("rsc-role", rscRole);
-            resourceNode.put("with-rsc-role", withRscRole);
+                resourceNode.put(CRMXML.SCORE_STRING, score);
+                resourceNode.put("rsc-role", rscRole);
+                resourceNode.put("with-rsc-role", withRscRole);
+            }
         }
 
 
