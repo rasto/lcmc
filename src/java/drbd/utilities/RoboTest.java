@@ -83,8 +83,8 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && prevP.getX() - p.getX() > 400
-            && p.getY() - prevP.getY() > 400) {
+            && prevP.getX() - p.getX() > 200
+            && p.getY() - prevP.getY() > 200) {
             prevP = null;
             Tools.info("test aborted");
             aborted = true;
