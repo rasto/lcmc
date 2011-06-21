@@ -1759,6 +1759,7 @@ sub gui_vm_test {
 	my $xml = `virsh dumpxml $name 2>/dev/null`;
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
+	$xml =~ s/^(\s*<emulator>)[^<]+/$1EMULATOR/gm;
 	$xml =~ s/$name/\@NAME@/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;

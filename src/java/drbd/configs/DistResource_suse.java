@@ -116,5 +116,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
 
         {"DrbdLog.log",
          "grep @GREPPATTERN@ /var/log/messages | tail -500"},
+        {"KVM.emulator",   "/usr/bin/qemu-kvm"},
     };
 }

@@ -178,6 +178,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Map from key to vms parallel device info object. */
     private final Map<String, VMSParallelInfo> parallelToInfo =
                                        new HashMap<String, VMSParallelInfo>();
+    /** Preferred emulator. It's distro dependent. */
+    private final String preferredEmulator;
     /** Map from target string in the table to vms interface info object. */
     private volatile Map<String, VMSParallelInfo> parallelKeyToInfo =
                                        new HashMap<String, VMSParallelInfo>();
@@ -626,6 +628,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     public VMSVirtualDomainInfo(final String name,
                                 final Browser browser) {
         super(name, browser);
+        final Host h = ((ClusterBrowser) browser).getClusterHosts()[0];
+        preferredEmulator = h.getDistString("KVM.emulator");
         setResource(new Resource(name));
     }
 
@@ -3009,6 +3013,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override protected String getParamPreferred(final String param) {
+        if (preferredEmulator != null
+            && VMSXML.VM_PARAM_EMULATOR.equals(param)) {
+            return preferredEmulator;
+        }
         return PREFERRED_MAP.get(param);
     }
 
@@ -3049,8 +3057,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                       null);
             if (getResource().isNew()
                 && !Tools.areEqual(emCB.getStringValue(), newValue)) {
-                paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, null).setValue(
-                                                                     newValue);
                 if (Tools.areEqual("xen", newValue)) {
                     paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue(
                                                 "/usr/lib/xen/boot/hvmloader");
@@ -4555,7 +4561,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Saves all preferred values. */
     public void savePreferredValues() {
         for (final String pv : PREFERRED_MAP.keySet()) {
-            getResource().setValue(pv, PREFERRED_MAP.get(pv));
+            if (preferredEmulator != null
+                && VMSXML.VM_PARAM_EMULATOR.equals(pv)) {
+                getResource().setValue(pv, preferredEmulator);
+            } else {
+                getResource().setValue(pv, PREFERRED_MAP.get(pv));
+            }
         }
     }
 

@@ -608,7 +608,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             Tools.info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + index, robot, cluster);
+                            startVMTest1("vm-test" + index, robot, cluster, 2);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -3305,11 +3305,11 @@ public final class RoboTest {
     /** VM Test 1. */
     private static void startVMTest1(final String vmTest,
                                      final Robot robot,
-                                     final Cluster cluster) {
+                                     final Cluster cluster,
+                                     final int count) {
         slowFactor = 0.2f;
         aborted = false;
         String name = "dmc";
-        final int count = 20;
         final int count2 = 3;
         for (int j = 0; j < count; j++) {
             checkVMTest(cluster, vmTest, 1, name);
