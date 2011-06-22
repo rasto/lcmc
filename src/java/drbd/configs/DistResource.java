@@ -294,6 +294,12 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"CRM.2.1.4.standByOff",
          SUDO + "/usr/sbin/crm_standby -U @HOST@ -v false"},
 
+        {"CRM.erase",
+         SUDO
+         + "/usr/sbin/cibadmin --obj_type configuration -R -X '<constraints/>'"
+         + " && " + SUDO
+         + "/usr/sbin/cibadmin --obj_type configuration -R -X '<resources/>'"},
+
         {"OpenAIS.getAisConfig",
          DistResource.SUDO + "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",

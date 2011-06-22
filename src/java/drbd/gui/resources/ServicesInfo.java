@@ -593,8 +593,6 @@ public final class ServicesInfo extends EditableInfo {
                               groupServiceIsPresent,
                               testOnly);
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
 
                 hg.clearKeepColocationList();
                 hg.clearKeepOrderList();
@@ -851,6 +849,8 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 hg.setServiceIsPresentList(serviceIsPresent);
                 /** Set placeholders to "new", if they have no connections. */
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 hg.killRemovedEdges();
                 final Map<String, ServiceInfo> idToInfoHash =
                    getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
@@ -1617,6 +1617,14 @@ public final class ServicesInfo extends EditableInfo {
                 if (getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
+                for (ServiceInfo si
+                        : getBrowser().getExistingServiceList(null)) {
+                    if (si.getGroupInfo() == null) {
+                        if (si.isRunning(false)) {
+                            return "there are running services";
+                        }
+                    }
+                }
                 return null;
             }
 
@@ -1632,20 +1640,12 @@ public final class ServicesInfo extends EditableInfo {
                      Tools.getString(
                          "ClusterBrowser.confirmRemoveAllServices.No"))) {
                     final Host dcHost = getBrowser().getDCHost();
-                    for (ServiceInfo si
-                            : getBrowser().getExistingServiceList(null)) {
-                        if (si.isConstraintPH()) {
-                            si.removeMyselfNoConfirm(dcHost, false);
-                        }
-                    }
-                    for (ServiceInfo si
-                            : getBrowser().getExistingServiceList(null)) {
+                    List<ServiceInfo> services =
+                                    getBrowser().getExistingServiceList(null);
+                    CRM.erase(dcHost, getBrowser().getClusterHosts(), testOnly);
+                    for (ServiceInfo si : services) {
                         if (si.getGroupInfo() == null) {
-                            if (si.getService().isOrphaned()) {
-                                si.cleanupResource(dcHost, false);
-                            } else if (!si.isRunning(false)) {
-                                si.removeMyselfNoConfirm(dcHost, false);
-                            }
+                            si.cleanupResource(dcHost, false);
                         }
                     }
                     getBrowser().getHeartbeatGraph().repaint();
