@@ -1584,7 +1584,7 @@ public final class RoboTest {
         stopEverything(robot);
         sleep(10000);
         checkTest(cluster, "test2", 12.5);
-        if (true) {
+        if (maybe()) {
             /* remove placeholder */
             moveTo(robot, phX , phY);
             rightClick(robot);
@@ -1687,7 +1687,7 @@ public final class RoboTest {
 
             addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 1 */
             addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 2 */
-            checkTest(cluster, "test4", 3);
+            checkTest(cluster, "test4", 2);
 
             /* TEST test */
             if (i < count - 1) {
@@ -1703,6 +1703,7 @@ public final class RoboTest {
         stopEverything(robot);
         checkTest(cluster, "test4", 4);
         removeEverything(robot);
+        sleep(40000);
     }
 
     /** TEST 5. */

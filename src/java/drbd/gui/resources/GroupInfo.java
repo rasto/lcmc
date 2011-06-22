@@ -41,6 +41,7 @@ import drbd.utilities.ButtonCallback;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 import java.awt.Color;
 import java.util.LinkedHashMap;
@@ -220,7 +221,7 @@ public final class GroupInfo extends ServiceInfo {
         */
         final String heartbeatId = getHeartbeatId(testOnly);
         if (getService().isNew()) {
-            final List<ServiceInfo> parents =
+            final Set<ServiceInfo> parents =
                              getBrowser().getHeartbeatGraph().getParents(this);
             final List<Map<String, String>> colAttrsList =
                                        new ArrayList<Map<String, String>>();

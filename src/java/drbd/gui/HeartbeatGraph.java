@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
@@ -241,8 +242,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns heartbeat ids from this service info's parents. */
-    public List<ServiceInfo> getParents(final ServiceInfo si) {
-        final List<ServiceInfo> parents = new ArrayList<ServiceInfo>();
+    public Set<ServiceInfo> getParents(final ServiceInfo si) {
+        final Set<ServiceInfo> parents = new TreeSet<ServiceInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
             lockGraph();
@@ -258,8 +259,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns children of the service. */
-    public List<ServiceInfo> getChildren(final ServiceInfo si) {
-        final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
+    public Set<ServiceInfo> getChildren(final ServiceInfo si) {
+        final Set<ServiceInfo> children = new TreeSet<ServiceInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
             lockGraph();
@@ -275,8 +276,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns children and parents of the service. */
-    public List<ServiceInfo> getChildrenAndParents(final ServiceInfo si) {
-        final List<ServiceInfo> chAndP = new ArrayList<ServiceInfo>();
+    public Set<ServiceInfo> getChildrenAndParents(final ServiceInfo si) {
+        final Set<ServiceInfo> chAndP = new TreeSet<ServiceInfo>();
         chAndP.addAll(getChildren(si));
         chAndP.addAll(getParents(si));
         return chAndP;
@@ -1208,34 +1209,30 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** Removes edge if it is not in the list of constraints. */
     private void removeEdge(final Edge e, final boolean testOnly) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (e == null) {
-                    return;
+        if (e == null) {
+            return;
+        }
+        if (!edgeIsOrderList.contains(e)
+            && !edgeIsColocationList.contains(e)) {
+            e.reset();
+            lockGraph();
+            getGraph().removeEdge(e);
+            unlockGraph();
+            mHbConnectionWriteLock.lock();
+            try {
+                mHbConnectionWriteLock.lock();
+                final HbConnectionInfo hbci =
+                                        edgeToHbconnectionMap.get(e);
+                edgeToHbconnectionMap.remove(e);
+                mHbConnectionWriteLock.unlock();
+                if (hbci != null) {
+                    hbconnectionToEdgeMap.remove(hbci);
+                    hbci.removeMyself(testOnly);
                 }
-                if (!edgeIsOrderList.contains(e)
-                    && !edgeIsColocationList.contains(e)) {
-                    e.reset();
-                    lockGraph();
-                    getGraph().removeEdge(e);
-                    unlockGraph();
-                    mHbConnectionWriteLock.lock();
-                    try {
-                        mHbConnectionWriteLock.lock();
-                        final HbConnectionInfo hbci =
-                                                edgeToHbconnectionMap.get(e);
-                        edgeToHbconnectionMap.remove(e);
-                        mHbConnectionWriteLock.unlock();
-                        if (hbci != null) {
-                            hbconnectionToEdgeMap.remove(hbci);
-                            hbci.removeMyself(testOnly);
-                        }
-                    } finally {
-                        mHbConnectionWriteLock.unlock();
-                    }
-                }
+            } finally {
+                mHbConnectionWriteLock.unlock();
             }
-        });
+        }
     }
 
     /** Remove vertices that were marked as not present. */
@@ -1500,7 +1497,11 @@ public final class HeartbeatGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                removeEdge(edge, testOnly);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeEdge(edge, testOnly);
+                    }
+                });
             }
         }
     }
@@ -1528,7 +1529,11 @@ public final class HeartbeatGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                removeEdge(edge, testOnly);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeEdge(edge, testOnly);
+                    }
+                });
             }
         }
     }
@@ -1582,7 +1587,11 @@ public final class HeartbeatGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                removeEdge(edge, testOnly);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeEdge(edge, testOnly);
+                    }
+                });
             }
         }
     }

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Object that holds an order constraint information.
@@ -416,9 +417,6 @@ public final class ConstraintPHInfo extends ServiceInfo {
             if (!testOnly) {
                 setUpdated(true);
                 getService().setRemoved(true);
-                getBrowser().removeFromServiceInfoHash(this);
-                getBrowser().getHeartbeatGraph().killRemovedVertices();
-                getService().doneRemoving();
             }
         }
     }
@@ -482,8 +480,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Adds constraint to or from placeholder. */
     protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
-                                      final List<ServiceInfo> servicesAll,
-                                      final List<ServiceInfo> servicesFrom,
+                                      final Set<ServiceInfo> servicesAll,
+                                      final Set<ServiceInfo> servicesFrom,
                                       final boolean colocationOnly,
                                       final boolean orderOnly,
                                       final Host dcHost,

@@ -3485,17 +3485,17 @@ public class ServiceInfo extends EditableInfo {
                 final List<Map<String, String>> ordAttrsList =
                                        new ArrayList<Map<String, String>>();
                 final List<String> parentIds = new ArrayList<String>();
-                final List<ServiceInfo> parents =
+                final Set<ServiceInfo> parents =
                             getBrowser().getHeartbeatGraph().getParents(this);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
                         final boolean colocationOnly = false;
                         final boolean orderOnly = false;
-                        final List<ServiceInfo> with =
-                                                 new ArrayList<ServiceInfo>();
+                        final Set<ServiceInfo> with =
+                                                 new TreeSet<ServiceInfo>();
                         with.add(this);
-                        final List<ServiceInfo> withFrom =
-                                                 new ArrayList<ServiceInfo>();
+                        final Set<ServiceInfo> withFrom =
+                                                 new TreeSet<ServiceInfo>();
                         ((ConstraintPHInfo) parentInfo)
                                     .addConstraintWithPlaceholder(
                                              with,
@@ -3781,7 +3781,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final List<ServiceInfo> withFrom = new ArrayList<ServiceInfo>();
+            final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -3790,7 +3790,7 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final List<ServiceInfo> with = new ArrayList<ServiceInfo>();
+            final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
             with.add(withService);
             cphi.addConstraintWithPlaceholder(with,
                                               withFrom,
@@ -3953,7 +3953,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final List<ServiceInfo> withFrom = new ArrayList<ServiceInfo>();
+            final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -3962,7 +3962,7 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final List<ServiceInfo> with = new ArrayList<ServiceInfo>();
+            final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
             with.add(withService);
             cphi.addConstraintWithPlaceholder(with,
                                               withFrom,
@@ -4070,7 +4070,7 @@ public class ServiceInfo extends EditableInfo {
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
                 final ConstraintPHInfo cphi;
                 final ServiceInfo withService;
-                final List<ServiceInfo> withFrom = new ArrayList<ServiceInfo>();
+                final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
                 if (isConstraintPH()) {
                     cphi = (ConstraintPHInfo) this;
                     withService = serviceInfo;
@@ -4079,7 +4079,7 @@ public class ServiceInfo extends EditableInfo {
                     withService = this;
                     withFrom.add(this);
                 }
-                final List<ServiceInfo> with = new ArrayList<ServiceInfo>();
+                final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
                                                   withFrom,

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
@@ -1229,6 +1230,15 @@ public final class CRM {
         }
         replaceHash.put("@HOST@", host.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Erase config. */
+    public static boolean erase(final Host host,
+                                final boolean testOnly) {
+        final Map<String, String> replaceHash = Collections.emptyMap();
+        final String command = host.getDistCommand("CRM.erase", replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
     }

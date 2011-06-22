@@ -173,7 +173,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         final Map<ServiceInfo, ServiceInfo> parentToChild =
                             new HashMap<ServiceInfo, ServiceInfo>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
-            final List<ServiceInfo> cphiParents =
+            final Set<ServiceInfo> cphiParents =
                             getBrowser().getHeartbeatGraph().getParents(cphi);
             boolean startComparing = false;
             for (final ConstraintPHInfo withCphi : allCphis) {
@@ -184,7 +184,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 if (!startComparing) {
                     continue;
                 }
-                final List<ServiceInfo> withCphiChildren =
+                final Set<ServiceInfo> withCphiChildren =
                          getBrowser().getHeartbeatGraph().getChildren(withCphi);
                 if (Tools.serviceInfoListEquals(cphiParents,
                                                 withCphiChildren)) {

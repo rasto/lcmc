@@ -1639,19 +1639,34 @@ public final class ServicesInfo extends EditableInfo {
                          "ClusterBrowser.confirmRemoveAllServices.Yes"),
                      Tools.getString(
                          "ClusterBrowser.confirmRemoveAllServices.No"))) {
-                    final Host dcHost = getBrowser().getDCHost();
-                    List<ServiceInfo> services =
+                    final Thread t = new Thread() {
+                        public void run() {
+                            final Host dcHost = getBrowser().getDCHost();
+                            List<ServiceInfo> services =
                                     getBrowser().getExistingServiceList(null);
-                    CRM.erase(dcHost, getBrowser().getClusterHosts(), testOnly);
-                    for (ServiceInfo si : services) {
-                        if (si.getGroupInfo() == null) {
-                            si.cleanupResource(dcHost, false);
+                            CRM.erase(dcHost, testOnly);
+                            for (ServiceInfo si : services) {
+                                if (si.getGroupInfo() == null
+                                    && !si.getResourceAgent().isClone()) {
+                                    si.getService().setRemoved(true);
+                                    si.cleanupResource(dcHost, false);
+                                }
+                            }
+                            getBrowser().getHeartbeatGraph().repaint();
                         }
-                    }
-                    getBrowser().getHeartbeatGraph().repaint();
+                    };
+                    t.start();
                 }
             }
         };
+        final ClusterBrowser.ClMenuItemCallback removeItemCallback =
+               getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
+            @Override public void action(final Host dcHost) {
+                final Host thisDCHost = getBrowser().getDCHost();
+                CRM.erase(dcHost, true); /* test only */
+            }
+        };
+        addMouseOverListener(removeMenuItem, removeItemCallback);
         items.add((UpdatableItem) removeMenuItem);
 
         /* view logs */

@@ -2343,8 +2343,8 @@ public final class Tools {
 
     /** Compares two Lists with services if thery are equal. The order does not
      * matter. */
-    public static boolean serviceInfoListEquals(final List<ServiceInfo> l1,
-                                                final List<ServiceInfo> l2) {
+    public static boolean serviceInfoListEquals(final Set<ServiceInfo> l1,
+                                                final Set<ServiceInfo> l2) {
         if (l1 == l2) {
             return true;
         }
