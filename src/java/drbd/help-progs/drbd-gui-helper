@@ -654,7 +654,7 @@ sub get_version_info {
 	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/CentOS/redhat/"|sed "s/SUSE LINUX/suse/" '
-	 .'| sed "s/enterprise_linux/redhatenterpriseserver/" '
+	 .'| sed "s/enterprise_linux\|ScientificSL/redhatenterpriseserver/" '
 	 .'| perl -lne "print lc((split /:\s*/)[1])";'
 	 .'cut -d ":" /etc/system-release-cpe -f 4,5 2>/dev/null|sed "s/:/\n/"'
 	 .'| sed "s/enterprise_linux/redhatenterpriseserver/" ';
@@ -1759,6 +1759,7 @@ sub gui_vm_test {
 	my $xml = `virsh dumpxml $name 2>/dev/null`;
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
+	$xml =~ s/^(\s*<emulator>)[^<]+/$1EMULATOR/gm;
 	$xml =~ s/$name/\@NAME@/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;

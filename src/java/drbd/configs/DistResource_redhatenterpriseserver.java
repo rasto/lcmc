@@ -43,6 +43,7 @@ public final class DistResource_redhatenterpriseserver
         {"version:Red Hat Enterprise Linux Server release 5*", "5"},
         {"version:Red Hat Enterprise Linux Server release 6*", "6"},
         {"version:Scientific Linux release 5*", "5"},
+        {"version:Scientific Linux SL release 5*", "5"},
         {"version:Scientific Linux release 6*", "6"},
 
         /* directory capturing regexp on the website from the kernel version */
@@ -104,5 +105,6 @@ public final class DistResource_redhatenterpriseserver
 
         {"Openais.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
+        {"KVM.emulator",    "/usr/libexec/qemu-kvm"},
     };
 }

@@ -195,5 +195,6 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         {"Openais.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
+        {"KVM.emulator",    "/usr/bin/qemu-kvm"},
     };
 }
