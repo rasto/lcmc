@@ -1646,10 +1646,13 @@ public final class ServicesInfo extends EditableInfo {
                                     getBrowser().getExistingServiceList(null);
                             CRM.erase(dcHost, testOnly);
                             for (ServiceInfo si : services) {
-                                if (si.getGroupInfo() == null
-                                    && !si.getResourceAgent().isClone()) {
-                                    si.getService().setRemoved(true);
-                                    si.cleanupResource(dcHost, false);
+                                if (si.getGroupInfo() == null) {
+                                    final ResourceAgent ra =
+                                                        si.getResourceAgent();
+                                    if (ra != null && !ra.isClone()) {
+                                        si.getService().setRemoved(true);
+                                        si.cleanupResource(dcHost, false);
+                                    }
                                 }
                             }
                             getBrowser().getHeartbeatGraph().repaint();
