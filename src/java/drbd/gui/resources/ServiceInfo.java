@@ -203,7 +203,7 @@ public class ServiceInfo extends EditableInfo {
     static final ImageIcon GROUP_DOWN_ICON = Tools.createImageIcon(
                                 Tools.getDefault("HeartbeatGraph.GroupDown"));
     /** Orphaned subtext. */
-    private static final Subtext ORPHANED_SUBTEXT = new Subtext("(ORPHANED)",
+    private static final Subtext ORPHANED_SUBTEXT = new Subtext("(LRM)",
                                                                 null,
                                                                 Color.BLACK);
     /** Orphaned with fail-count subtext. */
