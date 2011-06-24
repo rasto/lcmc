@@ -2339,11 +2339,11 @@ public final class CRMXML extends XML {
 
     /** Parses the transient attributes. */
     private void parseTransientAttributes(
-                              final String uname,
-                              final Node transientAttrNode,
-                              final MultiKeyMap<String, String> failedMap,
-                              final Map<String, Set<String>> failedClonesMap,
-                              final Map<String, String> pingCountMap) {
+                      final String uname,
+                      final Node transientAttrNode,
+                      final MultiKeyMap<String, String> failedMap,
+                      final MultiKeyMap<String, Set<String>> failedClonesMap,
+                      final Map<String, String> pingCountMap) {
         /* <instance_attributes> */
         final Node instanceAttrNode = getChildNode(transientAttrNode,
                                                    "instance_attributes");
@@ -2369,17 +2369,20 @@ public final class CRMXML extends XML {
                     } else if (name.indexOf(FAIL_COUNT_PREFIX) == 0) {
                         final String resId =
                                     name.substring(FAIL_COUNT_PREFIX.length());
-                        failedMap.put(uname.toLowerCase(Locale.US),
-                                      resId,
-                                      value);
+                        final String unameLowerCase =
+                                                uname.toLowerCase(Locale.US);
+                        failedMap.put(unameLowerCase, resId, value);
                         final Pattern p = Pattern.compile("(.*):(\\d+)$");
                         final Matcher m = p.matcher(resId);
                         if (m.matches()) {
                             final String crmId = m.group(1);
-                            Set<String> clones = failedClonesMap.get(crmId);
+                            Set<String> clones =
+                                    failedClonesMap.get(unameLowerCase, crmId);
                             if (clones == null) {
                                 clones = new LinkedHashSet<String>();
-                                failedClonesMap.put(crmId, clones);
+                                failedClonesMap.put(unameLowerCase,
+                                                    crmId,
+                                                    clones);
                             }
                             clones.add(m.group(2));
                             failedMap.put(uname.toLowerCase(Locale.US),
@@ -2675,8 +2678,8 @@ public final class CRMXML extends XML {
         final List<String> masterList = new ArrayList<String>();
         final MultiKeyMap<String, String> failedMap =
                                             new MultiKeyMap<String, String>();
-        final Map<String, Set<String>> failedClonesMap =
-                                     new LinkedHashMap<String, Set<String>>();
+        final MultiKeyMap<String, Set<String>> failedClonesMap =
+                                        new MultiKeyMap<String, Set<String>>();
         final Map<String, String> pingCountMap = new HashMap<String, String>();
         groupsToResourcesMap.put("none", new ArrayList<String>());
 
@@ -3443,7 +3446,7 @@ public final class CRMXML extends XML {
                   final Map<String, Map<String, String>> parametersMap,
                   final Map<String, Set<String>> inLRMList,
                   final Set<String> orphanedList,
-                  final Map<String, Set<String>> failedClonesMap) {
+                  final MultiKeyMap<String, Set<String>> failedClonesMap) {
         final Node lrmResourcesNode = getChildNode(lrmNode, "lrm_resources");
         final NodeList lrmResources = lrmResourcesNode.getChildNodes();
         for (int j = 0; j < lrmResources.getLength(); j++) {
@@ -3455,10 +3458,11 @@ public final class CRMXML extends XML {
                 String crmId;
                 if (m.matches()) {
                     crmId = m.group(1);
-                    Set<String> clones = failedClonesMap.get(crmId);
+                    Set<String> clones = failedClonesMap.get(unameLowerCase,
+                                                             crmId);
                     if (clones == null) {
                         clones = new LinkedHashSet<String>();
-                        failedClonesMap.put(crmId, clones);
+                        failedClonesMap.put(unameLowerCase, crmId, clones);
                     }
                     clones.add(m.group(2));
                 } else {

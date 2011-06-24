@@ -551,9 +551,11 @@ public final class ClusterStatus {
     }
 
     /** Returns failed clones for the specified resource. */
-    public Set<String> getFailedClones(final String res,
+    public Set<String> getFailedClones(final String node,
+                                       final String res,
                                        final boolean testOnly) {
-        return cibQueryMap.getFailedClones().get(res);
+        return cibQueryMap.getFailedClones().get(node.toLowerCase(Locale.US),
+                                                 res);
     }
 
     /** Returns value for specified node and parameter. */

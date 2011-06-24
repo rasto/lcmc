@@ -4279,28 +4279,36 @@ public class ServiceInfo extends EditableInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final List<Host> dirtyHosts = new ArrayList<Host>();
         final ClusterStatus cs = getBrowser().getClusterStatus();
+        final String rscId = getHeartbeatId(testOnly);
+        boolean failedClone = false;
         for (final Host host : getBrowser().getClusterHosts()) {
-            if (isInLRMOnHost(host.getName(), testOnly)
-                || failedOnHost(host.getName(), testOnly)) {
-                dirtyHosts.add(host);
+            final Set<String> failedClones =
+                       cs.getFailedClones(host.getName(), rscId, testOnly);
+            if (failedClones == null) {
+                continue;
+            }
+            failedClone = true;
+            for (final String fc : failedClones) {
+                CRM.cleanupResource(dcHost,
+                                    rscId + ":" + fc,
+                                    new Host[]{host},
+                                    testOnly);
             }
         }
-        final String rscId = getHeartbeatId(testOnly);
-        final Set<String> failedClones = cs.getFailedClones(rscId, testOnly);
-        if (failedClones == null) {
-            CRM.cleanupResource(dcHost,
-                                rscId,
-                                dirtyHosts.toArray(new Host[dirtyHosts.size()]),
-                                testOnly);
-        } else {
-            for (final String fc : failedClones) {
-                CRM.cleanupResource(
-                                dcHost,
-                                rscId + ":" + fc,
-                                dirtyHosts.toArray(new Host[dirtyHosts.size()]),
-                                testOnly);
+        if (!failedClone) {
+            final List<Host> dirtyHosts = new ArrayList<Host>();
+            for (final Host host : getBrowser().getClusterHosts()) {
+                if (isInLRMOnHost(host.getName(), testOnly)
+                    || failedOnHost(host.getName(), testOnly)) {
+                    dirtyHosts.add(host);
+                }
+            }
+            if (!dirtyHosts.isEmpty()) {
+                CRM.cleanupResource(dcHost,
+                                    rscId,
+                                    dirtyHosts.toArray(new Host[dirtyHosts.size()]),
+                                    testOnly);
             }
         }
     }

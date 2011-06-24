@@ -130,8 +130,8 @@ final class CibQuery {
     private MultiKeyMap<String, String> failed =
                                              new MultiKeyMap<String, String>();
     /** Map from rsc id to list of clone ids for failed clones. */
-    private Map<String, Set<String>> failedClones =
-                                      new LinkedHashMap<String, Set<String>>();
+    private MultiKeyMap<String, Set<String>> failedClones =
+                                      new MultiKeyMap<String, Set<String>>();
     /** Ping count per node. */
     private Map<String, String> pingCount = new HashMap<String, String>();
     /** rsc_defaults meta attributes id. */
@@ -538,12 +538,12 @@ final class CibQuery {
     }
 
     /** Sets failed clone map. */
-    void setFailedClones(final Map<String, Set<String>> failedClones) {
+    void setFailedClones(final MultiKeyMap<String, Set<String>> failedClones) {
         this.failedClones = failedClones;
     }
 
     /** Returns failed clone map. */
-    Map<String, Set<String>> getFailedClones() {
+    MultiKeyMap<String, Set<String>> getFailedClones() {
         return failedClones;
     }
 
