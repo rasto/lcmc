@@ -1391,7 +1391,7 @@ public final class RoboTest {
         }
         moveTo(robot, 1073, 337);
         leftClick(robot); /* no quorum policy */
-        moveTo(robot, 1058, 350);
+        moveTo(robot, 1058, 355);
         leftClick(robot); /* ignore */
         moveTo(robot, 828, 183);
         sleep(2000);
@@ -2768,7 +2768,7 @@ public final class RoboTest {
                                                     final int offset) {
         moveTo(robot, 521, 372 + offset); /* interface */
         leftClick(robot);
-        moveTo(robot, 486, 411 + offset);
+        moveTo(robot, 486, 416 + offset);
         leftClick(robot);
         sleep(1000);
     }
