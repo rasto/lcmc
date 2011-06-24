@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
@@ -154,12 +156,33 @@ final class CloneInfo extends ServiceInfo {
     /** Returns node name of the host where this service is slave. */
     List<String> getSlaveOnNodes(final boolean testOnly) {
         final ServiceInfo cs = containedService;
-        if (cs != null) {
-            final ClusterStatus clStatus = getBrowser().getClusterStatus();
-            return clStatus.getSlaveOnNodes(cs.getHeartbeatId(testOnly),
-                                                 testOnly);
+        if (cs == null) {
+            return null;
         }
-        return null;
+        final ClusterStatus clStatus = getBrowser().getClusterStatus();
+        if (clStatus == null) {
+            return null;
+        }
+        if (cs.getResourceAgent().isGroup()) {
+            final List<String> resources = clStatus.getGroupResources(
+                                                   cs.getHeartbeatId(testOnly),
+                                                   testOnly);
+            if (resources == null) {
+                return null;
+            }
+            final Set<String> slaves = new TreeSet<String>();
+            for (final String hbId : resources) {
+                final List<String> slNodes =
+                                      clStatus.getSlaveOnNodes(hbId, testOnly);
+                if (slNodes != null) {
+                    slaves.addAll(slNodes);
+                }
+            }
+            return new ArrayList<String>(slaves);
+        } else {
+            return clStatus.getSlaveOnNodes(cs.getHeartbeatId(testOnly),
+                                            testOnly);
+        }
     }
 
 
