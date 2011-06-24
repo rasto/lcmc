@@ -3582,6 +3582,7 @@ public class ServiceInfo extends EditableInfo {
                         groupMetaArgs.put(param, value);
                     }
                 }
+                cloneId = null;
             }
 
             groupId = null; /* we don't want to replace the whole group */
