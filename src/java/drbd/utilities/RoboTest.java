@@ -500,14 +500,18 @@ public final class RoboTest {
                         Tools.info("test" + index + ", secs: "
                                    + secs);
                     } else if ("f".equals(index)) {
-                        /* cloned group */
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestF(robot, cluster);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        int i = 1;
+                        while (!aborted) {
+                            /* cloned group */
+                            final long startTime = System.currentTimeMillis();
+                            Tools.info("test" + index + " no " + i);
+                            startTestF(robot, cluster);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            Tools.info("test" + index + " no " + i + ", secs: "
+                                       + secs);
+                            i++;
+                        }
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
                     if ("0".equals(index)) {
@@ -2066,49 +2070,72 @@ public final class RoboTest {
 
     /** Cloned group. */
     private static void startTestF(final Robot robot, final Cluster cluster) {
-        slowFactor = 0.5f;
+        slowFactor = 0.2f;
         aborted = false;
         final int gx = 235;
         final int gy = 255;
         disableStonith(robot, cluster);
+        checkTest(cluster, "testF", 1);
+        /* group with dummy resources */
+        moveTo(robot, gx, gy);
+        sleep(1000);
+        rightClick(robot); /* popup */
+        moveTo(robot, gx + 46, gy + 11);
+        sleep(1000);
+        leftClick(robot); /* choose group */
+        sleep(3000);
+        moveTo(robot, 900, 250);
+        leftClick(robot); /* clone */
+
+        final int gxM = 110; /* tree menu */
+        final int gyM = 290;
+        int type = 1;
         for (int i = 2; i > 0; i--) {
             Tools.info("I: " + i);
-
-            checkTest(cluster, "testA", 1);
-            /* group with dummy resources */
-            moveTo(robot, gx, gy);
-            sleep(1000);
-            rightClick(robot); /* popup */
-            moveTo(robot, gx + 46, gy + 11);
-            sleep(1000);
-            leftClick(robot); /* choose group */
-            sleep(3000);
             /* create dummy */
-            moveTo(robot, gx + 46, gy + 11);
+            moveTo(robot, gxM + 46, gyM + 11);
             rightClick(robot); /* group popup */
             sleep(2000 + i * 500);
-            moveTo(robot, gx + 80, gy + 20);
-            moveTo(robot, gx + 84, gy + 22);
-            moveTo(robot, gx + 580, gy + 22);
+            moveTo(robot, gxM + 80, gyM + 20);
+            moveTo(robot, gxM + 84, gyM + 22);
+            moveTo(robot, gxM + 580, gyM + 22);
             sleep(1000);
             typeDummy(robot);
             sleep(i * 300);
             setTimeouts(robot, true);
+            if (type == 1) {
+                moveTo(robot, 809, 192); /* ptest */
+                sleep(6000);
+                leftClick(robot); /* apply */
+                sleep(6000);
+            }
         }
-        moveTo(robot, gx, gy);
+        if (type != 1) {
+            moveTo(robot, 809, 192); /* ptest */
+            sleep(6000);
+            leftClick(robot); /* apply */
+            sleep(6000);
+        }
+        checkTest(cluster, "testF", 2);
+        /* set resource stickiness */
+        moveTo(robot, 1000, 480);
         sleep(1000);
         leftClick(robot);
         sleep(1000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_BACK_SPACE);
+        sleep(200);
+        press(robot, KeyEvent.VK_2);
+        sleep(1000);
         moveTo(robot, 809, 192); /* ptest */
         sleep(6000);
         leftClick(robot); /* apply */
         sleep(6000);
-        checkTest(cluster, "testE", 2);
+        checkTest(cluster, "testF", 3);
+
         stopResource(robot, gx, gy, 0);
         sleep(6000);
-        checkTest(cluster, "testE", 3);
-        removeResource(robot, gx, gy, 0);
+        checkTest(cluster, "testF", 4);
+        removeResource(robot, gx, gy, -40);
         resetTerminalAreas(cluster);
         System.gc();
     }
