@@ -3390,6 +3390,7 @@ public class ServiceInfo extends EditableInfo {
         if (gInfo != null) {
             if (gInfo.getService().isNew()) {
                 gInfo.apply(dcHost, testOnly);
+                return;
             }
             groupId = gInfo.getHeartbeatId(testOnly);
         }
@@ -4200,7 +4201,7 @@ public class ServiceInfo extends EditableInfo {
             if (!testOnly) {
                 setUpdated(true);
             }
-            gi.applyWhole(dcHost, newOrder, testOnly);
+            gi.applyWhole(dcHost, false, newOrder, testOnly);
         }
     }
 
@@ -4222,7 +4223,7 @@ public class ServiceInfo extends EditableInfo {
             if (!testOnly) {
                 setUpdated(true);
             }
-            gi.applyWhole(dcHost, newOrder, testOnly);
+            gi.applyWhole(dcHost, false, newOrder, testOnly);
         }
     }
 

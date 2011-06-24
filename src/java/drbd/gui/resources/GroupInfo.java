@@ -70,16 +70,17 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the the whole group if for example an order has changed. */
     void applyWhole(final Host dcHost,
+                    final boolean createGroup,
                     final List<String> newOrder,
                     final boolean testOnly) {
         final String[] params = getParametersFromXML();
-        //if (!testOnly) {
-        //    Tools.invokeAndWait(new Runnable() {
-        //        @Override public void run() {
-        //            getApplyButton().setEnabled(false);
-        //        }
-        //    });
-        //}
+        if (!testOnly) {
+            Tools.invokeAndWait(new Runnable() {
+                @Override public void run() {
+                    getApplyButton().setEnabled(false);
+                }
+            });
+        }
 
         final Map<String, String> groupMetaArgs =
                                         new LinkedHashMap<String, String>();
@@ -144,7 +145,37 @@ public final class GroupInfo extends ServiceInfo {
             operationsRefId.put(resId, gsi.getOperationsRefId());
             stonith.put(resId, gsi.getResourceAgent().isStonith());
         }
-        CRM.replaceGroup(dcHost,
+        final CloneInfo ci = getCloneInfo();
+        String cloneId = null;
+        boolean master = false;
+        final Map<String, String> cloneMetaArgs =
+                                            new LinkedHashMap<String, String>();
+        String cloneMetaAttrsRefIds = null;
+        if (createGroup && ci != null) {
+            cloneId = ci.getHeartbeatId(testOnly);
+            final String[] cloneParams = ci.getParametersFromXML();
+            master = ci.getService().isMaster();
+            cloneMetaAttrsRefIds = ci.getMetaAttrsRefId();
+            for (String param : cloneParams) {
+                if (GUI_ID.equals(param)
+                    || PCMK_ID.equals(param)) {
+                    continue;
+                }
+                final String value = ci.getComboBoxValue(param);
+                if (value.equals(ci.getParamDefault(param))) {
+                    continue;
+                }
+                if (!GUI_ID.equals(param) && !"".equals(value)) {
+                    cloneMetaArgs.put(param, value);
+                }
+            }
+        }
+        CRM.replaceGroup(createGroup,
+                         dcHost,
+                         cloneId,
+                         master,
+                         cloneMetaArgs,
+                         cloneMetaAttrsRefIds,
                          newOrder,
                          groupMetaArgs,
                          getHeartbeatId(testOnly),
@@ -253,6 +284,20 @@ public final class GroupInfo extends ServiceInfo {
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);
+            final Enumeration e = getNode().children();
+            final List<String> newOrder = new ArrayList<String>();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n =
+                                     (DefaultMutableTreeNode) e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                newOrder.add(child.getHeartbeatId(testOnly));
+            }
+            applyWhole(dcHost, true, newOrder, testOnly);
+            if (!testOnly) {
+                setApplyButtons(null, params);
+            }
+            getBrowser().getHeartbeatGraph().repaint();
+            return;
         } else {
             final Map<String, String> groupMetaArgs =
                                             new LinkedHashMap<String, String>();

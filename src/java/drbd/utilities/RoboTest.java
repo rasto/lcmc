@@ -2090,6 +2090,7 @@ public final class RoboTest {
         final int gxM = 110; /* tree menu */
         final int gyM = 290;
         int type = 1;
+        //int type = 2;
         for (int i = 2; i > 0; i--) {
             Tools.info("I: " + i);
             /* create dummy */

@@ -360,7 +360,12 @@ public final class CRM {
 
     /** Replaces the whole group. */
     public static boolean replaceGroup(
+               final boolean createGroup,
                final Host host,
+               final String cloneId,
+               final boolean master,
+               final Map<String, String> cloneMetaArgs,
+               final String cloneMetaAttrsRefId,
                final List<String> resourceIds,
                final Map<String, String> groupMetaArgs,
                final String groupId,
@@ -377,7 +382,26 @@ public final class CRM {
                final Map<String, Boolean> stonith,
                final boolean testOnly) {
         final StringBuilder xml = new StringBuilder(720);
-        xml.append("'<group id=\"");
+        xml.append('\'');
+        if (cloneId != null) {
+            if (master) {
+                if (Tools.versionBeforePacemaker(host)) {
+                    xml.append("<master_slave id=\"");
+                } else {
+                    xml.append("<master id=\"");
+                }
+            } else {
+                xml.append("<clone id=\"");
+            }
+            xml.append(cloneId);
+            xml.append("\">");
+            /* mater/slave meta_attributes */
+            xml.append(getMetaAttributes(host,
+                                         cloneId,
+                                         cloneMetaArgs,
+                                         cloneMetaAttrsRefId));
+        }
+        xml.append("<group id=\"");
         xml.append(groupId);
         xml.append("\">");
         xml.append(getMetaAttributes(host,
@@ -400,10 +424,28 @@ public final class CRM {
                                        testOnly));
         }
         xml.append("</group>");
+        if (cloneId != null) {
+            if (master) {
+                if (Tools.versionBeforePacemaker(host)) {
+                    xml.append("</master_slave>");
+                } else {
+                    xml.append("</master>");
+                }
+            } else {
+                xml.append("</clone>");
+            }
+        }
         xml.append('\'');
 
+        String cibadminOpt;
+        if (createGroup) {
+            cibadminOpt = "-C";
+        } else {
+            cibadminOpt = "-R";
+        }
+
         final SSH.SSHOutput ret = execCommand(host,
-                                              getCibCommand("-R",
+                                              getCibCommand(cibadminOpt,
                                                             "resources",
                                                             xml.toString()),
                                               true,
