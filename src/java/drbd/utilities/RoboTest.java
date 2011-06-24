@@ -490,6 +490,15 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         Tools.info("test" + index + ", secs: "
                                    + secs);
+                    } else if ("e".equals(index)) {
+                        /* host wizard deadlock */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestE(robot, cluster);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
                     if ("0".equals(index)) {
@@ -2023,6 +2032,30 @@ public final class RoboTest {
         }
         removeResource(robot, dummy1X, dummy1Y, -20);
     }
+
+    /** Host wizard deadlock. */
+    private static void startTestE(final Robot robot, final Cluster cluster) {
+        slowFactor = 0.2f;
+        aborted = false;
+        int count = 50;
+        for (int i = count; i > 0; i--) {
+            Tools.info("1 I: " + i);
+            moveTo(robot, 300 , 200); /* host */
+            sleep(2000);
+            rightClick(robot);
+            sleep(2000);
+            moveTo(robot, 400 , 220); /* wizard */
+            sleep(2000);
+            leftClick(robot);
+            sleep(10000);
+            moveTo(robot, 940 , 570); /* cancel */
+            sleep(2000);
+            leftClick(robot);
+            sleep(2000);
+        }
+    }
+
+    /** Sets location. */
 
     /** Sets location. */
     private static void setLocation(final Robot robot, final Integer[] events) {
