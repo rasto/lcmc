@@ -3193,7 +3193,7 @@ public final class RoboTest {
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 443 + correctionY); /* deselect dopd */
+        moveTo(robot, 1075, 448 + correctionY); /* deselect dopd */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -3377,7 +3377,7 @@ public final class RoboTest {
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 443 + correctionY); /* deselect dopd */
+        moveTo(robot, 1075, 448 + correctionY); /* deselect dopd */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
