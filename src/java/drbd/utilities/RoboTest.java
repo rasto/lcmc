@@ -2377,7 +2377,7 @@ public final class RoboTest {
     /** Confirms remove dialog. */
     private static void confirmRemove(final Robot robot) {
         sleep(1000);
-        moveTo(robot, 512 , 480);
+        moveTo(robot, 512 , 472);
         leftClick(robot);
     }
 
