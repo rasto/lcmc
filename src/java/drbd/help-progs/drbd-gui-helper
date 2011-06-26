@@ -1151,7 +1151,7 @@ XML
 }
 
 sub get_drbd_xml {
-	my %missing; # handlers and startup don't come from drbdsetup xml, so
+	my %missing; # handlers and startup don't come from drbdsetup xml-help, so
 		     # we parse them out of the man page.
 	my @missing;
 	my $manpage = `zcat /usr/share/man/man5/drbd.conf.5.gz || cat /usr/share/man/man5/drbd.conf.5 || cat /usr/man/man5/drbd.conf.5 || bzcat /usr/share/man/man5/drbd.conf.5.bz2`;
@@ -1280,12 +1280,14 @@ sub get_drbd_xml {
 
 	my ($v1, $v2, $v3) = get_drbd_version();
 	my @sections = ("net-options", "disk-options");
+	my $help_option = "xml-help";
 	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
 		@sections = ("net", "disk", "syncer");
+		$help_option = "xml";
 	}
 	    
 	for (@sections) {
-		my $xml = `/sbin/drbdsetup xml $_`;
+		my $xml = `/sbin/drbdsetup $help_option $_`;
 		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
 		print $xml;
 	}
