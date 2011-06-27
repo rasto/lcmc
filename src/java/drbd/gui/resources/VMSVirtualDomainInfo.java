@@ -654,6 +654,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates disk nodes. Returns whether the node changed. */
     private boolean updateDiskNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, DiskData> disks = getDisks();
         final List<String> diskNames  = new ArrayList<String>();
         if (disks != null) {
@@ -663,7 +667,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
@@ -705,7 +709,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         for (final String disk : diskNames) {
-            final Enumeration eee = getNode().children();
+            final Enumeration eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
@@ -733,7 +737,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmsdi);
             getBrowser().setNode(resource);
-            getNode().insert(resource, i);
+            thisNode.insert(resource, i);
             nodeChanged = true;
         }
         return nodeChanged;
@@ -741,6 +745,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates interface nodes. Returns whether the node changed. */
     private boolean updateInterfaceNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, InterfaceData> interfaces = getInterfaces();
         final List<String> interfaceNames  = new ArrayList<String>();
         if (interfaces != null) {
@@ -750,7 +758,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         VMSInterfaceInfo emptySlot = null; /* for generated mac address. */
         while (e.hasMoreElements()) {
@@ -791,7 +799,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String interf : interfaceNames) {
             VMSInterfaceInfo vmsii;
             if (emptySlot == null) {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -816,7 +824,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final DefaultMutableTreeNode resource =
                                             new DefaultMutableTreeNode(vmsii);
                 getBrowser().setNode(resource);
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
                 vmsii = emptySlot;
@@ -836,6 +844,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates input devices nodes. Returns whether the node changed. */
     private boolean updateInputDevNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, InputDevData> inputDevs = getInputDevs();
         final List<String> inputDevNames  = new ArrayList<String>();
         if (inputDevs != null) {
@@ -845,7 +857,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
@@ -883,7 +895,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String inputDev : inputDevNames) {
             VMSInputDevInfo vmsid;
             final InputDevData data = inputDevs.get(inputDev);
-            final Enumeration eee = getNode().children();
+            final Enumeration eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
@@ -908,7 +920,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmsid);
             getBrowser().setNode(resource);
-            getNode().insert(resource, i);
+            thisNode.insert(resource, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
             try {
@@ -920,14 +932,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         /* Sort it. */
         int i = 0;
-        for (int j = 0; j < getNode().getChildCount(); j++) {
+        for (int j = 0; j < thisNode.getChildCount(); j++) {
             final DefaultMutableTreeNode node =
-                         (DefaultMutableTreeNode) getNode().getChildAt(j);
+                         (DefaultMutableTreeNode) thisNode.getChildAt(j);
             final VMSHardwareInfo v = (VMSHardwareInfo) node.getUserObject();
             final String n = v.getName();
             if (i > 0) {
                 final DefaultMutableTreeNode prev =
-                     (DefaultMutableTreeNode) getNode().getChildAt(j - 1);
+                     (DefaultMutableTreeNode) thisNode.getChildAt(j - 1);
                 final VMSHardwareInfo prevI =
                                         (VMSHardwareInfo) prev.getUserObject();
                 if (prevI.getClass().getName().equals(v.getClass().getName())) {
@@ -935,8 +947,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (!prevI.getResource().isNew()
                         && !v.getResource().isNew()
                         && (prevN != null && prevN.compareTo(n) > 0)) {
-                        getNode().remove(j);
-                        getNode().insert(node, j - 1);
+                        thisNode.remove(j);
+                        thisNode.insert(node, j - 1);
                     }
                 } else {
                     i = 0;
@@ -949,6 +961,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates graphics devices nodes. Returns whether the node changed. */
     private boolean updateGraphicsNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, GraphicsData> graphicDisplays =
                                                         getGraphicDisplays();
         final List<String> graphicsNames  = new ArrayList<String>();
@@ -959,7 +975,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
@@ -1003,7 +1019,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String graphicDisplay : graphicsNames) {
             VMSGraphicsInfo vmsgi;
             final GraphicsData data = graphicDisplays.get(graphicDisplay);
-            final Enumeration eee = getNode().children();
+            final Enumeration eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
@@ -1029,7 +1045,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmsgi);
             getBrowser().setNode(resource);
-            getNode().insert(resource, i);
+            thisNode.insert(resource, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
             try {
@@ -1044,6 +1060,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates sound devices nodes. Returns whether the node changed. */
     private boolean updateSoundNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, SoundData> sounds = getSounds();
         final List<String> soundNames  = new ArrayList<String>();
         if (sounds != null) {
@@ -1053,7 +1073,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
@@ -1097,7 +1117,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String sound : soundNames) {
             VMSSoundInfo vmssi;
             final SoundData data = sounds.get(sound);
-            final Enumeration eee = getNode().children();
+            final Enumeration eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
@@ -1123,7 +1143,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmssi);
             getBrowser().setNode(resource);
-            getNode().insert(resource, i);
+            thisNode.insert(resource, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
             try {
@@ -1138,6 +1158,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates serial devices nodes. Returns whether the node changed. */
     private boolean updateSerialNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, SerialData> serials = getSerials();
         final List<String> serialNames  = new ArrayList<String>();
         if (serials != null) {
@@ -1147,7 +1171,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         VMSSerialInfo emptySlot = null; /* for generated target port. */
         while (e.hasMoreElements()) {
@@ -1188,7 +1212,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             VMSSerialInfo vmssi;
             final SerialData data = serials.get(serial);
             if (emptySlot == null) {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -1216,7 +1240,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final DefaultMutableTreeNode resource =
                                             new DefaultMutableTreeNode(vmssi);
                 getBrowser().setNode(resource);
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
                 vmssi = emptySlot;
@@ -1236,6 +1260,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates parallel devices nodes. Returns whether the node changed. */
     private boolean updateParallelNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, ParallelData> parallels = getParallels();
         final List<String> parallelNames  = new ArrayList<String>();
         if (parallels != null) {
@@ -1245,7 +1273,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         VMSParallelInfo emptySlot = null; /* for generated target port. */
         while (e.hasMoreElements()) {
@@ -1287,7 +1315,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             VMSParallelInfo vmspi;
             final ParallelData data = parallels.get(parallel);
             if (emptySlot == null) {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -1316,7 +1344,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final DefaultMutableTreeNode resource =
                                             new DefaultMutableTreeNode(vmspi);
                 getBrowser().setNode(resource);
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
                 vmspi = emptySlot;
@@ -1336,6 +1364,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Updates video devices nodes. Returns whether the node changed. */
     private boolean updateVideoNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         final Map<String, VideoData> videos = getVideos();
         final List<String> videoNames  = new ArrayList<String>();
         if (videos != null) {
@@ -1345,7 +1377,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = getNode().children();
+        final Enumeration e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
@@ -1388,7 +1420,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String video : videoNames) {
             VMSVideoInfo vmspi;
             final VideoData data = videos.get(video);
-            final Enumeration eee = getNode().children();
+            final Enumeration eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
                 final DefaultMutableTreeNode node =
@@ -1417,7 +1449,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode resource =
                                         new DefaultMutableTreeNode(vmspi);
             getBrowser().setNode(resource);
-            getNode().insert(resource, i);
+            thisNode.insert(resource, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
             try {
@@ -1479,6 +1511,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Sets service parameters with values from resourceNode hash. */
     public void updateParameters() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return;
+        }
         final List<String> runningOnHosts = new ArrayList<String>();
         final List<String> suspendedOnHosts = new ArrayList<String>();
         final List<String> definedhosts = new ArrayList<String>();
@@ -1640,7 +1676,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     || serialNodeChanged
                     || parallelNodeChanged
                     || vidoNodeChanged) {
-                    getBrowser().reload(getNode(), false);
+                    getBrowser().reload(thisNode, false);
                 }
             }
         });
@@ -2100,9 +2136,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsdi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmsdi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2113,10 +2153,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     break;
                 }
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmsdi.selectMyself();
         return vmsdi;
     }
@@ -2129,9 +2169,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsii);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmsii;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2144,10 +2188,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmsii.selectMyself();
         return vmsii;
     }
@@ -2160,9 +2204,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsidi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmsidi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2176,10 +2224,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmsidi.selectMyself();
     }
 
@@ -2191,9 +2239,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsgi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmsgi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2208,10 +2260,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmsgi.selectMyself();
         return vmsgi;
     }
@@ -2223,9 +2275,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmssi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmssi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2241,10 +2297,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmssi.selectMyself();
     }
 
@@ -2255,9 +2311,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmssi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmssi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2274,10 +2334,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmssi.selectMyself();
     }
 
@@ -2289,9 +2349,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmspi);
         getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmspi;
+        }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                final Enumeration eee = getNode().children();
+                final Enumeration eee = thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
                     final DefaultMutableTreeNode node =
@@ -2309,10 +2373,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     break;
                 }
 
-                getNode().insert(resource, i);
+                thisNode.insert(resource, i);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmspi.selectMyself();
     }
 
@@ -2324,12 +2388,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                            new DefaultMutableTreeNode(vmsvi);
         getBrowser().setNode(resource);
         /* all the way till the end */
+        final DefaultMutableTreeNode thisNode = getNode();
         Tools.invokeAndWait(new Runnable() {
             public void run() {
-                getNode().add(resource);
+                thisNode.add(resource);
             }
         });
-        getBrowser().reload(getNode(), true);
+        getBrowser().reload(thisNode, true);
         vmsvi.selectMyself();
     }
 
@@ -3270,7 +3335,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
-                    final Enumeration eee = getNode().children();
+                    final DefaultMutableTreeNode thisNode = getNode();
+                    final Enumeration eee = thisNode.children();
                     while (eee.hasMoreElements()) {
                         final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
@@ -3300,9 +3366,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns parameters of all devices. */
     protected Map<VMSHardwareInfo, Map<String, String>> getAllHWParameters(
                                                     final boolean allParams) {
-        final Enumeration e = getNode().children();
         final Map<VMSHardwareInfo, Map<String, String>> allParamaters =
                          new TreeMap<VMSHardwareInfo, Map<String, String>>();
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return allParamaters;
+        }
+        final Enumeration e = thisNode.children();
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) e.nextElement();
@@ -4226,6 +4296,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
      */
     @Override public boolean checkResourceFieldsChanged(final String param,
                                                         final String[] params) {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         boolean changed = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
@@ -4245,7 +4319,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 changed = true;
             }
         }
-        final Enumeration eee = getNode().children();
+        final Enumeration eee = thisNode.children();
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) eee.nextElement();
@@ -4266,6 +4340,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns whether all the parameters are correct. */
     @Override public boolean checkResourceFieldsCorrect(final String param,
                                                         final String[] params) {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
         boolean cor = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
@@ -4297,7 +4375,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 definedOnHostComboBoxHash.get(key).wrongValue();
             }
         }
-        final Enumeration eee = getNode().children();
+        final Enumeration eee = thisNode.children();
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) eee.nextElement();
@@ -4536,6 +4614,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Revert valus. */
     @Override public void revert() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return;
+        }
         for (final Host h : getBrowser().getClusterHosts()) {
             final GuiComboBox hostCB =
                                     definedOnHostComboBoxHash.get(h.getName());
@@ -4550,7 +4632,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
             hostCB.setValue(savedValue);
         }
-        final Enumeration eee = getNode().children();
+        final Enumeration eee = thisNode.children();
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node =
                         (DefaultMutableTreeNode) eee.nextElement();
