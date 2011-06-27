@@ -151,6 +151,24 @@ public class Browser {
         });
     }
 
+    /** Reloads the node. Must be called from swing thread. */
+    public final void reloadFromSwingThread(final DefaultMutableTreeNode node,
+                                            final boolean select) {
+        final JTree t = tree;
+        TreePath p = null;
+        if (t != null) {
+            p = t.getSelectionPath();
+        }
+        final TreePath path = p;
+        if (node != null) {
+            treeModel.reload(node);
+        }
+        if (!select && t != null && path != null) {
+            /* if don't want to select, we reselect the old path. */
+            t.setSelectionPath(path);
+        }
+    }
+
     /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         SwingUtilities.invokeLater(new Runnable() {

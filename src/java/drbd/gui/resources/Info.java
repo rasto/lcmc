@@ -1216,6 +1216,9 @@ public class Info implements Comparable {
     final void removeNode() {
         final DefaultMutableTreeNode n = node;
         node = null;
+        if (n == null) {
+            return;
+        }
         final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
         if (p != null) {
             p.remove(n);

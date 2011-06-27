@@ -526,14 +526,15 @@ public final class ServicesInfo extends EditableInfo {
                 final int p = pos;
                 Tools.invokeAndWait(new Runnable() {
                     @Override public void run() {
-                        final int i = n.getParent().getIndex(n);
-                        if (i > p) {
-                            final DefaultMutableTreeNode parent =
+                        final DefaultMutableTreeNode parent =
                                         (DefaultMutableTreeNode) n.getParent();
-                            if (parent != null) {
+                        if (parent != null) {
+                            final int i = parent.getIndex(n);
+                            if (i > p) {
                                 parent.remove(n);
                                 parent.insert(n, p);
-                                getBrowser().reload(parent, false);
+                                getBrowser().reloadFromSwingThread(parent,
+                                                                   false);
                             }
                         }
                     }
