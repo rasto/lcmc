@@ -1613,6 +1613,7 @@ public final class ClusterBrowser extends Browser {
                     drbdInfo.setAllApplyButtons();
                 }
             });
+            drbdInfo.reloadDRBDResourceComboBoxes();
             drbdGraph.scale();
         }
     }

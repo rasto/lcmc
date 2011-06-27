@@ -95,6 +95,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBox = null;
     /** Port combo box wizard. */
     private GuiComboBox portComboBoxWizard = null;
+    /** resync-after combobox/ */
+    private GuiComboBox resyncAfterParamCB = null;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -276,7 +278,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             paramComboBoxAdd(param, prefix, paramCb);
         } else if (DRBD_RES_PARAM_AFTER.equals(param)
                    || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
-            // TODO: has to be reloaded
             final List<Info> l = new ArrayList<Info>();
             final String defaultItem = getParamSaved(param);
             final StringInfo di = new StringInfo(
@@ -311,6 +312,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                       new AccessMode(
                                            getAccessType(param),
                                            isEnabledOnlyInAdvancedMode(param)));
+            resyncAfterParamCB = paramCb;
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else {
@@ -348,6 +350,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             getBrowser().putDrbdResHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdInfo().setAllApplyButtons();
+            getDrbdInfo().reloadDRBDResourceComboBoxes();
         }
     }
 
@@ -1234,10 +1237,54 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         drbdResHash.remove(getName());
         getBrowser().putDrbdResHash();
         dri.setName(null);
+        getDrbdInfo().reloadDRBDResourceComboBoxes();
     }
 
     /** Returns DRBD volumes. */
     public Set<DrbdVolumeInfo> getDrbdVolumes() {
         return drbdVolumes;
+    }
+
+    /** Reload combo boxes. */
+    @Override public void reloadComboBoxes() {
+        super.reloadComboBoxes();
+        String param = DRBD_RES_PARAM_AFTER;
+        if (!getDrbdInfo().atLeastVersion("8.4")) {
+            param = DRBD_RES_PARAM_AFTER_8_3;
+        }
+        final List<Info> l = new ArrayList<Info>();
+        final String defaultItem = getParamSaved(param);
+        final StringInfo di = new StringInfo(
+                                    Tools.getString("ClusterBrowser.None"),
+                                    "-1",
+                                    getBrowser());
+        l.add(di);
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                            getBrowser().getDrbdResHash();
+        System.out.print(getName() + " reload cbs");
+        for (final String drbdRes : drbdResHash.keySet()) {
+            final DrbdResourceInfo r = drbdResHash.get(drbdRes);
+            DrbdResourceInfo odri = r;
+            boolean cyclicRef = false;
+            while ((odri = drbdResHash.get(
+                   odri.getParamSaved(param))) != null) {
+                if (odri == this) {
+                    cyclicRef = true;
+                }
+            }
+            if (r != this && !cyclicRef) {
+                System.out.print(" " + r.getName());
+                l.add(r);
+            }
+        }
+        getBrowser().putDrbdResHash();
+        System.out.println("");
+
+        if (resyncAfterParamCB != null) {
+            final String value = resyncAfterParamCB.getStringValue();
+            System.out.println("reloaded: " + value);
+            resyncAfterParamCB.reloadComboBox(value,
+                                              l.toArray(new Info[l.size()]));
+        }
     }
 }
