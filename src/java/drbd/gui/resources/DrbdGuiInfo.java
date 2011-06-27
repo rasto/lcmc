@@ -41,7 +41,9 @@ import javax.swing.ImageIcon;
  */
 abstract class DrbdGuiInfo extends EditableInfo {
     /** Name of the drbd after parameter. */
-    protected static final String DRBD_RES_PARAM_AFTER = "after";
+    protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
+    /** Name of the drbd after parameter. Before 8.4 */
+    protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
     /** Prepares a new <code>DrbdGuiInfo</code> object. */
     public DrbdGuiInfo(final String name, final Browser browser) {
         super(name, browser);
@@ -308,7 +310,20 @@ abstract class DrbdGuiInfo extends EditableInfo {
                                 sectionConfig.append("\t\t" + param + ";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
-                            /* after parameter */
+                            /* resync-after parameter > 8.4 */
+                            if (!value.equals(Tools.getString(
+                                                "ClusterBrowser.None"))) {
+                                if (value != null) {
+                                    sectionConfig.append("\t\t");
+                                    sectionConfig.append(param);
+                                    sectionConfig.append('\t');
+                                    sectionConfig.append(
+                                                    Tools.escapeConfig(value));
+                                    sectionConfig.append(";\n");
+                                }
+                            }
+                        } else if (DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
+                            /* after parameter < 8.4 */
                             /* we get drbd device here, so it is converted
                              * to the resource. */
                             if (!value.equals(Tools.getString(
