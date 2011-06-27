@@ -437,16 +437,7 @@ public class Info implements Comparable {
      */
     public void removeMyself(final boolean testOnly) {
         cleanup();
-        final DefaultMutableTreeNode n = node;
-        setNode(null);
-        if (n != null) {
-            final DefaultMutableTreeNode parent =
-                                (DefaultMutableTreeNode) node.getParent();
-            if (parent != null) {
-                parent.remove(n);
-                getBrowser().reload(parent, true);
-            }
-        }
+        removeNode();
     }
 
     /** Selects and highlights this node. */
@@ -1228,6 +1219,7 @@ public class Info implements Comparable {
         final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
         if (p != null) {
             p.remove(n);
+            getBrowser().reload(p, true);
         }
     }
 }
