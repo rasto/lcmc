@@ -1627,7 +1627,7 @@ public final class RoboTest {
             sleep(5000);
         } else {
             removeEverything(robot);
-            removeResource(robot, phX, phY, -180);
+            removePlaceHolder(robot, phX, phY);
         }
         if (!aborted) {
             sleepNoFactor(20000);
@@ -1726,6 +1726,8 @@ public final class RoboTest {
         stopEverything(robot);
         checkTest(cluster, "test4", 4);
         removeEverything(robot);
+        removePlaceHolder(robot, ph1X, ph1Y);
+        removePlaceHolder(robot, ph2X, ph2Y);
         sleep(40000);
     }
 
