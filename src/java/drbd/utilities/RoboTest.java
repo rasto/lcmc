@@ -1627,6 +1627,7 @@ public final class RoboTest {
             sleep(5000);
         } else {
             removeEverything(robot);
+            removeResource(robot, phX, phY, -180);
         }
         if (!aborted) {
             sleepNoFactor(20000);
