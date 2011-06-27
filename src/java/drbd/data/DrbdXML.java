@@ -487,12 +487,8 @@ public final class DrbdXML extends XML {
                               final String param,
                               final boolean required) {
         addSpecialParameter(section, param, required);
-        if (!sectionParamsMap.containsKey(section)) {
-            sectionParamsMap.put(section, new ArrayList<String>());
-        }
-        if (!sectionParamsMap.get(section).contains(param)) {
-            sectionParamsMap.get(section).add(param);
-        }
+        sectionParamsMap.put(section, new ArrayList<String>());
+        sectionParamsMap.get(section).add(param);
     }
 
     /** Adds parameter with a default value to the specified section. */
@@ -612,6 +608,10 @@ public final class DrbdXML extends XML {
             if (optionNode.getNodeName().equals("option")) {
                 final String name = getAttribute(optionNode, "name");
                 String type = getAttribute(optionNode, "type");
+                if ("flag".equals(type)) {
+                    /* ignore flags */
+                    continue;
+                }
                 if ("allow-two-primaries".equals(name)) {
                     paramItemsMap.put(name, MODES);
                     paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
