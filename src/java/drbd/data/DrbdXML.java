@@ -171,7 +171,8 @@ public final class DrbdXML extends XML {
         NOT_ADVANCED_PARAMS.add("timeout");
         NOT_ADVANCED_PARAMS.add("allow-two-primaries");
         NOT_ADVANCED_PARAMS.add("fencing");
-        NOT_ADVANCED_PARAMS.add("after");
+        NOT_ADVANCED_PARAMS.add("after"); /* before 8.4 */
+        NOT_ADVANCED_PARAMS.add("resync-after");
         NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
     }
     /** Access types of some parameters. */
@@ -487,12 +488,8 @@ public final class DrbdXML extends XML {
                               final String param,
                               final boolean required) {
         addSpecialParameter(section, param, required);
-        if (!sectionParamsMap.containsKey(section)) {
-            sectionParamsMap.put(section, new ArrayList<String>());
-        }
-        if (!sectionParamsMap.get(section).contains(param)) {
-            sectionParamsMap.get(section).add(param);
-        }
+        sectionParamsMap.put(section, new ArrayList<String>());
+        sectionParamsMap.get(section).add(param);
     }
 
     /** Adds parameter with a default value to the specified section. */
@@ -612,6 +609,10 @@ public final class DrbdXML extends XML {
             if (optionNode.getNodeName().equals("option")) {
                 final String name = getAttribute(optionNode, "name");
                 String type = getAttribute(optionNode, "type");
+                if ("flag".equals(type)) {
+                    /* ignore flags */
+                    continue;
+                }
                 if ("allow-two-primaries".equals(name)) {
                     paramItemsMap.put(name, MODES);
                     paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
@@ -706,7 +707,8 @@ public final class DrbdXML extends XML {
                 }
                 if (!"resource".equals(section)
                     && !globalParametersList.contains(name)
-                    && !("syncer".equals(section) && "after".equals(name))) {
+                    && !("syncer".equals(section) && "after".equals(name))
+                    && !"resync-after".equals(name)) {
                     globalParametersList.add(name);
                 }
 

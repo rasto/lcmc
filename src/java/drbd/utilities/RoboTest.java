@@ -3118,7 +3118,7 @@ public final class RoboTest {
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, protocolY + 35); /* protocol b */
+        moveTo(robot, 1070, protocolY + 40); /* protocol b */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -3188,7 +3188,7 @@ public final class RoboTest {
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, protocolY + 55); /* protocol c */
+        moveTo(robot, 1070, protocolY + 62); /* protocol c */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -3302,7 +3302,7 @@ public final class RoboTest {
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, protocolY + 35); /* protocol b */
+        moveTo(robot, 1070, protocolY + 40); /* protocol b */
         sleep(2000);
         leftClick(robot);
         sleep(2000);
@@ -3372,7 +3372,7 @@ public final class RoboTest {
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1070, protocolY + 55); /* protocol c */
+        moveTo(robot, 1070, protocolY + 62); /* protocol c */
         sleep(2000);
         leftClick(robot);
         sleep(2000);

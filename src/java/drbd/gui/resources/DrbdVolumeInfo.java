@@ -1190,8 +1190,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Whether the parameter should be enabled. */
     @Override protected String isEnabled(final String param) {
         if (DRBD_VOL_PARAM_NUMBER.equals(param)
-            && !getDrbdResourceInfo().getDrbdInfo().atLeastVersion(
-                                                                "8.4.0rc1")) {
+            && !getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
             return "available in DRBD 8.4";
         }
         if (getDrbdVolume().isCommited()) {

@@ -95,6 +95,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBox = null;
     /** Port combo box wizard. */
     private GuiComboBox portComboBoxWizard = null;
+    /** resync-after combobox/ */
+    private GuiComboBox resyncAfterParamCB = null;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -218,7 +220,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      */
     @Override protected boolean checkParam(final String param,
                                                  final String newValue) {
-        if (DRBD_RES_PARAM_AFTER.equals(param)) {
+        if (DRBD_RES_PARAM_AFTER.equals(param)
+            || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
             /* drbdsetup xml syncer says it should be numeric, but in
                /etc/drbd.conf it is not. */
             return true;
@@ -273,10 +276,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                            isEnabledOnlyInAdvancedMode(param)));
             paramCb.setEnabled(!getDrbdResource().isCommited());
             paramComboBoxAdd(param, prefix, paramCb);
-        } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
-            // TODO: has to be reloaded
+        } else if (DRBD_RES_PARAM_AFTER.equals(param)
+                   || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
             final List<Info> l = new ArrayList<Info>();
-            final String defaultItem = getParamSaved(DRBD_RES_PARAM_AFTER);
+            final String defaultItem = getParamSaved(param);
             final StringInfo di = new StringInfo(
                                         Tools.getString("ClusterBrowser.None"),
                                         "-1",
@@ -289,7 +292,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 DrbdResourceInfo odri = r;
                 boolean cyclicRef = false;
                 while ((odri = drbdResHash.get(
-                       odri.getParamSaved(DRBD_RES_PARAM_AFTER))) != null) {
+                       odri.getParamSaved(param))) != null) {
                     if (odri == this) {
                         cyclicRef = true;
                     }
@@ -309,6 +312,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                       new AccessMode(
                                            getAccessType(param),
                                            isEnabledOnlyInAdvancedMode(param)));
+            resyncAfterParamCB = paramCb;
 
             paramComboBoxAdd(param, prefix, paramCb);
         } else {
@@ -346,6 +350,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             getBrowser().putDrbdResHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdInfo().setAllApplyButtons();
+            getDrbdInfo().reloadDRBDResourceComboBoxes();
         }
     }
 
@@ -1232,10 +1237,50 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         drbdResHash.remove(getName());
         getBrowser().putDrbdResHash();
         dri.setName(null);
+        getDrbdInfo().reloadDRBDResourceComboBoxes();
     }
 
     /** Returns DRBD volumes. */
     public Set<DrbdVolumeInfo> getDrbdVolumes() {
         return drbdVolumes;
+    }
+
+    /** Reload combo boxes. */
+    @Override public void reloadComboBoxes() {
+        super.reloadComboBoxes();
+        String param = DRBD_RES_PARAM_AFTER;
+        if (!getDrbdInfo().atLeastVersion("8.4")) {
+            param = DRBD_RES_PARAM_AFTER_8_3;
+        }
+        final List<Info> l = new ArrayList<Info>();
+        final String defaultItem = getParamSaved(param);
+        final StringInfo di = new StringInfo(
+                                    Tools.getString("ClusterBrowser.None"),
+                                    "-1",
+                                    getBrowser());
+        l.add(di);
+        final Map<String, DrbdResourceInfo> drbdResHash =
+                                            getBrowser().getDrbdResHash();
+        for (final String drbdRes : drbdResHash.keySet()) {
+            final DrbdResourceInfo r = drbdResHash.get(drbdRes);
+            DrbdResourceInfo odri = r;
+            boolean cyclicRef = false;
+            while ((odri = drbdResHash.get(
+                   odri.getParamSaved(param))) != null) {
+                if (odri == this) {
+                    cyclicRef = true;
+                }
+            }
+            if (r != this && !cyclicRef) {
+                l.add(r);
+            }
+        }
+        getBrowser().putDrbdResHash();
+
+        if (resyncAfterParamCB != null) {
+            final String value = resyncAfterParamCB.getStringValue();
+            resyncAfterParamCB.reloadComboBox(value,
+                                              l.toArray(new Info[l.size()]));
+        }
     }
 }

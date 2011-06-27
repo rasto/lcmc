@@ -66,7 +66,7 @@ public final class AddDrbdConfigDialog {
         //dri.setDialogStarted(true);
         WizardDialog dialog;
         if (!drbdInfo.getDrbdResources().isEmpty()
-            && drbdInfo.atLeastVersion("8.4.0rc1")) {
+            && drbdInfo.atLeastVersion("8.4")) {
             dialog = new Start(null, drbdInfo, blockDevInfo1, blockDevInfo2);
         } else {
             final DrbdResourceInfo drbdResourceInfo =

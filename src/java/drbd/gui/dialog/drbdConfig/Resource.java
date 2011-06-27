@@ -97,8 +97,7 @@ public final class Resource extends DrbdConfig {
     @Override public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        final boolean protocolInNetSection =
-                                           drbdInfo.atLeastVersion("8.4.0rc1");
+        final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
@@ -163,7 +162,6 @@ public final class Resource extends DrbdConfig {
     @Override protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        dri.selectMyself();
         dri.waitForInfoPanel();
         Tools.waitForSwing();
         final JPanel inputPane = new JPanel();

@@ -866,4 +866,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
         }
         return true;
     }
+
+    /** Reload DRBD resource combo boxes. (resync-after). */
+    public void reloadDRBDResourceComboBoxes() {
+        for (final DrbdResourceInfo dri : getDrbdResources()) {
+            dri.reloadComboBoxes();
+        }
+    }
 }

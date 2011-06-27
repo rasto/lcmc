@@ -525,6 +525,12 @@ public final class DRBD {
                                               getResVolReplaceHash(host,
                                                                    resource,
                                                                    volume));
+            } else if (Tools.compareVersions(host.getDrbdVersion(),
+                                            "8.3") <= 0) {
+                command = host.getDistCommand("DRBD.forcePrimary.8.3",
+                                              getResVolReplaceHash(host,
+                                                                   resource,
+                                                                   volume));
             } else {
                 command = host.getDistCommand("DRBD.forcePrimary",
                                               getResVolReplaceHash(host,

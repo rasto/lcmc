@@ -2335,7 +2335,7 @@ public class ServiceInfo extends EditableInfo {
                         getBrowser().getHeartbeatGraph()
                                     .exchangeObjectInTheVertex(ci, thisClass);
                     } else {
-                        getBrowser().getServicesNode().remove(oldCI.getNode());
+                        oldCI.removeNode();
                         getBrowser().getHeartbeatGraph()
                                     .exchangeObjectInTheVertex(ci, oldCI);
                         cleanup();
@@ -2355,8 +2355,8 @@ public class ServiceInfo extends EditableInfo {
             final CloneInfo ci = getCloneInfo();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
-                    ci.getNode().remove(getNode());
-                    getBrowser().getServicesNode().remove(ci.getNode());
+                    removeNode();
+                    ci.removeNode();
                     cleanup();
                     ci.cleanup();
                     getBrowser().getServicesNode().add(getNode());

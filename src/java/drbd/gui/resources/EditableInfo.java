@@ -1151,4 +1151,8 @@ public abstract class EditableInfo extends Info {
         super.cleanup();
         clearPanelLists();
     }
+
+    /** Reload combo boxes. */
+    public void reloadComboBoxes() {
+    }
 }

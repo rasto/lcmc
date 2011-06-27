@@ -44,42 +44,6 @@ public final class DistResource_suse_OPENSUSE11_3
         {"Support", "suse-OPENSUSE11_3"},
         {"DRBD.load", DistResource.SUDO + "/sbin/modprobe drbd"},
 
-        /* Drbd install method 2 */
-        {"DrbdInst.install.text.2",
-         " the opensuse way: 8.3.x"},
-
-        {"DrbdInst.install.2",
-         "zypper -n in drbd"},
-
-        {"DrbdInst.install.method.2",
-         ""},
-
-        /* Drbd install method 3 */
-        {"DrbdInst.install.text.3",
-         "from the source tarball"},
-
-        {"DrbdInst.install.method.3",
-         "source"},
-
-        {"DrbdInst.install.3",
-         "/bin/mkdir -p /tmp/drbdinst && "
-         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
-         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
-         + "cd /tmp/drbdinst && "
-         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
-         + "cd drbd-@VERSION@ && "
-         /* removing -pae etc. from uname -r */
-         + "/usr/bin/zypper -n in kernel-`uname -r|sed 's/.*-\\([a-z]\\)/\\1/'`"
-         + "-devel=`uname -r|sed s/-[a-z].*//;` && "
-         + "/usr/bin/zypper -n in make flex gcc && "
-         + "if [ -e configure ]; then"
-         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
-         + " --sysconfdir=/etc;"
-         + " fi && "
-         + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
-         + "/bin/rm -rf /tmp/drbdinst"},
-
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
          "clusterlabs repo: 1.0.x/1.2.x" },
