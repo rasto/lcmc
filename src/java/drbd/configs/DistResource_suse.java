@@ -62,9 +62,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         {"PmInst.install.i486", "i586" },
         {"PmInst.install.i586", "i586" },
 
-        {"HbPmInst.install.text.1", "CD" },
-        {"HbPmInst.install.1", "zypper -n --no-gpg-checks install heartbeat"},
-
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
          "from the source tarball"},
@@ -117,5 +114,55 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         {"DrbdLog.log",
          "grep @GREPPATTERN@ /var/log/messages | tail -500"},
         {"KVM.emulator",   "/usr/bin/qemu-kvm"},
+
+        /* Heartbeat/Pacemaker native */
+        {"HbPmInst.install.text.2", "zypper install" },
+        {"HbPmInst.install.2",
+         "zypper -n install heartbeat pacemaker"
+         + " && /sbin/chkconfig --add heartbeat"},
+
+        /* Openais/Pacemaker native */
+        {"PmInst.install.text.2", "zypper install" },
+        {"PmInst.install.2",
+         "zypper -n install pacemaker"
+         + " && if [ -e /etc/ais/openais.conf ];then"
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
+         + " && /sbin/chkconfig --add openais"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "zypper install"},
+
+        {"DrbdInst.install.2",
+         "zypper -n in drbd"},
+
+        {"DrbdInst.install.method.2",
+         ""},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.3",
+         "source"},
+
+        {"DrbdInst.install.3",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         /* removing -pae etc. from uname -r */
+         + "/usr/bin/zypper -n in kernel-`uname -r|sed 's/.*-\\([a-z]\\)/\\1/'`"
+         + "-devel=`uname -r|sed s/-[a-z].*//;` && "
+         + "/usr/bin/zypper -n in make flex gcc && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
+         //+ "/sbin/chkconfig --add drbd && "
+         + "/bin/rm -rf /tmp/drbdinst"},
     };
 }
