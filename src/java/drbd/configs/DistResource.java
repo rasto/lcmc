@@ -328,6 +328,8 @@ public final class DistResource extends java.util.ListResourceBundle {
          "echo -e \"yes\\nyes\"|" + SUDO + "/sbin/drbdadm @DRYRUN@ create-md @RES-VOL@"},
 
         {"DRBD.forcePrimary",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ primary @RES-VOL@ --force"},
+        {"DRBD.forcePrimary.8.3",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force primary @RES-VOL@"},
 
         {"DRBD.forcePrimary.8.3.7",

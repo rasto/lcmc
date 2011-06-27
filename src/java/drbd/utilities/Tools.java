@@ -1477,6 +1477,8 @@ public final class Tools {
         while (true) {
             if (i >= v1a.length && i >= v2a.length) {
                 break;
+            } else if (i >= v1a.length || i >= v2a.length) {
+                return 0;
             }
             int v1i = 0;
             if (i < v1a.length) {

@@ -2553,7 +2553,7 @@ public final class Host {
     /** Returns whether DRBD has volume feature. */
     public boolean hasVolumes() {
         try {
-            return Tools.compareVersions(getDrbdVersion(), "8.4.0rc1") >= 0;
+            return Tools.compareVersions(getDrbdVersion(), "8.4") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
             Tools.appWarning(e.getMessage(), e);
         }
