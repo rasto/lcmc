@@ -2206,7 +2206,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmsidi;
+            return;
         }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -2277,7 +2277,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmssi;
+            return;
         }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -2313,7 +2313,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmssi;
+            return;
         }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
@@ -2351,7 +2351,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmspi;
+            return;
         }
         Tools.invokeAndWait(new Runnable() {
             public void run() {
