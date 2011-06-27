@@ -1372,6 +1372,7 @@ public final class ClusterBrowser extends Browser {
                     bd.remove(bd.indexOf(cbdi.getName()));
                 } else {
                     /* remove not existing block devices */
+                    cbdi.setNode(null);
                     nodesToRemove.add(node);
                 }
             }
@@ -1462,6 +1463,7 @@ public final class ClusterBrowser extends Browser {
                 } else {
                     if (!vmsvdi.getResource().isNew()) {
                         /* remove not existing vms */
+                        vmsvdi.setNode(null);
                         nodesToRemove.add(node);
                         nodeChanged = true;
                     }

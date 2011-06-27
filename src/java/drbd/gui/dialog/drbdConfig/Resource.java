@@ -162,7 +162,6 @@ public final class Resource extends DrbdConfig {
     @Override protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        dri.selectMyself();
         dri.waitForInfoPanel();
         Tools.waitForSwing();
         final JPanel inputPane = new JPanel();

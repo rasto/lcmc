@@ -1261,7 +1261,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         l.add(di);
         final Map<String, DrbdResourceInfo> drbdResHash =
                                             getBrowser().getDrbdResHash();
-        System.out.print(getName() + " reload cbs");
         for (final String drbdRes : drbdResHash.keySet()) {
             final DrbdResourceInfo r = drbdResHash.get(drbdRes);
             DrbdResourceInfo odri = r;
@@ -1273,16 +1272,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
             if (r != this && !cyclicRef) {
-                System.out.print(" " + r.getName());
                 l.add(r);
             }
         }
         getBrowser().putDrbdResHash();
-        System.out.println("");
 
         if (resyncAfterParamCB != null) {
             final String value = resyncAfterParamCB.getStringValue();
-            System.out.println("reloaded: " + value);
             resyncAfterParamCB.reloadComboBox(value,
                                               l.toArray(new Info[l.size()]));
         }

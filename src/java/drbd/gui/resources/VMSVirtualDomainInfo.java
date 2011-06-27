@@ -693,6 +693,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mDiskToInfoLock.unlock();
                 }
+                vmsdi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -776,6 +777,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mInterfaceToInfoLock.unlock();
                 }
+                vmsii.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -867,6 +869,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mInputDevToInfoLock.unlock();
                 }
+                vmsid.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -986,6 +989,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mGraphicsToInfoLock.unlock();
                 }
+                vmsgi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1079,6 +1083,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mSoundToInfoLock.unlock();
                 }
+                vmssi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1168,6 +1173,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mSerialToInfoLock.unlock();
                 }
+                vmssi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1266,6 +1272,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mParallelToInfoLock.unlock();
                 }
+                vmspi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }
@@ -1367,6 +1374,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } finally {
                     mVideoToInfoLock.unlock();
                 }
+                vmsvi.setNode(null);
                 nodesToRemove.add(node);
                 nodeChanged = true;
             }

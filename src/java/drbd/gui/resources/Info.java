@@ -84,7 +84,7 @@ import java.util.concurrent.locks.Lock;
  */
 public class Info implements Comparable {
     /** Menu node of this object. */
-    private DefaultMutableTreeNode node;
+    private DefaultMutableTreeNode node = null;
     /** Name of the object. */
     private String name;
     /** Resource object as found in data/resources associated with this
@@ -437,12 +437,13 @@ public class Info implements Comparable {
      */
     public void removeMyself(final boolean testOnly) {
         cleanup();
-        if (node != null) {
+        final DefaultMutableTreeNode n = node;
+        setNode(null);
+        if (n != null) {
             final DefaultMutableTreeNode parent =
                                 (DefaultMutableTreeNode) node.getParent();
             if (parent != null) {
-                parent.remove(node);
-                setNode(null);
+                parent.remove(n);
                 getBrowser().reload(parent, true);
             }
         }
@@ -451,8 +452,10 @@ public class Info implements Comparable {
     /** Selects and highlights this node. */
     public void selectMyself() {
         // this fires an event in ViewPanel.
-        getBrowser().reload(node, true);
-        getBrowser().nodeChanged(node);
+        if (node != null) {
+            getBrowser().reload(node, true);
+            getBrowser().nodeChanged(node);
+        }
     }
 
     /** Returns resource object. */
@@ -1215,6 +1218,16 @@ public class Info implements Comparable {
                     pm.add((JMenuItem) pluginItem);
                 }
             });
+        }
+    }
+
+    /** Remove node in tree menu. Call it from swing thread. */
+    final void removeNode() {
+        final DefaultMutableTreeNode n = node;
+        node = null;
+        final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
+        if (p != null) {
+            p.remove(n);
         }
     }
 }
