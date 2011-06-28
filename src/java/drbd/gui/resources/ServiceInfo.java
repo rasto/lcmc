@@ -1395,13 +1395,16 @@ public class ServiceInfo extends EditableInfo {
                       (DefaultMutableTreeNode) drbdResources.nextElement();
             final DrbdResourceInfo drbdRes =
                                         (DrbdResourceInfo) n.getUserObject();
-            final Enumeration drbdVolumes = drbdRes.getNode().children();
-            while (drbdVolumes.hasMoreElements()) {
-                final DefaultMutableTreeNode vn =
+            final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
+            if (drbdResNode != null) {
+                final Enumeration drbdVolumes = drbdResNode.children();
+                while (drbdVolumes.hasMoreElements()) {
+                    final DefaultMutableTreeNode vn =
                            (DefaultMutableTreeNode) drbdVolumes.nextElement();
-                final CommonDeviceInterface drbdVol =
+                    final CommonDeviceInterface drbdVol =
                                    (CommonDeviceInterface) vn.getUserObject();
-                list.add((Info) drbdVol);
+                    list.add((Info) drbdVol);
+                }
             }
         }
 
@@ -1422,7 +1425,10 @@ public class ServiceInfo extends EditableInfo {
     /** Selects the node in the menu and reloads everything underneath. */
     @Override public void selectMyself() {
         super.selectMyself();
-        getBrowser().nodeChanged(getNode());
+        final DefaultMutableTreeNode node = getNode();
+        if (node != null) {
+            getBrowser().nodeChanged(node);
+        }
     }
 
     /**
@@ -2345,7 +2351,12 @@ public class ServiceInfo extends EditableInfo {
                         getBrowser().getHeartbeatIdToServiceInfo().remove(
                                           oldCI.getService().getHeartbeatId());
                         getBrowser().mHeartbeatIdToServiceUnlock();
-                        oldCI.getNode().setUserObject(null); // would leak
+                        final DefaultMutableTreeNode oldCINode =
+                                                               oldCI.getNode();
+                        if (oldCINode != null) {
+                            oldCINode.setUserObject(null); /* would leak
+                                                              without it*/
+                        }
                     }
                     ci.setCloneServicePanel(thisClass);
                     infoPanel = null;
@@ -2355,11 +2366,13 @@ public class ServiceInfo extends EditableInfo {
             final CloneInfo ci = getCloneInfo();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
+                    final DefaultMutableTreeNode node = getNode();
+                    final DefaultMutableTreeNode ciNode = ci.getNode();
                     removeNode();
                     ci.removeNode();
                     cleanup();
                     ci.cleanup();
-                    getBrowser().getServicesNode().add(getNode());
+                    getBrowser().getServicesNode().add(node);
                     getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                      thisClass,
                                                                      ci);
@@ -2371,7 +2384,7 @@ public class ServiceInfo extends EditableInfo {
                     infoPanel = null;
                     setCloneInfo(null);
                     selectMyself();
-                    ci.getNode().setUserObject(null); // would leak
+                    ciNode.setUserObject(null); /* would leak without it */
                 }
             });
         }
@@ -3633,15 +3646,17 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            getBrowser().reload(getNode(), false);
-            getBrowser().getHeartbeatGraph().repaint();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     setApplyButtons(null, params);
                 }
             });
         }
-        getBrowser().reload(getNode(), false);
+        final DefaultMutableTreeNode node = getNode();
+        if (node != null) {
+            getBrowser().reload(node, false);
+            getBrowser().getHeartbeatGraph().repaint();
+        }
     }
 
     /** Removes order(s). */
@@ -4186,9 +4201,17 @@ public class ServiceInfo extends EditableInfo {
     /** Puts a resource up in a group. */
     void upResource(final Host dcHost, final boolean testOnly) {
         final GroupInfo gi = groupInfo;
-        final int index = gi.getNode().getIndex(getNode());
+        final DefaultMutableTreeNode giNode = gi.getNode();
+        if (giNode == null) {
+            return;
+        }
+        final DefaultMutableTreeNode node = getNode();
+        if (node == null) {
+            return;
+        }
+        final int index = giNode.getIndex(node);
         if (index > 0) {
-            final Enumeration e = gi.getNode().children();
+            final Enumeration e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n =
@@ -4208,9 +4231,17 @@ public class ServiceInfo extends EditableInfo {
     /** Puts a resource down in a group. */
     void downResource(final Host dcHost, final boolean testOnly) {
         final GroupInfo gi = groupInfo;
-        final int index = gi.getNode().getIndex(getNode());
-        if (index < gi.getNode().getChildCount() - 1) {
-            final Enumeration e = gi.getNode().children();
+        final DefaultMutableTreeNode giNode = gi.getNode();
+        if (giNode == null) {
+            return;
+        }
+        final DefaultMutableTreeNode node = getNode();
+        if (node == null) {
+            return;
+        }
+        final int index = giNode.getIndex(node);
+        if (index < giNode.getChildCount() - 1) {
+            final Enumeration e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n =
@@ -4328,21 +4359,21 @@ public class ServiceInfo extends EditableInfo {
             ci.removeMyselfNoConfirm(dcHost, testOnly);
             setCloneInfo(null);
         }
-
-        if (getService().isNew() && groupInfo == null) {
+        final GroupInfo gi = groupInfo;
+        if (getService().isNew() && gi == null) {
             if (!testOnly) {
                 getService().setNew(false);
                 getBrowser().getHeartbeatGraph().killRemovedVertices();
             }
         } else {
             final ClusterStatus cs = getBrowser().getClusterStatus();
-            if (groupInfo == null) {
+            if (gi == null) {
                 removeConstraints(dcHost, testOnly);
             }
             if (!getResourceAgent().isGroup()
                 && !getResourceAgent().isClone()) {
                 String groupId = null; /* for pacemaker */
-                if (groupInfo != null) {
+                if (gi != null) {
                     /* get group id only if there is only one resource in a
                      * group.
                      */
@@ -4351,27 +4382,29 @@ public class ServiceInfo extends EditableInfo {
                             super.removeMyself(false);
                         }
                     } else {
-                        final String group = groupInfo.getHeartbeatId(testOnly);
-                        final Enumeration e = groupInfo.getNode().children();
-                        while (e.hasMoreElements()) {
-                            final DefaultMutableTreeNode n =
+                        final String group = gi.getHeartbeatId(testOnly);
+                        final DefaultMutableTreeNode giNode = gi.getNode();
+                        if (giNode != null) {
+                            final Enumeration e = giNode.children();
+                            while (e.hasMoreElements()) {
+                                final DefaultMutableTreeNode n =
                                       (DefaultMutableTreeNode) e.nextElement();
-                            final ServiceInfo child =
+                                final ServiceInfo child =
                                                (ServiceInfo) n.getUserObject();
-                            child.getService().setModified(true);
-                            child.getService().doneModifying();
+                                child.getService().setModified(true);
+                                child.getService().doneModifying();
+                            }
                         }
                         if (cs.getGroupResources(group, testOnly).size() == 1) {
                             if (!testOnly) {
-                                groupInfo.getService().setRemoved(true);
+                                gi.getService().setRemoved(true);
                             }
-                            groupInfo.removeMyselfNoConfirmFromChild(dcHost,
-                                                                     testOnly);
+                            gi.removeMyselfNoConfirmFromChild(dcHost, testOnly);
                             groupId = group;
-                            groupInfo.getService().doneRemoving();
+                            gi.getService().doneRemoving();
                         }
                     }
-                    groupInfo.resetPopup();
+                    gi.resetPopup();
                 }
                 if (!getService().isNew()) {
                     String cloneId = null;
@@ -5256,15 +5289,15 @@ public class ServiceInfo extends EditableInfo {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
-                    final DefaultMutableTreeNode gNode = gi.getNode();
-                    if (gNode == null) {
+                    final DefaultMutableTreeNode giNode = gi.getNode();
+                    if (giNode == null) {
                         return "no";
                     }
                     final DefaultMutableTreeNode node = getNode();
                     if (node == null) {
                         return "no";
                     }
-                    final int index = gNode.getIndex(node);
+                    final int index = giNode.getIndex(node);
                     if (index == 0) {
                         return "already up";
                     }
@@ -5309,16 +5342,16 @@ public class ServiceInfo extends EditableInfo {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
-                    final DefaultMutableTreeNode gNode = gi.getNode();
-                    if (gNode == null) {
+                    final DefaultMutableTreeNode giNode = gi.getNode();
+                    if (giNode == null) {
                         return "no";
                     }
                     final DefaultMutableTreeNode node = getNode();
                     if (node == null) {
                         return "no";
                     }
-                    final int index = gNode.getIndex(node);
-                    if (index >= gNode.getChildCount() - 1) {
+                    final int index = giNode.getIndex(node);
+                    if (index >= giNode.getChildCount() - 1) {
                         return "already down";
                     }
                     return null;
