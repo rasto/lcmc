@@ -455,50 +455,46 @@ public abstract class ConfigDialog {
             /* create option pane */
             final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
-            Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
-                    optionPane = new JOptionPane(
-                                        b,
-                                        getMessageType(),
-                                        JOptionPane.DEFAULT_OPTION,
-                                        icon(),
-                                        allOptions.toArray(
-                                         new JComponent[allOptions.size()]),
-                                        dbc);
-                    optionPane.setPreferredSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
-                    optionPane.setMaximumSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
-                    optionPane.setMinimumSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
+            optionPane = new JOptionPane(
+                                b,
+                                getMessageType(),
+                                JOptionPane.DEFAULT_OPTION,
+                                icon(),
+                                allOptions.toArray(
+                                 new JComponent[allOptions.size()]),
+                                dbc);
+            optionPane.setPreferredSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
+            optionPane.setMaximumSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
+            optionPane.setMinimumSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
 
-                    optionPane.setBackground(
-                               Tools.getDefaultColor(
-                                          "ConfigDialog.Background.Dark"));
-                    final Container mainFrame =
-                                        Tools.getGUIData().getMainFrame();
-                        if (mainFrame instanceof JApplet) {
-                            dialogPanel =
-                               optionPane.createDialog((JApplet) mainFrame,
-                                                       getDialogTitle());
-                        } else {
-                            dialogPanel = optionPane.createDialog(
-                                                        (JFrame) mainFrame,
-                                                        getDialogTitle());
-                        }
-                    dialogPanel.setModal(false);
-                    dialogPanel.setResizable(true);
-                    dialogPanel.setPreferredSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMaximumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMinimumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
+            optionPane.setBackground(
+                       Tools.getDefaultColor(
+                                  "ConfigDialog.Background.Dark"));
+            final Container mainFrame =
+                                Tools.getGUIData().getMainFrame();
+                if (mainFrame instanceof JApplet) {
+                    dialogPanel =
+                       optionPane.createDialog((JApplet) mainFrame,
+                                               getDialogTitle());
+                } else {
+                    dialogPanel = optionPane.createDialog(
+                                                (JFrame) mainFrame,
+                                                getDialogTitle());
                 }
-            });
+            dialogPanel.setModal(false);
+            dialogPanel.setResizable(true);
+            dialogPanel.setPreferredSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMaximumSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMinimumSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
             /* set location like the previous dialog */
         }
         /* add action listeners */
