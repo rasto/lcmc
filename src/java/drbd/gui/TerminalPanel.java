@@ -55,6 +55,8 @@ import java.awt.Color;
 import java.awt.BorderLayout;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An implementation of a terminal panel that show commands and output from
@@ -89,6 +91,8 @@ public final class TerminalPanel extends JScrollPane {
     private int prevLine = 0;
     /** Position of the cursor in the text. */
     private int pos = 0;
+    /** Position in terminal area lock. */
+    private final Lock mPosLock = new ReentrantLock();
     /** Maximum position of the cursor in the text. */
     private int maxPos = 0;
     /** Terminal output colors. */
@@ -276,10 +280,15 @@ public final class TerminalPanel extends JScrollPane {
         terminalArea.addCaretListener(new CaretListener() {
             @Override public void caretUpdate(final CaretEvent e) {
                 /* don't do this if caret moved because of selection */
-                if (e != null
-                    && e.getDot() < commandOffset
-                    && e.getDot() == e.getMark()) {
-                    terminalArea.setCaretPosition(commandOffset);
+                mPosLock.lock();
+                try {
+                    if (e != null
+                        && e.getDot() < commandOffset
+                        && e.getDot() == e.getMark()) {
+                        terminalArea.setCaretPosition(commandOffset);
+                    }
+                } finally {
+                    mPosLock.unlock();
                 }
             }
         });
@@ -354,6 +363,7 @@ public final class TerminalPanel extends JScrollPane {
                         final MutableAttributeSet colorAS) {
         userCommand = false;
         final MyDocument doc = (MyDocument) terminalArea.getStyledDocument();
+        mPosLock.lock();
         final int end = terminalArea.getDocument().getLength();
         pos = end + pos - maxPos;
         maxPos = end;
@@ -440,6 +450,7 @@ public final class TerminalPanel extends JScrollPane {
         }
         commandOffset = terminalArea.getDocument().getLength();
         terminalArea.setCaretPosition(terminalArea.getDocument().getLength());
+        mPosLock.unlock();
         userCommand = true;
     }
 
@@ -587,6 +598,7 @@ public final class TerminalPanel extends JScrollPane {
                                            final String s,
                                            final AttributeSet a)
             throws BadLocationException {
+            mPosLock.lock();
             if (offs < commandOffset) {
                 terminalArea.setCaretPosition(commandOffset);
                 offs = commandOffset;
@@ -597,8 +609,8 @@ public final class TerminalPanel extends JScrollPane {
                         final int end = terminalArea.getDocument().getLength();
                         super.insertString(end, "\n", commandColor);
                         final String command =
-                                    (getText(commandOffset,
-                                            end - commandOffset) + s).trim();
+                                (getText(commandOffset,
+                                         end - commandOffset) + s).trim();
                         prevLine = end + 1;
                         pos = end;
                         maxPos = end;
@@ -608,11 +620,11 @@ public final class TerminalPanel extends JScrollPane {
                     }
                 }
                 for (final String cheat : CHEATS_MAP.keySet()) {
-                    int pos = CHEATS_MAP.get(cheat);
-                    if (s.equals(cheat.substring(pos, pos + 1))) {
-                        pos++;
-                        CHEATS_MAP.put(cheat, pos);
-                        if (pos == cheat.length()) {
+                    int cheatPos = CHEATS_MAP.get(cheat);
+                    if (s.equals(cheat.substring(cheatPos, cheatPos + 1))) {
+                        cheatPos++;
+                        CHEATS_MAP.put(cheat, cheatPos);
+                        if (cheatPos == cheat.length()) {
                             for (final String ch : CHEATS_MAP.keySet()) {
                                 CHEATS_MAP.put(ch, 0);
                             }
@@ -625,24 +637,27 @@ public final class TerminalPanel extends JScrollPane {
             } else {
                 super.insertString(offs, s, a);
             }
+            mPosLock.unlock();
         }
 
         /** Is called while characters is removed. */
         @Override public void remove(
                                  final int offs,
                                  final int len) throws BadLocationException {
+            mPosLock.lock();
             if (offs >= commandOffset) {
 
                 for (final String cheat : CHEATS_MAP.keySet()) {
-                    final int pos = CHEATS_MAP.get(cheat);
-                    if (pos > 0) {
-                        CHEATS_MAP.put(cheat, pos - 1);
+                    final int cheatPos = CHEATS_MAP.get(cheat);
+                    if (cheatPos > 0) {
+                        CHEATS_MAP.put(cheat, cheatPos - 1);
                     }
                 }
                 if (editEnabled) {
                     super.remove(offs, len);
                 }
             }
+            mPosLock.unlock();
         }
 
         /** Same as remove. */
@@ -729,10 +744,12 @@ public final class TerminalPanel extends JScrollPane {
             try {
                 final MyDocument doc =
                                 (MyDocument) terminalArea.getStyledDocument();
+                mPosLock.lock();
                 commandOffset = 0;
                 pos = 0;
                 maxPos = 0;
                 doc.removeForced(0, doc.getLength());
+                mPosLock.unlock();
                 return;
             } catch (BadLocationException e) {
                 continue;
