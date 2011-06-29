@@ -677,21 +677,23 @@ public abstract class EditableInfo extends Info {
                                            final int width) {
         getResource().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
-        final String value = getParamSaved(param);
-        String initValue = null;
-        if (value == null || "".equals(value)) {
-            if (getResource().isNew()) {
-                initValue = getResource().getPreferredValue(param);
-                if (initValue == null) {
-                    initValue = getParamPreferred(param);
+        String initValue = getPreviouslySelected(param, prefix);
+        if (initValue == null) {
+            final String value = getParamSaved(param);
+            if (value == null || "".equals(value)) {
+                if (getResource().isNew()) {
+                    initValue = getResource().getPreferredValue(param);
+                    if (initValue == null) {
+                        initValue = getParamPreferred(param);
+                    }
                 }
+                if (initValue == null) {
+                    initValue = getParamDefault(param);
+                    getResource().setValue(param, initValue);
+                }
+            } else {
+                initValue = value;
             }
-            if (initValue == null) {
-                initValue = getParamDefault(param);
-                getResource().setValue(param, initValue);
-            }
-        } else {
-            initValue = value;
         }
         final String regexp = getParamRegexp(param);
         Map<String, String> abbreviations = new HashMap<String, String>();
@@ -1154,5 +1156,16 @@ public abstract class EditableInfo extends Info {
 
     /** Reload combo boxes. */
     public void reloadComboBoxes() {
+    }
+
+    /** Return previously selected value of the parameter. This is used, when
+     *  primitive changes to and from clone. */
+    protected final String getPreviouslySelected(final String param,
+                                                 final String prefix) {
+        final GuiComboBox prevParamCb = paramComboBoxGet(param, prefix);
+        if (prevParamCb != null) {
+            return prevParamCb.getStringValue();
+        }
+        return null;
     }
 }

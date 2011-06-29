@@ -1438,7 +1438,6 @@ public class ServiceInfo extends EditableInfo {
                                   final int leftWidth,
                                   final int rightWidth) {
         final CloneInfo ci = getCloneInfo();
-        ci.paramComboBoxClear();
 
         final String[] params = ci.getParametersFromXML();
         final Info savedMAIdRef = ci.getSavedMetaAttrInfoRef();
@@ -1489,13 +1488,12 @@ public class ServiceInfo extends EditableInfo {
                                     final int leftWidth,
                                     final int rightWidth) {
         int rows = 0;
-        scoreComboBoxHash.clear();
 
         final JPanel panel =
              getParamPanel(Tools.getString("ClusterBrowser.HostLocations"));
         panel.setLayout(new SpringLayout());
 
-        for (Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Map<String, String> abbreviations =
                                              new HashMap<String, String>();
@@ -1523,16 +1521,21 @@ public class ServiceInfo extends EditableInfo {
                                 new AccessMode(ConfigData.AccessType.ADMIN,
                                                false));
             cb.setEditable(true);
+            final GuiComboBox prevCB = scoreComboBoxHash.get(hi);
             scoreComboBoxHash.put(hi, cb);
 
             /* set selected host scores in the combo box from
              * savedHostLocations */
-            final HostLocation hl = savedHostLocations.get(hi);
-            String hsSaved = null;
-            if (hl != null) {
-                hsSaved = hl.getScore();
+            if (prevCB == null) {
+                final HostLocation hl = savedHostLocations.get(hi);
+                String hsSaved = null;
+                if (hl != null) {
+                    hsSaved = hl.getScore();
+                }
+                cb.setValue(hsSaved);
+            } else {
+                cb.setValue(prevCB.getValue());
             }
-            cb.setValue(hsSaved);
         }
 
         /* host score combo boxes */
@@ -1602,8 +1605,15 @@ public class ServiceInfo extends EditableInfo {
                              final int rightWidth) {
         int rows = 0;
         final JLabel pingLabel = new JLabel("pingd");
+        String savedPO = null;
+        final GuiComboBox prevCB = pingComboBox;
+        if (prevCB == null) {
+            savedPO = savedPingOperation;
+        } else {
+            savedPO = prevCB.getStringValue();
+        }
         final GuiComboBox pingCB =
-          new GuiComboBox(savedPingOperation,
+          new GuiComboBox(savedPO,
                           new StringInfo[]{new StringInfo(
                                              GuiComboBox.NOTHING_SELECTED,
                                              null,
@@ -1917,13 +1927,6 @@ public class ServiceInfo extends EditableInfo {
                                  final int leftWidth,
                                  final int rightWidth) {
         int rows = 0;
-        mOperationsComboBoxHashWriteLock.lock();
-        try {
-            operationsComboBoxHash.clear();
-        } finally {
-            mOperationsComboBoxHashWriteLock.unlock();
-        }
-
         final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
         //panel.setLayout(new SpringLayout());
@@ -1985,7 +1988,20 @@ public class ServiceInfo extends EditableInfo {
                 if (defaultValue == null) {
                     defaultValue = "0";
                 }
-                String savedValue = savedOperation.get(op, param);
+                String savedValue = null;
+                mOperationsComboBoxHashWriteLock.lock();
+                try {
+                    final GuiComboBox prevCB =
+                                        operationsComboBoxHash.get(op, param);
+                    if (prevCB != null) {
+                        savedValue = prevCB.getStringValue();
+                    }
+                } finally {
+                    mOperationsComboBoxHashWriteLock.unlock();
+                }
+                if (savedValue == null) {
+                    savedValue = savedOperation.get(op, param);
+                }
                 if (!getService().isNew()
                     && (savedValue == null || "".equals(savedValue))) {
                     savedValue = getOpDefaultsDefault(param);
@@ -2340,12 +2356,27 @@ public class ServiceInfo extends EditableInfo {
                     if (oldCI == null) {
                         getBrowser().getHeartbeatGraph()
                                     .exchangeObjectInTheVertex(ci, thisClass);
+                        ci.setPingComboBox(pingComboBox);
+                        for (final HostInfo hi : scoreComboBoxHash.keySet()) {
+                            ci.getScoreComboBoxHash().put(
+                                                    hi,
+                                                    scoreComboBoxHash.get(hi));
+                        }
+                        ci.getService().setId(
+                            getName() + "_"
+                            + paramComboBoxGet(GUI_ID, null).getStringValue());
                     } else {
                         oldCI.removeNode();
                         getBrowser().getHeartbeatGraph()
                                     .exchangeObjectInTheVertex(ci, oldCI);
                         cleanup();
                         oldCI.cleanup();
+                        ci.setPingComboBox(oldCI.getPingComboBox());
+                        for (final HostInfo hi
+                                    : oldCI.getScoreComboBoxHash().keySet()) {
+                            ci.getScoreComboBoxHash().put(
+                                    hi, oldCI.getScoreComboBoxHash().get(hi));
+                        }
                         getBrowser().removeFromServiceInfoHash(oldCI);
                         getBrowser().mHeartbeatIdToServiceLock();
                         getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -2357,6 +2388,8 @@ public class ServiceInfo extends EditableInfo {
                             oldCINode.setUserObject(null); /* would leak
                                                               without it*/
                         }
+                        ci.getService().setId(oldCI.paramComboBoxGet(
+                                               GUI_ID, null).getStringValue());
                     }
                     ci.setCloneServicePanel(thisClass);
                     infoPanel = null;
@@ -2366,12 +2399,19 @@ public class ServiceInfo extends EditableInfo {
             final CloneInfo ci = getCloneInfo();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
+                    setPingComboBox(ci.getPingComboBox());
+                    for (final HostInfo hi
+                                        : ci.getScoreComboBoxHash().keySet()) {
+                        scoreComboBoxHash.put(
+                                        hi, ci.getScoreComboBoxHash().get(hi));
+                    }
                     final DefaultMutableTreeNode node = getNode();
                     final DefaultMutableTreeNode ciNode = ci.getNode();
                     removeNode();
                     ci.removeNode();
                     cleanup();
                     ci.cleanup();
+                    setNode(node);
                     getBrowser().getServicesNode().add(node);
                     getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
                                                                      thisClass,
@@ -2789,7 +2829,6 @@ public class ServiceInfo extends EditableInfo {
 
         /* get dependent resources and create combo boxes for ones, that
          * need parameters */
-        paramComboBoxClear();
         final String[] params = getParametersFromXML();
         final Info savedMAIdRef = savedMetaAttrInfoRef;
         addParams(optionsPanel,
@@ -6207,5 +6246,20 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         mSavedOperationsLock.unlock();
+    }
+
+    /** Returns score combo box. */
+    final protected Map<HostInfo, GuiComboBox> getScoreComboBoxHash(){
+        return scoreComboBoxHash;
+    }
+
+    /** Returns ping combo box. */
+    final protected GuiComboBox getPingComboBox(){
+        return pingComboBox;
+    }
+
+    /** Sets ping combo box. */
+    final protected void setPingComboBox(final GuiComboBox pingComboBox){
+        this.pingComboBox = pingComboBox;
     }
 }

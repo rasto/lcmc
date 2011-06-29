@@ -428,7 +428,6 @@ public class Info implements Comparable {
                 i.cleanup();
             }
         }
-        paramComboBoxClear();
     }
 
     /**

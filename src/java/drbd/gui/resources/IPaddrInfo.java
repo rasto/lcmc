@@ -88,7 +88,10 @@ final class IPaddrInfo extends ServiceInfo {
         GuiComboBox paramCb;
         if ("ip".equals(param)) {
             /* get networks */
-            final String ip = getParamSaved("ip");
+            String ip = getPreviouslySelected(param, prefix);
+            if (ip == null) {
+                ip = getParamSaved(param);
+            }
             Info defaultValue;
             if (ip == null || "".equals(ip)) {
                 defaultValue = new StringInfo(

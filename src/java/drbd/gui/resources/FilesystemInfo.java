@@ -225,14 +225,14 @@ final class FilesystemInfo extends ServiceInfo {
                                                      final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
+            String selectedValue = getPreviouslySelected(param, prefix);
+            if (selectedValue == null) {
+                selectedValue = getParamSaved(param);
+            }
             final DrbdVolumeInfo selectedInfo =
-                          getBrowser().getDrbdDevHash().get(
-                                            getParamSaved(FS_RES_PARAM_DEV));
+                          getBrowser().getDrbdDevHash().get(selectedValue);
             getBrowser().putDrbdDevHash();
-            String selectedValue = null;
-            if (selectedInfo == null) {
-                selectedValue = getParamSaved(FS_RES_PARAM_DEV);
-            } else {
+            if (selectedInfo != null) {
                 selectedValue = selectedInfo.toString();
             }
             Info defaultValue = null;
@@ -262,7 +262,10 @@ final class FilesystemInfo extends ServiceInfo {
         } else if ("fstype".equals(param)) {
             final String defaultValue =
                         Tools.getString("ClusterBrowser.SelectFilesystem");
-            String selectedValue = getParamSaved("fstype");
+            String selectedValue = getPreviouslySelected(param, prefix);
+            if (selectedValue == null) {
+                selectedValue = getParamSaved(param);
+            }
             if (selectedValue == null || "".equals(selectedValue)) {
                 selectedValue = defaultValue;
             }
@@ -296,7 +299,10 @@ final class FilesystemInfo extends ServiceInfo {
                             null,
                             getBrowser());
             getResource().setPossibleChoices(param, items);
-            String selectedValue = getParamSaved("directory");
+            String selectedValue = getPreviouslySelected(param, prefix);
+            if (selectedValue == null) {
+                selectedValue = getParamSaved(param);
+            }
             if (selectedValue == null || "".equals(selectedValue)) {
                 selectedValue = defaultValue;
             }
