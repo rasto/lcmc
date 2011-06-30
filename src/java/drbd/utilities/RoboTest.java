@@ -3124,20 +3124,20 @@ public final class RoboTest {
         leftClick(robot);
         sleep(2000);
         leftClick(robot);
+
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1070, protocolY + 40); /* protocol b */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_UP); /* protocol b */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 468 + correctionY); /* select dopd */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_DOWN); /* select dopd */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
@@ -3196,18 +3196,17 @@ public final class RoboTest {
 
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1070, protocolY + 62); /* protocol c */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_DOWN); /* protocol c */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 448 + correctionY); /* deselect dopd */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_UP); /* deselect dopd */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
@@ -3311,20 +3310,20 @@ public final class RoboTest {
         leftClick(robot);
         sleep(2000);
         leftClick(robot);
+
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1070, protocolY + 40); /* protocol b */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_UP); /* protocol b */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 468 + correctionY); /* select dopd */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_DOWN); /* select dopd */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
@@ -3383,18 +3382,17 @@ public final class RoboTest {
 
         moveTo(robot, 1073, protocolY); /* select protocol */
         leftClick(robot);
-        sleep(2000);
-        moveTo(robot, 1070, protocolY + 62); /* protocol c */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_DOWN); /* protocol c */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
         leftClick(robot);
         sleep(2000);
-        moveTo(robot, 1075, 448 + correctionY); /* deselect dopd */
-        sleep(2000);
-        leftClick(robot);
+        press(robot, KeyEvent.VK_UP); /* deselect dopd */
+        sleep(200);
+        press(robot, KeyEvent.VK_ENTER);
         sleep(2000);
 
         moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
