@@ -1153,13 +1153,13 @@ public final class RoboTest {
 
         moveTo(robot, ipX + 20, ipY + 10);
         leftClick(robot); /* choose ip */
-        stopResource(robot, 1020, 180, 10); /* actions menu stop */
+        stopResource(robot, 1010, 180, 10); /* actions menu stop */
         sleep(5000);
         checkTest(cluster, "test1", 11.501);
 
         moveTo(robot, ipX + 20, ipY + 10);
         leftClick(robot); /* choose ip */
-        startResource(robot, 1020, 180, 20); /* actions menu start */
+        startResource(robot, 1010, 180, 20); /* actions menu start */
         sleep(5000);
         checkTest(cluster, "test1", 11.502);
 
@@ -1240,7 +1240,7 @@ public final class RoboTest {
         sleep(1000);
 
         moveTo(robot, 812, 179);
-        sleep(1000);
+        sleep(5000);
         leftClick(robot); /* apply */
         checkTest(cluster, "test1", 11.9);
         sleep(3000);
@@ -2392,7 +2392,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(2000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 130 + yFactor);
+        moveTo(robot, x + 70, y + 130 + yFactor);
         sleep(6000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2405,7 +2405,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(1000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 130 + yFactor);
+        moveTo(robot, x + 70, y + 130 + yFactor);
         sleep(120000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2435,7 +2435,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(1000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 80 + yFactor);
+        moveTo(robot, x + 70, y + 80 + yFactor);
         sleep(6000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2448,7 +2448,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(1000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 220 + yFactor);
+        moveTo(robot, x + 70, y + 220 + yFactor);
         sleep(6000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2461,7 +2461,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(6000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 260 + yFactor);
+        moveTo(robot, x + 70, y + 260 + yFactor);
         sleep(12000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2474,7 +2474,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(1000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 200 + yFactor);
+        moveTo(robot, x + 70, y + 200 + yFactor);
         sleep(6000); /* ptest */
         leftClick(robot); /* stop */
     }
@@ -2487,7 +2487,7 @@ public final class RoboTest {
         moveTo(robot, x + 50, y + 5);
         sleep(1000);
         rightClick(robot); /* popup */
-        moveTo(robot, x + 140, y + 200 + yFactor);
+        moveTo(robot, x + 70, y + 200 + yFactor);
         sleep(6000); /* ptest */
         leftClick(robot); /* stop */
     }
