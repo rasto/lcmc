@@ -3062,7 +3062,7 @@ public final class RoboTest {
         addBlockDevice(robot);
         addBlockDevice(robot);
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1.1);
+        checkDRBDTest(cluster, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
         moveTo(robot, 820, 570); /* fs */
