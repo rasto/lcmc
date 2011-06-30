@@ -2923,9 +2923,7 @@ public final class RoboTest {
     }
 
     private static void addFileSystem(final Robot robot) {
-        moveTo(robot, 820, 570); /* fs */
-        leftClick(robot); /* finish */
-        sleep(10000);
+        /* do nothing. */
     }
 
     private static void removeDrbdVolume(final Robot robot) {
@@ -2954,6 +2952,9 @@ public final class RoboTest {
         checkDRBDTest(cluster, drbdTest, 1);
         addMetaData(robot);
         addFileSystem(robot);
+        moveTo(robot, 820, 570); /* fs */
+        leftClick(robot); /* finish */
+        sleep(10000);
         checkDRBDTest(cluster, drbdTest, 1.1);
         removeDrbdVolume(robot);
         checkDRBDTest(cluster, drbdTest, 2);
@@ -3048,7 +3049,9 @@ public final class RoboTest {
         sleep(20000);
 
         moveTo(robot, 960, 570);
+        sleep(2000);
         leftClick(robot); /* cancel */
+        sleep(20000);
         confirmRemove(robot);
         sleep(60000);
 
@@ -3062,6 +3065,9 @@ public final class RoboTest {
         checkDRBDTest(cluster, drbdTest, 1.1);
         addMetaData(robot);
         addFileSystem(robot);
+        moveTo(robot, 820, 570); /* fs */
+        leftClick(robot); /* finish */
+        sleep(10000);
         checkDRBDTest(cluster, drbdTest, 1.1);
 
         removeDrbdVolume(robot);
@@ -3103,6 +3109,9 @@ public final class RoboTest {
             sleep(10000);
             addMetaData(robot);
             addFileSystem(robot);
+            moveTo(robot, 820, 570); /* fs */
+            leftClick(robot); /* finish */
+            sleep(10000);
 
             if (offset == 0) {
                 checkDRBDTest(cluster, drbdTest, 1);
@@ -3287,6 +3296,9 @@ public final class RoboTest {
 
             addMetaData(robot);
             addFileSystem(robot);
+            moveTo(robot, 820, 570); /* fs */
+            leftClick(robot); /* finish */
+            sleep(10000);
 
             if (offset == 0) {
                 checkDRBDTest(cluster, drbdTest, 1);
