@@ -484,12 +484,12 @@ public class ServiceInfo extends EditableInfo {
             boolean visible = false;
             GuiComboBox cb = null;
             for (int i = params.length - 1; i >= 0; i--) {
-                final GuiComboBox prevCb = paramComboBoxGet(params[i],
+                final GuiComboBox prevCB = paramComboBoxGet(params[i],
                                                             null);
-                if (prevCb == null) {
+                if (prevCB == null) {
                     continue;
                 }
-                if (!visible && !prevCb.getStringValue().equals("")) {
+                if (!visible && !prevCB.getStringValue().equals("")) {
                     visible = true;
                 }
                 if (cb != null && cb.isVisible() != visible) {
@@ -502,7 +502,7 @@ public class ServiceInfo extends EditableInfo {
                         }
                     });
                 }
-                cb = prevCb;
+                cb = prevCB;
             }
         }
 
@@ -2362,9 +2362,12 @@ public class ServiceInfo extends EditableInfo {
                                                     hi,
                                                     scoreComboBoxHash.get(hi));
                         }
-                        ci.getService().setId(
-                            getName() + "_"
-                            + paramComboBoxGet(GUI_ID, null).getStringValue());
+                        final GuiComboBox prevCB =
+                                                paramComboBoxGet(GUI_ID, null);
+                        if (prevCB != null) {
+                            ci.getService().setId(
+                                    getName() + "_" + prevCB.getStringValue());
+                        }
                     } else {
                         oldCI.removeNode();
                         getBrowser().getHeartbeatGraph()
