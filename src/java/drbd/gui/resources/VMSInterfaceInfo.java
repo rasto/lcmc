@@ -545,7 +545,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Returns real parameters. */
-    @Override String[] getRealParametersFromXML() {
+    @Override public String[] getRealParametersFromXML() {
         if ("network".equals(getComboBoxValue(InterfaceData.TYPE))) {
             return NETWORK_PARAMETERS.clone();
         } else {

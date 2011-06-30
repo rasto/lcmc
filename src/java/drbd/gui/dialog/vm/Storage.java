@@ -96,9 +96,11 @@ final class Storage extends VMConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
-        final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                final boolean enable = vmsdi.checkResourceFieldsCorrect(
+                                            null,
+                                            vmsdi.getRealParametersFromXML());
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

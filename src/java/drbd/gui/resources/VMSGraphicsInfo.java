@@ -623,7 +623,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns real parameters. */
-    @Override String[] getRealParametersFromXML() {
+    @Override public String[] getRealParametersFromXML() {
         if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
             return VNC_PARAMETERS.clone();
         } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {

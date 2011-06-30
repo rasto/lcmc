@@ -96,9 +96,11 @@ final class Display extends VMConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
-        final boolean enable = vmsgi.checkResourceFieldsCorrect(null, PARAMS);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                final boolean enable = vmsgi.checkResourceFieldsCorrect(
+                                            null,
+                                            vmsgi.getRealParametersFromXML());
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

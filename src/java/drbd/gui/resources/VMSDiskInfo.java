@@ -256,7 +256,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Returns real parameters. */
-    @Override String[] getRealParametersFromXML() {
+    @Override public String[] getRealParametersFromXML() {
         if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
             return BLOCK_PARAMETERS.clone();
         } else {

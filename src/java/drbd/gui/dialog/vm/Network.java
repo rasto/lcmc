@@ -94,9 +94,11 @@ final class Network extends VMConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         enableComponents();
-        final boolean enable = vmsii.checkResourceFieldsCorrect(null, PARAMS);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                final boolean enable = vmsii.checkResourceFieldsCorrect(
+                                            null,
+                                            vmsii.getRealParametersFromXML());
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
