@@ -351,6 +351,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(testOnly);
             getResource().setNew(false);
+            removeNode();
             return;
         }
         String desc = Tools.getString(

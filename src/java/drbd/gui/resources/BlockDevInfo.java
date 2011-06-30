@@ -161,6 +161,9 @@ public final class BlockDevInfo extends EditableInfo {
         getBlockDevice().setValue(DRBD_MD_PARAM, null);
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(testOnly);
+        if (!testOnly) {
+            removeNode();
+        }
         infoPanel = null;
     }
 

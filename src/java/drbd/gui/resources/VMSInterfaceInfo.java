@@ -518,6 +518,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        removeNode();
     }
 
     /**

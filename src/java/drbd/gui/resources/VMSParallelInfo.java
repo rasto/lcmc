@@ -131,6 +131,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        removeNode();
     }
 
     /** Returns "add new" button. */

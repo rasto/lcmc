@@ -724,6 +724,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        removeNode();
     }
 
     /** Returns string representation. */

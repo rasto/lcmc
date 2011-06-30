@@ -436,7 +436,6 @@ public class Info implements Comparable {
      */
     public void removeMyself(final boolean testOnly) {
         cleanup();
-        removeNode();
     }
 
     /** Selects and highlights this node. */

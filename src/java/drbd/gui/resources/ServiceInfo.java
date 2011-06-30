@@ -4392,7 +4392,9 @@ public class ServiceInfo extends EditableInfo {
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         if (!testOnly) {
-            setUpdated(true);
+            if (!getService().isNew()) {
+                setUpdated(true);
+            }
             getService().setRemoved(true);
             cleanup();
         }
@@ -4473,6 +4475,10 @@ public class ServiceInfo extends EditableInfo {
         }
         if (!testOnly) {
             getBrowser().removeFromServiceInfoHash(this);
+            removeNode();
+            if (ci != null) {
+                ci.removeNode();
+            }
             infoPanel = null;
             getService().doneRemoving();
             //getBrowser().reloadAllComboBoxes(this);
@@ -4484,6 +4490,8 @@ public class ServiceInfo extends EditableInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
+            removeNode();
+            getService().doneRemoving();
             return;
         }
         String desc = Tools.getString(

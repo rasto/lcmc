@@ -704,6 +704,9 @@ public final class DrbdVolumeInfo extends EditableInfo
         getBrowser().getDrbdGraph().updatePopupMenus();
         getBrowser().resetFilesystems();
         getBrowser().drbdStatusUnlock();
+        if (!testOnly) {
+            removeNode();
+        }
         getBrowser().getDrbdGraph().scale();
     }
 

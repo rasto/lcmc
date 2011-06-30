@@ -4408,12 +4408,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(testOnly);
             getResource().setNew(false);
+            removeNode();
             return;
         }
         String desc = Tools.getString(
                             "VMSVirtualDomainInfo.confirmRemove.Description");
 
-        desc  = desc.replaceAll("@DOMAIN@", getDomainName());
+        String dn = getDomainName();
+        if (dn == null) {
+            dn = "";
+        }
+        desc  = desc.replaceAll("@DOMAIN@", dn);
         if (Tools.confirmDialog(
                Tools.getString("VMSVirtualDomainInfo.confirmRemove.Title"),
                desc,
@@ -4436,6 +4441,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        removeNode();
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */

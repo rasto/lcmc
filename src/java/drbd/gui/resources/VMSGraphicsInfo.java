@@ -540,6 +540,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             getBrowser().periodicalVMSUpdate(h);
         }
+        removeNode();
     }
 
     /**

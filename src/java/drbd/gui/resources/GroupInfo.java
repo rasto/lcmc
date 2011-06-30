@@ -746,6 +746,7 @@ public final class GroupInfo extends ServiceInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
+            removeNode();
             getService().doneRemoving();
             return;
         }
@@ -809,6 +810,7 @@ public final class GroupInfo extends ServiceInfo {
             if (!testOnly) {
                 getService().setNew(false);
                 getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getService().doneRemoving();
             }
         } else {
             String cloneId = null;
@@ -838,6 +840,7 @@ public final class GroupInfo extends ServiceInfo {
                 child.cleanup();
                 child.getService().doneRemoving();
             }
+            removeNode();
         }
     }
 
