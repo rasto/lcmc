@@ -1650,7 +1650,9 @@ public final class ServicesInfo extends EditableInfo {
                                 if (si.getGroupInfo() == null) {
                                     final ResourceAgent ra =
                                                         si.getResourceAgent();
-                                    if (ra != null && !ra.isClone()) {
+                                    if (si.getService().isNew()) {
+                                        si.removeMyself(testOnly);
+                                    } else if (ra != null && !ra.isClone()) {
                                         si.getService().setRemoved(true);
                                         si.cleanupResource(dcHost, false);
                                     }

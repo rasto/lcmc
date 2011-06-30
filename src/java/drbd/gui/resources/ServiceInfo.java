@@ -4490,7 +4490,6 @@ public class ServiceInfo extends EditableInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
-            removeNode();
             getService().doneRemoving();
             return;
         }
@@ -4515,6 +4514,7 @@ public class ServiceInfo extends EditableInfo {
                                                 getService().getHeartbeatId());
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
+        removeNode();
         super.removeMyself(false);
     }
 
