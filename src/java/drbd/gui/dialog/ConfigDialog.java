@@ -478,23 +478,27 @@ public abstract class ConfigDialog {
                                   "ConfigDialog.Background.Dark"));
             final Container mainFrame =
                                 Tools.getGUIData().getMainFrame();
-                if (mainFrame instanceof JApplet) {
-                    dialogPanel =
-                       optionPane.createDialog((JApplet) mainFrame,
-                                               getDialogTitle());
-                } else {
-                    dialogPanel = optionPane.createDialog(
-                                                (JFrame) mainFrame,
-                                                getDialogTitle());
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
+                    if (mainFrame instanceof JApplet) {
+                        dialogPanel =
+                           optionPane.createDialog((JApplet) mainFrame,
+                                                   getDialogTitle());
+                    } else {
+                        dialogPanel = optionPane.createDialog(
+                                                    (JFrame) mainFrame,
+                                                    getDialogTitle());
+                    }
+                    dialogPanel.setModal(false);
+                    dialogPanel.setResizable(true);
+                    dialogPanel.setPreferredSize(
+                            new Dimension(dialogWidth(), dialogHeight()));
+                    dialogPanel.setMaximumSize(
+                            new Dimension(dialogWidth(), dialogHeight()));
+                    dialogPanel.setMinimumSize(
+                            new Dimension(dialogWidth(), dialogHeight()));
                 }
-            dialogPanel.setModal(false);
-            dialogPanel.setResizable(true);
-            dialogPanel.setPreferredSize(
-                    new Dimension(dialogWidth(), dialogHeight()));
-            dialogPanel.setMaximumSize(
-                    new Dimension(dialogWidth(), dialogHeight()));
-            dialogPanel.setMinimumSize(
-                    new Dimension(dialogWidth(), dialogHeight()));
+            });
             /* set location like the previous dialog */
         }
         /* add action listeners */
