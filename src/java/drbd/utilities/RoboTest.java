@@ -1781,7 +1781,7 @@ public final class RoboTest {
         removeConstraint(robot, dum1PopX, dum1PopY);
         checkTest(cluster, "test5", 2.5);
         /* constraints */
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 1; i++) {
             addConstraint(robot, dummy1X, dummy1Y, 35, false, -1);
 
             checkTest(cluster, "test5", 3);
