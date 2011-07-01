@@ -478,7 +478,8 @@ public abstract class ConfigDialog {
                                   "ConfigDialog.Background.Dark"));
             final Container mainFrame =
                                 Tools.getGUIData().getMainFrame();
-            Tools.invokeAndWait(new Runnable() {
+            final CountDownLatch waitForSwing = new CountDownLatch(1);
+            SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (mainFrame instanceof JApplet) {
                         dialogPanel =
@@ -497,8 +498,14 @@ public abstract class ConfigDialog {
                             new Dimension(dialogWidth(), dialogHeight()));
                     dialogPanel.setMinimumSize(
                             new Dimension(dialogWidth(), dialogHeight()));
+                    waitForSwing.countDown();
                 }
             });
+            try {
+                waitForSwing.await();
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
             /* set location like the previous dialog */
         }
         /* add action listeners */
