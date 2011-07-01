@@ -5,4 +5,4 @@
 Online: [ host1 host2 ]
 
  res_Dummy_1	(ocf::heartbeat:Dummy):	Started host1
- res_Dummy_2	(ocf::heartbeat:Dummy):	Started host1
+ res_Dummy_2	(ocf::heartbeat:Dummy):	Started host2
