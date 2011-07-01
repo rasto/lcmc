@@ -3696,7 +3696,11 @@ public class ServiceInfo extends EditableInfo {
         }
         final DefaultMutableTreeNode node = getNode();
         if (node != null) {
-            getBrowser().reload(node, false);
+            if (ci == null) {
+                getBrowser().reload(node, false);
+            } else {
+                getBrowser().reload(ci.getNode(), false);
+            }
             getBrowser().getHeartbeatGraph().repaint();
         }
     }

@@ -533,8 +533,7 @@ public final class ServicesInfo extends EditableInfo {
                             if (i > p) {
                                 parent.remove(n);
                                 parent.insert(n, p);
-                                getBrowser().reloadFromSwingThread(parent,
-                                                                   false);
+                                getBrowser().reload(parent, false);
                             }
                         }
                     }
