@@ -44,6 +44,9 @@ public class MyButtonCellRenderer extends MyButton
                                                       final boolean hasFocus,
                                                       final int row,
                                                       final int column) {
+        if (!(value instanceof MyButton)) {
+            return this;
+        }
         final MyButton button = (MyButton) value;
         if (button == null) {
             setText("");
