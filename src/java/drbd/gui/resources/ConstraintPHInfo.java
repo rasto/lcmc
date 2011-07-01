@@ -515,10 +515,10 @@ public final class ConstraintPHInfo extends ServiceInfo {
             ordRscSet2 = rdataOrd.getRscSet2();
         }
         if (servicesFrom.isEmpty()) {
-            if (!colocationOnly) {
+            if (!testOnly && !colocationOnly) {
                 reverseOrder();
             }
-            if (!orderOnly) {
+            if (!testOnly && !orderOnly) {
                 reverseColocation();
             }
         }

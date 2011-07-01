@@ -3832,11 +3832,14 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
         }
         if (isConstraintPH() || child.isConstraintPH()) {
-            if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedCol()) {
-                ((ConstraintPHInfo) this).reverseOrder();
-            } else if (child.isConstraintPH()
-                       && ((ConstraintPHInfo) child).isReversedCol()) {
-                ((ConstraintPHInfo) child).reverseOrder();
+            if (!testOnly) {
+                if (isConstraintPH()
+                    && ((ConstraintPHInfo) this).isReversedCol()) {
+                    ((ConstraintPHInfo) this).reverseOrder();
+                } else if (child.isConstraintPH()
+                           && ((ConstraintPHInfo) child).isReversedCol()) {
+                    ((ConstraintPHInfo) child).reverseOrder();
+                }
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
@@ -4004,11 +4007,14 @@ public class ServiceInfo extends EditableInfo {
             setUpdated(true);
         }
         if (isConstraintPH() || child.isConstraintPH()) {
-            if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedOrd()) {
-                ((ConstraintPHInfo) this).reverseColocation();
-            } else if (child.isConstraintPH()
-                       && ((ConstraintPHInfo) child).isReversedOrd()) {
-                ((ConstraintPHInfo) child).reverseColocation();
+            if (!testOnly) {
+                if (isConstraintPH()
+                    && ((ConstraintPHInfo) this).isReversedOrd()) {
+                    ((ConstraintPHInfo) this).reverseColocation();
+                } else if (child.isConstraintPH()
+                           && ((ConstraintPHInfo) child).isReversedOrd()) {
+                    ((ConstraintPHInfo) child).reverseColocation();
+                }
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
@@ -4138,6 +4144,8 @@ public class ServiceInfo extends EditableInfo {
                     withService = this;
                     withFrom.add(this);
                 }
+                withFrom.addAll(
+                            getBrowser().getHeartbeatGraph().getParents(cphi));
                 final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
