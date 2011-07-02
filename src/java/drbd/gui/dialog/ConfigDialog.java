@@ -479,28 +479,24 @@ public abstract class ConfigDialog {
             final Container mainFrame =
                                 Tools.getGUIData().getMainFrame();
             final CountDownLatch waitForSwing = new CountDownLatch(1);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if (mainFrame instanceof JApplet) {
-                        dialogPanel =
-                           optionPane.createDialog((JApplet) mainFrame,
-                                                   getDialogTitle());
-                    } else {
-                        dialogPanel = optionPane.createDialog(
-                                                    (JFrame) mainFrame,
-                                                    getDialogTitle());
-                    }
-                    dialogPanel.setModal(false);
-                    dialogPanel.setResizable(true);
-                    dialogPanel.setPreferredSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMaximumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMinimumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    waitForSwing.countDown();
-                }
-            });
+            if (mainFrame instanceof JApplet) {
+                dialogPanel =
+                   optionPane.createDialog((JApplet) mainFrame,
+                                           getDialogTitle());
+            } else {
+                dialogPanel = optionPane.createDialog(
+                                            (JFrame) mainFrame,
+                                            getDialogTitle());
+            }
+            dialogPanel.setModal(false);
+            dialogPanel.setResizable(true);
+            dialogPanel.setPreferredSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMaximumSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
+            dialogPanel.setMinimumSize(
+                    new Dimension(dialogWidth(), dialogHeight()));
+            waitForSwing.countDown();
             try {
                 waitForSwing.await();
             } catch (InterruptedException ignored) {
@@ -533,7 +529,11 @@ public abstract class ConfigDialog {
         optionPane.addPropertyChangeListener(propertyChangeListener);
 
         dialogPanel.setVisible(true);
-        initDialog();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                initDialog();
+            }
+        });
         try {
             dialogGate.await();
         } catch (InterruptedException ignored) {

@@ -2163,7 +2163,7 @@ public final class RoboTest {
     private static void startTestG(final Robot robot, final Cluster cluster) {
         slowFactor = 0.2f;
         aborted = false;
-        int count = 100;
+        int count = 200;
         for (int i = count; i > 0; i--) {
             Tools.info("1 I: " + i);
             moveTo(robot, 800 , 120); /* cluster wizard */
