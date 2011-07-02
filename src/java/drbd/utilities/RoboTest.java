@@ -30,6 +30,7 @@ import java.awt.MouseInfo;
 import java.awt.geom.Point2D;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -274,8 +275,10 @@ public final class RoboTest {
     public static void startTest(final String index, final Cluster cluster) {
         aborted = false;
         Tools.info("start test " + index + " in 3 seconds");
-        for (final Host host : cluster.getHosts()) {
-            host.getSSH().installTestFiles();
+        if (cluster != null) {
+            for (final Host host : cluster.getHosts()) {
+                host.getSSH().installTestFiles();
+            }
         }
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
@@ -289,9 +292,12 @@ public final class RoboTest {
                 if (robot == null) {
                     return;
                 }
-                final String selected =
+                String selected = "Services";
+                if (cluster != null) {
+                    selected =
                          cluster.getBrowser().getTree()
                                    .getLastSelectedPathComponent().toString();
+                }
                 if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
@@ -512,6 +518,15 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
+                    } else if ("g".equals(index)) {
+                        /* host wizard deadlock */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startTestG(robot, cluster);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
                     if ("0".equals(index)) {
@@ -2144,6 +2159,29 @@ public final class RoboTest {
         System.gc();
     }
 
+    /** Cluster wizard locked until focus is lost. */
+    private static void startTestG(final Robot robot, final Cluster cluster) {
+        slowFactor = 0.2f;
+        aborted = false;
+        int count = 100;
+        for (int i = count; i > 0; i--) {
+            Tools.info("1 I: " + i);
+            moveTo(robot, 800 , 120); /* cluster wizard */
+            sleep(500);
+            leftClick(robot);
+            sleep(2000);
+            if (!isColor(robot, 336, 520, new Color(184, 207, 229))) {
+                Tools.info("testG: failed");    
+                break;
+            }
+            moveTo(robot, 910 , 565); /* cancel */
+            sleep(500);
+            leftClick(robot);
+            sleep(1000);
+        }
+    }
+
+
     /** Sets location. */
 
     /** Sets location. */
@@ -2763,6 +2801,29 @@ public final class RoboTest {
         sleepNoFactor(10000);
     }
 
+    /** Get color on this position. */
+    private static boolean isColor(final Robot robot,
+                                   final int fromX,
+                                   final int fromY,
+                                   final Color color) {
+        if (aborted) {
+            return true;
+        }
+        final int xOffset = getOffset();
+        final Point2D appP =
+                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+        final int appX = (int) appP.getX() + fromX;
+        final int appY = (int) appP.getY() + fromY;
+        for (int y = -20; y < 20; y++) {
+            moveTo(robot, fromX, fromY + y);
+            if (color.equals(
+                  robot.getPixelColor(appX + xOffset, appY + y))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Move to position. */
     private static void moveTo(final Robot robot,
                                final int toX,
@@ -2822,6 +2883,16 @@ public final class RoboTest {
 
     /** Register movement. */
     public static void registerMovement() {
+        Robot rbt = null;
+        try {
+            rbt = new Robot(SCREEN_DEVICE);
+        } catch (final java.awt.AWTException e) {
+            Tools.appWarning("Robot error");
+        }
+        if (rbt == null) {
+            return;
+        }
+        final Robot robot = rbt;
         Tools.info("start register movement in 3 seconds");
         sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {
