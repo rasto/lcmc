@@ -70,7 +70,7 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
         }
         ((JLabel) ret).setHorizontalAlignment(al);
         final Object v = table.getValueAt(row, 0);
-        if (v != null) {
+        if (v instanceof MyButton) {
             final String key = ((MyButton) v).getText();
             final Color bg = getRowColor(key);
             ret.setBackground(bg);

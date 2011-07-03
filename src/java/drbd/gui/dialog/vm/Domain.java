@@ -93,12 +93,18 @@ public final class Domain extends VMConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        enableComponents();
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        final boolean enable = vdi.checkResourceFieldsCorrect(null, PARAMS);
+        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
+        final boolean cor = vdi.checkResourceFieldsCorrect(null, PARAMS);
+        if (cor) {
+            enableComponents();
+        } else {
+            /* don't enable */
+            enableComponents(new JComponent[]{buttonClass(nextButton())});
+        }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                buttonClass(nextButton()).setEnabled(enable);
+            public void run() {
+                makeDefaultButton(buttonClass(nextButton()));
             }
         });
     }
@@ -106,7 +112,8 @@ public final class Domain extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override protected JComponent getInputPane() {
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        vdi.selectMyself();
+        vdi.getInfoPanel();
+        vdi.waitForInfoPanel();
         if (inputPane != null) {
             return inputPane;
         }
@@ -117,7 +124,6 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        vdi.waitForInfoPanel();
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
         vdi.savePreferredValues();
         vdi.addWizardParams(

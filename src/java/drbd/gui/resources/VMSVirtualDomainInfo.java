@@ -4284,7 +4284,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns the regexp of the parameter. */
     @Override protected String getParamRegexp(final String param) {
         if (VMSXML.VM_PARAM_NAME.equals(param)) {
-            return "^[\\w-]*$";
+            return "^[\\w-]+$";
         } else {
             return super.getParamRegexp(param);
         }
