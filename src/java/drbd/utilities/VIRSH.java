@@ -104,7 +104,7 @@ public final class VIRSH {
             commands.append(command);
         }
         if (commands.length() > 0) {
-            execCommand(hosts, commands.toString(), true);
+            execCommand(hosts, commands.toString(), false);
         }
     }
 
