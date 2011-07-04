@@ -455,6 +455,8 @@ public abstract class ConfigDialog {
             /* create option pane */
             final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
             optionPane = new JOptionPane(
                                 b,
                                 getMessageType(),
@@ -496,12 +498,8 @@ public abstract class ConfigDialog {
                     new Dimension(dialogWidth(), dialogHeight()));
             dialogPanel.setMinimumSize(
                     new Dimension(dialogWidth(), dialogHeight()));
-            waitForSwing.countDown();
-            try {
-                waitForSwing.await();
-            } catch (InterruptedException ignored) {
-                Thread.currentThread().interrupt();
-            }
+        }
+    });
             /* set location like the previous dialog */
         }
         /* add action listeners */

@@ -94,7 +94,7 @@ public final class Domain extends VMConfig {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
+        final boolean ch = vdi.checkResourceFieldsChanged(null, PARAMS);
         final boolean cor = vdi.checkResourceFieldsCorrect(null, PARAMS);
         if (cor) {
             enableComponents();
