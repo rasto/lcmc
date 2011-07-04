@@ -359,6 +359,14 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
+                            startTestE(robot, cluster);
+                            if (aborted) {
+                                break;
+                            }
+                            startTestF(robot, cluster);
+                            if (aborted) {
+                                break;
+                            }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             Tools.info("test" + index + " no " + i + ", secs: "
@@ -519,7 +527,7 @@ public final class RoboTest {
                             i++;
                         }
                     } else if ("g".equals(index)) {
-                        /* host wizard deadlock */
+                        /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         Tools.info("test" + index);
                         startTestG(robot, cluster);
