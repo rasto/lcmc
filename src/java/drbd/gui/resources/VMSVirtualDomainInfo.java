@@ -3518,6 +3518,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                       final Map<String, VMSDiskInfo> dkti,
                                       final Map<String, DiskData> disks,
                                       final boolean opaque) {
+        if (disks == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3604,6 +3607,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSInterfaceInfo> iToInfo,
                                 final Map<String, InterfaceData> interfaces,
                                 final boolean opaque) {
+        if (interfaces == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3649,6 +3655,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSInputDevInfo> iToInfo,
                                 final Map<String, InputDevData> inputDevs,
                                 final boolean opaque) {
+        if (inputDevs == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3673,6 +3682,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSGraphicsInfo> iToInfo,
                                 final Map<String, GraphicsData> graphicDisplays,
                                 final boolean opaque) {
+        if (graphicDisplays == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3698,6 +3710,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSSoundInfo> iToInfo,
                                 final Map<String, SoundData> sounds,
                                 final boolean opaque) {
+        if (sounds == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3723,6 +3738,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSSerialInfo> iToInfo,
                                 final Map<String, SerialData> serials,
                                 final boolean opaque) {
+        if (serials == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3748,6 +3766,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSParallelInfo> iToInfo,
                                 final Map<String, ParallelData> parallels,
                                 final boolean opaque) {
+        if (parallels == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
@@ -3773,6 +3794,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Map<String, VMSVideoInfo> iToInfo,
                                 final Map<String, VideoData> videos,
                                 final boolean opaque) {
+        if (videos == null) {
+            return new Object[0];
+        }
         final MyButton removeBtn = new MyButton(
                                            "Remove",
                                            ClusterBrowser.REMOVE_ICON_SMALL,
