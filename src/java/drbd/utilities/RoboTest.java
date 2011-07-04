@@ -2814,12 +2814,17 @@ public final class RoboTest {
                        Tools.getGUIData().getMainFrame().getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
-        for (int y = -20; y < 20; y++) {
-            moveTo(robot, fromX, fromY + y);
-            if (color.equals(
-                  robot.getPixelColor(appX + xOffset, appY + y))) {
-                return true;
+        for (int i = 0; i < 5; i++) {
+            for (int y = -20; y < 20; y++) {
+                if (i > 0) {
+                    moveTo(robot, fromX, fromY + y);
+                }
+                if (color.equals(
+                      robot.getPixelColor(appX + xOffset, appY + y))) {
+                    return true;
+                }
             }
+            Tools.sleep(1000);
         }
         return false;
     }
