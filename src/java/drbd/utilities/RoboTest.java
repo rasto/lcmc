@@ -3652,16 +3652,19 @@ public final class RoboTest {
             checkVMTest(cluster, vmTest, 3, name);
 
             /* disk readonly */
-            moveTo(robot, 1100, 298);
-            leftPress(robot); /* scroll bar */
-            moveTo(robot, 1100, 410);
-            leftRelease(robot);
-
-            sleep(1000);
-            moveTo(robot, 400, 450 + yMoreHosts); /* choose disk */
+            moveTo(robot, 100, 280 + j * 15); /* choose disk */
             sleep(1000);
             leftClick(robot);
-            sleep(1000);
+            //moveTo(robot, 1100, 298);
+            //leftPress(robot); /* scroll bar */
+            //moveTo(robot, 1100, 410);
+            //leftRelease(robot);
+
+            //sleep(1000);
+            //moveTo(robot, 400, 450 + yMoreHosts); /* choose disk */
+            //sleep(1000);
+            //leftClick(robot);
+            //sleep(1000);
 
             moveTo(robot, 390, 540); /* readonly */
             sleep(1000);
@@ -3689,10 +3692,10 @@ public final class RoboTest {
             /* remove interface */
 
             // ...
-            moveTo(robot, 1100, 410);
-            leftPress(robot); /* scroll bar back */
-            moveTo(robot, 1100, 200);
-            leftRelease(robot);
+            //moveTo(robot, 1100, 410);
+            //leftPress(robot); /* scroll bar back */
+            //moveTo(robot, 1100, 200);
+            //leftRelease(robot);
 
             names.add(name);
             for (final String n : names) {
@@ -3705,14 +3708,14 @@ public final class RoboTest {
         moveTo(robot, 1066, 284); /* remove */
         leftClick(robot);
         sleepNoFactor(2000);
-        moveTo(robot, 516, 480); /* confirm */
+        moveTo(robot, 516, 476); /* confirm */
         leftClick(robot);
         sleepNoFactor(5000);
         for (int j = 1; j < count; j++) {
             moveTo(robot, 1066, 225); /* remove */
             leftClick(robot);
             sleepNoFactor(2000);
-            moveTo(robot, 516, 480); /* confirm */
+            moveTo(robot, 516, 476); /* confirm */
             leftClick(robot);
             sleepNoFactor(5000);
         }
