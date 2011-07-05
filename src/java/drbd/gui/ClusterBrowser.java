@@ -1768,9 +1768,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Highlights services. */
-    void selectServices() {
-        // this fires treeStructureChanged in ViewPanel.
-        //nodeChanged(servicesNode);
+    public void selectServices() {
         if (getClusterViewPanel().isDisabledDuringLoad()) {
             return;
         }

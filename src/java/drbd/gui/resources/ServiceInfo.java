@@ -3693,15 +3693,16 @@ public class ServiceInfo extends EditableInfo {
                     setApplyButtons(null, params);
                 }
             });
-        }
-        final DefaultMutableTreeNode node = getNode();
-        if (node != null) {
-            if (ci == null) {
-                getBrowser().reload(node, false);
-            } else {
-                getBrowser().reload(ci.getNode(), false);
+            final DefaultMutableTreeNode node = getNode();
+            if (node != null) {
+                if (ci == null) {
+                    getBrowser().reload(node, false);
+                } else {
+                    getBrowser().reload(ci.getNode(), false);
+                    getBrowser().reload(node, false);
+                }
+                getBrowser().getHeartbeatGraph().repaint();
             }
-            getBrowser().getHeartbeatGraph().repaint();
         }
     }
 
@@ -4487,10 +4488,6 @@ public class ServiceInfo extends EditableInfo {
         }
         if (!testOnly) {
             getBrowser().removeFromServiceInfoHash(this);
-            removeNode();
-            if (ci != null) {
-                ci.removeNode();
-            }
             infoPanel = null;
             getService().doneRemoving();
             //getBrowser().reloadAllComboBoxes(this);
@@ -4515,6 +4512,7 @@ public class ServiceInfo extends EditableInfo {
                Tools.getString("ClusterBrowser.confirmRemoveService.Yes"),
                Tools.getString("ClusterBrowser.confirmRemoveService.No"))) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeInfo();
             getService().setNew(false);
         }
     }
@@ -4527,6 +4525,10 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         removeNode();
+        final CloneInfo ci = cloneInfo;
+        if (ci != null) {
+            ci.removeNode();
+        }
         super.removeMyself(false);
     }
 

@@ -223,9 +223,7 @@ public final class GroupInfo extends ServiceInfo {
             /* add myself to the hash with service name and id as
              * keys */
             getBrowser().removeFromServiceInfoHash(this);
-        }
-        final String oldHeartbeatId = getHeartbeatId(testOnly);
-        if (!testOnly) {
+            final String oldHeartbeatId = getHeartbeatId(testOnly);
             if (oldHeartbeatId != null) {
                 getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -746,7 +744,7 @@ public final class GroupInfo extends ServiceInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
-            removeNode();
+            removeInfo();
             getService().doneRemoving();
             return;
         }
@@ -782,6 +780,7 @@ public final class GroupInfo extends ServiceInfo {
                 getService().setRemoved(true);
             }
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeInfo();
             getService().setNew(false);
         }
         getService().doneRemoving();
@@ -840,7 +839,6 @@ public final class GroupInfo extends ServiceInfo {
                 child.cleanup();
                 child.getService().doneRemoving();
             }
-            removeNode();
         }
     }
 

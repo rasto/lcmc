@@ -372,10 +372,12 @@ final class CloneInfo extends ServiceInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
+            removeInfo();
             getService().doneRemoving();
             return;
         }
         containedService.removeMyself(testOnly);
+        getBrowser().selectServices();
     }
 
     /** Removes the service without confirmation dialog. */

@@ -341,7 +341,6 @@ public final class ServicesInfo extends EditableInfo {
                                         cloneId,
                                         null,
                                         testOnly);
-            newCi.getService().setNew(false);
             getBrowser().addToHeartbeatIdList(newCi);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
@@ -357,6 +356,7 @@ public final class ServicesInfo extends EditableInfo {
                 hg.repaint();
             }
         }
+        newCi.getService().setNew(false);
         return newCi;
     }
 
@@ -378,7 +378,6 @@ public final class ServicesInfo extends EditableInfo {
                                      group,
                                      newCi,
                                      testOnly);
-            newGi.getService().setNew(false);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
                                       newGi.getHeartbeatId(testOnly));
@@ -396,6 +395,7 @@ public final class ServicesInfo extends EditableInfo {
                 hg.repaint();
             }
         }
+        newGi.getService().setNew(false);
         return newGi;
     }
 
@@ -594,261 +594,261 @@ public final class ServicesInfo extends EditableInfo {
                               testOnly);
         }
 
-                hg.clearKeepColocationList();
-                hg.clearKeepOrderList();
-                /* resource sets */
-                final List<CRMXML.RscSetConnectionData> rscSetConnections =
-                                               clStatus.getRscSetConnections();
-                if (rscSetConnections != null) {
-                    final Map<CRMXML.RscSetConnectionData, ConstraintPHInfo>
-                     rdataToCphi =
-                                 new LinkedHashMap<CRMXML.RscSetConnectionData,
-                                                   ConstraintPHInfo>();
-                    getBrowser().lockNameToServiceInfo();
-                    final Map<String, ServiceInfo> idToInfoHash =
-                         getBrowser().getNameToServiceInfoHash(
-                                                        ConstraintPHInfo.NAME);
-                    final List<ConstraintPHInfo> preNewCphis =
-                                            new ArrayList<ConstraintPHInfo>();
-                    if (idToInfoHash != null) {
-                        for (final String id : idToInfoHash.keySet()) {
-                            final ConstraintPHInfo cphi =
-                                       (ConstraintPHInfo) idToInfoHash.get(id);
-                            final CRMXML.RscSetConnectionData rdataOrd =
-                                            cphi.getRscSetConnectionDataOrd();
-                            final CRMXML.RscSetConnectionData rdataCol =
-                                            cphi.getRscSetConnectionDataCol();
-                            if (cphi.getService().isNew()) {
-                                preNewCphis.add(cphi);
-                            }
-                            if (rdataOrd != null && !rdataOrd.isEmpty()) {
-                                rdataToCphi.put(rdataOrd, cphi);
-                            }
-                            if (rdataCol != null && !rdataCol.isEmpty()) {
-                                rdataToCphi.put(rdataCol, cphi);
-                            }
-                        }
+        hg.clearKeepColocationList();
+        hg.clearKeepOrderList();
+        /* resource sets */
+        final List<CRMXML.RscSetConnectionData> rscSetConnections =
+                                       clStatus.getRscSetConnections();
+        if (rscSetConnections != null) {
+            final Map<CRMXML.RscSetConnectionData, ConstraintPHInfo>
+             rdataToCphi =
+                         new LinkedHashMap<CRMXML.RscSetConnectionData,
+                                           ConstraintPHInfo>();
+            getBrowser().lockNameToServiceInfo();
+            final Map<String, ServiceInfo> idToInfoHash =
+                 getBrowser().getNameToServiceInfoHash(
+                                                ConstraintPHInfo.NAME);
+            final List<ConstraintPHInfo> preNewCphis =
+                                    new ArrayList<ConstraintPHInfo>();
+            if (idToInfoHash != null) {
+                for (final String id : idToInfoHash.keySet()) {
+                    final ConstraintPHInfo cphi =
+                               (ConstraintPHInfo) idToInfoHash.get(id);
+                    final CRMXML.RscSetConnectionData rdataOrd =
+                                    cphi.getRscSetConnectionDataOrd();
+                    final CRMXML.RscSetConnectionData rdataCol =
+                                    cphi.getRscSetConnectionDataCol();
+                    if (cphi.getService().isNew()) {
+                        preNewCphis.add(cphi);
                     }
-                    getBrowser().unlockNameToServiceInfo();
-                    final List<ConstraintPHInfo> newCphis =
-                                            new ArrayList<ConstraintPHInfo>();
-                    for (final CRMXML.RscSetConnectionData rdata
-                                                        : rscSetConnections) {
-                        ConstraintPHInfo cphi = null;
-                        PcmkRscSetsInfo prsi = null;
+                    if (rdataOrd != null && !rdataOrd.isEmpty()) {
+                        rdataToCphi.put(rdataOrd, cphi);
+                    }
+                    if (rdataCol != null && !rdataCol.isEmpty()) {
+                        rdataToCphi.put(rdataCol, cphi);
+                    }
+                }
+            }
+            getBrowser().unlockNameToServiceInfo();
+            final List<ConstraintPHInfo> newCphis =
+                                    new ArrayList<ConstraintPHInfo>();
+            for (final CRMXML.RscSetConnectionData rdata
+                                                : rscSetConnections) {
+                ConstraintPHInfo cphi = null;
+                PcmkRscSetsInfo prsi = null;
 
-                        for (final CRMXML.RscSetConnectionData ordata
-                                                      : rdataToCphi.keySet()) {
-                            if (ordata == rdata) {
-                                continue;
-                            }
-                            if (rdata.equals(ordata)
-                                || rdata.equalsReversed(ordata)) {
-                                cphi = rdataToCphi.get(ordata);
-                                cphi.setRscSetConnectionData(rdata);
-                                break;
-                            }
+                for (final CRMXML.RscSetConnectionData ordata
+                                              : rdataToCphi.keySet()) {
+                    if (ordata == rdata) {
+                        continue;
+                    }
+                    if (rdata.equals(ordata)
+                        || rdata.equalsReversed(ordata)) {
+                        cphi = rdataToCphi.get(ordata);
+                        cphi.setRscSetConnectionData(rdata);
+                        break;
+                    }
+                }
+                if (cphi == null) {
+                    for (final CRMXML.RscSetConnectionData ordata
+                                              : rdataToCphi.keySet()) {
+                        if (ordata == rdata) {
+                            cphi = rdataToCphi.get(ordata);
+                            break;
                         }
-                        if (cphi == null) {
-                            for (final CRMXML.RscSetConnectionData ordata
-                                                      : rdataToCphi.keySet()) {
-                                if (ordata == rdata) {
-                                    cphi = rdataToCphi.get(ordata);
-                                    break;
-                                }
-                                if (rdataToCphi.get(ordata).sameConstraintId(
-                                                                      rdata)) {
-                                    /* use the same rsc set info object */
-                                    prsi = rdataToCphi.get(
-                                                 ordata).getPcmkRscSetsInfo();
-                                }
-                                if (rdataToCphi.get(
-                                                   ordata).getService().isNew()
-                                    || (rdata.samePlaceholder(ordata)
-                                        && rdataToCphi.get(
-                                                     ordata).sameConstraintId(
-                                                                     rdata))) {
-                                    cphi = rdataToCphi.get(ordata);
-                                    cphi.setRscSetConnectionData(rdata);
-                                    prsi = cphi.getPcmkRscSetsInfo();
-                                    if (prsi != null) {
-                                        if (rdata.isColocation()) {
-                                            prsi.addColocation(
-                                                       rdata.getConstraintId(),
-                                                       cphi);
-                                        } else {
-                                            prsi.addOrder(
-                                                       rdata.getConstraintId(),
-                                                       cphi);
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
+                        if (rdataToCphi.get(ordata).sameConstraintId(
+                                                              rdata)) {
+                            /* use the same rsc set info object */
+                            prsi = rdataToCphi.get(
+                                         ordata).getPcmkRscSetsInfo();
                         }
-                        if (cphi == null && !preNewCphis.isEmpty()) {
-                            /* placeholder */
-                            cphi = preNewCphis.remove(0);
-                            rdataToCphi.put(rdata, cphi);
+                        if (rdataToCphi.get(
+                                           ordata).getService().isNew()
+                            || (rdata.samePlaceholder(ordata)
+                                && rdataToCphi.get(
+                                             ordata).sameConstraintId(
+                                                             rdata))) {
+                            cphi = rdataToCphi.get(ordata);
                             cphi.setRscSetConnectionData(rdata);
-                        }
-                        if (cphi == null) {
-                            cphi = new ConstraintPHInfo(getBrowser(), rdata);
-                            if (prsi == null) {
-                                prsi = new PcmkRscSetsInfo(getBrowser());
-                            }
-                            if (rdata.isColocation()) {
-                                prsi.addColocation(rdata.getConstraintId(),
-                                                   cphi);
-                            } else {
-                                prsi.addOrder(rdata.getConstraintId(), cphi);
-                            }
-                            cphi.setPcmkRscSetsInfo(prsi);
-                            getBrowser().addNameToServiceInfoHash(cphi);
-                            newCphis.add(cphi); /* have to add it later,
-                                                   so that ids are correct. */
-                            rdataToCphi.put(rdata, cphi);
-                        }
-                        serviceIsPresent.add(cphi);
-
-                        final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
-                        final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
-                        if (rdata.isColocation()) {
-                            /* colocation */
-                            if (rscSet1 != null) {
-                                for (final String rscId : rscSet1.getRscIds()) {
-                                    final ServiceInfo si =
-                                       getBrowser().getServiceInfoFromCRMId(
-                                                                        rscId);
-                                    hg.addColocation(rdata.getConstraintId(),
-                                                     cphi,
-                                                     si);
+                            prsi = cphi.getPcmkRscSetsInfo();
+                            if (prsi != null) {
+                                if (rdata.isColocation()) {
+                                    prsi.addColocation(
+                                               rdata.getConstraintId(),
+                                               cphi);
+                                } else {
+                                    prsi.addOrder(
+                                               rdata.getConstraintId(),
+                                               cphi);
                                 }
                             }
-                            if (rscSet2 != null) {
-                                for (final String rscId : rscSet2.getRscIds()) {
-                                    final ServiceInfo si =
-                                       getBrowser().getServiceInfoFromCRMId(
-                                                                        rscId);
-                                    hg.addColocation(rdata.getConstraintId(),
-                                                     si,
-                                                     cphi);
-                                }
-                            }
-                        } else {
-                            /* order */
-                            if (rscSet1 != null) {
-                                for (final String rscId : rscSet1.getRscIds()) {
-                                    final ServiceInfo si =
-                                       getBrowser().getServiceInfoFromCRMId(
-                                                                        rscId);
-                                    hg.addOrder(rdata.getConstraintId(),
-                                                si,
-                                                cphi);
-                                }
-                            }
-                            if (rscSet2 != null) {
-                                for (final String rscId : rscSet2.getRscIds()) {
-                                    final ServiceInfo si =
-                                       getBrowser().getServiceInfoFromCRMId(
-                                                                        rscId);
-                                    hg.addOrder(rdata.getConstraintId(),
-                                                cphi,
-                                                si);
-                                }
-                            }
+                            break;
                         }
-                        if (!testOnly && cphi != null) {
-                            cphi.setUpdated(false);
-                            cphi.getService().setNew(false);
-                        }
-                    }
-
-                    for (final ConstraintPHInfo cphi : newCphis) {
-                        hg.addConstraintPlaceholder(cphi,
-                                                    null, /* pos */
-                                                    false);
                     }
                 }
+                if (cphi == null && !preNewCphis.isEmpty()) {
+                    /* placeholder */
+                    cphi = preNewCphis.remove(0);
+                    rdataToCphi.put(rdata, cphi);
+                    cphi.setRscSetConnectionData(rdata);
+                }
+                if (cphi == null) {
+                    cphi = new ConstraintPHInfo(getBrowser(), rdata);
+                    if (prsi == null) {
+                        prsi = new PcmkRscSetsInfo(getBrowser());
+                    }
+                    if (rdata.isColocation()) {
+                        prsi.addColocation(rdata.getConstraintId(),
+                                           cphi);
+                    } else {
+                        prsi.addOrder(rdata.getConstraintId(), cphi);
+                    }
+                    cphi.setPcmkRscSetsInfo(prsi);
+                    getBrowser().addNameToServiceInfoHash(cphi);
+                    newCphis.add(cphi); /* have to add it later,
+                                           so that ids are correct. */
+                    rdataToCphi.put(rdata, cphi);
+                }
+                serviceIsPresent.add(cphi);
 
-                /* colocations */
-                final Map<String, List<CRMXML.ColocationData>> colocationMap =
-                                                clStatus.getColocationRscMap();
-                for (final String rscId : colocationMap.keySet()) {
-                    final List<CRMXML.ColocationData> withs =
-                                                      colocationMap.get(rscId);
-                    for (final CRMXML.ColocationData data : withs) {
-                        final String withRscId = data.getWithRsc();
-                        final ServiceInfo withSi =
-                              getBrowser().getServiceInfoFromCRMId(withRscId);
-                        final ServiceInfo siP =
-                                   getBrowser().getServiceInfoFromCRMId(rscId);
-                        hg.addColocation(data.getId(), siP, withSi);
+                final CRMXML.RscSet rscSet1 = rdata.getRscSet1();
+                final CRMXML.RscSet rscSet2 = rdata.getRscSet2();
+                if (rdata.isColocation()) {
+                    /* colocation */
+                    if (rscSet1 != null) {
+                        for (final String rscId : rscSet1.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(
+                                                                rscId);
+                            hg.addColocation(rdata.getConstraintId(),
+                                             cphi,
+                                             si);
+                        }
+                    }
+                    if (rscSet2 != null) {
+                        for (final String rscId : rscSet2.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(
+                                                                rscId);
+                            hg.addColocation(rdata.getConstraintId(),
+                                             si,
+                                             cphi);
+                        }
+                    }
+                } else {
+                    /* order */
+                    if (rscSet1 != null) {
+                        for (final String rscId : rscSet1.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(
+                                                                rscId);
+                            hg.addOrder(rdata.getConstraintId(),
+                                        si,
+                                        cphi);
+                        }
+                    }
+                    if (rscSet2 != null) {
+                        for (final String rscId : rscSet2.getRscIds()) {
+                            final ServiceInfo si =
+                               getBrowser().getServiceInfoFromCRMId(
+                                                                rscId);
+                            hg.addOrder(rdata.getConstraintId(),
+                                        cphi,
+                                        si);
+                        }
                     }
                 }
+                if (!testOnly && cphi != null) {
+                    cphi.setUpdated(false);
+                    cphi.getService().setNew(false);
+                }
+            }
 
-                /* orders */
-                final Map<String, List<CRMXML.OrderData>> orderMap =
-                                                      clStatus.getOrderRscMap();
-                for (final String rscFirstId : orderMap.keySet()) {
-                    for (final CRMXML.OrderData data
-                                                 : orderMap.get(rscFirstId)) {
-                        final String rscThenId = data.getRscThen();
-                        final ServiceInfo si =
-                                getBrowser().getServiceInfoFromCRMId(rscThenId);
-                        if (si != null) { /* not yet complete */
-                            final ServiceInfo siP =
-                              getBrowser().getServiceInfoFromCRMId(rscFirstId);
-                            if (siP != null && siP.getResourceAgent() != null) {
-                                /* dangling orders and colocations */
-                                if ((siP.getResourceAgent().isDrbddisk()
-                                     || siP.getResourceAgent().isLinbitDrbd())
-                                    && si.getName().equals("Filesystem")) {
-                                    final List<CRMXML.ColocationData> cds =
-                                       clStatus.getColocationDatas(rscFirstId);
-                                    if (cds != null) {
-                                        for (final CRMXML.ColocationData cd
-                                                                       : cds) {
-                                            if (cd.getWithRsc().equals(
-                                                                 rscThenId)) {
-                                                setFilesystemWithDrbd(siP, si);
-                                            }
-                                        }
+            for (final ConstraintPHInfo cphi : newCphis) {
+                hg.addConstraintPlaceholder(cphi,
+                                            null, /* pos */
+                                            false);
+            }
+        }
+
+        /* colocations */
+        final Map<String, List<CRMXML.ColocationData>> colocationMap =
+                                        clStatus.getColocationRscMap();
+        for (final String rscId : colocationMap.keySet()) {
+            final List<CRMXML.ColocationData> withs =
+                                              colocationMap.get(rscId);
+            for (final CRMXML.ColocationData data : withs) {
+                final String withRscId = data.getWithRsc();
+                final ServiceInfo withSi =
+                      getBrowser().getServiceInfoFromCRMId(withRscId);
+                final ServiceInfo siP =
+                           getBrowser().getServiceInfoFromCRMId(rscId);
+                hg.addColocation(data.getId(), siP, withSi);
+            }
+        }
+
+        /* orders */
+        final Map<String, List<CRMXML.OrderData>> orderMap =
+                                              clStatus.getOrderRscMap();
+        for (final String rscFirstId : orderMap.keySet()) {
+            for (final CRMXML.OrderData data
+                                         : orderMap.get(rscFirstId)) {
+                final String rscThenId = data.getRscThen();
+                final ServiceInfo si =
+                        getBrowser().getServiceInfoFromCRMId(rscThenId);
+                if (si != null) { /* not yet complete */
+                    final ServiceInfo siP =
+                      getBrowser().getServiceInfoFromCRMId(rscFirstId);
+                    if (siP != null && siP.getResourceAgent() != null) {
+                        /* dangling orders and colocations */
+                        if ((siP.getResourceAgent().isDrbddisk()
+                             || siP.getResourceAgent().isLinbitDrbd())
+                            && si.getName().equals("Filesystem")) {
+                            final List<CRMXML.ColocationData> cds =
+                               clStatus.getColocationDatas(rscFirstId);
+                            if (cds != null) {
+                                for (final CRMXML.ColocationData cd
+                                                               : cds) {
+                                    if (cd.getWithRsc().equals(
+                                                         rscThenId)) {
+                                        setFilesystemWithDrbd(siP, si);
                                     }
                                 }
-                                hg.addOrder(data.getId(), siP, si);
                             }
                         }
+                        hg.addOrder(data.getId(), siP, si);
                     }
                 }
+            }
+        }
 
-                final Enumeration e = getNode().children();
-                while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n =
-                              (DefaultMutableTreeNode) e.nextElement();
-                    final ServiceInfo g = (ServiceInfo) n.getUserObject();
-                    if (g.getResourceAgent().isGroup()
-                        || g.getResourceAgent().isClone()) {
-                        final Enumeration ge = g.getNode().children();
-                        while (ge.hasMoreElements()) {
-                            final DefaultMutableTreeNode gn =
-                                     (DefaultMutableTreeNode) ge.nextElement();
-                            final ServiceInfo s =
-                                             (ServiceInfo) gn.getUserObject();
-                            if (!groupServiceIsPresent.contains(s)
-                                && !s.getService().isNew()) {
-                                /* remove the group service from the menu
-                                   that does not exist anymore. */
-                                s.removeInfo();
-                            } else if (!testOnly) {
-                                s.updateMenus(null);
-                            }
-                        }
+        final Enumeration e = getNode().children();
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode n =
+                      (DefaultMutableTreeNode) e.nextElement();
+            final ServiceInfo g = (ServiceInfo) n.getUserObject();
+            if (g.getResourceAgent().isGroup()
+                || g.getResourceAgent().isClone()) {
+                final Enumeration ge = g.getNode().children();
+                while (ge.hasMoreElements()) {
+                    final DefaultMutableTreeNode gn =
+                             (DefaultMutableTreeNode) ge.nextElement();
+                    final ServiceInfo s =
+                                     (ServiceInfo) gn.getUserObject();
+                    if (!groupServiceIsPresent.contains(s)
+                        && !s.getService().isNew()) {
+                        /* remove the group service from the menu
+                           that does not exist anymore. */
+                        s.removeInfo();
+                    } else if (!testOnly) {
+                        s.updateMenus(null);
                     }
-                    g.updateMenus(null);
                 }
-                hg.setServiceIsPresentList(serviceIsPresent);
-                /** Set placeholders to "new", if they have no connections. */
+            }
+            g.updateMenus(null);
+        }
+        hg.setServiceIsPresentList(serviceIsPresent);
+        /** Set placeholders to "new", if they have no connections. */
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 hg.killRemovedEdges();
