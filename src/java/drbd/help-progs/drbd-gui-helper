@@ -1438,15 +1438,17 @@ sub get_cluster_versions {
 	if (!$cs_version || "wrapper" eq $ais_version) {
 		my $ais_running_cmd = is_running($ais_script, $ais_prog);
 		$ais_running =
-			system("$ais_running_cmd 2>/dev/null") >> 8 || "on";
+			system("$ais_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	}
 	my $cs_running_cmd = is_running($cs_script, $cs_prog);
-	my $cs_running = system("$cs_running_cmd 2>/dev/null") >> 8 || "on";
-	my $hb_running = system("$hb_running_cmd 2>/dev/null") >> 8 || "on";
+	my $cs_running = system("$cs_running_cmd >/dev/null 2>&1") >> 8 || "on";
+	my $hb_running = system("$hb_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	my $pcmk_running_cmd = is_running($pcmk_script, $pcmk_prog);
-	my $pcmk_running = system("$pcmk_running_cmd 2>/dev/null") >> 8 || "on";
-	my $drbd_loaded = system("/sbin/lsmod |grep '\\<drbd\\>'") >> 8 || "on";
-	my $hb_conf = system("ls /etc/ha.d/ha.cf 2>/dev/null") >> 8 || "on";
+	my $pcmk_running =
+		system("$pcmk_running_cmd >/dev/null 2>&1") >> 8 || "on";
+	my $drbd_loaded =
+		system("/sbin/lsmod |grep -q '\\<drbd\\>'") >> 8 || "on";
+	my $hb_conf = system("ls /etc/ha.d/ha.cf >/dev/null 2>&1") >> 8 || "on";
 	my $cs_ais_conf;
 	if ($cs_version) {
 		$cs_ais_conf =
@@ -1496,6 +1498,31 @@ sub get_cluster_versions {
 	       ."drbd:$drbd_version\n"
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
+}
+
+# return -1 if ver1 is smaller than ver2 etc. 1.0.9.1 and 1.0.9 are considered
+# equal and return 0.
+sub compare_versions {
+	my $ver1 = shift;
+	my $ver2 = shift;
+	my @ver1 = split /\./, $ver1;
+	my @ver2 = split /\./, $ver2;
+	while (@ver1 > 0 && @ver2 > 0) {
+		my $v1 = shift @ver1;
+		my $v2 = shift @ver2;
+		if ($v1 < $v2) {
+			return -1;
+		} elsif ($v1 > $v2) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sub pcmk_version_smaller_than {
+	my $version = shift;
+	my ($pcmk_version) = (get_cluster_versions() =~ /pm:(.*)/);
+	return compare_versions($pcmk_version, $version) < 0;
 }
 
 sub get_vm_networks {
@@ -1725,6 +1752,9 @@ sub gui_test {
 		s/\\$//mg;
 		s/^\s+//;
 		s/\s+$//;
+	}
+	if (pcmk_version_smaller_than("1.1.5")) {
+		$statustest =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;
 	}
 	if ($hb_version eq "2.1.3" || $hb_version eq "2.1.4") {
 		print "na ";

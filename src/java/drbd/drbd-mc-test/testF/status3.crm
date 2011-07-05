@@ -5,4 +5,4 @@
 Online: [ host1 host2 ]
 
  Clone Set: cl_Group_1 [grp_1]
-     Started: [ host2 host1 ]
+     Started: [ host1 host2 ]
