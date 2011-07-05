@@ -1519,7 +1519,8 @@ public final class ServicesInfo extends EditableInfo {
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
                         && !si.isStopped(false)
-                        && !si.getService().isOrphaned()) {
+                        && !si.getService().isOrphaned()
+                        && !si.getService().isNew()) {
                         si.stopResource(dcHost, false);
                     }
                 }
@@ -1535,7 +1536,8 @@ public final class ServicesInfo extends EditableInfo {
                     if (si.getGroupInfo() == null
                         && !si.isConstraintPH()
                         && !si.isStopped(true)
-                        && !si.getService().isOrphaned()) {
+                        && !si.getService().isOrphaned()
+                        && !si.getService().isNew()) {
                         si.stopResource(thisDCHost, true); /* test only */
                     }
                 }
@@ -1644,6 +1646,15 @@ public final class ServicesInfo extends EditableInfo {
                             final Host dcHost = getBrowser().getDCHost();
                             List<ServiceInfo> services =
                                     getBrowser().getExistingServiceList(null);
+                            for (ServiceInfo si : services) {
+                                if (si.getGroupInfo() == null) {
+                                    final ResourceAgent ra =
+                                                        si.getResourceAgent();
+                                    if (ra != null && !ra.isClone()) {
+                                        si.getService().setRemoved(true);
+                                    }
+                                }
+                            }
                             CRM.erase(dcHost, testOnly);
                             for (ServiceInfo si : services) {
                                 if (si.getGroupInfo() == null) {
@@ -1652,7 +1663,6 @@ public final class ServicesInfo extends EditableInfo {
                                     if (si.getService().isNew()) {
                                         si.removeMyself(testOnly);
                                     } else if (ra != null && !ra.isClone()) {
-                                        si.getService().setRemoved(true);
                                         si.cleanupResource(dcHost, false);
                                     }
                                 }
