@@ -335,11 +335,6 @@ public class ServiceInfo extends EditableInfo {
                 gi.setApplyButtons(null, gi.getParametersFromXML());
             }
         }
-        //    return gi.checkResourceFieldsCorrect(param,
-        //                                         gi.getParametersFromXML(),
-        //                                         fromServicesInfo,
-        //                                         fromCloneInfo);
-        //}
         if (getService().isOrphaned()) {
             return false;
         }
@@ -403,10 +398,6 @@ public class ServiceInfo extends EditableInfo {
             if (!fromServicesInfo) {
                 gi.setApplyButtons(null, gi.getParametersFromXML());
             }
-            //return gi.checkResourceFieldsChanged(param,
-            //                                     gi.getParametersFromXML(),
-            //                                     fromServicesInfo,
-            //                                     fromCloneInfo);
         }
         if (id == null) {
             return false;
@@ -462,7 +453,6 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             if (heartbeatId == null) {
-                //changed = true;
             } else if (heartbeatId.equals(Service.RES_ID_PREFIX
                                           + getService().getName()
                                           + "_" + id)
@@ -545,7 +535,6 @@ public class ServiceInfo extends EditableInfo {
             }
             sameAsMetaAttrsCB.processAccessMode();
         }
-        //final boolean ch = changed;
         if (!fromServicesInfo) {
             final ServicesInfo sis = getBrowser().getServicesInfo();
             sis.setApplyButtons(null, sis.getParametersFromXML());
@@ -1929,7 +1918,6 @@ public class ServiceInfo extends EditableInfo {
         int rows = 0;
         final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
-        //panel.setLayout(new SpringLayout());
         String defaultOpIdRef = null;
         final Info savedOpIdRef = getSameServiceOpIdRef();
         if (savedOpIdRef != null) {
@@ -3222,7 +3210,6 @@ public class ServiceInfo extends EditableInfo {
             ci = getCloneInfo();
         } else {
             ci = gInfo.getCloneInfo();
-            //gInfo.revert();
         }
         final CloneInfo clInfo = ci;
         if (clInfo != null) {
@@ -3272,10 +3259,6 @@ public class ServiceInfo extends EditableInfo {
         }
         final ClusterStatus cs = getBrowser().getClusterStatus();
         mSavedOperationsLock.lock();
-        //if (sameAsOperationsCB != null
-        //    && !Tools.areEqual(savedOpIdRef, sameAsOperationsCBValue())) {
-        //    sameAsOperationsCB.setValue(savedOpIdRef);
-        //}
         boolean allAreDefaultValues = true;
         boolean allSavedAreDefaultValues = true;
         for (final String op : getResourceAgent().getOperationNames()) {
@@ -3309,7 +3292,6 @@ public class ServiceInfo extends EditableInfo {
         }
         boolean sameAs = false;
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
-        //String refCRMId = cs.getOperationsRef(getService().getHeartbeatId());
         ServiceInfo operationIdRef = null;
         final Info ref = sameAsOperationsCBValue();
         if (ref instanceof ServiceInfo) {
@@ -4490,7 +4472,6 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
-            //getBrowser().reloadAllComboBoxes(this);
         }
     }
 
@@ -4655,11 +4636,6 @@ public class ServiceInfo extends EditableInfo {
                     return "&lt;&lt;empty;&gt;&gt;";
                 }
                 return null;
-                //return !getBrowser().clStatusFailed()
-                //       && !getService().isRemoved()
-                //       && (enableForNew || !getService().isNew())
-                //       && !getService().isOrphaned();
-                //       //TODO: enableForNew should be always enabled
             }
 
             @Override public void update() {
@@ -5203,10 +5179,6 @@ public class ServiceInfo extends EditableInfo {
                         return IS_NEW_STRING;
                     }
                     return null;
-                    //return !getBrowser().clStatusFailed()
-                    //       && !getService().isRemoved()
-                    //       && !getService().isNew()
-                    //       && !getService().isOrphaned();
                 }
 
                 @Override public void action() {
@@ -5274,9 +5246,6 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         return getService().isAvailableWithText();
                     }
-                    //return !getBrowser().clStatusFailed()
-                    //       && getService().isAvailable()
-                    //       && !isStarted(testOnly);
                 }
 
                 @Override public void action() {
@@ -5310,9 +5279,6 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         return getService().isAvailableWithText();
                     }
-                    //return !getBrowser().clStatusFailed()
-                    //       && getService().isAvailable()
-                    //       && !isStopped(testOnly);
                 }
 
                 @Override public void action() {
@@ -5462,9 +5428,6 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         return getService().isAvailableWithText();
                     }
-                    //return !getBrowser().clStatusFailed()
-                    //       && getService().isAvailable()
-                    //       && isOneFailedCount(testOnly);
                 }
 
                 @Override public void action() {
@@ -5500,8 +5463,6 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         return getService().isAvailableWithText();
                     }
-                    //return !getBrowser().clStatusFailed()
-                    //       && getService().isAvailable();
                 }
 
                 @Override public void action() {
@@ -5545,11 +5506,6 @@ public class ServiceInfo extends EditableInfo {
                     } else if (isRunning(testOnly)) {
                         return "cannot remove running resource";
                     }
-                    //if (getBrowser().clStatusFailed()
-                    //    || getService().isRemoved()
-                    //    || isRunning(testOnly)) {
-                    //    return false;
-                    //}
                     if (groupInfo == null) {
                         return null;
                     }
@@ -5804,11 +5760,6 @@ public class ServiceInfo extends EditableInfo {
                         } else {
                             return null;
                         }
-                        //return !getBrowser().clStatusFailed()
-                        //       && getService().isAvailable()
-                        //       && !hostName.toLowerCase(Locale.US).equals(
-                        //                                      runningOnNode)
-                        //       && host.isClStatus();
                     }
 
                     @Override public void action() {
