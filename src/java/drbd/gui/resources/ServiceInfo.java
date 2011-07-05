@@ -5964,7 +5964,7 @@ public class ServiceInfo extends EditableInfo {
             texts.add(new Subtext(textNotOn,
                                   null,
                                   Color.BLACK));
-        } else if (isStopped(testOnly)) {
+        } else if (isStopped(testOnly) && !isRunning(testOnly)) {
             texts.add(new Subtext("stopped",
                                   ClusterBrowser.FILL_PAINT_STOPPED,
                                   Color.BLACK));
