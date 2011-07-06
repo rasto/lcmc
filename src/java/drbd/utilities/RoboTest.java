@@ -53,6 +53,10 @@ public final class RoboTest {
     private static volatile boolean aborted = false;
     /** Slow down the animation. */
     private static float slowFactor = 1f;
+    /** Robot. */
+    private static Robot robot;
+    /** Cluster. */
+    private static Cluster cluster;
     /** Private constructor, cannot be instantiated. */
     private RoboTest() {
         /* Cannot be instantiated. */
@@ -71,7 +75,7 @@ public final class RoboTest {
             int i = 0;
             while (x > 1536 || x < -100) {
                 if (i % 10 == 0) {
-                    Tools.info("sleep: " + x);
+                    info("sleep: " + x);
                 }
                 Tools.sleep(500);
                 if (MouseInfo.getPointerInfo() != null) {
@@ -87,7 +91,7 @@ public final class RoboTest {
             && prevP.getX() - p.getX() > 200
             && p.getY() - prevP.getY() > 200) {
             prevP = null;
-            Tools.info("test aborted");
+            info("test aborted");
             aborted = true;
             return true;
         }
@@ -100,17 +104,17 @@ public final class RoboTest {
      * was pressed.
      */
     public static void restoreMouse() {
-        Robot robot = null;
         try {
             robot = new Robot(SCREEN_DEVICE);
         } catch (final java.awt.AWTException e) {
+            robot = null;
             Tools.appWarning("Robot error");
         }
         if (robot == null) {
             return;
         }
-        leftClick(robot);
-        rightClick(robot);
+        leftClick();
+        rightClick();
     }
 
     /** Starts automatic left clicker in 10 seconds. */
@@ -141,7 +145,7 @@ public final class RoboTest {
                                       final int timeAfterRelase,
                                       final int timeAfterClickLazy,
                                       final int timeAfterRelaseLazy) {
-        Tools.info("start click test in 10 seconds");
+        info("start click test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
@@ -155,7 +159,7 @@ public final class RoboTest {
                 if (rbt == null) {
                     return;
                 }
-                final Robot robot = rbt;
+                robot = rbt;
                 final long startTime = System.currentTimeMillis();
                 while (true) {
                     robot.mousePress(buttonMask);
@@ -182,7 +186,7 @@ public final class RoboTest {
                     }
                     sleepNoFactor(500);
                 }
-                Tools.info("click test done");
+                info("click test done");
             }
         });
         thread.start();
@@ -193,7 +197,7 @@ public final class RoboTest {
                                   final boolean withClicks) {
         aborted = false;
         slowFactor = 0.3f;
-        Tools.info("start mouse move test in 10 seconds");
+        info("start mouse move test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
@@ -210,42 +214,42 @@ public final class RoboTest {
 
                 final Point2D locP =
                        Tools.getGUIData().getMainFrame().getLocationOnScreen();
-                final Robot robot = rbt;
+                robot = rbt;
                 final int xOffset = getOffset();
                 final Point2D origP = MouseInfo.getPointerInfo().getLocation();
                 final int origX = (int) (origP.getX() - locP.getX());
                 final int origY = (int) (origP.getY() - locP.getY());
-                Tools.info("move mouse to the end position");
+                info("move mouse to the end position");
                 sleepNoFactor(5000);
                 final Point2D endP = MouseInfo.getPointerInfo().getLocation();
                 final int endX = (int) (endP.getX() - locP.getX());
                 final int endY = (int) (endP.getY() - locP.getY());
                 int destX = origX;
                 int destY = origY;
-                Tools.info("test started");
+                info("test started");
                 final long startTime = System.currentTimeMillis();
                 int i = 1;
                 while (!aborted) {
-                    moveTo(robot, destX, destY);
+                    moveTo(destX, destY);
                     if (abortWithMouseMovement()) {
                         break;
                     }
                     if (withClicks) {
-                        leftClick(robot);
+                        leftClick();
                         sleepNoFactor(1000);
                     }
-                    moveTo(robot, endX, endY);
+                    moveTo(endX, endY);
                     if (abortWithMouseMovement()) {
                         break;
                     }
                     if (withClicks) {
-                        leftClick(robot);
+                        leftClick();
                         sleepNoFactor(1000);
                     }
                     System.out.println("mouse move test: " + i);
                     i++;
                 }
-                Tools.info("mouse move test done");
+                info("mouse move test done");
             }
         });
         thread.start();
@@ -272,9 +276,10 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final String index, final Cluster cluster) {
+    public static void startTest(final String index, final Cluster c) {
+        cluster = c;
         aborted = false;
-        Tools.info("start test " + index + " in 3 seconds");
+        info("start test " + index + " in 3 seconds");
         if (cluster != null) {
             for (final Host host : cluster.getHosts()) {
                 host.getSSH().installTestFiles();
@@ -283,10 +288,11 @@ public final class RoboTest {
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
                 sleepNoFactor(3000);
-                Robot robot = null;
+                robot = null;
                 try {
                     robot = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
+                    robot = null;
                     Tools.appWarning("Robot error");
                 }
                 if (robot == null) {
@@ -302,12 +308,11 @@ public final class RoboTest {
                     if ("1".equals(index)) {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startGUITest1(robot);
+                        info("test" + index);
+                        startGUITest1();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     }
                 } else if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
@@ -317,71 +322,71 @@ public final class RoboTest {
                         int i = 1;
                         while (true) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest1(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest1();
                             if (aborted) {
                                 break;
                             }
-                            startTest2(robot, cluster);
+                            startTest2();
                             if (aborted) {
                                 break;
                             }
-                            startTest3(robot, cluster);
+                            startTest3();
                             if (aborted) {
                                 break;
                             }
-                            startTest4(robot, cluster);
+                            startTest4();
                             if (aborted) {
                                 break;
                             }
-                            startTest5(robot, cluster);
+                            startTest5();
                             if (aborted) {
                                 break;
                             }
-                            startTest6(robot, cluster);
+                            startTest6();
                             if (aborted) {
                                 break;
                             }
-                            startTest7(robot, cluster);
+                            startTest7();
                             if (aborted) {
                                 break;
                             }
-                            startTest8(robot, cluster);
+                            startTest8();
                             if (aborted) {
                                 break;
                             }
-                            //startTest9(robot, cluster);
+                            //startTest9();
                             if (aborted) {
                                 break;
                             }
-                            startTestA(robot, cluster);
+                            startTestA();
                             if (aborted) {
                                 break;
                             }
-                            startTestB(robot, cluster);
+                            startTestB();
                             if (aborted) {
                                 break;
                             }
-                            startTestC(robot, cluster);
+                            startTestC();
                             if (aborted) {
                                 break;
                             }
-                            startTestD(robot, cluster);
+                            startTestD();
                             if (aborted) {
                                 break;
                             }
-                            startTestE(robot, cluster);
+                            startTestE();
                             if (aborted) {
                                 break;
                             }
-                            startTestF(robot, cluster);
+                            startTestF();
                             if (aborted) {
                                 break;
                             }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
                             i++;
                         }
                     } else if ("1".equals(index)) {
@@ -389,13 +394,13 @@ public final class RoboTest {
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest1(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest1();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                         }
                     } else if ("2".equals(index)) {
@@ -403,36 +408,35 @@ public final class RoboTest {
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest2(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest2();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                         }
                     } else if ("3".equals(index)) {
                         /* pacemaker drbd */
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index + " no " + i);
-                        startTest3(robot, cluster);
+                        info("test" + index + " no " + i);
+                        startTest3();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + " no " + i + ", secs: "
-                                   + secs);
+                        info("test" + index + " no " + i + ", secs: " + secs);
                     } else if ("4".equals(index)) {
                         /* placeholders 6 dummies */
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest4(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest4();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
                             i++;
                         }
                     } else if ("5".equals(index)) {
@@ -440,12 +444,12 @@ public final class RoboTest {
                         while (!aborted) {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest5(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest5();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
                             i++;
                         }
                     } else if ("6".equals(index)) {
@@ -453,88 +457,81 @@ public final class RoboTest {
                         while (!aborted) {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTest6(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTest6();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
                             i++;
                         }
                     } else if ("7".equals(index)) {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTest7(robot, cluster);
+                        info("test" + index);
+                        startTest7();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("8".equals(index)) {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTest8(robot, cluster);
+                        info("test" + index);
+                        startTest8();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("a".equals(index)) {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestA(robot, cluster);
+                        info("test" + index);
+                        startTestA();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("b".equals(index)) {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestB(robot, cluster);
+                        info("test" + index);
+                        startTestB();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("c".equals(index)) {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestC(robot, cluster);
+                        info("test" + index);
+                        startTestC();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("d".equals(index)) {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestD(robot, cluster);
+                        info("test" + index);
+                        startTestD();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("e".equals(index)) {
                         /* host wizard deadlock */
                         final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestE(robot, cluster);
+                        info("test" + index);
+                        startTestE();
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
+                        info("test" + index + ", secs: " + secs);
                     } else if ("f".equals(index)) {
                         int i = 1;
                         while (!aborted) {
                             /* cloned group */
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startTestF(robot, cluster);
+                            info("test" + index + " no " + i);
+                            startTestF();
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
                             i++;
                         }
                     }
@@ -545,30 +542,30 @@ public final class RoboTest {
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest1(robot, cluster, blockDevY);
+                            info("test" + index + " no " + i);
+                            startDRBDTest1(blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest2(robot, cluster, blockDevY);
+                            startDRBDTest2(blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest3(robot, cluster, blockDevY);
+                            startDRBDTest3(blockDevY);
                             if (aborted) {
                                 break;
                             }
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                startDRBDTest4(robot, cluster, blockDevY);
+                                startDRBDTest4(blockDevY);
                                 if (aborted) {
                                     break;
                                 }
                             }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
@@ -581,13 +578,13 @@ public final class RoboTest {
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest1(robot, cluster, blockDevY);
+                            info("test" + index + " no " + i);
+                            startDRBDTest1(blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
@@ -600,13 +597,13 @@ public final class RoboTest {
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest2(robot, cluster, blockDevY);
+                            info("test" + index + " no " + i);
+                            startDRBDTest2(blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                         }
                     } else if ("3".equals(index)) {
@@ -615,13 +612,13 @@ public final class RoboTest {
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest3(robot, cluster, blockDevY);
+                            info("test" + index + " no " + i);
+                            startDRBDTest3(blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
@@ -634,13 +631,13 @@ public final class RoboTest {
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startDRBDTest4(robot, cluster, blockDevY);
+                            info("test" + index + " no " + i);
+                            startDRBDTest4(blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
                                 Tools.getConfigData().setBigDRBDConf(
@@ -654,27 +651,25 @@ public final class RoboTest {
                         int i = 1;
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
-                            Tools.info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + index, robot, cluster, 2);
+                            info("test" + index + " no " + i);
+                            startVMTest1("vm-test" + index, 2);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
-                            Tools.info("test" + index + " no " + i + ", secs: "
-                                       + secs);
-                            resetTerminalAreas(cluster);
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
                             i++;
                         }
                     }
                 }
-                Tools.info(selected + " test " + index + " done");
+                info(selected + " test " + index + " done");
             }
         });
         thread.start();
     }
 
     /** Check test. */
-    private static void checkTest(final Cluster cluster,
-                                  final String test,
-                                  final double no) {
+    private static void checkTest(final String test, final double no) {
         for (final Host host : cluster.getHosts()) {
             if (abortWithMouseMovement()) {
                 return;
@@ -686,9 +681,7 @@ public final class RoboTest {
     }
 
     /** Check DRBD test. */
-    private static void checkDRBDTest(final Cluster cluster,
-                                      final String test,
-                                      final double no) {
+    private static void checkDRBDTest(final String test, final double no) {
         for (final Host host : cluster.getHosts()) {
             if (abortWithMouseMovement()) {
                 return;
@@ -712,8 +705,7 @@ public final class RoboTest {
         }
     }
     /** Check VM test. */
-    private static void checkVMTest(final Cluster cluster,
-                                    final String test,
+    private static void checkVMTest(final String test,
                                     final double no,
                                     final String name) {
         for (final Host host : cluster.getHosts()) {
@@ -727,7 +719,7 @@ public final class RoboTest {
     }
 
     /** TEST 1. */
-    private static void startTest1(final Robot robot, final Cluster cluster) {
+    private static void startTest1() {
         slowFactor = 0.2f;
         aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
@@ -739,281 +731,281 @@ public final class RoboTest {
         final int popY = 305;
         final int statefulX = 500;
         final int statefulY = 255;
-        disableStonith(robot, cluster);
-        checkTest(cluster, "test1", 1);
-        enableStonith(robot, cluster);
-        checkTest(cluster, "test1", 1.1);
-        disableStonith(robot, cluster);
-        checkTest(cluster, "test1", 1);
-        moveTo(robot, ipX, ipY);
-        rightClick(robot); /* popup */
-        moveTo(robot, ipX + 57, ipY + 28);
-        moveTo(robot, ipX + 270, ipY + 28);
-        moveTo(robot, ipX + 267, ipY + 52);
-        leftClick(robot); /* choose ipaddr */
-        removeResource(robot, ipX, ipY, -15);
+        disableStonith();
+        checkTest("test1", 1);
+        enableStonith();
+        checkTest("test1", 1.1);
+        disableStonith();
+        checkTest("test1", 1);
+        moveTo(ipX, ipY);
+        rightClick(); /* popup */
+        moveTo(ipX + 57, ipY + 28);
+        moveTo(ipX + 270, ipY + 28);
+        moveTo(ipX + 267, ipY + 52);
+        leftClick(); /* choose ipaddr */
+        removeResource(ipX, ipY, -15);
         /* again */
-        moveTo(robot, ipX, ipY);
-        rightClick(robot); /* popup */
-        moveTo(robot, ipX + 57, ipY + 28);
-        moveTo(robot, ipX + 270, ipY + 28);
-        moveTo(robot, ipX + 267, ipY + 52);
-        leftClick(robot); /* choose ipaddr */
+        moveTo(ipX, ipY);
+        rightClick(); /* popup */
+        moveTo(ipX + 57, ipY + 28);
+        moveTo(ipX + 270, ipY + 28);
+        moveTo(ipX + 267, ipY + 52);
+        leftClick(); /* choose ipaddr */
 
-        moveTo(robot, 1072, 405);
-        leftClick(robot); /* pull down */
-        moveTo(robot, 1044, 450);
-        leftClick(robot); /* choose */
+        moveTo(1072, 405);
+        leftClick(); /* pull down */
+        moveTo(1044, 450);
+        leftClick(); /* choose */
         sleep(1000);
-        press(robot, KeyEvent.VK_1);
-        press(robot, KeyEvent.VK_0);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_1);
+        press(KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(1000);
-        setTimeouts(robot, false);
-        moveTo(robot, 814, 189);
+        setTimeouts(false);
+        moveTo(814, 189);
         sleep(6000); /* ptest */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         /* CIDR netmask 24 */
         sleep(10000);
-        moveTo(robot, 335, 129); /* advanced */
+        moveTo(335, 129); /* advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
 
-        moveTo(robot, 960, 475); /* CIDR */
+        moveTo(960, 475); /* CIDR */
         sleep(3000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
-        press(robot, KeyEvent.VK_2);
+        press(KeyEvent.VK_2);
         sleep(200);
-        press(robot, KeyEvent.VK_4);
+        press(KeyEvent.VK_4);
         sleep(1000);
 
-        moveTo(robot, 335, 129); /* not advanced */
+        moveTo(335, 129); /* not advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* ptest */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
 
-        checkTest(cluster, "test1", 2); /* 2 */
+        checkTest("test1", 2); /* 2 */
 
         /* pingd */
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar */
-        moveTo(robot, 1100, 510);
-        leftRelease(robot);
-        moveTo(robot, 1076, 387);
-        leftClick(robot);
-        moveTo(robot, 1037, 454);
-        leftClick(robot); /* no ping */
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar */
+        moveTo(1100, 510);
+        leftRelease();
+        moveTo(1076, 387);
+        leftClick();
+        moveTo(1037, 454);
+        leftClick(); /* no ping */
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
         sleep(2000);
-        checkTest(cluster, "test1", 2.1); /* 2.1 */
+        checkTest("test1", 2.1); /* 2.1 */
 
-        moveTo(robot, 1076, 387);
-        leftClick(robot);
-        moveTo(robot, 1067, 412);
-        leftClick(robot); /* default */
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(1076, 387);
+        leftClick();
+        moveTo(1067, 412);
+        leftClick(); /* default */
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
 
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar */
-        moveTo(robot, 1100, 550);
-        leftRelease(robot);
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar */
+        moveTo(1100, 550);
+        leftRelease();
 
         /* group with dummy resources */
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
         /* remove it */
-        removeResource(robot, gx, gy, 0);
+        removeResource(gx, gy, 0);
 
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
 
-        rightClick(robot); /* group popup */
-        moveTo(robot, gx + 80, gy + 20);
-        moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 580, gy + 22);
+        rightClick(); /* group popup */
+        moveTo(gx + 80, gy + 20);
+        moveTo(gx + 84, gy + 22);
+        moveTo(gx + 580, gy + 22);
         sleep(1000);
-        typeDummy(robot);
+        typeDummy();
         sleep(1000);
 
         /* remove it */
-        removeResource(robot, gx, gy, 0);
+        removeResource(gx, gy, 0);
 
         /* group with dummy resources, once again */
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
-        rightClick(robot); /* group popup */
-        moveTo(robot, gx + 80, gy + 20);
-        moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 580, gy + 22);
+        rightClick(); /* group popup */
+        moveTo(gx + 80, gy + 20);
+        moveTo(gx + 84, gy + 22);
+        moveTo(gx + 580, gy + 22);
         sleep(1000);
-        typeDummy(robot);
+        typeDummy();
         sleep(1000);
 
-        moveTo(robot, 125, 320);
+        moveTo(125, 320);
         sleep(1000);
-        rightClick(robot);
+        rightClick();
         sleep(1000);
-        moveTo(robot, 150, 611);
-        leftClick(robot); /* remove service */
-        removeResource(robot, gx, gy, 0);
+        moveTo(150, 611);
+        leftClick(); /* remove service */
+        removeResource(gx, gy, 0);
 
         /* group with dummy resources, once again */
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
-        rightClick(robot); /* group popup */
-        moveTo(robot, gx + 80, gy + 20);
-        moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 580, gy + 22);
+        rightClick(); /* group popup */
+        moveTo(gx + 80, gy + 20);
+        moveTo(gx + 84, gy + 22);
+        moveTo(gx + 580, gy + 22);
         sleep(1000);
-        typeDummy(robot);
+        typeDummy();
         sleep(1000);
 
-        removeResource(robot, gx, gy, 0);
+        removeResource(gx, gy, 0);
 
         /* once again */
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
-        checkTest(cluster, "test1", 2); /* 2 */
-        rightClick(robot); /* group popup */
-        moveTo(robot, gx + 80, gy + 20);
-        moveTo(robot, gx + 84, gy + 22);
-        moveTo(robot, gx + 580, gy + 22);
+        checkTest("test1", 2); /* 2 */
+        rightClick(); /* group popup */
+        moveTo(gx + 80, gy + 20);
+        moveTo(gx + 84, gy + 22);
+        moveTo(gx + 580, gy + 22);
         sleep(1000);
-        typeDummy(robot);
+        typeDummy();
         sleep(1000);
-        setTimeouts(robot, true);
-        moveTo(robot, 809, 192); /* ptest */
+        setTimeouts(true);
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
         for (int i = 0; i < 2; i++) {
             /* another group resource */
             sleep(20000);
-            moveTo(robot, gx + 46, gy - 19);
-            rightClick(robot); /* group popup */
+            moveTo(gx + 46, gy - 19);
+            rightClick(); /* group popup */
             sleep(2000 + i * 500);
-            moveTo(robot, gx + 80, gy - 10);
-            moveTo(robot, gx + 84, gy - 8);
-            moveTo(robot, gx + 580, gy - 8);
+            moveTo(gx + 80, gy - 10);
+            moveTo(gx + 84, gy - 8);
+            moveTo(gx + 580, gy - 8);
             sleep(1000);
-            typeDummy(robot);
+            typeDummy();
             sleep(i * 300);
-            setTimeouts(robot, true);
-            moveTo(robot, 809, 192); /* ptest */
+            setTimeouts(true);
+            moveTo(809, 192); /* ptest */
             sleep(6000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(1000);
         }
         sleep(4000);
-        checkTest(cluster, "test1", 3); /* 3 */
+        checkTest("test1", 3); /* 3 */
         /* constraints */
-        addConstraint(robot, gx, gy - 30, 0, true, -1);
-        checkTest(cluster, "test1", 3.1); /* 3.1 */
+        addConstraint(gx, gy - 30, 0, true, -1);
+        checkTest("test1", 3.1); /* 3.1 */
 
         /* move up, move down */
         for (int i = 0; i < 2; i++) {
-            moveTo(robot, 137, 344);
-            rightClick(robot);
+            moveTo(137, 344);
+            rightClick();
             sleep(1000);
-            moveTo(robot, 221, 493);
-            leftClick(robot); /* move res 3 up */
+            moveTo(221, 493);
+            leftClick(); /* move res 3 up */
             sleepNoFactor(10000);
-            checkTest(cluster, "test1", 3.11); /* 3.11 */
-            moveTo(robot, 137, 328);
-            rightClick(robot);
-            moveTo(robot, 236, 515);
-            leftClick(robot); /* move res 3 down */
+            checkTest("test1", 3.11); /* 3.11 */
+            moveTo(137, 328);
+            rightClick();
+            moveTo(236, 515);
+            leftClick(); /* move res 3 down */
             sleepNoFactor(10000);
-            checkTest(cluster, "test1", 3.12); /* 3.12 */
+            checkTest("test1", 3.12); /* 3.12 */
         }
 
         /* same as */
-        moveTo(robot, 125, 345);
+        moveTo(125, 345);
         sleep(1000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar */
-        moveTo(robot, 1100, 510);
-        leftRelease(robot);
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar */
+        moveTo(1100, 510);
+        leftRelease();
 
         for (int i = 0; i < 2; i++) {
             sleep(1000);
-            moveTo(robot, 1073, 360);
+            moveTo(1073, 360);
             sleep(20000);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
-            moveTo(robot, 1073, 410);
+            moveTo(1073, 410);
             sleep(1000);
-            leftClick(robot); /* choose another dummy */
+            leftClick(); /* choose another dummy */
             sleep(1000);
-            moveTo(robot, 809, 192); /* ptest */
+            moveTo(809, 192); /* ptest */
             sleep(4000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(4000);
-            checkTest(cluster, "test1", 3.2); /* 3.2 */
+            checkTest("test1", 3.2); /* 3.2 */
 
-            moveTo(robot, 1073 , 360);
+            moveTo(1073 , 360);
             sleep(30000);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
-            moveTo(robot, 1073 , 380);
-            leftClick(robot); /* choose "nothing selected */
+            moveTo(1073 , 380);
+            leftClick(); /* choose "nothing selected */
             sleep(1000);
-            moveTo(robot, 809, 192); /* ptest */
+            moveTo(809, 192); /* ptest */
             sleep(4000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(9000);
-            checkTest(cluster, "test1", 4); /* 4 */
+            checkTest("test1", 4); /* 4 */
             sleep(20000);
         }
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1100, 150);
-        leftRelease(robot);
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar back */
+        moveTo(1100, 150);
+        leftRelease();
 
         /* locations */
-        moveTo(robot, ipX + 20, ipY);
-        leftClick(robot); /* choose ip */
-        setLocation(robot, new Integer[]{KeyEvent.VK_I});
+        moveTo(ipX + 20, ipY);
+        leftClick(); /* choose ip */
+        setLocation(new Integer[]{KeyEvent.VK_I});
         sleep(3000);
-        checkTest(cluster, "test1", 4.1); /* 4.1 */
+        checkTest("test1", 4.1); /* 4.1 */
 
-        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
+        setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -1024,429 +1016,427 @@ public final class RoboTest {
                                          KeyEvent.VK_MINUS,
                                          KeyEvent.VK_I});
         sleep(3000);
-        checkTest(cluster, "test1", 4.2); /* 4.2 */
+        checkTest("test1", 4.2); /* 4.2 */
 
-        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_PLUS});
+        setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_PLUS});
         sleep(3000);
-        checkTest(cluster, "test1", 4.3); /* 4.3 */
+        checkTest("test1", 4.3); /* 4.3 */
 
-        setLocation(robot, new Integer[]{KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE,
-                                         KeyEvent.VK_BACK_SPACE});
+        setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE,
+                                  KeyEvent.VK_BACK_SPACE});
         sleep(3000);
-        checkTest(cluster, "test1", 4.4); /* 4.4 */
+        checkTest("test1", 4.4); /* 4.4 */
         for (int i = 0; i < 3; i++) {
-            removeConstraint(robot, popX, popY);
-            checkTest(cluster, "test1", 5); /* 5 */
-            addConstraint(robot, gx, gy - 30, 0, true, -1);
-            checkTest(cluster, "test1", 4.4); /* 4.4 */
+            removeConstraint(popX, popY);
+            checkTest("test1", 5); /* 5 */
+            addConstraint(gx, gy - 30, 0, true, -1);
+            checkTest("test1", 4.4); /* 4.4 */
         }
 
-        removeConstraint(robot, popX, popY);
+        removeConstraint(popX, popY);
         sleep(3000);
-        checkTest(cluster, "test1", 5); /* 5 */
+        checkTest("test1", 5); /* 5 */
         sleep(1000);
 
-        addConstraint(robot, gx, gy - 30, 9, true, -1);
+        addConstraint(gx, gy - 30, 9, true, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 6); /* 6 */
+        checkTest("test1", 6); /* 6 */
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 7);
+        checkTest("test1", 7);
 
-        addOrder(robot, popX, popY);
+        addOrder(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 8);
+        checkTest("test1", 8);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 9);
+        checkTest("test1", 9);
 
-        addColocation(robot, popX, popY);
+        addColocation(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 10);
+        checkTest("test1", 10);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.1);
+        checkTest("test1", 10.1);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.2);
+        checkTest("test1", 10.2);
 
-        addConstraintOrderOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
+        addConstraintOrderOnly(gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
-        checkTest(cluster, "test1", 10.3);
+        checkTest("test1", 10.3);
 
-        addColocation(robot, popX, popY);
+        addColocation(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 10.4);
+        checkTest("test1", 10.4);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.5);
+        checkTest("test1", 10.5);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.6);
+        checkTest("test1", 10.6);
 
-        addConstraintColocationOnly(robot, gx, gy - 30, 0, 25, 0, true, -1);
+        addConstraintColocationOnly(gx, gy - 30, 0, 25, 0, true, -1);
         sleep(4000);
-        checkTest(cluster, "test1", 10.7);
+        checkTest("test1", 10.7);
 
-        addOrder(robot, popX, popY);
+        addOrder(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 10.8);
+        checkTest("test1", 10.8);
 
-        removeConstraint(robot, popX, popY);
+        removeConstraint(popX, popY);
         sleep(4000);
-        checkTest(cluster, "test1", 10.9);
+        checkTest("test1", 10.9);
 
-        addConstraint(robot, ipX, ipY, 0, false, -1);
+        addConstraint(ipX, ipY, 0, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 10.91);
+        checkTest("test1", 10.91);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.92);
+        checkTest("test1", 10.92);
 
-        addOrder(robot, popX, popY);
+        addOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.93);
+        checkTest("test1", 10.93);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.94);
+        checkTest("test1", 10.94);
 
-        addColocation(robot, popX, popY);
+        addColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.95);
+        checkTest("test1", 10.95);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.96);
+        checkTest("test1", 10.96);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.97);
+        checkTest("test1", 10.97);
 
-        addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
+        addConstraintColocationOnly(ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 10.98);
+        checkTest("test1", 10.98);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 10.99);
+        checkTest("test1", 10.99);
 
-        addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 0, false, -1);
+        addConstraintOrderOnly(ipX, ipY, -20, 100, 0, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 11);
+        checkTest("test1", 11);
 
-        addColocation(robot, popX, popY);
+        addColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.1);
+        checkTest("test1", 11.1);
 
-        removeConstraint(robot, popX, popY);
+        removeConstraint(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.2);
+        checkTest("test1", 11.2);
 
-        addConstraint(robot, ipX, ipY, 60, false, -1);
+        addConstraint(ipX, ipY, 60, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 11.3);
-        stopResource(robot, ipX, ipY, 0);
+        checkTest("test1", 11.3);
+        stopResource(ipX, ipY, 0);
         sleep(5000);
-        checkTest(cluster, "test1", 11.4);
-        resetStartStopResource(robot, ipX, ipY);
+        checkTest("test1", 11.4);
+        resetStartStopResource(ipX, ipY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.5);
+        checkTest("test1", 11.5);
 
-        moveTo(robot, ipX + 20, ipY + 10);
-        leftClick(robot); /* choose ip */
-        stopResource(robot, 1010, 180, 10); /* actions menu stop */
+        moveTo(ipX + 20, ipY + 10);
+        leftClick(); /* choose ip */
+        stopResource(1010, 180, 10); /* actions menu stop */
         sleep(5000);
-        checkTest(cluster, "test1", 11.501);
+        checkTest("test1", 11.501);
 
-        moveTo(robot, ipX + 20, ipY + 10);
-        leftClick(robot); /* choose ip */
-        startResource(robot, 1010, 180, 20); /* actions menu start */
+        moveTo(ipX + 20, ipY + 10);
+        leftClick(); /* choose ip */
+        startResource(1010, 180, 20); /* actions menu start */
         sleep(5000);
-        checkTest(cluster, "test1", 11.502);
+        checkTest("test1", 11.502);
 
-        resetStartStopResource(robot, ipX, ipY);
+        resetStartStopResource(ipX, ipY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.5);
+        checkTest("test1", 11.5);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.51);
+        checkTest("test1", 11.51);
 
-        addColocation(robot, popX, popY);
+        addColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.52);
+        checkTest("test1", 11.52);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.53);
+        checkTest("test1", 11.53);
 
-        addOrder(robot, popX, popY);
+        addOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.54);
+        checkTest("test1", 11.54);
 
-        removeColocation(robot, popX, popY);
+        removeColocation(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.55);
+        checkTest("test1", 11.55);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.56);
+        checkTest("test1", 11.56);
 
-        addConstraintOrderOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
+        addConstraintOrderOnly(ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 11.57);
+        checkTest("test1", 11.57);
 
-        removeOrder(robot, popX, popY);
+        removeOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.58);
+        checkTest("test1", 11.58);
 
-        addConstraintColocationOnly(robot, ipX, ipY, -20, 100, 55, false, -1);
+        addConstraintColocationOnly(ipX, ipY, -20, 100, 55, false, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 11.59);
+        checkTest("test1", 11.59);
 
-        addOrder(robot, popX, popY);
+        addOrder(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.6);
+        checkTest("test1", 11.6);
 
-        removeConstraint(robot, popX, popY);
+        removeConstraint(popX, popY);
         sleep(5000);
-        checkTest(cluster, "test1", 11.7);
+        checkTest("test1", 11.7);
 
-        addConstraint(robot, gx, gy - 30, 9, true, -1);
+        addConstraint(gx, gy - 30, 9, true, -1);
         sleep(5000);
-        checkTest(cluster, "test1", 11.8);
+        checkTest("test1", 11.8);
         /** Add m/s Stateful resource */
-        moveTo(robot, statefulX, statefulY);
-        rightClick(robot); /* popup */
-        moveTo(robot, statefulX + 137, statefulY + 8);
-        moveTo(robot, statefulX + 137, statefulY + 28);
-        moveTo(robot, statefulX + 412, statefulY + 27);
-        moveTo(robot, statefulX + 432, statefulY + 70);
-        moveTo(robot, statefulX + 665, statefulY + 70);
+        moveTo(statefulX, statefulY);
+        rightClick(); /* popup */
+        moveTo(statefulX + 137, statefulY + 8);
+        moveTo(statefulX + 137, statefulY + 28);
+        moveTo(statefulX + 412, statefulY + 27);
+        moveTo(statefulX + 432, statefulY + 70);
+        moveTo(statefulX + 665, statefulY + 70);
         sleep(1000);
 
-        press(robot, KeyEvent.VK_S);
+        press(KeyEvent.VK_S);
         sleep(200);
-        press(robot, KeyEvent.VK_T);
+        press(KeyEvent.VK_T);
         sleep(200);
-        press(robot, KeyEvent.VK_A);
+        press(KeyEvent.VK_A);
         sleep(200);
-        press(robot, KeyEvent.VK_T);
+        press(KeyEvent.VK_T);
         sleep(200);
-        press(robot, KeyEvent.VK_E);
+        press(KeyEvent.VK_E);
         sleep(200);
-        press(robot, KeyEvent.VK_F);
+        press(KeyEvent.VK_F);
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER); /* choose Stateful */
+        press(KeyEvent.VK_ENTER); /* choose Stateful */
         sleep(1000);
 
-        moveTo(robot, 812, 179);
+        moveTo(812, 179);
         sleep(5000);
-        leftClick(robot); /* apply */
-        checkTest(cluster, "test1", 11.9);
+        leftClick(); /* apply */
+        checkTest("test1", 11.9);
         sleep(3000);
         /* set clone max to 1 */
-        moveTo(robot, 978, 381);
+        moveTo(978, 381);
         sleep(3000);
-        leftClick(robot); /* Clone Max */
+        leftClick(); /* Clone Max */
         sleep(3000);
-        leftClick(robot);
+        leftClick();
         sleep(3000);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(3000);
-        press(robot, KeyEvent.VK_1);
+        press(KeyEvent.VK_1);
         sleep(3000);
-        setTimeouts(robot, false);
-        moveTo(robot, 812, 179);
+        setTimeouts(false);
+        moveTo(812, 179);
         sleep(3000);
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         sleep(3000);
-        checkTest(cluster, "test1", 12);
-        stopResource(robot, statefulX, statefulY, 0);
+        checkTest("test1", 12);
+        stopResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 13);
+        checkTest("test1", 13);
 
-        startResource(robot, statefulX, statefulY, 0);
+        startResource(statefulX, statefulY, 0);
         sleep(10000);
-        checkTest(cluster, "test1", 14);
-        unmanageResource(robot, statefulX, statefulY, 0);
+        checkTest("test1", 14);
+        unmanageResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 15);
-        manageResource(robot, statefulX, statefulY, 0);
+        checkTest("test1", 15);
+        manageResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 16);
+        checkTest("test1", 16);
 
         /* IP addr cont. */
-        stopResource(robot, ipX, ipY, 0);
+        stopResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 17);
-        startResource(robot, ipX, ipY, 0);
+        checkTest("test1", 17);
+        startResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 18);
-        unmanageResource(robot, ipX, ipY, 0);
+        checkTest("test1", 18);
+        unmanageResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 19);
-        manageResource(robot, ipX, ipY, 0);
+        checkTest("test1", 19);
+        manageResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 20);
-        migrateResource(robot, ipX, ipY, 0);
+        checkTest("test1", 20);
+        migrateResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 21);
-        unmigrateResource(robot, ipX, ipY, 0);
+        checkTest("test1", 21);
+        unmigrateResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest(cluster, "test1", 22);
+        checkTest("test1", 22);
 
         /* Group cont. */
-        stopResource(robot, gx, gy - 30, 15);
+        stopResource(gx, gy - 30, 15);
         sleep(10000);
-        checkTest(cluster, "test1", 23);
-        startResource(robot, gx, gy - 30, 15);
+        checkTest("test1", 23);
+        startResource(gx, gy - 30, 15);
         sleep(8000);
-        checkTest(cluster, "test1", 24);
-        unmanageResource(robot, gx, gy - 30, 15);
+        checkTest("test1", 24);
+        unmanageResource(gx, gy - 30, 15);
         sleep(5000);
-        checkTest(cluster, "test1", 25);
-        manageResource(robot, gx, gy - 30, 15);
+        checkTest("test1", 25);
+        manageResource(gx, gy - 30, 15);
         sleep(5000);
-        checkTest(cluster, "test1", 26);
-        migrateResource(robot, gx, gy - 30, 25);
+        checkTest("test1", 26);
+        migrateResource(gx, gy - 30, 25);
         sleep(5000);
-        moveTo(robot, gx, gy);
-        leftClick(robot);
-        checkTest(cluster, "test1", 27);
-        unmigrateResource(robot, 1020, 180, 55); /* actions menu unmigrate */
+        moveTo(gx, gy);
+        leftClick();
+        checkTest("test1", 27);
+        unmigrateResource(1020, 180, 55); /* actions menu unmigrate */
         sleep(5000);
-        checkTest(cluster, "test1", 28);
-        stopResource(robot, ipX, ipY, 0);
+        checkTest("test1", 28);
+        stopResource(ipX, ipY, 0);
         sleep(5000);
-        moveTo(robot, gx, gy);
-        leftClick(robot);
-        stopGroup(robot, 1020, 180, 25); /* actions menu stop */
+        moveTo(gx, gy);
+        leftClick();
+        stopGroup(1020, 180, 25); /* actions menu stop */
         sleep(5000);
-        stopGroup(robot, statefulX, statefulY, 0);
-        stopEverything(robot); /* to be sure */
+        stopGroup(statefulX, statefulY, 0);
+        stopEverything(); /* to be sure */
         sleep(5000);
-        checkTest(cluster, "test1", 29);
+        checkTest("test1", 29);
 
         if (true) {
-            removeResource(robot, ipX, ipY, -15);
+            removeResource(ipX, ipY, -15);
             sleep(5000);
-            removeGroup(robot, gx, gy - 20, 0);
+            removeGroup(gx, gy - 20, 0);
             sleep(5000);
-            removeGroup(robot, statefulX, statefulY, -15);
+            removeGroup(statefulX, statefulY, -15);
         } else {
-            removeEverything(robot);
+            removeEverything();
         }
         if (!aborted) {
             sleepNoFactor(20000);
         }
-        checkTest(cluster, "test1", 1);
+        checkTest("test1", 1);
     }
 
 
     /** Stop everything. */
-    private static void stopEverything(final Robot robot) {
+    private static void stopEverything() {
         sleep(10000);
-        moveTo(robot, 335, 129); /* advanced */
+        moveTo(335, 129); /* advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
-        moveTo(robot, 700, 568);
-        rightClick(robot); /* popup */
+        moveTo(700, 568);
+        rightClick(); /* popup */
         sleep(3000);
-        moveTo(robot, 760, 644);
+        moveTo(760, 644);
         sleep(3000);
-        leftClick(robot);
-        moveTo(robot, 335, 129); /* not advanced */
+        leftClick();
+        moveTo(335, 129); /* not advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
     }
 
     /** Remove everything. */
-    private static void removeEverything(final Robot robot) {
+    private static void removeEverything() {
         sleep(10000);
-        moveTo(robot, 335, 129); /* advanced */
+        moveTo(335, 129); /* advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
-        moveTo(robot, 700, 568);
-        rightClick(robot); /* popup */
+        moveTo(700, 568);
+        rightClick(); /* popup */
         sleep(3000);
-        moveTo(robot, 760, 674);
+        moveTo(760, 674);
         sleep(3000);
-        leftClick(robot);
-        confirmRemove(robot);
+        leftClick();
+        confirmRemove();
         sleep(3000);
-        leftClick(robot);
-        moveTo(robot, 335, 129); /* not advanced */
+        leftClick();
+        moveTo(335, 129); /* not advanced */
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
     }
 
     /** Enable stonith if it is enabled. */
-    private static void enableStonith(final Robot robot,
-                                      final Cluster cluster) {
-        moveTo(robot, 271, 250);
-        leftClick(robot); /* global options */
+    private static void enableStonith() {
+        moveTo(271, 250);
+        leftClick(); /* global options */
         final String stonith = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("stonith-enabled");
         if (stonith != null && "false".equals(stonith)) {
-            moveTo(robot, 944, 298);
-            leftClick(robot); /* enable stonith */
+            moveTo(944, 298);
+            leftClick(); /* enable stonith */
         }
-        moveTo(robot, 828, 183);
+        moveTo(828, 183);
         sleep(2000);
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
     }
 
     /** Disable stonith if it is enabled. */
-    private static void disableStonith(final Robot robot,
-                                       final Cluster cluster) {
-        moveTo(robot, 271, 250);
-        leftClick(robot); /* global options */
+    private static void disableStonith() {
+        moveTo(271, 250);
+        leftClick(); /* global options */
         final String stonith = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("stonith-enabled");
         if (stonith == null || "true".equals(stonith)) {
-            moveTo(robot, 944, 298);
-            leftClick(robot); /* disable stonith */
+            moveTo(944, 298);
+            leftClick(); /* disable stonith */
         }
-        moveTo(robot, 1073, 337);
-        leftClick(robot); /* no quorum policy */
-        moveTo(robot, 1058, 355);
-        leftClick(robot); /* ignore */
-        moveTo(robot, 828, 183);
+        moveTo(1073, 337);
+        leftClick(); /* no quorum policy */
+        moveTo(1058, 355);
+        leftClick(); /* ignore */
+        moveTo(828, 183);
         sleep(2000);
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
     }
 
     /** TEST 2. */
-    private static void startTest2(final Robot robot, final Cluster cluster) {
+    private static void startTest2() {
         slowFactor = 0.3f;
         aborted = false;
         final int dummy1X = 235;
@@ -1460,93 +1450,92 @@ public final class RoboTest {
         final int phX = 445;
         final int phY = 390;
 
-        disableStonith(robot, cluster);
-        checkTest(cluster, "test2", 1);
+        disableStonith();
+        checkTest("test2", 1);
         /* create 4 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        chooseDummy(robot, dummy2X, dummy2Y, false, true);
-        chooseDummy(robot, dummy3X, dummy3Y, false, true);
-        chooseDummy(robot, dummy4X, dummy4Y, false, true);
-        checkTest(cluster, "test2", 2);
+        chooseDummy(dummy1X, dummy1Y, false, true);
+        chooseDummy(dummy2X, dummy2Y, false, true);
+        chooseDummy(dummy3X, dummy3Y, false, true);
+        chooseDummy(dummy4X, dummy4Y, false, true);
+        checkTest("test2", 2);
 
         /* placeholder */
-        moveTo(robot, phX, phY);
-        rightClick(robot);
+        moveTo(phX, phY);
+        rightClick();
         sleep(2000);
-        moveTo(robot, phX + 30 , phY + 45);
+        moveTo(phX + 30 , phY + 45);
         sleep(2000);
-        leftClick(robot);
-        checkTest(cluster, "test2", 3);
+        leftClick();
+        checkTest("test2", 3);
         /* constraints */
-        addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 1 */
+        addConstraint(phX, phY, 0, false, -1); /* with dummy 1 */
         sleep(2000);
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
         sleep(5000);
-        checkTest(cluster, "test2", 4);
+        checkTest("test2", 4);
 
         final int dum1PopX = dummy1X + 130;
         final int dum1PopY = dummy1Y + 50;
         for (int i = 0; i < 1; i++) {
-            removeOrder(robot, dum1PopX, dum1PopY);
+            removeOrder(dum1PopX, dum1PopY);
             sleep(4000);
 
-            checkTest(cluster, "test2", 5);
+            checkTest("test2", 5);
 
-            addOrder(robot, dum1PopX, dum1PopY);
+            addOrder(dum1PopX, dum1PopY);
             sleep(4000);
-            checkTest(cluster, "test2", 6);
+            checkTest("test2", 6);
 
-            removeColocation(robot, dum1PopX, dum1PopY);
+            removeColocation(dum1PopX, dum1PopY);
             sleep(5000);
-            checkTest(cluster, "test2", 7);
+            checkTest("test2", 7);
 
-            addColocation(robot, dum1PopX, dum1PopY);
+            addColocation(dum1PopX, dum1PopY);
             sleep(4000);
-            checkTest(cluster, "test2", 8);
+            checkTest("test2", 8);
         }
 
-        addConstraint(robot, dummy3X, dummy3Y, 80, false, -1); /* with ph */
+        addConstraint(dummy3X, dummy3Y, 80, false, -1); /* with ph */
         sleep(5000);
-        checkTest(cluster, "test2", 9);
+        checkTest("test2", 9);
 
         final int dum3PopX = dummy3X + 165;
         final int dum3PopY = dummy3Y - 10;
         for (int i = 0; i < 2; i++) {
-            removeColocation(robot, dum3PopX, dum3PopY);
+            removeColocation(dum3PopX, dum3PopY);
             sleep(4000);
 
-            checkTest(cluster, "test2", 9.1);
+            checkTest("test2", 9.1);
 
-            addColocation(robot, dum3PopX, dum3PopY);
+            addColocation(dum3PopX, dum3PopY);
             sleep(4000);
-            checkTest(cluster, "test2", 9.2);
+            checkTest("test2", 9.2);
 
-            removeOrder(robot, dum3PopX, dum3PopY);
+            removeOrder(dum3PopX, dum3PopY);
             sleep(5000);
-            checkTest(cluster, "test2", 9.3);
+            checkTest("test2", 9.3);
 
-            addOrder(robot, dum3PopX, dum3PopY);
+            addOrder(dum3PopX, dum3PopY);
             sleep(4000);
-            checkTest(cluster, "test2", 9.4);
+            checkTest("test2", 9.4);
         }
 
-        addConstraint(robot, phX, phY, 0, false, -1); /* with dummy 2 */
+        addConstraint(phX, phY, 0, false, -1); /* with dummy 2 */
         sleep(5000);
-        checkTest(cluster, "test2", 10);
-        addConstraint(robot, dummy4X, dummy4Y, 80, false, -1); /* with ph */
+        checkTest("test2", 10);
+        addConstraint(dummy4X, dummy4Y, 80, false, -1); /* with ph */
         sleep(5000);
-        checkTest(cluster, "test2", 11);
+        checkTest("test2", 11);
 
         /* ph -> dummy2 */
         final int dum2PopX = dummy2X - 10;
         final int dum2PopY = dummy2Y + 70;
-        removeConstraint(robot, dum2PopX, dum2PopY);
+        removeConstraint(dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.1);
-        addConstraintOrderOnly(robot,
-                               phX,
+        checkTest("test2", 11.1);
+        addConstraintOrderOnly(phX,
                                phY,
                                -50,
                                20,
@@ -1554,12 +1543,11 @@ public final class RoboTest {
                                false,
                                -1); /* with dummy 2 */
         sleep(4000);
-        checkTest(cluster, "test2", 11.2);
-        removeOrder(robot, dum2PopX, dum2PopY);
+        checkTest("test2", 11.2);
+        removeOrder(dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.3);
-        addConstraintColocationOnly(robot,
-                                    phX,
+        checkTest("test2", 11.3);
+        addConstraintColocationOnly(phX,
                                     phY,
                                     -50,
                                     23,
@@ -1567,25 +1555,24 @@ public final class RoboTest {
                                     false,
                                     -1); /* with dummy 2 */
         sleep(4000);
-        checkTest(cluster, "test2", 11.4);
-        addOrder(robot, dum2PopX, dum2PopY);
+        checkTest("test2", 11.4);
+        addOrder(dum2PopX, dum2PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.5);
+        checkTest("test2", 11.5);
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
         final int dum4PopY = dummy4Y - 10;
-        removeConstraint(robot, dum4PopX, dum4PopY);
+        removeConstraint(dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.6);
-        moveTo(robot, dummy4X + 20, dummy4Y + 5);
+        checkTest("test2", 11.6);
+        moveTo(dummy4X + 20, dummy4Y + 5);
         sleep(1000);
-        rightClick(robot); /* workaround for the next popup not working. */
+        rightClick(); /* workaround for the next popup not working. */
         sleep(1000);
-        rightClick(robot); /* workaround for the next popup not working. */
+        rightClick(); /* workaround for the next popup not working. */
         sleep(1000);
-        addConstraintColocationOnly(robot,
-                                    dummy4X,
+        addConstraintColocationOnly(dummy4X,
                                     dummy4Y,
                                     -50,
                                     93,
@@ -1593,16 +1580,15 @@ public final class RoboTest {
                                     false,
                                     -1); /* with ph */
         sleep(4000);
-        checkTest(cluster, "test2", 11.7);
-        removeColocation(robot, dum4PopX, dum4PopY);
+        checkTest("test2", 11.7);
+        removeColocation(dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.8);
-        moveTo(robot, dummy4X + 20, dummy4Y + 5);
+        checkTest("test2", 11.8);
+        moveTo(dummy4X + 20, dummy4Y + 5);
         sleep(1000);
-        rightClick(robot); /* workaround for the next popup not working. */
+        rightClick(); /* workaround for the next popup not working. */
         sleep(1000);
-        addConstraintOrderOnly(robot,
-                               dummy4X,
+        addConstraintOrderOnly(dummy4X,
                                dummy4Y,
                                -50,
                                90,
@@ -1610,58 +1596,58 @@ public final class RoboTest {
                                false,
                                -1); /* ph 2 */
         sleep(4000);
-        checkTest(cluster, "test2", 11.9);
-        addColocation(robot, dum4PopX, dum4PopY);
+        checkTest("test2", 11.9);
+        addColocation(dum4PopX, dum4PopY);
         sleep(4000);
-        checkTest(cluster, "test2", 11.91);
+        checkTest("test2", 11.91);
         /* remove one dummy */
-        stopResource(robot, dummy1X, dummy1Y, 0);
+        stopResource(dummy1X, dummy1Y, 0);
         sleep(5000);
-        checkTest(cluster, "test2", 11.92);
-        removeResource(robot, dummy1X, dummy1Y, -15);
+        checkTest("test2", 11.92);
+        removeResource(dummy1X, dummy1Y, -15);
         sleep(5000);
-        checkTest(cluster, "test2", 12);
-        stopResource(robot, dummy2X, dummy2Y, 0);
+        checkTest("test2", 12);
+        stopResource(dummy2X, dummy2Y, 0);
         sleep(10000);
-        stopResource(robot, dummy3X, dummy3Y, 0);
+        stopResource(dummy3X, dummy3Y, 0);
         sleep(10000);
-        stopResource(robot, dummy3X, dummy3Y, 0);
+        stopResource(dummy3X, dummy3Y, 0);
         sleep(10000);
-        stopResource(robot, dummy4X, dummy4Y, 0);
-        stopEverything(robot);
+        stopResource(dummy4X, dummy4Y, 0);
+        stopEverything();
         sleep(10000);
-        checkTest(cluster, "test2", 12.5);
+        checkTest("test2", 12.5);
         if (maybe()) {
             /* remove placeholder */
-            moveTo(robot, phX , phY);
-            rightClick(robot);
+            moveTo(phX , phY);
+            rightClick();
             sleep(1000);
-            moveTo(robot, phX + 40 , phY + 80);
-            leftClick(robot);
-            confirmRemove(robot);
+            moveTo(phX + 40 , phY + 80);
+            leftClick();
+            confirmRemove();
             sleep(5000);
 
             /* remove rest of the dummies */
-            removeResource(robot, dummy2X, dummy2Y, -15);
+            removeResource(dummy2X, dummy2Y, -15);
             sleep(5000);
-            checkTest(cluster, "test2", 14);
-            removeResource(robot, dummy3X, dummy3Y, -15);
+            checkTest("test2", 14);
+            removeResource(dummy3X, dummy3Y, -15);
             sleep(5000);
-            checkTest(cluster, "test2", 15);
-            removeResource(robot, dummy4X, dummy4Y, -15);
+            checkTest("test2", 15);
+            removeResource(dummy4X, dummy4Y, -15);
             sleep(5000);
         } else {
-            removeEverything(robot);
-            removePlaceHolder(robot, phX, phY);
+            removeEverything();
+            removePlaceHolder(phX, phY);
         }
         if (!aborted) {
             sleepNoFactor(20000);
         }
-        checkTest(cluster, "test2", 16);
+        checkTest("test2", 16);
     }
 
     /** TEST 4. */
-    private static void startTest4(final Robot robot, final Cluster cluster) {
+    private static void startTest4() {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
@@ -1688,76 +1674,76 @@ public final class RoboTest {
         final int ph2X = 445;
         final int ph2Y = 473;
 
-        disableStonith(robot, cluster);
-        checkTest(cluster, "test4", 1);
+        disableStonith();
+        checkTest("test4", 1);
         /* create 6 dummies */
-        chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        chooseDummy(robot, dummy2X, dummy2Y, false, true);
-        chooseDummy(robot, dummy3X, dummy3Y, false, true);
-        chooseDummy(robot, dummy4X, dummy4Y, false, true);
-        chooseDummy(robot, dummy5X, dummy5Y, false, true);
-        chooseDummy(robot, dummy6X, dummy6Y, false, true);
-        checkTest(cluster, "test4", 2);
+        chooseDummy(dummy1X, dummy1Y, false, true);
+        chooseDummy(dummy2X, dummy2Y, false, true);
+        chooseDummy(dummy3X, dummy3Y, false, true);
+        chooseDummy(dummy4X, dummy4Y, false, true);
+        chooseDummy(dummy5X, dummy5Y, false, true);
+        chooseDummy(dummy6X, dummy6Y, false, true);
+        checkTest("test4", 2);
 
         /* 2 placeholders */
         final int count = 1;
         for (int i = 0; i < count; i++) {
-            moveTo(robot, ph1X, ph1Y);
-            rightClick(robot);
+            moveTo(ph1X, ph1Y);
+            rightClick();
             sleep(2000);
-            moveTo(robot, ph1X + 30 , ph1Y + 45);
+            moveTo(ph1X + 30 , ph1Y + 45);
             sleep(2000);
-            leftClick(robot);
+            leftClick();
 
-            moveTo(robot, ph2X, ph2Y);
-            rightClick(robot);
+            moveTo(ph2X, ph2Y);
+            rightClick();
             sleep(2000);
-            moveTo(robot, ph2X + 30 , ph2Y + 45);
+            moveTo(ph2X + 30 , ph2Y + 45);
             sleep(2000);
-            leftClick(robot);
-            checkTest(cluster, "test4", 2);
+            leftClick();
+            checkTest("test4", 2);
 
             /* constraints */
             /* menu dummy 5 with ph2 */
-            addConstraint(robot, 120, 346, 160, false, -1);
+            addConstraint(120, 346, 160, false, -1);
             /* menu dummy 6 with ph2 */
-            addConstraint(robot, 120, 364, 160, false, -1);
+            addConstraint(120, 364, 160, false, -1);
 
             /* with dummy 3 */
-            addConstraint(robot, ph2X, ph2Y, 60, false, -1);
+            addConstraint(ph2X, ph2Y, 60, false, -1);
             /* with dummy 4 */
-            addConstraint(robot, ph2X, ph2Y, 60, false, -1);
+            addConstraint(ph2X, ph2Y, 60, false, -1);
 
             /* with ph1 */
-            addConstraint(robot, dummy3X, dummy3Y, 80, false, -1);
+            addConstraint(dummy3X, dummy3Y, 80, false, -1);
             /* with ph1 */
-            addConstraint(robot, dummy4X, dummy4Y, 80, false, -1);
+            addConstraint(dummy4X, dummy4Y, 80, false, -1);
 
-            addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 1 */
-            addConstraint(robot, ph1X, ph1Y, 5, false, -1); /* with dummy 2 */
-            checkTest(cluster, "test4", 2);
+            addConstraint(ph1X, ph1Y, 5, false, -1); /* with dummy 1 */
+            addConstraint(ph1X, ph1Y, 5, false, -1); /* with dummy 2 */
+            checkTest("test4", 2);
 
             /* TEST test */
             if (i < count - 1) {
-                removePlaceHolder(robot, ph1X, ph1Y);
-                removePlaceHolder(robot, ph2X, ph2Y);
+                removePlaceHolder(ph1X, ph1Y);
+                removePlaceHolder(ph2X, ph2Y);
             }
         }
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
 
-        checkTest(cluster, "test4", 3);
-        stopEverything(robot);
-        checkTest(cluster, "test4", 4);
-        removeEverything(robot);
-        removePlaceHolder(robot, ph1X, ph1Y);
-        removePlaceHolder(robot, ph2X, ph2Y);
+        checkTest("test4", 3);
+        stopEverything();
+        checkTest("test4", 4);
+        removeEverything();
+        removePlaceHolder(ph1X, ph1Y);
+        removePlaceHolder(ph2X, ph2Y);
         sleep(40000);
     }
 
     /** TEST 5. */
-    private static void startTest5(final Robot robot, final Cluster cluster) {
+    private static void startTest5() {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1770,67 +1756,67 @@ public final class RoboTest {
         final int ph1Y = 500;
 
 
-        disableStonith(robot, cluster);
+        disableStonith();
         /* create 2 dummies */
-        checkTest(cluster, "test5", 1);
+        checkTest("test5", 1);
 
         /* placeholders */
-        moveTo(robot, ph1X, ph1Y);
-        rightClick(robot);
+        moveTo(ph1X, ph1Y);
+        rightClick();
         sleep(2000);
-        moveTo(robot, ph1X + 30 , ph1Y + 45);
+        moveTo(ph1X + 30 , ph1Y + 45);
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        chooseDummy(robot, dummy2X, dummy2Y, false, true);
-        checkTest(cluster, "test5", 2);
+        chooseDummy(dummy1X, dummy1Y, false, true);
+        chooseDummy(dummy2X, dummy2Y, false, true);
+        checkTest("test5", 2);
 
-        addConstraint(robot, dummy2X, dummy2Y, 35, false, -1);
+        addConstraint(dummy2X, dummy2Y, 35, false, -1);
         sleep(20000);
-        checkTest(cluster, "test5", 2);
-        addConstraint(robot, ph1X, ph1Y, 5, false, -1);
+        checkTest("test5", 2);
+        addConstraint(ph1X, ph1Y, 5, false, -1);
 
-        moveTo(robot, ph1X, ph1Y);
+        moveTo(ph1X, ph1Y);
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         sleep(2000);
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(809, 192); /* ptest */
         sleep(2000);
-        leftClick(robot); /*  apply */
-        checkTest(cluster, "test5", 2.1);
+        leftClick(); /*  apply */
+        checkTest("test5", 2.1);
 
-        leftClick(robot); /*  apply */
+        leftClick(); /*  apply */
         int dum1PopX = dummy1X + 80;
         int dum1PopY = dummy1Y + 60;
-        removeConstraint(robot, dum1PopX, dum1PopY);
-        checkTest(cluster, "test5", 2.5);
+        removeConstraint(dum1PopX, dum1PopY);
+        checkTest("test5", 2.5);
         /* constraints */
         for (int i = 1; i <= 1; i++) {
-            addConstraint(robot, dummy1X, dummy1Y, 35, false, -1);
+            addConstraint(dummy1X, dummy1Y, 35, false, -1);
 
-            checkTest(cluster, "test5", 3);
+            checkTest("test5", 3);
 
-            removeConstraint(robot, dum1PopX, dum1PopY);
-            checkTest(cluster, "test5", 2.5);
+            removeConstraint(dum1PopX, dum1PopY);
+            checkTest("test5", 2.5);
 
-            addConstraint(robot, ph1X, ph1Y, 5, false, -1);
+            addConstraint(ph1X, ph1Y, 5, false, -1);
 
-            checkTest(cluster, "test5", 3.5);
+            checkTest("test5", 3.5);
 
-            removeConstraint(robot, dum1PopX, dum1PopY);
-            checkTest(cluster, "test5", 2.5);
-            Tools.info("i: " + i);
+            removeConstraint(dum1PopX, dum1PopY);
+            checkTest("test5", 2.5);
+            info("i: " + i);
         }
-        stopEverything(robot);
-        checkTest(cluster, "test5", 3.1);
-        removeEverything(robot);
+        stopEverything();
+        checkTest("test5", 3.1);
+        removeEverything();
         sleep(5000);
-        checkTest(cluster, "test5", 1);
+        checkTest("test5", 1);
     }
 
     /** TEST 6. */
-    private static void startTest6(final Robot robot, final Cluster cluster) {
+    private static void startTest6() {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1840,353 +1826,353 @@ public final class RoboTest {
         final int ph1Y = 394;
 
 
-        //disableStonith(robot, cluster);
+        //disableStonith();
         /* create 2 dummies */
-        //checkTest(cluster, "test5", 1);
+        //checkTest("test5", 1);
 
         /* placeholders */
-        moveTo(robot, ph1X, ph1Y);
-        rightClick(robot);
+        moveTo(ph1X, ph1Y);
+        rightClick();
         sleep(2000);
-        moveTo(robot, ph1X + 30 , ph1Y + 45);
+        moveTo(ph1X + 30 , ph1Y + 45);
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        chooseDummy(robot, dummy1X, dummy1Y, false, true);
-        //checkTest(cluster, "test5", 2);
+        chooseDummy(dummy1X, dummy1Y, false, true);
+        //checkTest("test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         for (int i = 0; i < 20; i++) {
-            Tools.info("i: " + i);
-            addConstraint(robot, ph1X, ph1Y, 5, false, -1);
+            info("i: " + i);
+            addConstraint(ph1X, ph1Y, 5, false, -1);
             if (!aborted) {
                 sleepNoFactor(2000);
             }
-            removeConstraint(robot, dum1PopX, dum1PopY);
+            removeConstraint(dum1PopX, dum1PopY);
         }
-        stopEverything(robot);
+        stopEverything();
         sleepNoFactor(20000);
-        removeEverything(robot);
+        removeEverything();
         sleepNoFactor(20000);
-        resetTerminalAreas(cluster);
+        resetTerminalAreas();
     }
 
-    private static void startTest7(final Robot robot, final Cluster cluster) {
+    private static void startTest7() {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
-        disableStonith(robot, cluster);
+        disableStonith();
         for (int i = 30; i > 0; i--) {
-            Tools.info("I: " + i);
-            checkTest(cluster, "test7", 1);
+            info("I: " + i);
+            checkTest("test7", 1);
             /* create dummy */
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, false, true);
-            checkTest(cluster, "test7", 2);
+            chooseDummy(dummy1X, dummy1Y, false, true);
+            checkTest("test7", 2);
             sleep(5000);
-            stopResource(robot, dummy1X, dummy1Y, 0);
-            checkTest(cluster, "test7", 3);
+            stopResource(dummy1X, dummy1Y, 0);
+            checkTest("test7", 3);
             sleep(5000);
-            removeResource(robot, dummy1X, dummy1Y, -15);
+            removeResource(dummy1X, dummy1Y, -15);
         }
         System.gc();
     }
 
-    private static void startTest8(final Robot robot, final Cluster cluster) {
+    private static void startTest8() {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 250;
-        disableStonith(robot, cluster);
-        checkTest(cluster, "test8", 1);
+        disableStonith();
+        checkTest("test8", 1);
         final int count = 30;
         for (int i = count; i > 0; i--) {
-            Tools.info("I: " + i);
-            //checkTest(cluster, "test7", 1);
+            info("I: " + i);
+            //checkTest("test7", 1);
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, false, true);
+            chooseDummy(dummy1X, dummy1Y, false, true);
             sleep(5000);
-            moveTo(robot, 550, 250);
-            leftPress(robot); /* move the reosurce */
-            moveTo(robot, 300, 250);
-            leftRelease(robot);
+            moveTo(550, 250);
+            leftPress(); /* move the reosurce */
+            moveTo(300, 250);
+            leftRelease();
         }
-        checkTest(cluster, "test8-" + count, 2);
-        stopEverything(robot);
-        checkTest(cluster, "test8-" + count, 3);
-        removeEverything(robot);
-        checkTest(cluster, "test8", 4);
-        resetTerminalAreas(cluster);
+        checkTest("test8-" + count, 2);
+        stopEverything();
+        checkTest("test8-" + count, 3);
+        removeEverything();
+        checkTest("test8", 4);
+        resetTerminalAreas();
     }
 
-    private static void startTestA(final Robot robot, final Cluster cluster) {
+    private static void startTestA() {
         slowFactor = 0.5f;
         aborted = false;
         final int gx = 235;
         final int gy = 255;
-        disableStonith(robot, cluster);
+        disableStonith();
         for (int i = 20; i > 0; i--) {
-            Tools.info("I: " + i);
+            info("I: " + i);
 
-            checkTest(cluster, "testA", 1);
+            checkTest("testA", 1);
             /* group with dummy resources */
-            moveTo(robot, gx, gy);
+            moveTo(gx, gy);
             sleep(1000);
-            rightClick(robot); /* popup */
-            moveTo(robot, gx + 46, gy + 11);
+            rightClick(); /* popup */
+            moveTo(gx + 46, gy + 11);
             sleep(1000);
-            leftClick(robot); /* choose group */
+            leftClick(); /* choose group */
             sleep(3000);
             /* create dummy */
-            moveTo(robot, gx + 46, gy + 11);
-            rightClick(robot); /* group popup */
+            moveTo(gx + 46, gy + 11);
+            rightClick(); /* group popup */
             sleep(2000 + i * 500);
-            moveTo(robot, gx + 80, gy + 20);
-            moveTo(robot, gx + 84, gy + 22);
-            moveTo(robot, gx + 580, gy + 22);
+            moveTo(gx + 80, gy + 20);
+            moveTo(gx + 84, gy + 22);
+            moveTo(gx + 580, gy + 22);
             sleep(1000);
-            typeDummy(robot);
+            typeDummy();
             sleep(i * 300);
-            setTimeouts(robot, true);
-            moveTo(robot, 809, 192); /* ptest */
+            setTimeouts(true);
+            moveTo(809, 192); /* ptest */
             sleep(6000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(6000);
-            checkTest(cluster, "testA", 2);
-            stopResource(robot, gx, gy, 0);
+            checkTest("testA", 2);
+            stopResource(gx, gy, 0);
             sleep(6000);
-            checkTest(cluster, "testA", 3);
-            removeResource(robot, gx, gy, 0);
-            resetTerminalAreas(cluster);
+            checkTest("testA", 3);
+            removeResource(gx, gy, 0);
+            resetTerminalAreas();
         }
         System.gc();
     }
 
-    private static void startTestB(final Robot robot, final Cluster cluster) {
+    private static void startTestB() {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 255;
-        disableStonith(robot, cluster);
+        disableStonith();
         for (int i = 20; i > 0; i--) {
-            Tools.info("I: " + i);
-            checkTest(cluster, "testB", 1);
+            info("I: " + i);
+            checkTest("testB", 1);
             /* create dummy */
             sleep(5000);
-            chooseDummy(robot, dummy1X, dummy1Y, true, true);
-            checkTest(cluster, "testB", 2);
+            chooseDummy(dummy1X, dummy1Y, true, true);
+            checkTest("testB", 2);
             sleep(5000);
-            stopResource(robot, dummy1X, dummy1Y, 0);
-            checkTest(cluster, "testB", 3);
+            stopResource(dummy1X, dummy1Y, 0);
+            checkTest("testB", 3);
             sleep(5000);
-            removeResource(robot, dummy1X, dummy1Y, -15);
-            resetTerminalAreas(cluster);
+            removeResource(dummy1X, dummy1Y, -15);
+            resetTerminalAreas();
         }
         System.gc();
     }
 
-    private static void startTestC(final Robot robot, final Cluster cluster) {
+    private static void startTestC() {
         slowFactor = 0.5f;
         final int statefulX = 500;
         final int statefulY = 255;
-        disableStonith(robot, cluster);
+        disableStonith();
         for (int i = 20; i > 0; i--) {
-            Tools.info("I: " + i);
-            checkTest(cluster, "testC", 1);
+            info("I: " + i);
+            checkTest("testC", 1);
             /** Add m/s Stateful resource */
-            moveTo(robot, statefulX, statefulY);
-            rightClick(robot); /* popup */
-            moveTo(robot, statefulX + 137, statefulY + 8);
-            moveTo(robot, statefulX + 137, statefulY + 28);
-            moveTo(robot, statefulX + 412, statefulY + 27);
-            moveTo(robot, statefulX + 432, statefulY + 70);
-            moveTo(robot, statefulX + 665, statefulY + 70);
+            moveTo(statefulX, statefulY);
+            rightClick(); /* popup */
+            moveTo(statefulX + 137, statefulY + 8);
+            moveTo(statefulX + 137, statefulY + 28);
+            moveTo(statefulX + 412, statefulY + 27);
+            moveTo(statefulX + 432, statefulY + 70);
+            moveTo(statefulX + 665, statefulY + 70);
             sleep(1000);
 
-            press(robot, KeyEvent.VK_S);
+            press(KeyEvent.VK_S);
             sleep(200);
-            press(robot, KeyEvent.VK_T);
+            press(KeyEvent.VK_T);
             sleep(200);
-            press(robot, KeyEvent.VK_A);
+            press(KeyEvent.VK_A);
             sleep(200);
-            press(robot, KeyEvent.VK_T);
+            press(KeyEvent.VK_T);
             sleep(200);
-            press(robot, KeyEvent.VK_E);
+            press(KeyEvent.VK_E);
             sleep(200);
-            press(robot, KeyEvent.VK_F);
+            press(KeyEvent.VK_F);
             sleep(200);
-            press(robot, KeyEvent.VK_ENTER); /* choose Stateful */
+            press(KeyEvent.VK_ENTER); /* choose Stateful */
             sleep(1000);
 
-            moveTo(robot, 812, 179);
+            moveTo(812, 179);
             sleep(1000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(4000);
-            stopResource(robot, statefulX, statefulY, -20);
-            checkTest(cluster, "testC", 2);
+            stopResource(statefulX, statefulY, -20);
+            checkTest("testC", 2);
             sleep(5000);
-            removeResource(robot, statefulX, statefulY, -20);
-            resetTerminalAreas(cluster);
+            removeResource(statefulX, statefulY, -20);
+            resetTerminalAreas();
         }
     }
 
     /** Pacemaker Leak tests. */
-    private static void startTestD(final Robot robot, final Cluster cluster) {
+    private static void startTestD() {
         slowFactor = 0.2f;
         aborted = false;
         int count = 20;
         final int dummy1X = 540;
         final int dummy1Y = 250;
         for (int i = count; i > 0; i--) {
-            Tools.info("1 I: " + i);
-            chooseDummy(robot, dummy1X, dummy1Y, false, false);
-            removeResource(robot, dummy1X, dummy1Y, -20);
+            info("1 I: " + i);
+            chooseDummy(dummy1X, dummy1Y, false, false);
+            removeResource(dummy1X, dummy1Y, -20);
         }
-        chooseDummy(robot, dummy1X, dummy1Y, false, false);
+        chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
         for (int i = count; i > 0; i--) {
-            Tools.info("2 I: " + i);
+            info("2 I: " + i);
             double rand = Math.random();
             if (rand < 0.33) {
                 if (pos == 1) {
                     continue;
                 }
                 pos = 1;
-                moveTo(robot, 796, 247);
-                leftClick(robot);
+                moveTo(796, 247);
+                leftClick();
             } else if (rand < 0.66) {
                 if (pos == 2) {
                     continue;
                 }
                 pos = 2;
-                moveTo(robot, 894, 248);
-                leftClick(robot);
+                moveTo(894, 248);
+                leftClick();
             } else {
                 if (pos == 3) {
                     continue;
                 }
                 pos = 3;
-                moveTo(robot, 994, 248);
-                leftClick(robot);
+                moveTo(994, 248);
+                leftClick();
             }
         }
-        removeResource(robot, dummy1X, dummy1Y, -20);
+        removeResource(dummy1X, dummy1Y, -20);
     }
 
     /** Host wizard deadlock. */
-    private static void startTestE(final Robot robot, final Cluster cluster) {
+    private static void startTestE() {
         slowFactor = 0.2f;
         aborted = false;
         int count = 200;
         for (int i = count; i > 0; i--) {
-            Tools.info("1 I: " + i);
-            moveTo(robot, 300 , 200); /* host */
+            info("1 I: " + i);
+            moveTo(300 , 200); /* host */
             sleep(2000);
-            rightClick(robot);
+            rightClick();
             sleep(2000);
-            moveTo(robot, 400 , 220); /* wizard */
+            moveTo(400 , 220); /* wizard */
             sleep(2000);
-            leftClick(robot);
+            leftClick();
             sleep(30000);
-            moveTo(robot, 940 , 570); /* cancel */
+            moveTo(940 , 570); /* cancel */
             sleep(2000);
-            leftClick(robot);
+            leftClick();
             sleep(2000);
         }
     }
 
     /** Cloned group. */
-    private static void startTestF(final Robot robot, final Cluster cluster) {
+    private static void startTestF() {
         slowFactor = 0.2f;
         aborted = false;
         final int gx = 235;
         final int gy = 255;
-        disableStonith(robot, cluster);
-        checkTest(cluster, "testF", 1);
+        disableStonith();
+        checkTest("testF", 1);
         /* group with dummy resources */
-        moveTo(robot, gx, gy);
+        moveTo(gx, gy);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, gx + 46, gy + 11);
+        rightClick(); /* popup */
+        moveTo(gx + 46, gy + 11);
         sleep(1000);
-        leftClick(robot); /* choose group */
+        leftClick(); /* choose group */
         sleep(3000);
-        moveTo(robot, 900, 250);
-        leftClick(robot); /* clone */
+        moveTo(900, 250);
+        leftClick(); /* clone */
 
         final int gxM = 110; /* tree menu */
         final int gyM = 290;
         int type = 1;
         //int type = 2;
         for (int i = 2; i > 0; i--) {
-            Tools.info("I: " + i);
+            info("I: " + i);
             /* create dummy */
-            moveTo(robot, gxM + 46, gyM + 11);
-            rightClick(robot); /* group popup */
+            moveTo(gxM + 46, gyM + 11);
+            rightClick(); /* group popup */
             sleep(2000 + i * 500);
-            moveTo(robot, gxM + 80, gyM + 20);
-            moveTo(robot, gxM + 84, gyM + 22);
-            moveTo(robot, gxM + 580, gyM + 22);
+            moveTo(gxM + 80, gyM + 20);
+            moveTo(gxM + 84, gyM + 22);
+            moveTo(gxM + 580, gyM + 22);
             sleep(1000);
-            typeDummy(robot);
+            typeDummy();
             sleep(i * 300);
-            setTimeouts(robot, true);
+            setTimeouts(true);
             if (type == 1) {
-                moveTo(robot, 809, 192); /* ptest */
+                moveTo(809, 192); /* ptest */
                 sleep(6000);
-                leftClick(robot); /* apply */
+                leftClick(); /* apply */
                 sleep(6000);
             }
         }
         if (type != 1) {
-            moveTo(robot, 809, 192); /* ptest */
+            moveTo(809, 192); /* ptest */
             sleep(6000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(6000);
         }
-        checkTest(cluster, "testF", 2);
+        checkTest("testF", 2);
         /* set resource stickiness */
-        moveTo(robot, 1000, 480);
+        moveTo(1000, 480);
         sleep(1000);
-        leftClick(robot);
+        leftClick();
         sleep(1000);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(200);
-        press(robot, KeyEvent.VK_2);
+        press(KeyEvent.VK_2);
         sleep(1000);
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(809, 192); /* ptest */
         sleep(6000);
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         sleep(6000);
-        checkTest(cluster, "testF", 3);
+        checkTest("testF", 3);
 
-        stopResource(robot, gx, gy, 0);
+        stopResource(gx, gy, 0);
         sleep(6000);
-        checkTest(cluster, "testF", 4);
-        removeResource(robot, gx, gy, -40);
-        resetTerminalAreas(cluster);
+        checkTest("testF", 4);
+        removeResource(gx, gy, -40);
+        resetTerminalAreas();
         System.gc();
     }
 
     /** Cluster wizard locked until focus is lost. */
-    private static void startGUITest1(final Robot robot) {
+    private static void startGUITest1() {
         slowFactor = 0.2f;
         aborted = false;
         int count = 200;
         for (int i = count; i > 0; i--) {
-            Tools.info("1 I: " + i);
-            moveTo(robot, 800 , 120); /* cluster wizard */
+            info("1 I: " + i);
+            moveTo(800 , 120); /* cluster wizard */
             sleep(500);
-            leftClick(robot);
+            leftClick();
             sleep(2000);
-            if (!isColor(robot, 336, 520, new Color(184, 207, 229))) {
-                Tools.info("testG: failed");    
+            if (!isColor(336, 520, new Color(184, 207, 229))) {
+                info("testG: failed");    
                 break;
             }
-            moveTo(robot, 910 , 565); /* cancel */
+            moveTo(910 , 565); /* cancel */
             sleep(500);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
         }
     }
@@ -2195,132 +2181,131 @@ public final class RoboTest {
     /** Sets location. */
 
     /** Sets location. */
-    private static void setLocation(final Robot robot, final Integer[] events) {
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar */
-        moveTo(robot, 1100, 510);
-        leftRelease(robot);
+    private static void setLocation(final Integer[] events) {
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar */
+        moveTo(1100, 510);
+        leftRelease();
 
-        moveTo(robot, 1041 , 331);
+        moveTo(1041 , 331);
         sleep(2000);
-        leftClick(robot);
+        leftClick();
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
                 sleep(400);
             }
-            press(robot, ev);
+            press(ev);
             sleep(400);
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyRelease(KeyEvent.VK_SHIFT);
                 sleep(400);
             }
         }
-        moveTo(robot, 809, 192); /* ptest */
+        moveTo(809, 192); /* ptest */
         sleep(4000);
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         sleep(2000);
 
-        moveTo(robot, 1100, 350);
-        leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1100, 150);
-        leftRelease(robot);
+        moveTo(1100, 350);
+        leftPress(); /* scroll bar back */
+        moveTo(1100, 150);
+        leftRelease();
 
     }
 
     /** Choose dummy resource. */
-    private static void typeDummy(final Robot robot) {
-        press(robot, KeyEvent.VK_D);
+    private static void typeDummy() {
+        press(KeyEvent.VK_D);
         sleep(200);
-        press(robot, KeyEvent.VK_U);
+        press(KeyEvent.VK_U);
         sleep(200);
-        press(robot, KeyEvent.VK_M);
+        press(KeyEvent.VK_M);
         sleep(200);
-        press(robot, KeyEvent.VK_M);
+        press(KeyEvent.VK_M);
         sleep(200);
-        press(robot, KeyEvent.VK_Y);
+        press(KeyEvent.VK_Y);
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER); /* choose dummy */
+        press(KeyEvent.VK_ENTER); /* choose dummy */
     }
 
     /** Sets start timeout. */
-    private static void setTimeouts(final Robot robot,
-                                    final boolean migrateTimeouts) {
+    private static void setTimeouts(final boolean migrateTimeouts) {
         int yCorr = -5;
         if (migrateTimeouts) {
             yCorr = -95;
         }
         sleep(3000);
-        moveTo(robot, 1100, 298);
-        leftPress(robot); /* scroll bar */
-        moveTo(robot, 1100, 550);
-        leftRelease(robot);
-        moveTo(robot, 956, 490 + yCorr);
-        leftClick(robot); /* start timeout */
-        press(robot, KeyEvent.VK_2);
+        moveTo(1100, 298);
+        leftPress(); /* scroll bar */
+        moveTo(1100, 550);
+        leftRelease();
+        moveTo(956, 490 + yCorr);
+        leftClick(); /* start timeout */
+        press(KeyEvent.VK_2);
         sleep(200);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(200);
-        press(robot, KeyEvent.VK_0);
-        sleep(200);
-
-        moveTo(robot, 956, 520 + yCorr);
-        leftClick(robot); /* stop timeout */
-        press(robot, KeyEvent.VK_1);
-        sleep(200);
-        press(robot, KeyEvent.VK_9);
-        sleep(200);
-        press(robot, KeyEvent.VK_2);
+        press(KeyEvent.VK_0);
         sleep(200);
 
-        moveTo(robot, 956, 550 + yCorr);
-        leftClick(robot); /* monitor timeout */
-        press(robot, KeyEvent.VK_1);
+        moveTo(956, 520 + yCorr);
+        leftClick(); /* stop timeout */
+        press(KeyEvent.VK_1);
         sleep(200);
-        press(robot, KeyEvent.VK_5);
+        press(KeyEvent.VK_9);
         sleep(200);
-        press(robot, KeyEvent.VK_4);
+        press(KeyEvent.VK_2);
         sleep(200);
 
-        moveTo(robot, 956, 580 + yCorr);
-        leftClick(robot); /* monitor interval */
-        press(robot, KeyEvent.VK_1);
+        moveTo(956, 550 + yCorr);
+        leftClick(); /* monitor timeout */
+        press(KeyEvent.VK_1);
         sleep(200);
-        press(robot, KeyEvent.VK_2);
+        press(KeyEvent.VK_5);
         sleep(200);
-        press(robot, KeyEvent.VK_1);
+        press(KeyEvent.VK_4);
+        sleep(200);
+
+        moveTo(956, 580 + yCorr);
+        leftClick(); /* monitor interval */
+        press(KeyEvent.VK_1);
+        sleep(200);
+        press(KeyEvent.VK_2);
+        sleep(200);
+        press(KeyEvent.VK_1);
         sleep(200);
         if (migrateTimeouts) {
-            moveTo(robot, 956, 610 + yCorr);
-            leftClick(robot); /* reload */
-            press(robot, KeyEvent.VK_BACK_SPACE);
+            moveTo(956, 610 + yCorr);
+            leftClick(); /* reload */
+            press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
-            press(robot, KeyEvent.VK_BACK_SPACE);
-            sleep(200);
-
-            moveTo(robot, 956, 630 + yCorr);
-            leftClick(robot); /* migrate from */
-            press(robot, KeyEvent.VK_1);
-            sleep(200);
-            press(robot, KeyEvent.VK_2);
-            sleep(200);
-            press(robot, KeyEvent.VK_3);
+            press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
 
-            moveTo(robot, 956, 660 + yCorr);
-            leftClick(robot); /* migrate to */
-            press(robot, KeyEvent.VK_1);
+            moveTo(956, 630 + yCorr);
+            leftClick(); /* migrate from */
+            press(KeyEvent.VK_1);
             sleep(200);
-            press(robot, KeyEvent.VK_2);
+            press(KeyEvent.VK_2);
             sleep(200);
-            press(robot, KeyEvent.VK_2);
+            press(KeyEvent.VK_3);
+            sleep(200);
+
+            moveTo(956, 660 + yCorr);
+            leftClick(); /* migrate to */
+            press(KeyEvent.VK_1);
+            sleep(200);
+            press(KeyEvent.VK_2);
+            sleep(200);
+            press(KeyEvent.VK_2);
             sleep(200);
         }
 
-        moveTo(robot, 1100, 350);
-        leftPress(robot); /* scroll bar back */
-        moveTo(robot, 1100, 150);
-        leftRelease(robot);
+        moveTo(1100, 350);
+        leftPress(); /* scroll bar back */
+        moveTo(1100, 150);
+        leftRelease();
     }
     private static void sleepNoFactor(final double x) {
         sleep(x / slowFactor);
@@ -2358,202 +2343,184 @@ public final class RoboTest {
     }
 
     /** Create dummy resource. */
-    private static void chooseDummy(final Robot robot,
-                                    final int x,
+    private static void chooseDummy(final int x,
                                     final int y,
                                     final boolean clone,
                                     final boolean apply) {
-        moveTo(robot, x, y);
+        moveTo(x, y);
         sleep(1000);
-        rightClick(robot); /* popup */
+        rightClick(); /* popup */
         sleep(1000);
-        moveTo(robot, x + 57, y + 28);
-        moveTo(robot, x + 290, y + 28);
-        moveTo(robot, x + 290, y + 72);
-        moveTo(robot, x + 580, y + 72);
+        moveTo(x + 57, y + 28);
+        moveTo(x + 290, y + 28);
+        moveTo(x + 290, y + 72);
+        moveTo(x + 580, y + 72);
         sleep(2000);
-        typeDummy(robot);
+        typeDummy();
         if (apply) {
             sleep(2000);
-            setTimeouts(robot, true);
+            setTimeouts(true);
             if (clone) {
-                moveTo(robot, 893, 250);
-                leftClick(robot); /* clone */
+                moveTo(893, 250);
+                leftClick(); /* clone */
             }
-            moveTo(robot, 809, 192); /* ptest */
+            moveTo(809, 192); /* ptest */
             sleep(4000);
-            leftClick(robot); /* apply */
+            leftClick(); /* apply */
             sleep(2000);
         }
     }
 
     /** Removes service. */
-    private static void removeResource(final Robot robot,
-                                       final int x,
+    private static void removeResource(final int x,
                                        final int y,
                                        final int corr) {
-        moveTo(robot, x + 20, y);
-        rightClick(robot);
+        moveTo(x + 20, y);
+        rightClick();
         sleep(1000);
-        moveTo(robot, x + 40 , y + 250 + corr);
-        leftClick(robot);
-        confirmRemove(robot);
+        moveTo(x + 40 , y + 250 + corr);
+        leftClick();
+        confirmRemove();
     }
 
     /** Removes group. */
-    private static void removeGroup(final Robot robot,
-                                    final int x,
-                                    final int y,
-                                    final int corr) {
-        moveTo(robot, x + 20, y);
-        rightClick(robot);
+    private static void removeGroup(final int x, final int y, final int corr) {
+        moveTo(x + 20, y);
+        rightClick();
         sleep(120000);
-        moveTo(robot, x + 40 , y + 250 + corr);
-        leftClick(robot);
-        confirmRemove(robot);
+        moveTo(x + 40 , y + 250 + corr);
+        leftClick();
+        confirmRemove();
     }
 
     /** Removes placeholder. */
-    private static void removePlaceHolder(final Robot robot,
-                                          final int x,
-                                          final int y) {
-        moveTo(robot, x + 20, y);
-        rightClick(robot);
+    private static void removePlaceHolder(final int x, final int y) {
+        moveTo(x + 20, y);
+        rightClick();
         sleep(1000);
-        moveTo(robot, x + 40 , y + 60);
-        leftClick(robot);
-        confirmRemove(robot);
+        moveTo(x + 40 , y + 60);
+        leftClick();
+        confirmRemove();
     }
 
     /** Confirms remove dialog. */
-    private static void confirmRemove(final Robot robot) {
+    private static void confirmRemove() {
         sleep(1000);
-        moveTo(robot, 512 , 472);
-        leftClick(robot);
+        moveTo(512 , 472);
+        leftClick();
     }
 
     /** Stops resource. */
-    private static void stopResource(final Robot robot,
-                                     final int x,
+    private static void stopResource(final int x,
                                      final int y,
                                      final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+        moveTo(x + 50, y + 5);
         sleep(2000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 130 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 130 + yFactor);
         sleep(6000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Stops group. */
-    private static void stopGroup(final Robot robot,
-                                  final int x,
+    private static void stopGroup(final int x,
                                   final int y,
                                   final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 130 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 130 + yFactor);
         sleep(120000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Removes target role. */
-    private static void resetStartStopResource(final Robot robot,
-                                               final int x,
-                                               final int y) {
-        moveTo(robot, x + 50, y + 5);
+    private static void resetStartStopResource(final int x, final int y) {
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        leftClick(robot); /* select */
+        leftClick(); /* select */
 
-        moveTo(robot, 1072, 496);
-        leftClick(robot); /* pull down */
-        moveTo(robot, 1044, 520);
-        leftClick(robot); /* choose */
-        moveTo(robot, 814, 189);
+        moveTo(1072, 496);
+        leftClick(); /* pull down */
+        moveTo(1044, 520);
+        leftClick(); /* choose */
+        moveTo(814, 189);
         sleep(6000); /* ptest */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
     }
 
     /** Starts resource. */
-    private static void startResource(final Robot robot,
-                                     final int x,
-                                     final int y,
-                                     final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+    private static void startResource(final int x,
+                                      final int y,
+                                      final int yFactor) {
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 80 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 80 + yFactor);
         sleep(6000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Migrate resource. */
-    private static void migrateResource(final Robot robot,
-                                        final int x,
+    private static void migrateResource(final int x,
                                         final int y,
                                         final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 220 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 220 + yFactor);
         sleep(6000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Unmigrate resource. */
-    private static void unmigrateResource(final Robot robot,
-                                          final int x,
+    private static void unmigrateResource(final int x,
                                           final int y,
                                           final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+        moveTo(x + 50, y + 5);
         sleep(6000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 260 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 260 + yFactor);
         sleep(12000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Unmanage resource. */
-    private static void unmanageResource(final Robot robot,
-                                         final int x,
+    private static void unmanageResource(final int x,
                                          final int y,
                                          final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 200 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 200 + yFactor);
         sleep(6000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Manage resource. */
-    private static void manageResource(final Robot robot,
-                                         final int x,
-                                         final int y,
-                                         final int yFactor) {
-        moveTo(robot, x + 50, y + 5);
+    private static void manageResource(final int x,
+                                       final int y,
+                                       final int yFactor) {
+        moveTo(x + 50, y + 5);
         sleep(1000);
-        rightClick(robot); /* popup */
-        moveTo(robot, x + 70, y + 200 + yFactor);
+        rightClick(); /* popup */
+        moveTo(x + 70, y + 200 + yFactor);
         sleep(6000); /* ptest */
-        leftClick(robot); /* stop */
+        leftClick(); /* stop */
     }
 
     /** Go to the group service menu. */
-    private static void groupServiceMenu(final Robot robot,
-                                         final int x,
+    private static void groupServiceMenu(final int x,
                                          final int y,
                                          final int groupService) {
         final int groupServicePos = 365 + groupService;
         final int startBefore = 100 + groupService;
-        moveTo(robot, x + 82, y + groupServicePos);
-        moveTo(robot, x + 382, y + groupServicePos);
+        moveTo(x + 82, y + groupServicePos);
+        moveTo(x + 382, y + groupServicePos);
     }
 
     /** Adds constraint from vertex. */
-    private static void addConstraint(final Robot robot,
-                                      final int x,
+    private static void addConstraint(final int x,
                                       final int y,
                                       final int with,
                                       final boolean group,
@@ -2562,31 +2529,30 @@ public final class RoboTest {
         if (group) {
             groupcor = 24;
         }
-        moveTo(robot, x + 20, y + 5);
+        moveTo(x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */
+            rightClickGroup(); /* popup */
         } else {
-            rightClick(robot); /* popup */
+            rightClick(); /* popup */
         }
         if (groupService >= 0) {
-            groupServiceMenu(robot, x, y, groupService);
+            groupServiceMenu(x, y, groupService);
             final int startBefore = 100 + groupService;
-            moveTo(robot, x + 382, y + startBefore);
-            moveTo(robot, x + 632, y + startBefore);
-            moveTo(robot, x + 632, y + startBefore + with);
+            moveTo(x + 382, y + startBefore);
+            moveTo(x + 632, y + startBefore);
+            moveTo(x + 632, y + startBefore + with);
         } else {
-            moveTo(robot, x + 82, y + 50 + groupcor);
-            moveTo(robot, x + 335, y + 50 + groupcor);
-            moveTo(robot, x + 335, y + 50 + groupcor + with);
+            moveTo(x + 82, y + 50 + groupcor);
+            moveTo(x + 335, y + 50 + groupcor);
+            moveTo(x + 335, y + 50 + groupcor + with);
         }
         sleep(6000); /* ptest */
-        leftClick(robot); /* start before */
+        leftClick(); /* start before */
     }
 
     /** Adds constraint (order only) from vertex. */
-    private static void addConstraintOrderOnly(final Robot robot,
-                                               final int x,
+    private static void addConstraintOrderOnly(final int x,
                                                final int y,
                                                final int xCorrection,
                                                final int skipY,
@@ -2597,27 +2563,24 @@ public final class RoboTest {
         if (group) {
             groupcor = 24;
         }
-        moveTo(robot, x + 20, y + 5);
+        moveTo(x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */
+            rightClickGroup(); /* popup */
         } else {
-            rightClick(robot); /* popup */
+            rightClick(); /* popup */
         }
-        moveTo(robot, x + 82, y + 50 + groupcor);
-        moveTo(robot, x + 335, y + 50 + groupcor);
-        moveTo(robot, x + 335, y + 50 + groupcor + skipY + 34);
-        moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 34);
-        moveTo(robot,
-               x + 520 + xCorrection,
-               y + 50 + groupcor + skipY + 34 + with);
+        moveTo(x + 82, y + 50 + groupcor);
+        moveTo(x + 335, y + 50 + groupcor);
+        moveTo(x + 335, y + 50 + groupcor + skipY + 34);
+        moveTo(x + 500 + xCorrection, y + 50 + groupcor + skipY + 34);
+        moveTo(x + 520 + xCorrection, y + 50 + groupcor + skipY + 34 + with);
         sleep(6000); /* ptest */
-        leftClick(robot); /* start before */
+        leftClick(); /* start before */
     }
 
     /** Adds constraint (colocation only) from vertex. */
-    private static void addConstraintColocationOnly(final Robot robot,
-                                                    final int x,
+    private static void addConstraintColocationOnly(final int x,
                                                     final int y,
                                                     final int xCorrection,
                                                     final int skipY,
@@ -2628,131 +2591,119 @@ public final class RoboTest {
         if (group) {
             groupcor = 24;
         }
-        moveTo(robot, x + 20, y + 5);
+        moveTo(x + 20, y + 5);
         sleep(1000);
         if (group) {
-            rightClickGroup(robot); /* popup */
+            rightClickGroup(); /* popup */
         } else {
-            rightClick(robot); /* popup */
+            rightClick(); /* popup */
         }
-        moveTo(robot, x + 82, y + 50 + groupcor);
+        moveTo(x + 82, y + 50 + groupcor);
         sleep(1000);
-        moveTo(robot, x + 335, y + 50 + groupcor);
+        moveTo(x + 335, y + 50 + groupcor);
         sleep(1000);
-        moveTo(robot, x + 335, y + 50 + groupcor + skipY + 7);
+        moveTo(x + 335, y + 50 + groupcor + skipY + 7);
         sleep(1000);
-        moveTo(robot, x + 500 + xCorrection, y + 50 + groupcor + skipY + 7);
+        moveTo(x + 500 + xCorrection, y + 50 + groupcor + skipY + 7);
         sleep(1000);
-        moveTo(robot,
-               x + 520 + xCorrection,
-               y + 50 + groupcor + skipY + 7 + with);
+        moveTo(x + 520 + xCorrection, y + 50 + groupcor + skipY + 7 + with);
         sleep(6000); /* ptest */
-        leftClick(robot); /* start before */
+        leftClick(); /* start before */
     }
 
     /** Removes constraint. */
-    private static void removeConstraint(final Robot robot,
-                                         final int popX,
-                                         final int popY) {
-        moveTo(robot, popX, popY);
+    private static void removeConstraint(final int popX, final int popY) {
+        moveTo(popX, popY);
         sleep(10000);
-        rightClick(robot); /* constraint popup */
+        rightClick(); /* constraint popup */
         sleep(2000);
-        moveTo(robot, popX + 70, popY + 20);
+        moveTo(popX + 70, popY + 20);
         sleep(6000); /* ptest */
-        leftClick(robot); /* remove ord */
+        leftClick(); /* remove ord */
     }
 
     /** Removes order. */
-    private static void removeOrder(final Robot robot,
-                                    final int popX,
-                                    final int popY) {
-        moveTo(robot, popX, popY);
+    private static void removeOrder(final int popX, final int popY) {
+        moveTo(popX, popY);
         sleep(1000);
-        rightClick(robot); /* constraint popup */
-        moveTo(robot, popX + 70, popY + 50);
+        rightClick(); /* constraint popup */
+        moveTo(popX + 70, popY + 50);
         sleep(6000); /* ptest */
-        leftClick(robot); /* remove ord */
+        leftClick(); /* remove ord */
     }
 
     /** Adds order. */
-    private static void addOrder(final Robot robot,
-                                 final int popX,
-                                 final int popY) {
-        moveTo(robot, popX, popY);
+    private static void addOrder(final int popX, final int popY) {
+        moveTo(popX, popY);
         sleep(1000);
-        rightClick(robot); /* constraint popup */
-        moveTo(robot, popX + 70, popY + 50);
+        rightClick(); /* constraint popup */
+        moveTo(popX + 70, popY + 50);
         sleep(6000); /* ptest */
-        leftClick(robot); /* add ord */
+        leftClick(); /* add ord */
     }
 
     /** Removes colocation. */
-    private static void removeColocation(final Robot robot,
-                                         final int popX,
-                                         final int popY) {
-        moveTo(robot, popX, popY);
+    private static void removeColocation(final int popX, final int popY) {
+        moveTo(popX, popY);
         sleep(1000);
-        rightClick(robot); /* constraint popup */
-        moveTo(robot, popX + 70, popY + 93);
+        rightClick(); /* constraint popup */
+        moveTo(popX + 70, popY + 93);
         sleep(6000); /* ptest */
-        leftClick(robot); /* remove col */
+        leftClick(); /* remove col */
     }
 
     /** Adds colocation. */
-    private static void addColocation(final Robot robot,
-                                      final int popX,
-                                      final int popY) {
-        moveTo(robot, popX, popY);
+    private static void addColocation(final int popX, final int popY) {
+        moveTo(popX, popY);
         sleep(1000);
-        rightClick(robot); /* constraint popup */
-        moveTo(robot, popX + 70, popY + 90);
+        rightClick(); /* constraint popup */
+        moveTo(popX + 70, popY + 90);
         sleep(6000); /* ptest */
-        leftClick(robot); /* add col */
+        leftClick(); /* add col */
     }
 
     /** TEST 3. */
-    private static void startTest3(final Robot robot, final Cluster cluster) {
+    private static void startTest3() {
         slowFactor = 0.3f;
         aborted = false;
-        disableStonith(robot, cluster);
+        disableStonith();
         for (int i = 20; i > 0; i--) {
-            Tools.info("I: " + i);
-            checkTest(cluster, "test3", 1);
+            info("I: " + i);
+            checkTest("test3", 1);
             /* filesystem/drbd */
-            moveTo(robot, 577, 253);
-            rightClick(robot); /* popup */
-            moveTo(robot, 709, 278);
-            moveTo(robot, 894, 283);
-            leftClick(robot); /* choose fs */
-            moveTo(robot, 1075, 406);
-            leftClick(robot); /* choose drbd */
-            moveTo(robot, 1043, 444);
-            leftClick(robot); /* choose drbd */
-            moveTo(robot, 1068, 439);
-            leftClick(robot); /* mount point */
-            moveTo(robot, 1039, 475);
-            leftClick(robot); /* mount point */
+            moveTo(577, 253);
+            rightClick(); /* popup */
+            moveTo(709, 278);
+            moveTo(894, 283);
+            leftClick(); /* choose fs */
+            moveTo(1075, 406);
+            leftClick(); /* choose drbd */
+            moveTo(1043, 444);
+            leftClick(); /* choose drbd */
+            moveTo(1068, 439);
+            leftClick(); /* mount point */
+            moveTo(1039, 475);
+            leftClick(); /* mount point */
 
-            moveTo(robot, 1068, 475);
-            leftClick(robot); /* filesystem type */
-            moveTo(robot, 1039, 560);
-            leftClick(robot); /* ext3 */
+            moveTo(1068, 475);
+            leftClick(); /* filesystem type */
+            moveTo(1039, 560);
+            leftClick(); /* ext3 */
 
-            moveTo(robot, 815, 186);
-            leftClick(robot); /* apply */
+            moveTo(815, 186);
+            leftClick(); /* apply */
             sleep(2000);
-            checkTest(cluster, "test3", 2);
-            stopEverything(robot);
-            checkTest(cluster, "test3", 3);
-            removeEverything(robot);
-            resetTerminalAreas(cluster);
+            checkTest("test3", 2);
+            stopEverything();
+            checkTest("test3", 3);
+            removeEverything();
+            resetTerminalAreas();
         }
         System.gc();
     }
 
     /** Press button. */
-    private static void press(final Robot robot, final int ke)  {
+    private static void press(final int ke)  {
         if (aborted) {
             return;
         }
@@ -2762,7 +2713,7 @@ public final class RoboTest {
     }
 
     /** Left click. */
-    private static void leftClick(final Robot robot)  {
+    private static void leftClick()  {
         if (aborted) {
             return;
         }
@@ -2773,7 +2724,7 @@ public final class RoboTest {
     }
 
     /** Left press. */
-    private static void leftPress(final Robot robot)  {
+    private static void leftPress()  {
         if (aborted) {
             return;
         }
@@ -2782,7 +2733,7 @@ public final class RoboTest {
     }
 
     /** Left release. */
-    private static void leftRelease(final Robot robot)  {
+    private static void leftRelease()  {
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
         if (aborted) {
             return;
@@ -2791,7 +2742,7 @@ public final class RoboTest {
     }
 
     /** Right click. */
-    private static void rightClick(final Robot robot)  {
+    private static void rightClick()  {
         if (aborted) {
             return;
         }
@@ -2803,17 +2754,16 @@ public final class RoboTest {
     }
 
     /** Right click. */
-    private static void rightClickGroup(final Robot robot)  {
+    private static void rightClickGroup()  {
         if (aborted) {
             return;
         }
-        rightClick(robot);
+        rightClick();
         sleepNoFactor(10000);
     }
 
     /** Get color on this position. */
-    private static boolean isColor(final Robot robot,
-                                   final int fromX,
+    private static boolean isColor(final int fromX,
                                    final int fromY,
                                    final Color color) {
         if (aborted) {
@@ -2827,7 +2777,7 @@ public final class RoboTest {
         for (int i = 0; i < 5; i++) {
             for (int y = -20; y < 20; y++) {
                 if (i > 0) {
-                    moveTo(robot, fromX, fromY + y);
+                    moveTo(fromX, fromY + y);
                 }
                 if (color.equals(
                       robot.getPixelColor(appX + xOffset, appY + y))) {
@@ -2840,9 +2790,7 @@ public final class RoboTest {
     }
 
     /** Move to position. */
-    private static void moveTo(final Robot robot,
-                               final int toX,
-                               final int toY) {
+    private static void moveTo(final int toX, final int toY) {
         if (aborted) {
             return;
         }
@@ -2908,7 +2856,7 @@ public final class RoboTest {
             return;
         }
         final Robot robot = rbt;
-        Tools.info("start register movement in 3 seconds");
+        info("start register movement in 3 seconds");
         sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {
             @Override public void run() {
@@ -2924,10 +2872,10 @@ public final class RoboTest {
                                                       pos.getY() - loc.getY());
                     sleepNoFactor(2000);
                     if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
-                        Tools.info("moveTo(robot, "
-                                    + (int) newPos.getX()
-                                    + ", "
-                                    + (int) newPos.getY() + ");");
+                        info("moveTo("
+                             + (int) newPos.getX()
+                             + ", "
+                             + (int) newPos.getY() + ");");
                     }
                     prevPrevP = prevP;
                     prevP = newPos;
@@ -2935,7 +2883,7 @@ public final class RoboTest {
                         break;
                     }
                 }
-                Tools.info("stopped movement registering");
+                info("stopped movement registering");
             }
         });
         thread.start();
@@ -2943,7 +2891,7 @@ public final class RoboTest {
 
     /** Return vertical position of the blockdevices. */
     private static int getBlockDevY() {
-        Tools.info("move to position, start in 10 seconds");
+        info("move to position, start in 10 seconds");
         sleepNoFactor(10000);
         final Point2D loc =
            Tools.getGUIData().getMainFrame().getLocationOnScreen();
@@ -2956,214 +2904,206 @@ public final class RoboTest {
         return y;
     }
 
-    private static void addDrbdResource(final Robot robot,
-                                        final int blockDevY) {
-        moveTo(robot, 334, blockDevY); /* add drbd resource */
-        rightClick(robot);
-        moveTo(robot, 342, blockDevY + 6);
-        moveTo(robot, 667, blockDevY + 7);
-        leftClick(robot);
+    private static void addDrbdResource(final int blockDevY) {
+        moveTo(334, blockDevY); /* add drbd resource */
+        rightClick();
+        moveTo(342, blockDevY + 6);
+        moveTo(667, blockDevY + 7);
+        leftClick();
         sleep(20000);
     }
 
-    private static void newDrbdResource(final Robot robot) {
-        moveTo(robot, 720, 570); /* new drbd resource */
-        leftClick(robot); /* next */
+    private static void newDrbdResource() {
+        moveTo(720, 570); /* new drbd resource */
+        leftClick(); /* next */
         sleep(10000);
     }
 
-    private static void chooseDrbdResourceInterface(final Robot robot,
-                                                    final int offset) {
-        moveTo(robot, 521, 372 + offset); /* interface */
-        leftClick(robot);
-        moveTo(robot, 486, 416 + offset);
-        leftClick(robot);
+    private static void chooseDrbdResourceInterface(final int offset) {
+        moveTo(521, 372 + offset); /* interface */
+        leftClick();
+        moveTo(486, 416 + offset);
+        leftClick();
         sleep(1000);
     }
 
-    private static void chooseDrbdResource(final Robot robot) {
-        chooseDrbdResourceInterface(robot, 0);
-        chooseDrbdResourceInterface(robot, 30);
+    private static void chooseDrbdResource() {
+        chooseDrbdResourceInterface(0);
+        chooseDrbdResourceInterface(30);
 
-        moveTo(robot, 720, 570);
-        leftClick(robot); /* next */
+        moveTo(720, 570);
+        leftClick(); /* next */
         sleep(10000);
     }
 
-    private static void addDrbdVolume(final Robot robot) {
-        moveTo(robot, 720, 570); /* volume */
-        leftClick(robot); /* next */
+    private static void addDrbdVolume() {
+        moveTo(720, 570); /* volume */
+        leftClick(); /* next */
         sleep(10000);
     }
 
-    private static void addBlockDevice(final Robot robot) {
-        moveTo(robot, 720, 570); /* block device */
-        leftClick(robot); /* next */
+    private static void addBlockDevice() {
+        moveTo(720, 570); /* block device */
+        leftClick(); /* next */
         sleep(10000);
     }
 
-    private static void addMetaData(final Robot robot) {
-        moveTo(robot, 720, 570); /* meta-data */
-        leftClick(robot); /* next */
+    private static void addMetaData() {
+        moveTo(720, 570); /* meta-data */
+        leftClick(); /* next */
         sleep(20000);
     }
 
-    private static void addFileSystem(final Robot robot) {
+    private static void addFileSystem() {
         /* do nothing. */
     }
 
-    private static void removeDrbdVolume(final Robot robot) {
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot); /* finish */
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
+    private static void removeDrbdVolume() {
+        moveTo(480, 250); /* rsc popup */
+        rightClick(); /* finish */
+        moveTo(555, 340); /* remove */
+        leftClick();
+        confirmRemove();
     }
 
 
     /** DRBD Test 1. */
-    private static void startDRBDTest1(final Robot robot,
-                                       final Cluster cluster,
-                                       final int blockDevY) {
+    private static void startDRBDTest1(final int blockDevY) {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
 
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
+        addBlockDevice();
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1);
-        addMetaData(robot);
-        addFileSystem(robot);
-        moveTo(robot, 820, 570); /* fs */
-        leftClick(robot); /* finish */
+        checkDRBDTest(drbdTest, 1);
+        addMetaData();
+        addFileSystem();
+        moveTo(820, 570); /* fs */
+        leftClick(); /* finish */
         sleep(10000);
-        checkDRBDTest(cluster, drbdTest, 1.1);
-        removeDrbdVolume(robot);
-        checkDRBDTest(cluster, drbdTest, 2);
+        checkDRBDTest(drbdTest, 1.1);
+        removeDrbdVolume();
+        checkDRBDTest(drbdTest, 2);
 
-        checkDRBDTest(cluster, drbdTest, 2);
+        checkDRBDTest(drbdTest, 2);
     }
 
     /** DRBD Test 2. */
-    private static void startDRBDTest2(final Robot robot,
-                                       final Cluster cluster,
-                                       final int blockDevY) {
+    private static void startDRBDTest2(final int blockDevY) {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
 
-        Tools.info(drbdTest + "/1");
-        addDrbdResource(robot, blockDevY);
+        info(drbdTest + "/1");
+        addDrbdResource(blockDevY);
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
+        moveTo(960, 570);
+        leftClick(); /* cancel */
         sleep(60000);
 
-        Tools.info(drbdTest + "/2");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
+        info(drbdTest + "/2");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
+        moveTo(960, 570);
+        leftClick(); /* cancel */
         sleep(60000);
 
-        Tools.info(drbdTest + "/3");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
+        info(drbdTest + "/3");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        confirmRemove(robot);
+        moveTo(960, 570);
+        leftClick(); /* cancel */
+        confirmRemove();
         sleep(60000);
 
-        Tools.info(drbdTest + "/4");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
+        info(drbdTest + "/4");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        confirmRemove(robot);
+        moveTo(960, 570);
+        leftClick(); /* cancel */
+        confirmRemove();
         sleep(60000);
 
-        Tools.info(drbdTest + "/5");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
+        info(drbdTest + "/5");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
+        addBlockDevice();
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1);
+        checkDRBDTest(drbdTest, 1);
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        confirmRemove(robot);
+        moveTo(960, 570);
+        leftClick(); /* cancel */
+        confirmRemove();
         sleep(60000);
 
-        Tools.info(drbdTest + "/6");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
+        info(drbdTest + "/6");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
+        addBlockDevice();
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1);
-        addMetaData(robot);
+        checkDRBDTest(drbdTest, 1);
+        addMetaData();
 
-        moveTo(robot, 960, 570);
-        leftClick(robot); /* cancel */
-        confirmRemove(robot);
+        moveTo(960, 570);
+        leftClick(); /* cancel */
+        confirmRemove();
         sleep(60000);
 
-        Tools.info(drbdTest + "/7");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
+        info(drbdTest + "/7");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
+        addBlockDevice();
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1);
-        addMetaData(robot);
-        addFileSystem(robot);
-        checkDRBDTest(cluster, drbdTest, 1.1);
+        checkDRBDTest(drbdTest, 1);
+        addMetaData();
+        addFileSystem();
+        checkDRBDTest(drbdTest, 1.1);
         sleep(20000);
 
-        moveTo(robot, 960, 570);
+        moveTo(960, 570);
         sleep(2000);
-        leftClick(robot); /* cancel */
+        leftClick(); /* cancel */
         sleep(20000);
-        confirmRemove(robot);
+        confirmRemove();
         sleep(60000);
 
-        Tools.info(drbdTest + "/8");
-        addDrbdResource(robot, blockDevY);
-        chooseDrbdResource(robot);
-        addDrbdVolume(robot);
-        addBlockDevice(robot);
-        addBlockDevice(robot);
+        info(drbdTest + "/8");
+        addDrbdResource(blockDevY);
+        chooseDrbdResource();
+        addDrbdVolume();
+        addBlockDevice();
+        addBlockDevice();
         sleep(50000);
-        checkDRBDTest(cluster, drbdTest, 1);
-        addMetaData(robot);
-        addFileSystem(robot);
-        moveTo(robot, 820, 570); /* fs */
-        leftClick(robot); /* finish */
+        checkDRBDTest(drbdTest, 1);
+        addMetaData();
+        addFileSystem();
+        moveTo(820, 570); /* fs */
+        leftClick(); /* finish */
         sleep(10000);
-        checkDRBDTest(cluster, drbdTest, 1.1);
+        checkDRBDTest(drbdTest, 1.1);
 
-        removeDrbdVolume(robot);
-        checkDRBDTest(cluster, drbdTest, 2);
+        removeDrbdVolume();
+        checkDRBDTest(drbdTest, 2);
     }
 
     /** DRBD Test 3. */
-    private static void startDRBDTest3(final Robot robot,
-                                       final Cluster cluster,
-                                       final int blockDevY) {
+    private static void startDRBDTest3(final int blockDevY) {
         /* Two drbds. */
         final String drbdTest = "drbd-test3";
         slowFactor = 0.2f;
@@ -3176,169 +3116,167 @@ public final class RoboTest {
         }
         int offset = 0;
         for (int i = 0; i < 2; i++) {
-            addDrbdResource(robot, blockDevY + offset);
+            addDrbdResource(blockDevY + offset);
             if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
-                newDrbdResource(robot);
+                newDrbdResource();
             }
-            chooseDrbdResource(robot);
+            chooseDrbdResource();
 
-            addDrbdVolume(robot);
-            addBlockDevice(robot);
-            addBlockDevice(robot);
+            addDrbdVolume();
+            addBlockDevice();
+            addBlockDevice();
             sleep(50000);
 
             if (offset == 0) {
-                checkDRBDTest(cluster, drbdTest, 1.1);
+                checkDRBDTest(drbdTest, 1.1);
             } else {
-                checkDRBDTest(cluster, drbdTest, 1.2);
+                checkDRBDTest(drbdTest, 1.2);
             }
             sleep(10000);
-            addMetaData(robot);
-            addFileSystem(robot);
-            moveTo(robot, 820, 570); /* fs */
-            leftClick(robot); /* finish */
+            addMetaData();
+            addFileSystem();
+            moveTo(820, 570); /* fs */
+            leftClick(); /* finish */
             sleep(10000);
 
             if (offset == 0) {
-                checkDRBDTest(cluster, drbdTest, 1);
+                checkDRBDTest(drbdTest, 1);
             }
             offset += 40;
         }
-        checkDRBDTest(cluster, drbdTest, 2);
+        checkDRBDTest(drbdTest, 2);
 
-        moveTo(robot, 480, 250); /* select r0 */
-        leftClick(robot);
+        moveTo(480, 250); /* select r0 */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 1073, protocolY); /* select protocol */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_UP); /* protocol b */
+        moveTo(1073, protocolY); /* select protocol */
+        leftClick();
+        press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
-        leftClick(robot);
+        moveTo(1075, 423 + correctionY); /* select fence peer */
+        leftClick();
         sleep(2000);
-        press(robot, KeyEvent.VK_DOWN); /* select dopd */
+        press(KeyEvent.VK_DOWN); /* select dopd */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_9);
+        press(KeyEvent.VK_9);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.1); /* 2.1 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.1); /* 2.1 */
 
 
         /* common */
-        moveTo(robot, 500, 390); /* select background */
-        leftClick(robot);
+        moveTo(500, 390); /* select background */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 970, 383); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 383); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_3);
+        press(KeyEvent.VK_3);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         sleep(10000);
-        checkDRBDTest(cluster, drbdTest, 2.11); /* 2.11 */
-        moveTo(robot, 970, 383); /* wfc timeout */
+        checkDRBDTest(drbdTest, 2.11); /* 2.11 */
+        moveTo(970, 383); /* wfc timeout */
         sleep(6000);
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(2000);
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
 
         /* resource */
-        moveTo(robot, 480, 250); /* select r0 */
-        leftClick(robot);
+        moveTo(480, 250); /* select r0 */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 1073, protocolY); /* select protocol */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_DOWN); /* protocol c */
+        moveTo(1073, protocolY); /* select protocol */
+        leftClick();
+        press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
-        leftClick(robot);
+        moveTo(1075, 423 + correctionY); /* select fence peer */
+        leftClick();
         sleep(2000);
-        press(robot, KeyEvent.VK_UP); /* deselect dopd */
+        press(KeyEvent.VK_UP); /* deselect dopd */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_5);
+        press(KeyEvent.VK_5);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.2); /* 2.2 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.3); /* 2.3 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot);
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
-        checkDRBDTest(cluster, drbdTest, 3);
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot);
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
-        checkDRBDTest(cluster, drbdTest, 4);
+        moveTo(480, 250); /* rsc popup */
+        rightClick();
+        moveTo(555, 340); /* remove */
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 3);
+        moveTo(480, 250); /* rsc popup */
+        rightClick();
+        moveTo(555, 340); /* remove */
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 4);
     }
 
     /** DRBD Test 4. */
-    private static void startDRBDTest4(final Robot robot,
-                                       final Cluster cluster,
-                                       final int blockDevY) {
+    private static void startDRBDTest4(final int blockDevY) {
         final String drbdTest = "drbd-test4";
         /* Two drbds. */
         slowFactor = 0.2f;
@@ -3351,382 +3289,379 @@ public final class RoboTest {
             correctionY = 30;
         }
         for (int i = 0; i < 2; i++) {
-            addDrbdResource(robot, blockDevY + offset);
+            addDrbdResource(blockDevY + offset);
             if (i == 0) {
                 /* first one */
-                chooseDrbdResource(robot);
+                chooseDrbdResource();
             } else {
                 /* existing drbd resource */
-                moveTo(robot, 460, 400);
-                leftClick(robot);
-                moveTo(robot, 460, 440);
-                leftClick(robot); /* drbd: r0 */
-                moveTo(robot, 720, 570);
-                leftClick(robot); /* next */
+                moveTo(460, 400);
+                leftClick();
+                moveTo(460, 440);
+                leftClick(); /* drbd: r0 */
+                moveTo(720, 570);
+                leftClick(); /* next */
                 sleep(10000);
 
-                //addDrbdVolume(robot);
+                //addDrbdVolume();
             }
-            addDrbdVolume(robot);
+            addDrbdVolume();
 
-            addBlockDevice(robot);
-            addBlockDevice(robot);
+            addBlockDevice();
+            addBlockDevice();
             sleep(50000);
             if (offset == 0) {
-                checkDRBDTest(cluster, drbdTest, 1.1);
+                checkDRBDTest(drbdTest, 1.1);
             } else {
-                checkDRBDTest(cluster, drbdTest, 1.2);
+                checkDRBDTest(drbdTest, 1.2);
             }
             sleep(10000);
 
-            addMetaData(robot);
-            addFileSystem(robot);
-            moveTo(robot, 820, 570); /* fs */
-            leftClick(robot); /* finish */
+            addMetaData();
+            addFileSystem();
+            moveTo(820, 570); /* fs */
+            leftClick(); /* finish */
             sleep(10000);
 
             if (offset == 0) {
-                checkDRBDTest(cluster, drbdTest, 1);
+                checkDRBDTest(drbdTest, 1);
             }
             offset += 40;
         }
-        checkDRBDTest(cluster, drbdTest, 2);
+        checkDRBDTest(drbdTest, 2);
 
-        moveTo(robot, 480, 250); /* select r0 */
-        leftClick(robot);
+        moveTo(480, 250); /* select r0 */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 1073, protocolY); /* select protocol */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_UP); /* protocol b */
+        moveTo(1073, protocolY); /* select protocol */
+        leftClick();
+        press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
-        leftClick(robot);
+        moveTo(1075, 423 + correctionY); /* select fence peer */
+        leftClick();
         sleep(2000);
-        press(robot, KeyEvent.VK_DOWN); /* select dopd */
+        press(KeyEvent.VK_DOWN); /* select dopd */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_9);
+        press(KeyEvent.VK_9);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.1); /* 2.1 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.1); /* 2.1 */
 
 
         /* common */
-        moveTo(robot, 500, 390); /* select background */
-        leftClick(robot);
+        moveTo(500, 390); /* select background */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 970, 383); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 383); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_3);
+        press(KeyEvent.VK_3);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
         sleep(10000);
-        checkDRBDTest(cluster, drbdTest, 2.11); /* 2.11 */
-        moveTo(robot, 970, 383); /* wfc timeout */
+        checkDRBDTest(drbdTest, 2.11); /* 2.11 */
+        moveTo(970, 383); /* wfc timeout */
         sleep(6000);
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(2000);
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
+        leftClick(); /* apply */
 
         /* resource */
-        moveTo(robot, 480, 250); /* select r0 */
-        leftClick(robot);
+        moveTo(480, 250); /* select r0 */
+        leftClick();
         sleep(2000);
-        leftClick(robot);
+        leftClick();
 
-        moveTo(robot, 1073, protocolY); /* select protocol */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_DOWN); /* protocol c */
+        moveTo(1073, protocolY); /* select protocol */
+        leftClick();
+        press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 1075, 423 + correctionY); /* select fence peer */
-        leftClick(robot);
+        moveTo(1075, 423 + correctionY); /* select fence peer */
+        leftClick();
         sleep(2000);
-        press(robot, KeyEvent.VK_UP); /* deselect dopd */
+        press(KeyEvent.VK_UP); /* deselect dopd */
         sleep(200);
-        press(robot, KeyEvent.VK_ENTER);
+        press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_5);
+        press(KeyEvent.VK_5);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply/disables tooltip */
+        leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.2); /* 2.2 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
-        moveTo(robot, 970, 480 + correctionY); /* wfc timeout */
-        leftClick(robot);
-        press(robot, KeyEvent.VK_BACK_SPACE);
+        moveTo(970, 480 + correctionY); /* wfc timeout */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
-        press(robot, KeyEvent.VK_0);
+        press(KeyEvent.VK_0);
         sleep(2000);
 
-        moveTo(robot, 814, 189);
+        moveTo(814, 189);
         sleep(6000); /* test */
-        leftClick(robot); /* apply */
-        checkDRBDTest(cluster, drbdTest, 2.3); /* 2.3 */
+        leftClick(); /* apply */
+        checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot);
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
-        checkDRBDTest(cluster, drbdTest, 3);
-        moveTo(robot, 480, 250); /* rsc popup */
-        rightClick(robot);
-        moveTo(robot, 555, 340); /* remove */
-        leftClick(robot);
-        confirmRemove(robot);
-        checkDRBDTest(cluster, drbdTest, 4);
+        moveTo(480, 250); /* rsc popup */
+        rightClick();
+        moveTo(555, 340); /* remove */
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 3);
+        moveTo(480, 250); /* rsc popup */
+        rightClick();
+        moveTo(555, 340); /* remove */
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 4);
     }
 
     /** VM Test 1. */
-    private static void startVMTest1(final String vmTest,
-                                     final Robot robot,
-                                     final Cluster cluster,
-                                     final int count) {
+    private static void startVMTest1(final String vmTest, final int count) {
         slowFactor = 0.2f;
         aborted = false;
         String name = "dmc";
         final int count2 = 3;
         for (int j = 0; j < count; j++) {
-            checkVMTest(cluster, vmTest, 1, name);
+            checkVMTest(vmTest, 1, name);
             name += "i";
         }
         name = "dmc";
         final List<String> names = new ArrayList<String>();
 
         for (int j = 0; j < count; j++) {
-            moveTo(robot, 56, 252); /* popup */
-            rightClick(robot);
-            moveTo(robot, 159, 271); /* new domain */
-            leftClick(robot);
-            moveTo(robot, 450, 380); /* domain name */
-            leftClick(robot);
-            press(robot, KeyEvent.VK_D);
+            moveTo(56, 252); /* popup */
+            rightClick();
+            moveTo(159, 271); /* new domain */
+            leftClick();
+            moveTo(450, 380); /* domain name */
+            leftClick();
+            press(KeyEvent.VK_D);
             sleep(200);
-            press(robot, KeyEvent.VK_M);
+            press(KeyEvent.VK_M);
             sleep(200);
-            press(robot, KeyEvent.VK_C);
+            press(KeyEvent.VK_C);
             sleep(200);
             for (int k = 0; k < j; k++) {
-                press(robot, KeyEvent.VK_I); /* dmci, dmcii, etc. */
+                press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
                 sleep(200);
             }
-            moveTo(robot, 730, 570);
-            leftClick(robot);
-            //press(robot, KeyEvent.VK_ENTER);
+            moveTo(730, 570);
+            leftClick();
+            //press(KeyEvent.VK_ENTER);
 
-            moveTo(robot, 593, 440); /* source file */
+            moveTo(593, 440); /* source file */
             sleep(2000);
-            leftClick(robot);
+            leftClick();
             sleep(2000);
-            press(robot, KeyEvent.VK_T);
+            press(KeyEvent.VK_T);
             sleep(200);
-            press(robot, KeyEvent.VK_E);
+            press(KeyEvent.VK_E);
             sleep(200);
-            press(robot, KeyEvent.VK_S);
+            press(KeyEvent.VK_S);
             sleep(200);
-            press(robot, KeyEvent.VK_T);
+            press(KeyEvent.VK_T);
             sleep(2000);
             for (int i = 0; i < count2; i++) {
-                moveTo(robot, 600, 375); /* disk/block device */
-                leftClick(robot);
+                moveTo(600, 375); /* disk/block device */
+                leftClick();
                 sleep(1000);
-                moveTo(robot, 430, 375); /* image */
-                leftClick(robot);
+                moveTo(430, 375); /* image */
+                leftClick();
                 sleep(1000);
             }
 
-            moveTo(robot, 730, 570);
-            leftClick(robot);
-            //press(robot, KeyEvent.VK_ENTER);
+            moveTo(730, 570);
+            leftClick();
+            //press(KeyEvent.VK_ENTER);
             sleep(5000);
-            moveTo(robot, 730, 570);
-            leftClick(robot);
-            //press(robot, KeyEvent.VK_ENTER); /* storage */
-            sleep(5000);
-            for (int i = 0; i < count2; i++) {
-                moveTo(robot, 600, 375); /* bridge */
-                leftClick(robot);
-                sleep(1000);
-                moveTo(robot, 430, 375); /* network */
-                leftClick(robot);
-                sleep(1000);
-            }
-            moveTo(robot, 730, 570);
-            leftClick(robot);
-            //press(robot, KeyEvent.VK_ENTER); /* network */
+            moveTo(730, 570);
+            leftClick();
+            //press(KeyEvent.VK_ENTER); /* storage */
             sleep(5000);
             for (int i = 0; i < count2; i++) {
-                moveTo(robot, 600, 375); /* sdl */
-                leftClick(robot);
+                moveTo(600, 375); /* bridge */
+                leftClick();
                 sleep(1000);
-                moveTo(robot, 430, 375); /* vnc */
-                leftClick(robot);
+                moveTo(430, 375); /* network */
+                leftClick();
                 sleep(1000);
             }
-            moveTo(robot, 730, 570);
-            leftClick(robot);
-            //press(robot, KeyEvent.VK_ENTER); /* display */
+            moveTo(730, 570);
+            leftClick();
+            //press(KeyEvent.VK_ENTER); /* network */
+            sleep(5000);
+            for (int i = 0; i < count2; i++) {
+                moveTo(600, 375); /* sdl */
+                leftClick();
+                sleep(1000);
+                moveTo(430, 375); /* vnc */
+                leftClick();
+                sleep(1000);
+            }
+            moveTo(730, 570);
+            leftClick();
+            //press(KeyEvent.VK_ENTER); /* display */
             sleep(5000);
 
             final int yMoreHosts = 30 * (cluster.getHosts().size() - 1);
-            moveTo(robot, 530, 410 + yMoreHosts); /* create config */
-            leftClick(robot);
-            checkVMTest(cluster, vmTest, 2, name);
+            moveTo(530, 410 + yMoreHosts); /* create config */
+            leftClick();
+            checkVMTest(vmTest, 2, name);
 
             if (cluster.getHosts().size() > 1) {
                 /* two hosts */
-                moveTo(robot, 410, 370); /* deselect first */
-                leftClick(robot);
-                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
-                leftClick(robot);
+                moveTo(410, 370); /* deselect first */
+                leftClick();
+                moveTo(560, 410 + yMoreHosts); /* create config */
+                leftClick();
                 checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
                 checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
 
-                moveTo(robot, 410, 370); /* select first */
-                leftClick(robot);
-                moveTo(robot, 410, 405); /* deselect second */
-                leftClick(robot);
-                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
-                leftClick(robot);
+                moveTo(410, 370); /* select first */
+                leftClick();
+                moveTo(410, 405); /* deselect second */
+                leftClick();
+                moveTo(560, 410 + yMoreHosts); /* create config */
+                leftClick();
                 checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
                 checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
 
-                moveTo(robot, 410, 405); /* select second */
-                leftClick(robot);
-                moveTo(robot, 560, 410 + yMoreHosts); /* create config */
-                leftClick(robot);
-                checkVMTest(cluster, vmTest, 2, name);
+                moveTo(410, 405); /* select second */
+                leftClick();
+                moveTo(560, 410 + yMoreHosts); /* create config */
+                leftClick();
+                checkVMTest(vmTest, 2, name);
             }
 
             sleepNoFactor(2000);
-            moveTo(robot, 814, 570); /* finish */
-            leftClick(robot);
+            moveTo(814, 570); /* finish */
+            leftClick();
             sleepNoFactor(5000);
 
-            moveTo(robot, 620, 480 + yMoreHosts); /* number of cpus */
+            moveTo(620, 480 + yMoreHosts); /* number of cpus */
             sleep(1000);
-            leftClick(robot);
+            leftClick();
             sleep(500);
-            press(robot, KeyEvent.VK_BACK_SPACE);
+            press(KeyEvent.VK_BACK_SPACE);
             sleep(500);
-            press(robot, KeyEvent.VK_2);
+            press(KeyEvent.VK_2);
             sleep(500);
-            moveTo(robot, 250, 190); /* apply */
+            moveTo(250, 190); /* apply */
             sleep(1000);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
-            checkVMTest(cluster, vmTest, 3, name);
+            checkVMTest(vmTest, 3, name);
 
             /* disk readonly */
-            moveTo(robot, 100, 280 + j * 15); /* choose disk */
+            moveTo(100, 280 + j * 15); /* choose disk */
             sleep(1000);
-            leftClick(robot);
-            //moveTo(robot, 1100, 298);
-            //leftPress(robot); /* scroll bar */
-            //moveTo(robot, 1100, 410);
-            //leftRelease(robot);
+            leftClick();
+            //moveTo(1100, 298);
+            //leftPress(); /* scroll bar */
+            //moveTo(1100, 410);
+            //leftRelease();
 
             //sleep(1000);
-            //moveTo(robot, 400, 450 + yMoreHosts); /* choose disk */
+            //moveTo(400, 450 + yMoreHosts); /* choose disk */
             //sleep(1000);
-            //leftClick(robot);
+            //leftClick();
             //sleep(1000);
 
-            moveTo(robot, 390, 540); /* readonly */
+            moveTo(390, 540); /* readonly */
             sleep(1000);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
-            moveTo(robot, 250, 190); /* apply */
+            moveTo(250, 190); /* apply */
             sleep(1000);
-            leftClick(robot);
-            checkVMTest(cluster, vmTest, 3.1, name);
+            leftClick();
+            checkVMTest(vmTest, 3.1, name);
             sleep(1000);
-            moveTo(robot, 390, 645); /* readonly */
+            moveTo(390, 645); /* readonly */
             sleep(1000);
-            leftClick(robot);
+            leftClick();
 
             sleep(1000);
-            moveTo(robot, 950, 180); /* host overview */
+            moveTo(950, 180); /* host overview */
             sleep(1000);
-            leftClick(robot);
+            leftClick();
             sleep(1000);
 
-            moveTo(robot, 250, 190); /* host apply */
-            leftClick(robot);
-            checkVMTest(cluster, vmTest, 3.2, name);
+            moveTo(250, 190); /* host apply */
+            leftClick();
+            checkVMTest(vmTest, 3.2, name);
 
             /* remove interface */
 
             // ...
-            //moveTo(robot, 1100, 410);
-            //leftPress(robot); /* scroll bar back */
-            //moveTo(robot, 1100, 200);
-            //leftRelease(robot);
+            //moveTo(1100, 410);
+            //leftPress(); /* scroll bar back */
+            //moveTo(1100, 200);
+            //leftRelease();
 
             names.add(name);
             for (final String n : names) {
-                checkVMTest(cluster, vmTest, 3, n);
+                checkVMTest(vmTest, 3, n);
             }
             name += "i";
         }
 
         sleepNoFactor(2000);
-        moveTo(robot, 1066, 284); /* remove */
-        leftClick(robot);
+        moveTo(1066, 284); /* remove */
+        leftClick();
         sleepNoFactor(2000);
-        moveTo(robot, 516, 476); /* confirm */
-        leftClick(robot);
+        moveTo(516, 476); /* confirm */
+        leftClick();
         sleepNoFactor(5000);
         for (int j = 1; j < count; j++) {
-            moveTo(robot, 1066, 225); /* remove */
-            leftClick(robot);
+            moveTo(1066, 225); /* remove */
+            leftClick();
             sleepNoFactor(2000);
-            moveTo(robot, 516, 476); /* confirm */
-            leftClick(robot);
+            moveTo(516, 476); /* confirm */
+            leftClick();
             sleepNoFactor(5000);
         }
     }
@@ -3737,9 +3672,20 @@ public final class RoboTest {
         System.exit(0);
     }
 
-    private static void resetTerminalAreas(final Cluster cluster) {
+    private static void resetTerminalAreas() {
         for (final Host h : cluster.getHosts()) {
-            h.getTerminalPanel().resetTerminalArea();
+            if (!aborted) {
+                h.getTerminalPanel().resetTerminalArea();
+            }
         }
+    }
+
+    private static void info(final String text) {
+        if (cluster != null) {
+            for (final Host h : cluster.getHosts()) {
+                h.getTerminalPanel().addCommandOutput(text);
+            }
+        }
+        Tools.info(text);
     }
 }
