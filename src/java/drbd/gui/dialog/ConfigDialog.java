@@ -478,17 +478,15 @@ public abstract class ConfigDialog {
                                   "ConfigDialog.Background.Dark"));
             final Container mainFrame =
                                 Tools.getGUIData().getMainFrame();
-            final CountDownLatch waitForSwing = new CountDownLatch(1);
             Tools.invokeAndWait(new Runnable() {
                 public void run() {
                     if (mainFrame instanceof JApplet) {
-                        dialogPanel =
-                           optionPane.createDialog((JApplet) mainFrame,
-                                                   getDialogTitle());
+                        final JFrame noframe = new JFrame();
+                        dialogPanel = new JDialog(noframe);
+                        dialogPanel.setContentPane(optionPane);
                     } else {
-                        dialogPanel = optionPane.createDialog(
-                                                    (JFrame) mainFrame,
-                                                    getDialogTitle());
+                        dialogPanel = new JDialog((JFrame) mainFrame);
+                        dialogPanel.setContentPane(optionPane);
                     }
                     dialogPanel.setModal(false);
                     dialogPanel.setResizable(true);
@@ -498,6 +496,13 @@ public abstract class ConfigDialog {
                             new Dimension(dialogWidth(), dialogHeight()));
                     dialogPanel.setMinimumSize(
                             new Dimension(dialogWidth(), dialogHeight()));
+                    if (mainFrame instanceof JApplet) {
+                        dialogPanel.setLocationRelativeTo(
+                                       ((JApplet) mainFrame).getContentPane());
+                    } else {
+                        dialogPanel.setLocationRelativeTo(
+                                       ((JFrame) mainFrame).getContentPane());
+                    }
                 }
             });
             /* set location like the previous dialog */
