@@ -423,7 +423,11 @@ public final class ServicesInfo extends EditableInfo {
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         boolean newService = false;
         int pos = 0;
-        for (String hbId : clStatus.getGroupResources(grpOrCloneId, testOnly)) {
+        for (final String hbId : clStatus.getGroupResources(grpOrCloneId,
+                                                            testOnly)) {
+            if (clStatus.isOrphaned(hbId) && Tools.getConfigData().isNoLRM()) {
+                continue;
+            }
             ServiceInfo newSi;
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {

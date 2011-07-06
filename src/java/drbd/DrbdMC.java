@@ -71,6 +71,8 @@ public final class DrbdMC extends JPanel {
     private static final String HELP_OP = "help";
     /** The --version option. */
     private static final String VERSION_OP = "version";
+    /** The --nolrm option. */
+    private static final String NOLRM_OP = "nolrm";
     /** The --auto option. */
     private static final String AUTO_OP = "auto";
     /** The --ro option. */
@@ -302,6 +304,8 @@ public final class DrbdMC extends JPanel {
                           + "ro - read only\n"
                           + "op - operator\n"
                           + "admin - administrator");
+        options.addOption(null, NOLRM_OP, false,
+                          "do not show removed resources from LRM.");
         options.addOption(null, "auto", true, "for testing");
         options.addOption("v", VERSION_OP, false, "print version");
         options.addOption(null, AUTO_OP, true, "for testing");
@@ -385,6 +389,7 @@ public final class DrbdMC extends JPanel {
                                                cmd.hasOption(STAGING_DRBD_OP));
             Tools.getConfigData().setStagingPacemaker(
                                           cmd.hasOption(STAGING_PACEMAKER_OP));
+            Tools.getConfigData().setNoLRM(cmd.hasOption(NOLRM_OP));
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             final String pwd = System.getProperty("user.home");
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,

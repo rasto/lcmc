@@ -158,6 +158,8 @@ public final class ConfigData {
     private boolean stagingDrbd = false;
     /** Whether more pacemaker installation options should appear. */
     private boolean stagingPacemaker = false;
+    /** Do not show resources that are only in LRM. */
+    private boolean noLRM = false;
     /** Frames per second for animations. */
     private float animFPS = 15;
     /** Access type of the application at the moment. */
@@ -559,6 +561,17 @@ public final class ConfigData {
     public boolean isTightvnc() {
         return tightvnc;
     }
+
+    /** Set whether to show resources that are only in LRM. */
+    public void setNoLRM(final boolean noLRM) {
+        this.noLRM = noLRM;
+    }
+
+    /** Return whether to show resources that are only in LRM. */
+    public boolean isNoLRM() {
+        return noLRM;
+    }
+
 
     /**
      * Sets whether the drbd packages should be downloaded from staging
