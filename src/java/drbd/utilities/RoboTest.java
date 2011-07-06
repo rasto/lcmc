@@ -292,13 +292,24 @@ public final class RoboTest {
                 if (robot == null) {
                     return;
                 }
-                String selected = "Services";
+                String selected = null;
                 if (cluster != null) {
                     selected =
                          cluster.getBrowser().getTree()
                                    .getLastSelectedPathComponent().toString();
                 }
-                if ("Services".equals(selected)
+                if (selected == null) {
+                    if ("1".equals(index)) {
+                        /* cluster wizard deadlock */
+                        final long startTime = System.currentTimeMillis();
+                        Tools.info("test" + index);
+                        startGUITest1(robot);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        Tools.info("test" + index + ", secs: "
+                                   + secs);
+                    }
+                } else if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
                     if ("0".equals(index)) {
@@ -526,15 +537,6 @@ public final class RoboTest {
                                        + secs);
                             i++;
                         }
-                    } else if ("g".equals(index)) {
-                        /* cluster wizard deadlock */
-                        final long startTime = System.currentTimeMillis();
-                        Tools.info("test" + index);
-                        startTestG(robot, cluster);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        Tools.info("test" + index + ", secs: "
-                                   + secs);
                     }
                 } else if ("Storage (DRBD)".equals(selected)) {
                     if ("0".equals(index)) {
@@ -2086,7 +2088,7 @@ public final class RoboTest {
             moveTo(robot, 400 , 220); /* wizard */
             sleep(2000);
             leftClick(robot);
-            sleep(10000);
+            sleep(30000);
             moveTo(robot, 940 , 570); /* cancel */
             sleep(2000);
             leftClick(robot);
@@ -2168,7 +2170,7 @@ public final class RoboTest {
     }
 
     /** Cluster wizard locked until focus is lost. */
-    private static void startTestG(final Robot robot, final Cluster cluster) {
+    private static void startGUITest1(final Robot robot) {
         slowFactor = 0.2f;
         aborted = false;
         int count = 200;
