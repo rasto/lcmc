@@ -1521,7 +1521,7 @@ sub compare_versions {
 
 sub pcmk_version_smaller_than {
 	my $version = shift;
-	my ($pcmk_version) = (get_cluster_versions() =~ /pm:(.*)/);
+	my ($pcmk_version) = (get_cluster_versions() =~ /pm:([\d.]*)/);
 	return compare_versions($pcmk_version, $version) < 0;
 }
 
