@@ -455,32 +455,32 @@ public abstract class ConfigDialog {
             /* create option pane */
             final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
+            optionPane = new JOptionPane(
+                                b,
+                                getMessageType(),
+                                JOptionPane.DEFAULT_OPTION,
+                                icon(),
+                                allOptions.toArray(
+                                 new JComponent[allOptions.size()]),
+                                dbc);
+            optionPane.setPreferredSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
+            optionPane.setMaximumSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
+            optionPane.setMinimumSize(
+                                new Dimension(dialogWidth(),
+                                              dialogHeight()));
+
+            optionPane.setBackground(
+                       Tools.getDefaultColor(
+                                  "ConfigDialog.Background.Dark"));
+            final Container mainFrame =
+                                Tools.getGUIData().getMainFrame();
+            final CountDownLatch waitForSwing = new CountDownLatch(1);
             Tools.invokeAndWait(new Runnable() {
                 public void run() {
-                    optionPane = new JOptionPane(
-                                        b,
-                                        getMessageType(),
-                                        JOptionPane.DEFAULT_OPTION,
-                                        icon(),
-                                        allOptions.toArray(
-                                         new JComponent[allOptions.size()]),
-                                        dbc);
-                    optionPane.setPreferredSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
-                    optionPane.setMaximumSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
-                    optionPane.setMinimumSize(
-                                        new Dimension(dialogWidth(),
-                                                      dialogHeight()));
-
-                    optionPane.setBackground(
-                               Tools.getDefaultColor(
-                                          "ConfigDialog.Background.Dark"));
-                    final Container mainFrame =
-                                        Tools.getGUIData().getMainFrame();
-                    final CountDownLatch waitForSwing = new CountDownLatch(1);
                     if (mainFrame instanceof JApplet) {
                         dialogPanel =
                            optionPane.createDialog((JApplet) mainFrame,
