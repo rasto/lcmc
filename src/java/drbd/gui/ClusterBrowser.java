@@ -2488,6 +2488,9 @@ public final class ClusterBrowser extends Browser {
             mHeartbeatIdToServiceLock();
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
             mHeartbeatIdToServiceUnlock();
+            if (si == null) {
+                continue;
+            }
             if (si.getService().isMaster()) {
                 return true;
             }
