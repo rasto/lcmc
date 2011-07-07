@@ -107,6 +107,15 @@ public final class Domain extends VMConfig {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
+            }
+        });
+    }
+
+    /** Inits dialog after it is visible. */
+    @Override protected void initDialogAfterVisible() {
+        super.initDialogAfterVisible();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 domainNameCB.requestFocus();
             }
         });
@@ -137,9 +146,6 @@ public final class Domain extends VMConfig {
                           Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                           null);
         domainNameCB = vdi.paramComboBoxGet(VMSXML.VM_PARAM_NAME, "wizard");
-
-
-
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);
