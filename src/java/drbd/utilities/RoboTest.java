@@ -309,7 +309,15 @@ public final class RoboTest {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startGUITest1();
+                        startGUITest1(100);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
+                    } else if ("2".equals(index)) {
+                        /* cluster wizard deadlock */
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        startGUITest2(100);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -660,6 +668,15 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
+                    } else if ("2".equals(index)) {
+                        /* VMs dialog disabled textfields check. */
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        startVMTest2("vm-test" + index, 100);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
+                        resetTerminalAreas();
                     }
                 }
                 info(selected + " test " + index + " done");
@@ -2066,7 +2083,9 @@ public final class RoboTest {
         aborted = false;
         int count = 200;
         for (int i = count; i > 0; i--) {
-            info("1 I: " + i);
+            if (i % 10 == 0) {
+                info("testE I: " + i);
+            }
             moveTo(300 , 200); /* host */
             sleep(2000);
             rightClick();
@@ -2155,19 +2174,35 @@ public final class RoboTest {
         System.gc();
     }
 
-    /** Cluster wizard locked until focus is lost. */
-    private static void startGUITest1() {
+    /** Host wizard locked until focus is lost. */
+    private static void startGUITest1(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        int count = 200;
         for (int i = count; i > 0; i--) {
+            if (i % 10 == 0) {
+                info("gui-test1 " + i);    
+            }
             info("1 I: " + i);
-            moveTo(800 , 120); /* cluster wizard */
+            moveTo(470, 120); /* host wizard */
             sleep(500);
             leftClick();
-            sleep(2000);
-            if (!isColor(336, 520, new Color(184, 207, 229))) {
-                info("testG: failed");    
+            sleep(1000);
+            if (!isColor(360, 490, new Color(255, 100, 100), true)) {
+                info("gui-test1 1: failed");    
+                break;
+            }
+            boolean ok = false;
+            for (int error = 0; error < 5; error++) {
+                sleep(100);
+                press(KeyEvent.VK_X);
+                if (!isColor(360, 490, new Color(255, 100, 100), false)) {
+                    sleepNoFactor(1000);
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok) {
+                info("gui-test1 2: failed");    
                 break;
             }
             moveTo(910 , 565); /* cancel */
@@ -2177,8 +2212,29 @@ public final class RoboTest {
         }
     }
 
+    /** Cluster wizard locked until focus is lost. */
+    private static void startGUITest2(final int count) {
+        slowFactor = 0.2f;
+        aborted = false;
+        for (int i = count; i > 0; i--) {
+            if (i % 10 == 0) {
+                info("gui-test2 " + i);    
+            }
 
-    /** Sets location. */
+            moveTo(800 , 120); /* cluster wizard */
+            sleep(500);
+            leftClick();
+            sleep(2000);
+            if (!isColor(336, 520, new Color(184, 207, 229), true)) {
+                info("gui-test2: failed");    
+                break;
+            }
+            moveTo(910 , 565); /* cancel */
+            sleep(500);
+            leftClick();
+            sleep(1000);
+        }
+    }
 
     /** Sets location. */
     private static void setLocation(final Integer[] events) {
@@ -2307,7 +2363,8 @@ public final class RoboTest {
         moveTo(1100, 150);
         leftRelease();
     }
-    private static void sleepNoFactor(final double x) {
+
+    public static void sleepNoFactor(final double x) {
         sleep(x / slowFactor);
     }
 
@@ -2762,10 +2819,11 @@ public final class RoboTest {
         sleepNoFactor(10000);
     }
 
-    /** Get color on this position. */
+    /** Returns true if there is the specified color on this position. */
     private static boolean isColor(final int fromX,
                                    final int fromY,
-                                   final Color color) {
+                                   final Color color,
+                                   final boolean expected) {
         if (aborted) {
             return true;
         }
@@ -2775,18 +2833,29 @@ public final class RoboTest {
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
         for (int i = 0; i < 5; i++) {
+            boolean isColor = false;
             for (int y = -20; y < 20; y++) {
                 if (i > 0) {
-                    moveTo(fromX, fromY + y);
+                    moveTo(fromX - i, fromY + y);
                 }
-                if (color.equals(
-                      robot.getPixelColor(appX + xOffset, appY + y))) {
-                    return true;
+                if (expected) {
+                    if (color.equals(
+                          robot.getPixelColor(appX + xOffset - i, appY + y))) {
+                        return true;
+                    }
+                } else {
+                    if (color.equals(
+                          robot.getPixelColor(appX + xOffset - i, appY + y))) {
+                        isColor = true;
+                    }
                 }
+            }
+            if (!expected && !isColor) {
+                return false;
             }
             Tools.sleep(1000);
         }
-        return false;
+        return !expected;
     }
 
     /** Move to position. */
@@ -3666,6 +3735,43 @@ public final class RoboTest {
         }
     }
 
+    /** Cluster wizard locked until focus is lost. */
+    private static void startVMTest2(final String vmTest, final int count) {
+        slowFactor = 0.1f;
+        aborted = false;
+        for (int i = count; i > 0; i--) {
+            if (i % 10 == 0) {
+                info("vm-test2 I: " + i);
+            }
+            moveTo(330, 170); /* new VM */
+            sleep(500);
+            leftClick();
+            sleep(1000);
+            if (!isColor(480, 370, new Color(255, 100, 100), true)) {
+                info("vm-test2 1: failed");    
+                break;
+            }
+            boolean ok = false;
+            for (int error = 0; error < 5; error++) {
+                sleep(100);
+                press(KeyEvent.VK_X);
+                if (!isColor(480, 370, new Color(255, 100, 100), false)) {
+                    sleepNoFactor(1000);
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok) {
+                info("vm-test2 2: failed");    
+                break;
+            }
+            moveTo(910 , 565); /* cancel */
+            sleep(500);
+            leftClick();
+            sleep(1000);
+        }
+    }
+
     private static void saveAndExit() {
         Tools.save(Tools.getConfigData().getSaveFile());
         sleepNoFactor(10000);
@@ -3680,10 +3786,10 @@ public final class RoboTest {
         }
     }
 
-    private static void info(final String text) {
+    public static void info(final String text) {
         if (cluster != null) {
             for (final Host h : cluster.getHosts()) {
-                h.getTerminalPanel().addCommandOutput(text);
+                h.getTerminalPanel().addCommandOutput(text + "\n");
             }
         }
         Tools.info(text);
