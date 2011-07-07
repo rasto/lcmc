@@ -1452,11 +1452,12 @@ sub get_cluster_versions {
 	my $cs_ais_conf;
 	if ($cs_version) {
 		$cs_ais_conf =
-		  system("ls /etc/corosync/corosync.conf 2>/dev/null") >> 8
+		  system("ls /etc/corosync/corosync.conf >/dev/null 2>&1") >> 8
 		  					 	      || "on";
 	} else {
 		$cs_ais_conf =
-		   system("ls /etc/ais/openais.conf 2>/dev/null") >> 8 || "on";
+			system("ls /etc/ais/openais.conf >/dev/null 2>&1") >> 8
+								|| "on";
 	}
 	chomp $hb_running;
 	chomp $ais_running;
