@@ -28,6 +28,7 @@ import drbd.utilities.ExecCallback;
 import drbd.utilities.ConvertCmdCallback;
 import drbd.utilities.ConnectionCallback;
 import drbd.utilities.NewOutputCallback;
+import drbd.utilities.RoboTest;
 import drbd.gui.ProgressBar;
 import drbd.gui.TerminalPanel;
 import drbd.gui.SSHGui;
@@ -2422,18 +2423,18 @@ public final class Host {
                 break;
             }
             i++;
-            Tools.sleep(i * 2000);
+            RoboTest.sleepNoFactor(i * 2000);
         }
         String nameS = " " + name;
         if (name == null) {
             nameS = "";
         }
         if (i > 0) {
-            Tools.info(getName() + " "
-                       + test + " " + index + nameS + " tries: " + (i + 1));
+            RoboTest.info(getName() + " "
+                           + test + " " + index + nameS + " tries: " + (i + 1));
         }
-        Tools.info(getName() + " "
-                   + test + " " + index + nameS + " " + out.getOutput());
+        RoboTest.info(getName() + " "
+                       + test + " " + index + nameS + " " + out.getOutput());
         return out.getExitCode() == 0;
     }
 

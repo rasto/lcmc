@@ -25,6 +25,7 @@ package drbd.gui.dialog.vm;
 import drbd.utilities.Tools;
 import drbd.gui.resources.VMSVirtualDomainInfo;
 import drbd.gui.dialog.WizardDialog;
+import drbd.gui.GuiComboBox;
 import drbd.data.VMSXML;
 
 import javax.swing.JPanel;
@@ -48,6 +49,7 @@ public final class Domain extends VMConfig {
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
+    private GuiComboBox domainNameCB;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME,
                                             VMSXML.VM_PARAM_TYPE,
@@ -109,6 +111,16 @@ public final class Domain extends VMConfig {
         });
     }
 
+    /** Inits dialog after it is visible. */
+    @Override protected void initDialogAfterVisible() {
+        super.initDialogAfterVisible();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                domainNameCB.requestFocus();
+            }
+        });
+    }
+
     /** Returns input pane where user can configure a vm. */
     @Override protected JComponent getInputPane() {
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
@@ -133,7 +145,7 @@ public final class Domain extends VMConfig {
                           Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
                           null);
-
+        domainNameCB = vdi.paramComboBoxGet(VMSXML.VM_PARAM_NAME, "wizard");
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);

@@ -95,16 +95,15 @@ public final class Name extends DialogCluster {
         super.initDialog();
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
-
         enableComponents();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                if (!Tools.getConfigData().existsCluster(getCluster())) {
-                    Tools.getConfigData().addClusterToClusters(getCluster());
-                    Tools.getGUIData().addClusterTab(getCluster());
-                }
-            }
-        });
+        if (!Tools.getConfigData().existsCluster(getCluster())) {
+            Tools.getConfigData().addClusterToClusters(getCluster());
+            Tools.getGUIData().addClusterTab(getCluster());
+        }
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 nameField.requestFocus();

@@ -331,6 +331,12 @@ public abstract class ConfigDialog {
     }
 
     /**
+     * This method is called immediatly after the dialog is shown.
+     */
+    protected void initDialogAfterVisible() {
+    }
+
+    /**
      * This method is called during every insert, update and remove events of
      * field that was added with addCheckField(). It does nothing by default.
      */
@@ -455,31 +461,31 @@ public abstract class ConfigDialog {
             /* create option pane */
             final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
-            optionPane = new JOptionPane(
-                                b,
-                                getMessageType(),
-                                JOptionPane.DEFAULT_OPTION,
-                                icon(),
-                                allOptions.toArray(
-                                 new JComponent[allOptions.size()]),
-                                dbc);
-            optionPane.setPreferredSize(
-                                new Dimension(dialogWidth(),
-                                              dialogHeight()));
-            optionPane.setMaximumSize(
-                                new Dimension(dialogWidth(),
-                                              dialogHeight()));
-            optionPane.setMinimumSize(
-                                new Dimension(dialogWidth(),
-                                              dialogHeight()));
-
-            optionPane.setBackground(
-                       Tools.getDefaultColor(
-                                  "ConfigDialog.Background.Dark"));
-            final Container mainFrame =
-                                Tools.getGUIData().getMainFrame();
             Tools.invokeAndWait(new Runnable() {
                 public void run() {
+                    optionPane = new JOptionPane(
+                                        b,
+                                        getMessageType(),
+                                        JOptionPane.DEFAULT_OPTION,
+                                        icon(),
+                                        allOptions.toArray(
+                                         new JComponent[allOptions.size()]),
+                                        dbc);
+                    optionPane.setPreferredSize(
+                                        new Dimension(dialogWidth(),
+                                                      dialogHeight()));
+                    optionPane.setMaximumSize(
+                                        new Dimension(dialogWidth(),
+                                                      dialogHeight()));
+                    optionPane.setMinimumSize(
+                                        new Dimension(dialogWidth(),
+                                                      dialogHeight()));
+
+                    optionPane.setBackground(
+                               Tools.getDefaultColor(
+                                          "ConfigDialog.Background.Dark"));
+                    final Container mainFrame =
+                                    Tools.getGUIData().getMainFrame();
                     if (mainFrame instanceof JApplet) {
                         final JFrame noframe = new JFrame();
                         dialogPanel = new JDialog(noframe);
@@ -530,13 +536,13 @@ public abstract class ConfigDialog {
                 }
             };
         optionPane.addPropertyChangeListener(propertyChangeListener);
-
-        dialogPanel.setVisible(true);
-        SwingUtilities.invokeLater(new Runnable() {
+        initDialog();
+        Tools.invokeAndWait(new Runnable() {
             public void run() {
-                initDialog();
+                dialogPanel.setVisible(true);
             }
         });
+        initDialogAfterVisible();
         try {
             dialogGate.await();
         } catch (InterruptedException ignored) {

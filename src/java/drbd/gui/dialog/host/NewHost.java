@@ -212,19 +212,20 @@ public final class NewHost extends DialogHost {
         return Tools.getString("Dialog.Host.NewHost.Description");
     }
 
-    /**
-     * Inits the dialog.
-     */
+    /** Inits the dialog. */
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         enableComponents();
         checkFields((GuiComboBox) null);
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 hostField.requestFocus();
-
             }
         });
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
