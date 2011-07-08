@@ -433,6 +433,12 @@ public abstract class ConfigDialog {
     public final ConfigDialog showDialog() {
         /* making non modal dialog */
         dialogGate = new CountDownLatch(1);
+        dialogPanel = null; /* TODO: disabled caching because back button
+                               wouldn't work with
+                               dialogPanel.setContentPane(optionPane) method
+                               it would work with optionPane.createDialog...
+                               but that causes lockups with old javas and
+                               gnome. */
         if (dialogPanel == null) {
             final ImageIcon[] icons = getIcons();
             MyButton defaultButtonClass = null;
