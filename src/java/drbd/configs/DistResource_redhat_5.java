@@ -98,7 +98,7 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + " && /sbin/chkconfig --add heartbeat"},
 
         /* old heartbeat */
-        {"HbPmInst.install.text.2", "the centos way: HB 2.1.3 (obsolete)" },
+        {"HbPmInst.install.text.2", "yum install: HB 2.1.3 (obsolete)" },
 
         {"HbPmInst.install.2",
          "/usr/sbin/useradd hacluster 2>/dev/null; "

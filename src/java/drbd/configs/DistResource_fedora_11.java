@@ -74,7 +74,7 @@ public final class DistResource_fedora_11 extends java.util.ListResourceBundle {
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.2",
-         "the fedora way: HB 2.1.x (obsolete)" },
+         "yum install: HB 2.1.x (obsolete)" },
 
         {"HbPmInst.install.2",
          "/usr/bin/yum -y install heartbeat"},

@@ -41,7 +41,7 @@ public final class DistResource_ubuntu_KARMIC
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 2.99.x"},
+         "apt-get install: 1.0.x / 2.99.x"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -49,7 +49,7 @@ public final class DistResource_ubuntu_KARMIC
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 1.0.x"},
+         "apt-get install: 1.0.x / 1.0.x"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"

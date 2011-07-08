@@ -53,7 +53,7 @@ public final class DistResource_debian_ETCH
          + "\\.(?:rpm|deb))\"! or goto LINE'"
         },
 
-        {"HbPmInst.install.text.1", "the debian way: HB 2.0.x (obsolete)"},
+        {"HbPmInst.install.text.1", "apt-get install: HB 2.0.x (obsolete)"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 

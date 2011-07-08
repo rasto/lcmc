@@ -41,7 +41,7 @@ public final class DistResource_ubuntu_INTREPID
 
         /* pacemaker/hb install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: HB 2.1.3 (obsolete)"},
+         "apt-get install: HB 2.1.3 (obsolete)"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -53,6 +53,6 @@ public final class DistResource_ubuntu_INTREPID
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the ubuntu way: 8.2.x"},
+         "apt-get install: 8.2.x"},
     };
 }

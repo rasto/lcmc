@@ -60,7 +60,7 @@ public final class DistResource_suse_OPENSUSE11_1
          + " fi"},
 
         /* Openais/Pacemaker native */
-        {"PmInst.install.text.2", "opensuse way: 1.0.x/0.80.x" },
+        {"PmInst.install.text.2", "zypper install: 1.0.x/0.80.x" },
         {"PmInst.install.2",
          "zypper -n install heartbeat-resources pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"

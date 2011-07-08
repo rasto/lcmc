@@ -52,7 +52,7 @@ public final class DistResource_redhatenterpriseserver
         {"DrbdInst.install",
          DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
-        {"HbPmInst.install.text.1", "the redhat way: HB 2.1.4 (obsolete)"},
+        {"HbPmInst.install.text.1", "yum install: HB 2.1.4 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */

@@ -44,7 +44,7 @@ public final class DistResource_fedora_12 extends java.util.ListResourceBundle {
          DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
 
         {"PmInst.install.text.1",
-         "the Fedora way: 1.0.x/1.2.x" },
+         "yum install: 1.0.x/1.2.x" },
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.2",

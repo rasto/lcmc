@@ -49,13 +49,13 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+).*"},
 
         /* heartbeat/pacemaker */
-        {"HbPmInst.install.text.1", "the debian way"},
+        {"HbPmInst.install.text.1", "apt-get install"},
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o"
          + " 'DPkg::Options::force=--force-confnew' heartbeat pacemaker"},
 
         /* corosync/pacemaker */
-        {"PmInst.install.text.1", "the debian way"},
+        {"PmInst.install.text.1", "apt-get install"},
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y -q install -o"
          + " 'DPkg::Options::force=--force-confnew' corosync pacemaker"
@@ -98,7 +98,7 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the debian way"},
+         "apt-get install"},
 
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "

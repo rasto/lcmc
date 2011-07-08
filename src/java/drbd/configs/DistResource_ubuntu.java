@@ -52,7 +52,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
 
         /* pacemaker heartbeat install method 1 */
         {"HbPmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 3.0.x"},
+         "apt-get install: 1.0.x / 3.0.x"},
 
         {"HbPmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -61,7 +61,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
 
         /* pacemaker corosync install method 1 */
         {"PmInst.install.text.1",
-         "the ubuntu way: 1.0.x / 1.2.x"},
+         "apt-get install: 1.0.x / 1.2.x"},
 
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
@@ -98,7 +98,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the ubuntu way: 8.3.x"},
+         "apt-get install: 8.3.x"},
 
         {"DrbdInst.install.3",
          "apt-get update && /usr/bin/apt-get -y install -o "

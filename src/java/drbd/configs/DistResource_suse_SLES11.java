@@ -90,7 +90,7 @@ public final class DistResource_suse_SLES11
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         " the suse way: 8.2.x"},
+         "zypper install: 8.2.x"},
 
         {"DrbdInst.install.3",
          "zypper -n in drbd drbd-kmp-`uname -r|sed s/.*-//`"},

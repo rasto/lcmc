@@ -44,7 +44,7 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
 
         {"DrbdInst.install",
          DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
-        {"HbPmInst.install.text.1", "the centos way: HB 2.1.3 (obsolete)"},
+        {"HbPmInst.install.text.1", "yum install: HB 2.1.3 (obsolete)"},
         {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */
@@ -75,7 +75,7 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the centos way: 8.3.x"},
+         "yum install: 8.3.x"},
 
         {"DrbdInst.install.3",
          "/usr/bin/yum -y install kmod-drbd83 drbd83"},

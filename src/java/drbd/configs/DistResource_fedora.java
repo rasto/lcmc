@@ -50,7 +50,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         /* DRBD native */
         {"DrbdInst.install.text.1",
-         "the Fedora way"},
+         "yum install"},
 
         {"DrbdInst.install.1",
          "yum -y install drbd-utils drbd-udev "
@@ -60,7 +60,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.1",
-         "the Fedora way: 1.1.x/3.0.x"},
+         "yum install: 1.1.x/3.0.x"},
 
         {"HbPmInst.install.1",
          "yum -y install pacemaker heartbeat "
@@ -86,7 +86,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         /* Corosync/Pacemaker native */
         {"PmInst.install.text.1",
-         "the Fedora way: 1.1.x/1.3.x"},
+         "yum install: 1.1.x/1.3.x"},
         {"PmInst.install.1",
          "yum -y install pacemaker corosync"
          + "&& if ( rpm -qa|grep drbd ); then"

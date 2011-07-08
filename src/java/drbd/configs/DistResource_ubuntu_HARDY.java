@@ -62,7 +62,7 @@ public final class DistResource_ubuntu_HARDY
          + " && apt-get update"
          + " && apt-get -y -q  --allow-unauthenticated install -o 'DPkg::Options::force=--force-confnew' pacemaker-heartbeat"},
 
-        {"HbPmInst.install.text.2", "the ubuntu way: HB 2.1.3 (obsolete)"},
+        {"HbPmInst.install.text.2", "apt-get install: HB 2.1.3 (obsolete)"},
         {"HbPmInst.install.2",
          "apt-get update && /usr/bin/apt-get -y install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
 
@@ -94,7 +94,7 @@ public final class DistResource_ubuntu_HARDY
 
         /* Drbd install method 3 */
         {"DrbdInst.install.text.3",
-         "the ubuntu way: 8.0.x (obsolete)"},
+         "apt-get install: 8.0.x (obsolete)"},
 
         {"Openais.reloadOpenais",
          DistResource.SUDO + "/etc/init.d/openais force-reload"},

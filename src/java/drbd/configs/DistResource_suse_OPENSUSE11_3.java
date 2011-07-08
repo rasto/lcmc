@@ -58,7 +58,7 @@ public final class DistResource_suse_OPENSUSE11_3
          + " fi"},
 
         /* Openais/Pacemaker native */
-        {"PmInst.install.text.2", "opensuse way: 1.0.x/0.80.x" },
+        {"PmInst.install.text.2", "zypper install: 1.0.x/0.80.x" },
         {"PmInst.install.2",
          "zypper -n install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
@@ -76,7 +76,7 @@ public final class DistResource_suse_OPENSUSE11_3
          + " && /sbin/chkconfig --add heartbeat"},
 
         /* Heartbeat/Pacemaker native */
-        {"HbPmInst.install.text.2", "opensuse way: 1.0.x/2.99.x" },
+        {"HbPmInst.install.text.2", "zypper install: 1.0.x/2.99.x" },
         {"HbPmInst.install.2",
          "zypper -n install heartbeat pacemaker"
          + " && /sbin/chkconfig --add heartbeat"},

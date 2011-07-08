@@ -44,7 +44,7 @@ public final class DistResource_redhatenterpriseserver_6
 
         /* Corosync/Openais/Pacemaker native */
         {"PmInst.install.text.1",
-         "native: 1.1.x/1.2.x" },
+         "yum install: 1.1.x/1.2.x" },
 
         {"PmInst.install.1",
          "yum -y install pacemaker corosync"},

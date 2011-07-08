@@ -44,7 +44,7 @@ public final class DistResource_suse_SLES10
         {"Support", "suse-SLES10"},
 
         /* Heartbeat */
-        {"HbPmInst.install.text.1", "the suse way: 2.1.x (obsolete)"},
+        {"HbPmInst.install.text.1", "rug install: 2.1.x (obsolete)"},
         {"HbPmInst.install.1",
          "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&"
          + "/sbin/chkconfig --add heartbeat"},
