@@ -616,9 +616,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
             for (final String param : dxml.getSectionParams(section)) {
-                //if (DRBD_RES_PARAM_DEV.equals(param)) {
-                //    continue;
-                //}
                 String value = dxml.getConfigValue(resName, section, param);
                 final String defaultValue = getParamDefault(param);
                 final String oldValue = getParamSaved(param);

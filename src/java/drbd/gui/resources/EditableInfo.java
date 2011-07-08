@@ -403,6 +403,11 @@ public abstract class EditableInfo extends Info {
             GuiComboBox rpcb = null;
             if ("wizard".equals(prefix)) {
                 rpcb = paramComboBoxGet(param, null);
+                if (rpcb == null) {
+                    Tools.appError("unkown param: " + param
+                                   + ". Man pages not installed?");
+                    continue;
+                }
                 int height = 0;
                 if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
                     height = Tools.getDefaultInt("Browser.LabelFieldHeight");
