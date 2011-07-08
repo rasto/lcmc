@@ -684,6 +684,31 @@ public final class DRBD {
     }
 
     /**
+     * Executes the drbdadm get-gi on the specified host and resource
+     * and return the result or null if there are meta-data on the block
+     * device.
+     */
+    public static String getGI(final Host host,
+                               final String resource,
+                               final String volume,
+                               final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.get-gi",
+                                                   getResVolReplaceHash(
+                                                                      host,
+                                                                      resource,
+                                                                      volume));
+        final SSH.SSHOutput ret = execCommand(host,
+                                              command,
+                                              null,
+                                              false,
+                                              testOnly);
+        if (ret.getExitCode() == 0) {
+            return ret.getOutput();
+        }
+        return null;
+    }
+
+    /**
      * Executes the drbdadm adjust on the specified host and resource
      * This is done without actually to make an
      * adjust with -d option to catch possible changes.

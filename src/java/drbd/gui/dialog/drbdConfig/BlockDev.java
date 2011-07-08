@@ -85,6 +85,17 @@ final class BlockDev extends DrbdConfig {
         return true;
     }
 
+    /** Calls drbdadm get-gi, to find out if there is meta-data area. */
+    private String getGI(final BlockDevInfo bdi) {
+        final boolean testOnly = false;
+        final String gi = DRBD.getGI(
+                       bdi.getHost(),
+                       bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                       bdi.getDrbdVolumeInfo().getName(),
+                       testOnly);
+        return gi;
+    }
+
     /**
      * Sets next dialog and returns it. It is either second block device, or
      * drbd config create md dialog. In the second case the drbd admin adjust
@@ -103,58 +114,11 @@ final class BlockDev extends DrbdConfig {
                 final boolean testOnly = false;
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
                                                     .createDrbdConfig(false);
-                final boolean ret1 = adjust(blockDevInfo);
-                final boolean ret2 = adjust(oBdi);
-                if (!ret1 || !ret2) {
+                final String gi1 = getGI(blockDevInfo);
+                final String gi2 = getGI(oBdi);
+                if (gi1 == null || gi2 == null) {
                     getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
                                                                           true);
-                }
-                int i = 0;
-                if (ret1) {
-                    final int timeout = 20000;
-                    while (!blockDevInfo.getBlockDevice().isAttached()
-                           && i < timeout) {
-                        Tools.sleep(500);
-                        i += 500;
-                    }
-                    while (!oBdi.getBlockDevice().isAttached() && i < timeout) {
-                        Tools.sleep(500);
-                        i += 500;
-                    }
-                    while (!getDrbdVolumeInfo().isConnected(false)
-                           && i < timeout) {
-                        Tools.sleep(500);
-                        i += 500;
-                    }
-                    if (blockDevInfo.getBlockDevice().isAttached()) {
-                        DRBD.setSecondary(
-                                    blockDevInfo.getHost(),
-                                    getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                       .getName(),
-                                    getDrbdVolumeInfo().getName(),
-                                    testOnly);
-                        DRBD.detach(blockDevInfo.getHost(),
-                                    getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                       .getName(),
-                                    getDrbdVolumeInfo().getName(),
-                                    testOnly);
-                    }
-                }
-                if (ret2) {
-                    if (oBdi.getBlockDevice().isAttached()) {
-                        DRBD.setSecondary(
-                                    oBdi.getHost(),
-                                    getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                       .getName(),
-                                    getDrbdVolumeInfo().getName(),
-                                    testOnly);
-                        Tools.sleep(1000);
-                        DRBD.detach(oBdi.getHost(),
-                                    getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                       .getName(),
-                                    getDrbdVolumeInfo().getName(),
-                                    testOnly);
-                    }
                 }
                 getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser()
                                                     .reloadAllComboBoxes(null);

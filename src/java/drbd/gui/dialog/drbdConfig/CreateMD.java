@@ -187,26 +187,14 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
-        DRBD.attach(bdi1.getHost(),
+        DRBD.adjust(bdi1.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);
-        DRBD.attach(bdi2.getHost(),
+        DRBD.adjust(bdi2.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);
-        if (!bdi1.getBlockDevice().isConnected()) {
-            DRBD.connect(bdi1.getHost(),
-                         getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                         null,
-                         testOnly);
-        }
-        if (!bdi2.getBlockDevice().isConnected()) {
-            DRBD.connect(bdi2.getHost(),
-                         getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                         null,
-                         testOnly);
-        }
         return new CreateFS(this, getDrbdVolumeInfo());
     }
 
