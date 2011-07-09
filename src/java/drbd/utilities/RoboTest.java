@@ -660,7 +660,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + index, 2);
+                            startVMTest1("vm-test" + index, 10);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -1809,7 +1809,7 @@ public final class RoboTest {
         removeConstraint(dum1PopX, dum1PopY);
         checkTest("test5", 2.5);
         /* constraints */
-        for (int i = 1; i <= 1; i++) {
+        for (int i = 1; i <= 5; i++) {
             addConstraint(dummy1X, dummy1Y, 35, false, -1);
 
             checkTest("test5", 3);
@@ -1856,11 +1856,12 @@ public final class RoboTest {
         leftClick();
 
         chooseDummy(dummy1X, dummy1Y, false, true);
-        //checkTest("test5", 2);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         for (int i = 0; i < 20; i++) {
-            info("i: " + i);
+            if (i % 5 == 0) {
+                info("test6 i: " + i);
+            }
             addConstraint(ph1X, ph1Y, 5, false, -1);
             if (!aborted) {
                 sleepNoFactor(2000);
@@ -1881,7 +1882,9 @@ public final class RoboTest {
         final int dummy1Y = 255;
         disableStonith();
         for (int i = 30; i > 0; i--) {
-            info("I: " + i);
+            if (i % 5 == 0) {
+                info("test7 I: " + i);
+            }
             checkTest("test7", 1);
             /* create dummy */
             sleep(5000);
@@ -1905,7 +1908,9 @@ public final class RoboTest {
         checkTest("test8", 1);
         final int count = 30;
         for (int i = count; i > 0; i--) {
-            info("I: " + i);
+            if (i % 5 == 0) {
+                info("test8 i: " + i);
+            }
             //checkTest("test7", 1);
             sleep(5000);
             chooseDummy(dummy1X, dummy1Y, false, true);
@@ -1930,8 +1935,9 @@ public final class RoboTest {
         final int gy = 255;
         disableStonith();
         for (int i = 20; i > 0; i--) {
-            info("I: " + i);
-
+            if (i % 5 == 0) {
+                info("testA I: " + i);
+            }
             checkTest("testA", 1);
             /* group with dummy resources */
             moveTo(gx, gy);
@@ -1973,7 +1979,9 @@ public final class RoboTest {
         final int dummy1Y = 255;
         disableStonith();
         for (int i = 20; i > 0; i--) {
-            info("I: " + i);
+            if (i % 5 == 0) {
+                info("testB I: " + i);
+            }
             checkTest("testB", 1);
             /* create dummy */
             sleep(5000);
@@ -1995,7 +2003,9 @@ public final class RoboTest {
         final int statefulY = 255;
         disableStonith();
         for (int i = 20; i > 0; i--) {
-            info("I: " + i);
+            if (i % 5 == 0) {
+                info("testC I: " + i);
+            }
             checkTest("testC", 1);
             /** Add m/s Stateful resource */
             moveTo(statefulX, statefulY);
@@ -2042,14 +2052,18 @@ public final class RoboTest {
         final int dummy1X = 540;
         final int dummy1Y = 250;
         for (int i = count; i > 0; i--) {
-            info("1 I: " + i);
+            if (i % 5 == 0) {
+                info("testD 1 I: " + i);
+            }
             chooseDummy(dummy1X, dummy1Y, false, false);
             removeResource(dummy1X, dummy1Y, -20);
         }
         chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
         for (int i = count; i > 0; i--) {
-            info("2 I: " + i);
+            if (i % 5 == 0) {
+                info("testD 2 I: " + i);
+            }
             double rand = Math.random();
             if (rand < 0.33) {
                 if (pos == 1) {
@@ -2180,9 +2194,8 @@ public final class RoboTest {
         aborted = false;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("gui-test1 " + i);    
+                info("gui-test1 I: " + i);    
             }
-            info("1 I: " + i);
             moveTo(470, 120); /* host wizard */
             sleep(500);
             leftClick();
@@ -2725,7 +2738,9 @@ public final class RoboTest {
         aborted = false;
         disableStonith();
         for (int i = 20; i > 0; i--) {
-            info("I: " + i);
+            if (i % 5 == 0) {
+                info("test3 I: " + i);
+            }
             checkTest("test3", 1);
             /* filesystem/drbd */
             moveTo(577, 253);
@@ -3666,9 +3681,20 @@ public final class RoboTest {
             checkVMTest(vmTest, 3, name);
 
             /* disk readonly */
-            moveTo(100, 280 + j * 15); /* choose disk */
-            sleep(1000);
+            moveTo(56, 252); /* popup */
             leftClick();
+            sleep(1000);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
+            press(KeyEvent.VK_DOWN);
+            for (int down = 0; down < j; down++) {
+                sleep(200);
+                press(KeyEvent.VK_DOWN);
+            }
+
+            //moveTo(100, 280 + j * 18); /* choose disk */
+            //sleep(1000);
+            //leftClick();
             //moveTo(1100, 298);
             //leftPress(); /* scroll bar */
             //moveTo(1100, 410);
