@@ -1457,11 +1457,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            scale();
-                        }
-                    });
+                    scale();
                 }
             }
             /* shape */
