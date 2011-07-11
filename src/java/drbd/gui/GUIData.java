@@ -127,6 +127,15 @@ public final class GUIData  {
         return mainFrame;
     }
 
+    /** Returns content pane of the main frame. */
+    public Container getMainFrameContentPane() {
+        if (mainFrame instanceof JApplet) {
+            return ((JApplet) mainFrame).getContentPane();
+        } else {
+            return ((JFrame) mainFrame).getContentPane();
+        }
+    }
+
     /** Gets root pane of the main frame of this application. */
     public JRootPane getMainFrameRootPane() {
         if (mainFrame instanceof JFrame) {

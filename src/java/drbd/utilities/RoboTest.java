@@ -68,7 +68,7 @@ public final class RoboTest {
             return false;
         }
         final Point2D loc =
-                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
         Point2D p = MouseInfo.getPointerInfo().getLocation();
         double x = p.getX() - loc.getX();
         if (x > 1536 || x < -100) {
@@ -213,7 +213,8 @@ public final class RoboTest {
                 }
 
                 final Point2D locP =
-                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+                    Tools.getGUIData().getMainFrameContentPane()
+                                                    .getLocationOnScreen();
                 robot = rbt;
                 final int xOffset = getOffset();
                 final Point2D origP = MouseInfo.getPointerInfo().getLocation();
@@ -2844,7 +2845,7 @@ public final class RoboTest {
         }
         final int xOffset = getOffset();
         final Point2D appP =
-                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+             Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
         for (int i = 0; i < 5; i++) {
@@ -2884,9 +2885,9 @@ public final class RoboTest {
         final int origX = (int) origP.getX();
         final int origY = (int) origP.getY();
         final Point2D endP =
-                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
         final int endX = (int) endP.getX() + toX;
-        final int endY = (int) endP.getY() + toY;
+        final int endY = (int) endP.getY() + toY - 48;
         if (MOVE_MOUSE_FAST) {
             robot.mouseMove(endX, endY);
             return;
@@ -2948,7 +2949,8 @@ public final class RoboTest {
                 Point2D prevPrevP = new Point2D.Double(0, 0);
                 while (true) {
                     final Point2D loc =
-                       Tools.getGUIData().getMainFrame().getLocationOnScreen();
+                                Tools.getGUIData().getMainFrameContentPane()
+                                                        .getLocationOnScreen();
                     final Point2D pos =
                                       MouseInfo.getPointerInfo().getLocation();
                     final Point2D newPos = new Point2D.Double(
@@ -2978,7 +2980,7 @@ public final class RoboTest {
         info("move to position, start in 10 seconds");
         sleepNoFactor(10000);
         final Point2D loc =
-           Tools.getGUIData().getMainFrame().getLocationOnScreen();
+           Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
         final Point2D pos =
                           MouseInfo.getPointerInfo().getLocation();
         final int y = (int) (pos.getY() - loc.getY());

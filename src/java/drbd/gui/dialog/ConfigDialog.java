@@ -508,13 +508,8 @@ public abstract class ConfigDialog {
                             new Dimension(dialogWidth(), dialogHeight()));
                     dialogPanel.setMinimumSize(
                             new Dimension(dialogWidth(), dialogHeight()));
-                    if (mainFrame instanceof JApplet) {
-                        dialogPanel.setLocationRelativeTo(
-                                       ((JApplet) mainFrame).getContentPane());
-                    } else {
-                        dialogPanel.setLocationRelativeTo(
-                                       ((JFrame) mainFrame).getContentPane());
-                    }
+                    dialogPanel.setLocationRelativeTo(
+                                Tools.getGUIData().getMainFrameContentPane());
                 }
             });
             /* set location like the previous dialog */
