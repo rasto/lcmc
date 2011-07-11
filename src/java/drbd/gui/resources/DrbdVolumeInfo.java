@@ -599,7 +599,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             final String spString = getSyncedProgress();
             final String bsString = getFirstBlockDevInfo()
                                             .getBlockDevice().getBlockSize();
-            final String rateString = getResource().getValue("rate");
+            final String rateString =
+                        getDrbdResourceInfo().getResource().getValue("rate");
             if (spString != null && bsString != null && rateString != null) {
                 final double sp = Double.parseDouble(spString);
                 final double bs = Double.parseDouble(bsString);
