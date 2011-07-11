@@ -186,7 +186,7 @@ public final class DrbdGraph extends ResourceGraph {
             oldVertexList = new ArrayList<Vertex>(vertexList);
         }
         final Set<BlockDevInfo> blockDevInfos =
-                                  host.getBrowser().getBlockDevInfosInSwing();
+                                  host.getBrowser().getBlockDevInfos();
         if (oldVertexList != null) {
             for (final Vertex vertex : oldVertexList) {
                 final BlockDevInfo bdi = (BlockDevInfo) getInfo(vertex);

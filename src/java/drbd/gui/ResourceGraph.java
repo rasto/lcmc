@@ -1093,7 +1093,11 @@ public abstract class ResourceGraph {
                 final Point2D p = new Point2D.Double(x, y);
                 vertexReleased(vertex, p);
             }
-            scale();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    scale();
+                }
+            });
         }
 
         /** Graph was pressed. */
@@ -1457,7 +1461,11 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    scale();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            scale();
+                        }
+                    });
                 }
             }
             /* shape */
