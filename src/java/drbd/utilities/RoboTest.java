@@ -2847,7 +2847,7 @@ public final class RoboTest {
         final Point2D appP =
              Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
-        final int appY = (int) appP.getY() + fromY;
+        final int appY = (int) appP.getY() + fromY - 48;
         for (int i = 0; i < 5; i++) {
             boolean isColor = false;
             for (int y = -20; y < 20; y++) {
