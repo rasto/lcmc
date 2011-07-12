@@ -152,12 +152,6 @@ public final class DrbdXML extends XML {
          new StringInfo(PROTOCOL_C,             "C", null)};
     /** DRBD single-primary mode, that is a default. */
     private static final String MODE_SINGLE_PRIMARY = "False";
-    /** DRBD single and dual primary mode. */
-    static final List<Object> MODES = new ArrayList<Object>();
-    static {
-        MODES.add(new StringInfo("Single-Primary", MODE_SINGLE_PRIMARY, null));
-        MODES.add(new StringInfo("Dual-Primary",   "True",   null));
-    }
     /** Some non advanced parameters. */
     static final List<String> NOT_ADVANCED_PARAMS =
                                                     new ArrayList<String>();
@@ -613,13 +607,7 @@ public final class DrbdXML extends XML {
                     /* ignore flags */
                     continue;
                 }
-                if ("allow-two-primaries".equals(name)) {
-                    paramItemsMap.put(name, MODES);
-                    paramDefaultMap.put(name, MODE_SINGLE_PRIMARY);
-                    type = "booleanhandler";
-                //} else if ("protocol".equals(name)) {
-                //    type = "handler";
-                } else if ("handler".equals(type)) {
+                if ("handler".equals(type)) {
                     paramItemsMap.put(name, new ArrayList<Object>());
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
