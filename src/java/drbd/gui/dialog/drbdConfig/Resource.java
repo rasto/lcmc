@@ -58,6 +58,9 @@ public final class Resource extends DrbdConfig {
 
     /** Protocol option string. */
     private static final String PROTOCOL = "protocol";
+    /** Allow two primaries string. */
+    private static final String ALLOW_TWO_PRIMARIES =
+                                                  "allow-two-primaries";
     /** cram-hmac-alg option string. */
     private static final String CRAM_HMAC_ALG = "cram-hmac-alg";
     /** shared-secret option string. */
@@ -74,6 +77,7 @@ public final class Resource extends DrbdConfig {
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
                                             PROTOCOL,
+                                            ALLOW_TWO_PRIMARIES,
                                             CRAM_HMAC_ALG,
                                             SHARED_SECRET,
                                             WFC_TIMEOUT_PARAM,
