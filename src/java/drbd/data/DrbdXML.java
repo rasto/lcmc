@@ -412,6 +412,15 @@ public final class DrbdXML extends XML {
                            && v < paramMinMap.get(param).longValue()) {
                     correctValue = false;
                 }
+            } else if (!"s".equalsIgnoreCase(unit)) {
+                long v = Long.parseLong(rawValue);
+                if (paramMaxMap.get(param) != null
+                    && v > paramMaxMap.get(param).longValue()) {
+                    correctValue = false;
+                } else if (paramMinMap.get(param) != null
+                           && v < paramMinMap.get(param).longValue()) {
+                    correctValue = false;
+                }
             }
         } else {
             correctValue = true;
