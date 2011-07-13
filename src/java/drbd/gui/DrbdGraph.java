@@ -277,6 +277,9 @@ public final class DrbdGraph extends ResourceGraph {
     /** Removes drbd volume from the graph. */
     public void removeDrbdVolume(final DrbdVolumeInfo dvi) {
         final Edge e = drbdVolumeToEdgeMap.get(dvi);
+        if (e == null) {
+            return;
+        }
         e.reset();
         edgeToDrbdVolumeMap.remove(e);
         drbdVolumeToEdgeMap.remove(dvi);
