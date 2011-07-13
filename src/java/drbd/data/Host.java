@@ -2413,7 +2413,7 @@ public final class Host {
         command.append(" 2>&1");
         int i = 0;
         SSH.SSHOutput out = null;
-        while (i < 8) {
+        while (i < 5) {
             out = getSSH().execCommandAndWait(command.toString(),
                                               false,
                                               false,
