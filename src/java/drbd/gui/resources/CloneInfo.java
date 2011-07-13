@@ -85,10 +85,17 @@ final class CloneInfo extends ServiceInfo {
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
-        newServiceInfo.setNode(newServiceNode);
-        getBrowser().reload(getNode(), false);
-        getNode().add(newServiceNode);
-        getBrowser().reload(newServiceNode, true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                newServiceInfo.setNode(newServiceNode);
+                final DefaultMutableTreeNode node = getNode();
+                if (node != null) {
+                    getBrowser().reload(node, false);
+                    node.add(newServiceNode);
+                }
+                getBrowser().reload(newServiceNode, true);
+            }
+        });
     }
 
     /**
