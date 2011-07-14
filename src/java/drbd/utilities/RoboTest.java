@@ -3152,7 +3152,7 @@ public final class RoboTest {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(10000);
+        sleep(20000);
         addMetaData();
         addFileSystem();
         moveTo(820, 522); /* fs */
@@ -3188,7 +3188,7 @@ public final class RoboTest {
 
         moveTo(960, 522);
         leftClick(); /* cancel */
-        sleep(60000);
+        sleep(20000);
 
         info(drbdTest + "/3");
         addDrbdResource(blockDevY);
@@ -3198,13 +3198,14 @@ public final class RoboTest {
         moveTo(960, 522);
         leftClick(); /* cancel */
         confirmRemove();
-        sleep(60000);
+        sleep(20000);
 
         info(drbdTest + "/4");
         addDrbdResource(blockDevY);
         chooseDrbdResource();
         addDrbdVolume();
         addBlockDevice();
+        sleep(20000);
 
         moveTo(960, 522);
         leftClick(); /* cancel */
@@ -3217,7 +3218,7 @@ public final class RoboTest {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(50000);
+        sleep(20000);
         checkDRBDTest(drbdTest, 1);
 
         moveTo(960, 522);
@@ -3485,7 +3486,7 @@ public final class RoboTest {
 
             addBlockDevice();
             addBlockDevice();
-            sleep(50000);
+            sleep(20000);
             if (offset == 0) {
                 checkDRBDTest(drbdTest, 1.1);
             } else {
