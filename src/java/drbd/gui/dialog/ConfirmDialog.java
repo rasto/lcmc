@@ -23,6 +23,7 @@
 package drbd.gui.dialog;
 
 import drbd.utilities.Tools;
+import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JComponent;
@@ -136,7 +137,24 @@ public final class ConfirmDialog extends ConfigDialog {
 
     /** Inits the dialog. */
     @Override protected void initDialog() {
-        /* do nothing */
+        super.initDialog();
+        enableComponentsLater(new JComponent[]{buttonClass(noButton())});
+        enableComponents();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(noButton()).setEnabled(true);
+            }
+        });
+    }
+
+    /** Inits the dialog after it is visible. */
+    @Override protected void initDialogAfterVisible() {
+        super.initDialogAfterVisible();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                buttonClass(noButton()).requestFocus();
+            }
+        });
     }
 
     /**

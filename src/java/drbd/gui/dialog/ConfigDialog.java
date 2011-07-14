@@ -320,14 +320,6 @@ public abstract class ConfigDialog {
      * buttons. They have to be enabled with enableComponents()
      */
     protected void initDialog() {
-        if (buttonClass(okButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    buttonClass(okButton()).setEnabled(true);
-                }
-            });
-        }
-        disableComponents();
     }
 
     /**
@@ -502,14 +494,6 @@ public abstract class ConfigDialog {
                     }
                     dialogPanel.setModal(false);
                     dialogPanel.setResizable(true);
-                    dialogPanel.setPreferredSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMaximumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setMinimumSize(
-                            new Dimension(dialogWidth(), dialogHeight()));
-                    dialogPanel.setLocationRelativeTo(
-                                Tools.getGUIData().getMainFrameContentPane());
                 }
             });
             /* set location like the previous dialog */
@@ -540,7 +524,16 @@ public abstract class ConfigDialog {
         initDialog();
         Tools.invokeAndWait(new Runnable() {
             public void run() {
+                dialogPanel.setPreferredSize(
+                        new Dimension(dialogWidth(), dialogHeight()));
+                dialogPanel.setMaximumSize(
+                        new Dimension(dialogWidth(), dialogHeight()));
+                dialogPanel.setMinimumSize(
+                        new Dimension(dialogWidth(), dialogHeight()));
+                dialogPanel.setLocationByPlatform(true);
                 dialogPanel.setVisible(true);
+                dialogPanel.setLocationRelativeTo(
+                               Tools.getGUIData().getMainFrameContentPane());
             }
         });
         initDialogAfterVisible();
