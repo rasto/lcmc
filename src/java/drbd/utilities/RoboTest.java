@@ -23,6 +23,7 @@ package drbd.utilities;
 
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.configs.AppDefaults;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -3050,6 +3051,15 @@ public final class RoboTest {
         return y;
     }
 
+    private static boolean dialogColorTest(final String text) {
+        if (!isColor(125, 370, AppDefaults.LINBIT_ORANGE, true)) {
+            info(text + ": color test: error");    
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private static void addDrbdResource(final int blockDevY) {
         moveTo(334, blockDevY); /* add drbd resource */
         rightClick();
@@ -3057,12 +3067,14 @@ public final class RoboTest {
         moveTo(667, blockDevY + 7);
         leftClick();
         sleep(20000);
+        dialogColorTest("addDrbdResource");
     }
 
     private static void newDrbdResource() {
         moveTo(720, 522); /* new drbd resource */
         leftClick(); /* next */
         sleep(10000);
+        dialogColorTest("newDrbdResource");
     }
 
     private static void chooseDrbdResourceInterface(final int offset) {
@@ -3073,6 +3085,7 @@ public final class RoboTest {
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(1000);
+        dialogColorTest("chooseDrbdResourceInterface");
     }
 
     private static void chooseDrbdResource() {
@@ -3082,36 +3095,49 @@ public final class RoboTest {
         moveTo(720, 522);
         leftClick(); /* next */
         sleep(10000);
+        dialogColorTest("chooseDrbdResource");
     }
 
     private static void addDrbdVolume() {
         moveTo(720, 522); /* volume */
         leftClick(); /* next */
         sleep(10000);
+        dialogColorTest("addDrbdVolume");
     }
 
     private static void addBlockDevice() {
         moveTo(720, 522); /* block device */
         leftClick(); /* next */
         sleep(10000);
+        dialogColorTest("addBlockDevice");
     }
 
     private static void addMetaData() {
         moveTo(720, 522); /* meta-data */
         leftClick(); /* next */
         sleep(10000);
+        dialogColorTest("addMetaData");
     }
 
     private static void addFileSystem() {
         /* do nothing. */
+        dialogColorTest("addFileSystem");
     }
 
-    private static void removeDrbdVolume() {
+    private static void removeDrbdVolume(final boolean really) {
         moveTo(480, 202); /* rsc popup */
-        rightClick(); /* finish */
+        rightClick(); /* remove */
         moveTo(555, 292); /* remove */
         leftClick();
-        confirmRemove();
+        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+            info("remove drbd volume color: failed");    
+            aborted = true;
+        }
+        if (really) {
+            confirmRemove();
+        } else {
+            press(KeyEvent.VK_ENTER); /* cancel */
+        }
     }
 
 
@@ -3133,10 +3159,13 @@ public final class RoboTest {
         leftClick(); /* finish */
         sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
-        removeDrbdVolume();
+        for (int i = 0; i < 10; i++) {
+            info("i: " + i);
+            removeDrbdVolume(false);
+        }
+        removeDrbdVolume(true);
         checkDRBDTest(drbdTest, 2);
 
-        checkDRBDTest(drbdTest, 2);
     }
 
     /** DRBD Test 2. */
@@ -3144,13 +3173,14 @@ public final class RoboTest {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
+        for (int i = 0; i < 100; i++) {
+            info(drbdTest + "/1");
+            addDrbdResource(blockDevY);
 
-        info(drbdTest + "/1");
-        addDrbdResource(blockDevY);
-
-        moveTo(960, 522);
-        leftClick(); /* cancel */
-        sleep(60000);
+            moveTo(960, 522);
+            leftClick(); /* cancel */
+            sleep(2000);
+        }
 
         info(drbdTest + "/2");
         addDrbdResource(blockDevY);
@@ -3242,7 +3272,10 @@ public final class RoboTest {
         sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
 
-        removeDrbdVolume();
+        for (int i = 0; i < 3; i++) {
+            removeDrbdVolume(false);
+        }
+        removeDrbdVolume(true);
         checkDRBDTest(drbdTest, 2);
     }
 

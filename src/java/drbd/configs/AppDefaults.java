@@ -31,9 +31,9 @@ public final class AppDefaults extends java.util.ListResourceBundle {
     /** Linbit dark orange. */
     public static final Color LINBIT_DARK_ORANGE  = new Color(214, 75, 42);
     /** Linbit orange. */
-    private static final Color LINBIT_ORANGE       = new Color(250, 133, 34);
+    public static final Color LINBIT_ORANGE       = new Color(250, 133, 34);
     /** Linbit light orange. */
-    private static final Color LINBIT_LIGHT_ORANGE = new Color(253, 180, 109);
+    public static final Color LINBIT_LIGHT_ORANGE = new Color(253, 180, 109);
 
     /** Get contents. */
     @Override protected Object[][] getContents() {
