@@ -1459,6 +1459,9 @@ public final class RoboTest {
         moveTo(700, 520);
         rightClick(); /* popup */
         sleep(3000);
+        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+            info("remove everything color: failed");    
+        }
         moveTo(760, 626);
         sleep(3000);
         leftClick();
@@ -2362,7 +2365,7 @@ public final class RoboTest {
         leftPress(); /* scroll bar */
         moveTo(1090, 502);
         leftRelease();
-        moveTo(956, 442 + yCorr);
+        moveTo(956, 450 + yCorr);
         leftClick(); /* start timeout */
         press(KeyEvent.VK_2);
         sleep(200);
@@ -2371,7 +2374,7 @@ public final class RoboTest {
         press(KeyEvent.VK_0);
         sleep(200);
 
-        moveTo(956, 472 + yCorr);
+        moveTo(956, 477 + yCorr);
         leftClick(); /* stop timeout */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2380,7 +2383,7 @@ public final class RoboTest {
         press(KeyEvent.VK_2);
         sleep(200);
 
-        moveTo(956, 502 + yCorr);
+        moveTo(956, 507 + yCorr);
         leftClick(); /* monitor timeout */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2389,7 +2392,7 @@ public final class RoboTest {
         press(KeyEvent.VK_4);
         sleep(200);
 
-        moveTo(956, 532 + yCorr);
+        moveTo(956, 537 + yCorr);
         leftClick(); /* monitor interval */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2398,14 +2401,14 @@ public final class RoboTest {
         press(KeyEvent.VK_1);
         sleep(200);
         if (migrateTimeouts) {
-            moveTo(956, 562 + yCorr);
+            moveTo(956, 567 + yCorr);
             leftClick(); /* reload */
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
 
-            moveTo(956, 582 + yCorr);
+            moveTo(956, 587 + yCorr);
             leftClick(); /* migrate from */
             press(KeyEvent.VK_1);
             sleep(200);
@@ -2414,7 +2417,7 @@ public final class RoboTest {
             press(KeyEvent.VK_3);
             sleep(200);
 
-            moveTo(956, 612 + yCorr);
+            moveTo(956, 617 + yCorr);
             leftClick(); /* migrate to */
             press(KeyEvent.VK_1);
             sleep(200);
