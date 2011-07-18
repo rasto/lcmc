@@ -680,7 +680,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + testIndex, 2);
+                            startVMTest1("vm-test" + testIndex, 10);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -698,7 +698,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startVMTest1("vm-test" + testIndex, 2);
+                            startVMTest1("vm-test" + testIndex, 30);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -2255,7 +2255,7 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
             if (!isColor(360, 442, new Color(255, 100, 100), true)) {
-                info("gui-test1 1: failed");    
+                info("gui-test1 1: error");    
                 break;
             }
             boolean ok = false;
@@ -2293,7 +2293,7 @@ public final class RoboTest {
             leftClick();
             sleep(2000);
             if (!isColor(336, 472, new Color(184, 207, 229), true)) {
-                info("gui-test2: failed");    
+                info("gui-test2: error");    
                 break;
             }
             moveTo(910 , 517); /* cancel */
@@ -2532,6 +2532,9 @@ public final class RoboTest {
     /** Confirms remove dialog. */
     private static void confirmRemove() {
         sleep(1000);
+        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+            info("confirm remove color: error");    
+        }
         moveTo(512 , 424);
         leftClick();
     }
@@ -2911,7 +2914,7 @@ public final class RoboTest {
                                         .getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             boolean isColor = false;
             for (int y = -20; y < 20; y++) {
                 if (i > 0) {
@@ -2934,7 +2937,7 @@ public final class RoboTest {
             if (!expected && !isColor) {
                 return false;
             }
-            Tools.sleep(1000);
+            Tools.sleep(500 * i);
         }
         return !expected;
     }
@@ -3133,8 +3136,7 @@ public final class RoboTest {
         moveTo(555, 292); /* remove */
         leftClick();
         if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-            info("remove drbd volume color: failed");    
-            aborted = true;
+            info("remove drbd volume color: error");    
         }
         if (really) {
             confirmRemove();
@@ -3657,6 +3659,7 @@ public final class RoboTest {
             rightClick();
             moveTo(159, 223); /* new domain */
             leftClick();
+            dialogColorTest("new domain");
             moveTo(450, 332); /* domain name */
             leftClick();
             press(KeyEvent.VK_D);
@@ -3671,6 +3674,7 @@ public final class RoboTest {
             }
             moveTo(730, 522);
             leftClick();
+            dialogColorTest("source file");
             //press(KeyEvent.VK_ENTER);
 
             moveTo(593, 392); /* source file */
@@ -3698,10 +3702,12 @@ public final class RoboTest {
             leftClick();
             //press(KeyEvent.VK_ENTER);
             sleep(5000);
+            dialogColorTest("disk image");
             moveTo(730, 522);
             leftClick();
             //press(KeyEvent.VK_ENTER); /* storage */
             sleep(5000);
+            dialogColorTest("network");
             for (int i = 0; i < count2; i++) {
                 moveTo(600, 327); /* bridge */
                 leftClick();
@@ -3714,6 +3720,7 @@ public final class RoboTest {
             leftClick();
             //press(KeyEvent.VK_ENTER); /* network */
             sleep(5000);
+            dialogColorTest("display");
             for (int i = 0; i < count2; i++) {
                 moveTo(600, 327); /* sdl */
                 leftClick();
@@ -3726,33 +3733,44 @@ public final class RoboTest {
             leftClick();
             //press(KeyEvent.VK_ENTER); /* display */
             sleep(5000);
+            dialogColorTest("create config");
 
             final int yMoreHosts = 30 * (cluster.getHosts().size() - 1);
             moveTo(530, 362 + yMoreHosts); /* create config */
+            sleep(4000);
             leftClick();
             checkVMTest(vmTest, 2, name);
 
             if (cluster.getHosts().size() > 1) {
                 /* two hosts */
-                moveTo(410, 322); /* deselect first */
+                moveTo(410, 326); /* deselect first */
                 leftClick();
+                sleep(2000);
                 moveTo(560, 362 + yMoreHosts); /* create config */
+                sleep(2000);
                 leftClick();
                 checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
                 checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
 
-                moveTo(410, 322); /* select first */
+                moveTo(410, 326); /* select first */
+                sleep(1000);
                 leftClick();
-                moveTo(410, 357); /* deselect second */
+                sleep(1000);
+                moveTo(410, 361); /* deselect second */
+                sleep(1000);
                 leftClick();
+                sleep(1000);
                 moveTo(560, 362 + yMoreHosts); /* create config */
+                sleep(2000);
                 leftClick();
                 checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
                 checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
 
-                moveTo(410, 357); /* select second */
+                moveTo(410, 361); /* select second */
                 leftClick();
+                sleep(2000);
                 moveTo(560, 362 + yMoreHosts); /* create config */
+                sleep(4000);
                 leftClick();
                 checkVMTest(vmTest, 2, name);
             }
@@ -3851,6 +3869,9 @@ public final class RoboTest {
             moveTo(1066, 177); /* remove */
             leftClick();
             sleepNoFactor(2000);
+            if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+                info("remove VM color: error");    
+            }
             moveTo(516, 428); /* confirm */
             leftClick();
             sleepNoFactor(5000);
@@ -3870,7 +3891,7 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
             if (!isColor(480, 322, new Color(255, 100, 100), true)) {
-                info("vm-test2 1: failed");    
+                info("vm-test2 1: error");    
                 break;
             }
             boolean ok = false;

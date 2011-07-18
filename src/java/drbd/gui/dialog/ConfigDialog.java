@@ -532,8 +532,15 @@ public abstract class ConfigDialog {
                         new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setLocationByPlatform(true);
                 dialogPanel.setVisible(true);
+            }
+        });
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
                 dialogPanel.setLocationRelativeTo(
                                Tools.getGUIData().getMainFrameContentPane());
+                /* although the location was set before, it is set again as a
+                 * workaround for gray dialogs with nothing in it, that appear
+                 * in some comination of Java and compiz. */
             }
         });
         initDialogAfterVisible();
