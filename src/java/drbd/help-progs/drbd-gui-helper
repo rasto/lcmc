@@ -1771,11 +1771,13 @@ sub gui_test {
 		print $diff;
 		exit 1;
 	}
-	if ($status eq $statustest) {
+	my $status2 = $status;
+	$status2 =~ s/(Started host)(\d+)/$1 . (3 - $2)/ge;
+	if ($status eq $statustest || $status2 eq $statustest) {
 		print "ok";
 	} else {
 		open STTEST, ">$statustestfile.error" or print "$!";
-		print STTEST $status;
+		print STTEST $status2;
 		close STTEST;
 		my $diff = `diff -ub $statustestfile $statustestfile.error`;
 		print "error\n";

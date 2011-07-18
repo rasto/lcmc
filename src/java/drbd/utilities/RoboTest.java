@@ -807,7 +807,7 @@ public final class RoboTest {
         moveTo(ipX + 267, ipY + 52);
         leftClick(); /* choose ipaddr */
 
-        moveTo(1062, 357);
+        moveTo(1070, 357);
         leftClick(); /* pull down */
         sleep(500);
         press(KeyEvent.VK_DOWN);
@@ -848,11 +848,11 @@ public final class RoboTest {
         checkTest("test1", 2); /* 2 */
 
         /* pingd */
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 462);
+        moveTo(1100, 462);
         leftRelease();
-        moveTo(1066, 339);
+        moveTo(1066, 343);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* no ping */
@@ -867,7 +867,7 @@ public final class RoboTest {
         sleep(2000);
         checkTest("test1", 2.1); /* 2.1 */
 
-        moveTo(1066, 339);
+        moveTo(1066, 343);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_UP); /* no ping */
@@ -880,9 +880,9 @@ public final class RoboTest {
         sleep(2000);
         leftClick(); /*  apply */
 
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 502);
+        moveTo(1100, 502);
         leftRelease();
 
         /* group with dummy resources */
@@ -1023,9 +1023,9 @@ public final class RoboTest {
         sleep(1000);
         leftClick();
 
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 462);
+        moveTo(1100, 462);
         leftRelease();
 
         for (int i = 0; i < 2; i++) {
@@ -1063,9 +1063,9 @@ public final class RoboTest {
             checkTest("test1", 4); /* 4 */
             sleep(2000);
         }
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar back */
-        moveTo(1090, 102);
+        moveTo(1100, 102);
         leftRelease();
 
         /* locations */
@@ -1112,16 +1112,14 @@ public final class RoboTest {
                                   KeyEvent.VK_BACK_SPACE});
         sleep(3000);
         checkTest("test1", 4.4); /* 4.4 */
-        for (int i = 0; i < 3; i++) {
-            removeConstraint(popX, popY);
-            checkTest("test1", 5); /* 5 */
-            addConstraint(gx, gy - 30, 0, true, -1);
-            checkTest("test1", 4.4); /* 4.4 */
-        }
+        removeConstraint(popX, popY);
+        checkTest("test1", 5); /* 5 */
+        addConstraint(gx, gy - 30, 0, true, -1);
+        checkTest("test1", 5.1); /* 4.4 */
 
         removeConstraint(popX, popY);
         sleep(3000);
-        checkTest("test1", 5); /* 5 */
+        checkTest("test1", 5.2); /* 5 */
         sleep(1000);
 
         addConstraint(gx, gy - 30, 9, true, -1);
@@ -1459,12 +1457,12 @@ public final class RoboTest {
         moveTo(700, 520);
         rightClick(); /* popup */
         sleep(3000);
-        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-            info("remove everything color: failed");    
-        }
         moveTo(760, 626);
         sleep(3000);
         leftClick();
+        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+            info("remove everything color: failed");    
+        }
         confirmRemove();
         sleep(3000);
         leftClick();
@@ -1499,7 +1497,7 @@ public final class RoboTest {
             moveTo(938, 250);
             leftClick(); /* disable stonith */
         }
-        moveTo(1067, 289);
+        moveTo(1070, 289);
         leftClick(); /* no quorum policy */
         moveTo(1052, 307);
         leftClick(); /* ignore */
@@ -1780,7 +1778,7 @@ public final class RoboTest {
             /* menu dummy 5 with ph2 */
             addConstraint(120, 298, 160, false, -1);
             /* menu dummy 6 with ph2 */
-            addConstraint(120, 316, 160, false, -1);
+            addConstraint(120, 313, 160, false, -1);
 
             /* with dummy 3 */
             addConstraint(ph2X, ph2Y, 60, false, -1);
@@ -2307,13 +2305,15 @@ public final class RoboTest {
 
     /** Sets location. */
     private static void setLocation(final Integer[] events) {
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 462);
+        moveTo(1100, 462);
         leftRelease();
 
-        moveTo(1041 , 283);
-        sleep(2000);
+        moveTo(1041 , 286);
+        sleep(1000);
+        leftClick();
+        sleep(1000);
         leftClick();
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
@@ -2332,9 +2332,9 @@ public final class RoboTest {
         leftClick(); /* apply */
         sleep(2000);
 
-        moveTo(1090, 302);
+        moveTo(1100, 302);
         leftPress(); /* scroll bar back */
-        moveTo(1090, 102);
+        moveTo(1100, 102);
         leftRelease();
 
     }
@@ -2361,9 +2361,9 @@ public final class RoboTest {
             yCorr = -95;
         }
         sleep(3000);
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 502);
+        moveTo(1100, 502);
         leftRelease();
         moveTo(956, 450 + yCorr);
         leftClick(); /* start timeout */
@@ -2427,9 +2427,9 @@ public final class RoboTest {
             sleep(200);
         }
 
-        moveTo(1090, 302);
+        moveTo(1100, 302);
         leftPress(); /* scroll bar back */
-        moveTo(1090, 102);
+        moveTo(1100, 102);
         leftRelease();
     }
 
@@ -2566,7 +2566,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* select */
 
-        moveTo(1062, 448);
+        moveTo(1070, 448);
         leftClick(); /* pull down */
         moveTo(1044, 472);
         leftClick(); /* choose */
@@ -3791,9 +3791,9 @@ public final class RoboTest {
             //moveTo(100, 232 + j * 18); /* choose disk */
             //sleep(1000);
             //leftClick();
-            //moveTo(1090, 250);
+            //moveTo(1100, 250);
             //leftPress(); /* scroll bar */
-            //moveTo(1090, 362);
+            //moveTo(1100, 362);
             //leftRelease();
 
             //sleep(1000);
@@ -3828,9 +3828,9 @@ public final class RoboTest {
             /* remove interface */
 
             // ...
-            //moveTo(1090, 362);
+            //moveTo(1100, 362);
             //leftPress(); /* scroll bar back */
-            //moveTo(1090, 152);
+            //moveTo(1100, 152);
             //leftRelease();
 
             names.add(name);
