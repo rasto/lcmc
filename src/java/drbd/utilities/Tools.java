@@ -1597,7 +1597,9 @@ public final class Tools {
                 }
             }
             @Override public void mouseEntered(final MouseEvent evt) {
-                list.requestFocus();
+                /* request focus here causes the applet making all
+                   textfields to be not editable. */
+                /* list.requestFocus(); */
             }
 
             @Override public void mousePressed(final MouseEvent evt) {
