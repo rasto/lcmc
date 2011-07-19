@@ -798,7 +798,7 @@ public final class RoboTest {
         moveTo(ipX + 270, ipY + 28);
         moveTo(ipX + 267, ipY + 52);
         leftClick(); /* choose ipaddr */
-        removeResource(ipX, ipY, -15);
+        removeResource(ipX, ipY, -15, false);
         /* again */
         moveTo(ipX, ipY);
         rightClick(); /* popup */
@@ -894,7 +894,7 @@ public final class RoboTest {
         leftClick(); /* choose group */
         sleep(3000);
         /* remove it */
-        removeResource(gx, gy, 0);
+        removeResource(gx, gy, 0, false);
 
         moveTo(gx, gy);
         sleep(1000);
@@ -913,7 +913,7 @@ public final class RoboTest {
         sleep(1000);
 
         /* remove it */
-        removeResource(gx, gy, 0);
+        removeResource(gx, gy, 0, false);
 
         /* group with dummy resources, once again */
         moveTo(gx, gy);
@@ -937,7 +937,7 @@ public final class RoboTest {
         sleep(1000);
         moveTo(150, 563);
         leftClick(); /* remove service */
-        removeResource(gx, gy, 0);
+        removeResource(gx, gy, 0, false);
 
         /* group with dummy resources, once again */
         moveTo(gx, gy);
@@ -955,7 +955,7 @@ public final class RoboTest {
         typeDummy();
         sleep(1000);
 
-        removeResource(gx, gy, 0);
+        removeResource(gx, gy, 0, false);
 
         /* once again */
         moveTo(gx, gy);
@@ -1413,7 +1413,7 @@ public final class RoboTest {
         checkTest("test1", 29);
 
         if (true) {
-            removeResource(ipX, ipY, -15);
+            removeResource(ipX, ipY, -15, true);
             sleep(5000);
             removeGroup(gx, gy - 20, 0);
             sleep(5000);
@@ -1675,7 +1675,7 @@ public final class RoboTest {
         stopResource(dummy1X, dummy1Y, 0);
         sleep(5000);
         checkTest("test2", 11.92);
-        removeResource(dummy1X, dummy1Y, -15);
+        removeResource(dummy1X, dummy1Y, -15, true);
         sleep(5000);
         checkTest("test2", 12);
         stopResource(dummy2X, dummy2Y, 0);
@@ -1699,13 +1699,13 @@ public final class RoboTest {
             sleep(5000);
 
             /* remove rest of the dummies */
-            removeResource(dummy2X, dummy2Y, -15);
+            removeResource(dummy2X, dummy2Y, -15, true);
             sleep(5000);
             checkTest("test2", 14);
-            removeResource(dummy3X, dummy3Y, -15);
+            removeResource(dummy3X, dummy3Y, -15, true);
             sleep(5000);
             checkTest("test2", 15);
-            removeResource(dummy4X, dummy4Y, -15);
+            removeResource(dummy4X, dummy4Y, -15, true);
             sleep(5000);
         } else {
             removeEverything();
@@ -1948,7 +1948,7 @@ public final class RoboTest {
             stopResource(dummy1X, dummy1Y, 0);
             checkTest("test7", 3);
             sleep(5000);
-            removeResource(dummy1X, dummy1Y, -15);
+            removeResource(dummy1X, dummy1Y, -15, true);
         }
         System.gc();
     }
@@ -2020,7 +2020,7 @@ public final class RoboTest {
             stopResource(gx, gy, 0);
             sleep(6000);
             checkTest("testA", 3);
-            removeResource(gx, gy, 0);
+            removeResource(gx, gy, 0, true);
             resetTerminalAreas();
         }
         System.gc();
@@ -2045,7 +2045,7 @@ public final class RoboTest {
             stopResource(dummy1X, dummy1Y, 0);
             checkTest("testB", 3);
             sleep(5000);
-            removeResource(dummy1X, dummy1Y, -15);
+            removeResource(dummy1X, dummy1Y, -15, true);
             resetTerminalAreas();
         }
         System.gc();
@@ -2093,7 +2093,7 @@ public final class RoboTest {
             stopResource(statefulX, statefulY, -20);
             checkTest("testC", 2);
             sleep(5000);
-            removeResource(statefulX, statefulY, -20);
+            removeResource(statefulX, statefulY, -20, true);
             resetTerminalAreas();
         }
     }
@@ -2110,7 +2110,7 @@ public final class RoboTest {
                 info("testD 1 I: " + i);
             }
             chooseDummy(dummy1X, dummy1Y, false, false);
-            removeResource(dummy1X, dummy1Y, -20);
+            removeResource(dummy1X, dummy1Y, -20, true);
         }
         chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
@@ -2142,7 +2142,7 @@ public final class RoboTest {
                 leftClick();
             }
         }
-        removeResource(dummy1X, dummy1Y, -20);
+        removeResource(dummy1X, dummy1Y, -20, true);
     }
 
     /** Host wizard deadlock. */
@@ -2237,7 +2237,7 @@ public final class RoboTest {
         stopResource(gx, gy, 0);
         sleep(6000);
         checkTest("testF", 4);
-        removeResource(gx, gy, -40);
+        removeResource(gx, gy, -40, true);
         resetTerminalAreas();
         System.gc();
     }
@@ -2500,13 +2500,16 @@ public final class RoboTest {
     /** Removes service. */
     private static void removeResource(final int x,
                                        final int y,
-                                       final int corr) {
+                                       final int corr,
+                                       final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
         sleep(1000);
         moveTo(x + 40 , y + 250 + corr);
         leftClick();
-        confirmRemove();
+        if (confirm) {
+            confirmRemove();
+        }
     }
 
     /** Removes group. */
