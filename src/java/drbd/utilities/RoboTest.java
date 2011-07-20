@@ -1321,6 +1321,10 @@ public final class RoboTest {
         sleep(200);
         press(KeyEvent.VK_F);
         sleep(200);
+        press(KeyEvent.VK_TAB);
+        sleep(200);
+        press(KeyEvent.VK_DOWN);
+        sleep(200);
         press(KeyEvent.VK_ENTER); /* choose Stateful */
         sleep(1000);
 
@@ -2083,6 +2087,10 @@ public final class RoboTest {
             sleep(200);
             press(KeyEvent.VK_F);
             sleep(200);
+            press(KeyEvent.VK_TAB);
+            sleep(200);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
             press(KeyEvent.VK_ENTER); /* choose Stateful */
             sleep(1000);
 
@@ -2350,6 +2358,10 @@ public final class RoboTest {
         press(KeyEvent.VK_M);
         sleep(200);
         press(KeyEvent.VK_Y);
+        sleep(200);
+        press(KeyEvent.VK_TAB);
+        sleep(200);
+        press(KeyEvent.VK_DOWN);
         sleep(200);
         press(KeyEvent.VK_ENTER); /* choose dummy */
     }

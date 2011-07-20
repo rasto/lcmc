@@ -1732,9 +1732,7 @@ public final class Tools {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
                         for (final JDialog otherP : popups) {
-                            if (popup != otherP) {
-                                otherP.dispose();
-                            }
+                            otherP.dispose();
                         }
                     }
                 });

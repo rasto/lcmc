@@ -4548,6 +4548,7 @@ public class ServiceInfo extends EditableInfo {
                         final MyList list,
                         final boolean colocationOnly,
                         final boolean orderOnly,
+                        final List<JDialog> popups,
                         final boolean testOnly) {
         /* empty */
     }
@@ -4561,6 +4562,7 @@ public class ServiceInfo extends EditableInfo {
                         final MyList list,
                         final boolean colocationOnly,
                         final boolean orderOnly,
+                        final List<JDialog> popups,
                         final boolean testOnly) {
         final MyMenuItem mmi = new MyMenuItem(name,
                                               null,
@@ -4692,6 +4694,7 @@ public class ServiceInfo extends EditableInfo {
                                                list,
                                                colocationOnly,
                                                orderOnly,
+                                               popups,
                                                testOnly);
                     asi.addExistingGroupServiceMenuItems(thisClass,
                                                          dlm,
@@ -4699,6 +4702,7 @@ public class ServiceInfo extends EditableInfo {
                                                          list,
                                                          colocationOnly,
                                                          orderOnly,
+                                                         popups,
                                                          testOnly);
                 }
                 final boolean ret = Tools.getScrollingMenu(name,
@@ -4900,6 +4904,7 @@ public class ServiceInfo extends EditableInfo {
                                       final Point2D pos,
                                       final boolean colocationOnly,
                                       final boolean orderOnly,
+                                      final List<JDialog> popups,
                                       final boolean testOnly) {
         final MyMenuItem mmi =
                new MyMenuItem(
@@ -5099,6 +5104,7 @@ public class ServiceInfo extends EditableInfo {
                                                          pos,
                                                          colocationOnly,
                                                          orderOnly,
+                                                         popups,
                                                          testOnly);
                                 }
                             });

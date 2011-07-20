@@ -1315,6 +1315,7 @@ public final class GroupInfo extends ServiceInfo {
                         final MyList list,
                         final boolean colocationOnly,
                         final boolean orderOnly,
+                        final List<JDialog> popups,
                         final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
@@ -1332,6 +1333,7 @@ public final class GroupInfo extends ServiceInfo {
                                                    list,
                                                    colocationOnly,
                                                    orderOnly,
+                                                   popups,
                                                    testOnly);
                 }
             }
