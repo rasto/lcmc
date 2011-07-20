@@ -44,6 +44,7 @@ import drbd.utilities.CRM;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
+import drbd.utilities.MyListModel;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.pacemaker.ServiceLogs;
 
@@ -80,7 +81,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import javax.swing.DefaultListModel;
 import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 import java.lang.reflect.InvocationTargetException;
@@ -4543,7 +4543,7 @@ public class ServiceInfo extends EditableInfo {
     /** Adds existing service menu item for every member of a group. */
     protected void addExistingGroupServiceMenuItems(
                         final ServiceInfo asi,
-                        final DefaultListModel dlm,
+                        final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
                         final boolean colocationOnly,
@@ -4556,7 +4556,7 @@ public class ServiceInfo extends EditableInfo {
     protected void addExistingServiceMenuItem(
                         final String name,
                         final ServiceInfo asi,
-                        final DefaultListModel dlm,
+                        final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
                         final boolean colocationOnly,
@@ -4576,6 +4576,9 @@ public class ServiceInfo extends EditableInfo {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
                         hidePopup();
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
+                        }
                         addServicePanel(asi,
                                         null,
                                         colocationOnly,
@@ -4666,7 +4669,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 });
 
-                final DefaultListModel dlm = new DefaultListModel();
+                final MyListModel dlm = new MyListModel();
                 final Map<MyMenuItem, ButtonCallback> callbackHash =
                                  new HashMap<MyMenuItem, ButtonCallback>();
                 final MyList list = new MyList(dlm, getBackground());
@@ -4893,7 +4896,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds resource agent RA menu item. It is called in swing thread. */
     private void addResourceAgentMenu(final ResourceAgent ra,
-                                      final DefaultListModel dlm,
+                                      final MyListModel dlm,
                                       final Point2D pos,
                                       final boolean colocationOnly,
                                       final boolean orderOnly,
@@ -4910,6 +4913,9 @@ public class ServiceInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
             @Override public void action() {
                 hidePopup();
+                for (final JDialog otherP : popups) {
+                    otherP.dispose();
+                }
                 if (ra.isLinbitDrbd()
                     &&
                      !getBrowser().linbitDrbdConfirmDialog()) {
@@ -5083,7 +5089,7 @@ public class ServiceInfo extends EditableInfo {
                             ClusterBrowser.HB_CLASS_MENU.get(cl),
                             new AccessMode(ConfigData.AccessType.ADMIN, false),
                             new AccessMode(ConfigData.AccessType.OP, false));
-                    final DefaultListModel dlm = new DefaultListModel();
+                    final MyListModel dlm = new MyListModel();
                     for (final ResourceAgent ra : getAddServiceList(cl)) {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {

@@ -501,7 +501,7 @@ public class Info implements Comparable {
     }
 
     /** Returns popup object without updating. */
-    final void hidePopup() {
+    public void hidePopup() {
         mPopupLock.lock();
         final JPopupMenu popup0 = popup;
         mPopupLock.unlock();

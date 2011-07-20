@@ -37,6 +37,7 @@ import drbd.utilities.MyMenu;
 import drbd.utilities.Tools;
 import drbd.utilities.MyList;
 import drbd.utilities.MyMenuItem;
+import drbd.utilities.MyListModel;
 import drbd.utilities.ButtonCallback;
 
 import java.util.List;
@@ -50,7 +51,6 @@ import java.util.Enumeration;
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.DefaultListModel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JScrollPane;
@@ -615,7 +615,7 @@ public final class GroupInfo extends ServiceInfo {
                                                   false),
                                    new AccessMode(ConfigData.AccessType.OP,
                                                   false));
-                    DefaultListModel dlm = new DefaultListModel();
+                    MyListModel dlm = new MyListModel();
                     for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi =
                             new MyMenuItem(
@@ -633,6 +633,9 @@ public final class GroupInfo extends ServiceInfo {
                                     ci.hidePopup();
                                 }
                                 hidePopup();
+                                for (final JDialog otherP : popups) {
+                                    otherP.dispose();
+                                }
                                 if (ra.isLinbitDrbd()
                                     && !getBrowser()
                                                 .linbitDrbdConfirmDialog()) {
@@ -1307,7 +1310,7 @@ public final class GroupInfo extends ServiceInfo {
     /** Adds existing service menu item for every member of a group. */
     @Override protected void addExistingGroupServiceMenuItems(
                         final ServiceInfo asi,
-                        final DefaultListModel dlm,
+                        final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
                         final boolean colocationOnly,

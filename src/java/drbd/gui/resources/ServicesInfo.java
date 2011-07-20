@@ -43,6 +43,7 @@ import drbd.utilities.ButtonCallback;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.MyList;
+import drbd.utilities.MyListModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -68,7 +69,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 
 import java.util.concurrent.locks.Lock;
@@ -1396,7 +1396,7 @@ public final class ServicesInfo extends EditableInfo {
                                                    false),
                                        new AccessMode(ConfigData.AccessType.OP,
                                                       false));
-                    DefaultListModel dlm = new DefaultListModel();
+                    MyListModel dlm = new MyListModel();
                     for (final ResourceAgent ra : getAddServiceList(cl)) {
                         final MyMenuItem mmi =
                                 new MyMenuItem(ra.getMenuName(),
@@ -1411,6 +1411,9 @@ public final class ServicesInfo extends EditableInfo {
                             private static final long serialVersionUID = 1L;
                             @Override public void action() {
                                 hidePopup();
+                                for (final JDialog otherP : popups) {
+                                    otherP.dispose();
+                                }
                                 if (ra.isLinbitDrbd()
                                     &&
                                      !getBrowser().linbitDrbdConfirmDialog()) {

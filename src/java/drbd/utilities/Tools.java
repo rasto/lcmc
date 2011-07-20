@@ -1581,7 +1581,7 @@ public final class Tools {
     public static boolean getScrollingMenu(
                         final String name,
                         final MyMenu menu,
-                        final DefaultListModel dlm,
+                        final MyListModel dlm,
                         final MyList list,
                         final Info infoObject,
                         final List<JDialog> popups,
@@ -1600,9 +1600,7 @@ public final class Tools {
         final JScrollPane sp = new JScrollPane(list);
         sp.setViewportBorder(null);
         sp.setBorder(null);
-        final JTextField typeToSearchField =
-                                           new JTextField("type to search...");
-        typeToSearchField.setEnabled(false);
+        final JTextField typeToSearchField = dlm.getFilterField();
         final JDialog popup = new JDialog(new JFrame(), name, false);
         final JPanel popupPanel = new JPanel();
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
@@ -1648,7 +1646,7 @@ public final class Tools {
                             }
                         });
                         final MyMenuItem item =
-                                            (MyMenuItem) dlm.elementAt(index);
+                                            (MyMenuItem) dlm.getElementAt(index);
                         item.action();
                     }
                 });
@@ -1679,12 +1677,12 @@ public final class Tools {
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
                                 final MyMenuItem lastItem =
-                                        (MyMenuItem) dlm.elementAt(lastIndex);
+                                        (MyMenuItem) dlm.getElementAt(lastIndex);
                                 callbackHash.get(lastItem).mouseOut();
                             }
                             if (index >= 0) {
                                 final MyMenuItem item =
-                                            (MyMenuItem) dlm.elementAt(index);
+                                            (MyMenuItem) dlm.getElementAt(index);
                                 callbackHash.get(item).mouseOver();
                             }
                         }
@@ -1696,7 +1694,12 @@ public final class Tools {
         list.addKeyListener(new KeyAdapter() {
             @Override public void keyTyped(final KeyEvent e) {
                 final char ch = e.getKeyChar();
-                if (ch == ' ' || ch == '\n') {
+                if (ch == 27) { /* escape */
+                    for (final JDialog otherP : popups) {
+                        otherP.dispose();
+                    }
+                    infoObject.hidePopup();
+                } else if (ch == ' ' || ch == '\n') {
                     final MyMenuItem item =
                                        (MyMenuItem) list.getSelectedValue();
                     //SwingUtilities.invokeLater(new Runnable() {
@@ -1712,12 +1715,6 @@ public final class Tools {
                     if (Character.isLetterOrDigit(ch)) {
                         final Thread t = new Thread(new Runnable() {
                             @Override public void run() {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        typeToSearchField.setText("" + ch);
-
-                                    }
-                                });
                                 getGUIData().getMainGlassPane().start("" + ch,
                                                                       null,
                                                                       true);
@@ -1735,7 +1732,9 @@ public final class Tools {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
                         for (final JDialog otherP : popups) {
-                            otherP.dispose();
+                            if (popup != otherP) {
+                                otherP.dispose();
+                            }
                         }
                     }
                 });
@@ -1745,7 +1744,9 @@ public final class Tools {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
                         for (final JDialog otherP : popups) {
-                            otherP.dispose();
+                            if (popup != otherP) {
+                                otherP.dispose();
+                            }
                         }
                     }
                 });
@@ -1762,7 +1763,6 @@ public final class Tools {
                            (int) (l.getX() + menu.getBounds().getWidth()),
                            (int) l.getY());
                         popup.setVisible(true);
-                        list.requestFocus();
                     }
                 });
                 SwingUtilities.invokeLater(new Runnable() {
