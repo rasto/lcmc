@@ -57,6 +57,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.FileNotFoundException;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JEditorPane;
@@ -77,6 +81,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
+import javax.swing.JDialog;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -85,6 +91,8 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.Cursor;
 import java.awt.image.MemoryImageSource;
 import java.awt.Image;
@@ -1570,22 +1578,40 @@ public final class Tools {
     }
 
     /** Returns a popup in a scrolling pane. */
-    public static JScrollPane getScrollingMenu(
+    public static boolean getScrollingMenu(
+                        final String name,
                         final MyMenu menu,
                         final DefaultListModel dlm,
                         final MyList list,
+                        final Info infoObject,
+                        final List<JDialog> popups,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
-        prevScrollingMenuIndex = -1;
-        list.setFixedCellHeight(25);
         final int maxSize = dlm.getSize();
         if (maxSize <= 0) {
-            return null;
+            return false;
         }
+        prevScrollingMenuIndex = -1;
+        list.setFixedCellHeight(25);
         if (maxSize > 20) {
             list.setVisibleRowCount(20);
         } else {
             list.setVisibleRowCount(maxSize);
         }
+        final JScrollPane sp = new JScrollPane(list);
+        sp.setViewportBorder(null);
+        sp.setBorder(null);
+        final JTextField typeToSearchField =
+                                           new JTextField("type to search...");
+        typeToSearchField.setEnabled(false);
+        final JDialog popup = new JDialog(new JFrame(), name, false);
+        final JPanel popupPanel = new JPanel();
+        popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
+        popupPanel.add(typeToSearchField);
+        popupPanel.add(sp);
+        popup.setContentPane(popupPanel);
+        popup.pack();
+        popups.add(popup);
+
         list.addMouseListener(new MouseAdapter() {
             @Override public void mouseExited(final MouseEvent evt) {
                 prevScrollingMenuIndex = -1;
@@ -1599,7 +1625,7 @@ public final class Tools {
             @Override public void mouseEntered(final MouseEvent evt) {
                 /* request focus here causes the applet making all
                    textfields to be not editable. */
-                /* list.requestFocus(); */
+                list.requestFocus();
             }
 
             @Override public void mousePressed(final MouseEvent evt) {
@@ -1667,9 +1693,6 @@ public final class Tools {
                 thread.start();
             }
         });
-        final JScrollPane sp = new JScrollPane(list);
-        sp.setViewportBorder(null);
-        sp.setBorder(null);
         list.addKeyListener(new KeyAdapter() {
             @Override public void keyTyped(final KeyEvent e) {
                 final char ch = e.getKeyChar();
@@ -1689,6 +1712,12 @@ public final class Tools {
                     if (Character.isLetterOrDigit(ch)) {
                         final Thread t = new Thread(new Runnable() {
                             @Override public void run() {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    public void run() {
+                                        typeToSearchField.setText("" + ch);
+
+                                    }
+                                });
                                 getGUIData().getMainGlassPane().start("" + ch,
                                                                       null,
                                                                       true);
@@ -1700,7 +1729,52 @@ public final class Tools {
                 }
             }
         });
-        return sp;
+
+        menu.addMenuListener(new MenuListener() {
+            public void menuCanceled(final MenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override public void run() {
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
+                        }
+                    }
+                });
+            }
+
+            public void menuDeselected(final MenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override public void run() {
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
+                        }
+                    }
+                });
+            }
+
+            public void menuSelected(final MenuEvent e) {
+                final Point l = menu.getLocationOnScreen();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
+                        }
+                        popup.setLocation(
+                           (int) (l.getX() + menu.getBounds().getWidth()),
+                           (int) l.getY());
+                        popup.setVisible(true);
+                        list.requestFocus();
+                    }
+                });
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override public void run() {
+                        popup.setLocation(
+                           (int) (l.getX() + menu.getBounds().getWidth()),
+                           (int) l.getY());
+                    }
+                });
+            }
+        });
+        return true;
     }
 
     /** Returns whether the computer, where this program is run, is Linux. */
@@ -2239,7 +2313,7 @@ public final class Tools {
     public static void setMenuVisible(final JComponent menu,
                                       final boolean visible) {
         JComponent parent = (JComponent) menu.getParent();
-        if (parent instanceof javax.swing.JViewport) {
+        if (parent instanceof JViewport) {
             /* MyList */
             parent = (JComponent) parent.getParent();
             parent = (JComponent) parent.getParent();
@@ -2278,7 +2352,7 @@ public final class Tools {
     public static void setMenuOpaque(final JComponent menu,
                                       final boolean opaque) {
         JComponent parent = (JComponent) menu.getParent();
-        if (parent instanceof javax.swing.JViewport) {
+        if (parent instanceof JViewport) {
             /* MyList */
             parent = (JComponent) parent.getParent();
             parent = (JComponent) parent.getParent();

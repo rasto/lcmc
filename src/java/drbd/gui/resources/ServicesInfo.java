@@ -69,6 +69,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -1221,6 +1222,7 @@ public final class ServicesInfo extends EditableInfo {
                 }
             };
         items.add((UpdatableItem) addGroupMenuItem);
+        final ServicesInfo thisClass = this;
 
         /* add service */
         final MyMenu addServiceMenuItem = new MyMenu(
@@ -1385,6 +1387,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     });
                 }
+                final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
@@ -1429,15 +1432,16 @@ public final class ServicesInfo extends EditableInfo {
                         mmi.setPos(pos);
                         dlm.addElement(mmi);
                     }
-                    final JScrollPane jsp = Tools.getScrollingMenu(
-                                               classItem,
-                                               dlm,
-                                               new MyList(dlm, getBackground()),
-                                               null);
-                    if (jsp == null) {
+                    final boolean ret = Tools.getScrollingMenu(
+                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        classItem,
+                                        dlm,
+                                        new MyList(dlm, getBackground()),
+                                        thisClass,
+                                        popups,
+                                        null);
+                    if (!ret) {
                         classItem.setEnabled(false);
-                    } else {
-                        classItem.add(jsp);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {

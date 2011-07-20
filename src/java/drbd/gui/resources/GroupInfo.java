@@ -47,6 +47,7 @@ import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.swing.JDialog;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.DefaultListModel;
@@ -563,6 +564,7 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns items for the group popup. */
     @Override public List<UpdatableItem> createPopup() {
         final boolean testOnly = false;
+        final GroupInfo thisGroupInfo = this;
         /* add group service */
         final MyMenu addGroupServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
@@ -605,6 +607,7 @@ public final class GroupInfo extends ServiceInfo {
                         removeAll();
                     }
                 });
+                final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
@@ -641,15 +644,16 @@ public final class GroupInfo extends ServiceInfo {
                         };
                         dlm.addElement(mmi);
                     }
-                    final JScrollPane jsp = Tools.getScrollingMenu(
-                                              classItem,
-                                              dlm,
-                                              new MyList(dlm, getBackground()),
-                                              null);
-                    if (jsp == null) {
+                    final boolean ret = Tools.getScrollingMenu(
+                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        classItem,
+                                        dlm,
+                                        new MyList(dlm, getBackground()),
+                                        thisGroupInfo,
+                                        popups,
+                                        null);
+                    if (!ret) {
                         classItem.setEnabled(false);
-                    } else {
-                        classItem.add(jsp);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {

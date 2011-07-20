@@ -67,6 +67,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
 import java.util.Set;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -4669,6 +4670,8 @@ public class ServiceInfo extends EditableInfo {
                 final Map<MyMenuItem, ButtonCallback> callbackHash =
                                  new HashMap<MyMenuItem, ButtonCallback>();
                 final MyList list = new MyList(dlm, getBackground());
+
+                final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final ServiceInfo asi
                             : getBrowser().getExistingServiceList(thisClass)) {
                     if (asi.isConstraintPH() && isConstraintPH()) {
@@ -4695,19 +4698,20 @@ public class ServiceInfo extends EditableInfo {
                                                          orderOnly,
                                                          testOnly);
                 }
-                final JScrollPane jsp = Tools.getScrollingMenu(this,
-                                                               dlm,
-                                                               list,
-                                                               callbackHash);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        if (jsp == null) {
+                final boolean ret = Tools.getScrollingMenu(name,
+                                                           this,
+                                                           dlm,
+                                                           list,
+                                                           thisClass,
+                                                           popups,
+                                                           callbackHash);
+                if (!ret) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override public void run() {
                             setEnabled(false);
-                        } else {
-                            add(jsp);
                         }
-                    }
-                });
+                    });
+                }
                 if (!colocationOnly && !orderOnly) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {
@@ -4933,6 +4937,7 @@ public class ServiceInfo extends EditableInfo {
                                          final String name,
                                          final boolean colocationOnly,
                                          final boolean orderOnly) {
+        final ServiceInfo thisClass = this;
         return new MyMenu(name,
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -5072,6 +5077,7 @@ public class ServiceInfo extends EditableInfo {
                         Tools.printStackTrace();
                     }
                 }
+                final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem = new MyMenu(
                             ClusterBrowser.HB_CLASS_MENU.get(cl),
@@ -5099,15 +5105,16 @@ public class ServiceInfo extends EditableInfo {
                     try {
                         SwingUtilities.invokeAndWait(new Runnable() {
                             @Override public void run() {
-                                final JScrollPane jsp = Tools.getScrollingMenu(
-                                              classItem,
-                                              dlm,
-                                              new MyList(dlm, getBackground()),
-                                              null);
-                                if (jsp == null) {
+                                final boolean ret = Tools.getScrollingMenu(
+                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        classItem,
+                                        dlm,
+                                        new MyList(dlm, getBackground()),
+                                        thisClass,
+                                        popups,
+                                        null);
+                                if (!ret) {
                                     classItem.setEnabled(false);
-                                } else {
-                                    classItem.add(jsp);
                                 }
                                 thisMenu.add(classItem);
                             }
