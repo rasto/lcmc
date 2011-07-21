@@ -4087,7 +4087,6 @@ public class ServiceInfo extends EditableInfo {
         } else {
             newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
         }
-        getBrowser().addToHeartbeatIdList(newServiceInfo);
 
         addServicePanel(newServiceInfo,
                         pos,
@@ -4096,6 +4095,8 @@ public class ServiceInfo extends EditableInfo {
                         reloadNode,
                         getBrowser().getDCHost(),
                         testOnly);
+        System.out.println("new service info: "
+                            + newServiceInfo.getService().getId());
         return newServiceInfo;
     }
 
@@ -4188,6 +4189,8 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         } else {
+            System.out.println("new service info 2: "
+                            + serviceInfo.getService().getId());
             getBrowser().addNameToServiceInfoHash(serviceInfo);
             final DefaultMutableTreeNode newServiceNode =
                                     new DefaultMutableTreeNode(serviceInfo);
