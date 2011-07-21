@@ -482,8 +482,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
                                       final Set<ServiceInfo> servicesAll,
                                       final Set<ServiceInfo> servicesFrom,
-                                      final boolean colocationOnly,
-                                      final boolean orderOnly,
+                                      final boolean colocation,
+                                      final boolean order,
                                       final Host dcHost,
                                       final boolean force,
                                       final boolean testOnly) {
@@ -501,24 +501,24 @@ public final class ConstraintPHInfo extends ServiceInfo {
         CRMXML.RscSet ordRscSet2 = null;
 
         if (rdataCol != null) {
-            if (!orderOnly) {
+            if (colocation) {
                 colId = rdataCol.getConstraintId();
             }
             colRscSet1 = rdataCol.getRscSet1();
             colRscSet2 = rdataCol.getRscSet2();
         }
         if (rdataOrd != null) {
-            if (!colocationOnly) {
+            if (order) {
                 ordId = rdataOrd.getConstraintId();
             }
             ordRscSet1 = rdataOrd.getRscSet1();
             ordRscSet2 = rdataOrd.getRscSet2();
         }
         if (servicesFrom.isEmpty()) {
-            if (!testOnly && !colocationOnly) {
+            if (!testOnly && order) {
                 reverseOrder();
             }
-            if (!testOnly && !orderOnly) {
+            if (!testOnly && colocation) {
                 reverseColocation();
             }
         }
@@ -529,7 +529,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
         for (final ServiceInfo serviceInfo : servicesAll) {
             final boolean isFrom = servicesFrom.contains(serviceInfo);
             final String idToAdd = serviceInfo.getService().getHeartbeatId();
-            if (!orderOnly) {
+            if (colocation) {
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 /* colocation */
                 if (colId == null) {
@@ -649,7 +649,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 }
             }
 
-            if (!colocationOnly) {
+            if (order) {
                 /* order */
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 if (ordId == null) {

@@ -54,6 +54,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JScrollPane;
+import javax.swing.JCheckBox;
 import java.awt.geom.Point2D;
 
 import java.util.concurrent.locks.Lock;
@@ -649,6 +650,7 @@ public final class GroupInfo extends ServiceInfo {
                     }
                     final boolean ret = Tools.getScrollingMenu(
                                         ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        null, /* options */
                                         classItem,
                                         dlm,
                                         new MyList(dlm, getBackground()),
@@ -1313,8 +1315,8 @@ public final class GroupInfo extends ServiceInfo {
                         final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
-                        final boolean colocationOnly,
-                        final boolean orderOnly,
+                        final JCheckBox colocationCB,
+                        final JCheckBox orderCB,
                         final List<JDialog> popups,
                         final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -1331,8 +1333,8 @@ public final class GroupInfo extends ServiceInfo {
                                                    dlm,
                                                    callbackHash,
                                                    list,
-                                                   colocationOnly,
-                                                   orderOnly,
+                                                   colocationCB,
+                                                   orderCB,
                                                    popups,
                                                    testOnly);
                 }

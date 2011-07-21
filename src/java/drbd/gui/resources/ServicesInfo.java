@@ -1437,6 +1437,7 @@ public final class ServicesInfo extends EditableInfo {
                     }
                     final boolean ret = Tools.getScrollingMenu(
                                         ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        null, /* options */
                                         classItem,
                                         dlm,
                                         new MyList(dlm, getBackground()),

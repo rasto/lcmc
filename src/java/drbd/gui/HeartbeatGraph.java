@@ -355,8 +355,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     public boolean addResource(final ServiceInfo serviceInfo,
                                final ServiceInfo parent,
                                final Point2D pos,
-                               final boolean colocationOnly,
-                               final boolean orderOnly,
+                               final boolean colocation,
+                               final boolean order,
                                final boolean testOnly) {
         boolean vertexExists = true;
         Vertex v = getVertex(serviceInfo);
@@ -396,10 +396,10 @@ public final class HeartbeatGraph extends ResourceGraph {
         }
 
         if (parent != null && !testOnly) {
-            if (!orderOnly) {
+            if (colocation) {
                 addColocation(null, serviceInfo, parent);
             }
-            if (!colocationOnly) {
+            if (order) {
                 addOrder(null, parent, serviceInfo);
             }
         }

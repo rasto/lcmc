@@ -58,6 +58,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -82,6 +83,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
+import javax.swing.JCheckBox;
 import javax.swing.SpringLayout;
 import java.lang.reflect.InvocationTargetException;
 
@@ -3528,8 +3530,8 @@ public class ServiceInfo extends EditableInfo {
                             getBrowser().getHeartbeatGraph().getParents(this);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
-                        final boolean colocationOnly = false;
-                        final boolean orderOnly = false;
+                        final boolean colocation = true;
+                        final boolean order = true;
                         final Set<ServiceInfo> with =
                                                  new TreeSet<ServiceInfo>();
                         with.add(this);
@@ -3539,8 +3541,8 @@ public class ServiceInfo extends EditableInfo {
                                     .addConstraintWithPlaceholder(
                                              with,
                                              withFrom,
-                                             colocationOnly,
-                                             orderOnly,
+                                             colocation,
+                                             order,
                                              dcHost,
                                              !parentInfo.getService().isNew(),
                                              testOnly);
@@ -4051,8 +4053,8 @@ public class ServiceInfo extends EditableInfo {
     /** Adds service panel to the position 'pos'. */
     public ServiceInfo addServicePanel(final ResourceAgent newRA,
                                        final Point2D pos,
-                                       final boolean colocationOnly,
-                                       final boolean orderOnly,
+                                       final boolean colocation,
+                                       final boolean order,
                                        final boolean reloadNode,
                                        final boolean master,
                                        final boolean testOnly) {
@@ -4089,8 +4091,8 @@ public class ServiceInfo extends EditableInfo {
 
         addServicePanel(newServiceInfo,
                         pos,
-                        colocationOnly,
-                        orderOnly,
+                        colocation,
+                        order,
                         reloadNode,
                         getBrowser().getDCHost(),
                         testOnly);
@@ -4103,8 +4105,8 @@ public class ServiceInfo extends EditableInfo {
      */
     public void addServicePanel(final ServiceInfo serviceInfo,
                                 final Point2D pos,
-                                final boolean colocationOnly,
-                                final boolean orderOnly,
+                                final boolean colocation,
+                                final boolean order,
                                 final boolean reloadNode,
                                 final Host dcHost,
                                 final boolean testOnly) {
@@ -4115,8 +4117,8 @@ public class ServiceInfo extends EditableInfo {
         if (getBrowser().getHeartbeatGraph().addResource(serviceInfo,
                                                          this,
                                                          pos,
-                                                         colocationOnly,
-                                                         orderOnly,
+                                                         colocation,
+                                                         order,
                                                          testOnly)) {
             Tools.waitForSwing();
             /* edge added */
@@ -4138,8 +4140,8 @@ public class ServiceInfo extends EditableInfo {
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
                                                   withFrom,
-                                                  colocationOnly,
-                                                  orderOnly,
+                                                  colocation,
+                                                  order,
                                                   dcHost,
                                                   !cphi.getService().isNew(),
                                                   testOnly);
@@ -4165,15 +4167,15 @@ public class ServiceInfo extends EditableInfo {
                     ordAttrs.put("first-action", "promote");
                     ordAttrs.put("then-action", "start");
                 }
-                if (colocationOnly) {
+                if (colocation) {
                     colAttrsList.add(colAttrs);
-                    ordAttrsList.add(null);
-                } else if (orderOnly) {
-                    ordAttrsList.add(ordAttrs);
-                    colAttrsList.add(null);
                 } else {
-                    colAttrsList.add(colAttrs);
+                    colAttrsList.add(null);
+                }
+                if (order) {
                     ordAttrsList.add(ordAttrs);
+                } else {
+                    ordAttrsList.add(null);
                 }
                 if (!getService().isNew()
                     && !serviceInfo.getService().isNew()) {
@@ -4546,8 +4548,8 @@ public class ServiceInfo extends EditableInfo {
                         final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
-                        final boolean colocationOnly,
-                        final boolean orderOnly,
+                        final JCheckBox colocationCB,
+                        final JCheckBox orderCB,
                         final List<JDialog> popups,
                         final boolean testOnly) {
         /* empty */
@@ -4560,8 +4562,8 @@ public class ServiceInfo extends EditableInfo {
                         final MyListModel dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList list,
-                        final boolean colocationOnly,
-                        final boolean orderOnly,
+                        final JCheckBox colocationCB,
+                        final JCheckBox orderCB,
                         final List<JDialog> popups,
                         final boolean testOnly) {
         final MyMenuItem mmi = new MyMenuItem(name,
@@ -4583,8 +4585,8 @@ public class ServiceInfo extends EditableInfo {
                         }
                         addServicePanel(asi,
                                         null,
-                                        colocationOnly,
-                                        orderOnly,
+                                        colocationCB.isSelected(),
+                                        orderCB.isSelected(),
                                         true,
                                         getBrowser().getDCHost(),
                                         testOnly);
@@ -4604,8 +4606,8 @@ public class ServiceInfo extends EditableInfo {
                            @Override public void action(final Host dcHost) {
                                addServicePanel(asi,
                                                null,
-                                               colocationOnly,
-                                               orderOnly,
+                                               colocationCB.isSelected(),
+                                               orderCB.isSelected(),
                                                true,
                                                dcHost,
                                                true); /* test only */
@@ -4616,8 +4618,6 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns existing service manu item. */
     private MyMenu getExistingServiceMenuItem(final String name,
-                                              final boolean colocationOnly,
-                                              final boolean orderOnly,
                                               final boolean enableForNew,
                                               final boolean testOnly) {
         final ServiceInfo thisClass = this;
@@ -4660,6 +4660,12 @@ public class ServiceInfo extends EditableInfo {
             }
 
             private void updateThread() {
+                final JCheckBox colocationCB = new JCheckBox("Colo", true);
+                final JCheckBox orderCB = new JCheckBox("Order", true);
+                colocationCB.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                colocationCB.setPreferredSize(colocationCB.getMinimumSize());
+                orderCB.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                orderCB.setPreferredSize(orderCB.getMinimumSize());
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
                         setEnabled(false);
@@ -4692,20 +4698,26 @@ public class ServiceInfo extends EditableInfo {
                                                dlm,
                                                callbackHash,
                                                list,
-                                               colocationOnly,
-                                               orderOnly,
+                                               colocationCB,
+                                               orderCB,
                                                popups,
                                                testOnly);
                     asi.addExistingGroupServiceMenuItems(thisClass,
                                                          dlm,
                                                          callbackHash,
                                                          list,
-                                                         colocationOnly,
-                                                         orderOnly,
+                                                         colocationCB,
+                                                         orderCB,
                                                          popups,
                                                          testOnly);
                 }
+                final JPanel colOrdPanel =
+                            new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                colOrdPanel.add(colocationCB);
+                colOrdPanel.add(orderCB);
                 final boolean ret = Tools.getScrollingMenu(name,
+                                                           colOrdPanel,
                                                            this,
                                                            dlm,
                                                            list,
@@ -4719,40 +4731,6 @@ public class ServiceInfo extends EditableInfo {
                         }
                     });
                 }
-                if (!colocationOnly && !orderOnly) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            addSeparator();
-                        }
-                    });
-                    /* colocation only */
-                    final MyMenu colOnlyItem = getExistingServiceMenuItem(
-                           Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
-                           true,
-                           false,
-                           enableForNew,
-                           testOnly);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            add(colOnlyItem);
-                        }
-                    });
-
-                    /* order only */
-                    final MyMenu ordOnlyItem = getExistingServiceMenuItem(
-                           Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
-                           false,
-                           true,
-                           enableForNew,
-                           testOnly);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
-                            add(ordOnlyItem);
-                        }
-                    });
-                    colOnlyItem.update();
-                    ordOnlyItem.update();
-                }
                 super.update();
             }
         };
@@ -4763,8 +4741,6 @@ public class ServiceInfo extends EditableInfo {
                                    final CRMXML crmXML,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
-                                   final boolean colocationOnly,
-                                   final boolean orderOnly,
                                    final boolean testOnly) {
         final MyMenuItem ldMenuItem = new MyMenuItem(
                            Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
@@ -4783,8 +4759,8 @@ public class ServiceInfo extends EditableInfo {
                                                addServicePanel(
                                                     fsService,
                                                     getPos(),
-                                                    colocationOnly,
-                                                    orderOnly,
+                                                    true, /* colocation */
+                                                    true, /* order */
                                                     true,
                                                     false,
                                                     testOnly);
@@ -4805,8 +4781,6 @@ public class ServiceInfo extends EditableInfo {
                                  final CRMXML crmXML,
                                  final Point2D pos,
                                  final ResourceAgent fsService,
-                                 final boolean colocationOnly,
-                                 final boolean orderOnly,
                                  final boolean testOnly) {
         final ResourceAgent drbddiskService = crmXML.getHbDrbddisk();
         final MyMenuItem ddMenuItem = new MyMenuItem(
@@ -4819,13 +4793,13 @@ public class ServiceInfo extends EditableInfo {
             @Override public void action() {
                 hidePopup();
                 final FilesystemInfo fsi = (FilesystemInfo) addServicePanel(
-                                                                fsService,
-                                                                getPos(),
-                                                                colocationOnly,
-                                                                orderOnly,
-                                                                true,
-                                                                false,
-                                                                testOnly);
+                                                    fsService,
+                                                    getPos(),
+                                                    true, /* colocation */
+                                                    true, /* order */
+                                                    true,
+                                                    false,
+                                                    testOnly);
                 fsi.setDrbddiskIsPreferred(true);
                 getBrowser().getHeartbeatGraph().repaint();
             }
@@ -4842,8 +4816,6 @@ public class ServiceInfo extends EditableInfo {
     private void addIpMenu(final MyMenu menu,
                            final Point2D pos,
                            final ResourceAgent ipService,
-                           final boolean colocationOnly,
-                           final boolean orderOnly,
                            final boolean testOnly) {
         final MyMenuItem ipMenuItem =
           new MyMenuItem(ipService.getMenuName(),
@@ -4856,8 +4828,8 @@ public class ServiceInfo extends EditableInfo {
                 hidePopup();
                 addServicePanel(ipService,
                                 getPos(),
-                                colocationOnly,
-                                orderOnly,
+                                true, /* colocation */
+                                true, /* order */
                                 true,
                                 false,
                                 testOnly);
@@ -4872,8 +4844,6 @@ public class ServiceInfo extends EditableInfo {
     private void addFilesystemMenu(final MyMenu menu,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
-                                   final boolean colocationOnly,
-                                   final boolean orderOnly,
                                    final boolean testOnly) {
         final MyMenuItem fsMenuItem =
               new MyMenuItem(fsService.getMenuName(),
@@ -4886,8 +4856,8 @@ public class ServiceInfo extends EditableInfo {
                     hidePopup();
                     addServicePanel(fsService,
                                     getPos(),
-                                    colocationOnly,
-                                    orderOnly,
+                                    true, /* colocation */
+                                    true, /* order */
                                     true,
                                     false,
                                     testOnly);
@@ -4902,9 +4872,9 @@ public class ServiceInfo extends EditableInfo {
     private void addResourceAgentMenu(final ResourceAgent ra,
                                       final MyListModel dlm,
                                       final Point2D pos,
-                                      final boolean colocationOnly,
-                                      final boolean orderOnly,
                                       final List<JDialog> popups,
+                                      final JCheckBox colocationCB,
+                                      final JCheckBox orderCB,
                                       final boolean testOnly) {
         final MyMenuItem mmi =
                new MyMenuItem(
@@ -4931,8 +4901,8 @@ public class ServiceInfo extends EditableInfo {
                 }
                 addServicePanel(ra,
                                 getPos(),
-                                colocationOnly,
-                                orderOnly,
+                                colocationCB.isSelected(),
+                                orderCB.isSelected(),
                                 true,
                                 false,
                                 testOnly);
@@ -4945,9 +4915,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds new Service and dependence. */
     private MyMenu getAddServiceMenuItem(final boolean testOnly,
-                                         final String name,
-                                         final boolean colocationOnly,
-                                         final boolean orderOnly) {
+                                         final String name) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
@@ -5013,8 +4981,6 @@ public class ServiceInfo extends EditableInfo {
                                                   crmXML,
                                                   pos,
                                                   fsService,
-                                                  colocationOnly,
-                                                  orderOnly,
                                                   testOnly);
                             }
                         });
@@ -5035,8 +5001,6 @@ public class ServiceInfo extends EditableInfo {
                                                 crmXML,
                                                 pos,
                                                 fsService,
-                                                colocationOnly,
-                                                orderOnly,
                                                 testOnly);
                             }
                         });
@@ -5058,8 +5022,6 @@ public class ServiceInfo extends EditableInfo {
                                 addIpMenu(thisMenu,
                                           pos,
                                           ipService,
-                                          colocationOnly,
-                                          orderOnly,
                                           testOnly);
                             }
                         });
@@ -5077,8 +5039,6 @@ public class ServiceInfo extends EditableInfo {
                                 addFilesystemMenu(thisMenu,
                                                   pos,
                                                   fsService,
-                                                  colocationOnly,
-                                                  orderOnly,
                                                   testOnly);
                             }
                         });
@@ -5090,6 +5050,19 @@ public class ServiceInfo extends EditableInfo {
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
+                    final JCheckBox colocationCB = new JCheckBox("Colo", true);
+                    final JCheckBox orderCB = new JCheckBox("Order", true);
+                    colocationCB.setBackground(
+                                            ClusterBrowser.STATUS_BACKGROUND);
+                    colocationCB.setPreferredSize(
+                                            colocationCB.getMinimumSize());
+                    orderCB.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                    orderCB.setPreferredSize(orderCB.getMinimumSize());
+                    final JPanel colOrdPanel =
+                            new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                    colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                    colOrdPanel.add(colocationCB);
+                    colOrdPanel.add(orderCB);
                     final MyMenu classItem = new MyMenu(
                             ClusterBrowser.HB_CLASS_MENU.get(cl),
                             new AccessMode(ConfigData.AccessType.ADMIN, false),
@@ -5102,9 +5075,9 @@ public class ServiceInfo extends EditableInfo {
                                     addResourceAgentMenu(ra,
                                                          dlm,
                                                          pos,
-                                                         colocationOnly,
-                                                         orderOnly,
                                                          popups,
+                                                         colocationCB,
+                                                         orderCB,
                                                          testOnly);
                                 }
                             });
@@ -5119,6 +5092,7 @@ public class ServiceInfo extends EditableInfo {
                             @Override public void run() {
                                 final boolean ret = Tools.getScrollingMenu(
                                         ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        colOrdPanel,
                                         classItem,
                                         dlm,
                                         new MyList(dlm, getBackground()),
@@ -5136,37 +5110,6 @@ public class ServiceInfo extends EditableInfo {
                     } catch (final InvocationTargetException x) {
                         Tools.printStackTrace();
                     }
-                }
-                if (!colocationOnly && !orderOnly) {
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override public void run() {
-                            addSeparator();
-                        }
-                    });
-                    /* colocation only */
-                    final MyMenu colOnlyitem = getAddServiceMenuItem(
-                            testOnly,
-                            Tools.getString("ClusterBrowser.Hb.ColOnlySubmenu"),
-                            true,
-                            false);
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override public void run() {
-                            add(colOnlyitem);
-                        }
-                    });
-                    /* order only */
-                    final MyMenu ordOnlyItem = getAddServiceMenuItem(
-                            testOnly,
-                            Tools.getString("ClusterBrowser.Hb.OrdOnlySubmenu"),
-                            false,
-                            true);
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override public void run() {
-                            add(ordOnlyItem);
-                        }
-                    });
-                    colOnlyitem.update();
-                    ordOnlyItem.update();
                 }
                 super.update();
             }
@@ -5222,16 +5165,12 @@ public class ServiceInfo extends EditableInfo {
         /* add new service and dependency*/
         final MyMenu addServiceMenuItem = getAddServiceMenuItem(
                         testOnly,
-                        Tools.getString("ClusterBrowser.Hb.AddDependency"),
-                        false,
-                        false);
+                        Tools.getString("ClusterBrowser.Hb.AddDependency"));
         items.add((UpdatableItem) addServiceMenuItem);
 
         /* add existing service dependency*/
         final MyMenu existingServiceMenuItem = getExistingServiceMenuItem(
                     Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
-                    false,
-                    false,
                     enableForNew,
                     testOnly);
         items.add((UpdatableItem) existingServiceMenuItem);

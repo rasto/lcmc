@@ -1600,8 +1600,8 @@ public final class Tools {
         }
         prevScrollingMenuIndex = -1;
         list.setFixedCellHeight(25);
-        if (maxSize > 20) {
-            list.setVisibleRowCount(20);
+        if (maxSize > 10) {
+            list.setVisibleRowCount(10);
         } else {
             list.setVisibleRowCount(maxSize);
         }
@@ -1613,7 +1613,9 @@ public final class Tools {
         popup.setAlwaysOnTop(true);
         final JPanel popupPanel = new JPanel();
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
-        popupPanel.add(typeToSearchField);
+        if (maxSize > 10) {
+            popupPanel.add(typeToSearchField);
+        }
         popupPanel.add(sp);
         if (optionsPanel != null) {
             popupPanel.add(optionsPanel);
@@ -1688,13 +1690,21 @@ public final class Tools {
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
                                 final MyMenuItem lastItem =
-                                        (MyMenuItem) dlm.getElementAt(lastIndex);
-                                callbackHash.get(lastItem).mouseOut();
+                                      (MyMenuItem) dlm.getElementAt(lastIndex);
+                                final ButtonCallback bc =
+                                                    callbackHash.get(lastItem);
+                                if (bc != null) {
+                                    bc.mouseOut();
+                                }
                             }
                             if (index >= 0) {
                                 final MyMenuItem item =
-                                            (MyMenuItem) dlm.getElementAt(index);
-                                callbackHash.get(item).mouseOver();
+                                          (MyMenuItem) dlm.getElementAt(index);
+                                final ButtonCallback bc =
+                                                        callbackHash.get(item);
+                                if (bc != null) {
+                                    bc.mouseOver();
+                                }
                             }
                         }
                     }
@@ -1773,22 +1783,30 @@ public final class Tools {
             }
         });
 
+        /* menu is not new. */
+        for (final MenuListener ml : menu.getMenuListeners()) {
+            menu.removeMenuListener(ml);
+        }
         menu.addMenuListener(new MenuListener() {
             public void menuCanceled(final MenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
-                        for (final JDialog otherP : popups) {
-                            otherP.dispose();
-                        }
-                    }
-                });
             }
 
             public void menuDeselected(final MenuEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
+                        boolean pVisible = false;
+                        JPopupMenu p = (JPopupMenu) menu.getParent();
+                        while (p != null) {
+                            if (p.isVisible()) {
+                                pVisible = true;
+                                break;
+                            }
+                            p = (JPopupMenu) p.getParent();
+                        }
                         for (final JDialog otherP : popups) {
-                            if (popup != otherP) {
+                            if (popup != otherP || pVisible) {
+                                /* don't dispose the popup if it was clicked.
+                                 */
                                 otherP.dispose();
                             }
                         }
