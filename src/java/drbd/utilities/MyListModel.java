@@ -77,6 +77,11 @@ public final class MyListModel extends AbstractListModel {
         filteredItems.clear();
         String filter = filterField.getText();
         if (START_TEXT.equals(filter)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    filterField.selectAll();
+                }
+            });
             filter = "";
         }
         for (int i = 0; i < items.size(); i++) {

@@ -91,6 +91,11 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.Cursor;
@@ -103,6 +108,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.Desktop;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -113,6 +119,7 @@ import java.io.StringWriter;
 import java.io.InputStreamReader;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
@@ -1580,6 +1587,7 @@ public final class Tools {
     /** Returns a popup in a scrolling pane. */
     public static boolean getScrollingMenu(
                         final String name,
+                        final JPanel optionsPanel,
                         final MyMenu menu,
                         final MyListModel dlm,
                         final MyList list,
@@ -1607,6 +1615,9 @@ public final class Tools {
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
         popupPanel.add(typeToSearchField);
         popupPanel.add(sp);
+        if (optionsPanel != null) {
+            popupPanel.add(optionsPanel);
+        }
         popup.setContentPane(popupPanel);
         popups.add(popup);
 
@@ -1691,15 +1702,21 @@ public final class Tools {
                 thread.start();
             }
         });
-        list.addKeyListener(new KeyAdapter() {
-            @Override public void keyTyped(final KeyEvent e) {
-                final char ch = e.getKeyChar();
-                if (ch == 27) { /* escape */
+        list.addKeyListener(new KeyListener() {
+            @Override public void keyPressed(final KeyEvent e) {
+                final int ch = e.getKeyCode();
+                if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            typeToSearchField.requestFocus();
+                        }
+                    });
+                } else if (ch == KeyEvent.VK_ESCAPE) {
                     for (final JDialog otherP : popups) {
                         otherP.dispose();
                     }
                     infoObject.hidePopup();
-                } else if (ch == ' ' || ch == '\n') {
+                } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
                     final MyMenuItem item =
                                        (MyMenuItem) list.getSelectedValue();
                     //SwingUtilities.invokeLater(new Runnable() {
@@ -1711,19 +1728,48 @@ public final class Tools {
                     if (item != null) {
                         item.action();
                     }
-                } else {
-                    if (Character.isLetterOrDigit(ch)) {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override public void run() {
-                                getGUIData().getMainGlassPane().start("" + ch,
-                                                                      null,
-                                                                      true);
-                                stopProgressIndicator("" + ch);
-                            }
-                        });
-                        t.start();
+                }
+            }
+            @Override public void keyReleased(final KeyEvent e) {
+            }
+            @Override public void keyTyped(final KeyEvent e) {
+            }
+        });
+        popup.addWindowFocusListener(new WindowFocusListener() {
+            @Override public void windowGainedFocus(final WindowEvent e) {
+            }
+            @Override public void windowLostFocus(final WindowEvent e) {
+                popup.dispose();
+            }
+        });
+
+        typeToSearchField.addKeyListener(new KeyListener() {
+            @Override public void keyPressed(final KeyEvent e) {
+                final int ch = e.getKeyCode();
+                if (ch == KeyEvent.VK_DOWN) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            list.requestFocus();
+                            /* don't need to press down arrow twice */
+                            list.setSelectedIndex(0);
+                        }
+                    });
+                } else if (ch == KeyEvent.VK_ESCAPE) {
+                    for (final JDialog otherP : popups) {
+                        otherP.dispose();
+                    }
+                    infoObject.hidePopup();
+                } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
+                    final MyMenuItem item =
+                                   (MyMenuItem) list.getModel().getElementAt(0);
+                    if (item != null) {
+                        item.action();
                     }
                 }
+            }
+            @Override public void keyReleased(final KeyEvent e) {
+            }
+            @Override public void keyTyped(final KeyEvent e) {
             }
         });
 
@@ -1762,6 +1808,7 @@ public final class Tools {
                            (int) l.getY() - 1);
                         popup.pack();
                         popup.setVisible(true);
+                        typeToSearchField.requestFocus();
                     }
                 });
                 SwingUtilities.invokeLater(new Runnable() {
@@ -1928,10 +1975,10 @@ public final class Tools {
     /** Opens default browser. */
     public static void openBrowser(final String url) {
         try {
-            java.awt.Desktop.getDesktop().browse(new URI(url));
-        } catch (java.io.IOException e) {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (final IOException e) {
             Tools.appError("wrong uri", e);
-        } catch (java.net.URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             Tools.appError("error opening browser", e);
         }
     }
@@ -2327,7 +2374,7 @@ public final class Tools {
                     break;
                 }
                 invP.setVisible(visible);
-                for (final java.awt.Component c : invP.getComponents()) {
+                for (final Component c : invP.getComponents()) {
                     ((JComponent) c).setVisible(visible);
                 }
                 final JComponent pp = (JComponent) invP.getParent();
@@ -2342,7 +2389,7 @@ public final class Tools {
             if (pp != null) {
                 pp.setVisible(visible);
             }
-            for (final java.awt.Component c : parent.getComponents()) {
+            for (final Component c : parent.getComponents()) {
                 ((JComponent) c).setVisible(visible);
             }
             parent.repaint();
@@ -2366,7 +2413,7 @@ public final class Tools {
                     break;
                 }
                 invP.setOpaque(opaque);
-                for (final java.awt.Component c : invP.getComponents()) {
+                for (final Component c : invP.getComponents()) {
                     ((JComponent) c).setOpaque(opaque);
                 }
                 final JComponent pp = (JComponent) invP.getParent();
@@ -2381,7 +2428,7 @@ public final class Tools {
             if (pp != null) {
                 pp.setOpaque(opaque);
             }
-            for (final java.awt.Component c : parent.getComponents()) {
+            for (final Component c : parent.getComponents()) {
                 ((JComponent) c).setOpaque(opaque);
             }
             parent.repaint();
