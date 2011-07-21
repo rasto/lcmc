@@ -1610,6 +1610,7 @@ public final class Tools {
         sp.setBorder(null);
         final JTextField typeToSearchField = dlm.getFilterField();
         final JDialog popup = new JDialog(new JFrame(), name, false);
+        popup.setUndecorated(true);
         popup.setAlwaysOnTop(true);
         final JPanel popupPanel = new JPanel();
         popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));

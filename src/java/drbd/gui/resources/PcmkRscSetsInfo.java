@@ -202,8 +202,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                  cphi.addConstraintWithPlaceholder(
                   getBrowser().getHeartbeatGraph().getChildrenAndParents(cphi),
                   getBrowser().getHeartbeatGraph().getParents(cphi),
-                  false,
-                  false,
+                  true, /* colocation */
+                  true, /* order */
                   dcHost,
                   false,
                   testOnly);
@@ -224,8 +224,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                           .getChildrenAndParents(child),
                               getBrowser().getHeartbeatGraph()
                                           .getParents(child),
-                              false,
-                              false,
+                              true, /* colocation */
+                              true, /* order */
                               dcHost,
                               false,
                               testOnly);

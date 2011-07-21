@@ -353,11 +353,6 @@ public class ServiceInfo extends EditableInfo {
         final String id = getComboBoxValue(GUI_ID);
         final ServiceInfo si =
                 getBrowser().getServiceInfoFromId(getService().getName(), id);
-        System.out.println("n: " 
-                + getService().getName() + " id: " +  id
-                + " si: " + si
-                + " this: " + this
-                + " o: " + (si == null ? "null":si.getService().isOrphaned())); 
         if (si != null && si != this && !si.getService().isOrphaned()) {
             return false;
         }
