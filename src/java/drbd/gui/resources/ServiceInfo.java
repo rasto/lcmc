@@ -334,6 +334,14 @@ public class ServiceInfo extends EditableInfo {
         }
         final GroupInfo gi = getGroupInfo();
         if (!fromGroupInfo && gi != null) {
+            if (!gi.checkResourceFieldsCorrect(param,
+                                               gi.getParametersFromXML(),
+                                               fromServicesInfo,
+                                               fromCloneInfo)) {
+                return false;
+            }
+        }
+        if (!fromGroupInfo && gi != null) {
             if (!fromServicesInfo) {
                 gi.setApplyButtons(null, gi.getParametersFromXML());
             }
@@ -341,6 +349,19 @@ public class ServiceInfo extends EditableInfo {
         if (getService().isOrphaned()) {
             return false;
         }
+        /* Allow it only for resources that are in LRM. */
+        final String id = getComboBoxValue(GUI_ID);
+        final ServiceInfo si =
+                getBrowser().getServiceInfoFromId(getService().getName(), id);
+        System.out.println("n: " 
+                + getService().getName() + " id: " +  id
+                + " si: " + si
+                + " this: " + this
+                + " o: " + (si == null ? "null":si.getService().isOrphaned())); 
+        if (si != null && si != this && !si.getService().isOrphaned()) {
+            return false;
+        }
+
         if (!super.checkResourceFieldsCorrect(param, params)) {
             return false;
         }
@@ -4095,8 +4116,6 @@ public class ServiceInfo extends EditableInfo {
                         reloadNode,
                         getBrowser().getDCHost(),
                         testOnly);
-        System.out.println("new service info: "
-                            + newServiceInfo.getService().getId());
         return newServiceInfo;
     }
 
@@ -4189,8 +4208,6 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         } else {
-            System.out.println("new service info 2: "
-                            + serviceInfo.getService().getId());
             getBrowser().addNameToServiceInfoHash(serviceInfo);
             final DefaultMutableTreeNode newServiceNode =
                                     new DefaultMutableTreeNode(serviceInfo);
