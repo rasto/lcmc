@@ -1607,7 +1607,6 @@ public final class Tools {
         popupPanel.add(typeToSearchField);
         popupPanel.add(sp);
         popup.setContentPane(popupPanel);
-        popup.pack();
         popups.add(popup);
 
         list.addMouseListener(new MouseAdapter() {
@@ -1759,12 +1758,15 @@ public final class Tools {
                         }
                         popup.setLocation(
                            (int) (l.getX() + menu.getBounds().getWidth()),
-                           (int) l.getY());
+                           (int) l.getY() - 1);
+                        popup.pack();
                         popup.setVisible(true);
                     }
                 });
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {
+                        /* Setting location again. Moving it one pixel fixes
+                           the "gray window" problem. */
                         popup.setLocation(
                            (int) (l.getX() + menu.getBounds().getWidth()),
                            (int) l.getY());
