@@ -104,7 +104,10 @@ final class CheckInstallation extends DialogHost {
         );
 
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
+    }
 
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {

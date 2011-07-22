@@ -125,6 +125,10 @@ public final class Start extends WizardDialog {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
