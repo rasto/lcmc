@@ -50,7 +50,6 @@ final class DistDetection extends DialogHost {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-
         final String support =
                       Tools.getDistString("Support",
                                           getHost().getDist(),
@@ -60,6 +59,10 @@ final class DistDetection extends DialogHost {
                         + " (support file: "
                         + support + ")";
         answerPaneSetText(answerText);
+    }
+
+    /** Inits dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         enableComponents();
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);

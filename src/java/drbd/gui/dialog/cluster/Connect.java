@@ -118,7 +118,10 @@ final class Connect extends DialogCluster {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        // TODO: Tools.startProgressIndicator
+    }
+
+    /** Inits dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         final Thread t = new Thread(new Runnable() {
             @Override public void run() {
                 connectHosts();

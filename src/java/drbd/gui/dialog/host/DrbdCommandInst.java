@@ -74,6 +74,10 @@ final class DrbdCommandInst extends DialogHost {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         getProgressBar().start(50000);
         installDrbd();
     }

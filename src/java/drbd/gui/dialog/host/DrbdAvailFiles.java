@@ -78,6 +78,10 @@ public class DrbdAvailFiles extends DialogHost {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         disableComponents(new JComponent[]{drbdVersionCombo, drbdBuildCombo});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         getProgressBar().start(4000);
         getHost().setDrbdBuildToInstall(getHost().getDetectedKernelVersion());
         /* get drbd available versions and continue with availBuilds */

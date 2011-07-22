@@ -191,13 +191,16 @@ public class Init extends DialogCluster {
     /** Inits the dialog. */
     @Override protected final void initDialog() {
         super.initDialog();
-
         enableComponentsLater(new JComponent[]{});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         lastDrbdLoaded = null;
         lastPmStarted = null;
-        lastPmRc      = null;
-        lastHbStarted  = null;
-        lastHbRc       = null;
+        lastPmRc = null;
+        lastHbStarted = null;
+        lastHbRc = null;
         checkClusterStopped = false;
         checkClusterThread = new Thread(
             new Runnable() {

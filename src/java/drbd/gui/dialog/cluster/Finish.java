@@ -69,6 +69,10 @@ final class Finish extends DialogCluster {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
             Tools.getConfigData().removeAutoCluster();

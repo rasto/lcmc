@@ -102,7 +102,7 @@ public final class Name extends DialogCluster {
         }
     }
 
-    /** Inits the dialog. */
+    /** Inits the dialog after it becomes visible. */
     @Override protected void initDialogAfterVisible() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {

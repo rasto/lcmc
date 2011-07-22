@@ -238,6 +238,10 @@ final class CoroConfig extends DialogCluster {
         configPanel.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         final Thread thread = new Thread(
             new Runnable() {
                 @Override public void run() {

@@ -162,7 +162,6 @@ final class ClusterHosts extends DialogCluster {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        enableComponents();
 
         final Thread thread = new Thread(
             new Runnable() {
@@ -171,6 +170,11 @@ final class ClusterHosts extends DialogCluster {
                 }
             });
         thread.start();
+    }
+
+    /** Inits dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
+        enableComponents();
     }
 
     /** Returns the panel with hosts that can be selected. */

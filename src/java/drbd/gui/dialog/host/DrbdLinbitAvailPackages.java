@@ -349,6 +349,10 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     @Override protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         availVersions();
     }
 

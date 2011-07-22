@@ -55,6 +55,10 @@ public class DrbdLinbitInst extends DialogHost {
     @Override protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         getProgressBar().start(50000);
 
         getHost().execCommand("DrbdInst.mkdir",

@@ -216,13 +216,12 @@ public final class NewHost extends DialogHost {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-
-        enableComponents();
-        checkFields((GuiComboBox) null);
     }
 
     /** Inits the dialog. */
     @Override protected void initDialogAfterVisible() {
+        enableComponents();
+        checkFields((GuiComboBox) null);
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 hostField.requestFocus();

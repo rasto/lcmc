@@ -131,6 +131,11 @@ final class CheckInstallation extends DialogHost {
     /** Inits dialog. */
     @Override protected void initDialog() {
         super.initDialog();
+        enableComponentsLater(new JComponent[]{});
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
         drbdOk = false;
         pmOk = false;
         hbPmOk = false;
@@ -228,7 +233,6 @@ final class CheckInstallation extends DialogHost {
             }
         );
 
-        enableComponentsLater(new JComponent[]{});
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {

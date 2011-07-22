@@ -88,7 +88,10 @@ final class CommStack extends DialogCluster {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
+    }
 
+    /** Inits dialog after it becomes visible. */
+    @Override protected void initDialogAfterVisible() {
         final Host[] hosts = getCluster().getHostsArray();
         final ExecCommandThread[] infoThreads =
                                         new ExecCommandThread[hosts.length];
@@ -171,6 +174,7 @@ final class CommStack extends DialogCluster {
             }
         }
     }
+
 
     /** Returns the panel with radio boxes. */
     @Override protected JComponent getInputPane() {
