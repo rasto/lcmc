@@ -998,7 +998,7 @@ public final class RoboTest {
         sleep(4000);
         checkTest("test1", 3); /* 3 */
         /* constraints */
-        addConstraint(gx, gy, 0, false);
+        addConstraint(gx, gy, 1, false);
         checkTest("test1", 3.1); /* 3.1 */
 
         /* move up, move down */
@@ -1114,7 +1114,7 @@ public final class RoboTest {
         checkTest("test1", 4.4); /* 4.4 */
         removeConstraint(popX, popY);
         checkTest("test1", 5); /* 5 */
-        addConstraint(gx, gy, 0, false);
+        addConstraint(gx, gy, 1, false);
         checkTest("test1", 5.1); /* 4.4 */
 
         removeConstraint(popX, popY);
@@ -1122,7 +1122,7 @@ public final class RoboTest {
         checkTest("test1", 5.2); /* 5 */
         sleep(1000);
 
-        addConstraint(gx, gy, 0, false);
+        addConstraint(gx, gy, 1, false);
         sleep(5000);
         checkTest("test1", 6); /* 6 */
 
@@ -1150,7 +1150,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.2);
 
-        addConstraintOrderOnly(gx, gy, 1, false);
+        addConstraintOrderOnly(gx, gy, 2, false);
         sleep(4000);
         checkTest("test1", 10.3);
 
@@ -1214,7 +1214,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.99);
 
-        addConstraintOrderOnly(ipX, ipY, 1, false);
+        addConstraintOrderOnly(ipX, ipY, 0, false);
         sleep(5000);
         checkTest("test1", 11);
 
@@ -1600,10 +1600,10 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test2", 11);
 
-        ///* ph -> dummy2 */
+        /* ph -> dummy2 */
         final int dum2PopX = dummy2X - 10;
         final int dum2PopY = dummy2Y + 70;
-        //removeConstraint(dum2PopX, dum2PopY);
+        removeConstraint(dum2PopX, dum2PopY);
         sleep(4000);
         checkTest("test2", 11.1);
         addConstraintOrderOnly(phX, phY, 2, false); /* with dummy 2 */
@@ -1631,7 +1631,7 @@ public final class RoboTest {
         sleep(1000);
         rightClick(); /* workaround for the next popup not working. */
         sleep(1000);
-        addConstraintColocationOnly(dummy4X, dummy4Y, 4, false); /* with ph */
+        addConstraintColocationOnly(dummy4X, dummy4Y, 5, false); /* with ph */
         sleep(4000);
         checkTest("test2", 11.7);
         removeColocation(dum4PopX, dum4PopY);
@@ -1641,7 +1641,7 @@ public final class RoboTest {
         sleep(1000);
         rightClick(); /* workaround for the next popup not working. */
         sleep(1000);
-        addConstraintOrderOnly(dummy4X, dummy4Y, 2, false); /* ph 2 */
+        addConstraintOrderOnly(dummy4X, dummy4Y, 5, false); /* ph 2 */
         sleep(4000);
         checkTest("test2", 11.9);
         addColocation(dum4PopX, dum4PopY);
@@ -2637,15 +2637,15 @@ public final class RoboTest {
         rightClick();
         sleep(500);
         press(KeyEvent.VK_DOWN);
-        sleep(500);
+        sleep(50);
         if (!newPlaceholder) {
             press(KeyEvent.VK_DOWN);
-            sleep(500);
+            sleep(50);
             press(KeyEvent.VK_DOWN);
-            sleep(500);
+            sleep(50);
         }
         press(KeyEvent.VK_DOWN);
-        sleep(500);
+        sleep(50);
         for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
             sleep(500);
@@ -2708,8 +2708,6 @@ public final class RoboTest {
         press(KeyEvent.VK_TAB);
         sleep(200);
         press(KeyEvent.VK_SPACE); /* disable order */
-        sleep(200);
-        press(KeyEvent.VK_TAB);
         sleep(200);
         press(KeyEvent.VK_TAB); /* list */
         sleep(200);
