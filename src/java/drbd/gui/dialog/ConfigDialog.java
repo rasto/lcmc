@@ -530,7 +530,8 @@ public abstract class ConfigDialog {
                         new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMinimumSize(
                         new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setLocationByPlatform(true);
+                dialogPanel.setLocationRelativeTo(
+                               Tools.getGUIData().getMainFrame());
                 dialogPanel.setVisible(true);
             }
         });
