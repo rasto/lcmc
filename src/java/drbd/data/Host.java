@@ -722,7 +722,7 @@ public final class Host {
             case 6:
                 lsbDist = info[5];
             case 5:
-                if (lsbDist == null) {
+                if (lsbDist == null || "linux".equals(lsbDist)) {
                     detectedDist = info[4];
                 } else {
                     detectedDist = lsbDist;
