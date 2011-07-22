@@ -998,7 +998,7 @@ public final class RoboTest {
         sleep(4000);
         checkTest("test1", 3); /* 3 */
         /* constraints */
-        addConstraint(gx, gy, 1, false);
+        addConstraint(gx, gy, 1, true);
         checkTest("test1", 3.1); /* 3.1 */
 
         /* move up, move down */
@@ -1114,7 +1114,7 @@ public final class RoboTest {
         checkTest("test1", 4.4); /* 4.4 */
         removeConstraint(popX, popY);
         checkTest("test1", 5); /* 5 */
-        addConstraint(gx, gy, 1, false);
+        addConstraint(gx, gy, 1, true);
         checkTest("test1", 5.1); /* 4.4 */
 
         removeConstraint(popX, popY);
@@ -1122,7 +1122,7 @@ public final class RoboTest {
         checkTest("test1", 5.2); /* 5 */
         sleep(1000);
 
-        addConstraint(gx, gy, 1, false);
+        addConstraint(gx, gy, 1, true);
         sleep(5000);
         checkTest("test1", 6); /* 6 */
 
@@ -1150,7 +1150,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.2);
 
-        addConstraintOrderOnly(gx, gy, 2, false);
+        addConstraintOrderOnly(gx, gy, 2, true);
         sleep(4000);
         checkTest("test1", 10.3);
 
@@ -1166,7 +1166,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.6);
 
-        addConstraintColocationOnly(gx, gy, 2, false);
+        addConstraintColocationOnly(gx, gy, 2, true);
         sleep(4000);
         checkTest("test1", 10.7);
 
@@ -1178,7 +1178,7 @@ public final class RoboTest {
         sleep(4000);
         checkTest("test1", 10.9);
 
-        addConstraint(ipX, ipY, 0, false);
+        addConstraint(ipX, ipY, 1, false);
         sleep(5000);
         checkTest("test1", 10.91);
 
@@ -1206,7 +1206,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.97);
 
-        addConstraintColocationOnly(ipX, ipY, 4, false);
+        addConstraintColocationOnly(ipX, ipY, 1, false);
         sleep(5000);
         checkTest("test1", 10.98);
 
@@ -1214,7 +1214,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.99);
 
-        addConstraintOrderOnly(ipX, ipY, 0, false);
+        addConstraintOrderOnly(ipX, ipY, 1, false);
         sleep(5000);
         checkTest("test1", 11);
 
@@ -1296,7 +1296,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 11.7);
 
-        addConstraint(gx, gy, 0, false);
+        addConstraint(gx, gy, 1, true);
         sleep(5000);
         checkTest("test1", 11.8);
         /** Add m/s Stateful resource */
@@ -1539,7 +1539,7 @@ public final class RoboTest {
         leftClick();
         checkTest("test2", 3);
         /* constraints */
-        addConstraint(phX, phY, 0, true); /* with dummy 1 */
+        addConstraint(phX, phY, 1, false); /* with dummy 1 */
         sleep(2000);
         moveTo(809, 144); /* ptest */
         sleep(2000);
@@ -1568,7 +1568,7 @@ public final class RoboTest {
             checkTest("test2", 8);
         }
 
-        addConstraint(dummy3X, dummy3Y, 4, false); /* with ph */
+        addConstraint(dummy3X, dummy3Y, 5, false); /* with ph */
         sleep(5000);
         checkTest("test2", 9);
 
@@ -1593,10 +1593,10 @@ public final class RoboTest {
             checkTest("test2", 9.4);
         }
 
-        addConstraint(phX, phY, 0, false); /* with dummy 2 */
+        addConstraint(phX, phY, 1, false); /* with dummy 2 */
         sleep(5000);
         checkTest("test2", 10);
-        addConstraint(dummy4X, dummy4Y, 4, false); /* with ph */
+        addConstraint(dummy4X, dummy4Y, 5, false); /* with ph */
         sleep(5000);
         checkTest("test2", 11);
 
@@ -1752,9 +1752,9 @@ public final class RoboTest {
 
             /* constraints */
             /* menu dummy 5 with ph2 */
-            addConstraint(120, 298, 6, false);
+            addConstraint(120, 298, 7, false);
             /* menu dummy 6 with ph2 */
-            addConstraint(120, 313, 6, false);
+            addConstraint(120, 313, 7, false);
 
             /* with dummy 3 */
             addConstraint(ph2X, ph2Y, 3, false);
@@ -1822,7 +1822,7 @@ public final class RoboTest {
         addConstraint(dummy2X, dummy2Y, 2, false);
         sleep(20000);
         checkTest("test5", 2);
-        addConstraint(ph1X, ph1Y, 0, true);
+        addConstraint(ph1X, ph1Y, 1, false);
 
         moveTo(ph1X, ph1Y);
         sleep(2000);
@@ -1847,7 +1847,7 @@ public final class RoboTest {
             removeConstraint(dum1PopX, dum1PopY);
             checkTest("test5", 2.5);
 
-            addConstraint(ph1X, ph1Y, 0, false);
+            addConstraint(ph1X, ph1Y, 1, false);
 
             checkTest("test5", 3.5);
 
@@ -1892,7 +1892,7 @@ public final class RoboTest {
             if (i % 5 == 0) {
                 info("test6 i: " + i);
             }
-            addConstraint(ph1X, ph1Y, 0, true);
+            addConstraint(ph1X, ph1Y, 1, false);
             if (!aborted) {
                 sleepNoFactor(2000);
             }
@@ -2631,21 +2631,18 @@ public final class RoboTest {
     private static void addConstraint(final int x,
                                       final int y,
                                       final int number,
-                                      final boolean newPlaceholder) {
+                                      final boolean group) {
         moveTo(x + 20, y + 5);
-        sleep(500);
+        sleep(1000);
         rightClick();
         sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(50);
-        if (!newPlaceholder) {
-            press(KeyEvent.VK_DOWN);
-            sleep(50);
-            press(KeyEvent.VK_DOWN);
-            sleep(50);
+        if (group) {
+            moveTo(x + 30, y + 75);
+        } else {
+            moveTo(x + 30, y + 60);
         }
-        press(KeyEvent.VK_DOWN);
-        sleep(50);
+        sleep(500);
+        leftClick();
         for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
             sleep(500);
@@ -2657,19 +2654,20 @@ public final class RoboTest {
     private static void addConstraintOrderOnly(final int x,
                                                final int y,
                                                final int number,
-                                               final boolean newPlaceholder) {
+                                               final boolean group) {
 
         moveTo(x + 20, y + 5);
+        sleep(1000);
         rightClick();
         sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        if (!newPlaceholder) {
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
+        moveTo(x + 20, y + 5);
+        if (group) {
+            moveTo(x + 30, y + 75);
+        } else {
+            moveTo(x + 30, y + 60);
         }
+        sleep(500);
+        leftClick();
         press(KeyEvent.VK_TAB);
         sleep(200);
         press(KeyEvent.VK_SPACE); /* disable colocation */
@@ -2679,7 +2677,7 @@ public final class RoboTest {
         press(KeyEvent.VK_TAB); /* list */
         sleep(200);
 
-        for (int i = 0; i < number - 1; i++) {
+        for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
             sleep(200);
         }
@@ -2691,18 +2689,19 @@ public final class RoboTest {
                                                 final int x,
                                                 final int y,
                                                 final int number,
-                                                final boolean newPlaceholder) {
+                                                final boolean group) {
         moveTo(x + 20, y + 5);
+        sleep(1000);
         rightClick();
         sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        if (!newPlaceholder) {
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
+        moveTo(x + 20, y + 5);
+        if (group) {
+            moveTo(x + 30, y + 75);
+        } else {
+            moveTo(x + 30, y + 60);
         }
+        sleep(500);
+        leftClick();
         press(KeyEvent.VK_TAB);
         sleep(200);
         press(KeyEvent.VK_TAB);
@@ -2712,7 +2711,7 @@ public final class RoboTest {
         press(KeyEvent.VK_TAB); /* list */
         sleep(200);
 
-        for (int i = 0; i < number - 1; i++) {
+        for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
             sleep(200);
         }
