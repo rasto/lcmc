@@ -65,7 +65,7 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          + "/usr/bin/yum -y install kernel`uname -r|"
              + " grep -o '5PAE\\|5xen\\|5debug'"
              + "|tr 5 -`-devel-`uname -r|sed 's/\\(PAE\\|xen\\|debug\\)$//'` &&"
-         + "/usr/bin/yum -y install flex gcc && "
+         + "/usr/bin/yum -y install flex gcc make && "
          + "if [ -e configure ]; then"
          + " ./configure --prefix=/usr --with-km --localstatedir=/var"
          + " --sysconfdir=/etc;"

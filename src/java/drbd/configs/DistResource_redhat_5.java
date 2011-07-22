@@ -2,8 +2,7 @@
  * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
  * written by Rasto Levrinc.
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
- *
+ * Copyright (C) 2009, LINBIT HA-Solutions GmbH. *
  * DRBD Management Console is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
@@ -124,5 +123,9 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + " && /sbin/chkconfig --add heartbeat"},
+
+        {"HbPmInst.install.text.1", "yum install: HB 2.1.3 (obsolete)"},
+        {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
+
     };
 }
