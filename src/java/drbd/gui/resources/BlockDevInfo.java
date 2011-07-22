@@ -113,6 +113,8 @@ public final class BlockDevInfo extends EditableInfo {
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String NO_DRBD_RESOURCE_STRING =
                                                 "it is not a drbd resource";
+    /** Allow two primaries paramater. */
+    private static final String ALLOW_TWO_PRIMARIES = "allow-two-primaries";
 
     /**
      * Prepares a new <code>BlockDevInfo</code> object.
@@ -1275,7 +1277,10 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override public void action() {
                     BlockDevInfo oBdi = getOtherBlockDevInfo();
-                    if (oBdi != null && oBdi.getBlockDevice().isPrimary()) {
+                    if (oBdi != null && oBdi.getBlockDevice().isPrimary()
+                        && !"yes".equals(
+                            drbdVolumeInfo.getDrbdResourceInfo().getParamSaved(
+                                                       ALLOW_TWO_PRIMARIES))) {
                         oBdi.setSecondary(testOnly);
                     }
                     setPrimary(testOnly);
