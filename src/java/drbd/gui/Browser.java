@@ -129,11 +129,11 @@ public class Browser {
     public final void reload(final DefaultMutableTreeNode node,
                              final boolean select) {
         final JTree t = tree;
-        TreePath p = null;
+        DefaultMutableTreeNode oldN = null;
         if (t != null) {
-            p = t.getSelectionPath();
+            oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
         }
-        final TreePath path = p;
+        final DefaultMutableTreeNode oldNode = oldN;
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 if (node != null) {
@@ -141,14 +141,15 @@ public class Browser {
                 }
             }
         });
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                if (!select && t != null && path != null) {
+        if (!select && t != null && oldNode != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override public void run() {
                     /* if don't want to select, we reselect the old path. */
-                    t.setSelectionPath(path);
+                    //t.setSelectionPath(path);
+                    treeModel.reload(oldNode);
                 }
-            }
-        });
+            });
+        }
     }
 
     /** Sets the node change for the node. */

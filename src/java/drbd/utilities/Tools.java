@@ -2324,6 +2324,9 @@ public final class Tools {
     public static void resizeTable(final JTable table,
                                    final Map<Integer, Integer> defaultWidths) {
         final int margin = 3;
+        if (table == null) {
+            return;
+        }
 
         for (int i = 0; i < table.getColumnCount(); i++) {
             final int vColIndex = i;
