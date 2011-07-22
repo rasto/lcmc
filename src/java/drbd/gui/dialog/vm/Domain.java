@@ -95,6 +95,11 @@ public final class Domain extends VMConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
+        super.initDialogAfterVisible();
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
         final boolean ch = vdi.checkResourceFieldsChanged(null, PARAMS);
         final boolean cor = vdi.checkResourceFieldsCorrect(null, PARAMS);
@@ -109,11 +114,6 @@ public final class Domain extends VMConfig {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-    }
-
-    /** Inits dialog after it is visible. */
-    @Override protected void initDialogAfterVisible() {
-        super.initDialogAfterVisible();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 domainNameCB.requestFocus();

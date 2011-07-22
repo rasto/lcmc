@@ -95,6 +95,10 @@ final class Storage extends VMConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {

@@ -82,6 +82,10 @@ final class Finish extends VMConfig {
     @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
+    }
+
+    /** Inits the dialog. */
+    @Override protected void initDialogAfterVisible() {
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
