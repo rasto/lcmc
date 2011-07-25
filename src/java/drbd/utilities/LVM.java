@@ -94,6 +94,18 @@ public final class LVM {
         return ret.getExitCode() == 0;
     }
 
+    /** Remove a physical volume. */
+    public static boolean pvRemove(final Host host,
+                                   final String blockDevice,
+                                   final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(DEVICE_PH, blockDevice);
+        final String command = host.getDistCommand("LVM.pvremove", replaceHash);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
     /** Remove LVM device. */
     public static boolean lvRemove(final Host host,
                                    final String blockDevice,

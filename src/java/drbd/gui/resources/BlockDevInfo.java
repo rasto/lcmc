@@ -665,6 +665,12 @@ public final class BlockDevInfo extends EditableInfo {
         return LVM.pvCreate(getHost(), device, testOnly);
     }
 
+    /** Remove a physical volume. */
+    public boolean pvRemove(final boolean testOnly) {
+        final String device = getBlockDevice().getName();
+        return LVM.pvRemove(getHost(), device, testOnly);
+    }
+
     /** Remove a logical volume. */
     public boolean lvRemove(final boolean testOnly) {
         final String device = getBlockDevice().getName();

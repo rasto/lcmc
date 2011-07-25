@@ -53,22 +53,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 /**
- * This class implements PV_Create plugin. Note that no anonymous classes are
+ * This class implements PV_Remove plugin. Note that no anonymous classes are
  * allowed here, because caching wouldn't work.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public final class PV_Create implements RemotePlugin {
+public final class PV_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the pv create menu item. */
-    private static final String PV_CREATE_MENU_ITEM = "PV Create";
+    /** Name of the pv remove menu item. */
+    private static final String PV_REMOVE_MENU_ITEM = "PV Remove";
     /** Description. */
-    private static final String DESCRIPTION =
-                "Initialize a disk or partition for use by LVM.";
+    private static final String DESCRIPTION = "Remove a physical volume.";
     /** Private. */
-    public PV_Create() {
+    public PV_Remove() {
     }
 
     /** Inits the plugin. */
@@ -84,8 +83,8 @@ public final class PV_Create implements RemotePlugin {
         if (info instanceof BlockDevInfo) {
             final JMenu menu = info.getMenu();
             if (menu != null) {
-                info.addPluginMenuItem(getCreatePVItem((BlockDevInfo) info));
-                info.addPluginActionMenuItem(getCreatePVItem(
+                info.addPluginMenuItem(getRemovePVItem((BlockDevInfo) info));
+                info.addPluginActionMenuItem(getRemovePVItem(
                                                       (BlockDevInfo) info));
             }
         }
@@ -96,30 +95,30 @@ public final class PV_Create implements RemotePlugin {
                                              final List<UpdatableItem> items) {
         if (items != null) {
             if (info instanceof BlockDevInfo) {
-                items.add(getCreatePVItem((BlockDevInfo) info));
+                items.add(getRemovePVItem((BlockDevInfo) info));
             }
         }
     }
 
-    /** PV create menu. */
-    private MyMenuItem getCreatePVItem(final BlockDevInfo bdi) {
-        final CreatePVItem pvCreateMenu =
-            new CreatePVItem(PV_CREATE_MENU_ITEM,
+    /** PV remove menu. */
+    private MyMenuItem getRemovePVItem(final BlockDevInfo bdi) {
+        final RemovePVItem pvRemoveMenu =
+            new RemovePVItem(PV_REMOVE_MENU_ITEM,
                              null,
                              DESCRIPTION,
                              new AccessMode(ConfigData.AccessType.OP, true),
                              new AccessMode(ConfigData.AccessType.OP, true),
                              bdi);
-        pvCreateMenu.setToolTipText(DESCRIPTION);
-        return pvCreateMenu;
+        pvRemoveMenu.setToolTipText(DESCRIPTION);
+        return pvRemoveMenu;
     }
 
-    /** PV create menu item. (can't use anonymous classes). */
-    private final class CreatePVItem extends MyMenuItem {
+    /** PV remove menu item. (can't use anonymous classes). */
+    private final class RemovePVItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo blockDevInfo;
 
-        public CreatePVItem(final String text,
+        public RemovePVItem(final String text,
                             final ImageIcon icon,
                             final String shortDesc,
                             final AccessMode enableAccessMode,
@@ -128,30 +127,28 @@ public final class PV_Create implements RemotePlugin {
             super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
             this.blockDevInfo = blockDevInfo;
         }
-        public boolean predicate() {
-            return true;
-        }
 
         public boolean visiblePredicate() {
-            return !blockDevInfo.isLVM()
-                   && !blockDevInfo.getBlockDevice().isPhysicalVolume();
+            return blockDevInfo.getBlockDevice().isPhysicalVolume();
         }
 
         public String enablePredicate() {
             if (blockDevInfo.getBlockDevice().isDrbd()) {
                 return "DRBD is on it";
+            } else if (blockDevInfo.isLVM()) {
+                return "LVM is on it";
             }
             return null;
         }
 
         @Override public void action() {
-            final PVCreateDialog pvCreate = new PVCreateDialog(blockDevInfo);
+            final PVRemoveDialog pvRemove = new PVRemoveDialog(blockDevInfo);
             while (true) {
-                pvCreate.showDialog();
-                if (pvCreate.isPressedCancelButton()) {
-                    pvCreate.cancelDialog();
+                pvRemove.showDialog();
+                if (pvRemove.isPressedCancelButton()) {
+                    pvRemove.cancelDialog();
                     return;
-                } else if (pvCreate.isPressedFinishButton()) {
+                } else if (pvRemove.isPressedFinishButton()) {
                     break;
                 }
             }
@@ -180,7 +177,7 @@ public final class PV_Create implements RemotePlugin {
         }
 
         protected String getDialogTitle() {
-            return "PV Create " + Tools.getRelease();
+            return "PV Remove " + Tools.getRelease();
         }
 
         protected String getDescription() {
@@ -193,14 +190,14 @@ public final class PV_Create implements RemotePlugin {
         }
     }
 
-    /** PV create dialog. */
-    private class PVCreateDialog extends WizardDialog {
+    /** PV remove dialog. */
+    private class PVRemoveDialog extends WizardDialog {
         /** Block device info object. */
-        private final MyButton createButton = new MyButton("PV Create");
+        private final MyButton removeButton = new MyButton("PV Remove");
         private final BlockDevInfo blockDevInfo;
         private Map<Host, JCheckBox> hostCheckboxes = null;
-        /** Create new PVCreateDialog object. */
-        public PVCreateDialog(final BlockDevInfo blockDevInfo) {
+        /** Remove new PVRemoveDialog object. */
+        public PVRemoveDialog(final BlockDevInfo blockDevInfo) {
             super(null);
             this.blockDevInfo = blockDevInfo;
         }
@@ -216,7 +213,7 @@ public final class PV_Create implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "PV Create ";
+            return "PV Remove ";
         }
 
         /** Returns the description of the dialog. */
@@ -238,35 +235,35 @@ public final class PV_Create implements RemotePlugin {
 
         /** Enables and disabled buttons. */
         protected final void checkButtons() {
-            if (!blockDevInfo.getBlockDevice().isPhysicalVolume()) {
-                SwingUtilities.invokeLater(new EnableCreateRunnable(true));
+            if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
+                SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
             }
         }
 
-        private class EnableCreateRunnable implements Runnable {
+        private class EnableRemoveRunnable implements Runnable {
             private final boolean enable ;
-            public EnableCreateRunnable(final boolean enable) {
+            public EnableRemoveRunnable(final boolean enable) {
                 super();
                 this.enable = enable;
             }
 
             @Override public void run() {
                 final boolean e = enable;
-                createButton.setEnabled(e);
+                removeButton.setEnabled(e);
             }
         }
 
 
         /** Returns the input pane. */
         protected final JComponent getInputPane() {
-            createButton.setEnabled(false);
+            removeButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
 
             inputPane.add(new JLabel("Block Device:"));
             inputPane.add(new JLabel(blockDevInfo.getName()));
-            createButton.addActionListener(new CreateActionListener());
-            inputPane.add(createButton);
+            removeButton.addActionListener(new RemoveActionListener());
+            inputPane.add(removeButton);
             SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
                                                        1, 1,  // initX, initY
                                                        1, 1); // xPad, yPad
@@ -288,7 +285,7 @@ public final class PV_Create implements RemotePlugin {
                     hostCheckboxes.get(h).setEnabled(false);
                     hostCheckboxes.get(h).setSelected(true);
                 } else if (oBdi == null
-                           || oBdi.getBlockDevice().isPhysicalVolume()) {
+                           || !oBdi.getBlockDevice().isPhysicalVolume()) {
                     hostCheckboxes.get(h).setEnabled(false);
                     hostCheckboxes.get(h).setSelected(false);
                 } else {
@@ -310,24 +307,24 @@ public final class PV_Create implements RemotePlugin {
             return pane;
         }
 
-        /** Create action listener. */
-        private class CreateActionListener implements ActionListener {
-            public CreateActionListener() {
+        /** Remove action listener. */
+        private class RemoveActionListener implements ActionListener {
+            public RemoveActionListener() {
                 super();
             }
             @Override public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(new CreateRunnable());
+                final Thread thread = new Thread(new RemoveRunnable());
                 thread.start();
             }
         }
 
-        private class CreateRunnable implements Runnable {
-            public CreateRunnable() {
+        private class RemoveRunnable implements Runnable {
+            public RemoveRunnable() {
                 super();
             }
 
             @Override public void run() {
-                Tools.invokeAndWait(new EnableCreateRunnable(false));
+                Tools.invokeAndWait(new EnableRemoveRunnable(false));
                 for (final Host h : hostCheckboxes.keySet()) {
                     if (hostCheckboxes.get(h).isSelected()) {
                         final BlockDevInfo oBdi =
@@ -335,7 +332,7 @@ public final class PV_Create implements RemotePlugin {
                                 .findBlockDevInfo(h.getName(),
                                                   blockDevInfo.getName());
                         if (oBdi != null) {
-                            pvCreate(h, oBdi);
+                            pvRemove(h, oBdi);
                         }
                     }
                 }
@@ -343,20 +340,20 @@ public final class PV_Create implements RemotePlugin {
             }
         }
 
-        /** PV Create. */
-        private void pvCreate(final Host host,
+        /** PV Remove. */
+        private void pvRemove(final Host host,
                               final BlockDevInfo bdi) {
-            final boolean ret = bdi.pvCreate(false);
+            final boolean ret = bdi.pvRemove(false);
             if (ret) {
-                answerPaneAddText("Physical volume "
+                answerPaneAddText("Labels on physical volume "
                                   + bdi.getName()
-                                  + " was successfully created "
+                                  + " were successfully removed "
                                   + " on " + host.getName() + ".");
             } else {
-                answerPaneAddTextError("Creating of physical volume "
-                                       + bdi.getName()
-                                       + " on " + host.getName()
-                                       + " failed.");
+                answerPaneAddTextError("Removing labels on physical volume "
+                                        + bdi.getName()
+                                        + " on " + host.getName()
+                                        + " failed.");
             }
             for (final Host h : hostCheckboxes.keySet()) {
                 if (hostCheckboxes.get(h).isSelected()) {

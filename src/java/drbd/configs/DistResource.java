@@ -431,6 +431,9 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"LVM.pvcreate",
          SUDO + "pvcreate -f @DEVICE@"},
 
+        {"LVM.pvremove",
+         SUDO + "pvremove -f @DEVICE@"},
+
         {"LVM.resize",
          SUDO + "lvresize -L@SIZE@ @DEVICE@"},
 
