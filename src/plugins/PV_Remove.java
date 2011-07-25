@@ -129,14 +129,14 @@ public final class PV_Remove implements RemotePlugin {
         }
 
         public boolean visiblePredicate() {
-            return blockDevInfo.getBlockDevice().isPhysicalVolume();
+            return blockDevInfo.getBlockDevice().isPhysicalVolume()
+                   && blockDevInfo.getBlockDevice()
+                            .getVolumeGroupOnPhysicalVolume() == null;
         }
 
         public String enablePredicate() {
             if (blockDevInfo.getBlockDevice().isDrbd()) {
                 return "DRBD is on it";
-            } else if (blockDevInfo.isLVM()) {
-                return "LVM is on it";
             }
             return null;
         }
