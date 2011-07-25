@@ -338,14 +338,14 @@ sub get_lvm {
 	}
 
 	# create physical volume to volume group hash
+	my %pv_to_group;
 	my %group_to_pv;
-	my %pvs;
 	for (`$path/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
 		my ($pv_name, $vg_name) = split;
 		$pv_name =~ s!^/dev/!!;
 		print_debug("pv: $pv_name, $vg_name");
-		$group_to_pv{$vg_name} = $pv_name;
-		$pvs{$pv_name}++;
+		$pv_to_group{$pv_name} = $vg_name;
+		push @{$group_to_pv{$vg_name}}, $pv_name;
 	}
 
 	my %major_minor_to_dev;
@@ -357,15 +357,17 @@ sub get_lvm {
 	# create major:minor kernel number to device hash
 	for (`$path/lvdisplay -C --noheadings -o lv_kernel_major,lv_kernel_minor,vg_name,lv_name 2>/dev/null`) {
 		my ($major, $minor, $group, $name) = split;
-		print_debug("get_lvm: ($major, $minor, $group, $name, $group_to_pv{$group})");
+		print_debug("get_lvm: ($major, $minor, $group, $name)");
 		$major_minor_to_dev{"$major:$minor"} = "$group/$name";
 		$major_minor_to_group{"$major:$minor"} = $group;
 		$major_minor_to_lv_name{"$major:$minor"} = $name;
-		$devs_with_lvm{$group_to_pv{$group}}++;
+		for my $dev (@{$group_to_pv{$group}}) {
+			$devs_with_lvm{$dev}++;
+		}
 		$lvm_devs{"$group/$name"}++;
 
 	}
-	return (\%pvs,
+	return (\%pv_to_group,
 		\%group_to_pv,
 		\%major_minor_to_dev,
 		\%devs_with_lvm,
@@ -519,7 +521,7 @@ sub get_disk_info {
 		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
 		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
-		$info.= " pv:1" if $$pvs{$name};
+		$info.= " pv:".$$pvs{$name} if defined $$pvs{$name};
 		$info.= "\n";
 		push @info, $info;
 	}

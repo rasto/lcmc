@@ -1582,6 +1582,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
+         final String vgPV = getBlockDevice().getVolumeGroupOnPhysicalVolume();
          if (getBlockDevice().isDrbdMetaDisk()) {
              return METADISK_SUBTEXT;
          } else if (getBlockDevice().isSwap()) {
@@ -1598,6 +1599,10 @@ public final class BlockDevInfo extends EditableInfo {
                                s.length());
              }
              return new Subtext(s, Color.BLUE, Color.BLACK);
+         } else if (vgPV != null && !"".equals(vgPV)) {
+             /* vgPV == "", pv doesn't have a vg */
+             /* vgPV == null, no pv */
+             return new Subtext(vgPV, Color.BLUE, Color.BLACK);
          } else if (getBlockDevice().isPhysicalVolume()) {
              return PHYSICAL_VOLUME_SUBTEXT;
          }
@@ -1823,7 +1828,7 @@ public final class BlockDevInfo extends EditableInfo {
         return super.checkResourceFieldsCorrect(param, params);
     }
 
-    /** Returns whether this block device is LVM. */
+    /** Returns whether this block device is a volume group in LVM. */
     public boolean isLVM() {
         return getBlockDevice().getVolumeGroup() != null;
     }

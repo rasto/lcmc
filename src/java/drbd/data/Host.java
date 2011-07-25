@@ -253,6 +253,8 @@ public final class Host {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
+    /** Physical volumes on this host. */
+    private List<String> physicalVolumes = new ArrayList<String>();
     /** Volume group information on this host. */
     private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
     /** Volume group with all lvs in it. */
@@ -1765,6 +1767,7 @@ public final class Host {
                                      new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS =
                                      new HashMap<String, Set<String>>();
+        final List<String> newPhysicalVolumes = new ArrayList<String>();
         final Set<String> newFileSystems = new TreeSet<String>();
         final Set<String> newCryptoModules = new TreeSet<String>();
         final Set<String> newQemuKeymaps = new TreeSet<String>();
@@ -1832,6 +1835,9 @@ public final class Host {
                         logicalVolumes.add(lv);
                     }
                 }
+                if (blockDevice.isPhysicalVolume()) {
+                    newPhysicalVolumes.add(name);
+                }
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
                 if (vgi.length == 2) {
@@ -1864,6 +1870,7 @@ public final class Host {
         netInterfaces = newNetInterfaces;
         volumeGroups = newVolumeGroups;
         volumeGroupsLVS = newVolumeGroupsLVS;
+        physicalVolumes = newPhysicalVolumes;
 
         fileSystems = newFileSystems;
         cryptoModules = newCryptoModules;
@@ -2559,5 +2566,10 @@ public final class Host {
             Tools.appWarning(e.getMessage(), e);
         }
         return true;
+    }
+
+    /** Returns physical volumes. */
+    public List<String> getPhysicalVolumes() {
+        return physicalVolumes;
     }
 }

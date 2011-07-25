@@ -25,6 +25,8 @@ import drbd.data.Host;
 import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class provides LVM commands.
@@ -41,7 +43,9 @@ public final class LVM {
     /** LV name placeholder. */
     private static final String LV_NAME_PH = "@LVNAME@";
     /** Volume group placeholder. */
-    private static final String VG_PH      = "@VG@";
+    private static final String VG_NAME_PH = "@VGNAME@";
+    /** Physical volume names placeholder, delimited with space. */
+    private static final String PV_NAMES_PH = "@PVNAMES@";
 
     /** Private constructor, cannot be instantiated. */
     private LVM() {
@@ -121,14 +125,28 @@ public final class LVM {
     /** Create LVM device. */
     public static boolean lvCreate(final Host host,
                                    final String lvName,
-                                   final String volumeGroup,
+                                   final String vgName,
                                    final String size,
                                    final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(LV_NAME_PH, lvName);
-        replaceHash.put(VG_PH, volumeGroup);
+        replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.lvcreate", replaceHash);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Create a volume group. */
+    public static boolean vgCreate(final Host host,
+                                   final String vgName,
+                                   final List<String> pvNames,
+                                   final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put(PV_NAMES_PH, Tools.join(" ", pvNames));
+        replaceHash.put(VG_NAME_PH, vgName);
+        final String command = host.getDistCommand("LVM.vgcreate", replaceHash);
         final SSH.SSHOutput ret =
                     execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;

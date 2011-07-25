@@ -542,6 +542,11 @@ public final class BlockDevice extends Resource {
         return physicalVolume != null;
     }
 
+    /** Returns volume group that is on this physical volume. */
+    public String getVolumeGroupOnPhysicalVolume() {
+        return physicalVolume;
+    }
+
     /** Returns logical volume. */
     public String getLogicalVolume() {
         return logicalVolume;
