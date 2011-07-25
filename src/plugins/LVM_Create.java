@@ -569,7 +569,11 @@ public final class LVM_Create implements RemotePlugin {
                                        + lvName
                                        + " failed.");
             }
-            host.getBrowser().getClusterBrowser().updateHWInfo(host);
+            for (final Host h : hostCheckboxes.keySet()) {
+                if (hostCheckboxes.get(h).isSelected()) {
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                }
+            }
             setComboBoxes();
         }
 
