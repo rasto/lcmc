@@ -78,8 +78,8 @@ public final class BlockDevice extends Resource {
     private int used = -1;
     /** LVM group. */
     private String volumeGroup = null;
-    /** Physical volume. */
-    private String physicalVolume = null;
+    /** VG on physical volume. */
+    private String vgOnPhysicalVolume = null;
     /** Logical volume. */
     private String logicalVolume = null;
     /** States that means that we are connected. */
@@ -142,7 +142,7 @@ public final class BlockDevice extends Resource {
             this.fsType    = tokens.get("fs");
             this.volumeGroup = tokens.get("vg");
             this.logicalVolume = tokens.get("lv");
-            this.physicalVolume = tokens.get("pv");
+            this.vgOnPhysicalVolume = tokens.get("pv");
             final String usedStr = tokens.get("used");
             if (usedStr != null) {
                 this.used      = Integer.parseInt(usedStr);
@@ -539,12 +539,17 @@ public final class BlockDevice extends Resource {
 
     /** Returns whether it is a physical volume. */
     public boolean isPhysicalVolume() {
-        return physicalVolume != null;
+        return vgOnPhysicalVolume != null;
     }
 
     /** Returns volume group that is on this physical volume. */
     public String getVolumeGroupOnPhysicalVolume() {
-        return physicalVolume;
+        return vgOnPhysicalVolume;
+    }
+
+    /** Returns whether there's a volume group on the physical volume. */
+    public boolean isVolumeGroupOnPhysicalVolume() {
+        return vgOnPhysicalVolume != null && !"".equals(vgOnPhysicalVolume);
     }
 
     /** Returns logical volume. */

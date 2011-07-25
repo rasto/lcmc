@@ -31,6 +31,7 @@ import drbd.utilities.RemotePlugin;
 import drbd.utilities.MyButton;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
+import drbd.utilities.LVM;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
@@ -53,21 +54,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 /**
- * This class implements PV_Remove plugin. Note that no anonymous classes are
+ * This class implements VG_Remove plugin. Note that no anonymous classes are
  * allowed here, because caching wouldn't work.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public final class PV_Remove implements RemotePlugin {
+public final class VG_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the pv remove menu item. */
-    private static final String PV_REMOVE_MENU_ITEM = "PV Remove";
+    /** Name of the vg remove menu item. */
+    private static final String VG_REMOVE_MENU_ITEM = "VG Remove";
     /** Description. */
-    private static final String DESCRIPTION = "Remove a physical volume.";
+    private static final String DESCRIPTION = "Remove a volume group.";
     /** Private. */
-    public PV_Remove() {
+    public VG_Remove() {
     }
 
     /** Inits the plugin. */
@@ -83,8 +84,8 @@ public final class PV_Remove implements RemotePlugin {
         if (info instanceof BlockDevInfo) {
             final JMenu menu = info.getMenu();
             if (menu != null) {
-                info.addPluginMenuItem(getRemovePVItem((BlockDevInfo) info));
-                info.addPluginActionMenuItem(getRemovePVItem(
+                info.addPluginMenuItem(getRemoveVGItem((BlockDevInfo) info));
+                info.addPluginActionMenuItem(getRemoveVGItem(
                                                       (BlockDevInfo) info));
             }
         }
@@ -95,30 +96,30 @@ public final class PV_Remove implements RemotePlugin {
                                              final List<UpdatableItem> items) {
         if (items != null) {
             if (info instanceof BlockDevInfo) {
-                items.add(getRemovePVItem((BlockDevInfo) info));
+                items.add(getRemoveVGItem((BlockDevInfo) info));
             }
         }
     }
 
-    /** PV remove menu. */
-    private MyMenuItem getRemovePVItem(final BlockDevInfo bdi) {
-        final RemovePVItem pvRemoveMenu =
-            new RemovePVItem(PV_REMOVE_MENU_ITEM,
+    /** VG remove menu. */
+    private MyMenuItem getRemoveVGItem(final BlockDevInfo bdi) {
+        final RemoveVGItem vgRemoveMenu =
+            new RemoveVGItem(VG_REMOVE_MENU_ITEM,
                              null,
                              DESCRIPTION,
                              new AccessMode(ConfigData.AccessType.OP, true),
                              new AccessMode(ConfigData.AccessType.OP, true),
                              bdi);
-        pvRemoveMenu.setToolTipText(DESCRIPTION);
-        return pvRemoveMenu;
+        vgRemoveMenu.setToolTipText(DESCRIPTION);
+        return vgRemoveMenu;
     }
 
-    /** PV remove menu item. (can't use anonymous classes). */
-    private final class RemovePVItem extends MyMenuItem {
+    /** VG remove menu item. (can't use anonymous classes). */
+    private final class RemoveVGItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo blockDevInfo;
 
-        public RemovePVItem(final String text,
+        public RemoveVGItem(final String text,
                             final ImageIcon icon,
                             final String shortDesc,
                             final AccessMode enableAccessMode,
@@ -129,26 +130,22 @@ public final class PV_Remove implements RemotePlugin {
         }
 
         public boolean visiblePredicate() {
-            return blockDevInfo.getBlockDevice().isPhysicalVolume()
-                   && !blockDevInfo.getBlockDevice()
+            return blockDevInfo.getBlockDevice()
                                     .isVolumeGroupOnPhysicalVolume();
         }
 
         public String enablePredicate() {
-            if (blockDevInfo.getBlockDevice().isDrbd()) {
-                return "DRBD is on it";
-            }
             return null;
         }
 
         @Override public void action() {
-            final PVRemoveDialog pvRemove = new PVRemoveDialog(blockDevInfo);
+            final VGRemoveDialog vgRemove = new VGRemoveDialog(blockDevInfo);
             while (true) {
-                pvRemove.showDialog();
-                if (pvRemove.isPressedCancelButton()) {
-                    pvRemove.cancelDialog();
+                vgRemove.showDialog();
+                if (vgRemove.isPressedCancelButton()) {
+                    vgRemove.cancelDialog();
                     return;
-                } else if (pvRemove.isPressedFinishButton()) {
+                } else if (vgRemove.isPressedFinishButton()) {
                     break;
                 }
             }
@@ -177,7 +174,7 @@ public final class PV_Remove implements RemotePlugin {
         }
 
         protected String getDialogTitle() {
-            return "PV Remove " + Tools.getRelease();
+            return "VG Remove " + Tools.getRelease();
         }
 
         protected String getDescription() {
@@ -190,14 +187,14 @@ public final class PV_Remove implements RemotePlugin {
         }
     }
 
-    /** PV remove dialog. */
-    private class PVRemoveDialog extends WizardDialog {
+    /** VG remove dialog. */
+    private class VGRemoveDialog extends WizardDialog {
         /** Block device info object. */
-        private final MyButton removeButton = new MyButton("PV Remove");
+        private final MyButton removeButton = new MyButton("VG Remove");
         private final BlockDevInfo blockDevInfo;
         private Map<Host, JCheckBox> hostCheckBoxes = null;
-        /** Remove new PVRemoveDialog object. */
-        public PVRemoveDialog(final BlockDevInfo blockDevInfo) {
+        /** Remove new VGRemoveDialog object. */
+        public VGRemoveDialog(final BlockDevInfo blockDevInfo) {
             super(null);
             this.blockDevInfo = blockDevInfo;
         }
@@ -213,7 +210,7 @@ public final class PV_Remove implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "PV Remove ";
+            return "VG Remove ";
         }
 
         /** Returns the description of the dialog. */
@@ -325,33 +322,29 @@ public final class PV_Remove implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                final String vgName = blockDevInfo.getBlockDevice()
+                                            .getVolumeGroupOnPhysicalVolume();
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
-                        final BlockDevInfo oBdi =
-                            blockDevInfo.getBrowser().getDrbdGraph()
-                                .findBlockDevInfo(h.getName(),
-                                                  blockDevInfo.getName());
-                        if (oBdi != null) {
-                            pvRemove(h, oBdi);
-                        }
+                        vgRemove(h, vgName);
                     }
                 }
                 checkButtons();
             }
         }
 
-        /** PV Remove. */
-        private void pvRemove(final Host host,
-                              final BlockDevInfo bdi) {
-            final boolean ret = bdi.pvRemove(false);
+        /** VG Remove. */
+        private void vgRemove(final Host host,
+                              final String vgName) {
+            final boolean ret = LVM.vgRemove(host, vgName, false);
             if (ret) {
-                answerPaneAddText("Labels on physical volume "
-                                  + bdi.getName()
-                                  + " were successfully removed "
+                answerPaneAddText("Volume group "
+                                  + vgName
+                                  + " was successfully removed "
                                   + " on " + host.getName() + ".");
             } else {
-                answerPaneAddTextError("Removing labels on physical volume "
-                                        + bdi.getName()
+                answerPaneAddTextError("Removing volume group "
+                                        + vgName
                                         + " on " + host.getName()
                                         + " failed.");
             }
