@@ -148,7 +148,7 @@ public final class BlockDevInfo extends EditableInfo {
 
 
     /** Returns browser object of this info. */
-    @Override protected HostBrowser getBrowser() {
+    @Override public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

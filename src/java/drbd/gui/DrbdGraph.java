@@ -838,6 +838,7 @@ public final class DrbdGraph extends ResourceGraph {
     /**
      * Finds BlockDevInfo object on the specified host for block device
      * represented as a string and returns it.
+     * TODO: move it to BlockDevInfo
      */
     public BlockDevInfo findBlockDevInfo(final String hostName,
                                          final String disk) {

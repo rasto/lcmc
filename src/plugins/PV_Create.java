@@ -25,37 +25,33 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
-import drbd.gui.resources.DrbdResourceInfo;
-import drbd.gui.resources.HostDrbdInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
-import drbd.utilities.Unit;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
+import drbd.data.Cluster;
 import drbd.gui.dialog.WizardDialog;
-import drbd.gui.GuiComboBox;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JMenu;
 import javax.swing.JLabel;
+import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 /**
  * This class implements PV_Create plugin. Note that no anonymous classes are
  * allowed here, because caching wouldn't work.
@@ -66,16 +62,11 @@ import java.awt.event.ActionEvent;
 public final class PV_Create implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the PV menu item. */
-    private static final String PV_MENU_ITEM = "LVM";
     /** Name of the pv create menu item. */
     private static final String PV_CREATE_MENU_ITEM = "PV Create";
     /** Description. */
-    private static final String DESCRIPTION = "Manage logical volumes.";
-    /** Description PV Create. */
-    private static final String DESCRIPTION_PV_CREATE =
-                "Initialize a disk or partition for use by LVM. (pvcreate)";
-
+    private static final String DESCRIPTION =
+                "Initialize a disk or partition for use by LVM.";
     /** Private. */
     public PV_Create() {
     }
@@ -125,41 +116,44 @@ public final class PV_Create implements RemotePlugin {
     /** PV create menu item. (can't use anonymous classes). */
     private final class CreatePVItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
-        private final BlockDevInfo bdi;
+        private final BlockDevInfo blockDevInfo;
 
         public CreatePVItem(final String text,
                             final ImageIcon icon,
                             final String shortDesc,
                             final AccessMode enableAccessMode,
                             final AccessMode visibleAccessMode,
-                            final BlockDevInfo bdi) {
+                            final BlockDevInfo blockDevInfo) {
             super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
-            this.bdi = bdi;
+            this.blockDevInfo = blockDevInfo;
         }
         public boolean predicate() {
             return true;
         }
 
         public boolean visiblePredicate() {
-            return !bdi.isLVM();
+            return !blockDevInfo.isLVM();
         }
 
         public String enablePredicate() {
-            if (bdi.getBlockDevice().isDrbd()) {
+            if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
+                return "already PV";
+            } else if (blockDevInfo.getBlockDevice().isDrbd()) {
                 return "DRBD is on it";
             }
             return null;
         }
 
         @Override public void action() {
-            if (Tools.confirmDialog(
-                  "PV Create",
-                  "Initialize this block device for use by LVM with pvcreate?",
-                  "PVCREATE",
-                  "Cancel")) {
-                final boolean ret = bdi.pvCreate(false);
-                final Host host = bdi.getHost();
-                host.getBrowser().getClusterBrowser().updateHWInfo(host);
+            final PVCreateDialog pvCreate = new PVCreateDialog(blockDevInfo);
+            while (true) {
+                pvCreate.showDialog();
+                if (pvCreate.isPressedCancelButton()) {
+                    pvCreate.cancelDialog();
+                    return;
+                } else if (pvCreate.isPressedFinishButton()) {
+                    break;
+                }
             }
         }
 
@@ -196,6 +190,194 @@ public final class PV_Create implements RemotePlugin {
 
         protected JComponent getInputPane() {
             return null;
+        }
+    }
+
+    /** PV create dialog. */
+    private class PVCreateDialog extends WizardDialog {
+        /** Block device info object. */
+        private final MyButton createButton = new MyButton("PV Create");
+        private final BlockDevInfo blockDevInfo;
+        private Map<Host, JCheckBox> hostCheckboxes = null;
+        /** Create new PVCreateDialog object. */
+        public PVCreateDialog(final BlockDevInfo blockDevInfo) {
+            super(null);
+            this.blockDevInfo = blockDevInfo;
+        }
+
+        /** Finishes the dialog and sets the information. */
+        protected final void finishDialog() {
+        }
+
+        /** Returns the next dialog. */
+        public WizardDialog nextDialog() {
+            return null;
+        }
+
+        /** Returns the title of the dialog. */
+        protected final String getDialogTitle() {
+            return "PV Create ";
+        }
+
+        /** Returns the description of the dialog. */
+        protected final String getDescription() {
+            return DESCRIPTION;
+        }
+
+        public final String cancelButton() {
+            return "Close";
+        }
+
+        /** Inits the dialog. */
+        protected final void initDialog() {
+            super.initDialog();
+            enableComponentsLater(
+                              new JComponent[]{});
+            enableComponents();
+        }
+
+        /** Enables and disabled buttons. */
+        protected final void checkButtons() {
+            if (!blockDevInfo.getBlockDevice().isPhysicalVolume()) {
+                SwingUtilities.invokeLater(new EnableCreateRunnable(true));
+            }
+        }
+
+        private class EnableCreateRunnable implements Runnable {
+            private final boolean enable ;
+            public EnableCreateRunnable(final boolean enable) {
+                super();
+                this.enable = enable;
+            }
+
+            @Override public void run() {
+                final boolean e = enable;
+                createButton.setEnabled(e);
+            }
+        }
+
+
+        /** Returns the input pane. */
+        protected final JComponent getInputPane() {
+            createButton.setEnabled(false);
+            final JPanel pane = new JPanel(new SpringLayout());
+            final JPanel inputPane = new JPanel(new SpringLayout());
+
+            inputPane.add(new JLabel("Block Device:"));
+            inputPane.add(new JLabel(blockDevInfo.getName()));
+            createButton.addActionListener(new CreateActionListener());
+            inputPane.add(createButton);
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
+                                                       1, 1,  // initX, initY
+                                                       1, 1); // xPad, yPad
+
+            pane.add(inputPane);
+            final JPanel hostsPane = new JPanel(
+                            new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+            final Cluster cluster = blockDevInfo.getHost().getCluster();
+            hostCheckboxes = Tools.getHostCheckboxes(cluster);
+            hostsPane.add(new JLabel("Select Hosts: "));
+            for (final Host h : hostCheckboxes.keySet()) {
+                hostCheckboxes.get(h).addItemListener(
+                                                new ItemChangeListener(true));
+                final BlockDevInfo oBdi =
+                    blockDevInfo.getBrowser().getDrbdGraph().findBlockDevInfo(
+                                                      h.getName(),
+                                                      blockDevInfo.getName());
+                if (blockDevInfo.getHost() == h) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(true);
+                } else if (oBdi == null
+                           || oBdi.getBlockDevice().isPhysicalVolume()) {
+                    hostCheckboxes.get(h).setEnabled(false);
+                    hostCheckboxes.get(h).setSelected(false);
+                } else {
+                    hostCheckboxes.get(h).setEnabled(true);
+                    hostCheckboxes.get(h).setSelected(false);
+                }
+                hostsPane.add(hostCheckboxes.get(h));
+            }
+            final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
+                                                                   hostsPane);
+            sp.setPreferredSize(new java.awt.Dimension(0, 45));
+            pane.add(sp);
+            pane.add(getProgressBarPane(null));
+            pane.add(getAnswerPane(""));
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
+                                                  0, 0,  // initX, initY
+                                                  0, 0); // xPad, yPad
+            checkButtons();
+            return pane;
+        }
+
+        /** Create action listener. */
+        private class CreateActionListener implements ActionListener {
+            public CreateActionListener() {
+                super();
+            }
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new CreateRunnable());
+                thread.start();
+            }
+        }
+
+        private class CreateRunnable implements Runnable {
+            public CreateRunnable() {
+                super();
+            }
+
+            @Override public void run() {
+                Tools.invokeAndWait(new EnableCreateRunnable(false));
+                for (final Host h : hostCheckboxes.keySet()) {
+                    if (hostCheckboxes.get(h).isSelected()) {
+                        final BlockDevInfo oBdi =
+                            blockDevInfo.getBrowser().getDrbdGraph()
+                                .findBlockDevInfo(h.getName(),
+                                                  blockDevInfo.getName());
+                        if (oBdi != null) {
+                            pvCreate(h, oBdi);
+                        }
+                    }
+                }
+                checkButtons();
+            }
+        }
+
+        /** PV Create. */
+        private void pvCreate(final Host host,
+                              final BlockDevInfo bdi) {
+            final boolean ret = bdi.pvCreate(false);
+            if (ret) {
+                answerPaneAddText("Physical volume "
+                                  + bdi.getName()
+                                  + " was successfully created "
+                                  + " on " + host.getName() + ".");
+            } else {
+                answerPaneAddTextError("Creating of physical volume "
+                                       + bdi.getName()
+                                       + " on " + host.getName()
+                                       + " failed.");
+            }
+            for (final Host h : hostCheckboxes.keySet()) {
+                if (hostCheckboxes.get(h).isSelected()) {
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                }
+            }
+        }
+
+        /** Size combo box item listener. */
+        private class ItemChangeListener implements ItemListener {
+            private final boolean onDeselect;
+            public ItemChangeListener(final boolean onDeselect) {
+                super();
+                this.onDeselect = onDeselect;
+            }
+            @Override public void itemStateChanged(final ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED
+                    || onDeselect) {
+                    checkButtons();
+                }
+            }
         }
     }
 }
