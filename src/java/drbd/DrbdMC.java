@@ -45,6 +45,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.Container;
 import java.util.Arrays;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import javax.swing.plaf.metal.OceanTheme;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
@@ -113,6 +116,8 @@ public final class DrbdMC extends JPanel {
     private static final String ID_RSA_OP = "id-rsa";
     /** The --known-hosts option. */
     private static final String KNOWN_HOSTS_OP = "known-hosts";
+    /** The --out option. */
+    private static final String OUT_OP = "out";
 
     /**
      * Private constructor.
@@ -358,10 +363,26 @@ public final class DrbdMC extends JPanel {
                      KNOWN_HOSTS_OP,
                      true,
                      "location of known_hosts file ($HOME/.ssh/known_hosts)");
+        options.addOption(
+                     null,
+                     OUT_OP,
+                     true,
+                     "where to redirect the standard out");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
             final CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption(OUT_OP)) {
+                final String out = cmd.getOptionValue(OUT_OP);
+                if (out != null) {
+                    try {
+                        System.setOut(
+                                    new PrintStream(new FileOutputStream(out)));
+                    } catch (final FileNotFoundException e) {
+                        System.exit(2);
+                    }
+                }
+            }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
             final boolean realvnc = cmd.hasOption(REALVNC_OP);
