@@ -428,6 +428,9 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"Host.getConnectionStatus",
          "true"},
 
+        {"LVM.pvcreate",
+         SUDO + "pvcreate -f @DEVICE@"},
+
         {"LVM.resize",
          SUDO + "lvresize -L@SIZE@ @DEVICE@"},
 
