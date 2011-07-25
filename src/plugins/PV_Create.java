@@ -198,7 +198,7 @@ public final class PV_Create implements RemotePlugin {
         /** Block device info object. */
         private final MyButton createButton = new MyButton("PV Create");
         private final BlockDevInfo blockDevInfo;
-        private Map<Host, JCheckBox> hostCheckboxes = null;
+        private Map<Host, JCheckBox> hostCheckBoxes = null;
         /** Create new PVCreateDialog object. */
         public PVCreateDialog(final BlockDevInfo blockDevInfo) {
             super(null);
@@ -275,27 +275,27 @@ public final class PV_Create implements RemotePlugin {
             final JPanel hostsPane = new JPanel(
                             new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
             final Cluster cluster = blockDevInfo.getHost().getCluster();
-            hostCheckboxes = Tools.getHostCheckboxes(cluster);
+            hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
             hostsPane.add(new JLabel("Select Hosts: "));
-            for (final Host h : hostCheckboxes.keySet()) {
-                hostCheckboxes.get(h).addItemListener(
+            for (final Host h : hostCheckBoxes.keySet()) {
+                hostCheckBoxes.get(h).addItemListener(
                                                 new ItemChangeListener(true));
                 final BlockDevInfo oBdi =
                     blockDevInfo.getBrowser().getDrbdGraph().findBlockDevInfo(
                                                       h.getName(),
                                                       blockDevInfo.getName());
                 if (blockDevInfo.getHost() == h) {
-                    hostCheckboxes.get(h).setEnabled(false);
-                    hostCheckboxes.get(h).setSelected(true);
+                    hostCheckBoxes.get(h).setEnabled(false);
+                    hostCheckBoxes.get(h).setSelected(true);
                 } else if (oBdi == null
                            || oBdi.getBlockDevice().isPhysicalVolume()) {
-                    hostCheckboxes.get(h).setEnabled(false);
-                    hostCheckboxes.get(h).setSelected(false);
+                    hostCheckBoxes.get(h).setEnabled(false);
+                    hostCheckBoxes.get(h).setSelected(false);
                 } else {
-                    hostCheckboxes.get(h).setEnabled(true);
-                    hostCheckboxes.get(h).setSelected(false);
+                    hostCheckBoxes.get(h).setEnabled(true);
+                    hostCheckBoxes.get(h).setSelected(false);
                 }
-                hostsPane.add(hostCheckboxes.get(h));
+                hostsPane.add(hostCheckBoxes.get(h));
             }
             final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
                                                                    hostsPane);
@@ -328,8 +328,8 @@ public final class PV_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
-                for (final Host h : hostCheckboxes.keySet()) {
-                    if (hostCheckboxes.get(h).isSelected()) {
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
                         final BlockDevInfo oBdi =
                             blockDevInfo.getBrowser().getDrbdGraph()
                                 .findBlockDevInfo(h.getName(),
@@ -358,8 +358,8 @@ public final class PV_Create implements RemotePlugin {
                                        + " on " + host.getName()
                                        + " failed.");
             }
-            for (final Host h : hostCheckboxes.keySet()) {
-                if (hostCheckboxes.get(h).isSelected()) {
+            for (final Host h : hostCheckBoxes.keySet()) {
+                if (hostCheckBoxes.get(h).isSelected()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h);
                 }
             }

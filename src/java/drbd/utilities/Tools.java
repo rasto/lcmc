@@ -2772,7 +2772,7 @@ public final class Tools {
     }
 
     /** Returns array of host checkboxes in the specified cluster. */
-    public static Map<Host, JCheckBox> getHostCheckboxes(
+    public static Map<Host, JCheckBox> getHostCheckBoxes(
                                                        final Cluster cluster) {
         final Map<Host, JCheckBox> components =
                                         new LinkedHashMap<Host, JCheckBox>();

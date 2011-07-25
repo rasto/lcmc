@@ -210,7 +210,7 @@ public final class LVM_Resize implements RemotePlugin {
         private GuiComboBox sizeCB;
         private GuiComboBox oldSizeCB;
         private GuiComboBox maxSizeCB;
-        private Map<Host, JCheckBox> hostCheckboxes = null;
+        private Map<Host, JCheckBox> hostCheckBoxes = null;
         /** Create new LVResizeDialog object. */
         public LVResizeDialog(final BlockDevInfo blockDevInfo) {
             super(null);
@@ -423,31 +423,31 @@ public final class LVM_Resize implements RemotePlugin {
             final JPanel hostsPane = new JPanel(
                             new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
             final Cluster cluster = blockDevInfo.getHost().getCluster();
-            hostCheckboxes = Tools.getHostCheckboxes(cluster);
+            hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
             hostsPane.add(new JLabel("Select Hosts: "));
             final Host host = blockDevInfo.getHost();
             final String lv = blockDevInfo.getBlockDevice().getLogicalVolume();
-            for (final Host h : hostCheckboxes.keySet()) {
+            for (final Host h : hostCheckBoxes.keySet()) {
                 final Set<String> allLVS = h.getAllLogicalVolumes();
-                hostCheckboxes.get(h).addItemListener(
+                hostCheckBoxes.get(h).addItemListener(
                                                 new ItemChangeListener(true));
                 if (host == h) {
-                    hostCheckboxes.get(h).setEnabled(false);
-                    hostCheckboxes.get(h).setSelected(true);
+                    hostCheckBoxes.get(h).setEnabled(false);
+                    hostCheckBoxes.get(h).setSelected(true);
                 } else if (blockDevInfo.getBlockDevice().isDrbd()
                            && blockDevInfo.getOtherBlockDevInfo().getHost()
                               == h) {
-                    hostCheckboxes.get(h).setEnabled(false);
-                    hostCheckboxes.get(h).setSelected(true);
+                    hostCheckBoxes.get(h).setEnabled(false);
+                    hostCheckBoxes.get(h).setSelected(true);
                 } else if (!blockDevInfo.getBlockDevice().isDrbd()
                            && !allLVS.contains(lv)) {
-                    hostCheckboxes.get(h).setEnabled(false);
-                    hostCheckboxes.get(h).setSelected(false);
+                    hostCheckBoxes.get(h).setEnabled(false);
+                    hostCheckBoxes.get(h).setSelected(false);
                 } else {
-                    hostCheckboxes.get(h).setEnabled(true);
-                    hostCheckboxes.get(h).setSelected(false);
+                    hostCheckBoxes.get(h).setEnabled(true);
+                    hostCheckBoxes.get(h).setSelected(false);
                 }
-                hostsPane.add(hostCheckboxes.get(h));
+                hostsPane.add(hostCheckBoxes.get(h));
             }
             final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
                                                                    hostsPane);
@@ -538,9 +538,9 @@ public final class LVM_Resize implements RemotePlugin {
                         blockDevInfo.getBlockDevice().getLogicalVolume();
                 final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
                 boolean resizingFailed = false;
-                for (final Host h : hostCheckboxes.keySet()) {
+                for (final Host h : hostCheckBoxes.keySet()) {
                     if (h == blockDevInfo.getHost()
-                        || !hostCheckboxes.get(h).isSelected()) {
+                        || !hostCheckBoxes.get(h).isSelected()) {
                         continue;
                     }
                     for (final BlockDevice b : h.getBlockDevices()) {
@@ -608,12 +608,12 @@ public final class LVM_Resize implements RemotePlugin {
                 long max = free + taken;
                 final String lv =
                             blockDevInfo.getBlockDevice().getLogicalVolume();
-                if (hostCheckboxes != null) {
-                    for (final Host h : hostCheckboxes.keySet()) {
+                if (hostCheckBoxes != null) {
+                    for (final Host h : hostCheckBoxes.keySet()) {
                         if (blockDevInfo.getHost() == h) {
                             continue;
                         }
-                        if (hostCheckboxes.get(h).isSelected()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
                             for (final BlockDevice b : h.getBlockDevices()) {
                                 if (lv.equals(b.getLogicalVolume())
                                     || (oBDI != null
