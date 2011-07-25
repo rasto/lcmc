@@ -24,7 +24,6 @@ package plugins;
 import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
-import drbd.gui.resources.DrbdResourceInfo;
 import drbd.gui.resources.HostDrbdInfo;
 
 import drbd.utilities.Tools;
@@ -158,8 +157,8 @@ public final class LVM_Create implements RemotePlugin {
     }
 
     /** Adds menus to manage LVMs. */
-    public final void addLVMMenu(final MyMenu submenu,
-                                 final HostDrbdInfo hostDrbdInfo) {
+    public void addLVMMenu(final MyMenu submenu,
+                           final HostDrbdInfo hostDrbdInfo) {
         Tools.invokeAndWait(new Runnable() {
             @Override public void run() {
                 submenu.removeAll();

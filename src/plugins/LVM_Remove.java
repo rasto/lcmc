@@ -21,41 +21,22 @@
 
 package plugins;
 
-import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
-import drbd.gui.resources.DrbdResourceInfo;
-import drbd.gui.resources.HostDrbdInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
-import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
-import drbd.utilities.Unit;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
-import drbd.gui.dialog.WizardDialog;
-import drbd.gui.GuiComboBox;
 
 import java.util.List;
-import java.util.Set;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 import javax.swing.JMenu;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 /**
  * This class implements LVM remove plugin. Note that no anonymous classes are
  * allowed here, because caching wouldn't work.
@@ -66,14 +47,10 @@ import java.awt.event.ActionEvent;
 public final class LVM_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the LVM menu item. */
-    private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the remove menu item. */
     private static final String LV_REMOVE_MENU_ITEM = "LV Remove";
     /** Description. */
     private static final String DESCRIPTION = "Manage logical volumes.";
-    /** Description LVM remove. */
-    private static final String DESCRIPTION_REMOVE = "Remove the LVM volume.";
 
     /** Private. */
     public LVM_Remove() {
@@ -196,16 +173,5 @@ public final class LVM_Remove implements RemotePlugin {
         protected JComponent getInputPane() {
             return null;
         }
-    }
-
-    /** Return unit objects. */
-    private Unit[] getUnits() {
-        return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-                   new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
     }
 }

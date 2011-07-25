@@ -25,12 +25,10 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
-import drbd.gui.resources.DrbdResourceInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
 import drbd.utilities.UpdatableItem;
 import drbd.utilities.Unit;
@@ -65,8 +63,6 @@ import java.awt.event.ActionEvent;
 public final class LVM_Snapshot implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the LVM menu item. */
-    private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the snapshot menu item. */
     private static final String LV_SNAPSHOT_MENU_ITEM = "Create Snapshot ";
     /** Description LV snapshot. */
