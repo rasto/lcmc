@@ -108,6 +108,9 @@ public final class BlockDevInfo extends EditableInfo {
     /** Mounted subtext. */
     private static final Subtext MOUNTED_SUBTEXT =
                                new Subtext("mounted", Color.BLUE, Color.BLACK);
+    /** Physical volume subtext. */
+    private static final Subtext PHYSICAL_VOLUME_SUBTEXT =
+                               new Subtext("PV", Color.BLUE, Color.BLACK);
     /** String length after the cut. */
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -1589,6 +1592,8 @@ public final class BlockDevInfo extends EditableInfo {
                                s.length());
              }
              return new Subtext(s, Color.BLUE, Color.BLACK);
+         } else if (getBlockDevice().isPhysicalVolume()) {
+             return PHYSICAL_VOLUME_SUBTEXT;
          }
          return null;
     }

@@ -339,11 +339,13 @@ sub get_lvm {
 
 	# create physical volume to volume group hash
 	my %group_to_pv;
+	my %pvs;
 	for (`$path/pvdisplay -C --noheadings -o pv_name,vg_name 2>/dev/null`) {
 		my ($pv_name, $vg_name) = split;
 		$pv_name =~ s!^/dev/!!;
 		print_debug("pv: $pv_name, $vg_name");
 		$group_to_pv{$vg_name} = $pv_name;
+		$pvs{$pv_name}++;
 	}
 
 	my %major_minor_to_dev;
@@ -363,7 +365,8 @@ sub get_lvm {
 		$lvm_devs{"$group/$name"}++;
 
 	}
-	return (\%group_to_pv,
+	return (\%pvs,
+		\%group_to_pv,
 		\%major_minor_to_dev,
 		\%devs_with_lvm,
 		\%lvm_devs,
@@ -435,7 +438,8 @@ sub get_device_mapper_major {
 # them. In this case only device names of raid or lvm are used.
 sub get_disk_info {
 	my $devs_in_raid = get_raid();
-	my ($group_to_pv,
+	my ($pvs,
+	    $group_to_pv,
 	    $lvm_major_minor_to_dev,
 	    $devs_with_lvm,
 	    $lvm_devs,
@@ -515,6 +519,7 @@ sub get_disk_info {
 		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
 		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
+		$info.= " pv:1" if $$pvs{$name};
 		$info.= "\n";
 		push @info, $info;
 	}
