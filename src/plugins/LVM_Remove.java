@@ -48,7 +48,7 @@ public final class LVM_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the remove menu item. */
-    private static final String LV_REMOVE_MENU_ITEM = "LV Remove";
+    private static final String LV_REMOVE_MENU_ITEM = "Remove LV";
     /** Description. */
     private static final String DESCRIPTION = "Manage logical volumes.";
     /** Remove LV timeout. */

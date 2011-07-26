@@ -62,8 +62,8 @@ import java.awt.event.ActionEvent;
 public final class PV_Create implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the pv create menu item. */
-    private static final String PV_CREATE_MENU_ITEM = "PV Create";
+    /** Name of the create PV menu item. */
+    private static final String PV_CREATE_MENU_ITEM = "Create PV";
     /** Description. */
     private static final String DESCRIPTION =
                              "Initialize a disk or partition for use by LVM.";
@@ -104,7 +104,7 @@ public final class PV_Create implements RemotePlugin {
         }
     }
 
-    /** PV create menu. */
+    /** Create PV menu. */
     private MyMenuItem getCreatePVItem(final BlockDevInfo bdi) {
         final CreatePVItem pvCreateMenu =
             new CreatePVItem(PV_CREATE_MENU_ITEM,
@@ -117,7 +117,7 @@ public final class PV_Create implements RemotePlugin {
         return pvCreateMenu;
     }
 
-    /** PV create menu item. (can't use anonymous classes). */
+    /** Create PV menu item. (can't use anonymous classes). */
     private final class CreatePVItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo blockDevInfo;
@@ -182,7 +182,7 @@ public final class PV_Create implements RemotePlugin {
         }
 
         protected String getDialogTitle() {
-            return "PV Create " + Tools.getRelease();
+            return "Create PV";
         }
 
         protected String getDescription() {
@@ -195,10 +195,10 @@ public final class PV_Create implements RemotePlugin {
         }
     }
 
-    /** PV create dialog. */
+    /** Create PV dialog. */
     private class PVCreateDialog extends WizardDialog {
         /** Block device info object. */
-        private final MyButton createButton = new MyButton("PV Create");
+        private final MyButton createButton = new MyButton("Create PV");
         private final BlockDevInfo blockDevInfo;
         private Map<Host, JCheckBox> hostCheckBoxes = null;
         /** Create new PVCreateDialog object. */
@@ -218,7 +218,7 @@ public final class PV_Create implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "PV Create ";
+            return "Create PV";
         }
 
         /** Returns the description of the dialog. */
@@ -367,7 +367,7 @@ public final class PV_Create implements RemotePlugin {
             }
         }
 
-        /** PV Create. */
+        /** Create PV. */
         private boolean pvCreate(final Host host,
                                  final BlockDevInfo bdi) {
             final boolean ret = bdi.pvCreate(false);

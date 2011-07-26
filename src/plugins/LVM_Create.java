@@ -78,12 +78,12 @@ public final class LVM_Create implements RemotePlugin {
     private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the create menu item. */
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
-    /** Name of the vg create menu item. */
+    /** Name of the create VG menu item. */
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
-    /** Description VG create. */
+    /** Description create VG. */
     private static final String VG_CREATE_DESCRIPTION =
                                                     "Create a volume group.";
-    /** Description LV create. */
+    /** Description create LV. */
     private static final String LV_CREATE_DESCRIPTION =
                        "Create a logical volume in an existing volume group.";
     /** Create LV timeout. */
@@ -210,7 +210,7 @@ public final class LVM_Create implements RemotePlugin {
                               vg);
     }
 
-    /** Return VG create menu item. BlockDevInfo can be null, if nothing
+    /** Return create VG menu item. BlockDevInfo can be null, if nothing
      *  is preselected. */
     private MyMenuItem getVGCreateItem(final HostDrbdInfo hostDrbdInfo,
                                        final BlockDevInfo blockDevInfo) {
@@ -224,7 +224,7 @@ public final class LVM_Create implements RemotePlugin {
                               blockDevInfo);
     }
 
-    /** VG create menu item. (can't use anonymous classes). */
+    /** Create VG menu item. (can't use anonymous classes). */
     private final class VGCreateItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final HostDrbdInfo hostDrbdInfo;
@@ -344,7 +344,7 @@ public final class LVM_Create implements RemotePlugin {
         }
     }
 
-    /** VG create dialog. */
+    /** Create VG dialog. */
     private class VGCreateDialog extends WizardDialog {
         final HostDrbdInfo hostDrbdInfo;
         final BlockDevInfo selectedBlockDevInfo;
@@ -371,7 +371,7 @@ public final class LVM_Create implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "VG Create ";
+            return "Create VG";
         }
 
         /** Returns the description of the dialog. */
@@ -635,7 +635,7 @@ public final class LVM_Create implements RemotePlugin {
             }
         }
 
-        /** VG Create. */
+        /** Create VG. */
         private boolean vgCreate(final Host host,
                                  final String vgName,
                                  final List<String> pvNames) {
@@ -654,7 +654,7 @@ public final class LVM_Create implements RemotePlugin {
         }
     }
 
-    /** LV create dialog. */
+    /** Create LV dialog. */
     private class LVCreateDialog extends WizardDialog {
         /** Block device info object. */
         final HostDrbdInfo hostDrbdInfo;
@@ -683,7 +683,7 @@ public final class LVM_Create implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "LV Create ";
+            return "Create LV";
         }
 
         /** Returns the description of the dialog. */
@@ -994,7 +994,7 @@ public final class LVM_Create implements RemotePlugin {
             }
         }
 
-        /** LV Create. */
+        /** Create LV. */
         private boolean lvCreate(final Host host,
                                  final String lvName,
                                  final String size) {
