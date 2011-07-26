@@ -110,7 +110,7 @@ public final class BlockDevInfo extends EditableInfo {
                                new Subtext("mounted", Color.BLUE, Color.BLACK);
     /** Physical volume subtext. */
     private static final Subtext PHYSICAL_VOLUME_SUBTEXT =
-                               new Subtext("PV", Color.BLUE, Color.BLACK);
+                               new Subtext("PV", Color.BLUE, Color.GREEN);
     /** String length after the cut. */
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -1590,7 +1590,12 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
-         final String vgPV = getBlockDevice().getVolumeGroupOnPhysicalVolume();
+         String vg;
+         if (isLVM()) {
+             vg = getBlockDevice().getVolumeGroup();
+         } else {
+             vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
+         }
          if (getBlockDevice().isDrbdMetaDisk()) {
              return METADISK_SUBTEXT;
          } else if (getBlockDevice().isSwap()) {
@@ -1607,10 +1612,8 @@ public final class BlockDevInfo extends EditableInfo {
                                s.length());
              }
              return new Subtext(s, Color.BLUE, Color.BLACK);
-         } else if (vgPV != null && !"".equals(vgPV)) {
-             /* vgPV == "", pv doesn't have a vg */
-             /* vgPV == null, no pv */
-             return new Subtext("VG:" + vgPV, Color.BLUE, Color.BLACK);
+         } else if (vg != null && !"".equals(vg)) {
+             return new Subtext("VG " + vg, Color.BLUE, Color.GREEN);
          } else if (getBlockDevice().isPhysicalVolume()) {
              return PHYSICAL_VOLUME_SUBTEXT;
          }

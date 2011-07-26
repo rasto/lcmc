@@ -25,6 +25,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.HostDrbdInfo;
+import drbd.gui.resources.BlockDevInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
@@ -78,14 +79,13 @@ public final class LVM_Create implements RemotePlugin {
     /** Name of the create menu item. */
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
     /** Name of the vg create menu item. */
-    private static final String VG_CREATE_MENU_ITEM = "VG Create";
+    private static final String VG_CREATE_MENU_ITEM = "Create VG";
     /** Description VG create. */
     private static final String VG_CREATE_DESCRIPTION =
-               "Create a volume group on selected hosts.";
+                                                    "Create a volume group.";
     /** Description LV create. */
     private static final String LV_CREATE_DESCRIPTION =
-               "Create a logical volume in an existing volume group on"
-               + " selected hosts.";
+                       "Create a logical volume in an existing volume group.";
     /** Create LV timeout. */
     private static final int CREATE_TIMEOUT = 5000;
 
@@ -106,12 +106,25 @@ public final class LVM_Create implements RemotePlugin {
 
     /** Adds the menu items to the specified info object. */
     private void registerInfo(final Info info) {
-        if (info instanceof HostDrbdInfo) {
-            final JMenu menu = info.getMenu();
-            if (menu != null) {
+        final JMenu menu = info.getMenu();
+        if (menu != null) {
+            if (info instanceof HostDrbdInfo) {
                 info.addPluginMenuItem(getLVMItem((HostDrbdInfo) info));
-                info.addPluginActionMenuItem(getLVMItem(
-                                                      (HostDrbdInfo) info));
+                info.addPluginActionMenuItem(getLVMItem((HostDrbdInfo) info));
+            } else if (info instanceof BlockDevInfo) {
+                final BlockDevInfo bdi = (BlockDevInfo) info;
+                final HostDrbdInfo hdi =
+                                bdi.getHost().getBrowser().getHostDrbdInfo();
+                String vg = null;
+                if (bdi.isLVM()) {
+                    vg = bdi.getBlockDevice().getVolumeGroup();
+                } else {
+                    vg = bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume();
+                }
+                info.addPluginMenuItem(getLVMCreateItem(hdi, vg));
+                info.addPluginActionMenuItem(getLVMCreateItem(hdi, vg));
+                info.addPluginMenuItem(getVGCreateItem(hdi, bdi));
+                info.addPluginActionMenuItem(getVGCreateItem(hdi, bdi));
             }
         }
     }
@@ -122,6 +135,18 @@ public final class LVM_Create implements RemotePlugin {
         if (items != null) {
             if (info instanceof HostDrbdInfo) {
                 items.add(getLVMItem((HostDrbdInfo) info));
+            } else if (info instanceof BlockDevInfo) {
+                final BlockDevInfo bdi = (BlockDevInfo) info;
+                final HostDrbdInfo hdi =
+                                  bdi.getHost().getBrowser().getHostDrbdInfo();
+                items.add(getVGCreateItem(hdi, bdi));
+                String vg = null;
+                if (bdi.isLVM()) {
+                    vg = bdi.getBlockDevice().getVolumeGroup();
+                } else {
+                    vg = bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume();
+                }
+                items.add(getLVMCreateItem(hdi, vg));
             }
         }
     }
@@ -166,47 +191,63 @@ public final class LVM_Create implements RemotePlugin {
                 submenu.removeAll();
             }
         });
-        final MyMenuItem vgCreateItem = new VGCreateItem(
-                          VG_CREATE_MENU_ITEM,
-                          null,
-                          VG_CREATE_MENU_ITEM,
-                          new AccessMode(ConfigData.AccessType.OP, false),
-                          new AccessMode(ConfigData.AccessType.OP, false),
-                          hostDrbdInfo);
-        submenu.add(vgCreateItem);
+        submenu.add(getVGCreateItem(hostDrbdInfo, null));
         for (final String vg : hostDrbdInfo.getHost().getVolumeGroupNames()) {
-            final MyMenuItem vgItem = new LVMCreateItem(
+            submenu.add(getLVMCreateItem(hostDrbdInfo, vg));
+        }
+    }
+
+    /** Return create LV menu item. */
+    private MyMenuItem getLVMCreateItem(final HostDrbdInfo hostDrbdInfo,
+                                        final String vg) {
+        return new LVMCreateItem(
                               LV_CREATE_MENU_ITEM + vg,
                               null,
                               LV_CREATE_MENU_ITEM + vg,
                               new AccessMode(ConfigData.AccessType.OP, false),
                               new AccessMode(ConfigData.AccessType.OP, false),
-                              vg,
-                              hostDrbdInfo);
-            submenu.add(vgItem);
-        }
+                              hostDrbdInfo,
+                              vg);
+    }
+
+    /** Return VG create menu item. BlockDevInfo can be null, if nothing
+     *  is preselected. */
+    private MyMenuItem getVGCreateItem(final HostDrbdInfo hostDrbdInfo,
+                                       final BlockDevInfo blockDevInfo) {
+        return new VGCreateItem(
+                              VG_CREATE_MENU_ITEM,
+                              null,
+                              VG_CREATE_MENU_ITEM,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              hostDrbdInfo,
+                              blockDevInfo);
     }
 
     /** VG create menu item. (can't use anonymous classes). */
     private final class VGCreateItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final HostDrbdInfo hostDrbdInfo;
+        private final BlockDevInfo selectedBlockDevInfo;
 
         public VGCreateItem(final String text,
                             final ImageIcon icon,
                             final String shortDesc,
                             final AccessMode enableAccessMode,
                             final AccessMode visibleAccessMode,
-                            final HostDrbdInfo hostDrbdInfo) {
+                            final HostDrbdInfo hostDrbdInfo,
+                            final BlockDevInfo selectedBlockDevInfo) {
             super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
             this.hostDrbdInfo = hostDrbdInfo;
-        }
-        public boolean predicate() {
-            return true;
+            this.selectedBlockDevInfo = selectedBlockDevInfo;
         }
 
         public boolean visiblePredicate() {
-            return true;
+            return selectedBlockDevInfo == null
+                   || (!selectedBlockDevInfo.getBlockDevice()
+                                .isVolumeGroupOnPhysicalVolume()
+                       && !selectedBlockDevInfo.isLVM());
+                                                                
         }
 
         public String enablePredicate() {
@@ -214,7 +255,9 @@ public final class LVM_Create implements RemotePlugin {
         }
 
         @Override public void action() {
-            final VGCreateDialog vgCreate = new VGCreateDialog(hostDrbdInfo);
+            final VGCreateDialog vgCreate = new VGCreateDialog(
+                                                        hostDrbdInfo,
+                                                        selectedBlockDevInfo);
             while (true) {
                 vgCreate.showDialog();
                 if (vgCreate.isPressedCancelButton()) {
@@ -238,18 +281,15 @@ public final class LVM_Create implements RemotePlugin {
                              final String shortDesc,
                              final AccessMode enableAccessMode,
                              final AccessMode visibleAccessMode,
-                             final String volumeGroup,
-                             final HostDrbdInfo hostDrbdInfo) {
+                             final HostDrbdInfo hostDrbdInfo,
+                             final String volumeGroup) {
             super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
             this.hostDrbdInfo = hostDrbdInfo;
             this.volumeGroup = volumeGroup;
         }
-        public boolean predicate() {
-            return true;
-        }
 
         public boolean visiblePredicate() {
-            return true;
+            return volumeGroup != null && !"".equals(volumeGroup);
         }
 
         public String enablePredicate() {
@@ -306,16 +346,18 @@ public final class LVM_Create implements RemotePlugin {
 
     /** VG create dialog. */
     private class VGCreateDialog extends WizardDialog {
-        /** Block device info object. */
         final HostDrbdInfo hostDrbdInfo;
-        private final MyButton createButton = new MyButton("VG Create");
+        final BlockDevInfo selectedBlockDevInfo;
+        private final MyButton createButton = new MyButton("Create VG");
         private GuiComboBox vgNameCB;
         private Map<Host, JCheckBox> hostCheckBoxes = null;
         private Map<String, JCheckBox> pvCheckBoxes = null;
         /** Create new VGCreateDialog object. */
-        public VGCreateDialog(final HostDrbdInfo hostDrbdInfo) {
+        public VGCreateDialog(final HostDrbdInfo hostDrbdInfo,
+                              final BlockDevInfo selectedBlockDevInfo) {
             super(null);
             this.hostDrbdInfo = hostDrbdInfo;
+            this.selectedBlockDevInfo = selectedBlockDevInfo;
         }
 
         /** Finishes the dialog and sets the information. */
@@ -395,12 +437,14 @@ public final class LVM_Create implements RemotePlugin {
         }
 
         /** Returns array of volume group checkboxes. */
-        private Map<String, JCheckBox> getPVCheckBoxes() {
+        private Map<String, JCheckBox> getPVCheckBoxes(
+                                                    final String selectedPV) {
             final Map<String, JCheckBox> components =
                                         new LinkedHashMap<String, JCheckBox>();
             for (final String pvName
                              : hostDrbdInfo.getHost().getPhysicalVolumes()) {
-                final JCheckBox button = new JCheckBox(pvName);
+                final JCheckBox button =
+                               new JCheckBox(pvName, pvName.equals(selectedPV));
                 button.setBackground(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
                 components.put(pvName, button);
@@ -413,17 +457,21 @@ public final class LVM_Create implements RemotePlugin {
             createButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             /* Volume groups. */
-            final JPanel vgsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            pvCheckBoxes = getPVCheckBoxes();
-            vgsPane.add(new JLabel("Select physical volumes: "));
-            for (final String vgName : pvCheckBoxes.keySet()) {
-                pvCheckBoxes.get(vgName).addItemListener(
-                                                new ItemChangeListener(true));
-                vgsPane.add(pvCheckBoxes.get(vgName));
+            final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            String selectedPV = null;
+            if (selectedBlockDevInfo != null) {
+                selectedPV = selectedBlockDevInfo.getName();
             }
-            final JScrollPane vgSP = new JScrollPane(vgsPane);
-            vgSP.setPreferredSize(new Dimension(0, 45));
-            pane.add(vgSP);
+            pvCheckBoxes = getPVCheckBoxes(selectedPV);
+            pvsPane.add(new JLabel("Select physical volumes: "));
+            for (final String pvName : pvCheckBoxes.keySet()) {
+                pvCheckBoxes.get(pvName).addItemListener(
+                                                new ItemChangeListener(true));
+                pvsPane.add(pvCheckBoxes.get(pvName));
+            }
+            final JScrollPane pvSP = new JScrollPane(pvsPane);
+            pvSP.setPreferredSize(new Dimension(0, 45));
+            pane.add(pvSP);
 
             /* vg name */
             final JPanel inputPane = new JPanel(new SpringLayout());
@@ -552,8 +600,12 @@ public final class LVM_Create implements RemotePlugin {
                 boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
-                        final List<String> pvNames =
-                                new ArrayList<String>(pvCheckBoxes.keySet());
+                        final List<String> pvNames = new ArrayList<String>();
+                        for (final String pv : pvCheckBoxes.keySet()) {
+                            if (pvCheckBoxes.get(pv).isSelected()) {
+                                pvNames.add(pv);
+                            }
+                        }
                         final boolean ret =
                             vgCreate(h, vgNameCB.getStringValue(), pvNames);
                         if (!ret) {
@@ -637,6 +689,11 @@ public final class LVM_Create implements RemotePlugin {
         /** Returns the description of the dialog. */
         protected final String getDescription() {
             return LV_CREATE_DESCRIPTION;
+        }
+
+        /** Close button. */
+        public final String cancelButton() {
+            return "Close";
         }
 
         /** Inits the dialog. */
@@ -921,12 +978,14 @@ public final class LVM_Create implements RemotePlugin {
                         }
                     }
                 }
-                checkButtons();
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
                         h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                 }
+                final String maxBlockSize = getMaxBlockSize();
+                final long maxSize = Long.parseLong(maxBlockSize);
+                maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
                 if (oneFailed) {
                     progressBarDoneError();
                 } else {

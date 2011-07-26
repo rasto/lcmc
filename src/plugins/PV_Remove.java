@@ -62,8 +62,8 @@ import java.awt.event.ActionEvent;
 public final class PV_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the pv remove menu item. */
-    private static final String PV_REMOVE_MENU_ITEM = "PV Remove";
+    /** Name of the remove PV menu item. */
+    private static final String PV_REMOVE_MENU_ITEM = "Remove PV";
     /** Description. */
     private static final String DESCRIPTION = "Remove a physical volume.";
     /** Remove PV timeout. */
@@ -102,7 +102,7 @@ public final class PV_Remove implements RemotePlugin {
         }
     }
 
-    /** PV remove menu. */
+    /** Remove PV menu. */
     private MyMenuItem getRemovePVItem(final BlockDevInfo bdi) {
         final RemovePVItem pvRemoveMenu =
             new RemovePVItem(PV_REMOVE_MENU_ITEM,
@@ -115,7 +115,7 @@ public final class PV_Remove implements RemotePlugin {
         return pvRemoveMenu;
     }
 
-    /** PV remove menu item. (can't use anonymous classes). */
+    /** Remove PV menu item. (can't use anonymous classes). */
     private final class RemovePVItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo blockDevInfo;
@@ -179,7 +179,7 @@ public final class PV_Remove implements RemotePlugin {
         }
 
         protected String getDialogTitle() {
-            return "PV Remove " + Tools.getRelease();
+            return "Remove PV";
         }
 
         protected String getDescription() {
@@ -192,10 +192,10 @@ public final class PV_Remove implements RemotePlugin {
         }
     }
 
-    /** PV remove dialog. */
+    /** Remove PV dialog. */
     private class PVRemoveDialog extends WizardDialog {
         /** Block device info object. */
-        private final MyButton removeButton = new MyButton("PV Remove");
+        private final MyButton removeButton = new MyButton("Remove PV");
         private final BlockDevInfo blockDevInfo;
         private Map<Host, JCheckBox> hostCheckBoxes = null;
         /** Remove new PVRemoveDialog object. */
@@ -215,7 +215,7 @@ public final class PV_Remove implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "PV Remove ";
+            return "Remove PV";
         }
 
         /** Returns the description of the dialog. */
@@ -364,7 +364,7 @@ public final class PV_Remove implements RemotePlugin {
             }
         }
 
-        /** PV Remove. */
+        /** Remove PV. */
         private boolean pvRemove(final Host host,
                                  final BlockDevInfo bdi) {
             final boolean ret = bdi.pvRemove(false);

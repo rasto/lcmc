@@ -36,9 +36,11 @@ import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.data.resources.BlockDevice;
 import drbd.gui.dialog.WizardDialog;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -48,6 +50,7 @@ import javax.swing.JLabel;
 import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
@@ -63,8 +66,8 @@ import java.awt.event.ActionEvent;
 public final class VG_Remove implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Name of the vg remove menu item. */
-    private static final String VG_REMOVE_MENU_ITEM = "VG Remove";
+    /** Name of the remove VG menu item. */
+    private static final String VG_REMOVE_MENU_ITEM = "Remove VG";
     /** Description. */
     private static final String DESCRIPTION = "Remove a volume group.";
     /** Remove VG timeout. */
@@ -104,7 +107,7 @@ public final class VG_Remove implements RemotePlugin {
         }
     }
 
-    /** VG remove menu. */
+    /** Remove VG menu. */
     private MyMenuItem getRemoveVGItem(final BlockDevInfo bdi) {
         final RemoveVGItem vgRemoveMenu =
             new RemoveVGItem(VG_REMOVE_MENU_ITEM,
@@ -117,7 +120,7 @@ public final class VG_Remove implements RemotePlugin {
         return vgRemoveMenu;
     }
 
-    /** VG remove menu item. (can't use anonymous classes). */
+    /** Remove VG menu item. (can't use anonymous classes). */
     private final class RemoveVGItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final BlockDevInfo blockDevInfo;
@@ -177,7 +180,7 @@ public final class VG_Remove implements RemotePlugin {
         }
 
         protected String getDialogTitle() {
-            return "VG Remove " + Tools.getRelease();
+            return "Remove VG";
         }
 
         protected String getDescription() {
@@ -190,10 +193,10 @@ public final class VG_Remove implements RemotePlugin {
         }
     }
 
-    /** VG remove dialog. */
+    /** Remove VG dialog. */
     private class VGRemoveDialog extends WizardDialog {
         /** Block device info object. */
-        private final MyButton removeButton = new MyButton("VG Remove");
+        private final MyButton removeButton = new MyButton("Remove VG");
         private final BlockDevInfo blockDevInfo;
         private Map<Host, JCheckBox> hostCheckBoxes = null;
         /** Remove new VGRemoveDialog object. */
@@ -213,7 +216,7 @@ public final class VG_Remove implements RemotePlugin {
 
         /** Returns the title of the dialog. */
         protected final String getDialogTitle() {
-            return "VG Remove ";
+            return "Remove VG";
         }
 
         /** Returns the description of the dialog. */
@@ -257,17 +260,21 @@ public final class VG_Remove implements RemotePlugin {
         protected final JComponent getInputPane() {
             removeButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
-            final JPanel inputPane = new JPanel(new SpringLayout());
+            final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            bdPane.add(new JLabel("Block Devices: "));
+            final String vgName = blockDevInfo.getBlockDevice()
+                                            .getVolumeGroupOnPhysicalVolume();
+            final List<String> bds = new ArrayList<String>();
+            for (final BlockDevice bd
+                                : blockDevInfo.getHost().getBlockDevices()) {
+                final String thisVG = bd.getVolumeGroupOnPhysicalVolume();
+                if (vgName.equals(thisVG)) {
+                    bds.add(bd.getName());
+                }
 
-            inputPane.add(new JLabel("Block Device:"));
-            inputPane.add(new JLabel(blockDevInfo.getName()));
-            removeButton.addActionListener(new RemoveActionListener());
-            inputPane.add(removeButton);
-            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
-
-            pane.add(inputPane);
+            }
+            bdPane.add(new JLabel(Tools.join(", ", bds)));
+            pane.add(bdPane);
             final JPanel hostsPane = new JPanel(
                             new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
             final Cluster cluster = blockDevInfo.getHost().getCluster();
@@ -297,9 +304,20 @@ public final class VG_Remove implements RemotePlugin {
                                                                    hostsPane);
             sp.setPreferredSize(new java.awt.Dimension(0, 45));
             pane.add(sp);
+            final JPanel inputPane = new JPanel(new SpringLayout());
+
+            inputPane.add(new JLabel("Volume Group:"));
+            inputPane.add(new JLabel(vgName));
+            removeButton.addActionListener(new RemoveActionListener());
+            inputPane.add(removeButton);
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
+                                                       1, 1,  // initX, initY
+                                                       1, 1); // xPad, yPad
+
+            pane.add(inputPane);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
+            SpringUtilities.makeCompactGrid(pane, 5, 1,  // rows, cols
                                                   0, 0,  // initX, initY
                                                   0, 0); // xPad, yPad
             checkButtons();
@@ -352,7 +370,7 @@ public final class VG_Remove implements RemotePlugin {
             }
         }
 
-        /** VG Remove. */
+        /** Remove VG. */
         private boolean vgRemove(final Host host,
                                  final String vgName) {
             final boolean ret = LVM.vgRemove(host, vgName, false);
