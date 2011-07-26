@@ -177,7 +177,7 @@ public abstract class WizardDialog extends ConfigDialog {
                 @Override public void run() {
                     buttonClass(nextButton()).setEnabled(enable);
                     if (enable) {
-                        requestFocusLater(buttonClass(nextButton()));
+                        makeDefaultAndRequestFocus(buttonClass(nextButton()));
                     }
                 }
             });
@@ -224,22 +224,33 @@ public abstract class WizardDialog extends ConfigDialog {
                 if (buttonClass(retryButton()) != null
                     && buttonClass(retryButton()).isVisible()
                     && buttonClass(retryButton()).isEnabled()) {
-                    requestFocusLater(buttonClass(retryButton()));
+                    makeDefaultAndRequestFocus(buttonClass(retryButton()));
                 } else if (buttonClass(nextButton()) != null
                     && buttonClass(nextButton()).isEnabled()) {
-                    requestFocusLater(buttonClass(nextButton()));
+                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
                 } else if (buttonClass(finishButton()) != null
                     && buttonClass(finishButton()).isEnabled()) {
-                    requestFocusLater(buttonClass(finishButton()));
+                    makeDefaultAndRequestFocus(buttonClass(finishButton()));
                 }
             }
         });
     }
 
     /** Requests focus. */
-    protected final void requestFocusLater(final JButton b) {
-        getDialogPanel().getRootPane().setDefaultButton(b);
+    protected final void makeDefaultAndRequestFocus(final JComponent b) {
+        if (b instanceof JButton) {
+            getDialogPanel().getRootPane().setDefaultButton((JButton) b);
+        }
         b.requestFocus();
+    }
+
+    /** Requests focus in the swing thread. */
+    protected final void makeDefaultAndRequestFocusLater(final JComponent b) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                makeDefaultAndRequestFocus(b);
+            }
+        });
     }
 
     /** Sets as default button. */

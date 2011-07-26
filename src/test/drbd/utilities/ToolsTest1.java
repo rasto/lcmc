@@ -1349,10 +1349,10 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testGetHostCheckboxes() {
+    public void testGetHostCheckBoxes() {
         for (final Host host : TestSuite1.getHosts()) {
             final Map<Host, JCheckBox> comps =
-                                    Tools.getHostCheckboxes(host.getCluster());
+                                    Tools.getHostCheckBoxes(host.getCluster());
             assertNotNull(comps);
             assertTrue(comps.size() == TestSuite1.getHosts().size());
             assertTrue(comps.containsKey(host));

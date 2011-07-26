@@ -96,17 +96,9 @@ final class Finish extends DialogHost {
     @Override protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (Tools.getConfigData().danglingHostsCount() < 2) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    requestFocusLater(addAnotherHostButton);
-                }
-            });
+            makeDefaultAndRequestFocusLater(addAnotherHostButton);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    requestFocusLater(confClusterButton);
-                }
-            });
+            makeDefaultAndRequestFocusLater(confClusterButton);
         }
         Tools.getConfigData().removeAutoHost();
         if (Tools.getConfigData().getAutoHosts().isEmpty()) {

@@ -662,13 +662,21 @@ public final class BlockDevInfo extends EditableInfo {
     /** Initialize a physical volume. */
     public boolean pvCreate(final boolean testOnly) {
         final String device = getBlockDevice().getName();
-        return LVM.pvCreate(getHost(), device, testOnly);
+        final boolean ret = LVM.pvCreate(getHost(), device, testOnly);
+        if (ret) {
+            getBlockDevice().setVolumeGroupOnPhysicalVolume("");
+        }
+        return ret;
     }
 
     /** Remove a physical volume. */
     public boolean pvRemove(final boolean testOnly) {
         final String device = getBlockDevice().getName();
-        return LVM.pvRemove(getHost(), device, testOnly);
+        final boolean ret = LVM.pvRemove(getHost(), device, testOnly);
+        if (ret) {
+            getBlockDevice().setVolumeGroupOnPhysicalVolume(null);
+        }
+        return ret;
     }
 
     /** Remove a logical volume. */
@@ -1602,7 +1610,7 @@ public final class BlockDevInfo extends EditableInfo {
          } else if (vgPV != null && !"".equals(vgPV)) {
              /* vgPV == "", pv doesn't have a vg */
              /* vgPV == null, no pv */
-             return new Subtext(vgPV, Color.BLUE, Color.BLACK);
+             return new Subtext("VG:" + vgPV, Color.BLUE, Color.BLACK);
          } else if (getBlockDevice().isPhysicalVolume()) {
              return PHYSICAL_VOLUME_SUBTEXT;
          }

@@ -165,7 +165,7 @@ final class CommStack extends DialogCluster {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
                     buttonClass(nextButton()).setEnabled(true);
-                    requestFocusLater(buttonClass(nextButton()));
+                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
                 }
             });
             if (!Tools.getConfigData().getAutoClusters().isEmpty()) {

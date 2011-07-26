@@ -1544,13 +1544,11 @@ public final class Host {
     /** Gets and stores hardware info about the host. */
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
                           final ResourceGraph[] graphs) {
-        final long thisTS = timestamp;
+        final long thisTS = ++timestamp;
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              @Override public void done(final String ans) {
-                                 if (thisTS == timestamp) {
-                                     timestamp++;
-                                 } else {
+                                 if (thisTS != timestamp) {
                                      return;
                                  }
                                  if (!ans.equals(oldHwInfo)) {
@@ -1572,9 +1570,7 @@ public final class Host {
                              @Override public void doneError(
                                                           final String ans,
                                                           final int exitCode) {
-                                 if (thisTS == timestamp) {
-                                     timestamp++;
-                                 } else {
+                                 if (thisTS != timestamp) {
                                      return;
                                  }
                                  setLoadingError();
@@ -1598,9 +1594,7 @@ public final class Host {
         final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
                              @Override public void done(final String ans) {
-                                 if (thisTS == timestamp) {
-                                     timestamp++;
-                                 } else {
+                                 if (thisTS != timestamp) {
                                      return;
                                  }
                                  if (!ans.equals(oldHwInfo)) {
@@ -1622,9 +1616,7 @@ public final class Host {
                              @Override public void doneError(
                                                         final String ans,
                                                         final int exitCode) {
-                                 if (thisTS == timestamp) {
-                                     timestamp++;
-                                 } else {
+                                 if (thisTS != timestamp) {
                                      return;
                                  }
                                  setLoadingError();
