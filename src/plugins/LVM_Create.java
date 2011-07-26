@@ -284,8 +284,7 @@ public final class LVM_Create implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -343,8 +342,11 @@ public final class LVM_Create implements RemotePlugin {
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+            enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -619,17 +621,15 @@ public final class LVM_Create implements RemotePlugin {
             return LV_CREATE_DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+            enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
-            sizeCB.requestFocus();
             SwingUtilities.invokeLater(new SizeRequestFocusRunnable());
         }
 
@@ -900,21 +900,30 @@ public final class LVM_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
-                        lvCreate(h,
-                                 lvNameCB.getStringValue(),
-                                 sizeCB.getStringValue());
+                        final boolean ret = lvCreate(h,
+                                                     lvNameCB.getStringValue(),
+                                                     sizeCB.getStringValue());
+                        if (!ret) {
+                            oneFailed = true;
+                        }
                     }
                 }
                 checkButtons();
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    }
+                }
             }
         }
 
         /** LV Create. */
-        private void lvCreate(final Host host,
-                              final String lvName,
-                              final String size) {
+        private boolean lvCreate(final Host host,
+                                 final String lvName,
+                                 final String size) {
             final boolean ret = LVM.lvCreate(host,
                                              lvName,
                                              volumeGroup,
@@ -931,12 +940,7 @@ public final class LVM_Create implements RemotePlugin {
                                        + lvName
                                        + " failed.");
             }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                }
-            }
-            setComboBoxes();
+            return ret;
         }
 
         /** Returns maximum block size available in the group. */

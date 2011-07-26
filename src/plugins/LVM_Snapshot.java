@@ -169,8 +169,7 @@ public final class LVM_Snapshot implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -229,6 +228,10 @@ public final class LVM_Snapshot implements RemotePlugin {
         protected final void initDialog() {
             super.initDialog();
             enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
             sizeCB.requestFocus();
             SwingUtilities.invokeLater(new SizeRequestFocusRunnable());

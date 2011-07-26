@@ -66,7 +66,10 @@ public final class PV_Create implements RemotePlugin {
     private static final String PV_CREATE_MENU_ITEM = "PV Create";
     /** Description. */
     private static final String DESCRIPTION =
-                "Initialize a disk or partition for use by LVM.";
+                             "Initialize a disk or partition for use by LVM.";
+    /** Create PV timeout. */
+    private static final int CREATE_TIMEOUT = 5000;
+                             
     /** Private. */
     public PV_Create() {
     }
@@ -174,8 +177,7 @@ public final class PV_Create implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -224,16 +226,17 @@ public final class PV_Create implements RemotePlugin {
             return DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+            enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected final void initDialogAfterVisible() {
             enableComponents();
+            getDialogPanel().getRootPane().setDefaultButton(buttonClass(cancelButton()));
+            requestFocusLater(buttonClass(cancelButton()));
         }
 
         /** Enables and disabled buttons. */
@@ -328,6 +331,9 @@ public final class PV_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                getProgressBar().start(CREATE_TIMEOUT
+                                       * hostCheckBoxes.size());
+                boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
                         final BlockDevInfo oBdi =
@@ -335,17 +341,31 @@ public final class PV_Create implements RemotePlugin {
                                 .findBlockDevInfo(h.getName(),
                                                   blockDevInfo.getName());
                         if (oBdi != null) {
-                            pvCreate(h, oBdi);
+                            final boolean ret = pvCreate(h, oBdi);
+                            if (!ret) {
+                                oneFailed = true;
+                            }
                         }
                     }
                 }
-                checkButtons();
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    }
+                }
+                if (oneFailed) {
+                    checkButtons();
+                    progressBarDone();
+                } else {
+                    progressBarDone();
+                    disposeDialog();
+                }
             }
         }
 
         /** PV Create. */
-        private void pvCreate(final Host host,
-                              final BlockDevInfo bdi) {
+        private boolean pvCreate(final Host host,
+                                 final BlockDevInfo bdi) {
             final boolean ret = bdi.pvCreate(false);
             if (ret) {
                 answerPaneAddText("Physical volume "
@@ -358,11 +378,7 @@ public final class PV_Create implements RemotePlugin {
                                        + " on " + host.getName()
                                        + " failed.");
             }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                }
-            }
+            return ret;
         }
 
         /** Size combo box item listener. */

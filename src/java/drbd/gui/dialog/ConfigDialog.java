@@ -676,4 +676,9 @@ public abstract class ConfigDialog {
         mp.setAlignmentX(Component.LEFT_ALIGNMENT);
         return mp;
     }
+
+    /** Close dialog other than pressing button. */
+    protected final void disposeDialog() {
+        dialogGate.countDown();
+    }
 }

@@ -225,8 +225,11 @@ public final class VG_Remove implements RemotePlugin {
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+            enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 

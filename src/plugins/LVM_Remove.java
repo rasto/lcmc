@@ -156,8 +156,7 @@ public final class LVM_Remove implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 

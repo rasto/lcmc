@@ -183,8 +183,7 @@ public final class LVM_Resize implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -243,8 +242,11 @@ public final class LVM_Resize implements RemotePlugin {
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+            enableComponentsLater(new JComponent[]{});
+        }
+
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
             if (checkDRBD()) {
                 sizeCB.requestFocus();

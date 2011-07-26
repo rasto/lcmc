@@ -171,8 +171,8 @@ public final class PV_Remove implements RemotePlugin {
             super();
         }
 
-        protected void initDialog() {
-            super.initDialog();
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
             enableComponents();
         }
 
@@ -225,11 +225,9 @@ public final class PV_Remove implements RemotePlugin {
             return "Close";
         }
 
-        /** Inits the dialog. */
-        protected final void initDialog() {
-            super.initDialog();
-            enableComponentsLater(
-                              new JComponent[]{});
+        /** Inits the dialog after it becomes visible. */
+        protected void initDialogAfterVisible() {
+            enableComponentsLater(new JComponent[]{});
             enableComponents();
         }
 
