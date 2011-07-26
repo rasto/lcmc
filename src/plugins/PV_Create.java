@@ -235,8 +235,7 @@ public final class PV_Create implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected final void initDialogAfterVisible() {
             enableComponents();
-            getDialogPanel().getRootPane().setDefaultButton(buttonClass(cancelButton()));
-            requestFocusLater(buttonClass(cancelButton()));
+            makeDefaultAndRequestFocusLater(buttonClass(cancelButton()));
         }
 
         /** Enables and disabled buttons. */
@@ -348,17 +347,22 @@ public final class PV_Create implements RemotePlugin {
                         }
                     }
                 }
-                for (final Host h : hostCheckBoxes.keySet()) {
-                    if (hostCheckBoxes.get(h).isSelected()) {
-                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                    }
-                }
                 if (oneFailed) {
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
                     checkButtons();
-                    progressBarDone();
+                    progressBarDoneError();
                 } else {
                     progressBarDone();
                     disposeDialog();
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
                 }
             }
         }

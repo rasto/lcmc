@@ -82,6 +82,8 @@ public final class LVM_Resize implements RemotePlugin {
                    + " drbdadm resize will be called. If you have something"
                    + " like filesystem on the DRBD, you have to resize the"
                    + " filesystem yourself.";
+    /** Resize LV timeout. */
+    private static final int RESIZE_TIMEOUT = 5000;
 
     /** Private. */
     public LVM_Resize() {
@@ -235,10 +237,6 @@ public final class LVM_Resize implements RemotePlugin {
             return DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
@@ -249,9 +247,8 @@ public final class LVM_Resize implements RemotePlugin {
         protected void initDialogAfterVisible() {
             enableComponents();
             if (checkDRBD()) {
-                sizeCB.requestFocus();
+                makeDefaultAndRequestFocusLater(sizeCB);
             }
-            SwingUtilities.invokeLater(new SizeRequestFocusRunnable());
         }
 
         /** Check if it is DRBD device and if it could be resized. */
@@ -295,16 +292,6 @@ public final class LVM_Resize implements RemotePlugin {
                 }
             }
             return true;
-        }
-
-        private class SizeRequestFocusRunnable implements Runnable {
-            public SizeRequestFocusRunnable() {
-                super();
-            }
-
-            @Override public void run() {
-                sizeCB.requestFocus();
-            }
         }
 
         /** Enables and disabled buttons. */

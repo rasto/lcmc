@@ -51,6 +51,8 @@ public final class LVM_Remove implements RemotePlugin {
     private static final String LV_REMOVE_MENU_ITEM = "LV Remove";
     /** Description. */
     private static final String DESCRIPTION = "Manage logical volumes.";
+    /** Remove LV timeout. */
+    private static final int REMOVE_TIMEOUT = 5000;
 
     /** Private. */
     public LVM_Remove() {

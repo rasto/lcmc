@@ -220,10 +220,6 @@ public final class LVM_Snapshot implements RemotePlugin {
             return DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
@@ -233,18 +229,7 @@ public final class LVM_Snapshot implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
             enableComponents();
-            sizeCB.requestFocus();
-            SwingUtilities.invokeLater(new SizeRequestFocusRunnable());
-        }
-
-        private class SizeRequestFocusRunnable implements Runnable {
-            public SizeRequestFocusRunnable() {
-                super();
-            }
-
-            @Override public void run() {
-                sizeCB.requestFocus();
-            }
+            makeDefaultAndRequestFocusLater(sizeCB);
         }
 
         /** Enables and disabled buttons. */

@@ -67,6 +67,9 @@ public final class VG_Remove implements RemotePlugin {
     private static final String VG_REMOVE_MENU_ITEM = "VG Remove";
     /** Description. */
     private static final String DESCRIPTION = "Remove a volume group.";
+    /** Remove VG timeout. */
+    private static final int REMOVE_TIMEOUT = 5000;
+
     /** Private. */
     public VG_Remove() {
     }
@@ -218,10 +221,6 @@ public final class VG_Remove implements RemotePlugin {
             return DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
@@ -325,20 +324,37 @@ public final class VG_Remove implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                getProgressBar().start(REMOVE_TIMEOUT
+                                       * hostCheckBoxes.size());
                 final String vgName = blockDevInfo.getBlockDevice()
                                             .getVolumeGroupOnPhysicalVolume();
+                boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
-                        vgRemove(h, vgName);
+                        final boolean ret = vgRemove(h, vgName);
+                        if (!ret) {
+                            oneFailed = true;
+                        }
                     }
                 }
-                checkButtons();
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    }
+                }
+                if (oneFailed) {
+                    checkButtons();
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
+                    disposeDialog();
+                }
             }
         }
 
         /** VG Remove. */
-        private void vgRemove(final Host host,
-                              final String vgName) {
+        private boolean vgRemove(final Host host,
+                                 final String vgName) {
             final boolean ret = LVM.vgRemove(host, vgName, false);
             if (ret) {
                 answerPaneAddText("Volume group "
@@ -351,11 +367,7 @@ public final class VG_Remove implements RemotePlugin {
                                         + " on " + host.getName()
                                         + " failed.");
             }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                }
-            }
+            return ret;
         }
 
         /** Size combo box item listener. */

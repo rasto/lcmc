@@ -66,6 +66,8 @@ public final class PV_Remove implements RemotePlugin {
     private static final String PV_REMOVE_MENU_ITEM = "PV Remove";
     /** Description. */
     private static final String DESCRIPTION = "Remove a physical volume.";
+    /** Remove PV timeout. */
+    private static final int REMOVE_TIMEOUT = 5000;
     /** Private. */
     public PV_Remove() {
     }
@@ -221,14 +223,16 @@ public final class PV_Remove implements RemotePlugin {
             return DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
+        /** Inits the dialog. */
+        protected final void initDialog() {
+            super.initDialog();
+            enableComponentsLater(new JComponent[]{});
         }
 
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
-            enableComponentsLater(new JComponent[]{});
             enableComponents();
+            makeDefaultAndRequestFocusLater(buttonClass(cancelButton()));
         }
 
         /** Enables and disabled buttons. */
@@ -323,6 +327,9 @@ public final class PV_Remove implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                getProgressBar().start(REMOVE_TIMEOUT
+                                       * hostCheckBoxes.size());
+                boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
                         final BlockDevInfo oBdi =
@@ -330,17 +337,36 @@ public final class PV_Remove implements RemotePlugin {
                                 .findBlockDevInfo(h.getName(),
                                                   blockDevInfo.getName());
                         if (oBdi != null) {
-                            pvRemove(h, oBdi);
+                            final boolean ret = pvRemove(h, oBdi);
+                            if (!ret) {
+                                oneFailed = true;
+                            }
                         }
                     }
                 }
-                checkButtons();
+                if (oneFailed) {
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
+                    checkButtons();
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
+                    disposeDialog();
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
+                }
             }
         }
 
         /** PV Remove. */
-        private void pvRemove(final Host host,
-                              final BlockDevInfo bdi) {
+        private boolean pvRemove(final Host host,
+                                 final BlockDevInfo bdi) {
             final boolean ret = bdi.pvRemove(false);
             if (ret) {
                 answerPaneAddText("Labels on physical volume "
@@ -353,11 +379,7 @@ public final class PV_Remove implements RemotePlugin {
                                         + " on " + host.getName()
                                         + " failed.");
             }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                }
-            }
+            return ret;
         }
 
         /** Size combo box item listener. */

@@ -86,6 +86,8 @@ public final class LVM_Create implements RemotePlugin {
     private static final String LV_CREATE_DESCRIPTION =
                "Create a logical volume in an existing volume group on"
                + " selected hosts.";
+    /** Create LV timeout. */
+    private static final int CREATE_TIMEOUT = 5000;
 
     /** Private. */
     public LVM_Create() {
@@ -335,10 +337,6 @@ public final class LVM_Create implements RemotePlugin {
             return VG_CREATE_DESCRIPTION;
         }
 
-        public final String cancelButton() {
-            return "Close";
-        }
-
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
@@ -348,6 +346,7 @@ public final class LVM_Create implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
             enableComponents();
+            makeDefaultAndRequestFocusLater(vgNameCB);
         }
 
         /** Enables and disabled buttons. */
@@ -486,7 +485,7 @@ public final class LVM_Create implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
+            SpringUtilities.makeCompactGrid(pane, 5, 1,  // rows, cols
                                                   0, 0,  // initX, initY
                                                   0, 0); // xPad, yPad
             checkButtons();
@@ -548,22 +547,46 @@ public final class LVM_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                getProgressBar().start(CREATE_TIMEOUT
+                                       * hostCheckBoxes.size());
+                boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
                         final List<String> pvNames =
                                 new ArrayList<String>(pvCheckBoxes.keySet());
-                        vgCreate(h, vgNameCB.getStringValue(), pvNames);
+                        final boolean ret =
+                            vgCreate(h, vgNameCB.getStringValue(), pvNames);
+                        if (!ret) {
+                            oneFailed = true;
+                        }
                             
                     }
                 }
-                checkButtons();
+                if (oneFailed) {
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
+                    setComboBoxes();
+                    checkButtons();
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
+                    disposeDialog();
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                    }
+                }
             }
         }
 
         /** VG Create. */
-        private void vgCreate(final Host host,
-                              final String vgName,
-                              final List<String> pvNames) {
+        private boolean vgCreate(final Host host,
+                                 final String vgName,
+                                 final List<String> pvNames) {
             final boolean ret = LVM.vgCreate(host, vgName, pvNames, false);
             if (ret) {
                 answerPaneAddText("Volume group "
@@ -575,12 +598,7 @@ public final class LVM_Create implements RemotePlugin {
                                        + vgName
                                        + " failed.");
             }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                }
-            }
-            setComboBoxes();
+            return ret;
         }
     }
 
@@ -630,17 +648,7 @@ public final class LVM_Create implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
             enableComponents();
-            SwingUtilities.invokeLater(new SizeRequestFocusRunnable());
-        }
-
-        private class SizeRequestFocusRunnable implements Runnable {
-            public SizeRequestFocusRunnable() {
-                super();
-            }
-
-            @Override public void run() {
-                sizeCB.requestFocus();
-            }
+            makeDefaultAndRequestFocusLater(sizeCB);
         }
 
         /** Enables and disabled buttons. */
@@ -900,6 +908,8 @@ public final class LVM_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                getProgressBar().start(CREATE_TIMEOUT
+                                       * hostCheckBoxes.size());
                 boolean oneFailed = false;
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (hostCheckBoxes.get(h).isSelected()) {
@@ -916,6 +926,11 @@ public final class LVM_Create implements RemotePlugin {
                     if (hostCheckBoxes.get(h).isSelected()) {
                         h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
+                }
+                if (oneFailed) {
+                    progressBarDoneError();
+                } else {
+                    progressBarDone();
                 }
             }
         }
