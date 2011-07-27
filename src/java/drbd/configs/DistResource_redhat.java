@@ -45,8 +45,6 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
 
         {"DrbdInst.install",
          DistResource.SUDO + "/bin/rpm -Uvh /tmp/drbdinst/@DRBDPACKAGES@"},
-        {"HbPmInst.install.text.1", "yum install: HB 2.1.3 (obsolete)"},
-        {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",

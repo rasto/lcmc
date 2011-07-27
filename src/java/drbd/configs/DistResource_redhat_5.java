@@ -123,9 +123,5 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
          + " && /sbin/chkconfig --add heartbeat"},
-
-        {"HbPmInst.install.text.1", "yum install: HB 2.1.3 (obsolete)"},
-        {"HbPmInst.install.1", "/usr/bin/yum -y install heartbeat"},
-
     };
 }
