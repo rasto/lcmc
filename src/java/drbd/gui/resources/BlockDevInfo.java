@@ -1588,14 +1588,25 @@ public final class BlockDevInfo extends EditableInfo {
         return null;
     }
 
+    public String getMainTextForGraph() {
+        if (!isLVM()) {
+            final String vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
+            if (vg != null && !"".equals(vg)) {
+                return "VG " + vg;
+            }
+        }
+        return getName();
+    }
+
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
-         String vg;
+         String vg = null;
          if (isLVM()) {
              vg = getBlockDevice().getVolumeGroup();
          } else {
              vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
          }
+
          if (getBlockDevice().isDrbdMetaDisk()) {
              return METADISK_SUBTEXT;
          } else if (getBlockDevice().isSwap()) {
@@ -1613,7 +1624,11 @@ public final class BlockDevInfo extends EditableInfo {
              }
              return new Subtext(s, Color.BLUE, Color.BLACK);
          } else if (vg != null && !"".equals(vg)) {
-             return new Subtext("VG " + vg, Color.BLUE, Color.GREEN);
+             if (isLVM()) {
+                 return new Subtext("LV in " + vg, Color.BLUE, Color.GREEN);
+             } else {
+                 return new Subtext(getName(), Color.BLUE, Color.GREEN);
+             }
          } else if (getBlockDevice().isPhysicalVolume()) {
              return PHYSICAL_VOLUME_SUBTEXT;
          }
@@ -1739,6 +1754,7 @@ public final class BlockDevInfo extends EditableInfo {
     /** Sets stored parameters. */
     public void setParameters(final String resName) {
         getBlockDevice().setNew(false);
+
         final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();
         if (clusterBrowser == null) {
             return;

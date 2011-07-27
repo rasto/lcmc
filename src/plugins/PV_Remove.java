@@ -35,6 +35,7 @@ import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
+import drbd.gui.Browser;
 import drbd.gui.dialog.WizardDialog;
 
 import java.util.List;
@@ -232,7 +233,7 @@ public final class PV_Remove implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
             enableComponents();
-            makeDefaultAndRequestFocusLater(buttonClass(cancelButton()));
+            makeDefaultAndRequestFocusLater(removeButton);
         }
 
         /** Enables and disabled buttons. */
@@ -261,14 +262,15 @@ public final class PV_Remove implements RemotePlugin {
             removeButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
 
             inputPane.add(new JLabel("Block Device:"));
             inputPane.add(new JLabel(blockDevInfo.getName()));
             removeButton.addActionListener(new RemoveActionListener());
             inputPane.add(removeButton);
-            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
             final JPanel hostsPane = new JPanel(
@@ -302,9 +304,9 @@ public final class PV_Remove implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -327,6 +329,7 @@ public final class PV_Remove implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                disableComponents();
                 getProgressBar().start(REMOVE_TIMEOUT
                                        * hostCheckBoxes.size());
                 boolean oneFailed = false;
@@ -344,11 +347,10 @@ public final class PV_Remove implements RemotePlugin {
                         }
                     }
                 }
+                enableComponents();
                 if (oneFailed) {
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                     checkButtons();
                     progressBarDoneError();
@@ -356,9 +358,7 @@ public final class PV_Remove implements RemotePlugin {
                     progressBarDone();
                     disposeDialog();
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                 }
             }

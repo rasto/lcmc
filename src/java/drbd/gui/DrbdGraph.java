@@ -222,6 +222,7 @@ public final class DrbdGraph extends ResourceGraph {
         }
         BlockDevInfo prevBdi = null;
         for (final BlockDevInfo bdi : blockDevInfos) {
+            stopAnimation(bdi);
             Vertex bdv = null;
             if (!blockDeviceToVertexMap.containsKey(bdi.getBlockDevice())) {
                 bdv = new Vertex();
@@ -502,7 +503,7 @@ public final class DrbdGraph extends ResourceGraph {
                 if (info == null) {
                     return "";
                 }
-                l = info.getName();
+                l = info.getMainTextForGraph();
             }
             if (l.length() > MAX_VERTEX_STRING_LENGTH) {
                 l = "..." + l.substring(l.length()

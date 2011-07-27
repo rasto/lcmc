@@ -25,6 +25,7 @@ import drbd.gui.SpringUtilities;
 import drbd.gui.dialog.ConfigDialog;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
+import drbd.gui.Browser;
 
 import drbd.utilities.Tools;
 import drbd.utilities.RemotePlugin;
@@ -235,7 +236,7 @@ public final class PV_Create implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected final void initDialogAfterVisible() {
             enableComponents();
-            makeDefaultAndRequestFocusLater(buttonClass(cancelButton()));
+            makeDefaultAndRequestFocusLater(createButton);
         }
 
         /** Enables and disabled buttons. */
@@ -264,14 +265,15 @@ public final class PV_Create implements RemotePlugin {
             createButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
 
             inputPane.add(new JLabel("Block Device:"));
             inputPane.add(new JLabel(blockDevInfo.getName()));
             createButton.addActionListener(new CreateActionListener());
             inputPane.add(createButton);
-            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
             final JPanel hostsPane = new JPanel(
@@ -305,9 +307,9 @@ public final class PV_Create implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -330,6 +332,7 @@ public final class PV_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                disableComponents();
                 getProgressBar().start(CREATE_TIMEOUT
                                        * hostCheckBoxes.size());
                 boolean oneFailed = false;
@@ -347,11 +350,10 @@ public final class PV_Create implements RemotePlugin {
                         }
                     }
                 }
+                enableComponents();
                 if (oneFailed) {
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                     checkButtons();
                     progressBarDoneError();
@@ -359,9 +361,7 @@ public final class PV_Create implements RemotePlugin {
                     progressBarDone();
                     disposeDialog();
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                 }
             }

@@ -37,6 +37,7 @@ import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
+import drbd.gui.Browser;
 
 import java.util.List;
 import java.util.Set;
@@ -64,10 +65,12 @@ public final class LVM_Snapshot implements RemotePlugin {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the snapshot menu item. */
-    private static final String LV_SNAPSHOT_MENU_ITEM = "Create Snapshot ";
+    private static final String LV_SNAPSHOT_MENU_ITEM = "Create LV Snapshot ";
     /** Description LV snapshot. */
     private static final String DESCRIPTION =
                    "Create a snapshot of the logical volume.";
+    /** LV Snapshot timeout. */
+    private static final int SNAPSHOT_TIMEOUT = 5000;
 
     /** Private. */
     public LVM_Snapshot() {
@@ -282,6 +285,7 @@ public final class LVM_Snapshot implements RemotePlugin {
             snapshotButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
 
             final String volumeGroup =
                                 blockDevInfo.getBlockDevice().getVolumeGroup();
@@ -354,16 +358,16 @@ public final class LVM_Snapshot implements RemotePlugin {
             sizeCB.addListeners(new SizeItemListener(), 
                                 new SizeDocumentListener());
 
-            SpringUtilities.makeCompactGrid(inputPane, 4, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 3, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -419,14 +423,26 @@ public final class LVM_Snapshot implements RemotePlugin {
             }
 
             @Override public void run() {
-                SwingUtilities.invokeLater(new EnableSnapshotRunnable(false));
-                lvSnapshot(lvNameCB.getStringValue(),
-                           sizeCB.getStringValue());
+                Tools.invokeAndWait(new EnableSnapshotRunnable(false));
+                disableComponents();
+                getProgressBar().start(SNAPSHOT_TIMEOUT);
+                final boolean ret = lvSnapshot(lvNameCB.getStringValue(),
+                                               sizeCB.getStringValue());
+                final Host host = blockDevInfo.getHost();
+                host.getBrowser().getClusterBrowser().updateHWInfo(host);
+                setComboBoxes();
+                if (ret) {
+                    progressBarDone();
+                    disposeDialog();
+                } else {
+                    progressBarDoneError();
+                }
+                enableComponents();
             }
         }
 
         /** LV Snapshot. */
-        private void lvSnapshot(final String lvName, final String size) {
+        private boolean lvSnapshot(final String lvName, final String size) {
             final String volumeGroup =
                                 blockDevInfo.getBlockDevice().getVolumeGroup();
             final boolean ret = blockDevInfo.lvSnapshot(lvName,
@@ -442,9 +458,7 @@ public final class LVM_Snapshot implements RemotePlugin {
                                        + lvName
                                        + " failed.");
             }
-            final Host host = blockDevInfo.getHost();
-            host.getBrowser().getClusterBrowser().updateHWInfo(host);
-            setComboBoxes();
+            return ret;
         }
 
         /** Returns maximum block size available in the group. */
@@ -460,7 +474,6 @@ public final class LVM_Snapshot implements RemotePlugin {
     /** Return unit objects. */
     private Unit[] getUnits() {
         return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),
                    new Unit("M", "M", "MiByte", "MiBytes"),
                    new Unit("G",  "G",  "GiByte",      "GiBytes"),

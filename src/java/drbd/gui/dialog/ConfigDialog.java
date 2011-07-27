@@ -221,11 +221,9 @@ public abstract class ConfigDialog {
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         final JEditorPane descPane = new JEditorPane(
                        Tools.MIME_TYPE_TEXT_HTML,
-                       "<p style='font-family:Dialog; font-size:16; "
-                       + "font-weight: bold'>"
-                       + getDialogTitle() + "</p>"
-                       + "<p style='font-family:Dialog; font-size:12;'>"
-                       + getDescription() + "</p>");
+                       "<span style='font-family:Dialog; font-size:8;'>"
+                       + "<h3>" + getDialogTitle() + "</h3>" 
+                       + getDescription() + "</span>");
         descPane.setSize(300, Integer.MAX_VALUE);
 
         descPane.setBackground(

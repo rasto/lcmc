@@ -1223,4 +1223,10 @@ public class Info implements Comparable {
             getBrowser().reload(p, true);
         }
     }
+
+    /** Returns the main text that appears in the graph. */
+    public String getMainTextForGraph() {
+        return toString();
+    }
+
 }

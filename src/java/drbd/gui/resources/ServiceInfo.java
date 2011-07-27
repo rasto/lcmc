@@ -855,11 +855,6 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /** Returns the main text that appears in the graph. */
-    public String getMainTextForGraph() {
-        return toString();
-    }
-
     /** Returns name of this resource, that is used in logs. */
     String getNameForLog() {
         return getName();

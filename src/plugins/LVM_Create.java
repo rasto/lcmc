@@ -41,6 +41,7 @@ import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
+import drbd.gui.Browser;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -115,14 +116,8 @@ public final class LVM_Create implements RemotePlugin {
                 final BlockDevInfo bdi = (BlockDevInfo) info;
                 final HostDrbdInfo hdi =
                                 bdi.getHost().getBrowser().getHostDrbdInfo();
-                String vg = null;
-                if (bdi.isLVM()) {
-                    vg = bdi.getBlockDevice().getVolumeGroup();
-                } else {
-                    vg = bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume();
-                }
-                info.addPluginMenuItem(getLVMCreateItem(hdi, vg));
-                info.addPluginActionMenuItem(getLVMCreateItem(hdi, vg));
+                info.addPluginMenuItem(getLVMCreateItem(hdi, bdi, null));
+                info.addPluginActionMenuItem(getLVMCreateItem(hdi, bdi, null));
                 info.addPluginMenuItem(getVGCreateItem(hdi, bdi));
                 info.addPluginActionMenuItem(getVGCreateItem(hdi, bdi));
             }
@@ -140,13 +135,7 @@ public final class LVM_Create implements RemotePlugin {
                 final HostDrbdInfo hdi =
                                   bdi.getHost().getBrowser().getHostDrbdInfo();
                 items.add(getVGCreateItem(hdi, bdi));
-                String vg = null;
-                if (bdi.isLVM()) {
-                    vg = bdi.getBlockDevice().getVolumeGroup();
-                } else {
-                    vg = bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume();
-                }
-                items.add(getLVMCreateItem(hdi, vg));
+                items.add(getLVMCreateItem(hdi, bdi, null));
             }
         }
     }
@@ -186,42 +175,57 @@ public final class LVM_Create implements RemotePlugin {
     /** Adds menus to manage LVMs. */
     public void addLVMMenu(final MyMenu submenu,
                            final HostDrbdInfo hostDrbdInfo) {
-        Tools.invokeAndWait(new Runnable() {
-            @Override public void run() {
-                submenu.removeAll();
-            }
-        });
+        submenu.removeAll();
         submenu.add(getVGCreateItem(hostDrbdInfo, null));
         for (final String vg : hostDrbdInfo.getHost().getVolumeGroupNames()) {
-            submenu.add(getLVMCreateItem(hostDrbdInfo, vg));
+            submenu.add(getLVMCreateItem(hostDrbdInfo, null, vg));
         }
     }
 
     /** Return create LV menu item. */
     private MyMenuItem getLVMCreateItem(final HostDrbdInfo hostDrbdInfo,
+                                        final BlockDevInfo blockDevInfo,
                                         final String vg) {
-        return new LVMCreateItem(
-                              LV_CREATE_MENU_ITEM + vg,
+        String name;
+        if (vg == null) {
+            name = LV_CREATE_MENU_ITEM;
+            if (blockDevInfo != null) {
+                final String vgName =
+                                blockDevInfo.getBlockDevice().getVolumeGroup();
+                if (vgName != null) {
+                    name += vgName;
+                }
+            }
+        } else {
+            name = LV_CREATE_MENU_ITEM + vg;
+        }
+        final MyMenuItem mi = new LVMCreateItem(
+                              name,
                               null,
-                              LV_CREATE_MENU_ITEM + vg,
+                              LV_CREATE_DESCRIPTION,
                               new AccessMode(ConfigData.AccessType.OP, false),
                               new AccessMode(ConfigData.AccessType.OP, false),
                               hostDrbdInfo,
+                              blockDevInfo,
                               vg);
+        mi.setToolTipText(LV_CREATE_DESCRIPTION);
+        return mi;
     }
 
     /** Return create VG menu item. BlockDevInfo can be null, if nothing
      *  is preselected. */
     private MyMenuItem getVGCreateItem(final HostDrbdInfo hostDrbdInfo,
                                        final BlockDevInfo blockDevInfo) {
-        return new VGCreateItem(
-                              VG_CREATE_MENU_ITEM,
-                              null,
-                              VG_CREATE_MENU_ITEM,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              hostDrbdInfo,
-                              blockDevInfo);
+        final MyMenuItem mi = new VGCreateItem(
+                                VG_CREATE_MENU_ITEM,
+                                null,
+                                VG_CREATE_MENU_ITEM,
+                                new AccessMode(ConfigData.AccessType.OP, false),
+                                new AccessMode(ConfigData.AccessType.OP, false),
+                                hostDrbdInfo,
+                                blockDevInfo);
+        mi.setToolTipText(VG_CREATE_DESCRIPTION);
+        return mi;
     }
 
     /** Create VG menu item. (can't use anonymous classes). */
@@ -244,9 +248,9 @@ public final class LVM_Create implements RemotePlugin {
 
         public boolean visiblePredicate() {
             return selectedBlockDevInfo == null
-                   || (!selectedBlockDevInfo.getBlockDevice()
-                                .isVolumeGroupOnPhysicalVolume()
-                       && !selectedBlockDevInfo.isLVM());
+                   || (selectedBlockDevInfo.getBlockDevice().isPhysicalVolume()
+                       && !selectedBlockDevInfo.getBlockDevice()
+                                              .isVolumeGroupOnPhysicalVolume());
                                                                 
         }
 
@@ -274,6 +278,7 @@ public final class LVM_Create implements RemotePlugin {
     private final class LVMCreateItem extends MyMenuItem {
         private static final long serialVersionUID = 1L;
         private final HostDrbdInfo hostDrbdInfo;
+        private final BlockDevInfo blockDevInfo;
         final String volumeGroup;
 
         public LVMCreateItem(final String text,
@@ -282,14 +287,28 @@ public final class LVM_Create implements RemotePlugin {
                              final AccessMode enableAccessMode,
                              final AccessMode visibleAccessMode,
                              final HostDrbdInfo hostDrbdInfo,
+                             final BlockDevInfo blockDevInfo,
                              final String volumeGroup) {
             super(text, icon, shortDesc, enableAccessMode, visibleAccessMode);
             this.hostDrbdInfo = hostDrbdInfo;
+            this.blockDevInfo = blockDevInfo;
             this.volumeGroup = volumeGroup;
         }
 
+        private String getVolumeGroup() {
+            if (volumeGroup == null) {
+                return blockDevInfo.getBlockDevice()
+                                            .getVolumeGroupOnPhysicalVolume();
+            } else {
+                return volumeGroup;
+            }
+        }
+
         public boolean visiblePredicate() {
-            return volumeGroup != null && !"".equals(volumeGroup);
+            final String vg = getVolumeGroup();
+            return vg != null
+                   && !"".equals(vg)
+                   && hostDrbdInfo.getHost().getVolumeGroupNames().contains(vg);
         }
 
         public String enablePredicate() {
@@ -298,7 +317,7 @@ public final class LVM_Create implements RemotePlugin {
 
         @Override public void action() {
             final LVCreateDialog lvCreate = new LVCreateDialog(hostDrbdInfo,
-                                                               volumeGroup);
+                                                               getVolumeGroup());
             while (true) {
                 lvCreate.showDialog();
                 if (lvCreate.isPressedCancelButton()) {
@@ -308,6 +327,11 @@ public final class LVM_Create implements RemotePlugin {
                     break;
                 }
             }
+        }
+
+        @Override public void update() {
+            setText1(LV_CREATE_MENU_ITEM + getVolumeGroup());
+            super.update();
         }
     }
 
@@ -389,11 +413,21 @@ public final class LVM_Create implements RemotePlugin {
         protected void initDialogAfterVisible() {
             enableComponents();
             makeDefaultAndRequestFocusLater(vgNameCB);
+            makeDefaultButton(createButton);
         }
 
         /** Enables and disabled buttons. */
         protected final void checkButtons() {
-            SwingUtilities.invokeLater(new EnableCreateRunnable(true));
+            boolean enable = true;
+            for (final Host h : hostCheckBoxes.keySet()) {
+                if (hostCheckBoxes.get(h).isSelected()) {
+                    if (!hostHasPVS(h)) {
+                        enable = false;
+                        break;
+                    }
+                }
+            }
+            SwingUtilities.invokeLater(new EnableCreateRunnable(enable));
         }
 
         private class EnableCreateRunnable implements Runnable {
@@ -452,29 +486,39 @@ public final class LVM_Create implements RemotePlugin {
             return components;
         }
 
+        /** Returns true if the specified host has specified PVs without VGs. */
+        private boolean hostHasPVS(final Host host) {
+            final List<String> oPVS = host.getPhysicalVolumes();
+            final Set<String> pvs = pvCheckBoxes.keySet();
+            int selected = 0;
+            for (final String pv : pvs) {
+                if (!pvCheckBoxes.get(pv).isSelected()) {
+                    continue;
+                }
+                selected++;
+                if (!oPVS.contains(pv)) {
+                    return false;
+                }
+                final BlockDevInfo oBdi =
+                    host.getBrowser().getDrbdGraph().findBlockDevInfo(
+                                                                 host.getName(),
+                                                                 pv);
+                if (oBdi == null
+                    || !oBdi.getBlockDevice().isPhysicalVolume()
+                    || oBdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
+                    return false;
+                }
+            }
+            return selected > 0;
+        }
+
         /** Returns the input pane. */
         protected final JComponent getInputPane() {
             createButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
-            /* Volume groups. */
-            final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            String selectedPV = null;
-            if (selectedBlockDevInfo != null) {
-                selectedPV = selectedBlockDevInfo.getName();
-            }
-            pvCheckBoxes = getPVCheckBoxes(selectedPV);
-            pvsPane.add(new JLabel("Select physical volumes: "));
-            for (final String pvName : pvCheckBoxes.keySet()) {
-                pvCheckBoxes.get(pvName).addItemListener(
-                                                new ItemChangeListener(true));
-                pvsPane.add(pvCheckBoxes.get(pvName));
-            }
-            final JScrollPane pvSP = new JScrollPane(pvsPane);
-            pvSP.setPreferredSize(new Dimension(0, 45));
-            pane.add(pvSP);
-
             /* vg name */
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
 
             /* find next free group volume name */
             String defaultName;
@@ -503,11 +547,28 @@ public final class LVM_Create implements RemotePlugin {
 
             createButton.addActionListener(new CreateActionListener());
             inputPane.add(createButton);
-            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
+            /* Volume groups. */
+            final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            String selectedPV = null;
+            if (selectedBlockDevInfo != null) {
+                selectedPV = selectedBlockDevInfo.getName();
+            }
+            pvCheckBoxes = getPVCheckBoxes(selectedPV);
+            pvsPane.add(new JLabel("Select physical volumes: "));
+            for (final String pvName : pvCheckBoxes.keySet()) {
+                pvCheckBoxes.get(pvName).addItemListener(
+                                                new ItemChangeListener(true));
+                pvsPane.add(pvCheckBoxes.get(pvName));
+            }
+            final JScrollPane pvSP = new JScrollPane(pvsPane);
+            pvSP.setPreferredSize(new Dimension(0, 45));
+            pane.add(pvSP);
+
             final JPanel hostsPane = new JPanel(
                                             new FlowLayout(FlowLayout.LEFT));
             final Cluster cluster = hostDrbdInfo.getHost().getCluster();
@@ -519,11 +580,11 @@ public final class LVM_Create implements RemotePlugin {
                 if (hostDrbdInfo.getHost() == h) {
                     hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(true);
-                } else if (!h.getVolumeGroupNames().contains(defaultName)) {
-                    hostCheckBoxes.get(h).setEnabled(false);
+                } else if (hostHasPVS(h)) {
+                    hostCheckBoxes.get(h).setEnabled(true);
                     hostCheckBoxes.get(h).setSelected(false);
                 } else {
-                    hostCheckBoxes.get(h).setEnabled(true);
+                    hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(false);
                 }
                 hostsPane.add(hostCheckBoxes.get(h));
@@ -533,9 +594,9 @@ public final class LVM_Create implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 5, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 5, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -595,6 +656,7 @@ public final class LVM_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                disableComponents();
                 getProgressBar().start(CREATE_TIMEOUT
                                        * hostCheckBoxes.size());
                 boolean oneFailed = false;
@@ -614,11 +676,10 @@ public final class LVM_Create implements RemotePlugin {
                             
                     }
                 }
+                enableComponents();
                 if (oneFailed) {
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                     setComboBoxes();
                     checkButtons();
@@ -627,9 +688,7 @@ public final class LVM_Create implements RemotePlugin {
                     progressBarDone();
                     disposeDialog();
                     for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                        }
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
                     }
                 }
             }
@@ -639,6 +698,16 @@ public final class LVM_Create implements RemotePlugin {
         private boolean vgCreate(final Host host,
                                  final String vgName,
                                  final List<String> pvNames) {
+            for (final String pv : pvNames) {
+                final BlockDevInfo bdi =
+                    host.getBrowser().getDrbdGraph().findBlockDevInfo(
+                                                                 host.getName(),
+                                                                 pv);
+                if (bdi != null) {
+                    bdi.getBlockDevice().setVolumeGroupOnPhysicalVolume(vgName);
+                    bdi.getBrowser().getDrbdGraph().startAnimation(bdi);
+                }
+            }
             final boolean ret = LVM.vgCreate(host, vgName, pvNames, false);
             if (ret) {
                 answerPaneAddText("Volume group "
@@ -706,6 +775,7 @@ public final class LVM_Create implements RemotePlugin {
         protected void initDialogAfterVisible() {
             enableComponents();
             makeDefaultAndRequestFocusLater(sizeCB);
+            makeDefaultButton(createButton);
         }
 
         /** Enables and disabled buttons. */
@@ -770,38 +840,13 @@ public final class LVM_Create implements RemotePlugin {
             maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
         }
 
-        ///** Returns array of volume group checkboxes. */
-        //private Map<String, JCheckBox> getVGCheckBoxes() {
-        //    final Map<String, JCheckBox> components =
-        //                                  new LinkedHashMap<String, JCheckBox>();
-        //    for (final String vgName
-        //                     : hostDrbdInfo.getHost().getVolumeGroupNames()) {
-        //        final JCheckBox button = new JCheckBox(vgName);
-        //        button.setBackground(
-        //               Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        //        components.put(vgName, button);
-        //    }
-        //    return components;
-        //}
-
         /** Returns the input pane. */
         protected final JComponent getInputPane() {
             createButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
-            ///* Volume groups. */
-            //final JPanel vgsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            //vgCheckBoxes = getVGCheckBoxes();
-            //vgsPane.add(new JLabel("Select volume groups: "));
-            //for (final String vgName : vgCheckBoxes.keySet()) {
-            //    vgCheckBoxes.get(vgName).addItemListener(
-            //                                    new ItemChangeListener(true));
-            //    vgsPane.add(vgCheckBoxes.get(vgName));
-            //}
-            //final JScrollPane vgSP = new JScrollPane(vgsPane);
-            //vgSP.setPreferredSize(new Dimension(0, 45));
-            //pane.add(vgSP);
             /* name, size etc. */
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
 
             inputPane.add(new JLabel("Group"));
             inputPane.add(new JLabel(volumeGroup));
@@ -872,9 +917,9 @@ public final class LVM_Create implements RemotePlugin {
             sizeCB.addListeners(new ItemChangeListener(false), 
                                 new SizeDocumentListener());
 
-            SpringUtilities.makeCompactGrid(inputPane, 4, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
             final JPanel hostsPane = new JPanel(
@@ -903,9 +948,9 @@ public final class LVM_Create implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -965,6 +1010,7 @@ public final class LVM_Create implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableCreateRunnable(false));
+                disableComponents();
                 getProgressBar().start(CREATE_TIMEOUT
                                        * hostCheckBoxes.size());
                 boolean oneFailed = false;
@@ -979,13 +1025,12 @@ public final class LVM_Create implements RemotePlugin {
                     }
                 }
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    if (hostCheckBoxes.get(h).isSelected()) {
-                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                    }
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
                 }
                 final String maxBlockSize = getMaxBlockSize();
                 final long maxSize = Long.parseLong(maxBlockSize);
                 maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
+                enableComponents();
                 if (oneFailed) {
                     progressBarDoneError();
                 } else {
@@ -1036,7 +1081,6 @@ public final class LVM_Create implements RemotePlugin {
     /** Return unit objects. */
     private Unit[] getUnits() {
         return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),
                    new Unit("M", "M", "MiByte", "MiBytes"),
                    new Unit("G",  "G",  "GiByte",      "GiBytes"),

@@ -256,7 +256,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Updates the menu item, checking the predicate and enablePredicate. */
-    @Override public final void update() {
+    @Override public void update() {
         if (predicate()) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
@@ -449,5 +449,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }
+    }
+
+    /** Set text1. */
+    public final void setText1(final String text1) {
+        this.text1 = text1;
+    }
+
+    /** Set text2. */
+    public final void setText2(final String text2) {
+        this.text2 = text2;
     }
 }

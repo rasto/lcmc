@@ -38,10 +38,12 @@ import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.resources.BlockDevice;
 import drbd.gui.dialog.WizardDialog;
+import drbd.gui.Browser;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -233,6 +235,7 @@ public final class VG_Remove implements RemotePlugin {
         /** Inits the dialog after it becomes visible. */
         protected void initDialogAfterVisible() {
             enableComponents();
+            makeDefaultAndRequestFocus(removeButton);
         }
 
         /** Enables and disabled buttons. */
@@ -260,10 +263,22 @@ public final class VG_Remove implements RemotePlugin {
         protected final JComponent getInputPane() {
             removeButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
-            final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            bdPane.add(new JLabel("Block Devices: "));
+            final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
+
+            inputPane.add(new JLabel("Volume Group: "));
             final String vgName = blockDevInfo.getBlockDevice()
                                             .getVolumeGroupOnPhysicalVolume();
+            inputPane.add(new JLabel(vgName));
+            removeButton.addActionListener(new RemoveActionListener());
+            inputPane.add(removeButton);
+            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
+
+            pane.add(inputPane);
+            final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            bdPane.add(new JLabel("Block Devices: "));
             final List<String> bds = new ArrayList<String>();
             for (final BlockDevice bd
                                 : blockDevInfo.getHost().getBlockDevices()) {
@@ -283,15 +298,11 @@ public final class VG_Remove implements RemotePlugin {
             for (final Host h : hostCheckBoxes.keySet()) {
                 hostCheckBoxes.get(h).addItemListener(
                                                 new ItemChangeListener(true));
-                final BlockDevInfo oBdi =
-                    blockDevInfo.getBrowser().getDrbdGraph().findBlockDevInfo(
-                                                      h.getName(),
-                                                      blockDevInfo.getName());
+                final Set<String> vgs = h.getVolumeGroupNames();
                 if (blockDevInfo.getHost() == h) {
                     hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(true);
-                } else if (oBdi == null
-                           || !oBdi.getBlockDevice().isPhysicalVolume()) {
+                } else if (!vgs.contains(vgName)) {
                     hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(false);
                 } else {
@@ -304,22 +315,11 @@ public final class VG_Remove implements RemotePlugin {
                                                                    hostsPane);
             sp.setPreferredSize(new java.awt.Dimension(0, 45));
             pane.add(sp);
-            final JPanel inputPane = new JPanel(new SpringLayout());
-
-            inputPane.add(new JLabel("Volume Group:"));
-            inputPane.add(new JLabel(vgName));
-            removeButton.addActionListener(new RemoveActionListener());
-            inputPane.add(removeButton);
-            SpringUtilities.makeCompactGrid(inputPane, 1, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
-
-            pane.add(inputPane);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 5, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 5, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -342,6 +342,7 @@ public final class VG_Remove implements RemotePlugin {
 
             @Override public void run() {
                 Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                disableComponents();
                 getProgressBar().start(REMOVE_TIMEOUT
                                        * hostCheckBoxes.size());
                 final String vgName = blockDevInfo.getBlockDevice()
@@ -356,10 +357,9 @@ public final class VG_Remove implements RemotePlugin {
                     }
                 }
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    if (hostCheckBoxes.get(h).isSelected()) {
-                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
-                    }
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
                 }
+                enableComponents();
                 if (oneFailed) {
                     checkButtons();
                     progressBarDoneError();

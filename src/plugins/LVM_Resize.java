@@ -42,6 +42,7 @@ import drbd.data.Cluster;
 import drbd.data.resources.BlockDevice;
 import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
+import drbd.gui.Browser;
 
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,7 @@ public final class LVM_Resize implements RemotePlugin {
     /** Name of the LVM menu item. */
     private static final String LVM_MENU_ITEM = "LVM";
     /** Name of the resize menu item. */
-    private static final String LV_RESIZE_MENU_ITEM = "LV Resize";
+    private static final String LV_RESIZE_MENU_ITEM = "Resize LV";
     /** Description LVM resize. */
     private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not"
@@ -237,6 +238,12 @@ public final class LVM_Resize implements RemotePlugin {
             return DESCRIPTION;
         }
 
+        /** Close button. */
+        public final String cancelButton() {
+            return "Close";
+        }
+
+
         /** Inits the dialog. */
         protected final void initDialog() {
             super.initDialog();
@@ -345,6 +352,7 @@ public final class LVM_Resize implements RemotePlugin {
             resizeButton.setEnabled(false);
             final JPanel pane = new JPanel(new SpringLayout());
             final JPanel inputPane = new JPanel(new SpringLayout());
+            inputPane.setBackground(Browser.STATUS_BACKGROUND);
             /* old size */
             final JLabel oldSizeLabel = new JLabel("Current Size");
             oldSizeLabel.setEnabled(false);
@@ -404,9 +412,9 @@ public final class LVM_Resize implements RemotePlugin {
             sizeCB.addListeners(new ItemChangeListener(false), 
                                 new SizeDocumentListener());
 
-            SpringUtilities.makeCompactGrid(inputPane, 3, 3,  // rows, cols
-                                                       1, 1,  // initX, initY
-                                                       1, 1); // xPad, yPad
+            SpringUtilities.makeCompactGrid(inputPane, 3, 3,  /* rows, cols */
+                                                       1, 1,  /* initX, initY */
+                                                       1, 1); /* xPad, yPad */
 
             pane.add(inputPane);
             final JPanel hostsPane = new JPanel(
@@ -444,9 +452,9 @@ public final class LVM_Resize implements RemotePlugin {
             pane.add(sp);
             pane.add(getProgressBarPane(null));
             pane.add(getAnswerPane(""));
-            SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
-                                                  0, 0,  // initX, initY
-                                                  0, 0); // xPad, yPad
+            SpringUtilities.makeCompactGrid(pane, 4, 1,  /* rows, cols */
+                                                  0, 0,  /* initX, initY */
+                                                  0, 0); /* xPad, yPad */
             checkButtons();
             return pane;
         }
@@ -506,14 +514,26 @@ public final class LVM_Resize implements RemotePlugin {
 
             @Override public void run() {
                 if (checkDRBD()) {
-                    SwingUtilities.invokeLater(new EnableResizeRunnable(false));
-                    resize(sizeCB.getStringValue());
+                    Tools.invokeAndWait(new EnableResizeRunnable(false));
+                    disableComponents();
+                    getProgressBar().start(RESIZE_TIMEOUT
+                                           * hostCheckBoxes.size());
+                    final boolean ret = resize(sizeCB.getStringValue());
+                    final Host host = blockDevInfo.getHost();
+                    host.getBrowser().getClusterBrowser().updateHWInfo(host);
+                    setComboBoxes();
+                    if (ret) {
+                        progressBarDone();
+                    } else {
+                        progressBarDoneError();
+                    }
+                    enableComponents();
                 }
             }
         }
 
         /** LVM Resize and DRBD Resize. */
-        private void resize(final String size) {
+        private boolean resize(final String size) {
             final boolean ret = LVM.resize(
                                        blockDevInfo.getHost(),
                                        blockDevInfo.getBlockDevice().getName(),
@@ -580,9 +600,7 @@ public final class LVM_Resize implements RemotePlugin {
                                        + blockDevInfo.getHost()
                                        + " failed.");
             }
-            final Host host = blockDevInfo.getHost();
-            host.getBrowser().getClusterBrowser().updateHWInfo(host);
-            setComboBoxes();
+            return ret;
         }
 
         /** Returns maximum block size available in the group. */
@@ -633,7 +651,6 @@ public final class LVM_Resize implements RemotePlugin {
     /** Return unit objects. */
     private Unit[] getUnits() {
         return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),
                    new Unit("M", "M", "MiByte", "MiBytes"),
                    new Unit("G",  "G",  "GiByte",      "GiBytes"),

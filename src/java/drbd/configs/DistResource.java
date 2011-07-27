@@ -429,10 +429,10 @@ public final class DistResource extends java.util.ListResourceBundle {
          "true"},
 
         {"LVM.pvcreate",
-         SUDO + "pvcreate -f @DEVICE@"},
+         SUDO + "pvcreate @DEVICE@"},
 
         {"LVM.pvremove",
-         SUDO + "pvremove -f @DEVICE@"},
+         SUDO + "pvremove @DEVICE@"},
 
         {"LVM.vgcreate",
          SUDO + "vgcreate @VGNAME@ @PVNAMES@"},
@@ -444,7 +444,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "lvcreate -n@LVNAME@ -L@SIZE@ @VGNAME@"},
 
         {"LVM.vgremove",
-         SUDO + "vgremove -f @VGNAME@"},
+         SUDO + "vgremove @VGNAME@"},
 
         {"LVM.lvremove",
          SUDO + "lvremove -f @DEVICE@"},

@@ -2481,8 +2481,12 @@ public final class Host {
     }
 
     /** Returns how much is free space in a volume group. */
-    public Long getFreeInVolumeGroup(final String volumeGroup) {
-        return volumeGroups.get(volumeGroup);
+    public long getFreeInVolumeGroup(final String volumeGroup) {
+        Long f = volumeGroups.get(volumeGroup);
+        if (f == null) {
+            return 0;
+        }
+        return f;
     }
 
     /** Returns all volume groups. */
@@ -2545,7 +2549,10 @@ public final class Host {
     public Set<String> getAllLogicalVolumes() {
         final Set<String> allLVS = new LinkedHashSet<String>();
         for (final String vg : volumeGroups.keySet()) {
-            allLVS.addAll(volumeGroupsLVS.get(vg));
+            final Set<String> lvs = volumeGroupsLVS.get(vg);
+            if (lvs != null) {
+                allLVS.addAll(lvs);
+            }
         }
         return allLVS;
     }
