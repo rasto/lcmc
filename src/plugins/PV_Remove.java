@@ -289,7 +289,8 @@ public final class PV_Remove implements RemotePlugin {
                     hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(true);
                 } else if (oBdi == null
-                           || !oBdi.getBlockDevice().isPhysicalVolume()) {
+                           || !oBdi.getBlockDevice().isPhysicalVolume()
+                     || oBdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
                     hostCheckBoxes.get(h).setEnabled(false);
                     hostCheckBoxes.get(h).setSelected(false);
                 } else {
