@@ -539,7 +539,13 @@ public final class SSH {
             } catch (IOException e) {
                 exitCode = ERROR_EXIT_CODE;
             }
-            return new SSHOutput(res.toString(), exitCode);
+            final String outputString = res.toString();
+            Tools.debug(this, "output" + exitCode + ": "
+                              + host.getName()
+                              + ": "
+                              + outputString,
+                              3);
+            return new SSHOutput(outputString, exitCode);
         }
 
         /** Cancel the session. */
