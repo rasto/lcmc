@@ -118,6 +118,8 @@ public final class DrbdMC extends JPanel {
     private static final String KNOWN_HOSTS_OP = "known-hosts";
     /** The --out option. */
     private static final String OUT_OP = "out";
+    /** The --debug option. */
+    private static final String DEBUG_OP = "debug";
 
     /**
      * Private constructor.
@@ -368,6 +370,11 @@ public final class DrbdMC extends JPanel {
                      OUT_OP,
                      true,
                      "where to redirect the standard out");
+        options.addOption(
+                     null,
+                     DEBUG_OP,
+                     true,
+                     "debug level, 0 - none, 3 - all");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -381,6 +388,15 @@ public final class DrbdMC extends JPanel {
                     } catch (final FileNotFoundException e) {
                         System.exit(2);
                     }
+                }
+            }
+            if (cmd.hasOption(DEBUG_OP)) {
+                final String level = cmd.getOptionValue(DEBUG_OP);
+                if (level != null && Tools.isNumber(level)) {
+                    Tools.setDebugLevel(Integer.parseInt(level));
+                } else {
+                    throw new ParseException(
+                                        "cannot parse debug level: " + level);
                 }
             }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
