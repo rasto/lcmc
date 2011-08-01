@@ -1025,6 +1025,61 @@ public final class BlockDevInfo extends EditableInfo {
         };
     }
 
+    /** Returns 'lv create' menu item. */
+    private MyMenuItem getLVCreateItem() {
+        final HostDrbdInfo hdi = getHost().getBrowser().getHostDrbdInfo();
+        String name = LV_CREATE_MENU_ITEM;
+        final String vgName = getBlockDevice().getVolumeGroup();
+        if (vgName != null) {
+            name += vgName;
+        }
+
+        final MyMenuItem mi = new MyMenuItem(
+                           name,
+                           null,
+                           LV_CREATE_DESCRIPTION,
+                           new AccessMode(ConfigData.AccessType.OP, false),
+                           new AccessMode(ConfigData.AccessType.OP, false)) {
+            private String getVolumeGroup() {
+                return getBlockDevice().getVolumeGroupOnPhysicalVolume();
+            }
+
+            public boolean visiblePredicate() {
+                final String vg = getVolumeGroup();
+                return vg != null
+                       && !"".equals(vg)
+                       && hostDrbdInfo.getHost().getVolumeGroupNames().contains(
+                                                                            vg);
+            }
+
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                //final LVCreateDialog lvCreate = new LVCreateDialog(
+                //                                           hostDrbdInfo,
+                //                                           getVolumeGroup());
+                //while (true) {
+                //    lvCreate.showDialog();
+                //    if (lvCreate.isPressedCancelButton()) {
+                //        lvCreate.cancelDialog();
+                //        return;
+                //    } else if (lvCreate.isPressedFinishButton()) {
+                //        break;
+                //    }
+                //}
+            }
+
+            @Override public void update() {
+                setText1(LV_CREATE_MENU_ITEM + getVolumeGroup());
+                super.update();
+            }
+        };
+        mi.setToolTipText(LV_CREATE_DESCRIPTION);
+        return mi;
+    }
+
     /** Creates popup for the block device. */
     @Override public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -1131,6 +1186,8 @@ public final class BlockDevInfo extends EditableInfo {
             }
         };
         items.add(repMenuItem);
+        /* LV Create */
+        items.add(getLVCreateItem());
         /* attach / detach */
         final MyMenuItem attachMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),

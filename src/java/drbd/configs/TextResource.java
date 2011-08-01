@@ -42,12 +42,6 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"MainMenu.Session",
          "Session"},
 
-        {"MainMenu.Plugins",
-         "Plugins"},
-
-        {"MainMenu.RegisterPlugins",
-         "Register"},
-
         {"MainMenu.New",
          "New"},
 
@@ -444,23 +438,6 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"Dialog.Host.LinbitLogin.Save",
          "Save"},
-
-        {"Dialog.PluginLogin.Title",
-         "Plugin Registration"},
-
-        {"Dialog.PluginLogin.Description",
-         "Please provide an username and password, that activates the plugins."},
-
-        {"Dialog.PluginLogin.EnterUser",
-         "Username"},
-
-        {"Dialog.PluginLogin.EnterPassword",
-         "Password"},
-
-        {"Dialog.PluginLogin.Save",
-         "Save"},
-        {"Dialog.PluginLogin.FinishButton",
-         "Register"},
 
         {"Dialog.Host.DrbdAvailFiles.Title",
          "Available DRBD Packages"},

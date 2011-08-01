@@ -94,17 +94,6 @@ public final class LVM_Create implements RemotePlugin {
     public LVM_Create() {
     }
 
-    /** Inits the plugin. */
-    @Override public void init() {
-        for (final Cluster cluster
-                        : Tools.getConfigData().getClusters().getClusterSet()) {
-            final Host[] hosts = cluster.getHostsArray();
-            for (final Host host : hosts) {
-                registerInfo(host.getBrowser().getHostDrbdInfo());
-            }
-        }
-    }
-
     /** Adds the menu items to the specified info object. */
     private void registerInfo(final Info info) {
         final JMenu menu = info.getMenu();
@@ -339,33 +328,6 @@ public final class LVM_Create implements RemotePlugin {
     @Override public void showDescription() {
         final Description description = new Description();
         description.showDialog();
-    }
-
-    /** Description dialog. */
-    private final class Description extends ConfigDialog {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
-
-        public Description() {
-            super();
-        }
-
-        protected void initDialogAfterVisible() {
-            enableComponents();
-        }
-
-        protected String getDialogTitle() {
-            return "LVM Create " + Tools.getRelease();
-        }
-
-        protected String getDescription() {
-            return "You can now use LVM menu items in the "
-                   + "\"Storage (DRBD)\" view.<br><br>";
-        }
-
-        protected JComponent getInputPane() {
-            return null;
-        }
     }
 
     /** Create VG dialog. */

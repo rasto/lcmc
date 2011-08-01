@@ -523,7 +523,6 @@ public class Info implements Comparable {
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
-                Tools.addPluginMenuItems(this, items);
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
@@ -559,7 +558,6 @@ public class Info implements Comparable {
         if (popup == null) {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
-                Tools.addPluginMenuItems(this, items);
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
@@ -676,7 +674,6 @@ public class Info implements Comparable {
                     menu.setIcon(Browser.ACTIONS_ICON);
                     menu.setBackground(Browser.STATUS_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
-                    Tools.addPluginMenuItems(thisObject, items);
                     mActionMenuListLock.lock();
                     actionMenuList = items;
                     mActionMenuListLock.unlock();
@@ -1163,51 +1160,6 @@ public class Info implements Comparable {
             return ((MyButton) object).getText();
         }
         return object.toString();
-    }
-
-    /** Adds plugin menu item. */
-    public final void addPluginMenuItem(final UpdatableItem pluginItem) {
-        /* check if it is already there */
-        mMenuListLock.lock();
-        for (final UpdatableItem menuItem : menuList) {
-            if (menuItem.toString().equals(pluginItem.toString())) {
-                mMenuListLock.unlock();
-                return;
-            }
-        }
-        menuList.add(pluginItem);
-        mMenuListLock.unlock();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
-                menu.add((JMenuItem) pluginItem);
-            }
-        });
-    }
-
-    /** Adds plugin action menu item. */
-    public final void addPluginActionMenuItem(final UpdatableItem pluginItem) {
-        /* check if it is already there */
-        mActionMenuListLock.lock();
-        if (actionMenuList == null) {
-            mActionMenuListLock.unlock();
-            return;
-        }
-        for (final UpdatableItem actionMenuItem : actionMenuList) {
-            if (actionMenuItem.toString().equals(pluginItem.toString())) {
-                mActionMenuListLock.unlock();
-                return;
-            }
-        }
-        actionMenuList.add(pluginItem);
-        mActionMenuListLock.unlock();
-        final JPopupMenu pm = popup;
-        if (pm != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    pm.add((JMenuItem) pluginItem);
-                }
-            });
-        }
     }
 
     /** Remove node in tree menu. Call it from swing thread. */

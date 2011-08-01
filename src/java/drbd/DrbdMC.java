@@ -88,7 +88,7 @@ public final class DrbdMC extends JPanel {
     private static final String OP_MODE_OP = "op-mode";
     /** The --no-upgrade-check option. */
     private static final String NO_UPGRADE_CHECK_OP = "no-upgrade-check";
-    /** The --no-plugin-check option. */
+    /** The --no-plugin-check option. DEPRECATED, doesn't do anything */
     private static final String NO_PLUGIN_CHECK_OP = "no-plugin-check";
     /** The --tightvnc option. */
     private static final String TIGHTVNC_OP = "tightvnc";
@@ -320,10 +320,11 @@ public final class DrbdMC extends JPanel {
                           NO_UPGRADE_CHECK_OP,
                           false,
                           "disable upgrade check");
-        options.addOption(null,
-                          NO_PLUGIN_CHECK_OP,
-                          false,
-                          "disable plugin check");
+        options.addOption(
+                      null,
+                      NO_PLUGIN_CHECK_OP,
+                      false,
+                      "disable plugin check, DEPRECATED: there are no plugins");
         options.addOption(null, TIGHTVNC_OP, false, "enable tight vnc viewer");
         options.addOption(null, ULTRAVNC_OP, false, "enable ultra vnc viewer");
         options.addOption(null, REALVNC_OP, false, "enable real vnc viewer");
@@ -418,8 +419,6 @@ public final class DrbdMC extends JPanel {
 
             Tools.getConfigData().setUpgradeCheckEnabled(
                                           !cmd.hasOption(NO_UPGRADE_CHECK_OP));
-            Tools.getConfigData().setPluginsEnabled(
-                                           !cmd.hasOption(NO_PLUGIN_CHECK_OP));
             Tools.getConfigData().setBigDRBDConf(
                                                 cmd.hasOption(BIGDRBDCONF_OP));
             Tools.getConfigData().setStagingDrbd(

@@ -95,9 +95,6 @@ public final class ClustersPanel extends JPanel {
         if (Tools.getConfigData().isUpgradeCheckEnabled()) {
             startUpgradeCheck();
         }
-        if (Tools.getConfigData().arePluginsEnabled()) {
-            loadPlugins();
-        }
         setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
         showGUI();
     }
@@ -307,16 +304,6 @@ public final class ClustersPanel extends JPanel {
                         }
                     }
                 });
-            }
-        });
-        thread.start();
-    }
-
-    /** Load plugins. */
-    private void loadPlugins() {
-        final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
-                Tools.loadPlugins();
             }
         });
         thread.start();
