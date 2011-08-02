@@ -220,10 +220,11 @@ public abstract class ConfigDialog {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         final JEditorPane descPane = new JEditorPane(
-                       Tools.MIME_TYPE_TEXT_HTML,
-                       "<span style='font-family:Dialog; font-size:8;'>"
-                       + "<h3>" + getDialogTitle() + "</h3>" 
-                       + getDescription() + "</span>");
+           Tools.MIME_TYPE_TEXT_HTML,
+           "<span style='font:bold italic;font-family:Dialog; font-size:14;'>"
+           + getDialogTitle() + "</span><br>"
+           + "<span style='font-family:Dialog; font-size:12;'>"
+           + getDescription() + "</span>");
         descPane.setSize(300, Integer.MAX_VALUE);
 
         descPane.setBackground(
