@@ -27,6 +27,16 @@ import drbd.gui.Browser;
 import drbd.gui.HostBrowser;
 import drbd.gui.ClusterBrowser;
 import drbd.gui.DrbdGraph;
+
+import drbd.gui.dialog.lvm.PVCreate;
+import drbd.gui.dialog.lvm.PVRemove;
+import drbd.gui.dialog.lvm.VGCreate;
+import drbd.gui.dialog.lvm.VGRemove;
+import drbd.gui.dialog.lvm.LVCreate;
+import drbd.gui.dialog.lvm.LVResize;
+import drbd.gui.dialog.lvm.LVSnapshot;
+
+
 import drbd.data.ConfigData;
 import drbd.utilities.MyMenu;
 import drbd.utilities.MyMenuItem;
@@ -118,6 +128,46 @@ public final class BlockDevInfo extends EditableInfo {
                                                 "it is not a drbd resource";
     /** Allow two primaries paramater. */
     private static final String ALLOW_TWO_PRIMARIES = "allow-two-primaries";
+    /** Name of the create PV menu item. */
+    private static final String PV_CREATE_MENU_ITEM = "Create PV";
+    /** Description. */
+    private static final String PV_CREATE_MENU_DESCRIPTION =
+                             "Initialize a disk or partition for use by LVM.";
+    /** Name of the remove PV menu item. */
+    private static final String PV_REMOVE_MENU_ITEM = "Remove PV";
+    /** Description. */
+    private static final String PV_REMOVE_MENU_DESCRIPTION =
+                                                    "Remove a physical volume.";
+    /** Name of the create VG menu item. */
+    private static final String VG_CREATE_MENU_ITEM = "Create VG";
+    /** Description create VG. */
+    private static final String VG_CREATE_MENU_DESCRIPTION =
+                                                    "Create a volume group.";
+    /** Name of the remove VG menu item. */
+    private static final String VG_REMOVE_MENU_ITEM = "Remove VG";
+    /** Description. */
+    private static final String VG_REMOVE_MENU_DESCRIPTION =
+                                                      "Remove a volume group.";
+    /** Name of the create menu item. */
+    private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
+    /** Description create LV. */
+    private static final String LV_CREATE_MENU_DESCRIPTION =
+                                                    "Create a logical volume.";
+    /** Name of the LV remove menu item. */
+    private static final String LV_REMOVE_MENU_ITEM = "Remove LV";
+    /** Description for LV remove. */
+    private static final String LV_REMOVE_MENU_DESCRIPTION =
+                                                    "Remove the logical volume";
+    /** Name of the resize menu item. */
+    private static final String LV_RESIZE_MENU_ITEM = "Resize LV";
+    /** Description LVM resize. */
+    private static final String LV_RESIZE_MENU_DESCRIPTION =
+                                                    "Resize the logical volume";
+    /** Name of the snapshot menu item. */
+    private static final String LV_SNAPSHOT_MENU_ITEM = "Create LV Snapshot ";
+    /** Description LV snapshot. */
+    private static final String LV_SNAPSHOT_MENU_DESCRIPTION =
+                                    "Create a snapshot of the logical volume.";
 
     /**
      * Prepares a new <code>BlockDevInfo</code> object.
@@ -1025,9 +1075,149 @@ public final class BlockDevInfo extends EditableInfo {
         };
     }
 
+    /** Returns 'PV create' menu item. */
+    private MyMenuItem getPVCreateItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(PV_CREATE_MENU_ITEM,
+                              null,
+                              PV_CREATE_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override public boolean visiblePredicate() {
+                return !isLVM()
+                       && !getBlockDevice().isPhysicalVolume();
+            }
+
+            @Override public String enablePredicate() {
+                if (getBlockDevice().isDrbd()) {
+                    return "DRBD is on it";
+                }
+                return null;
+            }
+
+            @Override public void action() {
+                final PVCreate pvCreate = new PVCreate(thisBDI);
+                while (true) {
+                    pvCreate.showDialog();
+                    if (pvCreate.isPressedCancelButton()) {
+                        pvCreate.cancelDialog();
+                        return;
+                    } else if (pvCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /** Returns 'PV remove' menu item. */
+    private MyMenuItem getPVRemoveItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(PV_REMOVE_MENU_ITEM,
+                              null,
+                              PV_REMOVE_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override public boolean visiblePredicate() {
+                return getBlockDevice().isPhysicalVolume()
+                       && !getBlockDevice().isVolumeGroupOnPhysicalVolume();
+            }
+
+            @Override public String enablePredicate() {
+                if (getBlockDevice().isDrbd()) {
+                    return "DRBD is on it";
+                }
+                return null;
+            }
+
+            @Override public void action() {
+                final PVRemove pvRemove = new PVRemove(thisBDI);
+                while (true) {
+                    pvRemove.showDialog();
+                    if (pvRemove.isPressedCancelButton()) {
+                        pvRemove.cancelDialog();
+                        return;
+                    } else if (pvRemove.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /** Returns 'lv create' menu item. */
+    private MyMenuItem getVGCreateItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(
+                          VG_CREATE_MENU_ITEM,
+                          null,
+                          VG_CREATE_MENU_DESCRIPTION,
+                          new AccessMode(ConfigData.AccessType.OP, false),
+                          new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+            public boolean visiblePredicate() {
+                return getBlockDevice().isPhysicalVolume()
+                       && getBlockDevice().isVolumeGroupOnPhysicalVolume();
+                                                                    
+            }
+
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final VGCreate vgCreate = new VGCreate(getHost(), thisBDI);
+                while (true) {
+                    vgCreate.showDialog();
+                    if (vgCreate.isPressedCancelButton()) {
+                        vgCreate.cancelDialog();
+                        return;
+                    } else if (vgCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /** Returns 'VG remove' menu item. */
+    private MyMenuItem getVGRemoveItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(VG_REMOVE_MENU_ITEM,
+                              null,
+                              VG_REMOVE_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+            @Override public boolean visiblePredicate() {
+                return getBlockDevice().isVolumeGroupOnPhysicalVolume();
+            }
+
+            @Override public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final VGRemove vgRemove = new VGRemove(thisBDI);
+                while (true) {
+                    vgRemove.showDialog();
+                    if (vgRemove.isPressedCancelButton()) {
+                        vgRemove.cancelDialog();
+                        return;
+                    } else if (vgRemove.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
     /** Returns 'lv create' menu item. */
     private MyMenuItem getLVCreateItem() {
-        final HostDrbdInfo hdi = getHost().getBrowser().getHostDrbdInfo();
         String name = LV_CREATE_MENU_ITEM;
         final String vgName = getBlockDevice().getVolumeGroup();
         if (vgName != null) {
@@ -1037,38 +1227,37 @@ public final class BlockDevInfo extends EditableInfo {
         final MyMenuItem mi = new MyMenuItem(
                            name,
                            null,
-                           LV_CREATE_DESCRIPTION,
+                           LV_CREATE_MENU_DESCRIPTION,
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
             private String getVolumeGroup() {
                 return getBlockDevice().getVolumeGroupOnPhysicalVolume();
             }
 
-            public boolean visiblePredicate() {
+            @Override public boolean visiblePredicate() {
                 final String vg = getVolumeGroup();
                 return vg != null
                        && !"".equals(vg)
-                       && hostDrbdInfo.getHost().getVolumeGroupNames().contains(
-                                                                            vg);
+                       && getHost().getVolumeGroupNames().contains(vg);
             }
 
-            public String enablePredicate() {
+            @Override public String enablePredicate() {
                 return null;
             }
 
             @Override public void action() {
-                //final LVCreateDialog lvCreate = new LVCreateDialog(
-                //                                           hostDrbdInfo,
-                //                                           getVolumeGroup());
-                //while (true) {
-                //    lvCreate.showDialog();
-                //    if (lvCreate.isPressedCancelButton()) {
-                //        lvCreate.cancelDialog();
-                //        return;
-                //    } else if (lvCreate.isPressedFinishButton()) {
-                //        break;
-                //    }
-                //}
+                final LVCreate lvCreate = new LVCreate(getHost(),
+                                                       getVolumeGroup());
+                while (true) {
+                    lvCreate.showDialog();
+                    if (lvCreate.isPressedCancelButton()) {
+                        lvCreate.cancelDialog();
+                        return;
+                    } else if (lvCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
             }
 
             @Override public void update() {
@@ -1076,8 +1265,111 @@ public final class BlockDevInfo extends EditableInfo {
                 super.update();
             }
         };
-        mi.setToolTipText(LV_CREATE_DESCRIPTION);
+        mi.setToolTipText(LV_CREATE_MENU_DESCRIPTION);
         return mi;
+    }
+
+    /** Returns 'LV remove' menu item. */
+    private MyMenuItem getLVRemoveItem() {
+        return new MyMenuItem(LV_REMOVE_MENU_ITEM,
+                              null,
+                              LV_REMOVE_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override public boolean predicate() {
+                return true;
+            }
+
+            @Override public boolean visiblePredicate() {
+                return isLVM();
+            }
+
+            @Override public String enablePredicate() {
+                if (getBlockDevice().isDrbd()) {
+                    return "DRBD is on it";
+                }
+                return null;
+            }
+
+            @Override public void action() {
+                if (Tools.confirmDialog(
+                        "Remove Logical Volume",
+                        "Remove logical volume and DESTROY all the data on it?",
+                        "Remove",
+                        "Cancel")) {
+                    final boolean ret = lvRemove(false);
+                    final Host host = getHost();
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            }
+        };
+    }
+
+    /** Returns 'LV remove' menu item. */
+    private MyMenuItem getLVResizeItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(LV_RESIZE_MENU_ITEM,
+                              null,
+                              LV_RESIZE_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+            public boolean visiblePredicate() {
+                return isLVM();
+            }
+
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final LVResize lvmrd = new LVResize(thisBDI);
+                while (true) {
+                    lvmrd.showDialog();
+                    if (lvmrd.isPressedCancelButton()) {
+                        lvmrd.cancelDialog();
+                        return;
+                    } else if (lvmrd.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /** Returns 'LV snapshot' menu item. */
+    private MyMenuItem getLVSnapshotItem() {
+        final BlockDevInfo thisBDI = this;
+        return new MyMenuItem(LV_SNAPSHOT_MENU_ITEM,
+                              null,
+                              LV_SNAPSHOT_MENU_DESCRIPTION,
+                              new AccessMode(ConfigData.AccessType.OP, false),
+                              new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override public boolean visiblePredicate() {
+                return isLVM();
+            }
+
+            @Override public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final LVSnapshot lvsd = new LVSnapshot(thisBDI);
+                while (true) {
+                    lvsd.showDialog();
+                    if (lvsd.isPressedCancelButton()) {
+                        lvsd.cancelDialog();
+                        return;
+                    } else if (lvsd.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
     }
 
     /** Creates popup for the block device. */
@@ -1186,8 +1478,22 @@ public final class BlockDevInfo extends EditableInfo {
             }
         };
         items.add(repMenuItem);
+        /* PV Create */
+        items.add(getPVCreateItem());
+        /* PV Remove */
+        items.add(getPVRemoveItem());
+        /* VG Create */
+        items.add(getVGCreateItem());
+        /* VG Remove */
+        items.add(getVGRemoveItem());
         /* LV Create */
         items.add(getLVCreateItem());
+        /* LV Remove */
+        items.add(getLVRemoveItem());
+        /* LV Resize */
+        items.add(getLVResizeItem());
+        /* LV Snapshot */
+        items.add(getLVSnapshotItem());
         /* attach / detach */
         final MyMenuItem attachMenu =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
