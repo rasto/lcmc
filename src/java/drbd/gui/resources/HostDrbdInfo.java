@@ -29,6 +29,8 @@ import drbd.gui.HostBrowser;
 import drbd.gui.DrbdGraph;
 import drbd.gui.SpringUtilities;
 import drbd.gui.ClusterBrowser;
+import drbd.gui.dialog.lvm.VGCreate;
+import drbd.gui.dialog.lvm.LVCreate;
 import drbd.data.Host;
 import drbd.data.Subtext;
 import drbd.data.ConfigData;
@@ -71,6 +73,18 @@ public final class HostDrbdInfo extends Info {
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_DRBD_STATUS_STRING =
                                                 "drbd status is not available";
+    /** LVM menu. */
+    private static final String LVM_MENU = "LVM";
+    /** Name of the create VG menu item. */
+    private static final String VG_CREATE_MENU_ITEM = "Create VG";
+    /** Description create VG. */
+    private static final String VG_CREATE_MENU_DESCRIPTION =
+                                                    "Create a volume group.";
+    /** Name of the create menu item. */
+    private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
+    /** Description create LV. */
+    private static final String LV_CREATE_MENU_DESCRIPTION =
+                                                    "Create a logical volume.";
     /** Prepares a new <code>HostDrbdInfo</code> object. */
     public HostDrbdInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
@@ -666,8 +680,111 @@ public final class HostDrbdInfo extends Info {
             }
         };
         items.add(hostAdvancedSubmenu);
-
+        items.add(getLVMMenu());
         return items;
+    }
+
+    /** Returns lvm menu. */
+    private MyMenu getLVMMenu() {
+        return new MyMenu(LVM_MENU,
+                          new AccessMode(ConfigData.AccessType.OP, true),
+                          new AccessMode(ConfigData.AccessType.OP, true)) {
+            private static final long serialVersionUID = 1L;
+            @Override public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void update() {
+                super.update();
+                addLVMMenu(this);
+            }
+        };
+    }
+
+    /** Adds menus to manage LVMs. */
+    public final void addLVMMenu(final MyMenu submenu) {
+        submenu.removeAll();
+        submenu.add(getVGCreateItem());
+        for (final String vg : getHost().getVolumeGroupNames()) {
+            submenu.add(getLVMCreateItem(vg));
+        }
+    }
+
+    /** Return "Create VG" menu item. */
+    private MyMenuItem getVGCreateItem() {
+        final MyMenuItem mi = new MyMenuItem(
+                            VG_CREATE_MENU_ITEM,
+                            null,
+                            VG_CREATE_MENU_DESCRIPTION,
+                            new AccessMode(ConfigData.AccessType.OP, false),
+                            new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean visiblePredicate() {
+                return true;
+            }
+
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final VGCreate vgCreate = new VGCreate(getHost(), null);
+                while (true) {
+                    vgCreate.showDialog();
+                    if (vgCreate.isPressedCancelButton()) {
+                        vgCreate.cancelDialog();
+                        return;
+                    } else if (vgCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+        mi.setToolTipText(VG_CREATE_MENU_DESCRIPTION);
+        return mi;
+    }
+
+    /** Return create LV menu item. */
+    private MyMenuItem getLVMCreateItem(final String volumeGroup) {
+        final String name = LV_CREATE_MENU_ITEM + volumeGroup;
+        final MyMenuItem mi = new MyMenuItem(
+                             name,
+                             null,
+                             LV_CREATE_MENU_DESCRIPTION,
+                             new AccessMode(ConfigData.AccessType.OP, false),
+                             new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+            @Override public boolean visiblePredicate() {
+                return !"".equals(volumeGroup)
+                       && getHost().getVolumeGroupNames().contains(volumeGroup);
+            }
+
+            @Override public String enablePredicate() {
+                return null;
+            }
+
+            @Override public void action() {
+                final LVCreate lvCreate = new LVCreate(getHost(), volumeGroup);
+                while (true) {
+                    lvCreate.showDialog();
+                    if (lvCreate.isPressedCancelButton()) {
+                        lvCreate.cancelDialog();
+                        return;
+                    } else if (lvCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+
+            @Override public void update() {
+                setText1(LV_CREATE_MENU_ITEM + volumeGroup);
+                super.update();
+            }
+        };
+
+        mi.setToolTipText(LV_CREATE_MENU_DESCRIPTION);
+        return mi;
     }
 
     /** Returns grahical view if there is any. */

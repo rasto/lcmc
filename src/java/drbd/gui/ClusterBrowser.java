@@ -323,6 +323,9 @@ public final class ClusterBrowser extends Browser {
     private final MultiKeyMap<String, Integer> hbOpNotAdvanced =
                           MultiKeyMap.decorate(
                                  new LinkedMap<MultiKey<String>, Integer>());
+    /** Map with drbd parameters for every host. */
+    private final Map<Host, String> drbdParameters =
+                                                  new HashMap<Host, String>();
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
     public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,
@@ -746,7 +749,8 @@ public final class ClusterBrowser extends Browser {
                 crmXML = new CRMXML(firstHost);
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
-                final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray());
+                final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray(),
+                                                       drbdParameters);
                 for (final Host h : cluster.getHostsArray()) {
                     final String configString = newDrbdXML.getConfig(h);
                     newDrbdXML.update(configString);
@@ -763,8 +767,9 @@ public final class ClusterBrowser extends Browser {
                     Tools.getString("ClusterBrowser.HbUpdateResources"));
                 Tools.startProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
-
+                Tools.debug(this, "start update drbd resources", 2);
                 updateDrbdResources();
+                Tools.debug(this, "update drbd resources done", 2);
                 //drbdGraph.scale();
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
@@ -1070,7 +1075,8 @@ public final class ClusterBrowser extends Browser {
                            }
                            final String[] lines = output.split("\n");
                            final DrbdXML newDrbdXML =
-                                          new DrbdXML(cluster.getHostsArray());
+                                          new DrbdXML(cluster.getHostsArray(),
+                                                      drbdParameters);
 
                            final String configString =
                                                    newDrbdXML.getConfig(host);
@@ -1559,7 +1565,8 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates drbd resources. */
     private void updateDrbdResources() {
-        final DrbdXML dxml = new DrbdXML(cluster.getHostsArray());
+        final DrbdXML dxml = new DrbdXML(cluster.getHostsArray(),
+                                         drbdParameters);
         for (final Host host : cluster.getHostsArray()) {
             final String configString = dxml.getConfig(host);
             boolean configUpdated = false;
@@ -2549,5 +2556,10 @@ public final class ClusterBrowser extends Browser {
         });
         updateDrbdResources();
         drbdGraph.repaint();
+    }
+
+    /** Returns drbd parameter hash. */
+    public Map<Host, String> getDrbdParameters() {
+        return drbdParameters;
     }
 }

@@ -198,15 +198,8 @@ public final class Tools {
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /** Random number generator. */
     private static final Random RANDOM = new Random();
-    /** Hash mit classes from plugin. */
-    private static final Map<String, RemotePlugin> PLUGIN_OBJECTS =
-                                           new HashMap<String, RemotePlugin>();
-    /** Local plugin directory. */
-    private static final String PLUGIN_DIR = System.getProperty("user.home")
-                                             + "/.drbd-mc/plugins/";
-    /** Remote plugin location. */
-    private static final String PLUGIN_LOCATION =
-                                     "oss.linbit.com/drbd-mc/drbd-mc-plugins/";
+    /** Time when the application started in seconds. */
+    private static final long startTime = System.currentTimeMillis() / 1000;
     /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
@@ -227,6 +220,11 @@ public final class Tools {
         setDefaults();
         configData = new ConfigData();
         guiData = new GUIData();
+    }
+
+    /** Returns seconds since start. */
+    private static long seconds() {
+        return System.currentTimeMillis() / 1000 - startTime;
     }
 
 
@@ -317,7 +315,9 @@ public final class Tools {
      */
     private static void debug(final String msg) {
         if (debugLevel > 0) {
-            System.out.println(DEBUG_STRING + msg + " (drbd.utilities.Tools)");
+            System.out.println(DEBUG_STRING
+                               + "[" + seconds() + "s] "
+                               + msg + " (drbd.utilities.Tools)");
         }
     }
 
@@ -335,6 +335,7 @@ public final class Tools {
         if (level <= debugLevel) {
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
+                               + "[" + seconds() + "s] "
                                + msg + " (drbd.utilities.Tools)");
         }
     }
@@ -351,9 +352,13 @@ public final class Tools {
     public static void debug(final Object object, final String msg) {
         if (debugLevel > -1) {
             if (object == null) {
-                System.out.println(DEBUG_STRING + msg);
+                System.out.println(DEBUG_STRING
+                                   + "[" + seconds() + "s] "
+                                   + msg);
             } else {
-                System.out.println(DEBUG_STRING + msg
+                System.out.println(DEBUG_STRING
+                                   + "[" + seconds() + "s] "
+                                   + msg
                                    + " (" + object.getClass().getName() + ")");
             }
         }
@@ -381,6 +386,7 @@ public final class Tools {
             }
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
+                               + "[" + seconds() + "s] "
                                + msg
                                + from);
         }
@@ -2569,183 +2575,6 @@ public final class Tools {
             return filename;
         }
         return filename.substring(0, i + 1);
-    }
-
-    /** Returns list of plugins. */
-    public static Set<String> getPluginList() {
-        final Pattern p = Pattern.compile(
-                ".*<img src=\"/icons/folder.gif\" alt=\"\\[DIR\\]\">"
-                + "</td><td><a href=\".*?/\">(.*?)/</a>.*");
-        final Set<String> pluginList = new LinkedHashSet<String>();
-        try {
-            final String url = "http://" + PLUGIN_LOCATION
-                               + "/?drbd-mc-plugin-check-" + getRelease();
-            final BufferedReader reader = new BufferedReader(
-                             new InputStreamReader(new URL(url).openStream()));
-            do {
-                final String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                final Matcher m = p.matcher(line);
-                if (m.matches()) {
-                    final String pluginName = m.group(1);
-                    final String checkURL = "http://" + PLUGIN_LOCATION
-                               + pluginName + "/" + getRelease()
-                               + "/?drbd-mc-plugin-check-" + getRelease();
-                    try {
-                        new URL(checkURL).openStream();
-                        pluginList.add(pluginName);
-                    } catch (MalformedURLException mue) {
-                        Tools.appWarning("malformed URL");
-                    } catch (IOException ioe) {
-                        /* don't show this in the menu */
-                    }
-                }
-            } while (true);
-        } catch (MalformedURLException mue) {
-            Tools.appWarning("malformed URL");
-        } catch (IOException ioe) {
-        }
-        final File dir = new File(PLUGIN_DIR);
-        final String[] l = dir.list();
-        if (dir != null && l != null) {
-            for (final String fn : l) {
-                pluginList.add(fn);
-            }
-        }
-        return pluginList;
-    }
-
-    /** Loads one plugin. */
-    private static Class loadPlugin(final String pluginName,
-                                    final String url) {
-        final String user = getConfigData().getPluginUser();
-        final String passwd = getConfigData().getPluginPassword();
-
-        if (user != null && passwd != null) {
-            Authenticator.setDefault(new java.net.Authenticator() {
-                protected PasswordAuthentication
-                                            getPasswordAuthentication() {
-                    return new PasswordAuthentication(user,
-                                                   passwd.toCharArray());
-                }
-            });
-        }
-        URLClassLoader loader;
-        final String[] dirs = pluginName.split(":");
-        try {
-            loader = new URLClassLoader(new URL[] {
-                new URL(url + pluginName + "/" + getRelease() + "/")
-            });
-        } catch (java.net.MalformedURLException e) {
-            Tools.appWarning("could not get: " + url, e);
-            return null;
-        }
-
-        Class c = null;
-        final String className = "plugins." + dirs[dirs.length - 1];
-        try {
-            c = loader.loadClass(className);
-        } catch (java.lang.ClassNotFoundException e) {
-            Tools.debug("could not load " + url + " " + className, 1);
-            return null;
-        }
-        return c;
-    }
-
-    /** Saves the class. */
-    private static void savePluginClass(final String pluginName,
-                                        final Class c) {
-        for (final Class sc : c.getDeclaredClasses()) {
-            savePluginClass(pluginName, sc);
-        }
-        try {
-            final String className = c.getName();
-            final String classAsPath = className.replace('.', '/') + ".class";
-            final String dirToCreate = PLUGIN_DIR
-                                       + pluginName
-                                       + "/"
-                                       + getRelease()
-                                       + "/";
-            (new File(dirToCreate + "plugins/")).mkdirs();
-            final FileOutputStream fileOut = new FileOutputStream(
-                                                                dirToCreate
-                                                                + classAsPath);
-            final InputStream stream =
-                           c.getClassLoader().getResourceAsStream(classAsPath);
-
-            final byte[] buff = new byte[512];
-            while (stream.available() > 0) {
-                final int l = stream.read(buff);
-                fileOut.write(buff, 0, l);
-            }
-            fileOut.close();
-        } catch (FileNotFoundException e) {
-            Tools.appWarning("plugin not found", e);
-            return;
-        } catch (IOException e) {
-            Tools.appWarning("could not save plugin", e);
-            return;
-        }
-    }
-
-    /** Load all plugins. */
-    public static void loadPlugins() {
-        final Set<String> pluginList = getPluginList();
-        getGUIData().getMainMenu().reloadPluginsMenu(pluginList);
-        for (final String pluginName : pluginList) {
-            Class c = loadPlugin(pluginName, "http://" + PLUGIN_LOCATION);
-            if (c == null) {
-                c = loadPlugin(pluginName, "file://" + PLUGIN_DIR);
-                if (c == null) {
-                    continue;
-                }
-            } else {
-                savePluginClass(pluginName, c);
-                /* cache it. */
-            }
-            final Class pluginClass = c;
-            RemotePlugin remotePlugin = null;
-            try {
-                remotePlugin = (RemotePlugin) pluginClass.newInstance();
-            } catch (java.lang.InstantiationException e) {
-                Tools.appWarning("could not instantiate plugin: " + pluginName,
-                                 e);
-                continue;
-            } catch (java.lang.IllegalAccessException e) {
-                Tools.appWarning("could not access plugin: " + pluginName, e);
-                continue;
-            }
-            remotePlugin.init();
-            PLUGIN_OBJECTS.put(pluginName, remotePlugin);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    getGUIData().getMainMenu().enablePluginMenu(
-                                                        pluginName,
-                                                        pluginClass != null);
-                    if (pluginClass != null) {
-                        Tools.info(pluginName + " was enabled");
-                    }
-                }
-            });
-        }
-    }
-
-    /** Show plugin description. */
-    public static void showPluginDescription(final String pluginName) {
-        final RemotePlugin remotePlugin = PLUGIN_OBJECTS.get(pluginName);
-        if (remotePlugin != null) {
-            remotePlugin.showDescription();
-        }
-    }
-
-    /** Adds menu items from plugins. */
-    public static void addPluginMenuItems(final Info info,
-                                          final List<UpdatableItem> items) {
-        for (final String pluginName : PLUGIN_OBJECTS.keySet()) {
-            PLUGIN_OBJECTS.get(pluginName).addPluginMenuItems(info, items);
-        }
     }
 
     /** Escapes the quotes for the stacked ssh commands. */

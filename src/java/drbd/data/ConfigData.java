@@ -93,16 +93,6 @@ public final class ConfigData {
     /** If set to true user and password will be saved. */
     private boolean loginSave = true;
 
-    /** Default user for plugin login. */
-    private String pluginUser = null;
-    /** Default password for plugin login. */
-    private String pluginPassword = null;
-    /** User for plugin login. */
-    private String savedPluginUser = "";
-    /** Password for plugin login. */
-    private String savedPluginPassword = "";
-    /** If set to true user and password will be saved. */
-    private boolean pluginLoginSave = true;
     /** Whether it is an advanced mode. */
     private boolean advancedMode = false;
     /** Default save file. */
@@ -168,8 +158,6 @@ public final class ConfigData {
     private AccessType maxAccessType = AccessType.ADMIN;
     /** Whether the upgrade check is enabled. */
     private boolean upgradeCheckEnabled = true;
-    /** Whether the plugins are enabled. */
-    private boolean pluginsEnabled = true;
     /** Whether big drbd.conf and not drbd.d/ should be used. */
     private boolean bigDRBDConf = false;
 
@@ -244,48 +232,6 @@ public final class ConfigData {
             savedDownloadUser = "";
             savedDownloadPassword = "";
         }
-    }
-
-    /** Gets user for plugin area. */
-    public String getPluginUser() {
-        if (savedPluginUser != null && !savedPluginUser.equals("")) {
-            pluginUser = savedPluginUser;
-            savedPluginUser = "";
-        }
-        return pluginUser;
-    }
-
-    /** Gets password for plugin area. */
-    public String getPluginPassword() {
-        if (savedPluginPassword != null
-            && !savedPluginPassword.equals("")) {
-            pluginPassword = savedPluginPassword;
-            savedPluginPassword = "";
-        }
-        return pluginPassword;
-    }
-
-    /** Sets user and password for plugin area. */
-    public void setPluginLogin(final String pluginUser,
-                               final String pluginPassword,
-                               final boolean pluginLoginSave) {
-        this.pluginUser = pluginUser;
-        this.pluginPassword = pluginPassword;
-        this.pluginLoginSave = pluginLoginSave;
-        if (pluginLoginSave) {
-            savedPluginUser = pluginUser;
-            savedPluginPassword = pluginPassword;
-        } else {
-            savedPluginUser = "";
-            savedPluginPassword = "";
-        }
-    }
-
-    /**
-     * Returns whether the user and password for plugin area, shuld be saved.
-     */
-    public boolean getPluginLoginSave() {
-        return pluginLoginSave;
     }
 
     /** Return whether host exists in the hosts. */
@@ -669,16 +615,6 @@ public final class ConfigData {
     /** Returns whether the upgrade check is enabled. */
     public boolean isUpgradeCheckEnabled() {
         return upgradeCheckEnabled;
-    }
-
-    /** Returns whether the plugins are enabled. */
-    public boolean arePluginsEnabled() {
-        return pluginsEnabled;
-    }
-
-    /** Sets whether the plugins should be enabled. */
-    public void setPluginsEnabled(final boolean pluginsEnabled) {
-        this.pluginsEnabled = pluginsEnabled;
     }
 
     /** Returns whether big drbd.conf and not drbd.d/ should be used. */

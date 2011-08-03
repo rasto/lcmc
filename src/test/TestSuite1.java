@@ -55,7 +55,7 @@ public final class TestSuite1 {
     /** Whether to test interactive elements. ant -Dinteractive=true. */
     public static final boolean INTERACTIVE =
                         "true".equals(System.getProperty("test.interactive"));
-    /** Whether to test plugins and version. ant -Dconnect=true. */
+    /** Whether to test version. ant -Dconnect=true. */
     public static final boolean CONNECT_LINBIT =
                         "true".equals(System.getProperty("test.connect"));
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
@@ -154,8 +154,7 @@ public final class TestSuite1 {
                 /* plugins registration writes to stdout after a while. */
                 Tools.sleep(15000);
             } else {
-                drbd.DrbdMC.main(new String[]{"--no-plugin-check",
-                                              "--no-upgrade-check"});
+                drbd.DrbdMC.main(new String[]{"--no-upgrade-check"});
             }
         }
         Tools.setDebugLevel(-1);
