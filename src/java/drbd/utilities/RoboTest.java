@@ -998,7 +998,7 @@ public final class RoboTest {
         sleep(4000);
         checkTest("test1", 3); /* 3 */
         /* constraints */
-        addConstraint(gx, gy, 1, true);
+        addConstraint(gx, gy - 30, 1, true);
         checkTest("test1", 3.1); /* 3.1 */
 
         /* move up, move down */
@@ -1114,7 +1114,7 @@ public final class RoboTest {
         checkTest("test1", 4.4); /* 4.4 */
         removeConstraint(popX, popY);
         checkTest("test1", 5); /* 5 */
-        addConstraint(gx, gy, 1, true);
+        addConstraint(gx, gy - 30, 1, true);
         checkTest("test1", 5.1); /* 4.4 */
 
         removeConstraint(popX, popY);
@@ -1122,7 +1122,7 @@ public final class RoboTest {
         checkTest("test1", 5.2); /* 5 */
         sleep(1000);
 
-        addConstraint(gx, gy, 1, true);
+        addConstraint(gx, gy - 30, 1, true);
         sleep(5000);
         checkTest("test1", 6); /* 6 */
 
@@ -1150,7 +1150,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.2);
 
-        addConstraintOrderOnly(gx, gy, 2, true);
+        addConstraintOrderOnly(gx, gy - 30, 2, true);
         sleep(4000);
         checkTest("test1", 10.3);
 
@@ -1166,7 +1166,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 10.6);
 
-        addConstraintColocationOnly(gx, gy, 2, true);
+        addConstraintColocationOnly(gx, gy - 30, 2, true);
         sleep(4000);
         checkTest("test1", 10.7);
 
@@ -1276,7 +1276,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 11.56);
 
-        addConstraintOrderOnly(ipX, ipY, 2, false);
+        addConstraintOrderOnly(ipX, ipY, 3, false);
         sleep(5000);
         checkTest("test1", 11.57);
 
@@ -1284,7 +1284,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 11.58);
 
-        addConstraintColocationOnly(ipX, ipY, 4, false);
+        addConstraintColocationOnly(ipX, ipY, 3, false);
         sleep(5000);
         checkTest("test1", 11.59);
 
@@ -1296,7 +1296,7 @@ public final class RoboTest {
         sleep(5000);
         checkTest("test1", 11.7);
 
-        addConstraint(gx, gy, 1, true);
+        addConstraint(gx, gy - 30, 1, true);
         sleep(5000);
         checkTest("test1", 11.8);
         /** Add m/s Stateful resource */
@@ -2514,8 +2514,12 @@ public final class RoboTest {
         if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
             info("confirm remove color: error");    
         }
-        moveTo(512 , 424);
-        leftClick();
+    	press(KeyEvent.VK_TAB);
+	sleep(500);
+    	press(KeyEvent.VK_TAB);
+	sleep(500);
+    	press(KeyEvent.VK_SPACE);
+	sleep(500);
     }
 
     /** Stops resource. */
