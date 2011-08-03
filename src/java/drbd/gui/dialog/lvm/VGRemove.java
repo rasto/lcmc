@@ -22,21 +22,14 @@
 package drbd.gui.dialog.lvm;
 
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.ConfigDialog;
-import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
 import drbd.utilities.LVM;
-import drbd.data.ConfigData;
-import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.resources.BlockDevice;
-import drbd.gui.dialog.WizardDialog;
 import drbd.gui.Browser;
 
 import java.util.List;
@@ -46,10 +39,8 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JMenu;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
@@ -81,21 +72,22 @@ public final class VGRemove extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish dialog button. */
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "Remove VG";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return VG_REMOVE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -107,7 +99,7 @@ public final class VGRemove extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
             SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
         }
@@ -128,7 +120,7 @@ public final class VGRemove extends LV {
 
 
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         removeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -194,47 +186,38 @@ public final class VGRemove extends LV {
 
     /** Remove action listener. */
     private class RemoveActionListener implements ActionListener {
-        public RemoveActionListener() {
-            super();
-        }
         @Override public void actionPerformed(final ActionEvent e) {
-            final Thread thread = new Thread(new RemoveRunnable());
-            thread.start();
-        }
-    }
-
-    private class RemoveRunnable implements Runnable {
-        public RemoveRunnable() {
-            super();
-        }
-
-        @Override public void run() {
-            Tools.invokeAndWait(new EnableRemoveRunnable(false));
-            disableComponents();
-            getProgressBar().start(REMOVE_TIMEOUT
-                                   * hostCheckBoxes.size());
-            final String vgName = blockDevInfo.getBlockDevice()
-                                        .getVolumeGroupOnPhysicalVolume();
-            boolean oneFailed = false;
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    final boolean ret = vgRemove(h, vgName);
-                    if (!ret) {
-                        oneFailed = true;
+            final Thread thread = new Thread(new Runnable() {
+                @Override public void run() {
+                    Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                    disableComponents();
+                    getProgressBar().start(REMOVE_TIMEOUT
+                                           * hostCheckBoxes.size());
+                    final String vgName = blockDevInfo.getBlockDevice()
+                                                .getVolumeGroupOnPhysicalVolume();
+                    boolean oneFailed = false;
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        if (hostCheckBoxes.get(h).isSelected()) {
+                            final boolean ret = vgRemove(h, vgName);
+                            if (!ret) {
+                                oneFailed = true;
+                            }
+                        }
+                    }
+                    for (final Host h : hostCheckBoxes.keySet()) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    }
+                    enableComponents();
+                    if (oneFailed) {
+                        checkButtons();
+                        progressBarDoneError();
+                    } else {
+                        progressBarDone();
+                        disposeDialog();
                     }
                 }
-            }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                h.getBrowser().getClusterBrowser().updateHWInfo(h);
-            }
-            enableComponents();
-            if (oneFailed) {
-                checkButtons();
-                progressBarDoneError();
-            } else {
-                progressBarDone();
-                disposeDialog();
-            }
+            });
+            thread.start();
         }
     }
 
@@ -258,7 +241,9 @@ public final class VGRemove extends LV {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;

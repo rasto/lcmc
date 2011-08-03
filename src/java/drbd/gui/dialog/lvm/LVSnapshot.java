@@ -22,30 +22,21 @@
 package drbd.gui.dialog.lvm;
 
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.ConfigDialog;
-import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
-import drbd.utilities.Unit;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
-import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
 import drbd.gui.Browser;
 
-import java.util.List;
 import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JMenu;
 import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -80,21 +71,22 @@ public final class LVSnapshot extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    @Override protected final void finishDialog() {
+    @Override protected void finishDialog() {
+        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
-    @Override protected final String getDialogTitle() {
+    @Override protected String getDialogTitle() {
         return "LV Snapshot ";
     }
 
     /** Returns the description of the dialog. */
-    @Override protected final String getDescription() {
+    @Override protected String getDescription() {
         return SNAPSHOT_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    @Override protected final void initDialog() {
+    @Override protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -106,7 +98,7 @@ public final class LVSnapshot extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         SwingUtilities.invokeLater(new EnableSnapshotRunnable(true));
     }
 
@@ -151,7 +143,7 @@ public final class LVSnapshot extends LV {
     }
 
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         snapshotButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -207,7 +199,33 @@ public final class LVSnapshot extends LV {
                                                   false)); /* only adv. */
         inputPane.add(sizeLabel);
         inputPane.add(sizeCB);
-        snapshotButton.addActionListener(new SnapshotActionListener());
+        snapshotButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override public void run() {
+                        Tools.invokeAndWait(new EnableSnapshotRunnable(false));
+                        disableComponents();
+                        getProgressBar().start(SNAPSHOT_TIMEOUT);
+                        final boolean ret = lvSnapshot(
+                                                    lvNameCB.getStringValue(),
+                                                    sizeCB.getStringValue());
+                        final Host host = blockDevInfo.getHost();
+                        host.getBrowser().getClusterBrowser().updateHWInfo(
+                                                                         host);
+                        setComboBoxes();
+                        if (ret) {
+                            progressBarDone();
+                            disposeDialog();
+                        } else {
+                            progressBarDoneError();
+                        }
+                        enableComponents();
+                    }
+                });
+                thread.start();
+            }
+        });
+
         inputPane.add(snapshotButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
@@ -244,9 +262,6 @@ public final class LVSnapshot extends LV {
 
     /** Size combo box item listener. */
     private class SizeItemListener implements ItemListener {
-        public SizeItemListener() {
-            super();
-        }
         @Override public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 checkButtons();
@@ -256,9 +271,6 @@ public final class LVSnapshot extends LV {
 
     /** Size combo box action listener. */
     private class SizeDocumentListener implements DocumentListener {
-        public SizeDocumentListener() {
-            super();
-        }
         private void check() {
             checkButtons();
         }
@@ -273,41 +285,6 @@ public final class LVSnapshot extends LV {
 
         @Override public void changedUpdate(final DocumentEvent e) {
             check();
-        }
-    }
-
-    /** Snapshot action listener. */
-    private class SnapshotActionListener implements ActionListener {
-        public SnapshotActionListener() {
-            super();
-        }
-        @Override public void actionPerformed(final ActionEvent e) {
-            final Thread thread = new Thread(new SnapshotRunnable());
-            thread.start();
-        }
-    }
-
-    private class SnapshotRunnable implements Runnable {
-        public SnapshotRunnable() {
-            super();
-        }
-
-        @Override public void run() {
-            Tools.invokeAndWait(new EnableSnapshotRunnable(false));
-            disableComponents();
-            getProgressBar().start(SNAPSHOT_TIMEOUT);
-            final boolean ret = lvSnapshot(lvNameCB.getStringValue(),
-                                           sizeCB.getStringValue());
-            final Host host = blockDevInfo.getHost();
-            host.getBrowser().getClusterBrowser().updateHWInfo(host);
-            setComboBoxes();
-            if (ret) {
-                progressBarDone();
-                disposeDialog();
-            } else {
-                progressBarDoneError();
-            }
-            enableComponents();
         }
     }
 

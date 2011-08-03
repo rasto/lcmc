@@ -1319,19 +1319,6 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testGetPluginList() {
-        if (TestSuite1.CONNECT_LINBIT) {
-            final Set<String> list = Tools.getPluginList();
-            final String[] array = list.toArray(new String[list.size()]);
-            Assert.assertArrayEquals(new String[]{"LVM:LVM_Create",
-                                                  "LVM:LVM_Remove",
-                                                  "LVM:LVM_Resize",
-                                                  "LVM:LVM_Snapshot"},
-                                     array);
-        }
-    }
-
-    @Test
     public void testEscapeQuotes() {
         assertEquals("test", Tools.escapeQuotes("test", 0));
         assertEquals("test", Tools.escapeQuotes("test", -1));

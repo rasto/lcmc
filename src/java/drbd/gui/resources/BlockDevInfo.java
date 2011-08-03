@@ -1161,7 +1161,7 @@ public final class BlockDevInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
             public boolean visiblePredicate() {
                 return getBlockDevice().isPhysicalVolume()
-                       && getBlockDevice().isVolumeGroupOnPhysicalVolume();
+                       && !getBlockDevice().isVolumeGroupOnPhysicalVolume();
                                                                     
             }
 

@@ -22,30 +22,20 @@
 package drbd.gui.dialog.lvm;
 
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.ConfigDialog;
-import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
-import drbd.data.ConfigData;
-import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.gui.Browser;
-import drbd.gui.dialog.WizardDialog;
 
-import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JMenu;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -78,21 +68,22 @@ public final class PVRemove extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish dialog */
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "Remove PV";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return PV_REMOVE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -104,7 +95,7 @@ public final class PVRemove extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
             SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
         }
@@ -125,7 +116,7 @@ public final class PVRemove extends LV {
 
 
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         removeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -181,9 +172,6 @@ public final class PVRemove extends LV {
 
     /** Remove action listener. */
     private class RemoveActionListener implements ActionListener {
-        public RemoveActionListener() {
-            super();
-        }
         @Override public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new RemoveRunnable());
             thread.start();
@@ -191,10 +179,6 @@ public final class PVRemove extends LV {
     }
 
     private class RemoveRunnable implements Runnable {
-        public RemoveRunnable() {
-            super();
-        }
-
         @Override public void run() {
             Tools.invokeAndWait(new EnableRemoveRunnable(false));
             disableComponents();
@@ -252,7 +236,9 @@ public final class PVRemove extends LV {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;

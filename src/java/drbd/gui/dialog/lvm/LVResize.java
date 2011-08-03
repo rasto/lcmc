@@ -22,36 +22,26 @@
 package drbd.gui.dialog.lvm;
 
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.ConfigDialog;
-import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.resources.DrbdVolumeInfo;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenu;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
-import drbd.utilities.Unit;
 import drbd.utilities.LVM;
 import drbd.data.ConfigData;
 import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.data.resources.BlockDevice;
-import drbd.gui.dialog.WizardDialog;
 import drbd.gui.GuiComboBox;
 import drbd.gui.Browser;
 
-import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JMenu;
 import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 import javax.swing.event.DocumentListener;
@@ -81,11 +71,16 @@ public final class LVResize extends LV {
     /** Resize LV timeout. */
     private static final int RESIZE_TIMEOUT = 5000;
     /** Block device info object. */
-    final BlockDevInfo blockDevInfo;
+    private final BlockDevInfo blockDevInfo;
+    /** Resize button. */
     private final MyButton resizeButton = new MyButton("Resize");
+    /** Size combo box. */
     private GuiComboBox sizeCB;
+    /** Old size combo box. */
     private GuiComboBox oldSizeCB;
+    /** Max size combo box. */
     private GuiComboBox maxSizeCB;
+    /** Map from host to the checkboxes for these hosts. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Create new LVResize object. */
     public LVResize(final BlockDevInfo blockDevInfo) {
@@ -94,27 +89,28 @@ public final class LVResize extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "LVM Resize";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return DESCRIPTION;
     }
 
     /** Close button. */
-    public final String cancelButton() {
+    public String cancelButton() {
         return "Close";
     }
 
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -134,7 +130,7 @@ public final class LVResize extends LV {
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             if (!dvi.isConnected(false)) {
                 printErrorAndRetry(
-                                "Not resizing. DRBD resource is not connected.");
+                              "Not resizing. DRBD resource is not connected.");
                 sizeCB.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
@@ -171,12 +167,12 @@ public final class LVResize extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         SwingUtilities.invokeLater(new EnableResizeRunnable(true));
     }
 
     private class EnableResizeRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableResizeRunnable(final boolean enable) {
             super();
             this.enable = enable;
@@ -188,7 +184,7 @@ public final class LVResize extends LV {
                 final long oldSize = Tools.convertToKilobytes(
                                                oldSizeCB.getStringValue());
                 final long size = Tools.convertToKilobytes(
-                                                  sizeCB.getStringValue()); 
+                                                  sizeCB.getStringValue());
                 final String maxBlockSize = getMaxBlockSize();
                 final long maxSize = Long.parseLong(maxBlockSize);
                 maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
@@ -217,7 +213,7 @@ public final class LVResize extends LV {
     }
 
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         resizeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -260,7 +256,34 @@ public final class LVResize extends LV {
                                                   false)); /* only adv. */
         inputPane.add(sizeLabel);
         inputPane.add(sizeCB);
-        resizeButton.addActionListener(new ResizeActionListener());
+        resizeButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override public void run() {
+                        if (checkDRBD()) {
+                            Tools.invokeAndWait(
+                                               new EnableResizeRunnable(false));
+                            disableComponents();
+                            getProgressBar().start(RESIZE_TIMEOUT
+                                                   * hostCheckBoxes.size());
+                            final boolean ret = resize(sizeCB.getStringValue());
+                            final Host host = blockDevInfo.getHost();
+                            host.getBrowser().getClusterBrowser().updateHWInfo(
+                                                                          host);
+                            setComboBoxes();
+                            if (ret) {
+                                progressBarDone();
+                            } else {
+                                progressBarDoneError();
+                            }
+                            enableComponents();
+                        }
+                    }
+                });
+                thread.start();
+            }
+        });
+
         inputPane.add(resizeButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
@@ -278,7 +301,7 @@ public final class LVResize extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new ItemChangeListener(false), 
+        sizeCB.addListeners(new ItemChangeListener(false),
                             new SizeDocumentListener());
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 3,  /* rows, cols */
@@ -330,7 +353,9 @@ public final class LVResize extends LV {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;
@@ -345,9 +370,7 @@ public final class LVResize extends LV {
 
     /** Size combo box action listener. */
     private class SizeDocumentListener implements DocumentListener {
-        public SizeDocumentListener() {
-            super();
-        }
+        /** Check buttons. */
         private void check() {
             checkButtons();
         }
@@ -362,42 +385,6 @@ public final class LVResize extends LV {
 
         @Override public void changedUpdate(final DocumentEvent e) {
             check();
-        }
-    }
-
-    /** Resize action listener. */
-    private class ResizeActionListener implements ActionListener {
-        public ResizeActionListener() {
-            super();
-        }
-        @Override public void actionPerformed(final ActionEvent e) {
-            final Thread thread = new Thread(new ResizeRunnable());
-            thread.start();
-        }
-    }
-
-    private class ResizeRunnable implements Runnable {
-        public ResizeRunnable() {
-            super();
-        }
-
-        @Override public void run() {
-            if (checkDRBD()) {
-                Tools.invokeAndWait(new EnableResizeRunnable(false));
-                disableComponents();
-                getProgressBar().start(RESIZE_TIMEOUT
-                                       * hostCheckBoxes.size());
-                final boolean ret = resize(sizeCB.getStringValue());
-                final Host host = blockDevInfo.getHost();
-                host.getBrowser().getClusterBrowser().updateHWInfo(host);
-                setComboBoxes();
-                if (ret) {
-                    progressBarDone();
-                } else {
-                    progressBarDoneError();
-                }
-                enableComponents();
-            }
         }
     }
 

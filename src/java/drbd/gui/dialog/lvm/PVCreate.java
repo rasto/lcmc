@@ -22,30 +22,21 @@
 package drbd.gui.dialog.lvm;
 
 import drbd.gui.SpringUtilities;
-import drbd.gui.dialog.ConfigDialog;
-import drbd.gui.resources.Info;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.Browser;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
-import drbd.utilities.MyMenuItem;
-import drbd.utilities.UpdatableItem;
-import drbd.data.ConfigData;
-import drbd.data.AccessMode;
 import drbd.data.Host;
 import drbd.data.Cluster;
 import drbd.gui.dialog.WizardDialog;
 
-import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JMenu;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -77,7 +68,8 @@ public final class PVCreate extends WizardDialog {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish dialog */
     }
 
     /** Returns the next dialog. */
@@ -86,29 +78,29 @@ public final class PVCreate extends WizardDialog {
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "Create PV";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return PV_CREATE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
-    protected final void initDialogAfterVisible() {
+    protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocusLater(createButton);
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         if (!blockDevInfo.getBlockDevice().isPhysicalVolume()) {
             SwingUtilities.invokeLater(new EnableCreateRunnable(true));
         }
@@ -129,7 +121,7 @@ public final class PVCreate extends WizardDialog {
 
 
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -184,9 +176,6 @@ public final class PVCreate extends WizardDialog {
 
     /** Create action listener. */
     private class CreateActionListener implements ActionListener {
-        public CreateActionListener() {
-            super();
-        }
         @Override public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new CreateRunnable());
             thread.start();
@@ -194,10 +183,6 @@ public final class PVCreate extends WizardDialog {
     }
 
     private class CreateRunnable implements Runnable {
-        public CreateRunnable() {
-            super();
-        }
-
         @Override public void run() {
             Tools.invokeAndWait(new EnableCreateRunnable(false));
             disableComponents();
@@ -255,7 +240,9 @@ public final class PVCreate extends WizardDialog {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;

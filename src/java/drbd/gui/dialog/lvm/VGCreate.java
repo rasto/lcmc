@@ -28,7 +28,6 @@ import drbd.data.ConfigData;
 import drbd.data.Cluster;
 import drbd.gui.Browser;
 import drbd.gui.GuiComboBox;
-import drbd.gui.GuiComboBox;
 import drbd.gui.resources.BlockDevInfo;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.MyButton;
@@ -79,21 +78,22 @@ public final class VGCreate extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "Create VG";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return VG_CREATE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -106,14 +106,12 @@ public final class VGCreate extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         boolean enable = true;
         for (final Host h : hostCheckBoxes.keySet()) {
-            if (hostCheckBoxes.get(h).isSelected()) {
-                if (!hostHasPVS(h)) {
-                    enable = false;
-                    break;
-                }
+            if (hostCheckBoxes.get(h).isSelected() && !hostHasPVS(h)) {
+                enable = false;
+                break;
             }
         }
         SwingUtilities.invokeLater(new EnableCreateRunnable(enable));
@@ -154,9 +152,6 @@ public final class VGCreate extends LV {
             }
             createButton.setEnabled(e);
         }
-    }
-
-    private void setComboBoxes() {
     }
 
     /** Returns array of volume group checkboxes. */
@@ -200,7 +195,7 @@ public final class VGCreate extends LV {
     }
 
     /** Returns the input pane. */
-    @Override protected final JComponent getInputPane() {
+    @Override protected JComponent getInputPane() {
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         /* vg name */
@@ -289,7 +284,9 @@ public final class VGCreate extends LV {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;
@@ -304,9 +301,6 @@ public final class VGCreate extends LV {
 
     /** Size combo box action listener. */
     private class SizeDocumentListener implements DocumentListener {
-        public SizeDocumentListener() {
-            super();
-        }
         private void check() {
             checkButtons();
         }
@@ -326,9 +320,6 @@ public final class VGCreate extends LV {
 
     /** Create action listener. */
     private class CreateActionListener implements ActionListener {
-        public CreateActionListener() {
-            super();
-        }
         @Override public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new CreateRunnable());
             thread.start();
@@ -336,10 +327,6 @@ public final class VGCreate extends LV {
     }
 
     private class CreateRunnable implements Runnable {
-        public CreateRunnable() {
-            super();
-        }
-
         @Override public void run() {
             Tools.invokeAndWait(new EnableCreateRunnable(false));
             disableComponents();
@@ -367,7 +354,6 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h);
                 }
-                setComboBoxes();
                 checkButtons();
                 progressBarDoneError();
             } else {

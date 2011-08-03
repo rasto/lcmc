@@ -24,7 +24,6 @@ package drbd.gui.dialog.lvm;
 
 import drbd.gui.Browser;
 import drbd.gui.GuiComboBox;
-import drbd.gui.dialog.WizardDialog;
 import drbd.gui.SpringUtilities;
 import drbd.utilities.MyButton;
 import drbd.utilities.Tools;
@@ -55,18 +54,24 @@ import javax.swing.SpringLayout;
 /** Create LV dialog. */
 public final class LVCreate extends LV {
     /** Block device info object. */
-    final Host host;
+    private final Host host;
+    /** Create button. */
     private final MyButton createButton = new MyButton("Create");
+    /** Name of the logical volume. */
     private GuiComboBox lvNameCB;
+    /** New size of the logical volume. */
     private GuiComboBox sizeCB;
+    /** Maximum size of the logical volume. */
     private GuiComboBox maxSizeCB;
+    /** Volume group. */
     private final String volumeGroup;
+    /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Description create LV. */
     private static final String LV_CREATE_DESCRIPTION =
                        "Create a logical volume in an existing volume group.";
     /** LV create timeout. */
-    private static int CREATE_TIMEOUT = 5000;
+    private static final int CREATE_TIMEOUT = 5000;
     /** Create new LVCreate object. */
     public LVCreate(final Host host, final String volumeGroup) {
         super(null);
@@ -75,26 +80,27 @@ public final class LVCreate extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    protected final void finishDialog() {
+    protected void finishDialog() {
+        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
-    protected final String getDialogTitle() {
+    protected String getDialogTitle() {
         return "Create LV";
     }
 
     /** Returns the description of the dialog. */
-    protected final String getDescription() {
+    protected String getDescription() {
         return LV_CREATE_DESCRIPTION;
     }
 
     /** Close button. */
-    public final String cancelButton() {
+    public String cancelButton() {
         return "Close";
     }
 
     /** Inits the dialog. */
-    protected final void initDialog() {
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
@@ -107,12 +113,12 @@ public final class LVCreate extends LV {
     }
 
     /** Enables and disabled buttons. */
-    protected final void checkButtons() {
+    protected void checkButtons() {
         SwingUtilities.invokeLater(new EnableCreateRunnable(true));
     }
 
     private class EnableCreateRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableCreateRunnable(final boolean enable) {
             super();
             this.enable = enable;
@@ -125,7 +131,7 @@ public final class LVCreate extends LV {
                 final long maxSize = Long.parseLong(maxBlockSize);
                 maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
                 final long size = Tools.convertToKilobytes(
-                                                  sizeCB.getStringValue()); 
+                                                  sizeCB.getStringValue());
                 if (size > maxSize || size <= 0) {
                     e = false;
                     sizeCB.wrongValue();
@@ -161,15 +167,8 @@ public final class LVCreate extends LV {
         }
     }
 
-    private void setComboBoxes() {
-        final String maxBlockSize = getMaxBlockSize();
-        sizeCB.setValue(Tools.convertKilobytes(Long.toString(
-                                     + Long.parseLong(maxBlockSize) / 2)));
-        maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
-    }
-
     /** Returns the input pane. */
-    protected final JComponent getInputPane() {
+    protected JComponent getInputPane() {
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         /* name, size etc. */
@@ -223,7 +222,44 @@ public final class LVCreate extends LV {
                                                   false)); /* only adv. */
         inputPane.add(sizeLabel);
         inputPane.add(sizeCB);
-        createButton.addActionListener(new CreateActionListener());
+        createButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override public void run() {
+                        Tools.invokeAndWait(new EnableCreateRunnable(false));
+                        disableComponents();
+                        getProgressBar().start(CREATE_TIMEOUT
+                                               * hostCheckBoxes.size());
+                        boolean oneFailed = false;
+                        for (final Host h : hostCheckBoxes.keySet()) {
+                            if (hostCheckBoxes.get(h).isSelected()) {
+                                final boolean ret = lvCreate(
+                                                      h,
+                                                      lvNameCB.getStringValue(),
+                                                      sizeCB.getStringValue());
+                                if (!ret) {
+                                    oneFailed = true;
+                                }
+                            }
+                        }
+                        for (final Host h : hostCheckBoxes.keySet()) {
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                        }
+                        final String maxBlockSize = getMaxBlockSize();
+                        final long maxSize = Long.parseLong(maxBlockSize);
+                        maxSizeCB.setValue(Tools.convertKilobytes(
+                                                                maxBlockSize));
+                        enableComponents();
+                        if (oneFailed) {
+                            progressBarDoneError();
+                        } else {
+                            progressBarDone();
+                        }
+                    }
+                });
+                thread.start();
+            }
+        });
         inputPane.add(createButton);
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
@@ -241,7 +277,7 @@ public final class LVCreate extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new ItemChangeListener(false), 
+        sizeCB.addListeners(new ItemChangeListener(false),
                             new SizeDocumentListener());
 
         SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
@@ -249,14 +285,12 @@ public final class LVCreate extends LV {
                                                    1, 1); /* xPad, yPad */
 
         pane.add(inputPane);
-        final JPanel hostsPane = new JPanel(
-                        new FlowLayout(FlowLayout.LEFT));
+        final JPanel hostsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         final Cluster cluster = host.getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         for (final Host h : hostCheckBoxes.keySet()) {
-            hostCheckBoxes.get(h).addItemListener(
-                                            new ItemChangeListener(true));
+            hostCheckBoxes.get(h).addItemListener(new ItemChangeListener(true));
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
@@ -269,8 +303,7 @@ public final class LVCreate extends LV {
             }
             hostsPane.add(hostCheckBoxes.get(h));
         }
-        final JScrollPane sp = new JScrollPane(
-                                                               hostsPane);
+        final JScrollPane sp = new JScrollPane(hostsPane);
         sp.setPreferredSize(new Dimension(0, 45));
         pane.add(sp);
         pane.add(getProgressBarPane(null));
@@ -284,7 +317,9 @@ public final class LVCreate extends LV {
 
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
+        /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
+        /** Create ItemChangeListener object. */
         public ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;
@@ -299,9 +334,7 @@ public final class LVCreate extends LV {
 
     /** Size combo box action listener. */
     private class SizeDocumentListener implements DocumentListener {
-        public SizeDocumentListener() {
-            super();
-        }
+        /** Check. */
         private void check() {
             checkButtons();
         }
@@ -316,53 +349,6 @@ public final class LVCreate extends LV {
 
         @Override public void changedUpdate(final DocumentEvent e) {
             check();
-        }
-    }
-
-    /** Create action listener. */
-    private class CreateActionListener implements ActionListener {
-        public CreateActionListener() {
-            super();
-        }
-        @Override public void actionPerformed(final ActionEvent e) {
-            final Thread thread = new Thread(new CreateRunnable());
-            thread.start();
-        }
-    }
-
-    private class CreateRunnable implements Runnable {
-        public CreateRunnable() {
-            super();
-        }
-
-        @Override public void run() {
-            Tools.invokeAndWait(new EnableCreateRunnable(false));
-            disableComponents();
-            getProgressBar().start(CREATE_TIMEOUT
-                                   * hostCheckBoxes.size());
-            boolean oneFailed = false;
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    final boolean ret = lvCreate(h,
-                                                 lvNameCB.getStringValue(),
-                                                 sizeCB.getStringValue());
-                    if (!ret) {
-                        oneFailed = true;
-                    }
-                }
-            }
-            for (final Host h : hostCheckBoxes.keySet()) {
-                h.getBrowser().getClusterBrowser().updateHWInfo(h);
-            }
-            final String maxBlockSize = getMaxBlockSize();
-            final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
-            enableComponents();
-            if (oneFailed) {
-                progressBarDoneError();
-            } else {
-                progressBarDone();
-            }
         }
     }
 
