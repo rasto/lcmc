@@ -198,6 +198,8 @@ public final class Tools {
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /** Random number generator. */
     private static final Random RANDOM = new Random();
+    /** Time when the application started in seconds. */
+    private static final long startTime = System.currentTimeMillis() / 1000;
     /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
@@ -218,6 +220,11 @@ public final class Tools {
         setDefaults();
         configData = new ConfigData();
         guiData = new GUIData();
+    }
+
+    /** Returns seconds since start. */
+    private static long seconds() {
+        return System.currentTimeMillis() / 1000 - startTime;
     }
 
 
@@ -308,7 +315,9 @@ public final class Tools {
      */
     private static void debug(final String msg) {
         if (debugLevel > 0) {
-            System.out.println(DEBUG_STRING + msg + " (drbd.utilities.Tools)");
+            System.out.println(DEBUG_STRING
+                               + "[" + seconds() + "s] "
+                               + msg + " (drbd.utilities.Tools)");
         }
     }
 
@@ -326,6 +335,7 @@ public final class Tools {
         if (level <= debugLevel) {
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
+                               + "[" + seconds() + "s] "
                                + msg + " (drbd.utilities.Tools)");
         }
     }
@@ -342,9 +352,13 @@ public final class Tools {
     public static void debug(final Object object, final String msg) {
         if (debugLevel > -1) {
             if (object == null) {
-                System.out.println(DEBUG_STRING + msg);
+                System.out.println(DEBUG_STRING
+                                   + "[" + seconds() + "s] "
+                                   + msg);
             } else {
-                System.out.println(DEBUG_STRING + msg
+                System.out.println(DEBUG_STRING
+                                   + "[" + seconds() + "s] "
+                                   + msg
                                    + " (" + object.getClass().getName() + ")");
             }
         }
@@ -372,6 +386,7 @@ public final class Tools {
             }
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
+                               + "[" + seconds() + "s] "
                                + msg
                                + from);
         }

@@ -182,28 +182,35 @@ public final class DrbdXML extends XML {
     public static final String CONFIG_NO = "no";
 
     /** Prepares a new <code>DrbdXML</code> object. */
-    public DrbdXML(final Host[] hosts) {
+    public DrbdXML(final Host[] hosts, final Map<Host, String> drbdParameters) {
         super();
         addSpecialParameter("resource", "name", true);
-        for (Host host : hosts) {
-            final String command =
+        for (final Host host : hosts) {
+            String output = null;
+            if (drbdParameters.get(host) == null) {
+                final String command =
                                 host.getDistCommand("Drbd.getParameters",
                                                     (ConvertCmdCallback) null);
 
-            final SSH.SSHOutput ret =
+                final SSH.SSHOutput ret =
                               Tools.execCommand(host,
                                                 command,
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
-            if (ret.getExitCode() != 0) {
-                return;
+                if (ret.getExitCode() != 0) {
+                    return;
+                }
+                output = ret.getOutput();
+                if (output == null) {
+                    return;
+                }
+                drbdParameters.put(host, output);
+            } else {
+                output = drbdParameters.get(host);
             }
-            final String output = ret.getOutput();
-            if (output == null) {
-                return;
-            }
-
+            /* TODO: move this part somewhere else, it should be called
+               once per invocation or interactively. (drbd-get-xml) */
             final String[] lines = output.split("\\r?\\n");
             final Pattern bp = Pattern.compile("^<command name=\"(.*?)\".*");
             final Pattern ep = Pattern.compile("^</command>$");
@@ -235,7 +242,6 @@ public final class DrbdXML extends XML {
                              true);
             }
         }
-
     }
 
     /** Returns the filename of the drbd config file. */

@@ -631,7 +631,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
                     getBrowser().updateCommonBlockDevices();
                     final DrbdXML newDrbdXML =
-                        new DrbdXML(getBrowser().getCluster().getHostsArray());
+                        new DrbdXML(getBrowser().getCluster().getHostsArray(),
+                                    getBrowser().getDrbdParameters());
                     final String configString1 =
                                     newDrbdXML.getConfig(bd1.getHost());
                     newDrbdXML.update(configString1);
