@@ -875,7 +875,9 @@ public final class Tools {
     public static void save(final String filename) {
         debug("save");
         final String text =
-            Tools.getString("Tools.Saving").replaceAll("@FILENAME@", filename);
+            Tools.getString("Tools.Saving").replaceAll(
+                                             "@FILENAME@",
+                                             Matcher.quoteReplacement(filename));
         startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);

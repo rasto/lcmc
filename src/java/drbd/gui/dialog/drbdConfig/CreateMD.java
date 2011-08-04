@@ -45,6 +45,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import java.util.regex.Matcher;
+
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
@@ -159,8 +161,9 @@ final class CreateMD extends DrbdConfig {
                 answer[i] = Tools.getString(
                                    "Dialog.DrbdConfig.CreateMD.CreateMD.Done");
             }
-            answer[i] = answer[i].replaceAll("@HOST@",
-                                             bdis[i].getHost().getName());
+            answer[i] = answer[i].replaceAll(
+                         "@HOST@",
+                         Matcher.quoteReplacement(bdis[i].getHost().getName()));
         }
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answer));

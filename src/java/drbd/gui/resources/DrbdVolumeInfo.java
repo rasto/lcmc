@@ -49,6 +49,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
@@ -719,8 +720,9 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         String desc = Tools.getString(
                        "ClusterBrowser.confirmRemoveDrbdResource.Description");
-        desc = desc.replaceAll("@RESOURCE@",
-                               getDrbdResourceInfo() + "/" + getName());
+        desc = desc.replaceAll(
+             "@RESOURCE@",
+             Matcher.quoteReplacement(getDrbdResourceInfo() + "/" + getName()));
         if (Tools.confirmDialog(
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
               desc,

@@ -48,6 +48,7 @@ import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -778,8 +779,11 @@ public final class GroupInfo extends ServiceInfo {
             return;
         }
 
-        desc  = desc.replaceAll("@GROUP@", "'" + toString() + "'");
-        desc  = desc.replaceAll("@SERVICES@", services.toString());
+        desc  = desc.replaceAll(
+                            "@GROUP@",
+                            "'" + Matcher.quoteReplacement(toString()) + "'");
+        desc  = desc.replaceAll("@SERVICES@",
+                                Matcher.quoteReplacement(services.toString()));
         if (Tools.confirmDialog(
                 Tools.getString("ClusterBrowser.confirmRemoveGroup.Title"),
                 desc,

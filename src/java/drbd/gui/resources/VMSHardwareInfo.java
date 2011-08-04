@@ -357,7 +357,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         String desc = Tools.getString(
                                 "VMSHardwareInfo.confirmRemove.Description");
 
-        desc  = desc.replaceAll("@HW@", toString());
+        desc  = desc.replaceAll("@HW@", Matcher.quoteReplacement(toString()));
         if (Tools.confirmDialog(
                Tools.getString("VMSHardwareInfo.confirmRemove.Title"),
                desc,

@@ -25,6 +25,7 @@ import drbd.data.Host;
 import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 
 /**
  * This class provides virsh commands.
@@ -85,7 +86,9 @@ public final class VIRSH {
                 continue;
             }
             if (command.indexOf("@DOMAIN@") >= 0) {
-                command = command.replaceAll("@DOMAIN@", domainName);
+                command = command.replaceAll(
+                                          "@DOMAIN@",
+                                          Matcher.quoteReplacement(domainName));
             }
             if (command.indexOf("@VALUE@") >= 0) {
                 String value = parameters.get(param);

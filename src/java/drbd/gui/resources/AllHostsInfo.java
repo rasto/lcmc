@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Dimension;
@@ -141,7 +142,8 @@ public final class AllHostsInfo extends Info {
                          "EmptyBrowser.confirmRemoveMarkedClusters.Title"),
                      Tools.getString(
                          "EmptyBrowser.confirmRemoveMarkedClusters.Desc").
-                         replaceAll("@CLUSTERS@", clustersString),
+                         replaceAll("@CLUSTERS@",
+                                    Matcher.quoteReplacement(clustersString)),
                      Tools.getString(
                          "EmptyBrowser.confirmRemoveMarkedClusters.Yes"),
                      Tools.getString(

@@ -69,6 +69,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -4499,7 +4500,8 @@ public class ServiceInfo extends EditableInfo {
         String desc = Tools.getString(
                         "ClusterBrowser.confirmRemoveService.Description");
 
-        desc  = desc.replaceAll("@SERVICE@", toString());
+        desc  = desc.replaceAll("@SERVICE@",
+                                Matcher.quoteReplacement(toString()));
         if (Tools.confirmDialog(
                Tools.getString("ClusterBrowser.confirmRemoveService.Title"),
                desc,

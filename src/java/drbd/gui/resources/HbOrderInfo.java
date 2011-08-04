@@ -36,6 +36,7 @@ import drbd.utilities.Tools;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
 
 /**
  * Object that holds an order constraint information.
@@ -153,8 +154,12 @@ final class HbOrderInfo extends EditableInfo
         final String text =
                         getBrowser().getCRMXML().getOrderParamLongDesc(param);
         if (serviceInfoParent != null && serviceInfoChild != null) {
-            return text.replaceAll("@FIRST-RSC@", serviceInfoParent.toString())
-                       .replaceAll("@THEN-RSC@", serviceInfoChild.toString());
+            return text.replaceAll(
+                         "@FIRST-RSC@",
+                         Matcher.quoteReplacement(serviceInfoParent.toString()))
+                       .replaceAll(
+                         "@THEN-RSC@",
+                         Matcher.quoteReplacement(serviceInfoChild.toString()));
         } else {
             return text;
         }

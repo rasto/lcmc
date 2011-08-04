@@ -36,6 +36,7 @@ import drbd.utilities.Tools;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
 
 /**
  * Object that holds a colocation constraint information.
@@ -158,8 +159,12 @@ final class HbColocationInfo extends EditableInfo
         final String text =
                     getBrowser().getCRMXML().getColocationParamLongDesc(param);
         if (serviceInfoRsc != null && serviceInfoWithRsc != null) {
-            return text.replaceAll("@RSC@", serviceInfoRsc.toString())
-                       .replaceAll("@WITH-RSC@", serviceInfoWithRsc.toString());
+            return text.replaceAll("@RSC@",
+                                   Matcher.quoteReplacement(
+                                            serviceInfoRsc.toString()))
+                       .replaceAll("@WITH-RSC@",
+                                   Matcher.quoteReplacement(
+                                            serviceInfoWithRsc.toString()));
         }
         return text;
     }

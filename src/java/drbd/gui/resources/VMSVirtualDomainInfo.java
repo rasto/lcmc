@@ -73,6 +73,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -1700,7 +1701,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns menu item for VNC different viewers. */
     private String getVNCMenuString(final String viewer, final Host host) {
         return Tools.getString("VMSVirtualDomainInfo.StartVNCViewerOn")
-                            .replaceAll("@VIEWER@", viewer)
+                            .replaceAll("@VIEWER@",
+                                        Matcher.quoteReplacement(viewer))
                + host.getName();
     }
 
@@ -4442,7 +4444,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (dn == null) {
             dn = "";
         }
-        desc  = desc.replaceAll("@DOMAIN@", dn);
+        desc  = desc.replaceAll("@DOMAIN@", Matcher.quoteReplacement(dn));
         if (Tools.confirmDialog(
                Tools.getString("VMSVirtualDomainInfo.confirmRemove.Title"),
                desc,
