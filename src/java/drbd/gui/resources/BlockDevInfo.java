@@ -1232,7 +1232,14 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             private String getVolumeGroup() {
-                return getBlockDevice().getVolumeGroupOnPhysicalVolume();
+                final String vg = getBlockDevice().getVolumeGroup();
+                if (vg == null) {
+                    /* vg on pv */
+                    return getBlockDevice().getVolumeGroupOnPhysicalVolume();
+                } else {
+                    /* lv on vg */
+                    return vg;
+                }
             }
 
             @Override public boolean visiblePredicate() {
