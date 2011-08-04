@@ -3078,7 +3078,7 @@ public final class RoboTest {
 
     private static void chooseDrbdResource() {
         chooseDrbdResourceInterface(0);
-        chooseDrbdResourceInterface(40);
+        chooseDrbdResourceInterface(35);
 
         moveTo(720, 522);
         leftClick(); /* next */
@@ -3160,7 +3160,7 @@ public final class RoboTest {
         final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 2; i++) {
             info(drbdTest + "/1");
             addDrbdResource(blockDevY);
 
@@ -3184,8 +3184,7 @@ public final class RoboTest {
 
         moveTo(960, 522);
         leftClick(); /* cancel */
-        confirmRemove();
-        sleep(20000);
+        sleep(10000);
 
         info(drbdTest + "/4");
         addDrbdResource(blockDevY);
@@ -3196,8 +3195,7 @@ public final class RoboTest {
 
         moveTo(960, 522);
         leftClick(); /* cancel */
-        confirmRemove();
-        sleep(60000);
+        sleep(10000);
 
         info(drbdTest + "/5");
         addDrbdResource(blockDevY);
