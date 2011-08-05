@@ -1567,16 +1567,20 @@ public final class ClusterBrowser extends Browser {
     private void updateDrbdResources() {
         final DrbdXML dxml = new DrbdXML(cluster.getHostsArray(),
                                          drbdParameters);
+        boolean configUpdated = false;
         for (final Host host : cluster.getHostsArray()) {
             final String configString = dxml.getConfig(host);
-            boolean configUpdated = false;
             if (!Tools.areEqual(configString,
                             oldDrbdConfigString.get(host))) {
                 oldDrbdConfigString.put(host, configString);
+                configUpdated = true;
+                dxml.update(configString);
             }
-            dxml.update(configString);
         }
         drbdXML = dxml;
+        if (!configUpdated) {
+            return;
+        }
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
