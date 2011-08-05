@@ -57,9 +57,9 @@ import javax.swing.SwingUtilities;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {
-    final Host host;
-    /** Selected block device, can be null */
-    final BlockDevInfo selectedBlockDevInfo;
+    private final Host host;
+    /** Selected block device, can be null. */
+    private final BlockDevInfo selectedBlockDevInfo;
     private final MyButton createButton = new MyButton("Create VG");
     private GuiComboBox vgNameCB;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
@@ -118,7 +118,7 @@ public final class VGCreate extends LV {
     }
 
     private class EnableCreateRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableCreateRunnable(final boolean enable) {
             super();
             this.enable = enable;
@@ -346,7 +346,6 @@ public final class VGCreate extends LV {
                     if (!ret) {
                         oneFailed = true;
                     }
-                        
                 }
             }
             enableComponents();

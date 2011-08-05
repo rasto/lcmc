@@ -29,7 +29,6 @@ import drbd.utilities.AllHostsUpdatable;
 import drbd.EditClusterDialog;
 
 
-import javax.swing.JTree;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
@@ -65,8 +64,6 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Menu tree object. */
-    private final JTree tree;
     /** Combo box with operating modes. */
     private final JComboBox operatingModesCB;
     /** Advanced mode button. */
@@ -77,7 +74,7 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         super();
         this.cluster = cluster;
         cluster.createClusterBrowser();
-        tree = getTree(cluster.getBrowser());
+        getTree(cluster.getBrowser());
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
         /* wizard buttons */

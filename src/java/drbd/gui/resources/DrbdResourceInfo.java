@@ -95,7 +95,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBox = null;
     /** Port combo box wizard. */
     private GuiComboBox portComboBoxWizard = null;
-    /** resync-after combobox/ */
+    /** Resync-after combobox. */
     private GuiComboBox resyncAfterParamCB = null;
 
     /**

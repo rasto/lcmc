@@ -64,7 +64,8 @@ public final class VGRemove extends LV {
     private final BlockDevInfo blockDevInfo;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Description. */
-    private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
+    private static final String VG_REMOVE_DESCRIPTION =
+                                                     "Remove a volume group.";
     /** Remove new VGRemove object. */
     public VGRemove(final BlockDevInfo blockDevInfo) {
         super(null);
@@ -106,7 +107,7 @@ public final class VGRemove extends LV {
     }
 
     private class EnableRemoveRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableRemoveRunnable(final boolean enable) {
             super();
             this.enable = enable;
@@ -194,7 +195,7 @@ public final class VGRemove extends LV {
                     getProgressBar().start(REMOVE_TIMEOUT
                                            * hostCheckBoxes.size());
                     final String vgName = blockDevInfo.getBlockDevice()
-                                                .getVolumeGroupOnPhysicalVolume();
+                                             .getVolumeGroupOnPhysicalVolume();
                     boolean oneFailed = false;
                     for (final Host h : hostCheckBoxes.keySet()) {
                         if (hostCheckBoxes.get(h).isSelected()) {

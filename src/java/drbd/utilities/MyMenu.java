@@ -43,7 +43,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Access Type for this component to become enabled. */
     private final AccessMode enableAccessMode;
     /** Access Type for this component to become visible. */
-    private final AccessMode visibleAccessMode; // TODO:?
+    private final AccessMode visibleAccessMode; // TODO: not implemented
 
     /** Prepares a new <code>MyMenu</code> object. */
     public MyMenu(final String text,

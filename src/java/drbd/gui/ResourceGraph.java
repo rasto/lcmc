@@ -811,6 +811,7 @@ public abstract class ResourceGraph {
         /** Constructor. */
         MyVertexShapeSize(final Graph<V, E> graphIn,
                           final Transformer<Vertex, Point2D> vlfIn) {
+            super();
             this.graph = graphIn;
             this.vlf = vlfIn;
             setSizeTransformer(new Transformer<V, Integer>() {

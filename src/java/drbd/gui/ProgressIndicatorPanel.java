@@ -93,8 +93,6 @@ public final class ProgressIndicatorPanel extends JComponent
                                         implements MouseListener, KeyListener {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** The animation thread is responsible for fade in/out and rotation. */
-    private Thread animation  = null;
     /** Notifies whether the animation is running or not. */
     private boolean started    = false;
     /** Alpha level of the veil, used for fade in/out. */
@@ -260,8 +258,8 @@ public final class ProgressIndicatorPanel extends JComponent
             setVisible(true);
         }
         animator = new Animator();
-        animation = new Thread(animator);
-        animation.start();
+        final Thread t = new Thread(animator);
+        t.start();
         mAnimatorLock.unlock();
     }
 

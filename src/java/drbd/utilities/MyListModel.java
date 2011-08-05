@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.SwingUtilities;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -37,9 +38,8 @@ public final class MyListModel extends AbstractListModel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    private final ArrayList<MyMenuItem> items = new ArrayList<MyMenuItem>();
-    private final ArrayList<MyMenuItem> filteredItems =
-                                                new ArrayList<MyMenuItem>();
+    private final List<MyMenuItem> items = new ArrayList<MyMenuItem>();
+    private final List<MyMenuItem> filteredItems = new ArrayList<MyMenuItem>();
     private static final String START_TEXT = "type to search...";
     private final FilterField filterField = new FilterField(START_TEXT);
     /** Prepares a new <code>MyListModel</code> object. */
@@ -55,7 +55,7 @@ public final class MyListModel extends AbstractListModel {
     public FilterField getFilterField() {
         return filterField;
     }
-    
+
     public Object getElementAt(final int index) {
         if (index < filteredItems.size()) {
             return filteredItems.get(index);
@@ -110,7 +110,7 @@ public final class MyListModel extends AbstractListModel {
         }
 
         public void removeUpdate(final DocumentEvent e) {
-            refilter(); 
-        } 
+            refilter();
+        }
     }
 }

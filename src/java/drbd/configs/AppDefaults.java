@@ -60,16 +60,6 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"DebugLevel",       0}, /* level -1 - no messages, 2 all messages */
 
         /*
-         * locale
-         */
-        {"Locale.Lang",         "en"},
-        {"Locale.Country",      "US"},
-        /*
-        {"Locale.Lang",         "de"},
-        {"Locale.Country",      "DE"},
-        */
-
-        /*
          * dimensions of gui
          */
         {"DrbdMC.width",                         1120},

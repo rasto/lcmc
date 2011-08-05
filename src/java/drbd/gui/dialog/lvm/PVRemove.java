@@ -102,7 +102,7 @@ public final class PVRemove extends LV {
     }
 
     private class EnableRemoveRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableRemoveRunnable(final boolean enable) {
             super();
             this.enable = enable;

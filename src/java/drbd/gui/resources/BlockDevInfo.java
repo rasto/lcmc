@@ -1162,7 +1162,6 @@ public final class BlockDevInfo extends EditableInfo {
             public boolean visiblePredicate() {
                 return getBlockDevice().isPhysicalVolume()
                        && !getBlockDevice().isVolumeGroupOnPhysicalVolume();
-                                                                    
             }
 
             public String enablePredicate() {

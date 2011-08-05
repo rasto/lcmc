@@ -4389,10 +4389,11 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (!dirtyHosts.isEmpty()) {
-                CRM.cleanupResource(dcHost,
-                                    rscId,
-                                    dirtyHosts.toArray(new Host[dirtyHosts.size()]),
-                                    testOnly);
+                CRM.cleanupResource(
+                               dcHost,
+                               rscId,
+                               dirtyHosts.toArray(new Host[dirtyHosts.size()]),
+                               testOnly);
             }
         }
     }
@@ -6195,17 +6196,17 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns score combo box. */
-    final protected Map<HostInfo, GuiComboBox> getScoreComboBoxHash(){
+    protected final Map<HostInfo, GuiComboBox> getScoreComboBoxHash() {
         return scoreComboBoxHash;
     }
 
     /** Returns ping combo box. */
-    final protected GuiComboBox getPingComboBox(){
+    protected final GuiComboBox getPingComboBox() {
         return pingComboBox;
     }
 
     /** Sets ping combo box. */
-    final protected void setPingComboBox(final GuiComboBox pingComboBox){
+    protected final void setPingComboBox(final GuiComboBox pingComboBox) {
         this.pingComboBox = pingComboBox;
     }
 }

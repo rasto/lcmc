@@ -28,7 +28,6 @@ import drbd.gui.resources.Info;
 import drbd.gui.resources.AllHostsInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 
 /**
@@ -45,8 +44,6 @@ public final class EmptyBrowser extends Browser {
     private DefaultMutableTreeNode allHostsNode;
     /** Panel that holds this browser. */
     private EmptyViewPanel emptyViewPanel = null;
-    /** Tree menu root. */
-    private JTree treeMenu;
     /** All hosts info object of the host of this browser. */
     private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
 
@@ -93,9 +90,7 @@ public final class EmptyBrowser extends Browser {
     }
 
     /** Updates resources of a cluster in the tree. */
-    void updateHosts(final JTree treeMenu) {
-        this.treeMenu = treeMenu;
-
+    void updateHosts() {
         /* all hosts */
         final Host[] allHosts =
                               Tools.getConfigData().getHosts().getHostsArray();

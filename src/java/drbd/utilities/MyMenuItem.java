@@ -67,7 +67,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Pos of the click that can be used in the overriden action method. */
     private Point2D pos;
     /** Robot to move a mouse a little if a tooltip has changed. */
-    private Robot robot = null;
+    private final Robot robot;
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -106,11 +106,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         });
         setNormalFont();
         addActionListener(this);
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
     }
 
 
@@ -149,11 +151,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         addActionListener(this);
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
     }
 
     /**

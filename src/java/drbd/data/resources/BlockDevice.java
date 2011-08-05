@@ -552,7 +552,7 @@ public final class BlockDevice extends Resource {
         return vgOnPhysicalVolume != null && !"".equals(vgOnPhysicalVolume);
     }
 
-    /** Set volume group that is on this physical volume. 
+    /** Set volume group that is on this physical volume.
      * "", for no VG, but still it's physical volume. */
     public void setVolumeGroupOnPhysicalVolume(
                                             final String vgOnPhysicalVolume) {

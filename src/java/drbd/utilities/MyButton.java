@@ -55,7 +55,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Second color in the gradient. */
     private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
-    private Robot robot = null;
+    private final Robot robot;
     /** Button tooltip. */
     private JToolTip toolTip = null;
     /** Screen device. */
@@ -67,11 +67,13 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Prepares a new <code>MyButton</code> object. */
     public MyButton() {
         super();
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
         setContentAreaFilled(false);  // *
     }
 
@@ -83,11 +85,13 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public MyButton(final String text) {
         super(text);
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
         setContentAreaFilled(false);  // *
     }
 
@@ -101,11 +105,13 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public MyButton(final String text, final ImageIcon icon) {
         super(text, icon);
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
         setContentAreaFilled(false);  // *
     }
 
@@ -135,11 +141,13 @@ public class MyButton extends JButton implements ComponentWithTest {
      */
     public MyButton(final Color c1, final Color c2) {
         super();
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appError("Robot error");
         }
+        robot = r;
 
         this.color1 = c1;
         this.color2 = c2;

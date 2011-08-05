@@ -107,7 +107,7 @@ public final class PVCreate extends WizardDialog {
     }
 
     private class EnableCreateRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableCreateRunnable(final boolean enable) {
             super();
             this.enable = enable;

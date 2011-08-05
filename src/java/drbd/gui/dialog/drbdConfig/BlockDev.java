@@ -52,8 +52,6 @@ final class BlockDev extends DrbdConfig {
     private static final long serialVersionUID = 1L;
     /** This block device. */
     private final BlockDevInfo blockDevInfo;
-    /** Return code of adjust command that says 'no metadata'. */
-    private static final int DRBD_NO_METADATA_RC = 119;
 
     /** Prepares a new <code>BlockDev</code> object. */
     BlockDev(final WizardDialog previousDialog,
@@ -69,20 +67,6 @@ final class BlockDev extends DrbdConfig {
     @Override protected void finishDialog() {
         Tools.waitForSwing();
         blockDevInfo.apply(false);
-    }
-
-    /** Calls drbd adjust, returns false if there is no meta-data area. */
-    private boolean adjust(final BlockDevInfo bdi) {
-        final boolean testOnly = false;
-        final int err = DRBD.adjust(
-                    bdi.getHost(),
-                    bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                    bdi.getDrbdVolumeInfo().getName(),
-                    testOnly);
-        if (err == DRBD_NO_METADATA_RC) {
-            return false;
-        }
-        return true;
     }
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */

@@ -150,11 +150,8 @@ public final class DrbdXML extends XML {
         {new StringInfo("A / Asynchronous",     "A", null),
          new StringInfo("B / Semi-Synchronous", "B", null),
          new StringInfo(PROTOCOL_C,             "C", null)};
-    /** DRBD single-primary mode, that is a default. */
-    private static final String MODE_SINGLE_PRIMARY = "False";
     /** Some non advanced parameters. */
-    static final List<String> NOT_ADVANCED_PARAMS =
-                                                    new ArrayList<String>();
+    static final List<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
     static {
         NOT_ADVANCED_PARAMS.add("rate");
         NOT_ADVANCED_PARAMS.add("protocol");
@@ -419,7 +416,7 @@ public final class DrbdXML extends XML {
                     correctValue = false;
                 }
             } else if (!"s".equalsIgnoreCase(unit)) {
-                long v = Long.parseLong(rawValue);
+                final long v = Long.parseLong(rawValue);
                 if (paramMaxMap.get(param) != null
                     && v > paramMaxMap.get(param).longValue()) {
                     correctValue = false;
@@ -617,7 +614,7 @@ public final class DrbdXML extends XML {
             /* <option> */
             if (optionNode.getNodeName().equals("option")) {
                 final String name = getAttribute(optionNode, "name");
-                String type = getAttribute(optionNode, "type");
+                final String type = getAttribute(optionNode, "type");
                 if ("flag".equals(type)) {
                     /* ignore flags */
                     continue;

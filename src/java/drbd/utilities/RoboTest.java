@@ -1461,7 +1461,7 @@ public final class RoboTest {
         sleep(3000);
         leftClick();
         if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-            info("remove everything color: failed");    
+            info("remove everything color: failed");
         }
         confirmRemove();
         sleep(3000);
@@ -1834,8 +1834,8 @@ public final class RoboTest {
         checkTest("test5", 2.1);
 
         leftClick(); /*  apply */
-        int dum1PopX = dummy1X + 80;
-        int dum1PopY = dummy1Y + 60;
+        final int dum1PopX = dummy1X + 80;
+        final int dum1PopY = dummy1Y + 60;
         removeConstraint(dum1PopX, dum1PopY);
         checkTest("test5", 2.5);
         /* constraints */
@@ -2078,7 +2078,7 @@ public final class RoboTest {
     private static void startTestD() {
         slowFactor = 0.2f;
         aborted = false;
-        int count = 20;
+        final int count = 20;
         final int dummy1X = 540;
         final int dummy1Y = 202;
         for (int i = count; i > 0; i--) {
@@ -2094,7 +2094,7 @@ public final class RoboTest {
             if (i % 5 == 0) {
                 info("testD 2 I: " + i);
             }
-            double rand = Math.random();
+            final double rand = Math.random();
             if (rand < 0.33) {
                 if (pos == 1) {
                     continue;
@@ -2125,7 +2125,7 @@ public final class RoboTest {
     private static void startTestE() {
         slowFactor = 0.2f;
         aborted = false;
-        int count = 200;
+        final int count = 200;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
                 info("testE I: " + i);
@@ -2166,7 +2166,7 @@ public final class RoboTest {
 
         final int gxM = 110; /* tree menu */
         final int gyM = 242;
-        int type = 1;
+        final int type = 1;
         //int type = 2;
         for (int i = 2; i > 0; i--) {
             info("I: " + i);
@@ -2224,14 +2224,14 @@ public final class RoboTest {
         aborted = false;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("gui-test1 I: " + i);    
+                info("gui-test1 I: " + i);
             }
             moveTo(470, 72); /* host wizard */
             sleep(500);
             leftClick();
             sleep(1000);
             if (!isColor(360, 442, new Color(255, 100, 100), true)) {
-                info("gui-test1 1: error");    
+                info("gui-test1 1: error");
                 break;
             }
             boolean ok = false;
@@ -2245,7 +2245,7 @@ public final class RoboTest {
                 }
             }
             if (!ok) {
-                info("gui-test1 2: failed");    
+                info("gui-test1 2: failed");
                 break;
             }
             moveTo(910 , 517); /* cancel */
@@ -2261,7 +2261,7 @@ public final class RoboTest {
         aborted = false;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("gui-test2 " + i);    
+                info("gui-test2 " + i);
             }
 
             moveTo(800 , 72); /* cluster wizard */
@@ -2269,7 +2269,7 @@ public final class RoboTest {
             leftClick();
             sleep(2000);
             if (!isColor(336, 472, new Color(184, 207, 229), true)) {
-                info("gui-test2: error");    
+                info("gui-test2: error");
                 break;
             }
             moveTo(910 , 517); /* cancel */
@@ -2512,14 +2512,14 @@ public final class RoboTest {
     private static void confirmRemove() {
         sleep(1000);
         if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-            info("confirm remove color: error");    
+            info("confirm remove color: error");
         }
-    	press(KeyEvent.VK_TAB);
-	sleep(500);
-    	press(KeyEvent.VK_TAB);
-	sleep(500);
-    	press(KeyEvent.VK_SPACE);
-	sleep(500);
+        press(KeyEvent.VK_TAB);
+        sleep(500);
+        press(KeyEvent.VK_TAB);
+        sleep(500);
+        press(KeyEvent.VK_SPACE);
+        sleep(500);
     }
 
     /** Stops resource. */
@@ -2619,16 +2619,6 @@ public final class RoboTest {
         moveTo(x + 70, y + 200 + yFactor);
         sleep(6000); /* ptest */
         leftClick(); /* stop */
-    }
-
-    /** Go to the group service menu. */
-    private static void groupServiceMenu(final int x,
-                                         final int y,
-                                         final int groupService) {
-        final int groupServicePos = 365 + groupService;
-        final int startBefore = 100 + groupService;
-        moveTo(x + 82, y + groupServicePos);
-        moveTo(x + 382, y + groupServicePos);
     }
 
     /** Adds constraint from vertex. */
@@ -2791,19 +2781,19 @@ public final class RoboTest {
             leftClick(); /* choose fs */
 
             moveTo(1065, 358); /* choose drbd */
-            leftClick(); 
+            leftClick();
             press(KeyEvent.VK_DOWN);
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo(1065, 391); /* mount point */
-            leftClick(); 
+            leftClick();
             press(KeyEvent.VK_DOWN);
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo(1068, 427); /* filesystem type */
-            leftClick(); 
+            leftClick();
             press(KeyEvent.VK_E);
             sleep(200);
             press(KeyEvent.VK_E);
@@ -2871,15 +2861,6 @@ public final class RoboTest {
         sleepNoFactor(500);
         robot.mouseRelease(InputEvent.BUTTON3_MASK);
         sleep(6000);
-    }
-
-    /** Right click. */
-    private static void rightClickGroup()  {
-        if (aborted) {
-            return;
-        }
-        rightClick();
-        sleepNoFactor(10000);
     }
 
     /** Returns true if there is the specified color on this position. */
@@ -3041,7 +3022,7 @@ public final class RoboTest {
 
     private static boolean dialogColorTest(final String text) {
         if (!isColor(125, 370, AppDefaults.LINBIT_ORANGE, true)) {
-            info(text + ": color test: error");    
+            info(text + ": color test: error");
             return false;
         } else {
             return true;
@@ -3118,7 +3099,7 @@ public final class RoboTest {
         moveTo(555, 292); /* remove */
         leftClick();
         if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-            info("remove drbd volume color: error");    
+            info("remove drbd volume color: error");
         }
         if (really) {
             confirmRemove();
@@ -3850,7 +3831,7 @@ public final class RoboTest {
             leftClick();
             sleepNoFactor(2000);
             if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
-                info("remove VM color: error");    
+                info("remove VM color: error");
             }
             moveTo(516, 428); /* confirm */
             leftClick();
@@ -3864,14 +3845,14 @@ public final class RoboTest {
         aborted = false;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("vm-test2 I: " + i);
+                info(vmTest + " I: " + i);
             }
             moveTo(330, 122); /* new VM */
             sleep(500);
             leftClick();
             sleep(1000);
             if (!isColor(480, 322, new Color(255, 100, 100), true)) {
-                info("vm-test2 1: error");    
+                info(vmTest + " 1: error");
                 break;
             }
             boolean ok = false;
@@ -3885,7 +3866,7 @@ public final class RoboTest {
                 }
             }
             if (!ok) {
-                info("vm-test2 2: failed");    
+                info(vmTest + " 2: failed");
                 break;
             }
             moveTo(910, 517); /* cancel */

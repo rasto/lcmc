@@ -47,7 +47,7 @@ public final class MyList extends JList implements ComponentWithTest {
     /** Tools tip object. */
     private JToolTip toolTip;
     /** Robot to move a mouse a little if a tooltip has changed. */
-    private Robot robot = null;
+    private final Robot robot;
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -58,11 +58,13 @@ public final class MyList extends JList implements ComponentWithTest {
     public MyList(final ListModel dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
+        Robot r = null;
         try {
-            robot = new Robot(SCREEN_DEVICE);
+            r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
             Tools.appWarning("Robot error");
         }
+        robot = r;
         setBackground(bg);
     }
 

@@ -56,7 +56,7 @@ public final class LVSnapshot extends LV {
     /** LV Snapshot timeout. */
     private static final int SNAPSHOT_TIMEOUT = 5000;
     /** Block device info object. */
-    final BlockDevInfo blockDevInfo;
+    private final BlockDevInfo blockDevInfo;
     private final MyButton snapshotButton = new MyButton("Create Snapshot");
     private GuiComboBox lvNameCB;
     private GuiComboBox sizeCB;
@@ -103,7 +103,7 @@ public final class LVSnapshot extends LV {
     }
 
     private class EnableSnapshotRunnable implements Runnable {
-        private final boolean enable ;
+        private final boolean enable;
         public EnableSnapshotRunnable(final boolean enable) {
             super();
             this.enable = enable;
@@ -113,7 +113,7 @@ public final class LVSnapshot extends LV {
             boolean e = enable;
             if (enable) {
                 final long size = Tools.convertToKilobytes(
-                                                  sizeCB.getStringValue()); 
+                                                  sizeCB.getStringValue());
                 final long maxSize = Tools.convertToKilobytes(
                                                maxSizeCB.getStringValue());
                 if (size > maxSize) {
@@ -138,7 +138,7 @@ public final class LVSnapshot extends LV {
     private void setComboBoxes() {
         final String maxBlockSize = getMaxBlockSize();
         sizeCB.setValue(Tools.convertKilobytes(Long.toString(
-                                     + Long.parseLong(maxBlockSize) / 2)));
+                                     Long.parseLong(maxBlockSize) / 2)));
         maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
     }
 
@@ -243,7 +243,7 @@ public final class LVSnapshot extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new SizeItemListener(), 
+        sizeCB.addListeners(new SizeItemListener(),
                             new SizeDocumentListener());
 
         SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */

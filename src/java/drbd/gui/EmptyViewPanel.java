@@ -27,7 +27,6 @@ import drbd.utilities.Tools;
 import drbd.utilities.AllHostsUpdatable;
 import drbd.utilities.MyButton;
 
-import javax.swing.JTree;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -86,8 +85,6 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** I am new here help text. */
     private static final String HELP_TEXT_STRING =
                                 Tools.getString("EmptyViewPanel.HelpText");
-    /** Menu tree object. */
-    private JTree tree;
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
      */
@@ -227,12 +224,12 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
 
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
-        tree = getTree(browser);
-        browser.updateHosts(tree);
+        getTree(browser);
+        browser.updateHosts();
     }
 
     /** Updates the all hosts menu item. */
     @Override public void allHostsUpdate() {
-        browser.updateHosts(tree);
+        browser.updateHosts();
     }
 }

@@ -1010,7 +1010,8 @@ public final class GuiComboBox extends JPanel {
                         textFieldPart.setVisible(visible);
                         unitComboBox.setVisible(visible);
                         break;
-
+                    default:
+                        break;
                 }
                 //if (fieldButton != null) {
                 //    fieldButton.setVisible(visible);
@@ -1050,6 +1051,8 @@ public final class GuiComboBox extends JPanel {
                         textFieldPart.setEnabled(enabled);
                         unitComboBox.setEnabled(enabled && unitEnabled);
                         break;
+                    default:
+                        /* nothing */
                 }
                 if (fieldButton != null) {
                     componentPart.setEnabled(enabled);

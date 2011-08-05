@@ -69,7 +69,7 @@ public final class ClustersPanel extends JPanel {
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** New empty cluster tab. */
-    private static ClusterTab newClusterTab;
+    private final ClusterTab newClusterTab;
     /** Previously selected tab. */
     private ClusterTab prevSelected = null;
     /** Width of the tab border. */

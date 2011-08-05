@@ -121,8 +121,6 @@ public final class Host {
     private String drbdVersion = null;
     /** Drbd version of drbd module. */
     private String drbdModuleVersion = null;
-    /** Installed drbd version. TODO */
-    private final String installedDrbdVersion = null;
     /** Map of network interfaces of this host. */
     private Map<String, NetInterface> netInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
@@ -651,8 +649,7 @@ public final class Host {
 
     /**
      * Sets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed, installedDrbdVersion contains
-     * its version.
+     * If drbd is already installed.
      */
     public void setDrbdVersionToInstall(final String drbdVersionToInstall) {
         this.drbdVersionToInstall = drbdVersionToInstall;
@@ -669,8 +666,7 @@ public final class Host {
 
     /**
      * Gets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed, installedDrbdVersion contains
-     * its version.
+     * If drbd is already installed.
      */
     public String getDrbdVersionToInstall() {
         return drbdVersionToInstall;
@@ -2482,7 +2478,7 @@ public final class Host {
 
     /** Returns how much is free space in a volume group. */
     public long getFreeInVolumeGroup(final String volumeGroup) {
-        Long f = volumeGroups.get(volumeGroup);
+        final Long f = volumeGroups.get(volumeGroup);
         if (f == null) {
             return 0;
         }

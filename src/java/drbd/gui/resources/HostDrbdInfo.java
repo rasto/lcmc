@@ -702,7 +702,7 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Adds menus to manage LVMs. */
-    public final void addLVMMenu(final MyMenu submenu) {
+    public void addLVMMenu(final MyMenu submenu) {
         submenu.removeAll();
         submenu.add(getVGCreateItem());
         for (final String vg : getHost().getVolumeGroupNames()) {

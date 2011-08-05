@@ -88,7 +88,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import javax.swing.event.MenuEvent;
@@ -101,7 +100,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
-import java.awt.event.KeyEvent;
 import java.awt.Desktop;
 
 import java.io.BufferedReader;
@@ -144,11 +142,6 @@ public final class Tools {
     /** Image icon cache. */
     private static Map<String, ImageIcon> imageIcons =
                                               new HashMap<String, ImageIcon>();
-    /** Locales. */
-    private static String localeLang = ""; //TODO: not needed?
-    /** Locales. */
-    private static String localeCountry = ""; //TODO: not needed?
-
     /** Resource bundle. */
     private static ResourceBundle resource = null;
     /** Application defaults bundle. */
@@ -189,7 +182,7 @@ public final class Tools {
     /** Random number generator. */
     private static final Random RANDOM = new Random();
     /** Time when the application started in seconds. */
-    private static final long startTime = System.currentTimeMillis() / 1000;
+    private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
@@ -214,7 +207,7 @@ public final class Tools {
 
     /** Returns seconds since start. */
     private static long seconds() {
-        return System.currentTimeMillis() / 1000 - startTime;
+        return System.currentTimeMillis() / 1000 - START_TIME;
     }
 
 
@@ -270,9 +263,6 @@ public final class Tools {
         if (getDefault("AppError").equals("y")) {
             appError = true;
         }
-        localeLang = getDefault("Locale.Lang");
-        localeCountry = getDefault("Locale.Country");
-
     }
 
     /** Increments the debug level. */
@@ -866,8 +856,8 @@ public final class Tools {
         debug("save");
         final String text =
             Tools.getString("Tools.Saving").replaceAll(
-                                             "@FILENAME@",
-                                             Matcher.quoteReplacement(filename));
+                                           "@FILENAME@",
+                                           Matcher.quoteReplacement(filename));
         startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
@@ -1658,7 +1648,7 @@ public final class Tools {
                             }
                         });
                         final MyMenuItem item =
-                                            (MyMenuItem) dlm.getElementAt(index);
+                                          (MyMenuItem) dlm.getElementAt(index);
                         item.action();
                     }
                 });
