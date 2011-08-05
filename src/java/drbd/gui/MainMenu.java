@@ -42,7 +42,6 @@ import java.awt.event.KeyEvent;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;

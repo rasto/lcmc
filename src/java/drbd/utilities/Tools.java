@@ -52,10 +52,6 @@ import java.util.Collection;
 import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileNotFoundException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -68,7 +64,6 @@ import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
-import javax.swing.DefaultListModel;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
 import javax.swing.JTable;
@@ -107,7 +102,6 @@ import java.awt.Toolkit;
 import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.Desktop;
 
 import java.io.BufferedReader;
@@ -124,10 +118,6 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
-
-import java.net.URLClassLoader;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 
 /**
  * This class provides tools, that are not classified.

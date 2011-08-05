@@ -26,7 +26,6 @@ import drbd.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * This class provides LVM commands.

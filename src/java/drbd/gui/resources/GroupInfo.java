@@ -54,7 +54,6 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JScrollPane;
 import javax.swing.JCheckBox;
 import java.awt.geom.Point2D;
 
