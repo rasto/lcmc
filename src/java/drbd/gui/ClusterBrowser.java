@@ -1574,8 +1574,8 @@ public final class ClusterBrowser extends Browser {
                             oldDrbdConfigString.get(host))) {
                 oldDrbdConfigString.put(host, configString);
                 configUpdated = true;
-                dxml.update(configString);
             }
+            dxml.update(configString);
         }
         drbdXML = dxml;
         if (!configUpdated) {
