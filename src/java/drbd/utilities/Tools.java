@@ -92,6 +92,7 @@ import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.JApplet;
 import java.awt.Cursor;
 import java.awt.image.MemoryImageSource;
 import java.awt.Image;
@@ -101,6 +102,7 @@ import java.awt.Toolkit;
 import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
 import java.awt.Desktop;
+import java.awt.Container;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -1597,7 +1599,13 @@ public final class Tools {
         sp.setViewportBorder(null);
         sp.setBorder(null);
         final JTextField typeToSearchField = dlm.getFilterField();
-        final JDialog popup = new JDialog(new JFrame(), name, false);
+        final Container mainFrame = Tools.getGUIData().getMainFrame();
+        final JDialog popup;
+        if (mainFrame instanceof JApplet) {
+            popup = new JDialog(new JFrame(), name, false);
+        } else {
+            popup = new JDialog((JFrame) mainFrame, name, false);
+        }
         popup.setUndecorated(true);
         popup.setAlwaysOnTop(true);
         final JPanel popupPanel = new JPanel();
