@@ -2262,13 +2262,15 @@ public final class ClusterBrowser extends Browser {
      * The defaultValue is stored as the first item in the array.
      */
     public StringInfo[] getCommonFileSystems(final String defaultValue) {
-        StringInfo[] cfs =  new StringInfo[commonFileSystems.length + 1];
+        StringInfo[] cfs =  new StringInfo[commonFileSystems.length + 2];
         cfs[0] = new StringInfo(defaultValue, null, this);
         int i = 1;
         for (String cf : commonFileSystems) {
             cfs[i] = new StringInfo(cf, cf, this);
             i++;
         }
+        cfs[i] = new StringInfo("none", "none", this);
+            i++;
         return cfs;
     }
     /**
