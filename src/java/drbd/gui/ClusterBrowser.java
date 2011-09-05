@@ -1453,9 +1453,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates VM nodes. */
     void updateVMS() {
-        if (!mUpdateVMSlock.tryLock()) {
-            return;
-        }
+        mUpdateVMSlock.lock();
         Tools.debug(this, "VM status update", 1);
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
