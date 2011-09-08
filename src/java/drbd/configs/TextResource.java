@@ -112,8 +112,11 @@ public final class TextResource extends java.util.ListResourceBundle {
          ""},
 
         /** Clusters panel */
-        {"ClustersPanel.NewTabTip",
-         "New Cluster"},
+        {"ClustersPanel.ClustersTab",
+         "Clusters"},
+
+        {"ClustersPanel.ClustersTabTip",
+         "All Clusters"},
 
         /** Hosts panel */
         {"HostsPanel.NewTabTip",

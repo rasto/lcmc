@@ -68,6 +68,12 @@ public final class ClustersPanel extends JPanel {
     /** Icon of the cluster. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
+    /** Icon of all clusters. */
+    private static final ImageIcon CLUSTERS_ICON = Tools.createImageIcon(
+                               Tools.getDefault("ClustersPanel.ClustersIcon"));
+    /** Name of all clusters tab. */
+    private static final String CLUSTERS_LABEL =
+                                Tools.getString("ClustersPanel.ClustersTab");
     /** New empty cluster tab. */
     private final ClusterTab newClusterTab;
     /** Previously selected tab. */
@@ -115,7 +121,7 @@ public final class ClustersPanel extends JPanel {
         final MyTabbedPaneUI mtpui = new MyTabbedPaneUI();
         tabbedPane.setUI(mtpui);
 
-        addEmptyTab();
+        addClustersTab(CLUSTERS_LABEL);
         add(tabbedPane);
         this.setBorder(javax.swing.BorderFactory.createLineBorder(
                         Tools.getDefaultColor("ClustersPanel.Background"),
@@ -155,29 +161,29 @@ public final class ClustersPanel extends JPanel {
     /** Adds a new cluster tab. */
     void addTab(final Cluster cluster) {
         Tools.debug(this, "cluster add tab " + cluster.getName(), 2);
-        removeEmptyTab();
         final ClusterTab ct = new ClusterTab(cluster);
         cluster.setClusterTab(ct);
         /* insert tab before empty tab */
+        removeClustersTab();
+        addClustersTab("");
         tabbedPane.addTab(cluster.getName(),
                           CLUSTER_ICON,
                           ct,
                           Tools.join(" ", cluster.getHostNames()));
         tabbedPane.setSelectedComponent(ct);
-        addEmptyTab();
         refresh();
     }
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
-    void addEmptyTab() {
-        tabbedPane.addTab("",
-                          null,
+    void addClustersTab(final String label) {
+        tabbedPane.addTab(label,
+                          CLUSTERS_ICON,
                           newClusterTab,
-                          Tools.getString("ClustersPanel.NewTabTip"));
+                          Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
     /** Removes the empty tab. */
-    void removeEmptyTab() {
+    void removeClustersTab() {
         tabbedPane.remove(tabbedPane.getTabCount() - 1);
     }
 
@@ -189,14 +195,15 @@ public final class ClustersPanel extends JPanel {
         final ClusterTab selected = getClusterTab();
         selected.getCluster().setClusterTab(null);
         int index = tabbedPane.getSelectedIndex() - 1;
-        if (index < 0) {
-            index = 0;
+        if (index < 1) {
+            index = 1;
         }
         if (selected != null) {
-            /* deselecting so that dialogs don't appear */
-            tabbedPane.setSelectedIndex(-1);
             tabbedPane.remove(selected);
-            tabbedPane.setSelectedIndex(index);
+            if (tabbedPane.getTabCount() == 1) {
+                removeClustersTab();
+                addClustersTab(CLUSTERS_LABEL);
+            }
         }
     }
 
@@ -204,12 +211,16 @@ public final class ClustersPanel extends JPanel {
     public void removeTab(final Cluster cluster) {
         tabbedPane.remove(cluster.getClusterTab());
         cluster.setClusterTab(null);
+        if (tabbedPane.getTabCount() == 1) {
+            removeClustersTab();
+            addClustersTab(CLUSTERS_LABEL);
+        }
     }
 
     /** Removes all tabs. */
     public void removeAllTabs() {
         tabbedPane.removeAll();
-        addEmptyTab();
+        addClustersTab("");
     }
 
     /** Renames selected added tab. */
@@ -221,12 +232,12 @@ public final class ClustersPanel extends JPanel {
     /** Adds all cluster tabs, e.g. after loading of configuration. */
     private void addAllTabs() {
         final Clusters clusters = Tools.getConfigData().getClusters();
+        addClustersTab(CLUSTERS_LABEL);
         if (clusters != null) {
             for (final Cluster cluster : clusters.getClusterSet()) {
                 addTab(cluster);
             }
         }
-        addEmptyTab();
     }
 
     /** Refreshes the view. */
