@@ -47,7 +47,6 @@ import drbd.gui.resources.HbCategoryInfo;
 import drbd.gui.resources.HbConnectionInfo;
 import drbd.gui.resources.Info;
 import drbd.gui.resources.CategoryInfo;
-import drbd.gui.resources.AllHostsInfo;
 import drbd.gui.resources.ServicesInfo;
 import drbd.gui.resources.ServiceInfo;
 import drbd.gui.resources.GroupInfo;
@@ -118,8 +117,6 @@ public final class ClusterBrowser extends Browser {
      * one cluster).
      */
     private final Cluster cluster;
-    /** Menu's all hosts node. */
-    private DefaultMutableTreeNode allHostsNode;
     /** Menu's all hosts in the cluster node. */
     private DefaultMutableTreeNode clusterHostsNode;
     /** Menu's networks node. */
@@ -550,12 +547,6 @@ public final class ClusterBrowser extends Browser {
 
     /** Initializes cluster resources for cluster view. */
     void initClusterBrowser() {
-        /* all hosts */
-        allHostsNode = new DefaultMutableTreeNode(
-                                new AllHostsInfo(
-                                        Tools.getGUIData().getEmptyBrowser()));
-        setNode(allHostsNode);
-        topAdd(allHostsNode);
         /* hosts */
         clusterHostsInfo =
            new ClusterHostsInfo(Tools.getString("ClusterBrowser.ClusterHosts"),
@@ -630,22 +621,6 @@ public final class ClusterBrowser extends Browser {
         this.commonFileSystems = commonFileSystems.clone();
         this.commonMountPoints = commonMountPoints.clone();
         DefaultMutableTreeNode resource;
-
-        /* all hosts */
-        final Host[] allHosts =
-                               Tools.getConfigData().getHosts().getHostsArray();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                allHostsNode.removeAllChildren();
-            }
-        });
-        for (Host host : allHosts) {
-            final HostBrowser hostBrowser = host.getBrowser();
-            resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-            setNode(resource);
-            addNode(allHostsNode, resource);
-        }
-        reload(allHostsNode, false);
 
         /* cluster hosts */
         SwingUtilities.invokeLater(new Runnable() {
