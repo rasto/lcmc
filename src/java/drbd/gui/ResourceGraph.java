@@ -901,6 +901,12 @@ public abstract class ResourceGraph {
 
         /** Is called when mouse was clicked. */
         @Override public void mouseClicked(final MouseEvent e) {
+            final Point2D popP = e.getPoint();
+
+            final int posX = (int) popP.getX();
+            final int posY = (int) popP.getY();
+            handlePopup(e);
+
             super.mouseClicked(e);
             final PickedState<Edge> psEdge =
                                     vv.getRenderContext().getPickedEdgeState();
@@ -919,25 +925,22 @@ public abstract class ResourceGraph {
         protected void handlePopup(final MouseEvent me) {
             final Thread thread = new Thread(new Runnable() {
                 @Override public void run() {
-                    final Point2D p = me.getPoint();
-                    final GraphElementAccessor<Vertex, Edge> pickSupport =
-                                                           vv.getPickSupport();
-                    final Vertex v = pickSupport.getVertex(layout,
-                                                           p.getX(),
-                                                           p.getY());
                     final Point2D popP = me.getPoint();
 
                     final int posX = (int) popP.getX();
                     final int posY = (int) popP.getY();
 
+                    final GraphElementAccessor<Vertex, Edge> pickSupport =
+                                                           vv.getPickSupport();
+                    final Vertex v = pickSupport.getVertex(layout, posX, posY);
                     if (v == null) {
                         final Edge edge = pickSupport.getEdge(layout,
-                                                              p.getX(),
-                                                              p.getY());
+                                                              posX,
+                                                              posY);
                         if (edge == null) {
                             /* background was clicked */
                             final JPopupMenu backgroundPopup =
-                                                    handlePopupBackground(p);
+                                                  handlePopupBackground(popP);
                             if (backgroundPopup != null) {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override public void run() {
@@ -958,7 +961,8 @@ public abstract class ResourceGraph {
                             oneEdgePressed(edge);
                         }
                     } else {
-                        final JPopupMenu vertexPopup = handlePopupVertex(v, p);
+                        final JPopupMenu vertexPopup =
+                                                handlePopupVertex(v, popP);
                         if (vertexPopup != null) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override public void run() {
@@ -1481,7 +1485,7 @@ public abstract class ResourceGraph {
             /* icon */
             if (icons != null) {
                 for (final ImageIcon icon : icons) {
-                    icon.setDescription("sdf");
+                    icon.setDescription("");
                     g2d.drawImage(
                           icon.getImage(),
                           (int) (x + 4),
