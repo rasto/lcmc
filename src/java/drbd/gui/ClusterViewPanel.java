@@ -47,6 +47,8 @@ import java.awt.event.ItemEvent;
 import javax.swing.border.TitledBorder;
 import javax.swing.SwingUtilities;
 
+import java.util.ArrayList;
+
 
 
 /**
@@ -98,6 +100,23 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
             }
         });
 
+        /* disconnect cluster */
+        final MyButton disconnectButton = new MyButton(
+                            Tools.getString("ClusterViewPanel.DisconnectBtn"));
+        disconnectButton.setPreferredSize(new Dimension(150, 20));
+        disconnectButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override public void run() {
+                        Tools.stopCluster(cluster);
+                        Tools.getGUIData().getEmptyBrowser().setDisconnected(
+                                                                      cluster);
+                    }
+                });
+                t.start();
+            }
+        });
+
         final JPanel clusterButtonsPanel = new JPanel();
         clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
         final TitledBorder titledBorder = Tools.getBorder(
@@ -105,6 +124,7 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         clusterButtonsPanel.setBorder(titledBorder);
 
         clusterButtonsPanel.add(clusterWizardButton);
+        clusterButtonsPanel.add(disconnectButton);
         buttonPanel.add(clusterButtonsPanel);
 
         /* advanced mode button */
@@ -143,10 +163,6 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
                 }
             }
         });
-        opModePanel.add(opModeCB);
-        opModePanel.add(advancedModeCB);
-        buttonPanel.add(opModePanel);
-        operatingModesCB = opModeCB;
 
         /* upgrade field */
         buttonPanel.add(
@@ -156,12 +172,16 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final JPanel buttonArea = new JPanel(new BorderLayout());
         buttonArea.setBackground(STATUS_BACKGROUND);
         buttonArea.add(buttonPanel, BorderLayout.WEST);
-        final JLabel logo = new JLabel(Tools.createImageIcon(
-                                  Tools.getDefault("ClusterViewPanel.Logo")));
-        final JPanel l = new JPanel(new BorderLayout());
-        l.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
-        l.add(logo, BorderLayout.NORTH);
-        buttonArea.add(l, BorderLayout.EAST);
+        opModePanel.add(opModeCB);
+        opModePanel.add(advancedModeCB);
+        buttonArea.add(opModePanel, BorderLayout.EAST);
+        operatingModesCB = opModeCB;
+        //final JLabel logo = new JLabel(Tools.createImageIcon(
+        //                          Tools.getDefault("ClusterViewPanel.Logo")));
+        //final JPanel l = new JPanel(new BorderLayout());
+        //l.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
+        //l.add(logo, BorderLayout.NORTH);
+        //buttonArea.add(l, BorderLayout.EAST);
         add(buttonArea, BorderLayout.NORTH);
 
         allHostsUpdate();

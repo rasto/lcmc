@@ -373,15 +373,24 @@ public final class AllHostsInfo extends Info {
     }
 
     /**
-     * Sets this cluster as started. It is called after user enters a
+     * Sets this cluster as connected. It is called after user enters a
      * cluster through the dialogs.
      */
-    public void setAsStarted(final Cluster cluster) {
+    public void setConnected(final Cluster cluster) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 allLoadButtons.get(cluster).setEnabled(false);
                 clusterBackgrounds.get(cluster).setBackground(
                                                    Color.GREEN);
+            }
+        });
+    }
+
+    /** Sets this cluster as disconnected. */
+    public void setDisconnected(final Cluster cluster) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                allLoadButtons.get(cluster).setEnabled(true);
             }
         });
     }
@@ -422,7 +431,7 @@ public final class AllHostsInfo extends Info {
                 final JCheckBox cb = allCheckboxes.get(cluster);
                 if (cb.isSelected()) {
                     selectedClusters.add(cluster);
-                    setAsStarted(cluster);
+                    setConnected(cluster);
                 } else if (cluster.getClusterTab() == null) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override public void run() {

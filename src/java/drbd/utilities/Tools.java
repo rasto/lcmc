@@ -815,13 +815,18 @@ public final class Tools {
     /** Stops the specified clusters in the gui. */
     public static void stopClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
-            cluster.removeCluster();
-            for (final Host host : cluster.getHosts()) {
-                // TODO: can be run concurrently.
-                host.disconnect();
-            }
-            getGUIData().getClustersPanel().removeTab(cluster);
+            stopCluster(cluster);
         }
+    }
+
+    /** Stops the specified clusters in the gui. */
+    public static void stopCluster(final Cluster cluster) {
+        cluster.removeCluster();
+        for (final Host host : cluster.getHosts()) {
+            // TODO: can be run concurrently.
+            host.disconnect();
+        }
+        getGUIData().getClustersPanel().removeTab(cluster);
     }
 
     /** Removes the specified clusters from the gui. */

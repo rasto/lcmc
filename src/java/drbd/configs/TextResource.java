@@ -161,6 +161,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterWizard",
          "Cluster Wizard"},
 
+        {"ClusterViewPanel.DisconnectBtn",
+         "Disconnect"},
+
         {"ClusterViewPanel.OperatingMode",
          "Operating Mode"},
 

@@ -62,8 +62,13 @@ public final class EmptyBrowser extends Browser {
     /** Adds small box with cluster possibility to load it and remove it. */
     public void addClusterBox(final Cluster cluster) {
         allHostsInfo.addClusterBox(cluster);
-        allHostsInfo.setAsStarted(cluster);
+        allHostsInfo.setConnected(cluster);
         allHostsInfo.addCheckboxListener(cluster);
+    }
+
+    /** Set cluster as disconnected. */
+    public void setDisconnected(final Cluster cluster) {
+        allHostsInfo.setDisconnected(cluster);
     }
 
     /** Sets the empty view panel. */
