@@ -789,8 +789,8 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"Dialog.About.Description",
          "<b>DRBD Management Console by Rasto Levrinc "
-         + "(rasto@linbit.com).</b><br>"
-         + "(C)opyright 2007-2010 by Rasto Levrinc.<br>"
+         + "(rasto.levrinc@gmail.com).</b><br>"
+         + "(C)opyright 2007-2011 by Rasto Levrinc.<br>"
          + "Please visit the website "
          + "http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },

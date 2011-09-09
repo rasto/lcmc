@@ -36,7 +36,7 @@ public final class TextResource extends java.util.ListResourceBundle {
     /** Contents. */
     private static Object[][] contents = {
         {"DrbdMC.Title",
-         "DRBD Management Console"},
+         "Management Console"},
 
         /* Main Menu */
         {"MainMenu.Session",
@@ -113,7 +113,7 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         /** Clusters panel */
         {"ClustersPanel.ClustersTab",
-         "Clusters"},
+         "All Clusters"},
 
         {"ClustersPanel.ClustersTabTip",
          "All Clusters"},
@@ -848,9 +848,10 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"Dialog.About.Description",
          "<b>DRBD Management Console by Rasto Levrinc "
-         + "(rasto@linbit.com).</b><br>"
+         + "(rasto.levrinc@gmail.com).</b><br>"
          + "(C)opyright 2007-2010 by Rasto Levrinc.<br>"
-         + "Please visit the website "
+         + "Please visit the website<br>"
+         + "old: http://oss.linbit.com/drbd-mc<br>"
          + "http://www.drbd.org/mc/management-console/<br>"
          + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 

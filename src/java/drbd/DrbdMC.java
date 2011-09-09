@@ -2,6 +2,7 @@
  * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
  * written by Rasto Levrinc.
  *
+ * Copyright (C) 2011, Rastislav Levrinc
  * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
  *
  * DRBD Management Console is free software; you can redistribute it and/or
@@ -21,7 +22,6 @@
 
 /*
  * DrbdMC
- * (c) Linbit
  * written by Rasto Levrinc
  */
 package drbd;
@@ -448,7 +448,7 @@ public final class DrbdMC extends JPanel {
                 System.exit(0);
             }
             if (cmd.hasOption(VERSION_OP)) {
-                System.out.println("DRBD MANAGEMENT CONSOLE "
+                System.out.println("MANAGEMENT CONSOLE "
                                    + Tools.getRelease()
                                    + " by Rasto Levrinc");
                 System.exit(0);
