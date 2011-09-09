@@ -3538,15 +3538,22 @@ public class ServiceInfo extends EditableInfo {
                 final List<Map<String, String>> ordAttrsList =
                                        new ArrayList<Map<String, String>>();
                 final List<String> parentIds = new ArrayList<String>();
+                ServiceInfo infoForDependency;
+                if (clInfo == null) {
+                    infoForDependency = this;
+                } else {
+                    infoForDependency = clInfo;
+                }
                 final Set<ServiceInfo> parents =
-                            getBrowser().getHeartbeatGraph().getParents(this);
+                          getBrowser().getHeartbeatGraph().getParents(
+                                                            infoForDependency);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
                         final boolean colocation = true;
                         final boolean order = true;
                         final Set<ServiceInfo> with =
                                                  new TreeSet<ServiceInfo>();
-                        with.add(this);
+                        with.add(infoForDependency);
                         final Set<ServiceInfo> withFrom =
                                                  new TreeSet<ServiceInfo>();
                         ((ConstraintPHInfo) parentInfo)
@@ -3567,8 +3574,8 @@ public class ServiceInfo extends EditableInfo {
                         final Map<String, String> ordAttrs =
                                            new LinkedHashMap<String, String>();
                         if (getBrowser().getHeartbeatGraph().isColocation(
-                                                                    parentInfo,
-                                                                    this)) {
+                                                        parentInfo,
+                                                        infoForDependency)) {
                             colAttrs.put(CRMXML.SCORE_STRING,
                                          CRMXML.INFINITY_STRING);
                             if (parentInfo.getService().isMaster()) {
@@ -3578,8 +3585,9 @@ public class ServiceInfo extends EditableInfo {
                         } else {
                             colAttrsList.add(null);
                         }
-                        if (getBrowser().getHeartbeatGraph().isOrder(parentInfo,
-                                                                     this)) {
+                        if (getBrowser().getHeartbeatGraph().isOrder(
+                                                         parentInfo,
+                                                         infoForDependency)) {
                             ordAttrs.put(CRMXML.SCORE_STRING,
                                          CRMXML.INFINITY_STRING);
                             if (parentInfo.getService().isMaster()) {
