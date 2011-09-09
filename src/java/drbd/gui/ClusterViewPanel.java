@@ -173,16 +173,13 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final JPanel buttonArea = new JPanel(new BorderLayout());
         buttonArea.setBackground(STATUS_BACKGROUND);
         buttonArea.add(buttonPanel, BorderLayout.WEST);
-        opModePanel.add(opModeCB, BorderLayout.WEST);
+        final JPanel omPanel = new JPanel();
+        omPanel.add(opModeCB);
+        omPanel.setBackground(STATUS_BACKGROUND);
+        opModePanel.add(omPanel, BorderLayout.WEST);
         opModePanel.add(advancedModeCB, BorderLayout.EAST);
         buttonArea.add(opModePanel, BorderLayout.EAST);
         operatingModesCB = opModeCB;
-        //final JLabel logo = new JLabel(Tools.createImageIcon(
-        //                          Tools.getDefault("ClusterViewPanel.Logo")));
-        //final JPanel l = new JPanel(new BorderLayout());
-        //l.setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
-        //l.add(logo, BorderLayout.NORTH);
-        //buttonArea.add(l, BorderLayout.EAST);
         add(buttonArea, BorderLayout.NORTH);
 
         allHostsUpdate();
