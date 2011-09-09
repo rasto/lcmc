@@ -130,7 +130,8 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* advanced mode button */
         advancedModeCB = createAdvancedModeButton();
         /* Operating mode */
-        final JPanel opModePanel = new JPanel();
+        final JPanel opModePanel = new JPanel(new BorderLayout());
+        opModePanel.setPreferredSize(new Dimension(350, 0));
         opModePanel.setBackground(STATUS_BACKGROUND);
         final TitledBorder vmBorder = Tools.getBorder(
                           Tools.getString("ClusterViewPanel.OperatingMode"));
@@ -172,8 +173,8 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         final JPanel buttonArea = new JPanel(new BorderLayout());
         buttonArea.setBackground(STATUS_BACKGROUND);
         buttonArea.add(buttonPanel, BorderLayout.WEST);
-        opModePanel.add(opModeCB);
-        opModePanel.add(advancedModeCB);
+        opModePanel.add(opModeCB, BorderLayout.WEST);
+        opModePanel.add(advancedModeCB, BorderLayout.EAST);
         buttonArea.add(opModePanel, BorderLayout.EAST);
         operatingModesCB = opModeCB;
         //final JLabel logo = new JLabel(Tools.createImageIcon(
