@@ -822,7 +822,7 @@ public final class RoboTest {
         leftClick(); /* apply */
         /* CIDR netmask 24 */
         sleep(10000);
-        moveTo(335, 81); /* advanced */
+        moveTo(1080, 81); /* advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -836,7 +836,7 @@ public final class RoboTest {
         press(KeyEvent.VK_4);
         sleep(1000);
 
-        moveTo(335, 81); /* not advanced */
+        moveTo(1080, 81); /* not advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -1431,7 +1431,7 @@ public final class RoboTest {
     /** Stop everything. */
     private static void stopEverything() {
         sleep(10000);
-        moveTo(335, 81); /* advanced */
+        moveTo(1080, 81); /* advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -1441,7 +1441,7 @@ public final class RoboTest {
         moveTo(760, 596);
         sleep(3000);
         leftClick();
-        moveTo(335, 81); /* not advanced */
+        moveTo(1080, 81); /* not advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -1450,7 +1450,7 @@ public final class RoboTest {
     /** Remove everything. */
     private static void removeEverything() {
         sleep(10000);
-        moveTo(335, 81); /* advanced */
+        moveTo(1080, 81); /* advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -1466,7 +1466,7 @@ public final class RoboTest {
         confirmRemove();
         sleep(3000);
         leftClick();
-        moveTo(335, 81); /* not advanced */
+        moveTo(1080, 81); /* not advanced */
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -2341,7 +2341,7 @@ public final class RoboTest {
         leftPress(); /* scroll bar */
         moveTo(1100, 502);
         leftRelease();
-        moveTo(956, 450 + yCorr);
+        moveTo(956, 445 + yCorr);
         leftClick(); /* start timeout */
         press(KeyEvent.VK_2);
         sleep(200);
@@ -2350,7 +2350,7 @@ public final class RoboTest {
         press(KeyEvent.VK_0);
         sleep(200);
 
-        moveTo(956, 477 + yCorr);
+        moveTo(956, 472 + yCorr);
         leftClick(); /* stop timeout */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2359,7 +2359,7 @@ public final class RoboTest {
         press(KeyEvent.VK_2);
         sleep(200);
 
-        moveTo(956, 507 + yCorr);
+        moveTo(956, 502 + yCorr);
         leftClick(); /* monitor timeout */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2368,7 +2368,7 @@ public final class RoboTest {
         press(KeyEvent.VK_4);
         sleep(200);
 
-        moveTo(956, 537 + yCorr);
+        moveTo(956, 532 + yCorr);
         leftClick(); /* monitor interval */
         press(KeyEvent.VK_1);
         sleep(200);
@@ -2377,14 +2377,14 @@ public final class RoboTest {
         press(KeyEvent.VK_1);
         sleep(200);
         if (migrateTimeouts) {
-            moveTo(956, 567 + yCorr);
+            moveTo(956, 562 + yCorr);
             leftClick(); /* reload */
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
 
-            moveTo(956, 587 + yCorr);
+            moveTo(956, 582 + yCorr);
             leftClick(); /* migrate from */
             press(KeyEvent.VK_1);
             sleep(200);
@@ -2393,7 +2393,7 @@ public final class RoboTest {
             press(KeyEvent.VK_3);
             sleep(200);
 
-            moveTo(956, 617 + yCorr);
+            moveTo(956, 612 + yCorr);
             leftClick(); /* migrate to */
             press(KeyEvent.VK_1);
             sleep(200);
