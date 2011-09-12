@@ -60,9 +60,6 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Normal background color. */
-    private static final Color HELP_BACKGROUND =
-                        Tools.getDefaultColor("EmptyViewPanel.Help.Background");
     /** Add cluster icon. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                    Tools.getDefault("ClusterTab.ClusterIcon"));
@@ -74,17 +71,6 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                                                     new Dimension(300, 100);
     /** Logo panel for card layout. */
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    /** Help panel for card layout. */
-    private static final String HELP_PANEL_STRING = "HELP-STRING";
-    /** I am new here button text. */
-    private static final String HELP_BUTTON_STRING =
-                                Tools.getString("EmptyViewPanel.HelpButton");
-    /** Button that hides the help text. */
-    private static final String HIDE_HELP_BUTTON_STRING =
-                               Tools.getString("EmptyViewPanel.HideHelpButton");
-    /** I am new here help text. */
-    private static final String HELP_TEXT_STRING =
-                                Tools.getString("EmptyViewPanel.HelpText");
     /**
      * Prepares a new <code>ClusterViewPanel</code> object.
      */
@@ -110,57 +96,11 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         lPanel.setBackground(java.awt.Color.WHITE);
         lPanel.add(logo);
         logoPanel.add(lPanel, LOGO_PANEL_STRING);
-        final JEditorPane hp =
-                  new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, HELP_TEXT_STRING);
-        hp.setCaretPosition(0);
-        Tools.setEditorFont(hp);
-
-        hp.setBackground(HELP_BACKGROUND);
-        hp.setEditable(false);
-        final JScrollPane sp = new JScrollPane(hp);
-        sp.setHorizontalScrollBarPolicy(
-                              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        final JPanel helpPanel = new JPanel();
-        helpPanel.setBackground(STATUS_BACKGROUND);
-        helpPanel.setPreferredSize(
-                            new Dimension(600, logoImage.getIconHeight()));
-        sp.setPreferredSize(
-                        new Dimension(600, logoImage.getIconHeight() - 20));
-        helpPanel.add(sp);
-        logoPanel.add(helpPanel, HELP_PANEL_STRING);
-        /* add "I am new here" button */
         final JPanel smallButtonPanel = new JPanel();
         smallButtonPanel.setBackground(STATUS_BACKGROUND);
         smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
                                    BoxLayout.Y_AXIS));
-        final MyButton newButton = new MyButton(HELP_BUTTON_STRING);
-        smallButtonPanel.add(newButton);
         buttonPanel.add(smallButtonPanel);
-        newButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
-                final Thread thread = new Thread(
-                    new Runnable() {
-                        @Override public void run() {
-                            final CardLayout cl =
-                                        (CardLayout) (logoPanel.getLayout());
-                            final String btnString = e.getActionCommand();
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override public void run() {
-                                    if (HELP_BUTTON_STRING.equals(btnString)) {
-                                        cl.show(logoPanel, HELP_PANEL_STRING);
-                                        newButton.setText(
-                                                    HIDE_HELP_BUTTON_STRING);
-                                    } else {
-                                        cl.show(logoPanel, LOGO_PANEL_STRING);
-                                        newButton.setText(HELP_BUTTON_STRING);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                thread.start();
-            }
-        });
         /* check for upgrade field. */
         smallButtonPanel.add(
             Tools.getGUIData().getClustersPanel().registerUpgradeTextField());
