@@ -200,6 +200,7 @@ public final class AllHostsInfo extends Info {
         c.insets = new Insets(3, 3, 0, 0);
 
         mainPanel.setBackground(Browser.PANEL_BACKGROUND);
+        mainPanel.setBackground(Color.WHITE);
 
         final Set<Cluster> clusters =
                 Tools.getConfigData().getClusters().getClusterSet();
@@ -273,7 +274,7 @@ public final class AllHostsInfo extends Info {
 
         final JPanel mPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mPanel.add(mainPanel);
-        mPanel.setBackground(Browser.PANEL_BACKGROUND);
+        mPanel.setBackground(Color.WHITE);
         final JScrollPane clustersPane =
                     new JScrollPane(
                             mPanel,
@@ -301,7 +302,7 @@ public final class AllHostsInfo extends Info {
     /** adds one cluster box to the main cluster. */
     public void addClusterBox(final Cluster cluster) {
         final JPanel label = new JPanel();
-        label.setBackground(Color.WHITE);
+        label.setBackground(Browser.PANEL_BACKGROUND);
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
         label.add(new JLabel(cluster.getName()));
         for (final Host host : cluster.getHosts()) {
@@ -314,15 +315,15 @@ public final class AllHostsInfo extends Info {
             label.add(nl);
         }
         final JPanel startPanel = new JPanel(new BorderLayout());
-        startPanel.setBackground(Color.WHITE);
+        startPanel.setBackground(Browser.PANEL_BACKGROUND);
         clusterBackgrounds.put(cluster, startPanel);
         startPanel.setBorder(new LineBorder(Tools.getDefaultColor(
                                    "EmptyBrowser.StartPanelTitleBorder")));
         final JPanel left = new JPanel();
-        left.setBackground(Color.WHITE);
+        left.setBackground(Browser.PANEL_BACKGROUND);
         clusterBackgrounds.put(cluster, startPanel);
         final JCheckBox markCB = new JCheckBox();
-        markCB.setBackground(Color.WHITE);
+        markCB.setBackground(Browser.PANEL_BACKGROUND);
         allCheckboxes.put(cluster, markCB);
         left.add(markCB);
         left.add(label);
