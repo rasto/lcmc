@@ -1752,9 +1752,9 @@ public final class RoboTest {
 
             /* constraints */
             /* menu dummy 5 with ph2 */
-            addConstraint(120, 298, 7, false);
+            addConstraint(120, 278, 7, false);
             /* menu dummy 6 with ph2 */
-            addConstraint(120, 313, 7, false);
+            addConstraint(120, 293, 7, false);
 
             /* with dummy 3 */
             addConstraint(ph2X, ph2Y, 3, false);
@@ -1784,8 +1784,8 @@ public final class RoboTest {
         stopEverything();
         checkTest("test4", 4);
         removeEverything();
-        removePlaceHolder(ph1X, ph1Y);
-        removePlaceHolder(ph2X, ph2Y);
+        //removePlaceHolder(ph1X, ph1Y);
+        //removePlaceHolder(ph2X, ph2Y);
         sleep(40000);
     }
 
@@ -2384,7 +2384,7 @@ public final class RoboTest {
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
 
-            moveTo(956, 582 + yCorr);
+            moveTo(956, 587 + yCorr);
             leftClick(); /* migrate from */
             press(KeyEvent.VK_1);
             sleep(200);
@@ -2393,7 +2393,7 @@ public final class RoboTest {
             press(KeyEvent.VK_3);
             sleep(200);
 
-            moveTo(956, 612 + yCorr);
+            moveTo(956, 617 + yCorr);
             leftClick(); /* migrate to */
             press(KeyEvent.VK_1);
             sleep(200);
