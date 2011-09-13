@@ -54,7 +54,7 @@ public final class NetInterface extends Resource {
         super();
         final String[] cols = line.split(" ");
         if (cols.length < 4) {
-            Tools.appError("cannot parse: " + line);
+            Tools.appWarning("cannot parse: " + line);
         }
         String iface = "unknown";
         if (cols.length > 0) {
