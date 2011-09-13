@@ -1003,23 +1003,23 @@ public final class RoboTest {
 
         /* move up, move down */
         for (int i = 0; i < 2; i++) {
-            moveTo(137, 299);
+            moveTo(137, 284);
             rightClick();
             sleep(1000);
-            moveTo(221, 448);
+            moveTo(221, 433);
             leftClick(); /* move res 3 up */
             sleepNoFactor(2000);
             checkTest("test1", 3.11); /* 3.11 */
-            moveTo(137, 283);
+            moveTo(137, 268);
             rightClick();
-            moveTo(236, 470);
+            moveTo(236, 455);
             leftClick(); /* move res 3 down */
             sleepNoFactor(2000);
             checkTest("test1", 3.12); /* 3.12 */
         }
 
         /* same as */
-        moveTo(125, 297);
+        moveTo(125, 282);
         sleep(1000);
         leftClick();
 
