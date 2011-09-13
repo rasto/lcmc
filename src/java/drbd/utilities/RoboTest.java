@@ -3616,12 +3616,12 @@ public final class RoboTest {
         final List<String> names = new ArrayList<String>();
 
         for (int j = 0; j < count; j++) {
-            moveTo(56, 204); /* popup */
+            moveTo(56, 189); /* popup */
             rightClick();
-            moveTo(159, 223); /* new domain */
+            moveTo(159, 208); /* new domain */
             leftClick();
             dialogColorTest("new domain");
-            moveTo(450, 332); /* domain name */
+            moveTo(450, 317); /* domain name */
             leftClick();
             press(KeyEvent.VK_D);
             sleep(200);
