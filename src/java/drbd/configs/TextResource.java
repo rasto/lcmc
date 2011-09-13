@@ -149,10 +149,10 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         /* Cluster tab */
         {"ClusterTab.AddNewCluster",
-         "Cluster Wizard"},
+         "Add Cluster / Wizard"},
 
         {"ClusterTab.AddNewHost",
-         "Host Wizard"},
+         "Add Host / Wizard"},
 
         /* Cluster view panel */
         {"ClusterViewPanel.ClusterButtons",
@@ -1121,7 +1121,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Connect"},
 
         {"EmptyBrowser.NewHostWizard",
-         "New Host Wizard"},
+         "Add Host / Wizard"},
 
         {"EmptyBrowser.confirmRemoveMarkedClusters.Title",
          "Remove Marked Clusters"},
