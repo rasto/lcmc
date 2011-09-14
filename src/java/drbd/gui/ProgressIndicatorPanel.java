@@ -29,6 +29,7 @@ package drbd.gui;
 
 import drbd.utilities.Tools;
 import drbd.utilities.MyButton;
+import drbd.configs.AppDefaults;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -109,8 +110,6 @@ public final class ProgressIndicatorPanel extends JComponent
     /** Message positions or null. */
     private final Map<String, Point2D> textsPositions =
                                               new HashMap<String, Point2D>();
-    /** Message movement left to right. */
-    private final Set<String> textsRightMovement = new HashSet<String>();
     /** List of failed commands. */
     private final List<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per second. */
@@ -202,7 +201,7 @@ public final class ProgressIndicatorPanel extends JComponent
             return;
         }
         failuresMap.add(text);
-        start(text, null, false);
+        start(text, null);
         stop(text);
     }
 
@@ -212,7 +211,7 @@ public final class ProgressIndicatorPanel extends JComponent
             return;
         }
         failuresMap.add(text);
-        start(text, null, false);
+        start(text, null);
         Tools.sleep(n);
         stop(text);
     }
@@ -223,8 +222,7 @@ public final class ProgressIndicatorPanel extends JComponent
      * of the glass pane.
      */
     public void start(final String text,
-                      final Point2D position,
-                      final boolean rightMovement) {
+                      final Point2D position) {
         if (text == null) {
             return;
         }
@@ -233,9 +231,6 @@ public final class ProgressIndicatorPanel extends JComponent
         if (texts.containsKey(text)) {
             texts.put(text, MAX_ALPHA_LEVEL);
             textsPositions.put(text, position);
-            if (rightMovement) {
-                textsRightMovement.add(text);
-            }
             mTextsLock.unlock();
             animator.setRampUp(true);
             mAnimatorLock.unlock();
@@ -243,9 +238,6 @@ public final class ProgressIndicatorPanel extends JComponent
         }
         texts.put(text, MAX_ALPHA_LEVEL);
         textsPositions.put(text, position);
-        if (rightMovement) {
-            textsRightMovement.add(text);
-        }
 
         if (texts.size() > 1) {
             mTextsLock.unlock();
@@ -379,7 +371,7 @@ public final class ProgressIndicatorPanel extends JComponent
                     if (failuresMap.contains(text)) {
                         f = new Color(255, 0, 0);
                     } else {
-                        f = Browser.STATUS_BACKGROUND;
+                        f = AppDefaults.BACKGROUND_DARK;
                     }
                     g2.setColor(new Color(f.getRed(),
                                           f.getGreen(),
@@ -396,15 +388,9 @@ public final class ProgressIndicatorPanel extends JComponent
                         textPosX = (float) textPos.getX();
                         textPosY = (float) textPos.getY();
                     }
-                    if (textsRightMovement.contains(text)) {
-                        layout.draw(g2,
-                                    textPosX + x,
-                                    textPosY);
-                    } else {
-                        layout.draw(g2,
-                                    textPosX,
-                                    textPosY + y);
-                    }
+                    layout.draw(g2,
+                                textPosX,
+                                textPosY + y);
                     x = (int) (x + (((float) (10 + 15 * text.length())
                                      / MAX_ALPHA_LEVEL)
                                     * alpha));
@@ -497,7 +483,6 @@ public final class ProgressIndicatorPanel extends JComponent
                 for (final String text : toRemove) {
                     texts.remove(text);
                     textsPositions.remove(text);
-                    textsRightMovement.remove(text);
                     failuresMap.remove(text);
                 }
 

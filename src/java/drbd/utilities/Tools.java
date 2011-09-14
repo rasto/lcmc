@@ -1382,8 +1382,7 @@ public final class Tools {
 
     /** Starts progress indicator with specified text. */
     public static void startProgressIndicator(final String text) {
-        final boolean rightMovement = RANDOM.nextBoolean();
-        getGUIData().getMainGlassPane().start(text, null, rightMovement);
+        getGUIData().getMainGlassPane().start(text, null);
     }
 
     /** Starts progress indicator for host or cluster command. */
