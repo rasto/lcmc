@@ -610,7 +610,7 @@ public class Info implements Comparable {
                  */
                 protected final void paintComponent(final Graphics g) {
                     final Color color1 = Color.WHITE;
-                    final Color color2 = Browser.STATUS_BACKGROUND;
+                    final Color color2 = Browser.BUTTON_PANEL_BACKGROUND;
                     if (!isEnabled() || getModel().isPressed()) {
                         super.paintComponent(g);
                         return;
@@ -672,7 +672,7 @@ public class Info implements Comparable {
             final Thread thread = new Thread(new Runnable() {
                 @Override public void run() {
                     menu.setIcon(Browser.ACTIONS_ICON);
-                    menu.setBackground(Browser.STATUS_BACKGROUND);
+                    menu.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
                     mActionMenuListLock.lock();
                     actionMenuList = items;

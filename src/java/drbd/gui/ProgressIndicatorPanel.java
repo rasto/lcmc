@@ -141,6 +141,10 @@ public final class ProgressIndicatorPanel extends JComponent
     private double barWidth = 10;
     /** Maximum alpha level. */
     private static final int MAX_ALPHA_LEVEL = 255;
+    /** Veil color. */
+    private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
+    /** Text color. */
+    private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
 
     /**
      * Creates a new progress panel with default values:<br />
@@ -310,7 +314,9 @@ public final class ProgressIndicatorPanel extends JComponent
             final Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHints(hints);
 
-            g2.setColor(new Color(200, 221, 242,
+            g2.setColor(new Color(VEIL_COLOR.getRed(),
+                                  VEIL_COLOR.getGreen(),
+                                  VEIL_COLOR.getBlue(),
                                   (int) (alphaLevel * shield)));
             final int startAtHeight = 22;
             g2.fillRect(0,
@@ -324,7 +330,9 @@ public final class ProgressIndicatorPanel extends JComponent
             if (barPos < width) {
                 final int he = Tools.getGUIData().getTerminalPanelPos()
                                     - startAtHeight;
-                g2.setColor(new Color(250, 133, 34,
+                g2.setColor(new Color(VEIL2_COLOR.getRed(),
+                                      VEIL2_COLOR.getGreen(),
+                                      VEIL2_COLOR.getBlue(),
                                       (int) (alphaLevel * shield * 0.3)));
                 if (barPos < width / 2) {
                     g2.fillRect((int) barPos,
@@ -371,7 +379,7 @@ public final class ProgressIndicatorPanel extends JComponent
                     if (failuresMap.contains(text)) {
                         f = new Color(255, 0, 0);
                     } else {
-                        f = new Color(144, 75, 42); //getForeground();
+                        f = Browser.STATUS_BACKGROUND;
                     }
                     g2.setColor(new Color(f.getRed(),
                                           f.getGreen(),

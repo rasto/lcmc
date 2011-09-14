@@ -28,12 +28,22 @@ import java.util.Arrays;
  * Here are default values for application.
  */
 public final class AppDefaults extends java.util.ListResourceBundle {
+    /** Darker background color. */
+    public static final Color BACKGROUND_DARKER  = new Color(250, 133, 34);
+    //public static final Color BACKGROUND_DARKER = new Color(63, 155, 241);
+
     /** Dark background color. */
-    public static final Color BACKGROUND_DARK  = new Color(214, 75, 42);
+    public static final Color BACKGROUND_DARK = new Color(214, 75, 42);
+    //public static final Color BACKGROUND_DARK = new Color(120, 120, 120);
+
     /** Background color. */
     public static final Color BACKGROUND = new Color(250, 133, 34);
+    //public static final Color BACKGROUND = new Color(168, 168, 168);
+
     /** Light background color. */
     public static final Color BACKGROUND_LIGHT = new Color(253, 180, 109);
+    //public static final Color BACKGROUND_LIGHT = new Color(227, 227, 227);
+
 
     /** Get contents. */
     @Override protected Object[][] getContents() {
@@ -116,11 +126,11 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"DrbdMC.TableHeader",               BACKGROUND},
         {"DefaultButton.Background",         BACKGROUND },
         {"ViewPanel.Background",             BACKGROUND_LIGHT },
-        {"ViewPanel.Status.Background",      BACKGROUND },
+        {"ViewPanel.ButtonPanel.Background", BACKGROUND },
+        {"ViewPanel.Status.Background",      BACKGROUND_DARKER },
         {"ViewPanel.Foreground",             Color.BLACK },
         {"ViewPanel.Status.Foreground",      Color.WHITE },
         {"EmptyViewPanel.Help.Background",   Color.WHITE },
-        //{"ClustersPanel.Background",         BACKGROUND_LIGHT },
         {"ClustersPanel.Background",         Color.WHITE },
         {"HostsTab.Background",              Color.GRAY },
         {"TerminalPanel.Background",         Color.BLACK },

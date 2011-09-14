@@ -198,7 +198,7 @@ public abstract class EditableInfo extends Info {
     /** Creates revert button and adds it to the panel. */
     protected final void addRevertButton(final JPanel panel) {
         final JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-        p.setBackground(Browser.STATUS_BACKGROUND);
+        p.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
         p.add(revertButton);
         panel.add(p, BorderLayout.CENTER);
     }
@@ -514,7 +514,7 @@ public abstract class EditableInfo extends Info {
                     final GuiComboBox sameAsCombo = sameAsFields.get(section);
                     if (sameAsCombo != null) {
                         final JPanel saPanel = new JPanel(new SpringLayout());
-                        saPanel.setBackground(Browser.STATUS_BACKGROUND);
+                        saPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
                         final JLabel label = new JLabel("Same As");
                         sameAsCombo.setLabel(label, "");
                         addField(saPanel,

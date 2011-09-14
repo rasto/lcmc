@@ -200,7 +200,7 @@ public final class HostInfo extends Info {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(HostBrowser.STATUS_BACKGROUND);
+        buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
@@ -213,7 +213,7 @@ public final class HostInfo extends Info {
         mb.add(serviceCombo);
         buttonPanel.add(mb, BorderLayout.EAST);
         final JPanel p = new JPanel(new SpringLayout());
-        p.setBackground(HostBrowser.STATUS_BACKGROUND);
+        p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
         p.add(crmMonButton);
         p.add(crmConfigureShowButton);

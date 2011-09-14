@@ -121,7 +121,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         addHardwareTable(mainPanel);
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
@@ -165,7 +165,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         }
         final JPanel extraButtonPanel =
                            new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
-        extraButtonPanel.setBackground(Browser.STATUS_BACKGROUND);
+        extraButtonPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
         addRevertButton(extraButtonPanel);

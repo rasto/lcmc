@@ -917,7 +917,7 @@ public final class BlockDevInfo extends EditableInfo {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(HostBrowser.STATUS_BACKGROUND);
+        buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));

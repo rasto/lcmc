@@ -86,6 +86,7 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* cluster wizard */
         final MyButton clusterWizardButton = new MyButton(
                             Tools.getString("ClusterViewPanel.ClusterWizard"));
+        clusterWizardButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         clusterWizardButton.setPreferredSize(new Dimension(150, 20));
         clusterWizardButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
@@ -103,6 +104,7 @@ final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
         /* disconnect cluster */
         final MyButton disconnectButton = new MyButton(
                             Tools.getString("ClusterViewPanel.DisconnectBtn"));
+        disconnectButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         disconnectButton.setPreferredSize(new Dimension(150, 20));
         disconnectButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {

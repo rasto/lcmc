@@ -210,7 +210,7 @@ public final class AllHostsInfo extends Info {
             bPanel.setMaximumSize(new Dimension(10000, 60));
             final JPanel markedPanel = new JPanel(
                                         new FlowLayout(FlowLayout.LEFT));
-            markedPanel.setBackground(Browser.STATUS_BACKGROUND);
+            markedPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
             /* start marked clusters */
             loadMarkedClustersBtn.setEnabled(false);
             markedPanel.add(loadMarkedClustersBtn);

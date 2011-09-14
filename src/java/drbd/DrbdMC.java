@@ -161,13 +161,13 @@ public final class DrbdMC extends JPanel {
         UIManager.put("ToggleButton.gradient", buttonGradient);
 
         UIManager.put("Menu.selectionBackground",
-                      ClusterBrowser.PANEL_BACKGROUND);
+                      ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("MenuItem.selectionBackground",
-                      ClusterBrowser.PANEL_BACKGROUND);
+                      ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("List.selectionBackground",
-                      ClusterBrowser.PANEL_BACKGROUND);
+                      ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("ComboBox.selectionBackground",
-                      ClusterBrowser.PANEL_BACKGROUND);
+                      ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("OptionPane.background",
                       ClusterBrowser.STATUS_BACKGROUND);
         UIManager.put("Panel.background",

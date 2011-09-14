@@ -108,8 +108,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         final MyButton addHostButton = new MyButton(
                                     Tools.getString("ClusterTab.AddNewHost"),
                                     HOST_ICON);
-        //addHostButton.setBackground(
-        //                Tools.getDefaultColor("DefaultButton.Background"));
+        addHostButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addHostButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
@@ -134,8 +133,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         final MyButton addClusterButton =
                 new MyButton(Tools.getString("ClusterTab.AddNewCluster"),
                              CLUSTER_ICON);
-        addClusterButton.setBackground(
-                        Tools.getDefaultColor("DefaultButton.Background"));
+        addClusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addClusterButton.setMinimumSize(BIG_BUTTON_DIMENSION);
         addClusterButton.addActionListener(new ActionListener() {

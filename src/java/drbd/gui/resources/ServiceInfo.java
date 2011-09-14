@@ -1953,7 +1953,7 @@ public class ServiceInfo extends EditableInfo {
                                            "ClusterBrowser.OperationsSameAs"));
         sameAsOperationsCB.setLabel(label, "");
         final JPanel saPanel = new JPanel(new SpringLayout());
-        saPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        saPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         addField(saPanel,
                  label,
                  sameAsOperationsCB,

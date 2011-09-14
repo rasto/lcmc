@@ -236,7 +236,7 @@ public final class VMSInfo extends CategoryInfo {
             }
         });
         final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        bp.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        bp.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         bp.add(newButton);
         final Dimension d = bp.getPreferredSize();
         bp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) d.getHeight()));

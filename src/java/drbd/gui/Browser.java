@@ -79,6 +79,9 @@ public class Browser {
     /** Color of the most of backgrounds. */
     public static final Color PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Background");
+    /** Color of the button panel backgrounds. */
+    public static final Color BUTTON_PANEL_BACKGROUND =
+                     Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
     /** Color of the status backgrounds. */
     public static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
