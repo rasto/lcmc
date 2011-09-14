@@ -1460,7 +1460,7 @@ public final class RoboTest {
         moveTo(760, 626);
         sleep(3000);
         leftClick();
-        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
             info("remove everything color: failed");
         }
         confirmRemove();
@@ -2511,7 +2511,7 @@ public final class RoboTest {
     /** Confirms remove dialog. */
     private static void confirmRemove() {
         sleep(1000);
-        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
             info("confirm remove color: error");
         }
         press(KeyEvent.VK_TAB);
@@ -3021,7 +3021,7 @@ public final class RoboTest {
     }
 
     private static boolean dialogColorTest(final String text) {
-        if (!isColor(125, 370, AppDefaults.LINBIT_ORANGE, true)) {
+        if (!isColor(125, 370, AppDefaults.BACKGROUND, true)) {
             info(text + ": color test: error");
             return false;
         } else {
@@ -3098,7 +3098,7 @@ public final class RoboTest {
         rightClick(); /* remove */
         moveTo(555, 292); /* remove */
         leftClick();
-        if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
             info("remove drbd volume color: error");
         }
         if (really) {
@@ -3830,7 +3830,7 @@ public final class RoboTest {
             moveTo(1066, 177); /* remove */
             leftClick();
             sleepNoFactor(2000);
-            if (!isColor(365, 360, AppDefaults.LINBIT_ORANGE, true)) {
+            if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
                 info("remove VM color: error");
             }
             moveTo(516, 428); /* confirm */

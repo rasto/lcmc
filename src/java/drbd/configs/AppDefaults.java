@@ -28,12 +28,12 @@ import java.util.Arrays;
  * Here are default values for application.
  */
 public final class AppDefaults extends java.util.ListResourceBundle {
-    /** Linbit dark orange. */
-    public static final Color LINBIT_DARK_ORANGE  = new Color(214, 75, 42);
-    /** Linbit orange. */
-    public static final Color LINBIT_ORANGE       = new Color(250, 133, 34);
-    /** Linbit light orange. */
-    public static final Color LINBIT_LIGHT_ORANGE = new Color(253, 180, 109);
+    /** Dark background color. */
+    public static final Color BACKGROUND_DARK  = new Color(214, 75, 42);
+    /** Background color. */
+    public static final Color BACKGROUND = new Color(250, 133, 34);
+    /** Light background color. */
+    public static final Color BACKGROUND_LIGHT = new Color(253, 180, 109);
 
     /** Get contents. */
     @Override protected Object[][] getContents() {
@@ -113,14 +113,14 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         /*
          * Colors
          */
-        {"DrbdMC.TableHeader",               LINBIT_ORANGE},
-        {"DefaultButton.Background",         LINBIT_ORANGE },
-        {"ViewPanel.Background",             LINBIT_LIGHT_ORANGE },
-        {"ViewPanel.Status.Background",      LINBIT_ORANGE },
+        {"DrbdMC.TableHeader",               BACKGROUND},
+        {"DefaultButton.Background",         BACKGROUND },
+        {"ViewPanel.Background",             BACKGROUND_LIGHT },
+        {"ViewPanel.Status.Background",      BACKGROUND },
         {"ViewPanel.Foreground",             Color.BLACK },
         {"ViewPanel.Status.Foreground",      Color.WHITE },
         {"EmptyViewPanel.Help.Background",   Color.WHITE },
-        //{"ClustersPanel.Background",         LINBIT_LIGHT_ORANGE },
+        //{"ClustersPanel.Background",         BACKGROUND_LIGHT },
         {"ClustersPanel.Background",         Color.WHITE },
         {"HostsTab.Background",              Color.GRAY },
         {"TerminalPanel.Background",         Color.BLACK },
@@ -140,17 +140,17 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"TerminalPanel.TerminalCyan",       Color.CYAN},
 
         {"ConfigDialog.Background",          Color.WHITE },
-        {"ConfigDialog.Background.Dark",     LINBIT_ORANGE },
-        {"ConfigDialog.Background.Light",    LINBIT_LIGHT_ORANGE },
+        {"ConfigDialog.Background.Dark",     BACKGROUND },
+        {"ConfigDialog.Background.Light",    BACKGROUND_LIGHT },
         {"ConfigDialog.AnswerPane",          Color.BLACK },
         {"ConfigDialog.AnswerPane.Error",    Color.RED },
         {"ProgressBar.Background",           Color.WHITE },
-        {"ProgressBar.Foreground",           LINBIT_DARK_ORANGE },
+        {"ProgressBar.Foreground",           BACKGROUND_DARK },
 
         {"ProgressBar.DefaultWidth",         300},
         {"ProgressBar.DefaultHeight",        30},
 
-        {"ClusterTab.Background",            LINBIT_ORANGE },
+        {"ClusterTab.Background",            BACKGROUND },
 
         {"ResourceGraph.Background",         Color.WHITE },
         {"ResourceGraph.DrawPaint",          Color.BLACK },
@@ -197,7 +197,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"ClusterBrowser.Test.Tooltip.Background", new Color(255, 255, 0, 160)},
         {"Browser.Background",                    new Color(255, 255, 255) },
 
-        {"EmptyBrowser.StartPanelTitleBorder",    LINBIT_DARK_ORANGE },
+        {"EmptyBrowser.StartPanelTitleBorder",    BACKGROUND_DARK },
 
         /*
          * Images

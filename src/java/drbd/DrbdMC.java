@@ -268,7 +268,7 @@ public final class DrbdMC extends JPanel {
                     /** Button and other borders. */
                     protected ColorUIResource getSecondary1() {
                         return new ColorUIResource(
-                                  drbd.configs.AppDefaults.LINBIT_DARK_ORANGE);
+                                  drbd.configs.AppDefaults.BACKGROUND_DARK);
                     }
                     protected ColorUIResource getSecondary2() {
                         return new ColorUIResource(
