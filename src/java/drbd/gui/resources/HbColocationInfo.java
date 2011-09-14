@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
+import javax.swing.SwingUtilities;
 
 /**
  * Object that holds a colocation constraint information.
@@ -305,17 +306,6 @@ final class HbColocationInfo extends EditableInfo
 
     /** Applies changes to the colocation parameters. */
     @Override public void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
-            Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText(null);
-                }
-            });
-        }
-        getInfoPanel();
-        waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;
@@ -382,7 +372,6 @@ final class HbColocationInfo extends EditableInfo
         }
         if (!testOnly) {
             storeComboBoxValues(params);
-            checkResourceFieldsChanged(null, params);
         }
     }
 

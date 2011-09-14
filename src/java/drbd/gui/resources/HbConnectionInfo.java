@@ -240,8 +240,6 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             });
         }
-        getInfoPanel();
-        waitForInfoPanel();
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
@@ -254,6 +252,10 @@ public class HbConnectionInfo extends EditableInfo {
         }
         for (final HbConstraintInterface c : constraintsCopy) {
             c.apply(dcHost, testOnly);
+        }
+        if (!testOnly) {
+            setApplyButtons(null, null);
+            getBrowser().setRightComponentInView(this);
         }
     }
 
@@ -739,8 +741,8 @@ public class HbConnectionInfo extends EditableInfo {
         } finally {
             mConstraintsWriteLock.unlock();
         }
-        infoPanel = null;
         if (changed) {
+            infoPanel = null;
             selectMyself();
         }
     }

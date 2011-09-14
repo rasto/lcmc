@@ -294,17 +294,6 @@ final class HbOrderInfo extends EditableInfo
 
     /** Applies changes to the order parameters. */
     @Override public void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
-            Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText(null);
-                }
-            });
-        }
-        getInfoPanel();
-        waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = false;
@@ -372,7 +361,6 @@ final class HbOrderInfo extends EditableInfo
             }
             if (!testOnly) {
                 storeComboBoxValues(params);
-                checkResourceFieldsChanged(null, params);
             }
         }
     }
