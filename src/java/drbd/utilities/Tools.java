@@ -2418,9 +2418,19 @@ public final class Tools {
         }
     }
 
-    /** Sets the menu and all its parents opaque, not opaque. */
+    /** Sets background color to be opaque or semi-transparent. */
+    private static void setBGColor(final JComponent c,
+                                   final boolean opaque) {
+        final Color oc = c.getBackground();
+        c.setBackground(new Color(oc.getRed(),
+                                  oc.getGreen(),
+                                  oc.getBlue(),
+                                  opaque ? 255 : 120));
+    }
+
+    /** Sets the menu and all its parents opaque, transparent. */
     public static void setMenuOpaque(final JComponent menu,
-                                      final boolean opaque) {
+                                     final boolean opaque) {
         JComponent parent = (JComponent) menu.getParent();
         if (parent instanceof JViewport) {
             /* MyList */
@@ -2434,24 +2444,24 @@ public final class Tools {
                 if (!(invP instanceof JPopupMenu)) {
                     break;
                 }
-                invP.setOpaque(opaque);
+                setBGColor(invP, opaque);
                 for (final Component c : invP.getComponents()) {
-                    ((JComponent) c).setOpaque(opaque);
+                    setBGColor((JComponent) c, opaque);
                 }
                 final JComponent pp = (JComponent) invP.getParent();
                 if (pp != null) {
-                    pp.setOpaque(opaque);
+                    setBGColor(pp, opaque);
                 }
                 inv = (JComponent) ((JPopupMenu) invP).getInvoker();
             }
-            menu.setOpaque(opaque);
-            parent.setOpaque(opaque);
+            setBGColor(menu, opaque);
+            setBGColor(parent, opaque);
             final JComponent pp = (JComponent) parent.getParent();
             if (pp != null) {
-                pp.setOpaque(opaque);
+                setBGColor(pp, opaque);
             }
             for (final Component c : parent.getComponents()) {
-                ((JComponent) c).setOpaque(opaque);
+                setBGColor((JComponent) c, opaque);
             }
             parent.repaint();
         }

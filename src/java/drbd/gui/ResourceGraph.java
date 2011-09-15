@@ -273,6 +273,11 @@ public abstract class ResourceGraph {
         mTestOnlyFlag.lock();
         testOnlyFlag = false;
         mTestOnlyFlag.unlock();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Tools.setMenuOpaque(component, false);
+            }
+        });
         if (testAnimationList.isEmpty()) {
             mTestAnimationThreadLock.lock();
             if (testAnimationThread == null) {
@@ -289,11 +294,6 @@ public abstract class ResourceGraph {
                             testOnlyFlag = !testOnlyFlag;
                             final boolean testOnlyFlagLast = testOnlyFlag;
                             mTestOnlyFlag.unlock();
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    Tools.setMenuOpaque(component, false);
-                                }
-                            });
                             repaint();
                             int sleep = 300;
                             if (testOnlyFlag) {
@@ -313,12 +313,6 @@ public abstract class ResourceGraph {
                                 mTestAnimationListLock.lock();
 
                                 if (testAnimationList.isEmpty()) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        public void run() {
-                                            Tools.setMenuOpaque(component,
-                                                                true);
-                                        }
-                                    });
                                     mTestAnimationListLock.unlock();
                                     mTestOnlyFlag.lock();
                                     testOnlyFlag = false;
