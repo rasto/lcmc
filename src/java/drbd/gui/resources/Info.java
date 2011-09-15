@@ -63,6 +63,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -588,9 +590,32 @@ public class Info implements Comparable {
     }
 
     /** Returns the Action menu. */
+    @Deprecated
     final JMenu getActionsMenu() {
         final JMenu m = getNewMenu(Tools.getString("Browser.ActionsMenu"));
         m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
+        return m;
+    }
+
+    /** Returns the Action button. */
+    final MyButton getActionsButton() {
+        final MyButton m = new MyButton(Tools.getString("Browser.ActionsMenu"),
+                                        Browser.MENU_ICON);
+        m.miniButton();
+        m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
+        m.addActionListener(
+            new ActionListener() {
+                @Override public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override public void run() {
+                            showPopup(m, (int) m.getLocation().getX() - 300,
+                                         (int) m.getLocation().getY());
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        );
         return m;
     }
 
