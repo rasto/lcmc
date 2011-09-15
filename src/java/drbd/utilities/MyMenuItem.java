@@ -431,7 +431,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             return;
         }
         if ("".equals(toolTipText)) {
-            toolTipText = "---";
+            toolTipText = text1;
         }
         toolTip.setTipText(toolTipText);
         super.setToolTipText(toolTipText);
