@@ -101,7 +101,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
                                                              0,
                                                              0));
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));

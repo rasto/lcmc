@@ -830,7 +830,7 @@ public class Info implements Comparable {
             if (newButton != null) {
                 final JPanel bp = new JPanel(
                                     new FlowLayout(FlowLayout.LEFT, 0, 0));
-                bp.setBackground(Browser.STATUS_BACKGROUND);
+                bp.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
                 bp.add(newButton);
                 final Dimension d = bp.getPreferredSize();
                 bp.setMaximumSize(new Dimension(Short.MAX_VALUE,
