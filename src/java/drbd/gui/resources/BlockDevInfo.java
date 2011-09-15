@@ -743,6 +743,13 @@ public final class BlockDevInfo extends EditableInfo {
         return LVM.lvSnapshot(getHost(), snapshotName, device, size, testOnly);
     }
 
+    /** Skip initial full sync. */
+    public void skipInitialFullSync(final boolean testOnly) {
+        DRBD.skipInitialFullSync(getHost(),
+                                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
+                                 drbdVolumeInfo.getName(),
+                                 testOnly);
+    }
 
     /** Force primary. */
     public void forcePrimary(final boolean testOnly) {

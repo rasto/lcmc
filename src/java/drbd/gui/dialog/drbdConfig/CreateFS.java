@@ -60,6 +60,10 @@ final class CreateFS extends DrbdConfig {
     private GuiComboBox hostCB;
     /** Pull down menu with file systems. */
     private GuiComboBox filesystemCB;
+    /** Whether to skip the initial full sync. */
+    private GuiComboBox skipSyncCB;
+    /** Whether to skip the initial full sync label. */
+    private JLabel skipSyncLabel;
     /** Make file system button. */
     private final MyButton makeFsButton = new MyButton(
                 Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
@@ -71,6 +75,10 @@ final class CreateFS extends DrbdConfig {
                 Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem");
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
+    /** Skip sync false. */
+    private static final String SKIP_SYNC_FALSE = "false";
+    /** Skip sync true. */
+    private static final String SKIP_SYNC_TRUE = "true";
 
     /** Prepares a new <code>CreateFS</code> object. */
     CreateFS(final WizardDialog previousDialog,
@@ -86,6 +94,9 @@ final class CreateFS extends DrbdConfig {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
             final boolean testOnly = false;
+            if (SKIP_SYNC_TRUE.equals(skipSyncCB.getStringValue())) {
+                bdiPri.skipInitialFullSync(testOnly);
+            }
             bdiPri.forcePrimary(testOnly);
         }
     }
@@ -135,6 +146,9 @@ final class CreateFS extends DrbdConfig {
                 BlockDevInfo bdiPri = getPrimaryBD();
                 BlockDevInfo bdiSec = getSecondaryBD();
                 final boolean testOnly = false;
+                if (SKIP_SYNC_TRUE.equals(skipSyncCB.getStringValue())) {
+                    bdiPri.skipInitialFullSync(testOnly);
+                }
                 bdiPri.forcePrimary(testOnly);
                 final String fs = filesystemCB.getStringValue();
                 bdiPri.makeFilesystem(fs, testOnly);
@@ -204,11 +218,24 @@ final class CreateFS extends DrbdConfig {
         final boolean noHost = hostCB.getStringValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemCB.getStringValue().equals(
                                                         NO_FILESYSTEM_STRING);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                if (noHost) {
+                    skipSyncCB.setEnabled(false);
+                    skipSyncLabel.setEnabled(false);
+                    skipSyncCB.setValue(SKIP_SYNC_FALSE);
+                } else {
+                    skipSyncCB.setEnabled(true);
+                    skipSyncLabel.setEnabled(true);
+                }
+            }
+        });
         if (noFileSystem) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override public void run() {
                     buttonClass(finishButton()).setEnabled(true);
                     makeFsButton.setEnabled(false);
+                    skipSyncCB.setValue(SKIP_SYNC_FALSE);
                 }
             });
         } else if (noHost) {
@@ -223,6 +250,8 @@ final class CreateFS extends DrbdConfig {
                 @Override public void run() {
                     buttonClass(finishButton()).setEnabled(false);
                     makeFsButton.setEnabled(true);
+                    skipSyncCB.setValue(SKIP_SYNC_TRUE);
+                    skipSyncCB.setEnabled(true);
                 }
             });
         }
@@ -328,8 +357,28 @@ final class CreateFS extends DrbdConfig {
             }
         });
         inputPane.add(makeFsButton);
+        /* skip initial full sync */
+        skipSyncLabel = new JLabel(
+                    Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));
+        skipSyncLabel.setEnabled(false);
+        skipSyncCB = new GuiComboBox(SKIP_SYNC_FALSE,
+                                     new String[]{SKIP_SYNC_TRUE,
+                                                  SKIP_SYNC_FALSE},
+                                     null, /* units */
+                                     GuiComboBox.Type.CHECKBOX,
+                                     null, /* regexp */
+                                     COMBOBOX_WIDTH,
+                                     null, /* abbrv */
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    false)); /* only adv. */
+        skipSyncCB.setEnabled(false);
+        skipSyncCB.setBackgroundColor(
+                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        inputPane.add(skipSyncLabel);
+        inputPane.add(skipSyncCB);
+        inputPane.add(new JLabel(""));
 
-        SpringUtilities.makeCompactGrid(inputPane, 2, 3,  // rows, cols
+        SpringUtilities.makeCompactGrid(inputPane, 3, 3,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
 

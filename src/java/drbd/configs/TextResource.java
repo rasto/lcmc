@@ -952,7 +952,8 @@ public final class TextResource extends java.util.ListResourceBundle {
          + "You can choose one host as a primary host. You can create a "
          + "filesystem on it, but in this case you have to choose one host "
          + "as a primary, choose the file system and press "
-         + "\"Create File System\" button."},
+         + "\"Create File System\" button. <b>If you skip initial full sync, "
+         + "make sure that you create the filesystem there!</b>"},
 
         {"Dialog.DrbdConfig.CreateFS.NoHostString",
          "none"},
@@ -962,6 +963,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"Dialog.DrbdConfig.CreateFS.Filesystem",
          "file system"},
+
+        {"Dialog.DrbdConfig.CreateFS.SkipSync",
+         "skip initial full sync"},
 
         {"Dialog.DrbdConfig.CreateFS.SelectFilesystem",
          "Use existing data"},

@@ -497,6 +497,50 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
+    /** Executes the drbdadm -- --clear-bitmap new-current-uuid */
+    public static boolean skipInitialFullSync(final Host host,
+                                              final String resource,
+                                              final String volume,
+                                              final boolean testOnly) {
+        return skipInitialFullSync(host, resource, volume, null, testOnly);
+    }
+
+    /** Executes the drbdadm -- --clear-bitmap new-current-uuid */
+    public static boolean skipInitialFullSync(final Host host,
+                                              final String resource,
+                                              final String volume,
+                                              final ExecCallback execCallback,
+                                              final boolean testOnly) {
+        try {
+            String command;
+            final String drbdV = host.getDrbdVersion();
+            if (Tools.compareVersions(host.getDrbdVersion(), "8.3.7") <= 0) {
+                command = host.getDistCommand("DRBD.skipInitSync.8.3.7",
+                                              getResVolReplaceHash(host,
+                                                                   resource,
+                                                                   volume));
+            } else if (Tools.compareVersions(host.getDrbdVersion(),
+                                            "8.3") <= 0) {
+                command = host.getDistCommand("DRBD.skipInitSync.8.3",
+                                              getResVolReplaceHash(host,
+                                                                   resource,
+                                                                   volume));
+            } else {
+                command = host.getDistCommand("DRBD.skipInitSync",
+                                              getResVolReplaceHash(host,
+                                                                   resource,
+                                                                   volume));
+            }
+            final SSH.SSHOutput ret =
+                      execCommand(host, command, execCallback, true, testOnly);
+            return ret.getExitCode() == 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+            return false;
+        }
+    }
+
+
     /**
      * Executes the drbdadm -- --overwrite-data-of-peer connect on the specified
      * host.
