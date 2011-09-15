@@ -37,6 +37,8 @@ import drbd.utilities.Tools;
 import drbd.utilities.ButtonCallback;
 import drbd.utilities.DRBD;
 import drbd.utilities.MyButton;
+import drbd.utilities.UpdatableItem;
+import drbd.utilities.MyMenu;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -54,6 +56,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Enumeration;
+import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -62,9 +65,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 
 /**
  * this class holds info data, menus and configuration
@@ -1282,5 +1289,67 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             resyncAfterParamCB.reloadComboBox(value,
                                               l.toArray(new Info[l.size()]));
         }
+    }
+    /** Creates popup for the block device. */
+    @Override public List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        for (final DrbdVolumeInfo dvi : drbdVolumes) {
+            final MyMenu volumesMenu = new MyMenu(
+                            dvi.toString(),
+                            new AccessMode(ConfigData.AccessType.RO, false),
+                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                private static final long serialVersionUID = 1L;
+                private final Lock mUpdateLock = new ReentrantLock();
+
+                @Override public String enablePredicate() {
+                    return null;
+                }
+
+                @Override public void update() {
+                    final Thread t = new Thread(new Runnable() {
+                        @Override public void run() {
+                            if (mUpdateLock.tryLock()) {
+                                try {
+                                    updateThread();
+                                } finally {
+                                    mUpdateLock.unlock();
+                                }
+                            }
+                        }
+                    });
+                    t.start();
+                }
+
+                public void updateThread() {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override public void run() {
+                            setEnabled(false);
+                        }
+                    });
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override public void run() {
+                            removeAll();
+                        }
+                    });
+                    final List<UpdatableItem> volumeMenus =
+                                    new ArrayList<UpdatableItem>();
+                    for (final UpdatableItem u : dvi.createPopup()) {
+                        volumeMenus.add(u);
+                        u.update();
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override public void run() {
+                            for (final UpdatableItem u
+                                                 : volumeMenus) {
+                                add((JMenuItem) u);
+                            }
+                        }
+                    });
+                    super.update();
+                }
+            };
+            items.add((UpdatableItem) volumesMenu);
+        }
+        return items;
     }
 }
