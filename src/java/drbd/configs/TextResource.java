@@ -1140,7 +1140,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Cancel"},
 
         {"Browser.ActionsMenu",
-         "Actions"},
+         "Menu"},
 
         {"Browser.Resources",
          "Resources"},

@@ -671,7 +671,7 @@ public class Info implements Comparable {
             final Info thisObject = this;
             final Thread thread = new Thread(new Runnable() {
                 @Override public void run() {
-                    menu.setIcon(Browser.ACTIONS_ICON);
+                    menu.setIcon(Browser.MENU_ICON);
                     menu.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
                     final List<UpdatableItem> items = createPopup();
                     mActionMenuListLock.lock();

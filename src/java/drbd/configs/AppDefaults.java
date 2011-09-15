@@ -226,7 +226,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"Browser.ApplyIcon",    "Icons/tango/16x16/ok_16x16.png"},
         {"Browser.ApplyIconLarge", "Icons/tango/32x32/ok_32x32.png"},
         {"Browser.RevertIcon",    "Icons/tango/16x16/revert_16x16.png"},
-        {"Browser.ActionsIcon",  "Icons/tango/32x32/Arrow-down.png"},
+        {"Browser.MenuIcon",  "Icons/tango/16x16/menu_16x16.png"},
 
         {"HostBrowser.NetIntIcon", "Icons/tango/16x16/netzwk_16x16.png"},
 

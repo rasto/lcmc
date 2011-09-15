@@ -74,8 +74,8 @@ public class Browser {
     public static final ImageIcon REVERT_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
     /** Actions memu icon. */
-    public static final ImageIcon ACTIONS_ICON =
-            Tools.createImageIcon(Tools.getDefault("Browser.ActionsIcon"));
+    public static final ImageIcon MENU_ICON =
+            Tools.createImageIcon(Tools.getDefault("Browser.MenuIcon"));
     /** Color of the most of backgrounds. */
     public static final Color PANEL_BACKGROUND =
                     Tools.getDefaultColor("ViewPanel.Background");
