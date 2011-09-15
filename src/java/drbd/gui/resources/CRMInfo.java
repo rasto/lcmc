@@ -31,14 +31,18 @@ import javax.swing.JComponent;
  * This class holds data that describe the crm as whole.
  */
 public final class CRMInfo extends HbCategoryInfo {
+    /** Cluster manager icon. */
+    protected static final ImageIcon CRM_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
     /** Prepares a new <code>ServicesInfo</code> object. */
     public CRMInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
     /** Returns icon for the heartbeat menu item. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
+    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
+        return CRM_ICON;
     }
 
     /** Returns type of the info text. text/plain or text/html. */

@@ -1295,13 +1295,13 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Shared Disks"},
 
         {"ClusterBrowser.Drbd",
-         "Storage (DRBD)"},
+         "Storage (DRBD, LVM)"},
 
         {"ClusterBrowser.ClusterManager",
-         "Cluster Manager"},
+         "CRM (Pacemaker)"},
 
         {"ClusterBrowser.VMs",
-         "VMs"},
+         "VMs (KVM, Xen)"},
 
 
         {"ClusterBrowser.Services",

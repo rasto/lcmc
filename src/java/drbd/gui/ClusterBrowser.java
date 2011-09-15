@@ -126,7 +126,7 @@ public final class ClusterBrowser extends Browser {
     /** Menu's available heartbeat services node. */
     private DefaultMutableTreeNode availableServicesNode;
     /** Heartbeat node. */
-    private DefaultMutableTreeNode heartbeatNode;
+    private DefaultMutableTreeNode crmNode;
     /** Menu's heartbeat services node. */
     private DefaultMutableTreeNode servicesNode;
     /** Menu's drbd node. */
@@ -573,9 +573,9 @@ public final class ClusterBrowser extends Browser {
         final CRMInfo crmInfo = new CRMInfo(
                               Tools.getString("ClusterBrowser.ClusterManager"),
                               this);
-        heartbeatNode = new DefaultMutableTreeNode(crmInfo);
-        setNode(heartbeatNode);
-        topAdd(heartbeatNode);
+        crmNode = new DefaultMutableTreeNode(crmInfo);
+        setNode(crmNode);
+        topAdd(crmNode);
 
         /* available services */
         availableServicesNode = new DefaultMutableTreeNode(
@@ -583,14 +583,14 @@ public final class ClusterBrowser extends Browser {
                 Tools.getString("ClusterBrowser.availableServices"),
                 this));
         setNode(availableServicesNode);
-        addNode(heartbeatNode, availableServicesNode);
+        addNode(crmNode, availableServicesNode);
 
         /* block devices / shared disks, TODO: */
         commonBlockDevicesNode = new DefaultMutableTreeNode(
             new HbCategoryInfo(
                 Tools.getString("ClusterBrowser.CommonBlockDevices"), this));
         setNode(commonBlockDevicesNode);
-        /* addNode(heartbeatNode, commonBlockDevicesNode); */
+        /* addNode(crmNode, commonBlockDevicesNode); */
 
         /* resource defaults */
         rscDefaultsInfo = new RscDefaultsInfo("rsc_defaults", this);
@@ -600,9 +600,9 @@ public final class ClusterBrowser extends Browser {
                                  this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
         setNode(servicesNode);
-        addNode(heartbeatNode, servicesNode);
+        addNode(crmNode, servicesNode);
         addVMSNode();
-        selectPath(new Object[]{getTreeTop(), heartbeatNode});
+        selectPath(new Object[]{getTreeTop(), crmNode});
     }
 
     /**
@@ -1786,7 +1786,7 @@ public final class ClusterBrowser extends Browser {
         if (getClusterViewPanel().isDisabledDuringLoad()) {
             return;
         }
-        selectPath(new Object[]{getTreeTop(), heartbeatNode, servicesNode});
+        selectPath(new Object[]{getTreeTop(), crmNode, servicesNode});
     }
 
     /** Returns ServiceInfo object from crm id. */

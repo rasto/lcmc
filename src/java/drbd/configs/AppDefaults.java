@@ -267,6 +267,9 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"ClusterBrowser.ClusterIconSmall",
          "Icons/tango/16x16/cluster_16x16.png"},
 
+        {"ClusterBrowser.PacemakerIconSmall",
+         "Icons/tango/16x16/pacemaker_16x16.png"},
+
         {"HostViewPanel.HostIcon",     "Icons/tango/32x32/host_32x32.png"},
         {"HostTab.HostIcon",           "Icons/tango/32x32/host_32x32.png"},
         {"HostBrowser.HostIconSmall",    "Icons/tango/16x16/host_16x16.png"},
