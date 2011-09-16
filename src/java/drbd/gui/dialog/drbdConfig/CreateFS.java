@@ -22,6 +22,7 @@
 
 package drbd.gui.dialog.drbdConfig;
 
+import drbd.Exceptions;
 import drbd.utilities.Tools;
 import drbd.data.Host;
 import drbd.data.ConfigData;
@@ -225,8 +226,10 @@ final class CreateFS extends DrbdConfig {
                     skipSyncLabel.setEnabled(false);
                     skipSyncCB.setValue(SKIP_SYNC_FALSE);
                 } else {
-                    skipSyncCB.setEnabled(true);
-                    skipSyncLabel.setEnabled(true);
+                    if (skipSyncAvailable()) {
+                        skipSyncCB.setEnabled(true);
+                        skipSyncLabel.setEnabled(true);
+                    }
                 }
             }
         });
@@ -250,8 +253,10 @@ final class CreateFS extends DrbdConfig {
                 @Override public void run() {
                     buttonClass(finishButton()).setEnabled(false);
                     makeFsButton.setEnabled(true);
-                    skipSyncCB.setValue(SKIP_SYNC_TRUE);
-                    skipSyncCB.setEnabled(true);
+                    if (skipSyncAvailable()) {
+                        skipSyncCB.setValue(SKIP_SYNC_TRUE);
+                        skipSyncCB.setEnabled(true);
+                    }
                 }
             });
         }
@@ -390,5 +395,20 @@ final class CreateFS extends DrbdConfig {
                                               0, 0); // xPad, yPad
 
         return pane;
+    }
+
+    /** Returns whether skip sync is available. */
+    private boolean skipSyncAvailable() {
+        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
+        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
+        try {
+            return Tools.compareVersions(
+                                    bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
+                   && Tools.compareVersions(
+                                    bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+            return false;
+        }
     }
 }
