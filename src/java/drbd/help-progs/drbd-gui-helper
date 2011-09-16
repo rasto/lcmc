@@ -155,6 +155,8 @@ if ($option eq "all") {
 	gui_drbd_test(@ARGV);
 } elsif ($option eq "gui-vm-test") {
 	gui_vm_test(@ARGV);
+} elsif ($option eq "proc-drbd") {
+	get_proc_drbd();
 } else {
 	die "unknown command";
 }
@@ -1965,6 +1967,85 @@ sub gui_drbd_test {
 		print $diff;
 		exit 2;
 	}
+}
+
+sub get_proc_drbd {
+	my %texts = (ns=>"sent over network",
+		     nr=>"received over network",
+		     dw=>"written to the disk",
+		     dr=>"read from the disk",
+		     al=>"number of activity log updates",
+		     bm=>"number of bitmap updates",
+		     lo=>"local count",
+		     pe=>"pending",
+		     ua=>"unacknowledged",
+		     ap=>"application pending",
+		     ep=>"epochs",
+		     wo=>"write order",
+		     oos=>"out of sync");
+	my %units = (ns=>"KB",
+		     nr=>"KB",
+		     dw=>"KB",
+		     dr=>"KB",
+		     al=>"",
+		     bm=>"",
+		     lo=>"",
+		     pe=>"",
+		     ua=>"",
+		     ap=>"",
+		     ep=>"",
+		     wo=>"fdn",
+		     oos=>"KB");
+	my %write_orders = (b=>"barrier",
+			    f=>"flush",
+			    d=>"drain",
+			    n=>"none");
+			
+	if (!open my $pfh, "/proc/drbd") {
+		print "can't open /proc/drbd: $!\n";
+	} else {
+		my @infos;
+		while (<$pfh>) {
+			print;
+			if (/ns:/ && /nr:/ && /dr:/) {
+				@infos = split;
+			}
+		}
+		close $pfh;
+		my $l = 0;
+		for (values %texts) {
+			$l = length $_ if length $_ > $l;
+		}
+		print "\n\n";
+		for (@infos) {
+			my ($name, $value) = split /:/;
+			if ($texts{$name}) {
+				print "$texts{$name}: ";
+				print " "x($l - length $texts{$name});
+				my $unit = $units{$name};
+				if ("fdn" eq $unit) {
+					print $write_orders{$value}."\n";
+				} elsif ("KB" eq $unit) {
+					print convert_kilobytes($value)."\n";
+				} else {
+					print "$value\n";
+				}
+			} else {
+				print "$name: $value\n";
+			}
+		}
+	}
+}
+
+sub convert_kilobytes {
+	my $value = shift;
+	for my $unit ("KiBytes", "MiBytes", "GiBytes", "TiBytes") {
+		if ($value < 1024) {
+			return sprintf("%.2f %s", $value, $unit);
+		}
+		$value = $value / 1024;
+	}
+	return $value." TiBytes";
 }
 
 
