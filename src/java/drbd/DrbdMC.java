@@ -130,17 +130,18 @@ public final class DrbdMC extends JPanel {
     /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
         final java.util.List<Object> buttonGradient = Arrays.asList(
-          new Object[] {new Float(.3f),
-                        new Float(0f),
-                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
-                        new ColorUIResource(0xFFFFFF),
-                        new ColorUIResource(ClusterBrowser.STATUS_BACKGROUND)});
+          new Object[]{
+               new Float(.3f),
+               new Float(0f),
+               new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+               new ColorUIResource(0xFFFFFF),
+               new ColorUIResource(ClusterBrowser.BUTTON_PANEL_BACKGROUND)});
         final java.util.List<Object> checkboxGradient = Arrays.asList(
-          new Object[] {new Float(.3f),
-                        new Float(0f),
-                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
-                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
-                        new ColorUIResource(0xFFFFFF)});
+          new Object[]{new Float(.3f),
+                       new Float(0f),
+                       new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+                       new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+                       new ColorUIResource(0xFFFFFF)});
         ToolTipManager.sharedInstance().setInitialDelay(
                                                     TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(
@@ -169,7 +170,7 @@ public final class DrbdMC extends JPanel {
         UIManager.put("ComboBox.selectionBackground",
                       ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("OptionPane.background",
-                      ClusterBrowser.STATUS_BACKGROUND);
+                      ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("Panel.background",
                       ClusterBrowser.PANEL_BACKGROUND);
 
