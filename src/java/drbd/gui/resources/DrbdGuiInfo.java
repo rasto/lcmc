@@ -54,11 +54,6 @@ abstract class DrbdGuiInfo extends EditableInfo {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns menu icon for drbd resource. */
-    @Override public final ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
-    }
-
     /** Returns cluster object to resource belongs. */
     public final Cluster getCluster() {
         return getBrowser().getCluster();

@@ -57,6 +57,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
+import javax.swing.ImageIcon;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -68,6 +69,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+    /** DRBD icon. */
+    private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
+                             Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
 
     /** Prepares a new <code>DrbdInfo</code> object. */
     public DrbdInfo(final String name, final Browser browser) {
@@ -870,4 +874,15 @@ public final class DrbdInfo extends DrbdGuiInfo {
             dri.reloadComboBoxes();
         }
     }
+
+    /** Returns menu icon for drbd resource. */
+    @Override public final ImageIcon getMenuIcon(final boolean testOnly) {
+        return DRBD_ICON;
+    }
+
+    /** Menu icon. */
+    @Override public final ImageIcon getCategoryIcon(final boolean testOnly) {
+        return DRBD_ICON;
+    }
+
 }
