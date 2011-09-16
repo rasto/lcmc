@@ -224,11 +224,7 @@ public final class AllHostsInfo extends Info {
 
             bPanel.add(markedPanel, BorderLayout.CENTER);
             /* actions menu */
-            final JMenuBar mb = new JMenuBar();
-            mb.setBackground(Browser.PANEL_BACKGROUND);
-            final JMenu actionsMenu = getActionsMenu();
-            mb.add(actionsMenu);
-            bPanel.add(mb, BorderLayout.EAST);
+            bPanel.add(getActionsButton(), BorderLayout.EAST);
             infoPanel.add(bPanel);
             for (final Cluster cluster : clusters) {
                 addClusterBox(cluster);

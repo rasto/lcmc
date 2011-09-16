@@ -998,10 +998,6 @@ public final class ServicesInfo extends EditableInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        //final JMenuBar mb = new JMenuBar();
-        //mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        //final JMenu serviceCombo = getActionsMenu();
-        //mb.add(serviceCombo);
         buttonPanel.add(getActionsButton(), BorderLayout.EAST);
 
         newPanel.add(buttonPanel);

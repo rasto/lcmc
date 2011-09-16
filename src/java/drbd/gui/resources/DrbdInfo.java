@@ -444,11 +444,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        final JMenu serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,

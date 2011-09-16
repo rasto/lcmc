@@ -935,12 +935,7 @@ public final class BlockDevInfo extends EditableInfo {
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(HostBrowser.PANEL_BACKGROUND);
-        final JMenu serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
         if (getBlockDevice().isDrbd()) {
             final String[] params = getParametersFromXML();
 

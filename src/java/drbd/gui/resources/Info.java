@@ -50,6 +50,10 @@ import javax.swing.SwingConstants;
 import javax.swing.JTable;
 import javax.swing.BoxLayout;
 import javax.swing.border.TitledBorder;
+import javax.swing.JToggleButton;
+import javax.swing.AbstractButton;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -115,10 +119,6 @@ public class Info implements Comparable {
     private final Lock mMenuListLock = new ReentrantLock();
     /** list of items in the menu for this object. */
     private List<UpdatableItem> menuList = new ArrayList<UpdatableItem>();
-    /** Action menu list lock. */
-    private final Lock mActionMenuListLock = new ReentrantLock();
-    /** list of items in the action menu for this object. */
-    private List<UpdatableItem> actionMenuList = new ArrayList<UpdatableItem>();
     /** Whether the info object is being updated. */
     private boolean updated = false;
     /** Animation index. */
@@ -407,18 +407,6 @@ public class Info implements Comparable {
 
     /** Cleanup. */
     void cleanup() {
-        mActionMenuListLock.lock();
-        if (actionMenuList == null) {
-            mActionMenuListLock.unlock();
-        } else {
-            final List<UpdatableItem> actionMenuListCopy =
-                               new ArrayList<UpdatableItem>(actionMenuList);
-            mActionMenuListLock.unlock();
-            for (final UpdatableItem i : actionMenuListCopy) {
-                i.cleanup();
-            }
-        }
-
         mMenuListLock.lock();
         if (menuList == null) {
             mMenuListLock.unlock();
@@ -589,136 +577,88 @@ public class Info implements Comparable {
         return popup0;
     }
 
-    /** Returns the Action menu. */
-    @Deprecated
-    final JMenu getActionsMenu() {
-        final JMenu m = getNewMenu(Tools.getString("Browser.ActionsMenu"));
-        m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
-        return m;
+    /** Adds listener that deselects the toggle button, when the popup menu
+        closes. */
+    private void addPopupMenuListener(final JPopupMenu pm,
+                                      final AbstractButton b) {
+        pm.addPopupMenuListener(new PopupMenuListener() {
+            @Override public void popupMenuCanceled(final PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        b.setSelected(false);
+                    }
+                });
+            }
+            @Override public void popupMenuWillBecomeInvisible(
+                                                    final PopupMenuEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        b.setSelected(false);
+                    }
+                });
+            }
+            @Override public void popupMenuWillBecomeVisible(
+                                                    final PopupMenuEvent e) {
+            }
+        });
+    }
+
+    /** Show popup underneath the button. */
+    private void showPopup(final JPopupMenu pm, final AbstractButton b) {
+        int w = (int) pm.getBounds().getWidth();
+        if (w == 0) {
+            pm.show(b,
+                    (int) b.getBounds().getWidth(),
+                    (int) b.getBounds().getHeight());
+            w = (int) pm.getBounds().getWidth();
+        }
+        pm.show(b,
+                (int) (b.getBounds().getWidth() - w),
+                (int) b.getBounds().getHeight());
+        addPopupMenuListener(pm, b);
     }
 
     /** Returns the Action button. */
-    final MyButton getActionsButton() {
-        final MyButton m = new MyButton(Tools.getString("Browser.ActionsMenu"),
+    final JToggleButton getActionsButton() {
+        final JToggleButton b =
+                      new JToggleButton(Tools.getString("Browser.ActionsMenu"),
                                         Browser.MENU_ICON);
-        m.miniButton();
-        m.setToolTipText(Tools.getString("Browser.ActionsMenu"));
-        m.addActionListener(
-            new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
-                            showPopup(m, (int) m.getLocation().getX() - 300,
-                                         (int) m.getLocation().getY());
-                        }
-                    });
-                    thread.start();
+        b.setToolTipText(Tools.getString("Browser.ActionsMenu"));
+        Tools.makeMiniButton(b);
+        b.addMouseListener(
+            new MouseAdapter() {
+                @Override public void mousePressed(final MouseEvent e) {
+                    final JToggleButton source =
+                                              (JToggleButton) (e.getSource());
+                    if (source.isSelected()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                b.setSelected(true);
+                            }
+                        });
+                    } else {
+                        final Thread thread = new Thread(new Runnable() {
+                            @Override public void run() {
+                                final JPopupMenu pm = getPopup();
+                                if (pm != null) {
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                            showPopup(pm, b);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        thread.start();
+                    }
                 }
             }
         );
-        return m;
+        return b;
     }
 
     /** Returns menu object. */
     public final JMenu getMenu() {
-        return menu;
-    }
-
-    /** Returns the menu with menu item spefified in the createPopup method. */
-    final JMenu getNewMenu(final String name) {
-        if (menu == null) {
-            menu = new JMenu(name) {
-                /** Serial version uid. */
-                private static final long serialVersionUID = 1L;
-                /**
-                 * Overloaded in order to paint the background.
-                 */
-                protected final void paintComponent(final Graphics g) {
-                    final Color color1 = Color.WHITE;
-                    final Color color2 = Browser.BUTTON_PANEL_BACKGROUND;
-                    if (!isEnabled() || getModel().isPressed()) {
-                        super.paintComponent(g);
-                        return;
-                    }
-
-                    final Graphics2D g2 = (Graphics2D) g;
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                        RenderingHints.VALUE_ANTIALIAS_ON);
-                    final GradientPaint gp1 = new GradientPaint(
-                                                   1.0f,
-                                                   (float) getHeight(),
-                                                   color2,
-                                                   1.0f,
-                                                   (float) getHeight() * 0.3f,
-                                                   color1);
-                    final GradientPaint gp2 = new GradientPaint(
-                                                   1.0f,
-                                                   0.0f,
-                                                   color2,
-                                                   1.0f,
-                                                   (float) getHeight() * 0.3f,
-                                                   color1);
-                    final Rectangle2D.Float rf = new Rectangle2D.Float(
-                                                   0.0f,
-                                                   0.0f,
-                                                   (float) getWidth() - 1,
-                                                   (float) getHeight() - 1);
-                    final Rectangle2D.Float rf1 = new Rectangle2D.Float(
-                                                   0.0f,
-                                                   (float) getHeight() * 0.3f,
-                                                   (float) getWidth(),
-                                                   (float) getHeight());
-                    final Rectangle2D.Float rf2 = new Rectangle2D.Float(
-                                                   0.0f,
-                                                   0.0f,
-                                                   (float) getWidth(),
-                                                   (float) getHeight() * 0.3f);
-                    g2.setPaint(gp1);
-                    g2.fill(rf1);
-                    g2.setPaint(gp2);
-                    g2.fill(rf2);
-                    final Color c = g2.getColor();
-                    g2.setColor(Color.GRAY);
-                    g2.draw(rf);
-                    g2.setColor(c);
-
-                    super.paintComponent(g);
-                }
-            };
-
-            final Font font = menu.getFont();
-            final String fname = font.getFontName();
-            final int style = font.getStyle();
-            final int size = font.getSize();
-            menu.setFont(new Font(fname, style, 10));
-            menu.setMargin(new Insets(2, 2, 2, 2));
-            menu.setIconTextGap(0);
-            final Info thisObject = this;
-            final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
-                    menu.setIcon(Browser.MENU_ICON);
-                    menu.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
-                    final List<UpdatableItem> items = createPopup();
-                    mActionMenuListLock.lock();
-                    actionMenuList = items;
-                    mActionMenuListLock.unlock();
-                    if (items != null) {
-                        for (final UpdatableItem u : items) {
-                            menu.add((JMenuItem) u);
-                        }
-                    }
-                    updateMenus(null);
-                }
-            });
-            thread.start();
-        } else {
-            final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
-                    updateMenus(null);
-                }
-            });
-            thread.start();
-        }
         return menu;
     }
 
@@ -746,24 +686,6 @@ public class Info implements Comparable {
             if (size > maxMenuList) {
                 maxMenuList = size;
                 Tools.debug(this, "menu list size: " + maxMenuList, 2);
-            }
-        }
-
-        mActionMenuListLock.lock();
-        if (actionMenuList == null) {
-            mActionMenuListLock.unlock();
-        } else {
-            final List<UpdatableItem> actionMenuListCopy =
-                               new ArrayList<UpdatableItem>(actionMenuList);
-            mActionMenuListLock.unlock();
-            for (final UpdatableItem i : actionMenuListCopy) {
-                i.setPos(pos);
-                i.update();
-            }
-            final int aSize = actionMenuListCopy.size();
-            if (aSize > maxMenuList) {
-                maxMenuList = aSize;
-                Tools.debug(this, "action menu list size: " + maxMenuList, 2);
             }
         }
     }

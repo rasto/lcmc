@@ -1880,11 +1880,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                   null);
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        JMenu serviceCombo;
-        serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
         mainPanel.add(optionsPanel);
 
         final MyButton newDiskBtn = VMSDiskInfo.getNewBtn(this);

@@ -186,12 +186,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                   null);
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        JMenu serviceCombo;
-        serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
 
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();

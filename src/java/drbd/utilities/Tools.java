@@ -78,6 +78,7 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.JDialog;
+import javax.swing.AbstractButton;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -2633,5 +2634,16 @@ public final class Tools {
             Tools.appWarning(e.getMessage(), e);
             return false;
         }
+    }
+
+    /** Makes the buttons font smaller. */
+    public static void makeMiniButton(final AbstractButton ab) {
+        final Font font = ab.getFont();
+        final String name = font.getFontName();
+        final int style = font.getStyle();
+        final int size = font.getSize();
+        ab.setFont(new Font(name, style, 10));
+        ab.setMargin(new Insets(2, 2, 2, 2));
+        ab.setIconTextGap(0);
     }
 }

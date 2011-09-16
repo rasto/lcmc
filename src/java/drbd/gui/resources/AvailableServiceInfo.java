@@ -134,12 +134,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
         buttonPanel.add(overviewButton, BorderLayout.WEST);
 
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        JMenu serviceCombo;
-        serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
         return buttonPanel;
     }
 

@@ -178,11 +178,7 @@ public final class HostDrbdInfo extends Info {
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        final JMenuBar mb = new JMenuBar();
-        mb.setBackground(HostBrowser.PANEL_BACKGROUND);
-        final JMenu serviceCombo = getActionsMenu();
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
         final JPanel p = new JPanel(new SpringLayout());
         p.setBackground(HostBrowser.STATUS_BACKGROUND);
 

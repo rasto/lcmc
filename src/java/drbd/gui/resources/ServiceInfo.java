@@ -86,6 +86,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.SpringLayout;
+import javax.swing.AbstractButton;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
@@ -2770,14 +2771,13 @@ public class ServiceInfo extends EditableInfo {
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        JMenu serviceCombo;
+        AbstractButton serviceMenu;
         if (ci == null) {
-            serviceCombo = getActionsMenu();
+            serviceMenu = getActionsButton();
         } else {
-            serviceCombo = ci.getActionsMenu();
+            serviceMenu = ci.getActionsButton();
         }
-        mb.add(serviceCombo);
-        buttonPanel.add(mb, BorderLayout.EAST);
+        buttonPanel.add(serviceMenu, BorderLayout.EAST);
         String defaultValue = PRIMITIVE_TYPE_STRING;
         if (ci != null) {
             if (ci.getService().isMaster()) {

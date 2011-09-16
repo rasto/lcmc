@@ -288,12 +288,6 @@ public class MyButton extends JButton implements ComponentWithTest {
 
     /** Make it a mini button. */
     public final void miniButton() {
-        final Font font = getFont();
-        final String name = font.getFontName();
-        final int style = font.getStyle();
-        final int size = font.getSize();
-        setFont(new Font(name, style, 10));
-        setMargin(new Insets(2, 2, 2, 2));
-        setIconTextGap(0);
+        Tools.makeMiniButton(this);
     }
 }
