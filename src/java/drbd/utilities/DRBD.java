@@ -514,13 +514,7 @@ public final class DRBD {
         try {
             String command;
             final String drbdV = host.getDrbdVersion();
-            if (Tools.compareVersions(host.getDrbdVersion(), "8.3.7") <= 0) {
-                command = host.getDistCommand("DRBD.skipInitSync.8.3.7",
-                                              getResVolReplaceHash(host,
-                                                                   resource,
-                                                                   volume));
-            } else if (Tools.compareVersions(host.getDrbdVersion(),
-                                            "8.3") <= 0) {
+            if (Tools.compareVersions(host.getDrbdVersion(), "8.3") <= 0) {
                 command = host.getDistCommand("DRBD.skipInitSync.8.3",
                                               getResVolReplaceHash(host,
                                                                    resource,

@@ -334,15 +334,16 @@ public final class DistResource extends java.util.ListResourceBundle {
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --force primary @RES-VOL@"},
 
         {"DRBD.forcePrimary.8.3.7",
-         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --clear-bitmap new-current-uuid @RES-VOL@"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RES-VOL@"},
 
         {"DRBD.skipInitSync",
-         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --clear-bitmap new-current-uuid @RES-VOL@"},
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ new-current-uuid @RES-VOL@ --clear-bitmap"},
         {"DRBD.skipInitSync.8.3",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --clear-bitmap new-current-uuid @RES-VOL@"},
 
-        {"DRBD.skipInitSync.8.3.7",
-         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --overwrite-data-of-peer primary @RES-VOL@"},
+        {"DRBD.skipInitSync.8.3.2",
+         "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ -- --clear-bitmap new-current-uuid @RES-VOL@"},
+
 
         {"DRBD.invalidate",    SUDO + "/sbin/drbdadm @DRYRUN@ invalidate @RES-VOL@"},
         {"DRBD.discardData",
