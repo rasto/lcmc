@@ -214,7 +214,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             try {
                 bigDRBDConf =
                   Tools.getConfigData().getBigDRBDConf()
-                  || Tools.compareVersions(host.getDrbdVersion(), "8.3.0") < 0;
+                  || Tools.compareVersions(host.getDrbdVersion(), "8.3.7") < 0;
             } catch (Exceptions.IllegalVersionException e) {
                 Tools.appWarning(e.getMessage(), e);
             }
