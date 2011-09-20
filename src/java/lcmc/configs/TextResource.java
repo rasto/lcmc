@@ -1501,6 +1501,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterBrowser.Hb.Stopping",
          "stopping..."},
 
+        {"ClusterBrowser.Hb.Enslaving",
+         "enslaving..."},
+
         {"ClusterBrowser.Hb.Migrating",
          "migrating..."},
 

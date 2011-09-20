@@ -229,7 +229,7 @@ public final class CRMXML extends XML {
     /** Target role master. */
     private static final String TARGET_ROLE_MASTER = "master";
     /** Target role slave. */
-    private static final String TARGET_ROLE_SLAVE = "slave";
+    public static final String TARGET_ROLE_SLAVE = "slave";
     /** INFINITY keyword. */
     public static final String INFINITY_STRING = "INFINITY";
     /** Alternative INFINITY keyword. */

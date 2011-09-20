@@ -931,6 +931,29 @@ public class ServiceInfo extends EditableInfo {
         return false;
     }
 
+    /** Returns whether the service was set to be in slave role. */
+    public boolean isEnslaved(final boolean testOnly) {
+        final Host dcHost = getBrowser().getDCHost();
+        String targetRoleString = "target-role";
+        if (Tools.versionBeforePacemaker(dcHost)) {
+            targetRoleString = "target_role";
+        }
+        String crmId = getHeartbeatId(testOnly);
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        final String refCRMId = cs.getMetaAttrsRef(crmId);
+        if (refCRMId != null) {
+            crmId = refCRMId;
+        }
+        String targetRole = cs.getParameter(crmId, targetRoleString, testOnly);
+        if (targetRole == null) {
+            targetRole = getParamDefault(targetRoleString);
+        }
+        if (CRMXML.TARGET_ROLE_SLAVE.equals(targetRole)) {
+            return true;
+        }
+        return false;
+    }
+
     /** Returns whether service is stopped. */
     public boolean isStopped(final boolean testOnly) {
         final Host dcHost = getBrowser().getDCHost();
@@ -6019,6 +6042,11 @@ public class ServiceInfo extends EditableInfo {
         };
     }
 
+    /** Returns whether it is slave on all nodes. */
+    protected boolean isSlaveOnAllNodes(final boolean testOnly) {
+        return false;
+    }
+
     /** Returns text that appears above the icon in the graph. */
     public String getIconTextForGraph(final boolean testOnly) {
         if (getBrowser().allHostsDown()) {
@@ -6029,6 +6057,12 @@ public class ServiceInfo extends EditableInfo {
             return "new...";
         } else if (getService().isOrphaned()) {
             return "";
+        } else if (isEnslaved(testOnly)) {
+            if (isSlaveOnAllNodes(testOnly)) {
+                return "";
+            } else {
+                return Tools.getString("ClusterBrowser.Hb.Enslaving");
+            }
         } else if (isStarted(testOnly)) {
             if (isRunning(testOnly)) {
                 final List<Host> migratedTo = getMigratedTo(testOnly);

@@ -207,6 +207,14 @@ final class CloneInfo extends ServiceInfo {
         return null;
     }
 
+    /** Returns whether it is slave on all nodes. */
+    @Override protected final boolean isSlaveOnAllNodes(
+                                                    final boolean testOnly) {
+         final List<String> slaves = getSlaveOnNodes(testOnly);
+         return slaves != null
+                && slaves.size() == getBrowser().getClusterHosts().length;
+    }
+
     /** Returns color for the host vertex. */
     @Override public List<Color> getHostColors(final boolean testOnly) {
          List<String> nodes = getRunningOnNodes(testOnly);
@@ -460,6 +468,21 @@ final class CloneInfo extends ServiceInfo {
             final ServiceInfo cs = containedService;
             if (cs != null) {
                 return cs.isStarted(testOnly) && super.isStarted(testOnly);
+            }
+            return false;
+        }
+    }
+
+    /** Returns whether the service was set to be in slave role. */
+    @Override public final boolean isEnslaved(final boolean testOnly) {
+        final Host dcHost = getBrowser().getDCHost();
+        if (Tools.versionBeforePacemaker(dcHost)) {
+            return super.isEnslaved(testOnly);
+        } else {
+            final ServiceInfo cs = containedService;
+            if (cs != null) {
+                return cs.isEnslaved(testOnly)
+                       || super.isEnslaved(testOnly);
             }
             return false;
         }
