@@ -1886,6 +1886,9 @@ public final class ClusterBrowser extends Browser {
                                  nameToServiceInfoHash.get(service.getName());
         if (idToInfoHash != null) {
             idToInfoHash.remove(service.getId());
+            if (idToInfoHash.size() == 0) {
+                nameToServiceInfoHash.remove(service.getName());
+            }
         }
         unlockNameToServiceInfo();
     }
@@ -1969,7 +1972,7 @@ public final class ClusterBrowser extends Browser {
         final Service service = serviceInfo.getService();
         lockNameToServiceInfo();
         Map<String, ServiceInfo> idToInfoHash =
-                                nameToServiceInfoHash.get(service.getName());
+                                  nameToServiceInfoHash.get(service.getName());
         String csPmId = null;
         final ServiceInfo cs = serviceInfo.getContainedService();
         if (cs != null) {
