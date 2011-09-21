@@ -1699,8 +1699,13 @@ sub gui_test {
 		# sort node lines
 		$cib =~
 	  	   s/(^node\s+.*$)\n(^node\s+.*$)/join "\n", sort ($1, $2)/me;
-		$crm_status =
-			"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,5d";
+		if (pcmk_version_smaller_than("1.1.6")) {
+			$crm_status =
+				"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,5d";
+		} else {
+			$crm_status =
+				"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,6d";
+		}
 		$status = `$crm_status`;
 		$ret = $?;
 		if ($ret != 0) {
