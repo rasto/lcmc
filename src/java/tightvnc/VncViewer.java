@@ -305,7 +305,7 @@ public class VncViewer extends java.applet.Applet
     // If we failed to create VncCanvas2D, use old VncCanvas.
     if (vc == null)
       vc = new VncCanvas(this, maxWidth, maxHeight);
-    drbd.utilities.Tools.hideMousePointer(vc);
+    lcmc.utilities.Tools.hideMousePointer(vc);
   }
 
 

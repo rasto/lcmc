@@ -19,7 +19,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package drbd;
+package lcmc;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
-import drbd.utilities.Tools;
-import drbd.gui.TerminalPanel;
-import drbd.data.Host;
-import drbd.data.Cluster;
+import lcmc.utilities.Tools;
+import lcmc.gui.TerminalPanel;
+import lcmc.data.Host;
+import lcmc.data.Cluster;
 
 /**
  * This class provides tools for testing.
@@ -150,11 +150,11 @@ public final class TestSuite1 {
     private static void initTestCluster() {
         if (Tools.getGUIData() == null) {
             if (CONNECT_LINBIT) {
-                drbd.DrbdMC.main(new String[]{});
+                lcmc.DrbdMC.main(new String[]{});
                 /* plugins registration writes to stdout after a while. */
                 Tools.sleep(15000);
             } else {
-                drbd.DrbdMC.main(new String[]{"--no-upgrade-check"});
+                lcmc.DrbdMC.main(new String[]{"--no-upgrade-check"});
             }
         }
         Tools.setDebugLevel(-1);

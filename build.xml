@@ -11,12 +11,12 @@
 	<property name="buildlib.dir"	value="build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
 	
-	<property name="main-class"  value="drbd.DrbdMC"/>
+	<property name="main-class"  value="lcmc.DrbdMC"/>
 	<tstamp/>
 	<property name="now" value="${DSTAMP}-${TSTAMP}" />
 	
 	<target name="clean">
-		<delete dir="${build.dir}/classes/drbd/"/>
+		<delete dir="${build.dir}/classes/lcmc/"/>
 		<delete dir="${build.dir}/classes/plugins/"/>
 		<delete dir="${jar.dir}"/>
 	</target>
@@ -30,20 +30,20 @@
 	<target name="compile">
 		<mkdir dir="${classes.dir}"/>
 		<copy todir="${classes.dir}/images">
-			<fileset dir="${java.dir}/drbd/images"/>
+			<fileset dir="${java.dir}/lcmc/images"/>
 		</copy>
 		
 		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${java.dir}/drbd/help-progs"/>
+			<fileset dir="${java.dir}/lcmc/help-progs"/>
 		</copy>
-		<tar tarfile="${java.dir}/drbd/drbd-mc-test.tar"
-		     basedir="${java.dir}/drbd/"
-		     includes="drbd-mc-test/**"/>
-		<move tofile="${classes.dir}/drbd-mc-test.tar"
-			file="${java.dir}/drbd/drbd-mc-test.tar"
+		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
+		     basedir="${java.dir}/lcmc/"
+		     includes="lcmc-test/**"/>
+		<move tofile="${classes.dir}/lcmc-test.tar"
+			file="${java.dir}/lcmc/lcmc-test.tar"
 			overwrite="yes"/>
 		
-		<copy tofile="${classes.dir}/drbd/release.properties"
+		<copy tofile="${classes.dir}/lcmc/release.properties"
 		      file="release"
 		      overwrite="yes"/>
 		<!-- verbose="true" -->
@@ -113,20 +113,20 @@
 	<target name="error">
 		<mkdir dir="${classes.dir}"/>
 		<copy todir="${classes.dir}/images">
-			<fileset dir="${java.dir}/drbd/images"/>
+			<fileset dir="${java.dir}/lcmc/images"/>
 		</copy>
 		
 		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${java.dir}/drbd/help-progs"/>
+			<fileset dir="${java.dir}/lcmc/help-progs"/>
 		</copy>
-		<tar tarfile="${java.dir}/drbd/drbd-mc-test.tar"
-		     basedir="${java.dir}/drbd/"
-		     includes="drbd-mc-test/**"/>
-		<move tofile="${classes.dir}/drbd-mc-test.tar"
-			file="${java.dir}/drbd/drbd-mc-test.tar"
+		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
+		     basedir="${java.dir}/lcmc/"
+		     includes="lcmc-test/**"/>
+		<move tofile="${classes.dir}/lcmc-test.tar"
+			file="${java.dir}/lcmc/lcmc-test.tar"
 			overwrite="yes"/>
 		
-		<copy tofile="${classes.dir}/drbd/release.properties"
+		<copy tofile="${classes.dir}/lcmc/release.properties"
 		      file="release"
 		      overwrite="yes"/>
 		<javac 
@@ -154,7 +154,7 @@
 	<target name="jar" depends="compile">
 		<mkdir dir="${jar.dir}"/>
 		<jar destfile="${jar.dir}/${ant.project.name}.jar"
-		     excludes="plugins/ drbd-mc-test.tar"
+		     excludes="plugins/ lcmc-test.tar"
 		     basedir="${classes.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}"/>
@@ -294,7 +294,7 @@
 	</target>
 
 	<target name="junit" depends="compilejunit">
-		<java fork="true" classname="drbd.TestSuite1">
+		<java fork="true" classname="lcmc.TestSuite1">
 			<jvmarg value="-Xmx512m"/>
 			<jvmarg value="-Xdebug"/>
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>

@@ -198,7 +198,7 @@ public class VncViewer extends java.applet.Applet
       doProtocolInitialisation();
 
       vc = new VncCanvas(this);
-      drbd.utilities.Tools.hideMousePointer(vc);
+      lcmc.utilities.Tools.hideMousePointer(vc);
       gbc.weightx = 1.0;
       gbc.weighty = 1.0;
 
