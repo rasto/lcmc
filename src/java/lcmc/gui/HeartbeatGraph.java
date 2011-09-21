@@ -144,6 +144,26 @@ public final class HeartbeatGraph extends ResourceGraph {
     private static final ImageIcon SERVICE_RUNNING_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
                                        "HeartbeatGraph.ServiceRunningIcon"));
+    /** Icon that indicates a running that failed. */
+    private static final ImageIcon SERVICE_RUNNING_FAILED_ICON =
+                                Tools.createImageIcon(Tools.getDefault(
+                                   "HeartbeatGraph.ServiceRunningFailedIcon"));
+    /** Icon that indicates a started service (but not running). */
+    private static final ImageIcon SERVICE_STARTED_ICON =
+                                     Tools.createImageIcon(Tools.getDefault(
+                                       "HeartbeatGraph.ServiceStartedIcon"));
+    /** Icon that indicates a stopping service (but not stopped). */
+    private static final ImageIcon SERVICE_STOPPING_ICON =
+                                     Tools.createImageIcon(Tools.getDefault(
+                                       "HeartbeatGraph.ServiceStoppingIcon"));
+    /** Icon that indicates a not running service. */
+    private static final ImageIcon SERVICE_STOPPED_ICON =
+                                Tools.createImageIcon(Tools.getDefault(
+                                        "HeartbeatGraph.ServiceStoppedIcon"));
+    /** Icon that indicates a not running service that failed. */
+    private static final ImageIcon SERVICE_STOPPED_FAILED_ICON =
+                                Tools.createImageIcon(Tools.getDefault(
+                                   "HeartbeatGraph.ServiceStoppedFailedIcon"));
     /** Icon that indicates an unmanaged service. */
     private static final ImageIcon SERVICE_UNMANAGED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
@@ -152,10 +172,6 @@ public final class HeartbeatGraph extends ResourceGraph {
     private static final ImageIcon SERVICE_MIGRATED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
                                        "HeartbeatGraph.ServiceMigratedIcon"));
-    /** Icon that indicates a not running service. */
-    private static final ImageIcon SERVICE_NOT_RUNNING_ICON =
-                                Tools.createImageIcon(Tools.getDefault(
-                                    "HeartbeatGraph.ServiceNotRunningIcon"));
     /** Prepares a new <code>HeartbeatGraph</code> object. */
     HeartbeatGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
@@ -1405,10 +1421,25 @@ public final class HeartbeatGraph extends ResourceGraph {
         if (si == null) {
             return null;
         }
-        if (si.isStopped(testOnly) || getClusterBrowser().allHostsDown()) {
-            icons.add(SERVICE_NOT_RUNNING_ICON);
+        if (si.isFailed(testOnly)) {
+            if (si.isRunning(testOnly)) {
+                icons.add(SERVICE_RUNNING_FAILED_ICON);
+            } else {
+                icons.add(SERVICE_STOPPED_FAILED_ICON);
+            }
+        } else if (si.isStopped(testOnly)
+                   || getClusterBrowser().allHostsDown()) {
+            if (si.isRunning(testOnly)) {
+                icons.add(SERVICE_STOPPING_ICON);
+            } else {
+                icons.add(SERVICE_STOPPED_ICON);
+            }
         } else {
-            icons.add(SERVICE_RUNNING_ICON);
+            if (si.isRunning(testOnly)) {
+                icons.add(SERVICE_RUNNING_ICON);
+            } else {
+                icons.add(SERVICE_STARTED_ICON);
+            }
         }
         if (!si.isManaged(testOnly) || si.getService().isOrphaned()) {
             icons.add(SERVICE_UNMANAGED_ICON);

@@ -1348,9 +1348,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns the icon for the category. */
     @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
         if (getBrowser().allHostsDown() || !isOneRunning(testOnly)) {
-            return ServiceInfo.SERVICE_STOPPED_ICON;
+            return ServiceInfo.SERVICE_STOPPED_ICON_SMALL;
         }
-        return ServiceInfo.SERVICE_STARTED_ICON;
+        return ServiceInfo.SERVICE_RUNNING_ICON_SMALL;
     }
 
     /** Revert all values. */

@@ -53,7 +53,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     /** Available services icon. */
     private static final ImageIcon AVAIL_SERVICES_ICON =
         Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.ServiceStoppedIcon"));
+                Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));

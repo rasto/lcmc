@@ -175,26 +175,42 @@ public class ServiceInfo extends EditableInfo {
     /** Unmanage service icon. */
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
                       Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
-    /** Started service icon. */
-    protected static final ImageIcon SERVICE_STARTED_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.ServiceStartedIcon"));
-    /** Stopped service icon. */
-    protected static final ImageIcon SERVICE_STOPPED_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.ServiceStoppedIcon"));
+    /** Icon that indicates a running service. */
+    public static final ImageIcon SERVICE_RUNNING_ICON_SMALL =
+                                     Tools.createImageIcon(Tools.getDefault(
+                                    "ServiceInfo.ServiceRunningIconSmall"));
+    /** Icon that indicates a running that failed. */
+    private static final ImageIcon SERVICE_RUNNING_FAILED_ICON_SMALL =
+                            Tools.createImageIcon(Tools.getDefault(
+                              "ServiceInfo.ServiceRunningFailedIconSmall"));
+    /** Icon that indicates a started service (but not running). */
+    private static final ImageIcon SERVICE_STARTED_ICON_SMALL =
+                                  Tools.createImageIcon(Tools.getDefault(
+                                    "ServiceInfo.ServiceStartedIconSmall"));
+    /** Icon that indicates a stopping service (but not stopped). */
+    private static final ImageIcon SERVICE_STOPPING_ICON_SMALL =
+                                 Tools.createImageIcon(Tools.getDefault(
+                                   "ServiceInfo.ServiceStoppingIconSmall"));
+    /** Icon that indicates a not running service. */
+    public static final ImageIcon SERVICE_STOPPED_ICON_SMALL =
+                               Tools.createImageIcon(Tools.getDefault(
+                                    "ServiceInfo.ServiceStoppedIconSmall"));
+    /** Icon that indicates a not running service that failed. */
+    private static final ImageIcon SERVICE_STOPPED_FAILED_ICON_SMALL =
+                           Tools.createImageIcon(Tools.getDefault(
+                              "ServiceInfo.ServiceStoppedFailedIconSmall"));
     /** Running service icon. */
     private static final ImageIcon SERVICE_RUNNING_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("HeartbeatGraph.ServiceRunningIcon"));
     /** Not running service icon. */
-    private static final ImageIcon SERVICE_NOT_RUNNING_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("HeartbeatGraph.ServiceNotRunningIcon"));
+    private static final ImageIcon SERVICE_STOPPED_ICON =
+            Tools.createImageIcon(
+                        Tools.getDefault("HeartbeatGraph.ServiceStoppedIcon"));
     /** Start service icon. */
     private static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
     /** Stop service icon. */
-    static final ImageIcon STOP_ICON  = SERVICE_NOT_RUNNING_ICON;
+    static final ImageIcon STOP_ICON  = SERVICE_STOPPED_ICON;
     /** Migrate icon. */
     protected static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
                             Tools.getDefault("HeartbeatGraph.MigrateIcon"));
@@ -1182,10 +1198,25 @@ public class ServiceInfo extends EditableInfo {
      * TODO: broken icon, not managed icon.
      */
     @Override public ImageIcon getMenuIcon(final boolean testOnly) {
-        if (getBrowser().allHostsDown() || !isRunning(testOnly)) {
-            return SERVICE_STOPPED_ICON;
+        if (isFailed(testOnly)) {
+            if (isRunning(testOnly)) {
+                return SERVICE_RUNNING_FAILED_ICON_SMALL;
+            } else {
+                return SERVICE_STOPPED_FAILED_ICON_SMALL;
+            }
+        } else if (isStopped(testOnly) || getBrowser().allHostsDown()) {
+            if (isRunning(testOnly)) {
+                return SERVICE_STOPPING_ICON_SMALL;
+            } else {
+                return SERVICE_STOPPED_ICON_SMALL;
+            }
+        } else {
+            if (isRunning(testOnly)) {
+                return SERVICE_RUNNING_ICON_SMALL;
+            } else {
+                return SERVICE_STARTED_ICON_SMALL;
+            }
         }
-        return SERVICE_STARTED_ICON;
     }
 
     /** Gets saved host scores. */
