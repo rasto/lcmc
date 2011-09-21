@@ -545,7 +545,7 @@ public final class RoboTest {
                             i++;
                         }
                     }
-                } else if ("Storage (DRBD)".equals(selected)) {
+                } else if ("Storage (DRBD, LVM)".equals(selected)) {
                     if ("0".equals(index)) {
                         /* all DRBD tests */
                         int i = 1;
@@ -655,7 +655,7 @@ public final class RoboTest {
                             }
                         }
                     }
-                } else if ("VMs".equals(selected)) {
+                } else if ("VMs (KVM, Xen)".equals(selected)) {
                     if ("1".equals(index) || "x1".equals(index)) {
                         /* VMs */
                         int i = 1;
@@ -1003,16 +1003,16 @@ public final class RoboTest {
 
         /* move up, move down */
         for (int i = 0; i < 2; i++) {
-            moveTo(137, 284);
+            moveTo(137, 281);
             rightClick();
             sleep(1000);
-            moveTo(221, 433);
+            moveTo(221, 430);
             leftClick(); /* move res 3 up */
             sleepNoFactor(2000);
             checkTest("test1", 3.11); /* 3.11 */
-            moveTo(137, 268);
+            moveTo(137, 265);
             rightClick();
-            moveTo(236, 455);
+            moveTo(236, 452);
             leftClick(); /* move res 3 down */
             sleepNoFactor(2000);
             checkTest("test1", 3.12); /* 3.12 */
