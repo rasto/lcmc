@@ -21,6 +21,7 @@
 
 package lcmc.utilities;
 
+import lcmc.Exceptions;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
@@ -786,12 +787,22 @@ public final class RoboTest {
         final int popY = 257;
         final int statefulX = 500;
         final int statefulY = 207;
+        String testName = "test1";
+        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+                testName = "test1-1.0";
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
+
         disableStonith();
-        checkTest("test1", 1);
+        checkTest(testName, 1);
         enableStonith();
-        checkTest("test1", 1.1);
+        checkTest(testName, 1.1);
         disableStonith();
-        checkTest("test1", 1);
+        checkTest(testName, 1);
         moveTo(ipX, ipY);
         rightClick(); /* popup */
         moveTo(ipX + 57, ipY + 28);
@@ -845,7 +856,7 @@ public final class RoboTest {
         sleep(6000); /* ptest */
         leftClick(); /* apply */
 
-        checkTest("test1", 2); /* 2 */
+        checkTest(testName, 2); /* 2 */
 
         /* pingd */
         moveTo(1100, 250);
@@ -865,7 +876,7 @@ public final class RoboTest {
         sleep(2000);
         leftClick(); /*  apply */
         sleep(2000);
-        checkTest("test1", 2.1); /* 2.1 */
+        checkTest(testName, 2.1); /* 2.1 */
 
         moveTo(1066, 343);
         leftClick();
@@ -965,7 +976,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* choose group */
         sleep(3000);
-        checkTest("test1", 2); /* 2 */
+        checkTest(testName, 2); /* 2 */
         rightClick(); /* group popup */
         moveTo(gx + 80, gy + 20);
         moveTo(gx + 84, gy + 22);
@@ -996,10 +1007,10 @@ public final class RoboTest {
             sleep(1000);
         }
         sleep(4000);
-        checkTest("test1", 3); /* 3 */
+        checkTest(testName, 3); /* 3 */
         /* constraints */
         addConstraint(gx, gy - 30, 1, true);
-        checkTest("test1", 3.1); /* 3.1 */
+        checkTest(testName, 3.1); /* 3.1 */
 
         /* move up, move down */
         for (int i = 0; i < 2; i++) {
@@ -1009,13 +1020,13 @@ public final class RoboTest {
             moveTo(221, 430);
             leftClick(); /* move res 3 up */
             sleepNoFactor(2000);
-            checkTest("test1", 3.11); /* 3.11 */
+            checkTest(testName, 3.11); /* 3.11 */
             moveTo(137, 265);
             rightClick();
             moveTo(236, 452);
             leftClick(); /* move res 3 down */
             sleepNoFactor(2000);
-            checkTest("test1", 3.12); /* 3.12 */
+            checkTest(testName, 3.12); /* 3.12 */
         }
 
         /* same as */
@@ -1044,7 +1055,7 @@ public final class RoboTest {
             sleep(4000);
             leftClick(); /* apply */
             sleep(4000);
-            checkTest("test1", 3.2); /* 3.2 */
+            checkTest(testName, 3.2); /* 3.2 */
 
             moveTo(1063 , 312);
             sleep(2000);
@@ -1060,7 +1071,7 @@ public final class RoboTest {
             sleep(4000);
             leftClick(); /* apply */
             sleep(9000);
-            checkTest("test1", 4); /* 4 */
+            checkTest(testName, 4); /* 4 */
             sleep(2000);
         }
         moveTo(1100, 250);
@@ -1073,7 +1084,7 @@ public final class RoboTest {
         leftClick(); /* choose ip */
         setLocation(new Integer[]{KeyEvent.VK_I});
         sleep(3000);
-        checkTest("test1", 4.1); /* 4.1 */
+        checkTest(testName, 4.1); /* 4.1 */
 
         setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
                                          KeyEvent.VK_BACK_SPACE,
@@ -1086,7 +1097,7 @@ public final class RoboTest {
                                          KeyEvent.VK_MINUS,
                                          KeyEvent.VK_I});
         sleep(3000);
-        checkTest("test1", 4.2); /* 4.2 */
+        checkTest(testName, 4.2); /* 4.2 */
 
         setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
                                   KeyEvent.VK_BACK_SPACE,
@@ -1099,7 +1110,7 @@ public final class RoboTest {
                                   KeyEvent.VK_BACK_SPACE,
                                   KeyEvent.VK_PLUS});
         sleep(3000);
-        checkTest("test1", 4.3); /* 4.3 */
+        checkTest(testName, 4.3); /* 4.3 */
 
         setLocation(new Integer[]{KeyEvent.VK_BACK_SPACE,
                                   KeyEvent.VK_BACK_SPACE,
@@ -1111,194 +1122,194 @@ public final class RoboTest {
                                   KeyEvent.VK_BACK_SPACE,
                                   KeyEvent.VK_BACK_SPACE});
         sleep(3000);
-        checkTest("test1", 4.4); /* 4.4 */
+        checkTest(testName, 4.4); /* 4.4 */
         removeConstraint(popX, popY);
-        checkTest("test1", 5); /* 5 */
+        checkTest(testName, 5); /* 5 */
         addConstraint(gx, gy - 30, 1, true);
-        checkTest("test1", 5.1); /* 4.4 */
+        checkTest(testName, 5.1); /* 4.4 */
 
         removeConstraint(popX, popY);
         sleep(3000);
-        checkTest("test1", 5.2); /* 5 */
+        checkTest(testName, 5.2); /* 5 */
         sleep(1000);
 
         addConstraint(gx, gy - 30, 1, true);
         sleep(5000);
-        checkTest("test1", 6); /* 6 */
+        checkTest(testName, 6); /* 6 */
 
         removeOrder(popX, popY);
         sleep(4000);
-        checkTest("test1", 7);
+        checkTest(testName, 7);
 
         addOrder(popX, popY);
         sleep(4000);
-        checkTest("test1", 8);
+        checkTest(testName, 8);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 9);
+        checkTest(testName, 9);
 
         addColocation(popX, popY);
         sleep(4000);
-        checkTest("test1", 10);
+        checkTest(testName, 10);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.1);
+        checkTest(testName, 10.1);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.2);
+        checkTest(testName, 10.2);
 
         addConstraintOrderOnly(gx, gy - 30, 2, true);
         sleep(4000);
-        checkTest("test1", 10.3);
+        checkTest(testName, 10.3);
 
         addColocation(popX, popY);
         sleep(4000);
-        checkTest("test1", 10.4);
+        checkTest(testName, 10.4);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.5);
+        checkTest(testName, 10.5);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.6);
+        checkTest(testName, 10.6);
 
         addConstraintColocationOnly(gx, gy - 30, 2, true);
         sleep(4000);
-        checkTest("test1", 10.7);
+        checkTest(testName, 10.7);
 
         addOrder(popX, popY);
         sleep(4000);
-        checkTest("test1", 10.8);
+        checkTest(testName, 10.8);
 
         removeConstraint(popX, popY);
         sleep(4000);
-        checkTest("test1", 10.9);
+        checkTest(testName, 10.9);
 
         addConstraint(ipX, ipY, 1, false);
         sleep(5000);
-        checkTest("test1", 10.91);
+        checkTest(testName, 10.91);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.92);
+        checkTest(testName, 10.92);
 
         addOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.93);
+        checkTest(testName, 10.93);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.94);
+        checkTest(testName, 10.94);
 
         addColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.95);
+        checkTest(testName, 10.95);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.96);
+        checkTest(testName, 10.96);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.97);
+        checkTest(testName, 10.97);
 
         addConstraintColocationOnly(ipX, ipY, 1, false);
         sleep(5000);
-        checkTest("test1", 10.98);
+        checkTest(testName, 10.98);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 10.99);
+        checkTest(testName, 10.99);
 
         addConstraintOrderOnly(ipX, ipY, 1, false);
         sleep(5000);
-        checkTest("test1", 11);
+        checkTest(testName, 11);
 
         addColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.1);
+        checkTest(testName, 11.1);
 
         removeConstraint(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.2);
+        checkTest(testName, 11.2);
 
         addConstraint(ipX, ipY, 3, false);
         sleep(5000);
-        checkTest("test1", 11.3);
+        checkTest(testName, 11.3);
         stopResource(ipX, ipY, 0);
         sleep(5000);
-        checkTest("test1", 11.4);
+        checkTest(testName, 11.4);
         resetStartStopResource(ipX, ipY);
         sleep(5000);
-        checkTest("test1", 11.5);
+        checkTest(testName, 11.5);
 
         moveTo(ipX + 20, ipY + 10);
         leftClick(); /* choose ip */
         stopResource(1010, 132, 10); /* actions menu stop */
         sleep(5000);
-        checkTest("test1", 11.501);
+        checkTest(testName, 11.501);
 
         moveTo(ipX + 20, ipY + 10);
         leftClick(); /* choose ip */
         startResource(1010, 132, 20); /* actions menu start */
         sleep(5000);
-        checkTest("test1", 11.502);
+        checkTest(testName, 11.502);
 
         resetStartStopResource(ipX, ipY);
         sleep(5000);
-        checkTest("test1", 11.5);
+        checkTest(testName, 11.5);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.51);
+        checkTest(testName, 11.51);
 
         addColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.52);
+        checkTest(testName, 11.52);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.53);
+        checkTest(testName, 11.53);
 
         addOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.54);
+        checkTest(testName, 11.54);
 
         removeColocation(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.55);
+        checkTest(testName, 11.55);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.56);
+        checkTest(testName, 11.56);
 
         addConstraintOrderOnly(ipX, ipY, 3, false);
         sleep(5000);
-        checkTest("test1", 11.57);
+        checkTest(testName, 11.57);
 
         removeOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.58);
+        checkTest(testName, 11.58);
 
         addConstraintColocationOnly(ipX, ipY, 3, false);
         sleep(5000);
-        checkTest("test1", 11.59);
+        checkTest(testName, 11.59);
 
         addOrder(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.6);
+        checkTest(testName, 11.6);
 
         removeConstraint(popX, popY);
         sleep(5000);
-        checkTest("test1", 11.7);
+        checkTest(testName, 11.7);
 
         addConstraint(gx, gy - 30, 1, true);
         sleep(5000);
-        checkTest("test1", 11.8);
+        checkTest(testName, 11.8);
         /** Add m/s Stateful resource */
         moveTo(statefulX, statefulY);
         rightClick(); /* popup */
@@ -1327,7 +1338,7 @@ public final class RoboTest {
         moveTo(812, 131);
         sleep(5000);
         leftClick(); /* apply */
-        checkTest("test1", 11.9);
+        checkTest(testName, 11.9);
         sleep(3000);
         /* set clone max to 1 */
         moveTo(978, 333);
@@ -1345,62 +1356,62 @@ public final class RoboTest {
         sleep(3000);
         leftClick(); /* apply */
         sleep(3000);
-        checkTest("test1", 12);
+        checkTest(testName, 12);
         stopResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest("test1", 13);
+        checkTest(testName, 13);
 
         startResource(statefulX, statefulY, 0);
         sleep(10000);
-        checkTest("test1", 14);
+        checkTest(testName, 14);
         unmanageResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest("test1", 15);
+        checkTest(testName, 15);
         manageResource(statefulX, statefulY, 0);
         sleep(3000);
-        checkTest("test1", 16);
+        checkTest(testName, 16);
 
         /* IP addr cont. */
         stopResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 17);
+        checkTest(testName, 17);
         startResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 18);
+        checkTest(testName, 18);
         unmanageResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 19);
+        checkTest(testName, 19);
         manageResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 20);
+        checkTest(testName, 20);
         migrateResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 21);
+        checkTest(testName, 21);
         unmigrateResource(ipX, ipY, 0);
         sleep(3000);
-        checkTest("test1", 22);
+        checkTest(testName, 22);
 
         /* Group cont. */
         stopResource(gx, gy - 30, 15);
         sleep(10000);
-        checkTest("test1", 23);
+        checkTest(testName, 23);
         startResource(gx, gy - 30, 15);
         sleep(8000);
-        checkTest("test1", 24);
+        checkTest(testName, 24);
         unmanageResource(gx, gy - 30, 15);
         sleep(5000);
-        checkTest("test1", 25);
+        checkTest(testName, 25);
         manageResource(gx, gy - 30, 15);
         sleep(5000);
-        checkTest("test1", 26);
+        checkTest(testName, 26);
         migrateResource(gx, gy - 30, 25);
         sleep(5000);
         moveTo(gx, gy);
         leftClick();
-        checkTest("test1", 27);
+        checkTest(testName, 27);
         unmigrateResource(1020, 132, 55); /* actions menu unmigrate */
         sleep(5000);
-        checkTest("test1", 28);
+        checkTest(testName, 28);
         stopResource(ipX, ipY, 0);
         sleep(5000);
         moveTo(gx, gy);
@@ -1410,7 +1421,7 @@ public final class RoboTest {
         stopGroup(statefulX, statefulY, 0);
         stopEverything(); /* to be sure */
         sleep(5000);
-        checkTest("test1", 29);
+        checkTest(testName, 29);
 
         if (true) {
             removeResource(ipX, ipY, -15, true);
@@ -1424,7 +1435,7 @@ public final class RoboTest {
         if (!aborted) {
             sleepNoFactor(20000);
         }
-        checkTest("test1", 1);
+        checkTest(testName, 1);
     }
 
 

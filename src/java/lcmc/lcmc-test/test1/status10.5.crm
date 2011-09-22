@@ -1,11 +1,11 @@
 2 Nodes configured, 2 expected votes
-2 Resources configured.
+4 Resources configured.
 ============
 
 Online: [ host1 host2 ]
 
- res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Started host1
+ res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Started host2
  Resource Group: grp_1
-     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host1
-     res_Dummy_2	(ocf::heartbeat:Dummy):	Started host1
-     res_Dummy_3	(ocf::heartbeat:Dummy):	Started host1
+     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_2	(ocf::heartbeat:Dummy):	Started host2
+     res_Dummy_3	(ocf::heartbeat:Dummy):	Started host2
