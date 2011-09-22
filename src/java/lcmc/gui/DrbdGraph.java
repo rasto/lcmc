@@ -311,7 +311,11 @@ public final class DrbdGraph extends ResourceGraph {
             if (bdi == null) {
                 return icons;
             }
-            icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
+            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+                icons.add(BlockDevInfo.HARDDISK_DRBD_ICON_LARGE);
+            } else {
+                icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
+            }
             if (bdi.isDiskless(testOnly)) {
                 icons.add(BlockDevInfo.NO_HARDDISK_ICON_LARGE);
                 return icons;

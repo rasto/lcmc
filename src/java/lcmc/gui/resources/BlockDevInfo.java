@@ -103,6 +103,10 @@ public final class BlockDevInfo extends EditableInfo {
     /** Large harddisk icon. */
     public static final ImageIcon HARDDISK_ICON_LARGE = Tools.createImageIcon(
                            Tools.getDefault("BlockDevInfo.HarddiskIconLarge"));
+    /** Large harddisk with drbd icon. */
+    public static final ImageIcon HARDDISK_DRBD_ICON_LARGE =
+                    Tools.createImageIcon(
+                       Tools.getDefault("BlockDevInfo.HarddiskDRBDIconLarge"));
     /** Large no harddisk icon. */
     public static final ImageIcon NO_HARDDISK_ICON_LARGE =
                     Tools.createImageIcon(
@@ -1510,7 +1514,7 @@ public final class BlockDevInfo extends EditableInfo {
                            Tools.getString("HostBrowser.Drbd.Detach.ToolTip"),
 
                            Tools.getString("HostBrowser.Drbd.Attach"),
-                           HARDDISK_ICON_LARGE,
+                           HARDDISK_DRBD_ICON_LARGE,
                            Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
                            new AccessMode(ConfigData.AccessType.OP, true),
                            new AccessMode(ConfigData.AccessType.OP, false)) {

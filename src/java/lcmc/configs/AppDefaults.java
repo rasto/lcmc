@@ -336,8 +336,12 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"HostsPanel.HostIcon",          "Icons/32x32/host_32x32.png"},
 
         {"Info.LogIcon",     "Icons/32x32/logfile.png"},
+
         {"BlockDevInfo.HarddiskIconLarge",
          "Icons/32x32/blockdevice_32x32.png"},
+
+        {"BlockDevInfo.HarddiskDRBDIconLarge",
+         "Icons/32x32/blockdevice_drbd_32x32.png"},
 
         {"BlockDevInfo.NoHarddiskIconLarge",
          "Icons/32x32/noharddisk.png"},
