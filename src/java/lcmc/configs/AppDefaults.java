@@ -295,8 +295,13 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"ClusterBrowser.ClusterIconSmall",
          "Icons/16x16/cluster_16x16.png"},
 
+        {"ServiceInfo.ManageByCRMIcon", "Icons/32x32/pacemaker_32x32.png"},
+        {"ServiceInfo.UnmanageByCRMIcon", "Icons/32x32/nopacemaker_32x32.png"},
+
         {"ClusterBrowser.PacemakerIconSmall",
          "Icons/16x16/pacemaker_16x16.png"},
+        {"ClusterBrowser.PacemakerIcon",
+         "Icons/32x32/pacemaker_32x32.png"},
 
         {"ClusterBrowser.DRBDIconSmall",
          "Icons/16x16/drbd_16x16.png"},

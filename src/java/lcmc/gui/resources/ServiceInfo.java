@@ -172,6 +172,12 @@ public class ServiceInfo extends EditableInfo {
     protected static final String CACHED_FIELD = "cached";
     /** Master / Slave type string. */
     static final String MASTER_SLAVE_TYPE_STRING = "Master/Slave";
+    /** Manage by CRM icon. */
+    private static final ImageIcon MANAGE_BY_CRM_ICON = Tools.createImageIcon(
+                  Tools.getDefault("ServiceInfo.ManageByCRMIcon"));
+    /** Don't Manage by CRM icon. */
+    private static final ImageIcon UNMANAGE_BY_CRM_ICON = Tools.createImageIcon(
+                 Tools.getDefault("ServiceInfo.UnmanageByCRMIcon"));
     /** Unmanage service icon. */
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
                       Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
@@ -5476,11 +5482,11 @@ public class ServiceInfo extends EditableInfo {
         final MyMenuItem manageMenuItem =
             new MyMenuItem(
                   Tools.getString("ClusterBrowser.Hb.ManageResource"),
-                  START_ICON,
+                  MANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                   Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
-                  UNMANAGE_ICON,
+                  UNMANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                   new AccessMode(ConfigData.AccessType.OP, false),
