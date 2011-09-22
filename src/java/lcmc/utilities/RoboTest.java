@@ -334,50 +334,50 @@ public final class RoboTest {
                         while (true) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startTest1();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest2();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest3();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest4();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest5();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest6();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest7();
-                            if (aborted) {
-                                break;
-                            }
-                            startTest8();
-                            if (aborted) {
-                                break;
-                            }
-                            //startTest9();
-                            if (aborted) {
-                                break;
-                            }
-                            startTestA();
-                            if (aborted) {
-                                break;
-                            }
-                            startTestB();
-                            if (aborted) {
-                                break;
-                            }
+                            //startTest1();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest2();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest3();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest4();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest5();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest6();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest7();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTest8();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            ////startTest9();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTestA();
+                            //if (aborted) {
+                            //    break;
+                            //}
+                            //startTestB();
+                            //if (aborted) {
+                            //    break;
+                            //}
                             startTestC();
                             if (aborted) {
                                 break;
@@ -2019,18 +2019,27 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 207;
         disableStonith();
+        String testName = "testB";
+        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+                testName = "testB-1.0";
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (int i = 20; i > 0; i--) {
             if (i % 5 == 0) {
-                info("testB I: " + i);
+                info(testName + " I: " + i);
             }
-            checkTest("testB", 1);
+            checkTest(testName, 1);
             /* create dummy */
             sleep(5000);
             chooseDummy(dummy1X, dummy1Y, true, true);
-            checkTest("testB", 2);
+            checkTest(testName, 2);
             sleep(5000);
             stopResource(dummy1X, dummy1Y, 0);
-            checkTest("testB", 3);
+            checkTest(testName, 3);
             sleep(5000);
             removeResource(dummy1X, dummy1Y, -15, true);
             resetTerminalAreas();
@@ -2043,11 +2052,20 @@ public final class RoboTest {
         final int statefulX = 500;
         final int statefulY = 207;
         disableStonith();
+        String testName = "testC";
+        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+                testName = "testC-1.0";
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (int i = 20; i > 0; i--) {
             if (i % 5 == 0) {
-                info("testC I: " + i);
+                info(testName + " I: " + i);
             }
-            checkTest("testC", 1);
+            checkTest(testName, 1);
             /** Add m/s Stateful resource */
             moveTo(statefulX, statefulY);
             rightClick(); /* popup */
@@ -2078,7 +2096,7 @@ public final class RoboTest {
             leftClick(); /* apply */
             sleep(4000);
             stopResource(statefulX, statefulY, -20);
-            checkTest("testC", 2);
+            checkTest(testName, 2);
             sleep(5000);
             removeResource(statefulX, statefulY, -20, true);
             resetTerminalAreas();
@@ -2097,7 +2115,7 @@ public final class RoboTest {
                 info("testD 1 I: " + i);
             }
             chooseDummy(dummy1X, dummy1Y, false, false);
-            removeResource(dummy1X, dummy1Y, -20, true);
+            removeResource(dummy1X, dummy1Y, -20, false);
         }
         chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
@@ -2163,7 +2181,16 @@ public final class RoboTest {
         final int gx = 235;
         final int gy = 207;
         disableStonith();
-        checkTest("testF", 1);
+        String testName = "testF";
+        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+                testName = "testF-1.0";
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
+        checkTest(testName, 1);
         /* group with dummy resources */
         moveTo(gx, gy);
         sleep(1000);
@@ -2176,7 +2203,7 @@ public final class RoboTest {
         leftClick(); /* clone */
 
         final int gxM = 110; /* tree menu */
-        final int gyM = 242;
+        final int gyM = 212;
         final int type = 1;
         //int type = 2;
         for (int i = 2; i > 0; i--) {
@@ -2205,7 +2232,7 @@ public final class RoboTest {
             leftClick(); /* apply */
             sleep(6000);
         }
-        checkTest("testF", 2);
+        checkTest(testName, 2);
         /* set resource stickiness */
         moveTo(1000, 432);
         sleep(1000);
@@ -2219,11 +2246,11 @@ public final class RoboTest {
         sleep(6000);
         leftClick(); /* apply */
         sleep(6000);
-        checkTest("testF", 3);
+        checkTest(testName, 3);
 
         stopResource(gx, gy, 0);
         sleep(6000);
-        checkTest("testF", 4);
+        checkTest(testName, 4);
         removeResource(gx, gy, -40, true);
         resetTerminalAreas();
         System.gc();
@@ -2779,11 +2806,20 @@ public final class RoboTest {
         slowFactor = 0.3f;
         aborted = false;
         disableStonith();
+        String testName = "test3";
+        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+                testName = "test3-1.0";
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         for (int i = 20; i > 0; i--) {
             if (i % 5 == 0) {
-                info("test3 I: " + i);
+                info(testName + " I: " + i);
             }
-            checkTest("test3", 1);
+            checkTest(testName, 1);
             /* filesystem/drbd */
             moveTo(577, 205);
             rightClick(); /* popup */
@@ -2814,9 +2850,9 @@ public final class RoboTest {
             moveTo(815, 138);
             leftClick(); /* apply */
             sleep(2000);
-            checkTest("test3", 2);
+            checkTest(testName, 2);
             stopEverything();
-            checkTest("test3", 3);
+            checkTest(testName, 3);
             removeEverything();
             resetTerminalAreas();
         }
@@ -3050,9 +3086,12 @@ public final class RoboTest {
         dialogColorTest("addDrbdResource");
     }
 
+    private static void drbdNext() {
+        press(KeyEvent.VK_ENTER);
+    }
+
     private static void newDrbdResource() {
-        moveTo(720, 522); /* new drbd resource */
-        leftClick(); /* next */
+        drbdNext();
         sleep(10000);
         dialogColorTest("newDrbdResource");
     }
@@ -3072,29 +3111,25 @@ public final class RoboTest {
         chooseDrbdResourceInterface(0);
         chooseDrbdResourceInterface(35);
 
-        moveTo(720, 522);
-        leftClick(); /* next */
+        drbdNext();
         sleep(10000);
         dialogColorTest("chooseDrbdResource");
     }
 
     private static void addDrbdVolume() {
-        moveTo(720, 522); /* volume */
-        leftClick(); /* next */
+        drbdNext();
         sleep(10000);
         dialogColorTest("addDrbdVolume");
     }
 
     private static void addBlockDevice() {
-        moveTo(720, 522); /* block device */
-        leftClick(); /* next */
+        drbdNext();
         sleep(10000);
         dialogColorTest("addBlockDevice");
     }
 
     private static void addMetaData() {
-        moveTo(720, 522); /* meta-data */
-        leftClick(); /* next */
+        drbdNext();
         sleep(10000);
         dialogColorTest("addMetaData");
     }
@@ -3453,8 +3488,7 @@ public final class RoboTest {
                 sleep(200);
                 press(KeyEvent.VK_ENTER);
 
-                moveTo(720, 522);
-                leftClick(); /* next */
+                drbdNext();
                 sleep(10000);
 
                 //addDrbdVolume();

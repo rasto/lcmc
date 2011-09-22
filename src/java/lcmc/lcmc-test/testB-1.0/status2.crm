@@ -1,0 +1,8 @@
+2 Nodes configured, 2 expected votes
+1 Resources configured.
+============
+
+Online: [ host1 host2 ]
+
+ Clone Set: cl_Dummy_1
+     Started: [ host1 host2 ]

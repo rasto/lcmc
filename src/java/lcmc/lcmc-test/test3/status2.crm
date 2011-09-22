@@ -1,10 +1,10 @@
 2 Nodes configured, 2 expected votes
-2 Resources configured.
+3 Resources configured.
 ============
 
 Online: [ host1 host2 ]
 
- Master/Slave Set: ms_drbd_1
-     Masters: [ host1 ]
-     Slaves: [ host2 ]
- res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started host1
+ Master/Slave Set: ms_drbd_1res_drbd_1]
+     Masters: [ host2 ]
+     Slaves: [ host1 ]
+ res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started host2
