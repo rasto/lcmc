@@ -1,0 +1,4 @@
+node host1
+node host2
+property $id="cib-bootstrap-options" 
+	no-quorum-policy="ignore"
