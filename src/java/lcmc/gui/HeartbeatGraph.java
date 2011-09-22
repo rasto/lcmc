@@ -436,6 +436,9 @@ public final class HeartbeatGraph extends ResourceGraph {
         }
         Vertex vP = getVertex(parent);
         Vertex v = getVertex(serviceInfo);
+        if (vP == v) {
+            return;
+        }
         if (parent.isConstraintPH() || serviceInfo.isConstraintPH()) {
             /* if it is sequential rsc set change it to show to the resource
              * instead on placeholder. */
@@ -565,6 +568,9 @@ public final class HeartbeatGraph extends ResourceGraph {
         }
         Vertex vRsc = getVertex(rsc);
         Vertex vWithRsc = getVertex(withRsc);
+        if (vRsc == vWithRsc) {
+            return;
+        }
         if (rsc.isConstraintPH() || withRsc.isConstraintPH()) {
             /* if it is sequential rsc set change it to show to the resource
              * instead on placeholder. */
