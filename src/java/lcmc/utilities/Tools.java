@@ -300,7 +300,7 @@ public final class Tools {
         if (debugLevel > 0) {
             System.out.println(DEBUG_STRING
                                + "[" + seconds() + "s] "
-                               + msg + " (drbd.utilities.Tools)");
+                               + msg + " (lcmc.utilities.Tools)");
         }
     }
 
@@ -319,7 +319,7 @@ public final class Tools {
             System.out.println(DEBUG_STRING
                                + "(" + level + ") "
                                + "[" + seconds() + "s] "
-                               + msg + " (drbd.utilities.Tools)");
+                               + msg + " (lcmc.utilities.Tools)");
         }
     }
 
@@ -1364,7 +1364,7 @@ public final class Tools {
     /** Returns thrue if object is in StringInfo class. */
     public static boolean isStringInfoClass(final Object o) {
         if (o != null
-            && o.getClass().getName().equals("drbd.gui.resources.StringInfo")) {
+            && o.getClass().getName().equals("lcmc.gui.resources.StringInfo")) {
             return true;
         }
         return false;
