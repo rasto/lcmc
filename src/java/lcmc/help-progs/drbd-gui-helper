@@ -212,6 +212,9 @@ sub get_net_info {
 				}
 			}
 			$dev = "";
+			$mac  = "";
+			$ip   = "";
+			$mask = "";
 		}
 	}
 }
