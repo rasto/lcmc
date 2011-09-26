@@ -1762,6 +1762,20 @@ public final class Host {
         final Set<String> newCpuMapModels = new TreeSet<String>();
         final Set<String> newCpuMapVendors = new TreeSet<String>();
         final Set<String> newMountPoints = new TreeSet<String>();
+
+        boolean netInfo = false;
+        boolean diskInfo = false;
+        boolean vgInfo = false;
+        boolean filesystemsInfo = false;
+        boolean cryptoInfo = false;
+        boolean qemuKeymapsInfo = false;
+        boolean cpuMapModelInfo = false;
+        boolean cpuMapVerndorInfo = false;
+        boolean mountPointsInfo = false;
+        boolean guiInfo = false;
+        boolean installationInfo = false;
+        boolean versionInfo = false;
+
         newMountPoints.add("/mnt/");
 
         final Pattern bdP = Pattern.compile("(\\D+)\\d+");
@@ -1792,6 +1806,7 @@ public final class Host {
                     netInterface = netInterfaces.get(netInterface.getName());
                 }
                 newNetInterfaces.put(netInterface.getName(), netInterface);
+                netInfo = true;
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String name = blockDevice.getName();
@@ -1826,6 +1841,7 @@ public final class Host {
                 if (blockDevice.isPhysicalVolume()) {
                     newPhysicalVolumes.add(name);
                 }
+                diskInfo = true;
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
                 if (vgi.length == 2) {
@@ -1833,39 +1849,79 @@ public final class Host {
                 } else {
                     Tools.appWarning("could not parse volume info: " + line);
                 }
+                vgInfo = true;
             } else if ("filesystems-info".equals(type)) {
                 newFileSystems.add(line);
+                filesystemsInfo = true;
             } else if ("crypto-info".equals(type)) {
                 newCryptoModules.add(line);
+                cryptoInfo = true;
             } else if ("qemu-keymaps-info".equals(type)) {
                 newQemuKeymaps.add(line);
+                qemuKeymapsInfo = true;
             } else if ("cpu-map-model-info".equals(type)) {
                 newCpuMapModels.add(line);
+                cpuMapModelInfo = true;
             } else if ("cpu-map-vendor-info".equals(type)) {
                 newCpuMapVendors.add(line);
+                cpuMapVerndorInfo = true;
             } else if ("mount-points-info".equals(type)) {
                 newMountPoints.add(line);
+                mountPointsInfo = true;
             } else if ("gui-info".equals(type)) {
                 parseGuiInfo(line);
+                guiInfo = true;
             } else if ("installation-info".equals(type)) {
                 parseInstallationInfo(line);
+                installationInfo = true;
             } else if ("version-info".equals(type)) {
                 versionLines.add(line);
+                versionInfo = true;
             }
         }
-        setDistInfo(versionLines.toArray(new String[versionLines.size()]));
-        blockDevices = newBlockDevices;
-        netInterfaces = newNetInterfaces;
-        volumeGroups = newVolumeGroups;
-        volumeGroupsLVS = newVolumeGroupsLVS;
-        physicalVolumes = newPhysicalVolumes;
 
-        fileSystems = newFileSystems;
-        cryptoModules = newCryptoModules;
-        qemuKeymaps = newQemuKeymaps;
-        cpuMapModels = newCpuMapModels;
-        cpuMapVendors = newCpuMapVendors;
-        mountPoints = newMountPoints;
+        if (netInfo) {
+            netInterfaces = newNetInterfaces;
+        }
+
+        if (diskInfo) {
+            blockDevices = newBlockDevices;
+            physicalVolumes = newPhysicalVolumes;
+            volumeGroupsLVS = newVolumeGroupsLVS;
+        }
+
+        if (vgInfo) {
+            volumeGroups = newVolumeGroups;
+        }
+
+        if (filesystemsInfo) {
+            fileSystems = newFileSystems;
+        }
+
+        if (cryptoInfo) {
+            cryptoModules = newCryptoModules;
+        }
+
+        if (qemuKeymapsInfo) {
+            qemuKeymaps = newQemuKeymaps;
+        }
+
+        if (cpuMapModelInfo) {
+            cpuMapModels = newCpuMapModels;
+        }
+
+        if (cpuMapVerndorInfo) {
+            cpuMapVendors = newCpuMapVendors;
+        }
+
+        if (mountPointsInfo) {
+            mountPoints = newMountPoints;
+        }
+
+        if (versionInfo) {
+            setDistInfo(versionLines.toArray(new String[versionLines.size()]));
+        }
+
 
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
