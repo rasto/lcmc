@@ -110,9 +110,9 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "アップグレードの確認が失敗しました"},
 
         {"MainPanel.UpgradeAvailable",
-         "<font color=black>新しいDRBD-MC&nbsp;@LATEST@&nbsp;が利用できます。"
-         + "</font><br><a href=\"http://oss.linbit.com/drbd-mc/"
-         + "DMC-@LATEST@.jar?from-drbd-mc\">さあ、入手しよう</a>！"},
+         "<font color=black>新しいMC&nbsp;@LATEST@&nbsp;が利用できます。"
+         + "</font><br><a href=\"http://sourceforge.net/projects/lcmc/files/"
+         + "?from-lcmc\">さあ、入手しよう</a>！"},
 
         {"MainPanel.NoUpgradeAvailable",
          ""},

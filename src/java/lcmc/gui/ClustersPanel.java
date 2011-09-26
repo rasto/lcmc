@@ -287,8 +287,7 @@ public final class ClustersPanel extends JPanel {
                 final String latestVersion = Tools.getLatestVersion();
                 mUpgradeLock.lock();
                 if (latestVersion == null) {
-                    upgradeCheck =
-                             Tools.getString("MainPanel.UpgradeCheckFailed");
+                    upgradeCheck = "";
                 } else {
                     final String release = Tools.getRelease();
                     try {

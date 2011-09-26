@@ -1958,11 +1958,16 @@ public final class Tools {
     /** Returns the latest version of this application. */
     public static String getLatestVersion() {
         String version = null;
+        //final Pattern vp = Pattern.compile(
+        //                      ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
         final Pattern vp = Pattern.compile(
-                              ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
+         ".*<a\\s+href=\".*/files/(?:DMC|LCMC)-.*?([0-9.]*?)\\.jar/download\"");
         try {
-            final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
-                               + getRelease();
+            //final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
+            //                   + getRelease();
+            final String url =
+                "http://sourceforge.net/projects/lcmc/files/?lcmc-check-"
+                + getRelease();
             final BufferedReader reader = new BufferedReader(
                              new InputStreamReader(new URL(url).openStream()));
             String line;
