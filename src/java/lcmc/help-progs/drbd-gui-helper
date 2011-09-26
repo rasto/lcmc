@@ -2012,36 +2012,38 @@ sub get_proc_drbd {
 	if (!open my $pfh, "/proc/drbd") {
 		print "can't open /proc/drbd: $!\n";
 	} else {
-		my @infos;
 		while (<$pfh>) {
+			my @infos;
 			print;
 			if (/ns:/ && /nr:/ && /dr:/) {
 				@infos = split;
 			}
+			my $l = 0;
+			for (values %texts) {
+				$l = length $_ if length $_ > $l;
+			}
+			for (@infos) {
+				my ($name, $value) = split /:/;
+				if ($texts{$name}) {
+					print "    $texts{$name}: ";
+					print " "x($l - length $texts{$name});
+					my $unit = $units{$name};
+					if ("fdn" eq $unit) {
+						print $write_orders{$value}
+						      ."\n";
+					} elsif ("KB" eq $unit) {
+						print convert_kilobytes($value)
+						      ."\n";
+					} else {
+						print "$value\n";
+					}
+				} else {
+					print "$name: $value\n";
+				}
+			}
+			print "\n\n";
 		}
 		close $pfh;
-		my $l = 0;
-		for (values %texts) {
-			$l = length $_ if length $_ > $l;
-		}
-		print "\n\n";
-		for (@infos) {
-			my ($name, $value) = split /:/;
-			if ($texts{$name}) {
-				print "$texts{$name}: ";
-				print " "x($l - length $texts{$name});
-				my $unit = $units{$name};
-				if ("fdn" eq $unit) {
-					print $write_orders{$value}."\n";
-				} elsif ("KB" eq $unit) {
-					print convert_kilobytes($value)."\n";
-				} else {
-					print "$value\n";
-				}
-			} else {
-				print "$name: $value\n";
-			}
-		}
 	}
 }
 
