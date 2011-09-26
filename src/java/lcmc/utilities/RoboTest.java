@@ -334,50 +334,50 @@ public final class RoboTest {
                         while (true) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            //startTest1();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest2();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest3();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest4();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest5();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest6();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest7();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTest8();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            ////startTest9();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTestA();
-                            //if (aborted) {
-                            //    break;
-                            //}
-                            //startTestB();
-                            //if (aborted) {
-                            //    break;
-                            //}
+                            startTest1();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest2();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest3();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest4();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest5();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest6();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest7();
+                            if (aborted) {
+                                break;
+                            }
+                            startTest8();
+                            if (aborted) {
+                                break;
+                            }
+                            //startTest9();
+                            if (aborted) {
+                                break;
+                            }
+                            startTestA();
+                            if (aborted) {
+                                break;
+                            }
+                            startTestB();
+                            if (aborted) {
+                                break;
+                            }
                             startTestC();
                             if (aborted) {
                                 break;
@@ -3661,9 +3661,9 @@ public final class RoboTest {
         final List<String> names = new ArrayList<String>();
 
         for (int j = 0; j < count; j++) {
-            moveTo(56, 189); /* popup */
+            moveTo(56, 186); /* popup */
             rightClick();
-            moveTo(159, 208); /* new domain */
+            moveTo(159, 205); /* new domain */
             leftClick();
             dialogColorTest("new domain");
             moveTo(450, 317); /* domain name */
@@ -3801,11 +3801,9 @@ public final class RoboTest {
             checkVMTest(vmTest, 3, name);
 
             /* disk readonly */
-            moveTo(56, 204); /* popup */
+            moveTo(56, 201); /* popup */
             leftClick();
             sleep(1000);
-            press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_DOWN);
             for (int down = 0; down < j; down++) {
                 sleep(200);
