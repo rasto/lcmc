@@ -398,6 +398,10 @@ public final class GroupInfo extends ServiceInfo {
      */
     void addGroupServicePanel(final ServiceInfo newServiceInfo,
                               final boolean reloadNode) {
+        final DefaultMutableTreeNode gn = getNode();
+        if (gn == null) {
+            return;
+        }
         newServiceInfo.getService().setResourceClass(
                         newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
@@ -406,9 +410,9 @@ public final class GroupInfo extends ServiceInfo {
         final DefaultMutableTreeNode newServiceNode =
                                    new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        getNode().add(newServiceNode);
+        gn.add(newServiceNode);
         if (reloadNode) {
-            getBrowser().reload(getNode(), false);
+            getBrowser().reload(gn, false);
             getBrowser().reload(newServiceNode, true);
         }
     }
