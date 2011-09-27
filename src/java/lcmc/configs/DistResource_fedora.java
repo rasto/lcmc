@@ -196,5 +196,36 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"Openais.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
         {"KVM.emulator",    "/usr/bin/qemu-kvm"},
+
+        /* Drbd install method 2 */
+        {"DrbdInst.install.text.2",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.2",
+         "source"},
+
+        {"DrbdInst.install.2",
+         "/bin/mkdir -p /tmp/drbdinst && "
+         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
+         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
+         /* it installs eather kernel-devel- or kernel-PAE-devel-, etc. */
+         + "/usr/bin/yum -y install kernel`uname -r|"
+         + " grep -o '\\.PAEdebug\\|\\.PAE'"
+         + "|tr . -`-devel-`uname -r|sed 's/\\.\\(PAEdebug\\|PAE\\)$//'` "
+         + "|tee -a /dev/tty|grep 'No package'>/dev/null;"
+         + "(if [ \"$?\" == 0 ]; then "
+         + "echo \"you need to find and install kernel-devel-`uname -r`.rpm "
+         + "package, or upgrade the kernel, sorry\";"
+         + "exit 1; fi)"
+         + "&& /usr/bin/yum -y install flex gcc make which && "
+         + "cd /tmp/drbdinst && "
+         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
+         + "cd drbd-@VERSION@ && "
+         + "if [ -e configure ]; then"
+         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
+         + " --sysconfdir=/etc;"
+         + " fi && "
+         + "make && make install DESTDIR=/ && "
+         + "/bin/rm -rf /tmp/drbdinst"},
     };
 }
