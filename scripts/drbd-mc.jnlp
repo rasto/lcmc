@@ -15,5 +15,5 @@
                 <j2se version="1.6+" />
                 <jar href="DMC.jar"/>
         </resources>
-        <application-desc main-class="drbd.DrbdMC"/>
+        <application-desc main-class="lcmc.DrbdMC"/>
 </jnlp>
