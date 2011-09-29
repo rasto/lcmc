@@ -1,5 +1,7 @@
 DRBD Management Console
-by Rasto Levrinc
+
+Copyright (C) 2007 - 2011 LINBIT HA-Solutions GmbH.
+Copyright (C) 2007 - Rastislav Levrinc
 
 to compile and run type: ant
 

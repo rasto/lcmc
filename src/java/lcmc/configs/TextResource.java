@@ -850,7 +850,8 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.About.Description",
          "<b>DRBD Management Console by "
          + "(rasto.levrinc@gmail.com).</b><br>"
-         + "(C)opyright 2007-2010 by Rasto Levrinc.<br>"
+         + "(C)opyright 2007 - 2011 by LINBIT HA-Solution GmbH.<br>"
+         + "(C)opyright 2007 - 2011 by Rasto Levrinc.<br>"
          + "Please visit the website:<br><br>"
          + "http://sourceforge.net/projects/lcmc<br>"
          + "http://github.com/rasto/drbd-mc<br>"
