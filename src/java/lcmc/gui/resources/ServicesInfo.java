@@ -529,16 +529,20 @@ public final class ServicesInfo extends EditableInfo {
             final DefaultMutableTreeNode n = newSi.getNode();
             if (n != null) {
                 final int p = pos;
-                final DefaultMutableTreeNode parent =
-                                (DefaultMutableTreeNode) n.getParent();
-                if (parent != null) {
-                    final int i = parent.getIndex(n);
-                    if (i > p) {
-                        parent.remove(n);
-                        parent.insert(n, p);
-                        getBrowser().reload(parent, false);
+                Tools.invokeAndWait(new Runnable() {
+                    @Override public void run() {
+                        final DefaultMutableTreeNode parent =
+                                        (DefaultMutableTreeNode) n.getParent();
+                        if (parent != null) {
+                            final int i = parent.getIndex(n);
+                            if (i > p) {
+                                parent.remove(n);
+                                parent.insert(n, p);
+                                getBrowser().reload(parent, false);
+                            }
+                        }
                     }
-                }
+                });
                 pos++;
             }
         }
