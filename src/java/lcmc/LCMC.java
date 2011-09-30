@@ -21,7 +21,7 @@
  */
 
 /*
- * DrbdMC
+ * LCMC
  * written by Rasto Levrinc
  */
 package lcmc;
@@ -60,9 +60,9 @@ import org.apache.commons.cli.HelpFormatter;
 
 
 /**
- * This is the central class with main function. It starts the DRBD GUI.
+ * This is the central class with main function. It starts the LCMC GUI.
  */
-public final class DrbdMC extends JPanel {
+public final class LCMC extends JPanel {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -125,7 +125,7 @@ public final class DrbdMC extends JPanel {
     /**
      * Private constructor.
      */
-    private DrbdMC() {
+    private LCMC() {
         /* no instantiation possible. */
     }
     /** Create the GUI and show it. */

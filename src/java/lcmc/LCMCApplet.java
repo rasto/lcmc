@@ -20,7 +20,7 @@
  */
 
 /*
- * DrbdMCApplet
+ * LCMCApplet
  * (c) Rasto Levrinc, Linbit
  */
 package lcmc;
@@ -32,12 +32,12 @@ import javax.swing.JApplet;
 /**
  * This is the central class with main function. It starts the DRBD GUI.
  */
-public final class DrbdMCApplet extends JApplet {
+public final class LCMCApplet extends JApplet {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
 
     /** Public applet constructor. */
-    public DrbdMCApplet() {
+    public LCMCApplet() {
     }
 
     /** Start the applet. */
@@ -51,11 +51,11 @@ public final class DrbdMCApplet extends JApplet {
             params = paramsLine.split("\\s+");
         }
 
-        DrbdMC.initApp(params);
-        setJMenuBar(DrbdMC.getMenuBar());
-        setContentPane(DrbdMC.getMainPanel());
-        setGlassPane(DrbdMC.getMainGlassPane());
-        DrbdMC.createAndShowGUI(this);
+        LCMC.initApp(params);
+        setJMenuBar(LCMC.getMenuBar());
+        setContentPane(LCMC.getMainPanel());
+        setGlassPane(LCMC.getMainGlassPane());
+        LCMC.createAndShowGUI(this);
         //TODO: save on quit
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //addWindowListener(new ExitListener());

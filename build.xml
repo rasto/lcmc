@@ -1,4 +1,4 @@
-<project name="DMC" basedir="." default="main">
+<project name="LCMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/java"/>
 	<property name="test.dir"	value="${src.dir}/test"/>
@@ -11,7 +11,7 @@
 	<property name="buildlib.dir"	value="build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
 	
-	<property name="main-class"  value="lcmc.DrbdMC"/>
+	<property name="main-class"  value="lcmc.LCMC"/>
 	<tstamp/>
 	<property name="now" value="${DSTAMP}-${TSTAMP}" />
 	
@@ -280,7 +280,7 @@
 	<target name="main" depends="clean,run"/>
 	
 	<target name="init">
-		<property name="project" value="drbd-mc" />
+		<property name="project" value="lcmc" />
 		<property name="tarball.tar" value="${project}-${now}.tar" />  
 		<property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
 	</target>
@@ -288,7 +288,7 @@
 	<target name="dist" depends="init">
 		<tar tarfile="${tarball.tar}"
 		     basedir=".."
-		     includes="drbd-mc/src/** drbd-mc/build.xml drbd-mc/release drbd-mc/README" />
+		     includes="lcmc/src/** lcmc/build.xml lcmc/release lcmc/README" />
 		<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 		<delete file="${tarball.tar}"/>
 	</target>
