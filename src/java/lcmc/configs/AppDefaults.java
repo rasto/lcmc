@@ -29,20 +29,16 @@ import java.util.Arrays;
  */
 public final class AppDefaults extends java.util.ListResourceBundle {
     /** Darker background color. */
-    public static final Color BACKGROUND_DARKER  = new Color(250, 133, 34);
-    //public static final Color BACKGROUND_DARKER = new Color(63, 155, 241);
+    public static final Color BACKGROUND_DARKER = new Color(63, 155, 241);
 
     /** Dark background color. */
-    public static final Color BACKGROUND_DARK = new Color(214, 75, 42);
-    //public static final Color BACKGROUND_DARK = new Color(120, 120, 120);
+    public static final Color BACKGROUND_DARK = new Color(120, 120, 120);
 
     /** Background color. */
-    public static final Color BACKGROUND = new Color(250, 133, 34);
-    //public static final Color BACKGROUND = new Color(168, 168, 168);
+    public static final Color BACKGROUND = new Color(168, 168, 168);
 
     /** Light background color. */
-    public static final Color BACKGROUND_LIGHT = new Color(253, 180, 109);
-    //public static final Color BACKGROUND_LIGHT = new Color(227, 227, 227);
+    public static final Color BACKGROUND_LIGHT = new Color(227, 227, 227);
 
 
     /** Get contents. */

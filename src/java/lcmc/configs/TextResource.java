@@ -36,7 +36,7 @@ public final class TextResource extends java.util.ListResourceBundle {
     /** Contents. */
     private static Object[][] contents = {
         {"DrbdMC.Title",
-         "Management Console"},
+         "Linux Cluster Management Console"},
 
         /* Main Menu */
         {"MainMenu.Session",
@@ -845,35 +845,32 @@ public final class TextResource extends java.util.ListResourceBundle {
          "DRBD is not loaded"},
 
         {"Dialog.About.Title",
-         "DRBD Management Console. Release: "},
+         "Linux Cluster Management Console. Release: "},
 
         {"Dialog.About.Description",
-         "<b>DRBD Management Console by "
-         + "(rasto.levrinc@gmail.com).</b><br>"
-         + "(C)opyright 2007 - 2011 by LINBIT HA-Solution GmbH.<br>"
-         + "(C)opyright 2007 - 2011 by Rasto Levrinc.<br>"
+         "<b> by "
+         + "rasto.levrinc@gmail.com.</b><br>"
+         + "(C)opyright 2011 by Rasto Levrinc.<br>"
+         + "(C)opyright 2007 - 2011 by Rasto Levrinc, LINBIT HA-Solution GmbH.<br>"
          + "Please visit the website:<br><br>"
-         + "http://sourceforge.net/projects/lcmc<br>"
-         + "http://github.com/rasto/drbd-mc<br>"
-         + "<br>"
-         + "old: http://oss.linbit.com/drbd-mc<br>"
-         + "http://www.drbd.org/mc/management-console/<br>"
-         + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
+         + "http://lcmc.sourceforge.net<br>"
+         + "http://github.com/rasto/lcmc<br>"
+         + "Old mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 
 
         {"Dialog.About.Licences",
-"DRBD Management Console is free software; you can redistribute it and/or\n"
+"Linux Cluster Management Console is free software; you can redistribute it and/or\n"
 + "modify it under the terms of the GNU General Public License as published\n"
 + "by the Free Software Foundation; either version 2, or (at your option)\n"
 + "any later version.\n\n"
 
-+ "DRBD Management Console is distributed in the hope that it will be useful,\n"
++ "Linux Cluster Management Console is distributed in the hope that it will be useful,\n"
 + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
 + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
 + "GNU General Public License for more details.\n\n"
 
 + "You should have received a copy of the GNU General Public License\n"
-+ "along with DRBD; see the file COPYING.  If not, write to\n"
++ "along with LCMC; see the file COPYING.  If not, write to\n"
 + "the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.\n\n"
 
 + "This software uses the following libraries:\n"
