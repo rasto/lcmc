@@ -72,12 +72,21 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
-         "from the source tarball"},
-
-        {"DrbdInst.install.method.2",
-         "source"},
+         "apt-get install: 8.3.x"},
 
         {"DrbdInst.install.2",
+         "apt-get update && /usr/bin/apt-get -y install -o "
+         + "'DPkg::Options::force=--force-confnew'"
+         + "  drbd8-utils"},
+
+        /* Drbd install method 3 */
+        {"DrbdInst.install.text.3",
+         "from the source tarball"},
+
+        {"DrbdInst.install.method.3",
+         "source"},
+
+        {"DrbdInst.install.3",
          "/bin/mkdir -p /tmp/drbdinst && "
          + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
          + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
@@ -96,14 +105,6 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
          //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
-        /* Drbd install method 3 */
-        {"DrbdInst.install.text.3",
-         "apt-get install: 8.3.x"},
-
-        {"DrbdInst.install.3",
-         "apt-get update && /usr/bin/apt-get -y install -o "
-         + "'DPkg::Options::force=--force-confnew'"
-         + "  drbd8-utils"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"

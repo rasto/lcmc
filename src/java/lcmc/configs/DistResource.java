@@ -397,10 +397,10 @@ public final class DistResource extends java.util.ListResourceBundle {
          +  " || grep @GREPPATTERN@ /var/log/messages)| tail -500"},
 
         /* DrbdINst.install.x is automatically in 'sudo bash -c ...' */
-        {"DrbdInst.install.text.1", "packages from LINBIT"},
-        {"DrbdInst.install.1",
+        {"DrbdInst.install.text.6", "packages from LINBIT"},
+        {"DrbdInst.install.6",
                         " packages from www.linbit.com for LINBIT customers"},
-        {"DrbdInst.install.method.1",       "linbit"},
+        {"DrbdInst.install.method.6",       "linbit"},
 
         {"Pacemaker.Service.Ver", "0"},
 

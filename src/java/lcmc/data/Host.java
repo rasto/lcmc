@@ -862,7 +862,6 @@ public final class Host {
     /** Returns heartbeat lib path. */
     public String getHeartbeatLibPath() {
         if (hbLibPath != null) {
-            System.out.println("hbLibPath: " + hbLibPath);
             return hbLibPath;
         }
         if ("".equals(arch)) {
