@@ -234,6 +234,8 @@ public final class Host {
     private String hbPmInstallMethod;
     /** Drbd installation method index. */
     private String drbdInstallMethod;
+    /** Heartbeat lib path. */
+    private String hbLibPath = null;
     /** MD5 checksum of VM Info from server. */
     private String vmInfoMD5 = null;
     /** Previous hw info output. */
@@ -859,6 +861,10 @@ public final class Host {
 
     /** Returns heartbeat lib path. */
     public String getHeartbeatLibPath() {
+        if (hbLibPath != null) {
+            System.out.println("hbLibPath: " + hbLibPath);
+            return hbLibPath;
+        }
         if ("".equals(arch)) {
             Tools.appWarning(
                         "getHeartbeatLibPath() called to soon: unknown arch");
@@ -2082,6 +2088,13 @@ public final class Host {
             } else {
                 drbdLoaded = false;
             }
+        } else if ("hb-lib-path".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                hbLibPath = tokens[1].trim();
+            } else {
+                hbLibPath = null;
+            }
+            setName(hostname);
         } else if ("hn".equals(tokens[0])) {
             if (tokens.length == 2) {
                 hostname = tokens[1].trim();

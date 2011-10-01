@@ -731,7 +731,7 @@ sub cib_message {
 sub get_hb_lib_path {
 	my $arch = `uname -m`;
 	chomp $arch;
-	if ($arch eq "x86_64") {
+	if ($arch eq "x86_64" && -e "/usr/lib64") {
 		return "/usr/lib64/heartbeat";
 	}
 	return "/usr/lib/heartbeat";
@@ -1515,6 +1515,7 @@ sub get_cluster_versions {
 	       ."drbd:$drbd_version\n"
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
+	       ."hb-lib-path:$libpath\n"
 }
 
 # return -1 if ver1 is smaller than ver2 etc. 1.0.9.1 and 1.0.9 are considered
