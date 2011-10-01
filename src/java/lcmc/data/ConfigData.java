@@ -289,6 +289,12 @@ public final class ConfigData {
         return saveFile;
     }
 
+    /** Returns file name where gui data were saved the last time. The old
+     * location, drbd-gui.drbdg. */
+    public String getSaveFileOld() {
+        return Tools.getDefault("MainMenu.DrbdGuiFiles.Old");
+    }
+
     /** Returns path of the known host file. */
     public String getKnownHostPath() {
         return knownHostPath;

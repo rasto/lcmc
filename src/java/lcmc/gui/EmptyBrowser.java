@@ -52,7 +52,11 @@ public final class EmptyBrowser extends Browser {
         super();
         /* Load the default file */
         final String saveFile = Tools.getConfigData().getSaveFile();
-        final String xml = Tools.loadFile(saveFile, false);
+        String xml = Tools.loadFile(saveFile, false);
+        if (xml == null) {
+            final String saveFileOld = Tools.getConfigData().getSaveFileOld();
+            xml = Tools.loadFile(saveFileOld, false);
+        }
         if (xml != null) {
             Tools.loadXML(xml);
         }

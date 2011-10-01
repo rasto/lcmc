@@ -111,8 +111,11 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"Dialog.vm.Resource.LabelWidth", 150},
         {"Dialog.vm.Resource.FieldWidth", 350},
 
-        {"MainMenu.DrbdGuiFiles.Extension",     "drbdg"},
+        {"MainMenu.DrbdGuiFiles.Extension",     "lcmc"},
         {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home")
+                                                + "/"
+                                                + "lcmc-conf.lcmc"},
+        {"MainMenu.DrbdGuiFiles.Old",       System.getProperty("user.home")
                                                 + "/"
                                                 + "drbd-gui.drbdg"},
 

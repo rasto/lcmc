@@ -341,7 +341,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
 
                      public String getDescription() {
-                         return "Drbd GUI Files";
+                         return "LCMC GUI Files";
                      }
                  };
                  fc.setFileFilter(filter);
