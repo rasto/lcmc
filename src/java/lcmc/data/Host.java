@@ -1720,7 +1720,7 @@ public final class Host {
         }
         if (command.indexOf("@GUI-HELPER@") > -1) {
             command = command.replaceAll("@GUI-HELPER@",
-                                         "/usr/local/bin/drbd-gui-helper-"
+                                         "/usr/local/bin/lcmc-gui-helper-"
                                          + Tools.getRelease());
         }
         return command;

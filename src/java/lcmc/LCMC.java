@@ -301,7 +301,7 @@ public final class LCMC extends JPanel {
         options.addOption(null,
                           KEEP_HELPER_OP,
                           false,
-                          "do not overwrite the drbd-gui-helper program");
+                          "do not overwrite the lcmc-gui-helper program");
         options.addOption(null, RO_OP, false, "read only mode");
         options.addOption(null, OP_OP, false, "operator mode");
         options.addOption(null, ADMIN_OP, false, "administrator mode");

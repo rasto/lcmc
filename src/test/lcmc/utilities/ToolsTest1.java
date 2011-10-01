@@ -1079,7 +1079,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testGetFile() {
-        final String testFile = "/help-progs/drbd-gui-helper";
+        final String testFile = "/help-progs/lcmc-gui-helper";
         assertTrue(Tools.getFile(testFile).indexOf("#!") == 0);
         assertNull(Tools.getFile(null));
         assertNull(Tools.getFile("not_existing_file"));

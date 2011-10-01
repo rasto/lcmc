@@ -1487,7 +1487,7 @@ public final class SSH {
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
         if (!Tools.getConfigData().getKeepHelper()) {
-            final String fileName = "/help-progs/drbd-gui-helper";
+            final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
                 scp(file, "@GUI-HELPER@", "0700", false, null, null, null);
