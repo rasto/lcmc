@@ -1,7 +1,7 @@
-DRBD Management Console
+Linux Cluster Management Console
 
-Copyright (C) 2007 - 2011 LINBIT HA-Solutions GmbH.
-Copyright (C) 2007 - Rastislav Levrinc
+Copyright (C) 2011 - Rasto Levrinc
+Copyright (C) 2007 - 2011 Rasto Levrinc, LINBIT HA-Solutions GmbH.
 
 to compile and run type: ant
 
