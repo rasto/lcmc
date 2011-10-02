@@ -5,5 +5,5 @@ Exec=lcmc %f
 GenericName=Linux Cluster MC
 Icon=/usr/share/pixmaps/LCMC.png
 Icon=LCMC
-Name=LCMC
+Name=Linux Cluster MC
 Type=Application
