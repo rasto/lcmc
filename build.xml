@@ -288,7 +288,7 @@
 	<target name="dist" depends="init">
 		<tar tarfile="${tarball.tar}"
 		     basedir=".."
-		     includes="lcmc/src/** lcmc/build.xml lcmc/release lcmc/README" />
+		     includes="lcmc/src/** lcmc/build.xml lcmc/release lcmc/README lcmc/debian/**" />
 		<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
 		<delete file="${tarball.tar}"/>
 	</target>
