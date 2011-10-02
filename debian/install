@@ -2,4 +2,5 @@ build/jar/LCMC.jar usr/share/java
 debian/wrappers/lcmc usr/bin
 debian/lcmc.desktop usr/share/applications
 debian/lcmc.xpm usr/share/pixmaps
+debian/LCMC.png usr/share/pixmaps
 debian/lcmc.schemas usr/share/gconf/schemas

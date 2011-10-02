@@ -3,6 +3,7 @@ Categories=Java;Settings
 Comment=Manage Pacemaker Clusters
 Exec=lcmc %f
 GenericName=Linux Cluster MC
+Icon=/usr/share/pixmaps/LCMC.png
 Icon=LCMC
 Name=LCMC
 Type=Application
