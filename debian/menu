@@ -1,0 +1,3 @@
+?package(lcmc):needs="X11" section="Applications/System Tools"\
+  icon="/usr/share/pixmaps/lcmc.xpm"\
+  title="LCMC" command="/usr/bin/lcmc"

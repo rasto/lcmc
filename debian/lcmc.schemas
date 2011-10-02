@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<gconfschemafile>
+  <schemalist>
+    <schema>
+      <key>/schemas/desktop/gnome/url-handlers/magnet/enabled</key>
+      <applyto>/desktop/gnome/url-handlers/magnet/enabled</applyto>
+      <owner>lcmc</owner>
+      <type>bool</type>
+      <default>true</default>
+      <locale name="C">
+        <short>Whether the specified command should handle "magnet" URLs</short>
+        <long>True if the command specified in the "command" key should handle "magnet" URLs.</long>
+      </locale>
+    </schema>
+    <schema>
+      <key>/schemas/desktop/gnome/url-handlers/magnet/command</key>
+      <applyto>/desktop/gnome/url-handlers/magnet/command</applyto>
+      <owner>lcmc</owner>
+      <type>string</type>
+      <default>lcmc "%s"</default>
+      <locale name="C">
+        <short>The handler for "magnet" URLs</short>
+        <long>The command used to handle "magnet" URLs, if enabled.</long>
+      </locale>
+    </schema>
+    <schema>
+      <key>/schemas/desktop/gnome/url-handlers/magnet/needs_terminal</key>
+      <applyto>/desktop/gnome/url-handlers/magnet/needs_terminal</applyto>
+      <owner>lcmc</owner>
+      <type>bool</type>
+      <default>false</default>
+      <locale name="C">
+        <short>Run the command in a terminal</short>
+        <long>True if the command used to handle this type of URL should be run in a terminal.</long>
+      </locale>
+    </schema>
+  </schemalist>
+</gconfschemafile>

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Include java-wrappers
+. /usr/lib/java-wrappers/java-wrappers.sh
+
+JAVA_CLASSPATH="/usr/lib/jni:/usr/lib/java"
+LCMC_BIN="/usr/bin/lcmc"
+
+find_java_runtime sunmin5 openjdk
+
+find_jars LCMC
+
+if [ ! -x $LCMC_BIN ]; then
+	UI=-Dforce.ui=az2
+fi
+
+run_java -Dlcmc.install.path="$HOME/.lcmc" $UI \
+    lcmc.LCMC "$@"

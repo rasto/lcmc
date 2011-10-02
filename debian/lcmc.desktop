@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Java;Settings
+Comment=Manage Pacemaker Clusters
+Exec=lcmc %f
+GenericName=Linux Cluster MC
+Icon=LCMC
+Name=LCMC
+Type=Application
