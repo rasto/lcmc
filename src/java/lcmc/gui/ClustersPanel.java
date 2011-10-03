@@ -163,9 +163,6 @@ public final class ClustersPanel extends JPanel {
         Tools.debug(this, "cluster add tab " + cluster.getName(), 2);
         final ClusterTab ct = new ClusterTab(cluster);
         cluster.setClusterTab(ct);
-        /* insert tab before empty tab */
-        removeClustersTab();
-        addClustersTab("");
         tabbedPane.addTab(cluster.getName(),
                           CLUSTER_ICON,
                           ct,
@@ -200,10 +197,6 @@ public final class ClustersPanel extends JPanel {
         }
         if (selected != null) {
             tabbedPane.remove(selected);
-            if (tabbedPane.getTabCount() == 1) {
-                removeClustersTab();
-                addClustersTab(CLUSTERS_LABEL);
-            }
         }
     }
 
@@ -211,10 +204,6 @@ public final class ClustersPanel extends JPanel {
     public void removeTab(final Cluster cluster) {
         tabbedPane.remove(cluster.getClusterTab());
         cluster.setClusterTab(null);
-        if (tabbedPane.getTabCount() == 1) {
-            removeClustersTab();
-            addClustersTab(CLUSTERS_LABEL);
-        }
     }
 
     /** Removes all tabs. */
