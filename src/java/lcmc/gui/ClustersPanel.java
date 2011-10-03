@@ -163,6 +163,9 @@ public final class ClustersPanel extends JPanel {
         Tools.debug(this, "cluster add tab " + cluster.getName(), 2);
         final ClusterTab ct = new ClusterTab(cluster);
         cluster.setClusterTab(ct);
+        if (tabbedPane.getTabCount() == 1) {
+            removeAllTabs();
+        }
         tabbedPane.addTab(cluster.getName(),
                           CLUSTER_ICON,
                           ct,
@@ -179,11 +182,6 @@ public final class ClustersPanel extends JPanel {
                           Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
-    /** Removes the empty tab. */
-    void removeClustersTab() {
-        tabbedPane.remove(tabbedPane.getTabCount() - 1);
-    }
-
     /**
      * Removes selected tab, after clicking on the cancel button in the config
      * dialogs.
@@ -198,12 +196,20 @@ public final class ClustersPanel extends JPanel {
         if (selected != null) {
             tabbedPane.remove(selected);
         }
+        if (tabbedPane.getTabCount() == 1) {
+            tabbedPane.removeAll();
+            addClustersTab(CLUSTERS_LABEL);
+        }
     }
 
     /** Removes specified tab. */
     public void removeTab(final Cluster cluster) {
         tabbedPane.remove(cluster.getClusterTab());
         cluster.setClusterTab(null);
+        if (tabbedPane.getTabCount() == 1) {
+            tabbedPane.removeAll();
+            addClustersTab(CLUSTERS_LABEL);
+        }
     }
 
     /** Removes all tabs. */
