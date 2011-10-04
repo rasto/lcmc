@@ -36,17 +36,11 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
     /** Contents. */
     private static Object[][] contents = {
         {"DrbdMC.Title",
-         "DRBD Management Console"},
+         "Linux Cluster Management Console"},
 
         /* Main Menu */
         {"MainMenu.Session",
          "セッション"},
-
-        {"MainMenu.Plugins",
-         "プラグイン"},
-
-        {"MainMenu.RegisterPlugins",
-         "登録"},
 
         {"MainMenu.New",
          "新規"},
@@ -76,13 +70,13 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "設定"},
 
         {"MainMenu.LookAndFeel",
-         "Look And Feel"},
+         "ルック アンド フィール"},
 
         {"MainMenu.Help",
          "ヘルプ"},
 
         {"MainMenu.About",
-         "DRBD MC について"},
+         "LCMCについて"},
 
         {"MainMenu.DrbdGuiFiles",
          "DRBD Management Console ファイル"},
@@ -118,8 +112,11 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          ""},
 
         /** Clusters panel */
-        {"ClustersPanel.NewTabTip",
-         "新しいクラスター"},
+        {"ClustersPanel.ClustersTab",
+         "すべてのクラスター"},
+
+        {"ClustersPanel.ClustersTabTip",
+         "すべてのクラスター"},
 
         /** Hosts panel */
         {"HostsPanel.NewTabTip",
@@ -127,7 +124,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         /** Tools */
         {"Tools.ExecutingCommand",
-         "コマンド実行中..."},
+         "コマンドを実行しています..."},
 
         {"Tools.CommandDone",
          "[終了]"},
@@ -139,7 +136,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "読み込んでいます..."},
 
         {"Tools.Saving",
-         "\"@FILENAME@\" の保存しています..."},
+         "\"@FILENAME@\" を保存しています..."},
 
         {"Tools.Warning.Title",
          "警告: "},
@@ -152,10 +149,10 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         /* Cluster tab */
         {"ClusterTab.AddNewCluster",
-         "クラスター設定ウィザード"},
+         "クラスターの追加 / 設定ウィザード"},
 
         {"ClusterTab.AddNewHost",
-         "ホスト設定ウィザード"},
+         "ホストの追加 / 設定ウィザード"},
 
         /* Cluster view panel */
         {"ClusterViewPanel.ClusterButtons",
@@ -164,12 +161,15 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterWizard",
          "クラスター設定ウィザード"},
 
+        {"ClusterViewPanel.DisconnectBtn",
+         "切断"},
+
         {"ClusterViewPanel.OperatingMode",
          "操作モード"},
 
         /* Progress bar */
         {"ProgressBar.Cancel",
-         "中止"},
+         "キャンセル"},
 
         /* Dialogs */
         {"Dialog.Dialog.Next",
@@ -231,7 +231,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "IP:"},
 
         {"Dialog.Host.Configuration.DNSLookup",
-         "DNSサーバへホスト名を問い合わせ中"},
+         "ホスト名の解決"},
 
         {"Dialog.Host.Configuration.DNSLookupOk",
          "ホスト名の解決に成功しました。"},
@@ -315,12 +315,12 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "ディストリビューションの検出"},
 
         {"Dialog.Host.DistDetection.Description",
-         "そのホストのLinuxディストリビューションを検出しています。"
+         "そのホストのLinuxディストリビューションを検出を試みます。"
          + "Linuxであるかどうかも含めて検出します。検出できなければ、そのディストリビューションはサポートされていません。"
-         + "似ているディストリビューションを選ぶことができますが、動くか動かないかはわかりません。"},
+         + "似ているディストリビューションを選ぶことができますが、動くかどうかはわかりません。"},
 
         {"Dialog.Host.DistDetection.Executing",
-         "実行中..."},
+         "実行しています..."},
 
         {"Dialog.Host.CheckInstallation.Title",
          "インストール環境の確認"},
@@ -336,7 +336,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "DRBDがインストールされていません。「インストール」ボタンを押して新しいDRBDをインストールしてください。"},
 
         {"Dialog.Host.CheckInstallation.Heartbeat.AlreadyInstalled",
-         "Heartbeatは既にインストールされています"},
+         "Heartbeatは既にインストールされています。"},
 
         {"Dialog.Host.CheckInstallation.Heartbeat.NotInstalled",
          "Heartbeatがインストールされていないか、正しくインストールされていません。"
@@ -382,13 +382,13 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "インストール"},
 
         {"Dialog.Host.CheckInstallation.CheckingPm",
-         "Pacemakerの確認中..."},
+         "Pacemakerを確認しています..."},
 
         {"Dialog.Host.CheckInstallation.CheckingHbPm",
-         "Pacemaker/Heartbeatの確認中..."},
+         "Pacemaker/Heartbeatを確認しています..."},
 
         {"Dialog.Host.CheckInstallation.CheckingDrbd",
-         "DRBDの確認中..."},
+         "DRBDを確認しています..."},
 
         {"Dialog.Host.CheckInstallation.PmInstallMethod",
          "インストール方法: "},
@@ -415,23 +415,6 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"Dialog.Host.LinbitLogin.Save",
          "保存"},
 
-        {"Dialog.PluginLogin.Title",
-         "プラグインの登録"},
-
-        {"Dialog.PluginLogin.Description",
-         "ユーザー名とパスワードを入力してください。プラグインを有効にできます。"},
-
-        {"Dialog.PluginLogin.EnterUser",
-         "ユーザー名"},
-
-        {"Dialog.PluginLogin.EnterPassword",
-         "パスワード"},
-
-        {"Dialog.PluginLogin.Save",
-         "保存"},
-        {"Dialog.PluginLogin.FinishButton",
-         "登録"},
-
         {"Dialog.Host.DrbdAvailFiles.Title",
          "利用できるDRBDパッケージ"},
 
@@ -439,7 +422,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "利用できるパッケージを検出します。ディストリビューションのカーネルを使っていれば、一つのモジュールと一つのユーティリティ パッケージになります。パッケージが自動検出できなければ、プルダウン メニューで適切なカーネル バージョンを選びます。あなたのシステムでパッケージがビルドされていなくてもよいです。その場合はLINBITサポートに問い合わせてください。できるだけ早くパッケージが提供されるでしょう。"},
 
         {"Dialog.Host.DrbdAvailFiles.Executing",
-         "実行中..."},
+         "実行しています..."},
 
         {"Dialog.Host.DrbdAvailFiles.NoFiles",
          "パッケージが見つかりません。"},
@@ -454,7 +437,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "LINBITウェブサイトから利用できるソースコードのtarファイルを探します。インストールすべきDRBDバージョンがわからなければ、すでに選択されたものを使ってください。これは最新のものになります。"},
 
         {"Dialog.Host.DrbdAvailSourceFiles.Executing",
-         "実行中..."},
+         "実行しています..."},
 
         {"Dialog.Host.DrbdAvailSourceFiles.NoBuilds",
          "ビルドが見つかりません"},
@@ -463,10 +446,10 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "DRBDのインストール"},
 
         {"Dialog.Host.DrbdLinbitInst.Description",
-         "DRBDをインストールしています。認証エラーで失敗したら、間違ったユーザー名とパスワードを入力しています。前に戻って、正しく入力して、修正します。他の可能性としては、誤ったディストリビューションが選択されていて、インストールがうまく動かないことです。別の可能性としては、LINBITサーバーがダウンしていることです。しかし、LINBITサーバはDRBDにより耐障害性があるため、ほとんど起こりません。"},
+         "DRBDをインストールしています。認証エラーで失敗したら、間違ったユーザー名とパスワードを入力しています。前に戻って、正しく入力して修正します。他の可能性としては、誤ったディストリビューションが選択されていて、インストールがうまく動かないことです。別の可能性としては、LINBITサーバーがダウンしていることです。しかし、LINBITサーバはDRBDにより耐障害性があるため、ほとんど起こりません。"},
 
         {"Dialog.Host.DrbdLinbitInst.CheckingFile",
-         "インストールされるファイルを確認中..."},
+         "インストールされるファイルを確認しています..."},
 
         {"Dialog.Host.DrbdLinbitInst.FileExists",
          "ファイルはすでに存在します。"},
@@ -484,7 +467,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "インストールが失敗しました。"},
 
         {"Dialog.Host.DrbdLinbitInst.Executing",
-         "実行中..."},
+         "実行しています..."},
 
         {"Dialog.Host.DrbdLinbitInst.Starting",
          "DRBDを開始しています..."},
@@ -636,7 +619,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "構成ファイルはすべてのホストで同じではありません"},
 
         {"Dialog.Cluster.CoroConfig.Loading",
-         "読み込み中..."},
+         "読み込んでいます..."},
 
         {"Dialog.Cluster.CoroConfig.CurrentConfig",
          "現在の構成:"},
@@ -695,7 +678,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "構成ファイルはすべてのホストで同じではありません"},
 
         {"Dialog.Cluster.HbConfig.Loading",
-         "読み込み中..."},
+         "読み込んでいます..."},
 
         {"Dialog.Cluster.HbConfig.CurrentConfig",
          "現在の構成:"},
@@ -719,13 +702,13 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "クラスター/DRBDの初期化。ここでは、DRBDをロードして、Corosync(OpenAIS)かHeartbeatを開始することができます。"},
 
         {"Dialog.Cluster.Init.CheckingDrbd",
-         "確認中..."},
+         "確認しています..."},
 
         {"Dialog.Cluster.Init.LoadDrbdButton",
          "ロードする"},
 
         {"Dialog.Cluster.Init.CheckingPm",
-         "確認中..."},
+         "確認しています..."},
 
         {"Dialog.Cluster.Init.StartCsAisButton",
          "開始"},
@@ -752,7 +735,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "は構成されていない"},
 
         {"Dialog.Cluster.Init.CheckingHb",
-         "確認中..."},
+         "確認しています..."},
 
         {"Dialog.Cluster.Init.StartHbButton",
          "開始"},
@@ -785,30 +768,32 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "DRBDはロードされていない"},
 
         {"Dialog.About.Title",
-         "DRBD Management Console. Release: "},
+         "Linux Cluster Management Console. Release: "},
 
         {"Dialog.About.Description",
-         "<b>DRBD Management Console by Rasto Levrinc "
-         + "(rasto.levrinc@gmail.com).</b><br>"
-         + "(C)opyright 2007-2011 by Rasto Levrinc.<br>"
-         + "Please visit the website "
-         + "http://www.drbd.org/mc/management-console/<br>"
-         + "Mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
+         "<b> by "
+         + "rasto.levrinc@gmail.com.</b><br>"
+         + "(C)opyright 2011 by Rasto Levrinc.<br>"
+         + "(C)opyright 2007 - 2011 by Rasto Levrinc, LINBIT HA-Solution GmbH.<br>"
+         + "Please visit the website:<br><br>"
+         + "http://lcmc.sourceforge.net<br>"
+         + "http://github.com/rasto/lcmc<br>"
+         + "Old mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
 
 
         {"Dialog.About.Licences",
-"DRBD Management Console is free software; you can redistribute it and/or\n"
+"Linux Cluster Management Console is free software; you can redistribute it and/or\n"
 + "modify it under the terms of the GNU General Public License as published\n"
 + "by the Free Software Foundation; either version 2, or (at your option)\n"
 + "any later version.\n\n"
 
-+ "DRBD Management Console is distributed in the hope that it will be useful,\n"
++ "Linux Cluster Management Console is distributed in the hope that it will be useful,\n"
 + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
 + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
 + "GNU General Public License for more details.\n\n"
 
 + "You should have received a copy of the GNU General Public License\n"
-+ "along with DRBD; see the file COPYING.  If not, write to\n"
++ "along with LCMC; see the file COPYING.  If not, write to\n"
 + "the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.\n\n"
 
 + "This software uses the following libraries:\n"
@@ -835,11 +820,30 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"Dialog.Cluster.Finish.Save",
          "保存する"},
 
+        {"Dialog.DrbdConfig.Start.Title",
+         "DRBDボリュームの構成"},
+
+        {"Dialog.DrbdConfig.Start.Description",
+         "DRBDリソースを生成するのか、既存のDRBDリソースにボリュームを追加するのかを選びます。"},
+
+        {"Dialog.DrbdConfig.Start.DrbdResource",
+         "DRBDリソース"},
+
+        {"Dialog.DrbdConfig.Start.NewDrbdResource",
+         "新しいDRBDリソース"},
+
         {"Dialog.DrbdConfig.Resource.Title",
          "DRBDリソースの構成"},
 
         {"Dialog.DrbdConfig.Resource.Description",
-         "新しいDRBDリソースを構成します。リソースの<b>名前</b>を入力します。名前はユニークである限り何でもよいです。DRBDデバイスについても同じです。この<b>デバイス</b>は/dev/drbdXの形式になります。DRBDがレプリケーションのために使う<b>プロトコル</b>を選びます。プロトコル -- レプリケーション モードとして知られている -- については<a href=\"http://www.drbd.org/docs/introduction/\">DRBD User's Guide: Introduction to DRBD</a>で学ぶことができます。その欄を変更した後、あるいはデフォルトでよければ、<b>次へ</b>を押して、続けてます。"},
+         "新しいDRBDリソースを構成します。リソースの<b>名前</b>を入力します。名前はユニークであれば何でもよいです。DRBDデバイスについても同じです。この<b>デバイス</b>は/dev/drbdXの形式になります。DRBDがレプリケーションのために使う<b>プロトコル</b>を選びます。プロトコル（レプリケーション モード）については<a href=\"http://www.drbd.org/docs/introduction/\">DRBD User's Guide: Introduction to DRBD</a>で学ぶことができます。その欄を変更した後、あるいはデフォルトでよければ、<b>次へ</b>を押して、続けてます。"},
+
+        {"Dialog.DrbdConfig.Volume.Title",
+         "DRBDボリュームの構成"},
+
+        {"Dialog.DrbdConfig.Volume.Description",
+         "新しいDRBDボリュームを構成します。 "
+         + "<b>デバイス</b>は/dev/drbdXの形式になります。 "},
 
         {"Dialog.DrbdConfig.BlockDev.Title",
          "DRBDブロック デバイスの構成"},
@@ -861,6 +865,9 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"Dialog.DrbdConfig.CreateFS.Filesystem",
          "ファイルシステム"},
+
+        {"Dialog.DrbdConfig.CreateFS.SkipSync",
+         "初期完全同期を省きます"},
 
         {"Dialog.DrbdConfig.CreateFS.SelectFilesystem",
          "既存データを使います"},
@@ -944,7 +951,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "確認ダイアログ"},
 
         {"ConfirmDialog.Description",
-         "よいですか？"},
+         "本当によいですか？"},
 
         {"ConfirmDialog.Yes",
          "はい"},
@@ -1016,7 +1023,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "クラスターの削除"},
 
         {"EmptyBrowser.confirmRemoveMarkedClusters.Desc",
-         "以下のクラスターを削除しますか？<br>@CLUSTERS@"},
+         "以下のクラスターを削除します。本当によいですか？<br>@CLUSTERS@"},
 
         {"EmptyBrowser.confirmRemoveMarkedClusters.Yes",
          "削除"},
@@ -1073,7 +1080,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "すべてのサービスの削除"},
 
         {"ClusterBrowser.confirmRemoveAllServices.Description",
-         "すべてのサービスと制約を削除しますか？"},
+         "すべてのサービスと制約を削除します。本当によいですか？"},
 
         {"ClusterBrowser.confirmRemoveAllServices.Yes",
          "削除"},
@@ -1085,7 +1092,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "DRBDリソースの削除"},
 
         {"ClusterBrowser.confirmRemoveDrbdResource.Description",
-         "DRBDリソース@RESOURCE@を削除しますか？"},
+         "DRBDリソース@RESOURCE@を削除します。本当によいですか？"},
 
         {"ClusterBrowser.confirmRemoveDrbdResource.Yes",
          "削除"},
@@ -1097,7 +1104,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "サービスの削除"},
 
         {"ClusterBrowser.confirmRemoveService.Description",
-         "サービス@SERVICE@を削除しますか？"},
+         "サービス@SERVICE@を削除します。本当によいですか？"},
 
         {"ClusterBrowser.confirmRemoveService.Yes",
          "削除"},
@@ -1109,7 +1116,8 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "グループの削除"},
 
         {"ClusterBrowser.confirmRemoveGroup.Description",
-         "グループ@GROUP@とそのサービス@SERVICES@を削除しますか？"},
+         "グループ@GROUP@とそのサービス@SERVICES@を削除します。"
+         + "本当によいですか？"},
 
         {"ClusterBrowser.confirmRemoveGroup.Yes",
          "削除"},
@@ -1293,13 +1301,13 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "グループを下に移動"},
 
         {"ClusterBrowser.Hb.MigrateResource",
-         "マイグレーション先"},
+         "移動先"},
 
         {"ClusterBrowser.Hb.ForceMigrateResource",
-         "強制マイグレーション先"},
+         "強制移動先"},
 
         {"ClusterBrowser.Hb.MigrateFromResource",
-         "マイグレーション元"},
+         "移動元"},
 
 
         {"ClusterBrowser.Hb.UnmigrateResource",
@@ -1309,46 +1317,46 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "サービス ログの表示"},
 
         {"ClusterBrowser.Hb.RemoveEdge",
-         "起動ノード依存と順序の削除"},
+         "同居制約(collocation)と順序制約(order)の削除"},
 
         {"ClusterBrowser.Hb.RemoveEdge.ToolTip",
-         "順序と起動ノード依存関係を削除します。"},
+         "順序制約(order)と同居制約(collocation)の依存を削除します。"},
 
         {"ClusterBrowser.Hb.RemoveOrder",
-         "順序の削除"},
+         "順序制約(order)の削除"},
 
         {"ClusterBrowser.Hb.RemoveOrder.ToolTip",
-         "順序の依存を削除します。"},
+         "順序制約(order)の依存を削除します。"},
 
         {"ClusterBrowser.Hb.ReverseOrder",
-         "順序の逆順"},
+         "順序制約(order)の逆"},
 
         {"ClusterBrowser.Hb.ReverseOrder.ToolTip",
-         "制約の順序を逆にします。"},
+         "順序制約(order)を逆にします。"},
 
         {"ClusterBrowser.Hb.RemoveColocation",
-         "起動ノード依存の削除"},
+         "同居制約(collocation)の削除"},
 
         {"ClusterBrowser.Hb.RemoveColocation.ToolTip",
-         "起動ノードの依存関係を削除します。"},
+         "同居制約(collocation)の依存を削除します。"},
 
         {"ClusterBrowser.Hb.AddOrder",
-         "順序の追加"},
+         "順序制約(order)の追加"},
 
         {"ClusterBrowser.Hb.AddOrder.ToolTip",
-         "順序の依存を追加します。"},
+         "順序制約(order)の依存を追加します。"},
 
         {"ClusterBrowser.Hb.AddColocation",
-         "起動ノード依存設定の追加"},
+         "同居制約(collocation)の追加"},
 
         {"ClusterBrowser.Hb.AddColocation.ToolTip",
-         "起動ノードの依存設定を追加します。"},
+         "同居制約(collocation)の依存を追加します。"},
 
         {"ClusterBrowser.Hb.CleanUpFailedResource",
-         "フェイルの再開（クリーンナップ）"},
+         "故障したリソースの再開（cleanup）"},
 
         {"ClusterBrowser.Hb.CleanUpResource",
-         "フェイル カウントのリセット（クリーンナップ）"},
+         "フェイルカウントの削除（cleanup）"},
 
         {"ClusterBrowser.Hb.ViewLogs",
          "ログの参照"},
@@ -1375,19 +1383,22 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "開始が失敗しました"},
 
         {"ClusterBrowser.Hb.Starting",
-         "開始中..."},
+         "開始しています..."},
 
         {"ClusterBrowser.Hb.Stopping",
-         "停止中..."},
+         "停止しています..."},
+
+        {"ClusterBrowser.Hb.Enslaving",
+         "スレーブにしています..."},
 
         {"ClusterBrowser.Hb.Migrating",
-         "マイグレーション中..."},
+         "移動しています..."},
 
         {"ClusterBrowser.Hb.ColOnlySubmenu",
-         "起動ノード依存のみ"},
+         "同居制約(collocation)のみ"},
 
         {"ClusterBrowser.Hb.OrdOnlySubmenu",
-         "順序のみ"},
+         "順序制約(order)のみ"},
 
         {"ClusterBrowser.HbUpdateResources",
          "クラスター リソースを更新しています..."},
@@ -1500,7 +1511,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "複製するディスクの追加"},
 
         {"HostBrowser.Drbd.RemoveDrbdResource",
-         "DRBDリソースの削除"},
+         "DRBDボリュームの削除"},
 
         {"HostBrowser.Drbd.SetPrimary",
          "プライマリーに昇格"},
@@ -1569,10 +1580,19 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "ログの参照"},
 
         {"HostBrowser.Drbd.AttachAll",
-         "切断中のすべてのディスクの接続"},
+         "すべてのディスクの接続"},
+
+        {"HostBrowser.Drbd.DetachAll",
+         "すべてのディスクの切断"},
 
         {"HostBrowser.Drbd.LoadDrbd",
          "DRBDモジュールの読み込み"},
+
+        {"HostBrowser.Drbd.AdjustAllDrbd",
+         "DRBD構成の読み込み（適応）"},
+
+        {"HostBrowser.Drbd.AdjustAllDrbd.ToolTip",
+         "DRBDモジュールへのDRBD構成の読み込み(drbdadm adjust all)"},
 
         {"HostBrowser.Drbd.UpAll",
          "すべてのDRBDの開始"},
@@ -1599,7 +1619,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "すべてのDRBDデバイスをセカンダリーにする"},
 
         {"HostInfo.CRM.AllMigrateFrom",
-         "すべてのリソースをマイグレートする"},
+         "すべてのリソースを移動する"},
 
         {"HostInfo.StopCorosync",
          "Corosyncの停止"},
@@ -1612,6 +1632,9 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"HostInfo.StartCorosync",
          "Corosyncの起動"},
+
+        {"HostInfo.StartPacemaker",
+         "Pacemakerの開始"},
 
         {"HostInfo.StartOpenais",
          "Openaisの起動"},
@@ -1674,6 +1697,12 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"HostBrowser.Hb.NoInfoAvailable",
          "情報が利用できません"},
 
+        {"HostDrbdInfo.LVMMenu",
+         "LVM"},
+
+        {"HostDrbdInfo.AddToVG",
+         "VGにLVを生成する"},
+
         {"HostBrowser.AdvancedSubmenu",
          "拡張オプション"},
 
@@ -1705,51 +1734,57 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "OCFのパラメータを取得しています..."},
 
         {"CRMXML.TargetRole.ShortDesc",
-         "ターゲット ロール"},
+         "Target Role"},
 
         {"CRMXML.TargetRole.LongDesc",
          "サービスが開始、停止、昇格されるべきかを選択します。"},
 
         {"CRMXML.IsManaged.ShortDesc",
-         "クラスターによる管理"},
+         "Is Managed By Cluster"},
 
         {"CRMXML.IsManaged.LongDesc",
          "サービスがクラスターで管理されるべきかを選択します。"},
 
+        {"CRMXML.AllowMigrate.ShortDesc",
+         "Allow Migrate"},
+
+        {"CRMXML.AllowMigrate.LongDesc",
+         "ライブ マイグレーションを行いたいときにはこれを設定します。"},
+
         {"CRMXML.Priority.ShortDesc",
-         "優先"},
+         "Priority"},
 
         {"CRMXML.Priority.LongDesc",
          "アクティブのままにするのを優先します。"},
 
         {"CRMXML.ResourceStickiness.ShortDesc",
-         "リソースの接着性"},
+         "Resource Stickiness"},
 
         {"CRMXML.ResourceStickiness.LongDesc",
          "リソースがどれくらいの強さでとどまるべきかをスコアとして設定します。"},
 
         {"CRMXML.MigrationThreshold.ShortDesc",
-         "マイグレーションの閾値"},
+         "Migration Threshold"},
 
         {"CRMXML.MigrationThreshold.LongDesc",
-         "マイグレーションの閾値の失敗の後にマイグレートします。"},
+         "マイグレーションの閾値の失敗の後に移動します。"},
 
         {"CRMXML.FailureTimeout.ShortDesc",
-         "失敗のタイムアウト"},
+         "Failure Timeout"},
 
         {"CRMXML.FailureTimeout.LongDesc",
-         "失敗を無視する時間。"},
+         "失敗を無視する時間を秒数で設定します。"},
 
         {"CRMXML.MultipleActive.ShortDesc",
-         "複数のアクティブ"},
+         "Multiple Active"},
 
         {"CRMXML.MultipleActive.LongDesc",
-         "リソースが複数のノードで誤ってアクティブになったときにどうするか。"},
+         "リソースが複数のノードで誤ってアクティブになったときにどうするかを設定します。"},
 
         {"CRMXML.ColocationSectionParams",
-         "起動ノード依存設定パラメータ"},
+         "同居制約(colocation)パラメータ"},
         {"CRMXML.OrderSectionParams",
-         "順序パラメータ"},
+         "順序制約(order)パラメータ"},
 
         {"GuiComboBox.Select",
          "選択..."},
@@ -1758,22 +1793,22 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "<<選択なし>>"},
 
         {"HeartbeatGraph.ColOrd",
-         "同 / 順"},
+         "同居 / 順序"},
 
         {"HeartbeatGraph.Colocation",
-         "起動ノード依存"},
+         "同居指定"},
 
         {"HeartbeatGraph.NoColOrd",
-         "反発 / 順"},
+         "反発 / 順序"},
 
         {"HeartbeatGraph.NoColocation",
          "反発"},
 
         {"HeartbeatGraph.Order",
-         "起動順序指定"},
+         "順序指定"},
 
         {"HeartbeatGraph.Removing",
-         " 削除中... "},
+         " 削除しています... "},
 
         {"HeartbeatGraph.Unconfigured",
          "未設定"},
@@ -1830,7 +1865,6 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"SSH.SudoAuthentication",
          "sudo認証"},
 
-
         {"Boolean.True",
          "有効"},
 
@@ -1841,7 +1875,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "メタデータを取得しています"},
 
         {"Heartbeat.ExecutingCommand",
-         "CRMコマンドを実行中..."},
+         "CRMコマンドを実行しています..."},
 
         {"DrbdNetInterface",
          "ネットワーク インターフェース"},
@@ -1871,33 +1905,33 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "キャンセル"},
 
         {"CIB.ExecutingCommand",
-         "CRMコマンドを実行中..."},
+         "CRMコマンドを実行しています..."},
 
         {"Openais.ExecutingCommand",
-         "OpenAISコマンドを実行中..."},
+         "OpenAISコマンドを実行しています..."},
 
         {"Corosync.ExecutingCommand",
-         "Corosyncコマンドを実行中..."},
+         "Corosyncコマンドを実行しています..."},
 
         {"DRBD.ExecutingCommand",
-         "DRBDコマンドを実行中..."},
+         "DRBDコマンドを実行しています..."},
 
         {"DrbdXML.GetConfig",
-         "DRBD構成を取得中..."},
+         "DRBD構成を取得しています..."},
 
         {"DrbdXML.GetParameters",
-         "DRBDパラメータを取得中..."},
+         "DRBDパラメータを取得しています..."},
         {"Error.Title",
          "エラー"},
 
         {"LVM.ExecutingCommand",
-         "LVMコマンドを実行中..."},
+         "LVMコマンドを実行しています..."},
 
         {"VIRSH.ExecutingCommand",
-         "virshコマンドを実行中..."},
+         "virshコマンドを実行しています..."},
 
         {"VMSXML.GetConfig",
-         "libvirt構成を解析中..."},
+         "libvirt構成を解析しています..."},
 
         {"VMSInfo.AddNewDomain",
          "新しい仮想マシンの追加"},
@@ -1911,8 +1945,14 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Section.Features",
          "機能"},
 
+        {"VMSVirtualDomainInfo.Section.CPUMatch",
+         "CPU Match"},
+
         {"VMSVirtualDomainInfo.Short.Name",
          "ドメイン名"},
+
+        {"VMSVirtualDomainInfo.Short.Type",
+         "タイプ"},
 
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "CPU数"},
@@ -1925,6 +1965,9 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"VMSVirtualDomainInfo.Short.Os.Boot",
          "ブート デバイス"},
+
+        {"VMSVirtualDomainInfo.Short.Os.Loader",
+         "ローダー"},
 
         {"VMSVirtualDomainInfo.Short.Autostart",
          "自動起動"},
@@ -1940,6 +1983,36 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"VMSVirtualDomainInfo.Short.Pae",
          "PAE"},
+
+        {"VMSVirtualDomainInfo.Short.Hap",
+         "HAP"},
+
+        {"VMSVirtualDomainInfo.Short.CPU.Match",
+         "Match"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Model",
+         "Model"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Vendor",
+         "Vendor"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologySockets",
+         "Topology Sockets"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyCores",
+         "Topology Cores"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyThreads",
+         "Topology Threads"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Policy",
+         "Policy"},
+
+        {"VMSVirtualDomainInfo.Short.CPUMatch.Features",
+         "Features"},
+
+        {"VMSVirtualDomainInfo.Short.OnPoweroff",
+         "On Poweroff"},
 
         {"VMSVirtualDomainInfo.Short.OnReboot",
          "リブート時"},
@@ -2011,13 +2084,17 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "仮想ドメインの削除"},
 
         {"VMSVirtualDomainInfo.confirmRemove.Description",
-         "仮想ドメイン\"@DOMAIN@\"を削除しますか？"},
+         "仮想ドメイン\"@DOMAIN@\"を削除します。"
+         + "本当によいですか？"},
 
         {"VMSVirtualDomainInfo.confirmRemove.Yes",
          "削除"},
 
         {"VMSVirtualDomainInfo.confirmRemove.No",
          "キャンセル"},
+
+        {"VMSVirtualDomainInfo.AvailableInVersion",
+         "libvirt バージョン@VERSION@で利用可能"},
 
         {"ConstraintPHInfo.ToolTip",
          "リソースセットのプレースホルダー"},
@@ -2029,7 +2106,8 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "制約のプレースホルダーの削除"},
 
         {"ConstraintPHInfo.confirmRemove.Description",
-         "すべての制約と共にこのプレースホルダーを削除しますか？"},
+         "すべての制約と共にこのプレースホルダーを削除します。"
+         + "本当によいですか？"},
 
         {"ConstraintPHInfo.confirmRemove.Yes",
          "削除"},
@@ -2052,12 +2130,6 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"EditableInfo.MoreOptions",
          "拡張モードではより多くのオプションが利用できます..."},
 
-        {"EmptyViewPanel.HelpButton",
-         "初心者モード"},
-
-        {"EmptyViewPanel.HideHelpButton",
-         "上級者モード"},
-
         {"VMSDiskInfo.FileChooserTitle",
          "イメージを選択します。"},
 
@@ -2077,7 +2149,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "画面の数"},
 
         {"VMSVideoInfo.ModelVRAM.ToolTip",
-         "キロバイトでのビデオ メモリー (VRAM)"},
+         "ビデオ メモリー(VRAM) (Kb)"},
 
         {"VMSVideoInfo.ModelHeads.ToolTip",
          "画面の数 (Heads)"},
@@ -2092,7 +2164,8 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "仮想ハードウェアの削除"},
 
         {"VMSHardwareInfo.confirmRemove.Description",
-         "仮想\"@HW@\"を削除しますか？"},
+         "仮想\"@HW@\"を削除します。"
+         + "本当によいですか？"},
 
         {"VMSHardwareInfo.confirmRemove.Yes",
          "削除"},
@@ -2105,11 +2178,52 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          + "接続可能性に従って場所を設定します。<br>"
          + "うまく動くように、ping/pingdリソースを設定してください。</html>"},
 
-        {"EmptyViewPanel.HelpText",
-"<h3>DRBD Management Console にようこそ</h3>"
-+ "著者: Rasto Levrinc"
-+ "<p>「ホスト設定ウィザード」ボタンをクリックして開始できます。2台以上のホストを追加すると、「クラスター設定ウィザード」ボタンで新しいクラスターとしてそのホストを組み合わせることができます。同じように、既存のクラスターや構成済みで実行中のクラスターや以前の組み合わせを追加することもできます。「Heartbeatの初期化」ダイアログ ウィンドウで「Heartbeat構成の生成」ボタンを押さないでください。そうすれば、クラスターはうまく動くでしょう。</p> <p><i>もちろん、これはベータ版であるので、GUIが行っているすべてのことを忘れずに二重に確認してください。バグを見つけたら、バグ レポートを送ってください。</i></p><p>クラスターのホストに何もインストールしていなくても開始できます。もちろん、Linuxディストリビューションはインストールしてください。「ホスト設定ウィザード」を実行中の間、異なる方法で異なるソースから必要なすべてのコンポーネントをインストールすることができます。1,2分後にはクラスターが動いていますよ。</p> <p>ホストとクラスターの設定ウィザードではインストール構成と開始を行い、DRBDとPacemaker（Heartbeat）クラスターの視覚的な概要図を表示できます。 OpenaisやHeartbeatの構成部はとても基本的なものであり、自身で確認したり、構成ファイルを書かなければなりません。これは正しく実装されるまでの間のことです。</p> <p>ありがとう。</p>"
-        },
+        {"ServiceInfo.Filesystem.RunningOn",
+         "動作中"},
 
+        {"ServiceInfo.Filesystem.NotRunning",
+         "停止中"},
+
+        {"ServiceInfo.Filesystem.MoutedOn",
+         "マウント中"},
+
+        {"ServiceInfo.Filesystem.NotMounted",
+         "マウントなし"},
+
+        {"ServiceInfo.NotRunningAnywhere",
+         "どのノードでも動作していない"},
+
+        {"ServiceInfo.AlreadyRunningOnNode",
+         "このノードで常に動作している"},
+
+        {"ServiceInfo.AlreadyStarted",
+         "既に起動している"},
+
+        {"ServiceInfo.AlreadyStopped",
+         "既に停止している"},
+
+        {"DrbdInfo.CommonSection",
+         "common "},
+
+        {"DrbdResourceInfo.HostAddresses",
+         "Net Interface"},
+
+        {"DrbdResourceInfo.AddressOnHost",
+         "on "},
+
+        {"DrbdResourceInfo.NetInterfacePort",
+         "Port"},
+
+        {"BlockDevice.MetaDiskSection",
+         "DRBDメタディスク"},
+
+        {"DrbdVolumeInfo.VolumeSection",
+         "DRBD Volume"},
+
+        {"DrbdVolumeInfo.Number",
+         "Number"},
+
+        {"DrbdVolumeInfo.Device",
+         "Device"},
     };
 }
