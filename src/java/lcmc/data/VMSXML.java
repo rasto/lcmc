@@ -1694,7 +1694,8 @@ public final class VMSXML extends XML {
                     final String option = optionValue[0].trim();
                     final String value = optionValue[1].trim();
                     if ("State".equals(option)) {
-                        if ("running".equals(value)) {
+                        if ("running".equals(value)
+                            || "idle".equals(value)) {
                             running = true;
                             suspended = false;
                         } else if ("paused".equals(value)) {
