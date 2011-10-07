@@ -363,7 +363,6 @@ final class FilesystemInfo extends ServiceInfo {
         getBrowser().putDrbdDevHash();
         super.removeMyselfNoConfirm(dcHost, testOnly);
         if (oldDvi != null && !testOnly) {
-            oldDvi.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
                 @Override public void run() {
                     oldDvi.updateMenus(null);
@@ -410,14 +409,13 @@ final class FilesystemInfo extends ServiceInfo {
             } else {
                 oldDvi.removeLinbitDrbd(this, dcHost, testOnly);
             }
-            oldDvi.setUsedByCRM(null);
             final Thread t = new Thread(new Runnable() {
                 @Override public void run() {
                     oldDvi.updateMenus(null);
                 }
             });
             t.start();
-            //oldDvi.setUsedByCRM(false);
+            oldDvi.getDrbdResourceInfo().setUsedByCRM(null);
             //final Thread t = new Thread(new Runnable() {
             //    @Override public void run() {
             //        oldDvi.updateMenus(null);
@@ -430,7 +428,7 @@ final class FilesystemInfo extends ServiceInfo {
             }
         }
         if (newDvi != null) {
-            //newDvi.setUsedByCRM(true);
+            //newDvi.getDrbdResourceInfo().setUsedByCRM(true);
             //final Thread t = new Thread(new Runnable() {
             //    @Override public void run() {
             //        newDvi.updateMenus(null);

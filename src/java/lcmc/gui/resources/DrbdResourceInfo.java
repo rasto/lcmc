@@ -104,6 +104,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox portComboBoxWizard = null;
     /** Resync-after combobox. */
     private GuiComboBox resyncAfterParamCB = null;
+    /** Whether the drbd resource used by CRM. */
+    private ServiceInfo isUsedByCRM;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -1348,4 +1350,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         return items;
     }
+
+    /** Sets that this drbd resource is used by crm. */
+    public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
+        this.isUsedByCRM = isUsedByCRM;
+    }
+
+    /** Returns whether this drbd resource is used by crm. */
+    public boolean isUsedByCRM() {
+        return isUsedByCRM != null && isUsedByCRM.isManaged(false);
+    }
+
 }

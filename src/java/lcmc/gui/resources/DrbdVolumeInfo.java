@@ -78,10 +78,6 @@ public final class DrbdVolumeInfo extends EditableInfo
     private String device;
     /** Last created filesystem. */
     private String createdFs = null;
-    /**
-     * Whether the block device is used by heartbeat via Filesystem service.
-     */
-    private ServiceInfo isUsedByCRM;
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
     /** Name of the drbd device parameter. */
@@ -382,7 +378,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
 
             @Override public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getConfigData().isAdvancedMode()
+                    && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 if (isSyncing()) {
@@ -550,7 +547,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
 
             @Override public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getConfigData().isAdvancedMode()
+                    && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
@@ -736,16 +734,6 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns device name, like /dev/drbd0. */
     @Override public String getDevice() {
         return device;
-    }
-
-    /** Sets that this drbd resource is used by hb. */
-    @Override public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
-        this.isUsedByCRM = isUsedByCRM;
-    }
-
-    /** Returns whether this drbd resource is used by crm. */
-    @Override public boolean isUsedByCRM() {
-        return isUsedByCRM != null && isUsedByCRM.isManaged(false);
     }
 
     /** Returns the last created filesystem. */
@@ -1273,5 +1261,15 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Sets stored parameters. */
     public void setParameters() {
         getDrbdVolume().setCommited(true);
+    }
+
+    /** Sets that this drbd resource is used by crm. */
+    public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
+        getDrbdResourceInfo().setUsedByCRM(isUsedByCRM);
+    }
+
+    /** Returns whether this drbd resource is used by crm. */
+    public boolean isUsedByCRM() {
+        return getDrbdResourceInfo().isUsedByCRM();
     }
 }

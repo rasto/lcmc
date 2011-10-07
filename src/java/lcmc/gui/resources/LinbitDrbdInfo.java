@@ -84,26 +84,26 @@ final class LinbitDrbdInfo extends ServiceInfo {
     /** Removes the linbit::drbd service. */
     @Override public void removeMyselfNoConfirm(final Host dcHost,
                                                 final boolean testOnly) {
+        final DrbdResourceInfo dri =
+                        getBrowser().getDrbdResHash().get(getResourceName());
+        getBrowser().putDrbdResHash();
         super.removeMyselfNoConfirm(dcHost, testOnly);
-        final DrbdVolumeInfo dvi =
-                        getBrowser().getDrbdDevHash().get(getResourceName());
-        getBrowser().putDrbdDevHash();
-        if (dvi != null) {
-            dvi.setUsedByCRM(null);
+        if (dri != null) {
+            dri.setUsedByCRM(null);
         }
     }
 
     /** Sets service parameters with values from resourceNode hash. */
     @Override void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
-        final DrbdVolumeInfo dvi =
-                        getBrowser().getDrbdDevHash().get(getResourceName());
-        getBrowser().putDrbdDevHash();
-        if (dvi != null) {
+        final DrbdResourceInfo dri =
+                        getBrowser().getDrbdResHash().get(getResourceName());
+        getBrowser().putDrbdResHash();
+        if (dri != null) {
             if (isManaged(false) && !getService().isOrphaned()) {
-                dvi.setUsedByCRM(this);
+                dri.setUsedByCRM(this);
             } else {
-                dvi.setUsedByCRM(null);
+                dri.setUsedByCRM(null);
             }
             //final Thread t = new Thread(new Runnable() {
             //    @Override public void run() {

@@ -1534,7 +1534,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (getBlockDevice().isSyncing()) {
@@ -1593,7 +1593,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (!getBlockDevice().isSyncing()
@@ -1665,7 +1665,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (!getBlockDevice().isSecondary()) {
@@ -1706,7 +1706,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (!getBlockDevice().isPrimary()) {
@@ -1740,7 +1740,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     return null;
@@ -1771,7 +1771,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (getBlockDevice().isSyncing()) {
@@ -1819,7 +1819,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (!getBlockDevice().isSyncing()) {
@@ -1857,7 +1857,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (getBlockDevice().isSyncing()) {
@@ -1891,7 +1891,7 @@ public final class BlockDevInfo extends EditableInfo {
                         return NO_DRBD_RESOURCE_STRING;
                     }
                     if (!Tools.getConfigData().isAdvancedMode()
-                        && getDrbdVolumeInfo().isUsedByCRM()) {
+                        && drbdVolumeInfo.getDrbdResourceInfo().isUsedByCRM()) {
                         return DrbdVolumeInfo.IS_USED_BY_CRM_STRING;
                     }
                     if (getBlockDevice().isSyncing()) {
