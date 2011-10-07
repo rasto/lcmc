@@ -53,6 +53,7 @@ final class Network extends VMConfig {
                                             InterfaceData.MAC_ADDRESS,
                                             InterfaceData.SOURCE_NETWORK,
                                             InterfaceData.SOURCE_BRIDGE,
+                                            InterfaceData.SCRIPT_PATH,
                                             InterfaceData.MODEL_TYPE};
     /** VMS interface info object. */
     private VMSInterfaceInfo vmsii = null;

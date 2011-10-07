@@ -260,6 +260,8 @@ public final class VMSXML extends XML {
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.TARGET_DEV, "dev");
         INTERFACE_TAG_MAP.put(InterfaceData.MODEL_TYPE, "model");
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.MODEL_TYPE, "type");
+        INTERFACE_TAG_MAP.put(InterfaceData.SCRIPT_PATH, "script");
+        INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.SCRIPT_PATH, "path");
 
         DISK_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
         DISK_TAG_MAP.put(DiskData.TARGET_DEVICE, "target");
@@ -1418,6 +1420,7 @@ public final class VMSXML extends XML {
                         String sourceBridge = null;
                         String targetDev = null;
                         String modelType = null;
+                        String scriptPath = null;
                         final NodeList opts = deviceNode.getChildNodes();
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
@@ -1434,6 +1437,8 @@ public final class VMSXML extends XML {
                                                           "address");
                             } else if ("model".equals(nodeName)) {
                                 modelType = getAttribute(optionNode, "type");
+                            } else if ("script".equals(nodeName)) {
+                                scriptPath = getAttribute(optionNode, "path");
                             } else if ("address".equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
@@ -1448,7 +1453,8 @@ public final class VMSXML extends XML {
                                                                 sourceNetwork,
                                                                 sourceBridge,
                                                                 targetDev,
-                                                                modelType);
+                                                                modelType,
+                                                                scriptPath);
                             macMap.put(macAddress, interfaceData);
                         }
                     } else if ("sound".equals(deviceNode.getNodeName())) {
@@ -2243,6 +2249,8 @@ public final class VMSXML extends XML {
         public static final String SOURCE_NETWORK = "source_network";
         /** Source bridge. */
         public static final String SOURCE_BRIDGE = "source_bridge";
+        /** Script path. */
+        public static final String SCRIPT_PATH = "script_path";
         /** Target dev. */
         public static final String TARGET_DEV = "target_dev";
         /** Model type: virtio... */
@@ -2254,7 +2262,8 @@ public final class VMSXML extends XML {
                              final String sourceNetwork,
                              final String sourceBridge,
                              final String targetDev,
-                             final String modelType) {
+                             final String modelType,
+                             final String scriptPath) {
             super();
             this.type = type;
             setValue(TYPE, type);
@@ -2266,6 +2275,7 @@ public final class VMSXML extends XML {
             this.targetDev = targetDev;
             setValue(TARGET_DEV, targetDev);
             setValue(MODEL_TYPE, modelType);
+            setValue(SCRIPT_PATH, scriptPath);
         }
 
         /** Returns type. */

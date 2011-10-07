@@ -61,6 +61,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.MAC_ADDRESS,
                                                 InterfaceData.SOURCE_NETWORK,
                                                 InterfaceData.SOURCE_BRIDGE,
+                                                InterfaceData.SCRIPT_PATH,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
     /** Network parameters. */
@@ -68,6 +69,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
                                                 InterfaceData.SOURCE_NETWORK,
+                                                InterfaceData.SCRIPT_PATH,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
     /** Bridge parameters. */
@@ -75,6 +77,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
                                                 InterfaceData.SOURCE_BRIDGE,
+                                                InterfaceData.SCRIPT_PATH,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
     /** Field type. */
@@ -90,6 +93,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
         SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
         SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
+        SHORTNAME_MAP.put(InterfaceData.SCRIPT_PATH, "Script Path");
         SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
         SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
     }
@@ -129,6 +133,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                          "virtio"});
         POSSIBLE_VALUES.put(InterfaceData.TYPE,
                             new String[]{"network", "bridge"});
+        POSSIBLE_VALUES.put(InterfaceData.SCRIPT_PATH,
+                            new String[]{null,
+                                         "/etc/xen/scripts/vif-bridge"});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
