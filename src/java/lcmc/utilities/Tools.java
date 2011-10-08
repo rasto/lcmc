@@ -1960,13 +1960,12 @@ public final class Tools {
         String version = null;
         //final Pattern vp = Pattern.compile(
         //                      ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
-        final Pattern vp = Pattern.compile(
-         ".*<a\\s+href=\".*/files/(?:DMC|LCMC)-.*?([0-9.]*?)\\.jar/download\"");
+        final Pattern vp = Pattern.compile(".*version:\\s+([0-9.]*)");
         try {
             //final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
             //                   + getRelease();
             final String url =
-                "http://sourceforge.net/projects/lcmc/files/?lcmc-check-"
+                "http://lcmc.sourceforge.net/version.html?lcmc-check-"
                 + getRelease();
             final BufferedReader reader = new BufferedReader(
                              new InputStreamReader(new URL(url).openStream()));
