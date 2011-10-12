@@ -2325,6 +2325,31 @@ public final class Tools {
         return -1;
     }
 
+    /** Converts value with units. */
+    public static long convertUnits(final String value) {
+        final Object[] v = Tools.extractUnit(value);
+        if (v.length == 2 && Tools.isNumber((String) v[0])) {
+            long num = Long.parseLong((String) v[0]);
+            final String unit = (String) v[1];
+            if ("P".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024 * 1024 * 1024;
+            } else if ("T".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024 * 1024;
+            } else if ("G".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024;
+            } else if ("M".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024;
+            } else if ("K".equalsIgnoreCase(unit)) {
+                num = num * 1024;
+            } else if ("".equalsIgnoreCase(unit)) {
+            } else {
+                return -1;
+            }
+            return num;
+        }
+        return -1;
+    }
+
     /** Resize table. */
     public static void resizeTable(final JTable table,
                                    final Map<Integer, Integer> defaultWidths) {

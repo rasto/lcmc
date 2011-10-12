@@ -308,12 +308,11 @@ public final class DrbdXML extends XML {
 
     /** Returns whether the parameter has a unit prefix. */
     public boolean hasUnitPrefix(final String param) {
-        final String unit = getUnitLong(param);
-        if (unit != null && (unit.equals("bytes")
-                             || unit.equals("bytes/second"))) {
-            return true;
-        }
-        return false;
+        final String unit = paramUnitLongMap.get(param);
+        return paramDefaultUnitMap.containsKey(param)
+               && (unit == null
+                   || "bytes".equals(unit)
+                   || "bytes/second".equals(unit));
     }
 
     /**
@@ -367,7 +366,7 @@ public final class DrbdXML extends XML {
 
         String value = rawValue;
         String unit = null;
-        if (rawValue != null && getDefaultUnit(param) != null) {
+        if (rawValue != null && hasUnitPrefix(param)) {
             /* number with unit */
             final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
             final Matcher m = p.matcher(rawValue);
@@ -416,7 +415,7 @@ public final class DrbdXML extends XML {
                     correctValue = false;
                 }
             } else if (!"s".equalsIgnoreCase(unit)) {
-                final long v = Long.parseLong(rawValue);
+                final long v = Tools.convertUnits(rawValue);
                 if (paramMaxMap.get(param) != null
                     && v > paramMaxMap.get(param).longValue()) {
                     correctValue = false;
@@ -690,12 +689,18 @@ public final class DrbdXML extends XML {
                     } else if ("unit".equals(tag)) {
                         paramUnitLongMap.put(name, getText(optionInfo));
                     } else if ("unit_prefix".equals(tag)) {
-                        String option = getText(optionInfo);
-                        if (!"s".equals(option)) {
-                            /* "s" is an exception */
-                            option = option.toUpperCase(Locale.US);
+                        if (!"after".equals(name)
+                            && !"resync-after".equals(name)) {
+                            String option = getText(optionInfo);
+                            if (!"s".equals(option)) {
+                                /* "s" is an exception */
+                                option = option.toUpperCase(Locale.US);
+                            }
+                            if ("1".equals(option)) {
+                                option = "";
+                            }
+                            paramDefaultUnitMap.put(name, option);
                         }
-                        paramDefaultUnitMap.put(name, option);
                     } else if ("desc".equals(tag)) {
                         paramLongDescMap.put(name, getText(optionInfo));
                     }

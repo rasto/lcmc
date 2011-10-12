@@ -222,30 +222,52 @@ abstract class DrbdGuiInfo extends EditableInfo {
             if (index > -1) {
                 unitPart = unit.substring(index);
             }
+            GuiComboBox.Type type = null;
+            Unit[] units = null;
+            if ("".equals(unit)) {
+                units = new Unit[]{
+                    new Unit("", "", "", ""),
 
-            final Unit[] units = {
-                new Unit("", "", "Byte", "Bytes"),
+                    new Unit("k",
+                             "K",
+                             "k",
+                             "k"),
 
-                new Unit("K",
-                         "k",
-                         "KiByte" + unitPart,
-                         "KiBytes" + unitPart),
+                    new Unit("m",
+                             "M",
+                             "m",
+                             "m"),
 
-                new Unit("M",
-                         "m",
-                         "MiByte" + unitPart,
-                         "MiBytes" + unitPart),
+                    new Unit("g",
+                             "G",
+                             "g",
+                             "g")
+                };
+            } else {
+                units = new Unit[]{
+                    new Unit("", "", "Byte", "Bytes"),
 
-                new Unit("G",
-                         "g",
-                         "GiByte" + unitPart,
-                         "GiBytes" + unitPart),
+                    new Unit("K",
+                             "k",
+                             "KiByte" + unitPart,
+                             "KiBytes" + unitPart),
 
-                new Unit("s",
-                         "s",
-                         "Sector" + unitPart,
-                         "Sectors" + unitPart)
-            };
+                    new Unit("M",
+                             "m",
+                             "MiByte" + unitPart,
+                             "MiBytes" + unitPart),
+
+                    new Unit("G",
+                             "g",
+                             "GiByte" + unitPart,
+                             "GiBytes" + unitPart),
+
+                    new Unit("s",
+                             "s",
+                             "Sector" + unitPart,
+                             "Sectors" + unitPart)
+                };
+            }
 
             paramCb = new GuiComboBox(selectedValue,
                                       getPossibleChoices(param),
