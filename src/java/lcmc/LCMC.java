@@ -497,7 +497,9 @@ public final class LCMC extends JPanel {
     public static void main(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(
-           Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+        mainFrame.setIconImage(Tools.createImageIcon(
+                                 Tools.getDefault("LCMC.AppIcon")).getImage());
         final String autoArgs = initApp(args);
         mainFrame.setGlassPane(getMainGlassPane());
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
