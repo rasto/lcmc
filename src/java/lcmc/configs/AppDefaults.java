@@ -212,7 +212,6 @@ public final class AppDefaults extends java.util.ListResourceBundle {
          * Images
          */
         {"ConfigDialog.Icon",                     "teaser_drdb_boxes_01.png"},
-        {"ClusterViewPanel.Logo",                 "logo_test.png"},
 
         {"Dialog.Cluster.ClusterHosts.HostCheckedIcon",
          "Icons/32x32/Checked.gif"},
