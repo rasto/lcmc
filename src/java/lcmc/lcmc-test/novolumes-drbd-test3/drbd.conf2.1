@@ -37,6 +37,14 @@ resource r0 {
 		wfc-timeout	9;
 	}
 
+	net {
+		max-buffers	5k;
+	}
+
+	syncer {
+		after	r1;
+	}
+
 	on host1 {
 		device		/dev/drbd0;
 		disk		DISK;

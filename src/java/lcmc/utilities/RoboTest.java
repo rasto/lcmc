@@ -3359,6 +3359,41 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_9);
         sleep(2000);
+        int correctionYPlus = 0;
+        if (cluster.getHostsArray()[0].hasVolumes()) {
+            correctionYPlus = 20;
+        }
+
+        moveTo(940, 615 + correctionY + correctionYPlus); /* max buffers */
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_5);
+        sleep(1000);
+        moveTo(1000, 615 + correctionY + correctionYPlus);/* max buffers unit */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_DOWN);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveTo(1090, 250);
+        leftPress(); /* scroll bar */
+        moveTo(1090, 500);
+        leftRelease();
+        moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_DOWN);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(1000);
+
+        moveTo(1090, 502);
+        leftPress(); /* scroll bar */
+        moveTo(1090, 250);
+        leftRelease();
 
         moveTo(814, 141);
         sleep(6000); /* test */
@@ -3395,6 +3430,7 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_0);
         sleep(2000);
+
         moveTo(814, 141);
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
@@ -3428,6 +3464,46 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(2000);
+
+        moveTo(950, 615 + correctionY + correctionYPlus); /* max buffers */
+        leftClick();
+        sleep(1000);
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_2);
+        sleep(500);
+        press(KeyEvent.VK_0);
+        sleep(500);
+        press(KeyEvent.VK_4);
+        sleep(500);
+        press(KeyEvent.VK_8);
+        sleep(500);
+        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_UP);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveTo(1090, 250);
+        leftPress(); /* scroll bar */
+        moveTo(1090, 500);
+        leftRelease();
+        moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_UP);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(1000);
+
+        moveTo(1090, 502);
+        leftPress(); /* scroll bar */
+        moveTo(1090, 250);
+        leftRelease();
 
         moveTo(814, 141);
         sleep(6000); /* test */

@@ -38,6 +38,11 @@ resource r0 {
 
 	net {
 		protocol	B;
+		max-buffers	5k;
+	}
+
+	disk {
+		resync-after	r1;
 	}
 
 	on host1 {
