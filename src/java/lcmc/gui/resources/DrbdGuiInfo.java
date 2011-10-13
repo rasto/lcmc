@@ -345,9 +345,9 @@ abstract class DrbdGuiInfo extends EditableInfo {
                              * to the resource. */
                             if (!value.equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
-                                final DrbdVolumeInfo v0 =
-                                     getBrowser().getDrbdDevHash().get(value);
-                                getBrowser().putDrbdDevHash();
+                                final DrbdResourceInfo v0 =
+                                     getBrowser().getDrbdResHash().get(value);
+                                getBrowser().putDrbdResHash();
                                 if (v0 != null) {
                                     final String v = v0.getName();
                                     sectionConfig.append("\t\t");
