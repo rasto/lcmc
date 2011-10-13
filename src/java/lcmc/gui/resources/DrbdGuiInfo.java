@@ -314,7 +314,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 final StringBuilder sectionConfig = new StringBuilder("");
                 for (String param : params) {
                     final String value = getComboBoxValue(param);
-                    if (value == null) {
+                    if (value == null || "".equals(value)) {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
