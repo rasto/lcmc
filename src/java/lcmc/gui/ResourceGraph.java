@@ -899,7 +899,6 @@ public abstract class ResourceGraph {
 
             final int posX = (int) popP.getX();
             final int posY = (int) popP.getY();
-            handlePopup(e);
 
             super.mouseClicked(e);
             final PickedState<Edge> psEdge =
