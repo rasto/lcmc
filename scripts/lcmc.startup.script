@@ -1,4 +1,3 @@
 #!/bin/sh
 
-JAVA_HOME=/usr/lib/jvm/java-openjdk CLASSPATH=`build-classpath j3dutils j3dcore
-jai_core`:/usr/share/LCMC.jar java lcmc.LCMC "$@"
+JAVA_HOME=/usr/lib/jvm/java-openjdk CLASSPATH=/usr/share/LCMC.jar java lcmc.LCMC "$@"

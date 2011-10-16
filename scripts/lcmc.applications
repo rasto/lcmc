@@ -1,0 +1,5 @@
+lcmc
+ 	command=lcmc
+ 	name=LCMC
+ 	can_open_multiple_files=true
+ 	requires_terminal=false

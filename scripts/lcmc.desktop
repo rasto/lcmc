@@ -1,9 +1,8 @@
 [Desktop Entry]
-Categories=Java;System;
-Comment=Manage Pacemaker Clusters
+Categories=Java;System;Settings;
+Comment=Manage Pacemaker/KVM/DRBD Clusters
 Exec=lcmc %f
 GenericName=Linux Cluster MC
-Icon=/usr/share/pixmaps/LCMC.png
-Icon=LCMC
+Icon=/usr/share/pixmaps/lcmc.png
 Name=Linux Cluster MC
 Type=Application
