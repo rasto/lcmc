@@ -107,7 +107,7 @@ public class Class2HTML implements Constants {
              */
             for (int i = 0; i < argv.length; i++) {
                 if (argv[i].charAt(0) == '-') { // command line switch
-                    if (argv[i].equals("-d")) { // Specify target directory, default `.´
+                    if (argv[i].equals("-d")) { // Specify target directory, default `.Â´
                         dir = argv[++i];
                         if (!dir.endsWith("" + sep)) {
                             dir = dir + sep;

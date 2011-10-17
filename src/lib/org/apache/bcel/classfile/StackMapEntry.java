@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * This class represents a stack map entry recording the types of
  * local variables and the the of stack items at a given byte code offset.
- * See CLDC specification ง5.3.1.2
+ * See CLDC specification ยง5.3.1.2
  *
  * @version $Id: StackMapEntry.java 386056 2006-03-15 11:31:56Z tcurdt $
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>

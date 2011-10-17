@@ -620,7 +620,7 @@ public abstract class Utility {
 
 
     /**
-     * A return­type signature represents the return value from a method.
+     * A returnÂ­type signature represents the return value from a method.
      * It is a series of bytes in the following grammar:
      *
      * <return_signature> ::= <field_type> | V

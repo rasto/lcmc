@@ -1327,7 +1327,7 @@ public final class Pass2Verifier extends PassVerifier implements Constants{
 	 * This method returns true if and only if the supplied String
 	 * represents a valid Java programming language method name stored as a simple
 	 * (non-qualified) name.
-	 * Conforming to: The Java Virtual Machine Specification, Second Edition, ง2.7, ง2.7.1, ง2.2.
+	 * Conforming to: The Java Virtual Machine Specification, Second Edition, ยง2.7, ยง2.7.1, ยง2.2.
 	 */
 	private static boolean validJavaLangMethodName(String name){
 		if (!Character.isJavaIdentifierStart(name.charAt(0))) {

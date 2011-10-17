@@ -28,7 +28,7 @@ import org.apache.bcel.Constants;
  * (J2ME). This attribute is used by the <a
  * href="http://java.sun.com/products/cldc/">KVM</a> and contained
  * within the Code attribute of a method. See CLDC specification
- * ง5.3.1.2
+ * ยง5.3.1.2
  *
  * @version $Id: StackMap.java 386056 2006-03-15 11:31:56Z tcurdt $
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>

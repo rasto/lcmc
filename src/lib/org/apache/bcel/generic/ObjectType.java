@@ -139,7 +139,7 @@ public class ObjectType extends ReferenceType {
 
 
     /**
-     * Java Virtual Machine Specification edition 2, ง 5.4.4 Access Control
+     * Java Virtual Machine Specification edition 2, ยง 5.4.4 Access Control
      * @throws ClassNotFoundException if the class referenced by this type
      *   can't be found
      */

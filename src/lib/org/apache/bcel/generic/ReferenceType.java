@@ -104,7 +104,7 @@ public abstract class ReferenceType extends Type {
         /* If this is an interface type, then:
          */
         if ((this instanceof ObjectType) && (((ObjectType) this).referencesInterfaceExact())) {
-            /* If T is a class type, then T must be Object (ง2.4.7).
+            /* If T is a class type, then T must be Object (ยง2.4.7).
              */
             if ((T instanceof ObjectType) && (((ObjectType) T).referencesClassExact())) {
                 if (T.equals(Type.OBJECT)) {
@@ -112,7 +112,7 @@ public abstract class ReferenceType extends Type {
                 }
             }
             /* If T is an interface type, then T must be the same interface
-             * as this or a superinterface of this (ง2.13.2).
+             * as this or a superinterface of this (ยง2.13.2).
              */
             if ((T instanceof ObjectType) && (((ObjectType) T).referencesInterfaceExact())) {
                 if (this.equals(T)) {
@@ -128,7 +128,7 @@ public abstract class ReferenceType extends Type {
          * array of components of type SC, then:
          */
         if (this instanceof ArrayType) {
-            /* If T is a class type, then T must be Object (ง2.4.7).
+            /* If T is a class type, then T must be Object (ยง2.4.7).
              */
             if ((T instanceof ObjectType) && (((ObjectType) T).referencesClassExact())) {
                 if (T.equals(Type.OBJECT)) {
@@ -139,14 +139,14 @@ public abstract class ReferenceType extends Type {
              * of type TC, then one of the following must be true:
              */
             if (T instanceof ArrayType) {
-                /* TC and SC are the same primitive type (ง2.4.1).
+                /* TC and SC are the same primitive type (ยง2.4.1).
                  */
                 Type sc = ((ArrayType) this).getElementType();
                 Type tc = ((ArrayType) T).getElementType();
                 if (sc instanceof BasicType && tc instanceof BasicType && sc.equals(tc)) {
                     return true;
                 }
-                /* TC and SC are reference types (ง2.4.6), and type SC is
+                /* TC and SC are reference types (ยง2.4.6), and type SC is
                  * assignable to TC by these runtime rules.
                  */
                 if (tc instanceof ReferenceType && sc instanceof ReferenceType
@@ -154,7 +154,7 @@ public abstract class ReferenceType extends Type {
                     return true;
                 }
             }
-            /* If T is an interface type, T must be one of the interfaces implemented by arrays (ง2.15). */
+            /* If T is an interface type, T must be one of the interfaces implemented by arrays (ยง2.15). */
             // TODO: Check if this is still valid or find a way to dynamically find out which
             // interfaces arrays implement. However, as of the JVM specification edition 2, there
             // are at least two different pages where assignment compatibility is defined and
@@ -185,7 +185,7 @@ public abstract class ReferenceType extends Type {
      * first common super class of the basic types of "this" and t.
      * If "this" or t is a ReferenceType referencing an interface, then Type.OBJECT is returned.
      * If not all of the two classes' superclasses cannot be found, "null" is returned.
-     * See the JVM specification edition 2, "ง4.9.2 The Bytecode Verifier".
+     * See the JVM specification edition 2, "ยง4.9.2 The Bytecode Verifier".
      *
      * @throws ClassNotFoundException on failure to find superclasses of this
      *  type, or the type passed as a parameter
@@ -267,7 +267,7 @@ public abstract class ReferenceType extends Type {
      * If "this" or t is an ArrayType, then Type.OBJECT is returned.
      * If "this" or t is a ReferenceType referencing an interface, then Type.OBJECT is returned.
      * If not all of the two classes' superclasses cannot be found, "null" is returned.
-     * See the JVM specification edition 2, "ง4.9.2 The Bytecode Verifier".
+     * See the JVM specification edition 2, "ยง4.9.2 The Bytecode Verifier".
      *
      * @deprecated use getFirstCommonSuperclass(ReferenceType t) which has
      *             slightly changed semantics.
