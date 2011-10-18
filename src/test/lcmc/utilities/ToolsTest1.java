@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -66,8 +68,7 @@ public final class ToolsTest1 extends TestCase {
     public void testDebug() {
         Tools.setDebugLevel(1);
         Tools.debug(null, "test a");
-        assertEquals(TestSuite1.DEBUG_STRING + "test a\n",
-                     TestSuite1.getStdout());
+        assertTrue(TestSuite1.getStdout().indexOf("test a\n") > 0);
         TestSuite1.clearStdout();
         Tools.setDebugLevel(0);
         Tools.decrementDebugLevel(); /* -1 */
@@ -77,19 +78,19 @@ public final class ToolsTest1 extends TestCase {
         Tools.incrementDebugLevel(); /* 0 */
         TestSuite1.clearStdout();
         Tools.debug(null, "test c");
-        assertEquals(TestSuite1.DEBUG_STRING + "test c\n",
-                     TestSuite1.getStdout());
+        assertTrue(TestSuite1.getStdout().indexOf("test c\n") > 0);
         TestSuite1.clearStdout();
         Tools.setDebugLevel(1); /* 1 */
         TestSuite1.clearStdout();
         Tools.debug(new Object(), "test d2", 2);
         Tools.debug(new Object(), "test d1", 1);
         Tools.debug(new Object(), "test d0", 0);
-        assertEquals(TestSuite1.DEBUG_STRING
-                     + "(1) test d1 (java.lang.Object)\n"
-                     + TestSuite1.DEBUG_STRING
-                     + "(0) test d0 (java.lang.Object)\n",
-                     TestSuite1.getStdout());
+        final Pattern p = Pattern.compile("^" + TestSuite1.DEBUG_STRING
+                 + "\\(1\\) \\[\\d+s\\] test d1 \\(java\\.lang\\.Object\\)\\s+"
+                 + TestSuite1.DEBUG_STRING + ".*"
+                 + "\\(0\\) \\[\\d+s\\] test d0 \\(java\\.lang\\.Object\\)\\s+");
+        final Matcher m = p.matcher(TestSuite1.getStdout());
+        assertTrue(m.matches());
         TestSuite1.clearStdout();
         Tools.setDebugLevel(-1);
     }
@@ -210,6 +211,7 @@ public final class ToolsTest1 extends TestCase {
             final String file = Tools.loadFile(testFile,
                                                TestSuite1.INTERACTIVE);
             assertNotNull(file);
+            TestSuite1.clearStdout();
             assertFalse("".equals(file));
         }
     }
@@ -264,7 +266,7 @@ public final class ToolsTest1 extends TestCase {
             assertEquals(testString, Tools.getString(testString));
             TestSuite1.clearStdout();
         }
-        assertEquals("DRBD Management Console",
+        assertEquals("Linux Cluster Management Console",
                      Tools.getString("DrbdMC.Title"));
     }
 
