@@ -3,7 +3,7 @@
 <jnlp spec="1.0+"
       codebase="http://localhost">
         <information>
-                <title>DRBD Management Console</title>
+                <title>Linux Cluster Management Console</title>
                 <vendor>LINBIT Ha-Solutions GmbH</vendor>
                 <update check="always"/>
                 <offline-allowed/>
@@ -13,7 +13,7 @@
         </security>
         <resources>
                 <j2se version="1.6+" />
-                <jar href="DMC.jar"/>
+                <jar href="LCMC.jar"/>
         </resources>
-        <application-desc main-class="lcmc.DrbdMC"/>
+        <application-desc main-class="lcmc.LCMC"/>
 </jnlp>

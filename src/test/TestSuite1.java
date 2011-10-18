@@ -150,11 +150,11 @@ public final class TestSuite1 {
     private static void initTestCluster() {
         if (Tools.getGUIData() == null) {
             if (CONNECT_LINBIT) {
-                lcmc.DrbdMC.main(new String[]{});
+                lcmc.LCMC.main(new String[]{});
                 /* plugins registration writes to stdout after a while. */
                 Tools.sleep(15000);
             } else {
-                lcmc.DrbdMC.main(new String[]{"--no-upgrade-check"});
+                lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
             }
         }
         Tools.setDebugLevel(-1);
