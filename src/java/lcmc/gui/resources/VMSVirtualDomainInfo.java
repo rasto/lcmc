@@ -581,16 +581,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                          "coredump-destroy", /* since 0.8.4 */
                                          "coredump-restart"}); /* since 0.8.4*/
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
-                            new StringInfo[]{
-                                   new StringInfo("kvm",
-                                                  "/usr/bin/kvm",
-                                                  null),
-                                   new StringInfo("xen",
-                                                  "/usr/lib/xen/bin/qemu-dm",
-                                                  null),
-                                   new StringInfo("qemu",
-                                                  "/usr/bin/qemu",
-                                               null)});
+                            new String[]{"/usr/bin/kvm",
+                                         "/usr/lib/xen/bin/qemu-dm",
+                                         "/usr/lib64/xen/bin/qemu-dm",
+                                         "/usr/bin/qemu"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPU_MATCH,
                             new String[]{"", "exact", "minimum", "strict"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,

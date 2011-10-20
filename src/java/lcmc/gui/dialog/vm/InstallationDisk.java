@@ -53,6 +53,7 @@ final class InstallationDisk extends VMConfig {
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
                                             DiskData.SOURCE_DEVICE,
+                                            DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
                                             DiskData.READONLY};
     /** VMS disk info object. */

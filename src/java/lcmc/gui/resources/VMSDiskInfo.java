@@ -175,7 +175,10 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                        new StringInfo("SCSI Disk",   "scsi/disk",   null),
                        new StringInfo("USB Disk",    "usb/disk",    null),
                        new StringInfo("Virtio Disk", "virtio/disk", null)});
-        POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{null, "qemu"});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{null,
+                                                               "qemu",
+                                                               "file",
+                                                               "phy"});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
