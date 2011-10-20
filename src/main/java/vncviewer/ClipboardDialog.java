@@ -22,7 +22,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
-class ClipboardDialog extends vncviewer.Dialog {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class ClipboardDialog extends vncviewer.Dialog {
 
   public ClipboardDialog(CConn cc_) {
     super(false);

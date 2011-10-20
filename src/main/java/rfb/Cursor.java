@@ -17,7 +17,7 @@
  */
 package rfb;
 
-public class Cursor extends ManagedPixelBuffer {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Cursor extends ManagedPixelBuffer {
 
   public void setSize(int w, int h) {
     super.setSize(w, h);

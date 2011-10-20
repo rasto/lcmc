@@ -23,7 +23,7 @@ package JavaViewer;
 
 //import java.lang.Math;
 
-public class DH {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) public class DH {
 
 	public DH() {
 		maxNum = (((long) 1) << DH_MAX_BITS) - 1;

@@ -38,7 +38,7 @@ import ch.ethz.ssh2.util.TimeoutService.TimeoutToken;
  * @version 2.50, 03/15/10
  */
 
-public class Connection
+@SuppressWarnings({"unchecked", "deprecation", "serial", "dep-ann"}) public class Connection
 {
 	/**
 	 * The identifier presented to the SSH-2 server.

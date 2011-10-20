@@ -22,7 +22,7 @@
 //
 package tightvnc;
 
-abstract public class InStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class InStream {
 
   // check() ensures there is buffer data for at least one item of size
   // itemSize bytes.  Returns the number of items in the buffer (up to a

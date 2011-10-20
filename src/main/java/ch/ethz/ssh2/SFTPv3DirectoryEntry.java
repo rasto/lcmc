@@ -8,7 +8,7 @@ package ch.ethz.ssh2;
  * @version 2.50, 03/15/10
  */
 
-public class SFTPv3DirectoryEntry
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SFTPv3DirectoryEntry
 {
 	/**
 	 *  A relative name within the directory, without any path components.

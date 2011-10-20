@@ -17,7 +17,7 @@
  */
 package rdr;
 
-public class EndOfStream extends Exception {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class EndOfStream extends Exception {
   public EndOfStream() {
     super("EndOfStream");
   }

@@ -11,7 +11,7 @@ package ch.ethz.ssh2;
  * @version 2.50, 03/15/10
  */
 
-public class HTTPProxyData implements ProxyData
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class HTTPProxyData implements ProxyData
 {
 	public final String proxyHost;
 	public final int proxyPort;

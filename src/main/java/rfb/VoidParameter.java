@@ -18,7 +18,7 @@
 
 package rfb;
 
-abstract public class VoidParameter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class VoidParameter {
   public VoidParameter(String name_, String desc_) {
     name = name_;
     description = desc_;

@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.zip.*;
 
 
-class RfbProto {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) class RfbProto {
 
 	private final static boolean DEBUG  = false; // Modif: troessner
 	final String versionMsg = "RFB 003.003\n";

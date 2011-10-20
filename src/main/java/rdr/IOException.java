@@ -18,7 +18,7 @@
 
 package rdr;
 
-class IOException extends Exception {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class IOException extends Exception {
   public IOException(java.io.IOException ex_) {
     super(ex_.toString());
     ex = ex_;

@@ -16,6 +16,6 @@
  * USA.
  */
 package rfb;
-public class Exception extends rdr.Exception {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Exception extends rdr.Exception {
   public Exception(String s) { super(s); }
 }

@@ -16,6 +16,6 @@
  * USA.
  */
 package rfb;
-public class AuthFailureException extends Exception {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class AuthFailureException extends Exception {
   public AuthFailureException(String s) { super(s); }
 }

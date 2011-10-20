@@ -26,7 +26,7 @@ package JavaViewer;
 import java.awt.*;
 import java.awt.event.*;
 
-class ClipboardFrame extends Frame
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) class ClipboardFrame extends Frame
   implements WindowListener, ActionListener {
 
   TextArea textArea;

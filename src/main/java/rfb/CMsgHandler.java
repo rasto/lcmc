@@ -21,7 +21,7 @@
 
 package rfb;
 
-public class CMsgHandler {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CMsgHandler {
 
   public CMsgHandler() {
     cp = new ConnParams();

@@ -89,7 +89,7 @@ import java.io.*;
 // @see EncryptedOutputStream
 // @see EncryptedInputStream
 
-public class DesCipher
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class DesCipher
     {
 
     // Constructor, byte-array key.

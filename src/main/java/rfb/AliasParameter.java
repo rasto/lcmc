@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class AliasParameter extends VoidParameter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class AliasParameter extends VoidParameter {
   public AliasParameter(String name_, String desc_, VoidParameter v) {
     super(name_, desc_);
     param = v;

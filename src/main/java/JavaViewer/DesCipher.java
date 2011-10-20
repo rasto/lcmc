@@ -89,7 +89,7 @@ package JavaViewer;
 // @see EncryptedOutputStream
 // @see EncryptedInputStream
 
-public class DesCipher
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) public class DesCipher
     {
 
     // Constructor, byte-array key.

@@ -25,7 +25,7 @@ import java.io.*;
 // VncCanvas2 is a special version of VncCanvas which may use Java 2 API.
 //
 
-class VncCanvas2 extends VncCanvas {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class VncCanvas2 extends VncCanvas {
 
   public VncCanvas2(VncViewer v) throws IOException {
     super(v);

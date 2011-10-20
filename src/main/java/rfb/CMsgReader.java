@@ -22,7 +22,7 @@
 
 package rfb;
 
-abstract public class CMsgReader {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class CMsgReader {
 
   abstract public void readServerInit();
 

@@ -22,7 +22,7 @@
 
 package rfb;
 
-public class UnicodeToKeysym {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class UnicodeToKeysym {
 
   public static short[][] table = {
     { 0x03c0, 0x0100 },

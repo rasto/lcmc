@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class IntParameter extends VoidParameter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class IntParameter extends VoidParameter {
   public IntParameter(String name_, String desc_, int v) {
     super(name_, desc_);
     value = v;

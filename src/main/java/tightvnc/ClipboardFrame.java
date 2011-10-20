@@ -26,7 +26,7 @@ package tightvnc;
 import java.awt.*;
 import java.awt.event.*;
 
-class ClipboardFrame extends Frame
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class ClipboardFrame extends Frame
   implements WindowListener, ActionListener {
 
   TextArea textArea;

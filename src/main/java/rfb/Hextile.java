@@ -16,7 +16,7 @@
  * USA.
  */
 package rfb;
-public class Hextile {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Hextile {
   public static final int raw = (1 << 0);
   public static final int bgSpecified = (1 << 1);
   public static final int fgSpecified = (1 << 2);

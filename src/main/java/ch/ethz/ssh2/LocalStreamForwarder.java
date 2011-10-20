@@ -17,7 +17,7 @@ import ch.ethz.ssh2.channel.LocalAcceptThread;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class LocalStreamForwarder
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class LocalStreamForwarder
 {
 	ChannelManager cm;
 

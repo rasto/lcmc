@@ -23,7 +23,7 @@
 //
 package tightvnc;
 
-class CapabilityInfo {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class CapabilityInfo {
 
   // Public methods
 

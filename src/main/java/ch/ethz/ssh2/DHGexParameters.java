@@ -14,7 +14,7 @@ package ch.ethz.ssh2;
  * @version 2.50, 03/15/10
  */
 
-public class DHGexParameters
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class DHGexParameters
 {
 	private final int min_group_len;
 	private final int pref_group_len;

@@ -28,7 +28,7 @@ import java.applet.*;
 import java.net.*;
 import java.io.*;
 
-class HTTPConnectSocketFactory implements SocketFactory {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class HTTPConnectSocketFactory implements SocketFactory {
 
   public Socket createSocket(String host, int port, Applet applet)
     throws IOException {

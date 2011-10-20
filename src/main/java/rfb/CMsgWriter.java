@@ -18,7 +18,7 @@
 
 package rfb;
 
-abstract public class CMsgWriter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class CMsgWriter {
 
   abstract public void writeClientInit(boolean shared);
 

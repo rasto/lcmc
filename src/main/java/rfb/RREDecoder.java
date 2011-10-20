@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class RREDecoder extends Decoder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class RREDecoder extends Decoder {
 
   public RREDecoder(CMsgReader reader_) { reader = reader_; }
 

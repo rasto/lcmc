@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class VncAuth {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class VncAuth {
 
   public static final int ok = 0;
   public static final int failed = 1;

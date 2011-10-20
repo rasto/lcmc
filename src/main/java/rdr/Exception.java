@@ -18,7 +18,7 @@
 
 package rdr;
 
-public class Exception extends RuntimeException {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Exception extends RuntimeException {
   public Exception(String s) {
     super(s);
   }

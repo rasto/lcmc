@@ -17,7 +17,7 @@
  */
 package rdr;
 
-public class MemInStream extends InStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class MemInStream extends InStream {
 
   public MemInStream(byte[] data, int offset, int len) {
     b = data;

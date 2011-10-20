@@ -20,7 +20,7 @@ package vncviewer;
 
 import java.awt.*;
 
-class InfoDialog extends vncviewer.Dialog {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class InfoDialog extends vncviewer.Dialog {
 
   public InfoDialog() { 
     super(false);

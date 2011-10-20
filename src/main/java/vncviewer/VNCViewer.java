@@ -31,7 +31,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Label;
 
-public class VNCViewer extends java.applet.Applet implements Runnable
+public @SuppressWarnings({"unchecked", "deprecation", "serial"}) class VNCViewer extends java.applet.Applet implements Runnable
 {
   public static final String version = "4.1";
   public static final String about1 = "VNC Viewer Free Edition "+version;

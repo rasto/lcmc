@@ -9,7 +9,7 @@ import java.util.Vector;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class BlockCipherFactory
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class BlockCipherFactory
 {
 	static class CipherEntry
 	{

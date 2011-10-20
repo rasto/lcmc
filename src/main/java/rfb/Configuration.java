@@ -21,7 +21,7 @@
 
 package rfb;
 
-public class Configuration {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Configuration {
 
   // - Set named parameter to value
   public static boolean setParam(String name, String value) {

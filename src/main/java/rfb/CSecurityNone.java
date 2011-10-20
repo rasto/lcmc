@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class CSecurityNone extends CSecurity {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CSecurityNone extends CSecurity {
   public int processMsg(CConnection cc) {
     return 1;
   }

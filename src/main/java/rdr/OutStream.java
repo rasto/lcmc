@@ -23,7 +23,7 @@
 
 package rdr;
 
-abstract public class OutStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class OutStream {
 
   // check() ensures there is buffer space for at least one item of size
   // itemSize bytes.  Returns the number of items which fit (up to a maximum

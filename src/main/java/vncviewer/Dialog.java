@@ -28,7 +28,7 @@ package vncviewer;
 
 import java.awt.*;
 
-class Dialog extends Frame {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class Dialog extends Frame {
 
   public Dialog(boolean modal_) { modal = modal_; }
 

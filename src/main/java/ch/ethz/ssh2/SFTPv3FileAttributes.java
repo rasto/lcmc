@@ -9,7 +9,7 @@ package ch.ethz.ssh2;
  * @version 2.50, 03/15/10
  */
 
-public class SFTPv3FileAttributes
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SFTPv3FileAttributes
 {
 	/**
 	 * The SIZE attribute. <code>NULL</code> if not present.

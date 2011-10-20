@@ -32,7 +32,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 
-public class VncViewer extends java.applet.Applet
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class VncViewer extends java.applet.Applet
   implements java.lang.Runnable, WindowListener {
 
   boolean inAnApplet = true;

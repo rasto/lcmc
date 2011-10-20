@@ -28,7 +28,7 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
-class DesktopWindow extends Canvas implements Runnable {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "fallthrough"}) class DesktopWindow extends Canvas implements Runnable {
 
   ////////////////////////////////////////////////////////////////////
   // The following methods are all called from the RFB thread

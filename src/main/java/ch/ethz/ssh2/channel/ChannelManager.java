@@ -31,7 +31,7 @@ import ch.ethz.ssh2.transport.TransportManager;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class ChannelManager implements MessageHandler
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ChannelManager implements MessageHandler
 {
 	private static final Logger log = Logger.getLogger(ChannelManager.class);
 

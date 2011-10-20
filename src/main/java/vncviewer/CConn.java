@@ -39,7 +39,7 @@ import java.awt.ScrollPane;
 
 import rfb.SecTypes;
 
-class ViewportFrame extends Frame {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class ViewportFrame extends Frame {
   public ViewportFrame(String name, CConn cc_) {
     super(name);
     cc = cc_;
@@ -68,7 +68,7 @@ class ViewportFrame extends Frame {
   ScrollPane sp;
 }
 
-public class CConn extends rfb.CConnection
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CConn extends rfb.CConnection
   implements rfb.UserPasswdGetter, OptionsDialogCallback
 {
   ////////////////////////////////////////////////////////////////////

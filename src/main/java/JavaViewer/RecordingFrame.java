@@ -27,7 +27,7 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-class RecordingFrame extends Frame
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) class RecordingFrame extends Frame
   implements WindowListener, ActionListener {
 
   boolean recording;

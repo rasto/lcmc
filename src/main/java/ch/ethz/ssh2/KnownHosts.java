@@ -42,7 +42,7 @@ import ch.ethz.ssh2.util.StringEncoder;
  * @version 2.50, 03/15/10
  */
 
-public class KnownHosts
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class KnownHosts
 {
 	public static final int HOSTKEY_IS_OK = 0;
 	public static final int HOSTKEY_IS_NEW = 1;

@@ -17,7 +17,7 @@
  */
 package rfb;
 
-public class Hostname {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Hostname {
 
   public static String getHost(String vncServerName) {
     int colonPos = vncServerName.indexOf(':');

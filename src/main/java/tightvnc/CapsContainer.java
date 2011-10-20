@@ -26,7 +26,7 @@ package tightvnc;
 import java.util.Vector;
 import java.util.Hashtable;
 
-class CapsContainer {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class CapsContainer {
 
   // Public methods
 

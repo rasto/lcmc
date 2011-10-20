@@ -42,7 +42,7 @@ import javax.swing.*;
  * sf@2004, 2005, 2006, 2007
  *
  */
-public class FTPFrame extends JFrame implements ActionListener, MouseListener {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) public class FTPFrame extends JFrame implements ActionListener, MouseListener {
 
 	private VncViewer viewer;
 

@@ -16,6 +16,6 @@
  * USA.
  */
 package rfb;
-public class ConnFailedException extends Exception {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ConnFailedException extends Exception {
   public ConnFailedException(String s) { super(s); }
 }

@@ -23,7 +23,7 @@
 
 package rfb;
 
-public class Keysyms {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Keysyms {
 
   public static final int BackSpace = 0xFF08;
   public static final int Tab = 0xFF09;

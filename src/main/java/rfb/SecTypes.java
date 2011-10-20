@@ -21,7 +21,7 @@
 
 package rfb;
 
-public class SecTypes {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SecTypes {
   public static final int invalid = 0;
   public static final int none    = 1;
   public static final int vncAuth = 2;

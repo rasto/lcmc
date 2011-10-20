@@ -22,7 +22,7 @@
 
 package rdr;
 
-public class ZlibInStream extends InStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ZlibInStream extends InStream {
 
   static final int defaultBufSize = 16384;
 

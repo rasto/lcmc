@@ -25,7 +25,7 @@ import java.awt.event.*;
 // The panel which implements the user authentication scheme
 //
 
-class AuthPanel extends Panel implements ActionListener {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) class AuthPanel extends Panel implements ActionListener {
 
   Label title, retry, prompt;
   TextField password;

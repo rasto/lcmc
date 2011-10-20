@@ -19,7 +19,7 @@ import ch.ethz.ssh2.channel.X11ServerData;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class Session
+@SuppressWarnings({"unchecked", "deprecation", "serial", "dep-ann"}) public class Session
 {
 	ChannelManager cm;
 	Channel cn;

@@ -32,7 +32,7 @@
 
 package rfb;
 
-abstract public class CSecurity {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class CSecurity {
   abstract public int processMsg(CConnection cc);
   abstract public int getType();
   abstract public String description();

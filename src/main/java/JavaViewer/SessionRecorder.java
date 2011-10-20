@@ -25,7 +25,7 @@ package JavaViewer;
 
 import java.io.*;
 
-class SessionRecorder {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "cast"}) class SessionRecorder {
 
   protected FileOutputStream f;
   protected DataOutputStream df;

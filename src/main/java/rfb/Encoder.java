@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class Encoder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Encoder {
   static public boolean supported(int encoding) {
     return false;
   }

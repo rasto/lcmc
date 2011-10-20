@@ -34,7 +34,7 @@ import ch.ethz.ssh2.transport.TransportManager;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class AuthenticationManager implements MessageHandler
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class AuthenticationManager implements MessageHandler
 {
 	TransportManager tm;
 

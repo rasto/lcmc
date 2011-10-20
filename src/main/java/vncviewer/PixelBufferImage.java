@@ -25,7 +25,7 @@ package vncviewer;
 import java.awt.*;
 import java.awt.image.*;
 
-public class PixelBufferImage extends rfb.PixelBuffer implements ImageProducer
+public @SuppressWarnings({"unchecked", "deprecation", "serial"}) class PixelBufferImage extends rfb.PixelBuffer implements ImageProducer
 {
   public PixelBufferImage(int w, int h, java.awt.Component win) {
     setPF(new rfb.PixelFormat(8, 8, false, false, 0, 0, 0, 0, 0, 0));

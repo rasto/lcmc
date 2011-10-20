@@ -21,7 +21,7 @@
 
 package rfb;
 
-public class PixelFormat {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class PixelFormat {
 
   public PixelFormat(int b, int d, boolean e, boolean t) {
     bpp = b;

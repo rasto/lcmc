@@ -24,7 +24,7 @@ import ch.ethz.ssh2.util.StringEncoder;
  * @version 2.50, 03/15/10
  */
 
-public class SCPClient
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SCPClient
 {
 	Connection conn;
 

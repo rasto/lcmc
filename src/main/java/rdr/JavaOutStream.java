@@ -22,7 +22,7 @@
 
 package rdr;
 
-public class JavaOutStream extends OutStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class JavaOutStream extends OutStream {
 
   static final int defaultBufSize = 16384;
   static final int minBulkSize = 1024;

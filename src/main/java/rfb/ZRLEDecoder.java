@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class ZRLEDecoder extends Decoder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ZRLEDecoder extends Decoder {
 
   public ZRLEDecoder(CMsgReader reader_) {
     reader = reader_;

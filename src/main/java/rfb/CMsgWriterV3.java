@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class CMsgWriterV3 extends CMsgWriter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CMsgWriterV3 extends CMsgWriter {
 
   public CMsgWriterV3(ConnParams cp_, rdr.OutStream os_) { super(cp_, os_); }
 

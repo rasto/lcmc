@@ -22,7 +22,7 @@
 
 package rdr;
 
-public class MemOutStream extends OutStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class MemOutStream extends OutStream {
 
   public MemOutStream(int len) {
     b = new byte[len];

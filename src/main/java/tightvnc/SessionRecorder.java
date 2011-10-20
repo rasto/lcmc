@@ -25,7 +25,7 @@ package tightvnc;
 
 import java.io.*;
 
-class SessionRecorder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class SessionRecorder {
 
   protected FileOutputStream f;
   protected DataOutputStream df;

@@ -20,7 +20,7 @@ package vncviewer;
 import java.awt.*;
 import java.awt.event.*;
 
-public class F8Menu extends PopupMenu implements ActionListener {
+public @SuppressWarnings({"unchecked", "deprecation", "serial"}) class F8Menu extends PopupMenu implements ActionListener {
   public F8Menu(CConn cc_) {
     super("VNC Menu");
     cc = cc_;

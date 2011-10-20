@@ -7,7 +7,7 @@ package ch.ethz.ssh2;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class ConnectionInfo
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ConnectionInfo
 {
 	/**
 	 * The used key exchange (KEX) algorithm in the latest key exchange.

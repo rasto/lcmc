@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class MsgTypes {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class MsgTypes {
 
   // server to client
 

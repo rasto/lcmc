@@ -17,7 +17,7 @@
  */
 package rfb;
 
-public class Encodings {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class Encodings {
 
   public static final int raw = 0;
   public static final int copyRect = 1;

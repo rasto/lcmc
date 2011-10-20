@@ -31,7 +31,7 @@ import java.awt.event.*;
 import java.net.Socket;
 import java.util.zip.*;
 
-class RfbProto {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class RfbProto {
 
   final static String
     versionMsg_3_3 = "RFB 003.003\n",

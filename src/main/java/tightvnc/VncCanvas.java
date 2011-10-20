@@ -34,7 +34,7 @@ import java.util.zip.*;
 // VncCanvas is a subclass of Canvas which draws a VNC desktop on it.
 //
 
-class VncCanvas extends Canvas
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class VncCanvas extends Canvas
   implements KeyListener, MouseListener, MouseMotionListener {
 
   VncViewer viewer;

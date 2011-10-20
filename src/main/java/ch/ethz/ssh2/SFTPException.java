@@ -13,7 +13,7 @@ import ch.ethz.ssh2.sftp.ErrorCodes;
  * @version 2.50, 03/15/10
  */
 
-public class SFTPException extends IOException
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SFTPException extends IOException
 {
 	private static final long serialVersionUID = 578654644222421811L;
 

@@ -20,7 +20,7 @@ package vncviewer;
 
 import java.awt.*;
 
-class PasswdDialog extends vncviewer.Dialog {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class PasswdDialog extends vncviewer.Dialog {
 
   public PasswdDialog(String title, boolean userDisabled, boolean passwdDisabled) {
     super(true);

@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class CSecurityVncAuth extends CSecurity {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CSecurityVncAuth extends CSecurity {
 
   public CSecurityVncAuth(UserPasswdGetter upg_) { upg = upg_; }
 

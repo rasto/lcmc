@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class HextileDecoder extends Decoder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class HextileDecoder extends Decoder {
 
   public HextileDecoder(CMsgReader reader_) { reader = reader_; }
 

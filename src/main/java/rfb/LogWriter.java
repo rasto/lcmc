@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class LogWriter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class LogWriter {
 
   public LogWriter(String name_) {
     name = name_;

@@ -8,7 +8,7 @@ package ch.ethz.ssh2;
  * @version 2.50, 03/15/10
  */
 
-public class SFTPv3FileHandle
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class SFTPv3FileHandle
 {
 	final SFTPv3Client client;
 	final byte[] fileHandle;

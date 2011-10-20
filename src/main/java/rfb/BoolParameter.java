@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class BoolParameter extends VoidParameter {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class BoolParameter extends VoidParameter {
   public BoolParameter(String name_, String desc_, boolean v) {
     super(name_, desc_);
     value = v;

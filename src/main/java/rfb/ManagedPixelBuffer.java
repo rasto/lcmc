@@ -17,7 +17,7 @@
  */
 package rfb;
 
-public class ManagedPixelBuffer extends PixelBuffer {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ManagedPixelBuffer extends PixelBuffer {
   public void setSize(int w, int h) {
     width_ = w;
     height_ = h;

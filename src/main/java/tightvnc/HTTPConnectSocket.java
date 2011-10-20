@@ -27,7 +27,7 @@ package tightvnc;
 import java.net.*;
 import java.io.*;
 
-class HTTPConnectSocket extends Socket {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class HTTPConnectSocket extends Socket {
 
   public HTTPConnectSocket(String host, int port,
 			   String proxyHost, int proxyPort)

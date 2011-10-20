@@ -57,7 +57,7 @@ import ch.ethz.ssh2.sftp.Packet;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class SFTPv3Client
+@SuppressWarnings({"unchecked", "deprecation", "serial", "dep-ann"}) public class SFTPv3Client
 {
 	final Connection conn;
 	final Session sess;

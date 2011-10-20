@@ -18,7 +18,7 @@
 
 package rfb;
 
-abstract public class CConnection extends CMsgHandler {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "fallthrough"}) abstract public class CConnection extends CMsgHandler {
 
   public CConnection() {
     state_ = RFBSTATE_UNINITIALISED;

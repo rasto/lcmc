@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class CMsgReaderV3 extends CMsgReader {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class CMsgReaderV3 extends CMsgReader {
 
   public CMsgReaderV3(CMsgHandler handler_, rdr.InStream is_) {
     super(handler_, is_);

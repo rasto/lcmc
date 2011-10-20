@@ -20,7 +20,7 @@ package vncviewer;
 
 import java.awt.*;
 
-class MessageBox extends vncviewer.Dialog {
+@SuppressWarnings({"unchecked", "deprecation", "serial", "fallthrough"}) class MessageBox extends vncviewer.Dialog {
 
   public static final int MB_OK = 0;
   public static final int MB_OKAYCANCEL = 1;

@@ -32,7 +32,7 @@ import java.applet.*;
 // The panel which implements the Relogin button
 //
 
-class ReloginPanel extends Panel implements ActionListener {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class ReloginPanel extends Panel implements ActionListener {
   Button reloginButton;
   Button closeButton;
   VncViewer viewer;

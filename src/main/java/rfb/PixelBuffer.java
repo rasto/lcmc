@@ -22,7 +22,7 @@
 
 package rfb;
 
-public class PixelBuffer {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class PixelBuffer {
 
   public PixelBuffer() {
     setPF(new PixelFormat());

@@ -32,7 +32,7 @@ import java.io.InputStream;
  * @version 2.50, 03/15/10
  */
 
-public class StreamGobbler extends InputStream
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class StreamGobbler extends InputStream
 {
 	class GobblerThread extends Thread
 	{

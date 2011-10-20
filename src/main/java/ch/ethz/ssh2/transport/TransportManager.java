@@ -51,7 +51,7 @@ import ch.ethz.ssh2.util.Tokenizer;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class TransportManager
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class TransportManager
 {
 	private static final Logger log = Logger.getLogger(TransportManager.class);
 

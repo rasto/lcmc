@@ -18,7 +18,7 @@
 
 package rfb;
 
-public class ConnParams {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class ConnParams {
 
   public ConnParams() {
   }

@@ -19,7 +19,7 @@ import ch.ethz.ssh2.log.Logger;
  * @author Christian Plattner
  * @version 2.50, 03/15/10
  */
-public class TimeoutService
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class TimeoutService
 {
 	private static final Logger log = Logger.getLogger(TimeoutService.class);
 

@@ -18,7 +18,7 @@
 
 package rfb;
 
-abstract public class Decoder {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) abstract public class Decoder {
 
   abstract public void readRect(int x, int y, int w, int h,
                                 CMsgHandler handler);

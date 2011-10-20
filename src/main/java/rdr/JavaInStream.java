@@ -22,7 +22,7 @@
 
 package rdr;
 
-public class JavaInStream extends InStream {
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class JavaInStream extends InStream {
 
   static final int defaultBufSize = 8192;
   static final int minBulkSize = 1024;

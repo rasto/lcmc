@@ -31,7 +31,7 @@ package tightvnc;
 import java.awt.*;
 import java.awt.event.*;
 
-class OptionsFrame extends Frame
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) class OptionsFrame extends Frame
   implements WindowListener, ActionListener, ItemListener {
 
   static String[] names = {

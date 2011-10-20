@@ -13,7 +13,7 @@ import java.io.IOException;
  * @version 2.50, 03/15/10
  */
 
-public class HTTPProxyException extends IOException
+@SuppressWarnings({"unchecked", "deprecation", "serial"}) public class HTTPProxyException extends IOException
 {
 	private static final long serialVersionUID = 2241537397104426186L;
 
