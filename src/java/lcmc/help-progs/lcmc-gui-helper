@@ -170,10 +170,20 @@ sub net_info_error {
 	print STDERR "cannot parse ifconfig: $error\n";
 }
 
+sub get_brctl_path {
+	for my $p ("/usr/sbin/brctl", "/sbin/brctl", "/usr/local/sbin/brctl") {
+		if (-e $p) {
+			return $p;
+		}
+	}
+	return "/usr/sbin/brctl";
+}
+
 # Returns all bridges as an array.
 sub get_bridges {
 	my %bridges;
-	for (`/usr/sbin/brctl show 2>/dev/null`) {
+	my $brctl = get_brctl_path();
+	for (`$brctl show 2>/dev/null`) {
 		next if /^\s*bridge\s+name/;
 		next if /^\s/;
 		$bridges{(split)[0]}++;
@@ -1492,7 +1502,6 @@ sub get_cluster_versions {
 	$drbd_version = "" if !$drbd_version;
 	my $drbd_mod_version = `(/sbin/modinfo -F version drbd 2>/dev/null|grep . || /sbin/modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
 	chomp $drbd_mod_version;
-
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
