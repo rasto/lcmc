@@ -1,7 +1,7 @@
 <project name="LCMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
-	<property name="java.dir"	value="${src.dir}/java"/>
-	<property name="test.dir"	value="${src.dir}/test"/>
+	<property name="java.dir"	value="${src.dir}/main/java"/>
+	<property name="testjava.dir"	value="${src.dir}/test/java"/>
 	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="build"/>
@@ -101,7 +101,7 @@
 		 deprecation="true"
 		 memoryInitialSize="512m"
 		 memoryMaximumSize="512m"
-		 srcdir="${test.dir}" destdir="${classes.dir}"
+		 srcdir="${testjava.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
 		 source="1.6"
 		 target="1.6"
@@ -302,7 +302,7 @@
 	</target>
 
 	<target name="junit" depends="compilejunit">
-		<java fork="true" classname="lcmc.TestSuite1">
+		<java fork="true" classname="lcmc.utilities.TestSuite1">
 			<jvmarg value="-Xmx512m"/>
 			<jvmarg value="-Xdebug"/>
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>

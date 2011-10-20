@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.awt.Color;
-import lcmc.TestSuite1;
+import lcmc.utilities.TestSuite1;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.utilities.ExecCallback;

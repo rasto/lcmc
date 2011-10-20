@@ -19,7 +19,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc;
+package lcmc.utilities;
 
 import java.io.OutputStream;
 import java.io.PrintStream;

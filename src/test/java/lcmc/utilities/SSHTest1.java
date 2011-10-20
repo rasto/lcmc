@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import lcmc.TestSuite1;
+import lcmc.utilities.TestSuite1;
 import lcmc.data.Host;
 
 public final class SSHTest1 extends TestCase {

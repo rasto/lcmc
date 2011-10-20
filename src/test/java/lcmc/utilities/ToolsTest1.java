@@ -18,7 +18,7 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import java.net.InetAddress;
-import lcmc.TestSuite1;
+import lcmc.utilities.TestSuite1;
 import lcmc.Exceptions;
 import lcmc.data.Host;
 
