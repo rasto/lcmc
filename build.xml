@@ -1,6 +1,7 @@
 <project name="LCMC" basedir="." default="main">
 	<property name="src.dir"	value="src"/>
 	<property name="java.dir"	value="${src.dir}/main/java"/>
+	<property name="resources.dir"	value="${src.dir}/main/resources"/>
 	<property name="testjava.dir"	value="${src.dir}/test/java"/>
 	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
@@ -29,12 +30,8 @@
 	
 	<target name="compile">
 		<mkdir dir="${classes.dir}"/>
-		<copy todir="${classes.dir}/images">
-			<fileset dir="${java.dir}/lcmc/images"/>
-		</copy>
-		
-		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${java.dir}/lcmc/help-progs"/>
+		<copy todir="${classes.dir}">
+			<fileset dir="${resources.dir}/"/>
 		</copy>
 		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
 		     basedir="${java.dir}/lcmc/"
