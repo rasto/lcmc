@@ -33,12 +33,9 @@
 		<copy todir="${classes.dir}">
 			<fileset dir="${resources.dir}/"/>
 		</copy>
-		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
-		     basedir="${java.dir}/lcmc/"
+		<tar tarfile="${classes.dir}/lcmc-test.tar"
+		     basedir="${classes.dir}/"
 		     includes="lcmc-test/**"/>
-		<move tofile="${classes.dir}/lcmc-test.tar"
-			file="${java.dir}/lcmc/lcmc-test.tar"
-			overwrite="yes"/>
 		
 		<copy tofile="${classes.dir}/lcmc/release.properties"
 		      file="release"
