@@ -11,6 +11,10 @@
 	<property name="signed.dir"	value="${build.dir}/signed"/>
 	<property name="buildlib.dir"	value="build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
+
+	<loadproperties> 
+	<file file="${resources.dir}/release.properties"/> 
+        </loadproperties> 
 	
 	<property name="main-class"  value="lcmc.LCMC"/>
 	<tstamp/>
@@ -277,20 +281,24 @@
 	<target name="clean-build" depends="clean,jar"/>
 	
 	<target name="main" depends="clean,run"/>
-	
-	<target name="init">
-		<property name="project" value="lcmc" />
-		<property name="tarball.tar" value="${project}-${now}.tar" />  
-		<property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
-	</target>
-	
-	<target name="dist" depends="init">
-		<tar tarfile="${tarball.tar}"
-		     basedir=".."
-		     includes="lcmc/src/** lcmc/build.xml lcmc/pom.xml lcmc/release lcmc/README lcmc/debian/**" />
-		<gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
-		<delete file="${tarball.tar}"/>
-	</target>
+
+       <target name="init">
+                <property name="project" value="lcmc-${release}" />  
+                <property name="tarball.tar" value="${project}.tar" />  
+                <property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
+        </target>
+        
+        <target name="dist" depends="init">
+                <copy todir="/tmp/${project}">
+                        <fileset dir="."/>
+                </copy>
+                <tar tarfile="${tarball.tar}"
+                     basedir="/tmp/"
+                     includes="${project}/src/** ${project}/build.xml ${project}/release ${project}/README ${project}/debian/**" />
+                <gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
+                <delete file="${tarball.tar}"/>
+                <delete dir="/tmp/${project}"/>
+        </target>
 
 	<target name="junit" depends="compilejunit">
 		<java fork="true" classname="lcmc.utilities.TestSuite1">
