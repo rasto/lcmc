@@ -174,11 +174,11 @@ public final class HostTest1 extends TestCase {
     @Test
     public void testGetIpsFromNetwork() {
         for (final Host host : TestSuite1.getHosts()) {
-            final List<String> ips = host.getIpsFromNetwork("192.168.122.0");
+            final List<String> ips = host.getIpsFromNetwork("192.168.133.0");
             assertTrue(!ips.isEmpty());
             assertTrue(TestSuite1.noValueIsNull(ips));
             for (final String ip : ips) {
-                assertTrue(ip.startsWith("192.168.122."));
+                assertTrue(ip.startsWith("192.168.133."));
             }
         }
     }
