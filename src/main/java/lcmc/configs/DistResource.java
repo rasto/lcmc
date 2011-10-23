@@ -120,7 +120,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          "/usr/bin/wget --no-check-certificate -q"
          + " http://www.linbit.com/@SUPPORTDIR@/"
          + "@DRBDDIR@-@DRBDVERSION@/@DISTRIBUTION@/@KERNELVERSIONDIR@/ -O -"
-         + " |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:utils_)?(\\d.*?)-\\d+[._]@ARCH@\\..+?\"! or goto LINE'"
+         + " |perl -ple '($_) = m!href=\"drbd8?-(?:plus8?-)?(?:utils_)?(\\d.*?)-\\d+(?:\\.el5)[._]@ARCH@\\..+?\"! or goto LINE'"
         },
 
         {"DrbdAvailFiles",
