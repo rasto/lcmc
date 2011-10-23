@@ -243,7 +243,7 @@ public final class Tools {
         }
         final Properties p = new Properties();
         try {
-            p.load(Tools.class.getResourceAsStream("/lcmc/release.properties"));
+            p.load(Tools.class.getResourceAsStream("/release.properties"));
             release = p.getProperty("release");
             return release;
         } catch (IOException e) {

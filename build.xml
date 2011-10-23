@@ -37,9 +37,6 @@
 		     basedir="${classes.dir}/"
 		     includes="lcmc-test/**"/>
 		
-		<copy tofile="${classes.dir}/lcmc/release.properties"
-		      file="release"
-		      overwrite="yes"/>
 		<!-- verbose="true" -->
 		<!-- <compilerarg value="-Xlint:unchecked"/> -->
 		<!-- target="jsr14" for java runtime 1.4 -->
