@@ -284,7 +284,7 @@
 
        <target name="init">
                 <property name="project" value="lcmc-${release}" />  
-                <property name="tarball.tar" value="${project}.tar" />  
+                <property name="tarball.tar" value="LCMC-source-${release}.tar" />  
                 <property name="tarball.tar.gz" value="${tarball.tar}.gz" />  
         </target>
         
