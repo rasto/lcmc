@@ -19,7 +19,7 @@ type "lcmc" to run it, or run it from menu.
 
 installation on Redhat/Fedora/Suse etc.
 =======================================
-rpm -Uvh lcmc-.rpm (coming soon...)
+rpm -Uvh lcmc-*.rpm
 type "lcmc" to run it, or run it from menu.
 
 sudoers file (if you must)
