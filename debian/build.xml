@@ -1,7 +1,8 @@
 <project name="LCMC" basedir="." default="main">
 	<property name="src.dir"	value="../src"/>
-	<property name="java.dir"	value="${src.dir}/java"/>
-	<property name="test.dir"	value="${src.dir}/test"/>
+	<property name="java.dir"	value="${src.dir}/main/java"/>
+	<property name="resources.dir"	value="${src.dir}/main/resources"/>
+	<property name="testjava.dir"	value="${src.dir}/test/java"/>
 	<property name="lib.dir"	value="${src.dir}/lib"/>
 	<property name="reports.dir"	value="reports"/>
 	<property name="build.dir"	value="../build"/>
@@ -10,6 +11,10 @@
 	<property name="signed.dir"	value="${build.dir}/signed"/>
 	<property name="buildlib.dir"	value="../build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
+
+	<loadproperties> 
+	<file file="${resources.dir}/release.properties"/> 
+        </loadproperties> 
 	
 	<property name="main-class"  value="lcmc.LCMC"/>
 	<tstamp/>
@@ -21,31 +26,15 @@
 		<delete dir="${jar.dir}"/>
 	</target>
 	
-	<target name="superclean">
-		<delete dir="${jar.dir}"/>
-		<delete dir="${signed.dir}"/>
-		<delete dir="${build.dir}/classes/"/>
-	</target>
-	
 	<target name="compile">
 		<mkdir dir="${classes.dir}"/>
-		<copy todir="${classes.dir}/images">
-			<fileset dir="${java.dir}/lcmc/images"/>
+		<copy todir="${classes.dir}">
+			<fileset dir="${resources.dir}/"/>
 		</copy>
-		
-		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${java.dir}/lcmc/help-progs"/>
-		</copy>
-		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
-		     basedir="${java.dir}/lcmc/"
+		<tar tarfile="${classes.dir}/lcmc-test.tar"
+		     basedir="${classes.dir}/"
 		     includes="lcmc-test/**"/>
-		<move tofile="${classes.dir}/lcmc-test.tar"
-			file="${java.dir}/lcmc/lcmc-test.tar"
-			overwrite="yes"/>
 		
-		<copy tofile="${classes.dir}/lcmc/release.properties"
-		      file="release"
-		      overwrite="yes"/>
 		<!-- verbose="true" -->
 		<!-- <compilerarg value="-Xlint:unchecked"/> -->
 		<!-- target="jsr14" for java runtime 1.4 -->
@@ -60,6 +49,8 @@
 		 memoryMaximumSize="512m"
 		 srcdir="${lib.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
+		 source="1.6"
+		 target="1.6"
 		>
 		  <classpath>
 		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
@@ -80,6 +71,8 @@
 		 memoryMaximumSize="512m"
 		 srcdir="${java.dir}" destdir="${classes.dir}"
 		 encoding="utf8"
+		 source="1.6"
+		 target="1.6"
 		>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 
