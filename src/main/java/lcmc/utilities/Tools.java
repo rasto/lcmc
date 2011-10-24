@@ -2627,6 +2627,8 @@ public final class Tools {
             } else if (c == '"' || c == '$' || c == '`') {
                 sb.append('\\');
                 sb.append(c);
+            } else if (c == '\n') {
+                sb.append("\n");
             } else {
                 sb.append(c);
             }
