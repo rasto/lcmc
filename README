@@ -26,9 +26,13 @@ sudoers file (if you must)
 ==========================
 for sudo you would need at least this commands in the sudoers file:
 
-rasto ALL=SETENV: /usr/local/bin/drbd-gui-helper-*, /sbin/drbdadm,
+rasto ALL=SETENV: /usr/local/bin/lcmc-gui-helper-*, /sbin/drbdadm,
 /usr/sbin/cibadmin, /usr/sbin/crm_resource, /usr/sbin/crm_attribute,
 /usr/sbin/ptest
+
+Some things like creating of VM and DRBD config files wouldn't work
+unless you allow the "bash" command. A user may not be able to see
+log files in the GUI if he doesn't have permissions to read them. 
 
 Copyright
 =========
