@@ -388,11 +388,11 @@ public final class SSH {
                                                host.getHoppedCommand(command),
                                                true),
                                   2);
-                thisSession.execCommand("export LC_ALL=C;"
+                thisSession.execCommand("bash -c '"
+                                        + Tools.escapeSingleQuotes("export LC_ALL=C;"
                                         + host.getSudoCommand(
                                                host.getHoppedCommand(command),
-                                               false));
-
+                                               false), 1) + "'");
                 final InputStream stdout = thisSession.getStdout();
                 final java.io.OutputStream stdin = thisSession.getStdin();
                 final InputStream stderr = thisSession.getStderr();

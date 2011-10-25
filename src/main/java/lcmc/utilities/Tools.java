@@ -2636,6 +2636,28 @@ public final class Tools {
         return escapeQuotes(sb.toString(), count - 1);
     }
 
+    /** Escapes the single quotes. */
+    public static String escapeSingleQuotes(final String s, final int count) {
+        if (s == null) {
+            return null;
+        }
+        if (count <= 0) {
+            return s;
+        }
+        final StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            if (c == '\n') {
+                sb.append("\n");
+            } else if (c == '\'') {
+                sb.append("'\\''");
+            } else {
+                sb.append(c);
+            }
+        }
+        return escapeQuotes(sb.toString(), count - 1);
+    }
+
     /** Returns array of host checkboxes in the specified cluster. */
     public static Map<Host, JCheckBox> getHostCheckBoxes(
                                                        final Cluster cluster) {
