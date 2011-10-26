@@ -134,7 +134,7 @@ final class Storage extends VMConfig {
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hda");
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
         if ("xen".equals(getVMSVirtualDomainInfo().paramComboBoxGet(
-                            VMSXML.VM_PARAM_TYPE, null).getStringValue())) {
+                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
             vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "file");
         } else {
             vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "qemu");

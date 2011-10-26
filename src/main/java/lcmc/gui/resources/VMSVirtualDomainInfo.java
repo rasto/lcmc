@@ -203,7 +203,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                     VMSXML.VM_PARAM_NAME,
-                                    VMSXML.VM_PARAM_TYPE,
+                                    VMSXML.VM_PARAM_DOMAIN_TYPE,
                                     VMSXML.VM_PARAM_EMULATOR,
                                     VMSXML.VM_PARAM_VCPU,
                                     VMSXML.VM_PARAM_CURRENTMEMORY,
@@ -386,7 +386,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                           new HashMap<String, GuiComboBox>();
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
-        SECTION_MAP.put(VMSXML.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_EMULATOR,      VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
@@ -423,7 +423,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    VMSXML.VM_PARAM_NAME,
                    Tools.getString("VMSVirtualDomainInfo.Short.Name"));
         SHORTNAME_MAP.put(
-                   VMSXML.VM_PARAM_TYPE,
+                   VMSXML.VM_PARAM_DOMAIN_TYPE,
                    Tools.getString("VMSVirtualDomainInfo.Short.Type"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_VCPU,
@@ -522,7 +522,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_TYPE, "kvm");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, "kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
@@ -559,7 +559,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{"", "/usr/lib/xen/boot/hvmloader"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_AUTOSTART,
                             new String[]{"True", "False"});
-        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
                             new String[]{"kvm", "xen"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ARCH,
                             new String[]{"x86_64", "i686", ""});
@@ -3117,7 +3117,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 paramComboBoxGet(VMSXML.VM_PARAM_MEMORY, null).setValue(
                                                                      newValue);
             }
-        } else if (VMSXML.VM_PARAM_TYPE.equals(param)) {
+        } else if (VMSXML.VM_PARAM_DOMAIN_TYPE.equals(param)) {
             final GuiComboBox emCB = paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR,
                                                       null);
             if (getResource().isNew()

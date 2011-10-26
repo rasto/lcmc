@@ -141,7 +141,7 @@ public final class VMSXML extends XML {
     /** VM field: status. */
     public static final String VM_PARAM_STATUS = "status";
     /** VM field: type. */
-    public static final String VM_PARAM_TYPE = "type";
+    public static final String VM_PARAM_DOMAIN_TYPE = "type";
     /** VM field: vcpu. */
     public static final String VM_PARAM_VCPU = "vcpu";
     /** VM field: currentMemory. */
@@ -537,7 +537,8 @@ public final class VMSXML extends XML {
         //  </os>
         //</domain>
 
-        final String type = parametersMap.get(VM_PARAM_TYPE); /* kvm/xen */
+        /* domain type: kvm/xen */
+        final String type = parametersMap.get(VM_PARAM_DOMAIN_TYPE);
         String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
         if ("xen".equals(type)) {
             configName = "/etc/xen/vm/" + domainName + ".xml";
@@ -1177,7 +1178,7 @@ public final class VMSXML extends XML {
                     domainNames.add(name);
                 }
                 parameterValues.put(name, VM_PARAM_NAME, name);
-                parameterValues.put(name, VM_PARAM_TYPE, domainType);
+                parameterValues.put(name, VM_PARAM_DOMAIN_TYPE, domainType);
                 if (!name.equals(nameInFilename)) {
                     Tools.appWarning("unexpected name: " + name
                                      + " != " + nameInFilename);
