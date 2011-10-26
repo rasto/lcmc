@@ -2064,8 +2064,8 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Name",
          "Domain name"},
 
-        {"VMSVirtualDomainInfo.Short.Type",
-         "Type"},
+        {"VMSVirtualDomainInfo.Short.DomainType",
+         "Domain Type"},
 
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "Number of CPUs"},
@@ -2090,6 +2090,10 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"VMSVirtualDomainInfo.Short.Machine",
          "Machine"},
+
+        {"VMSVirtualDomainInfo.Short.Type",
+         "Type"},
+
 
         {"VMSVirtualDomainInfo.Short.Acpi",
          "ACPI"},

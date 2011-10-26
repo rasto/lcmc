@@ -140,8 +140,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_DEFINED = "defined";
     /** VM field: status. */
     public static final String VM_PARAM_STATUS = "status";
-    /** VM field: type. */
-    public static final String VM_PARAM_DOMAIN_TYPE = "type";
+    /** VM field: domain type. */
+    public static final String VM_PARAM_DOMAIN_TYPE = "domain-type";
     /** VM field: vcpu. */
     public static final String VM_PARAM_VCPU = "vcpu";
     /** VM field: currentMemory. */
@@ -154,6 +154,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_LOADER = "loader";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
+    /** VM field: type. */
+    public static final String VM_PARAM_TYPE = "type";
     /** VM field: arch. */
     public static final String VM_PARAM_TYPE_ARCH = "arch";
     /** VM field: machine. */
@@ -594,11 +596,11 @@ public final class VMSXML extends XML {
                                                   doc.createElement("os"));
         final Element typeNode = (Element) osNode.appendChild(
                                                   doc.createElement("type"));
+        typeNode.appendChild(
+                    doc.createTextNode(parametersMap.get(VM_PARAM_TYPE)));
         typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_TYPE_ARCH));
-        //typeNode.setAttribute("machine", "pc-0.12");
         typeNode.setAttribute("machine",
                               parametersMap.get(VM_PARAM_TYPE_MACHINE));
-        typeNode.appendChild(doc.createTextNode("hvm"));
         final Element bootNode = (Element) osNode.appendChild(
                                                   doc.createElement("boot"));
         final Node loaderNode = (Element) osNode.appendChild(
@@ -664,6 +666,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
         paths.put(VM_PARAM_VCPU, "vcpu");
         paths.put(VM_PARAM_BOOT, "os/boot");
+        paths.put(VM_PARAM_TYPE, "os/type");
         paths.put(VM_PARAM_TYPE_ARCH, "os/type");
         paths.put(VM_PARAM_TYPE_MACHINE, "os/type");
         paths.put(VM_PARAM_LOADER, "os/loader");
@@ -1211,6 +1214,9 @@ public final class VMSXML extends XML {
                                             VM_PARAM_BOOT,
                                             getAttribute(osOption, "dev"));
                     } else if ("type".equals(osOption.getNodeName())) {
+                        parameterValues.put(name,
+                                            VM_PARAM_TYPE,
+                                            getText(option));
                         parameterValues.put(name,
                                             VM_PARAM_TYPE_ARCH,
                                             getAttribute(osOption, "arch"));
