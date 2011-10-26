@@ -156,6 +156,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_AUTOSTART = "autostart";
     /** VM field: arch. */
     public static final String VM_PARAM_TYPE_ARCH = "arch";
+    /** VM field: machine. */
+    public static final String VM_PARAM_TYPE_MACHINE = "machine";
     /** VM field: acpi. */
     public static final String VM_PARAM_ACPI = "acpi";
     /** VM field: apic. */
@@ -594,7 +596,8 @@ public final class VMSXML extends XML {
                                                   doc.createElement("type"));
         typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_TYPE_ARCH));
         //typeNode.setAttribute("machine", "pc-0.12");
-        typeNode.setAttribute("machine", "pc");
+        typeNode.setAttribute("machine",
+                              parametersMap.get(VM_PARAM_TYPE_MACHINE));
         typeNode.appendChild(doc.createTextNode("hvm"));
         final Element bootNode = (Element) osNode.appendChild(
                                                   doc.createElement("boot"));
@@ -662,6 +665,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_VCPU, "vcpu");
         paths.put(VM_PARAM_BOOT, "os/boot");
         paths.put(VM_PARAM_TYPE_ARCH, "os/type");
+        paths.put(VM_PARAM_TYPE_MACHINE, "os/type");
         paths.put(VM_PARAM_LOADER, "os/loader");
         paths.put(VM_PARAM_CPU_MATCH, "cpu");
         paths.put(VM_PARAM_ACPI, "features");
@@ -702,6 +706,8 @@ public final class VMSXML extends XML {
                     node.setAttribute("dev", value);
                 } else if (VM_PARAM_TYPE_ARCH.equals(param)) {
                     node.setAttribute("arch", value);
+                } else if (VM_PARAM_TYPE_MACHINE.equals(param)) {
+                    node.setAttribute("machine", value);
                 } else if (VM_PARAM_CPU_MATCH.equals(param)) {
                     if ("".equals(value)) {
                         node.getParentNode().removeChild(node);
@@ -1208,6 +1214,9 @@ public final class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_TYPE_ARCH,
                                             getAttribute(osOption, "arch"));
+                        parameterValues.put(name,
+                                            VM_PARAM_TYPE_MACHINE,
+                                            getAttribute(osOption, "machine"));
                     } else {
                         parameterValues.put(name,
                                             osOption.getNodeName(),

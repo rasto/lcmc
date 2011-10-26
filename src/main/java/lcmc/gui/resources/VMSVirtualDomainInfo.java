@@ -212,6 +212,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_LOADER,
                                     VMSXML.VM_PARAM_AUTOSTART,
                                     VMSXML.VM_PARAM_TYPE_ARCH,
+                                    VMSXML.VM_PARAM_TYPE_MACHINE,
                                     VMSXML.VM_PARAM_ACPI,
                                     VMSXML.VM_PARAM_APIC,
                                     VMSXML.VM_PARAM_PAE,
@@ -395,6 +396,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
 
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
@@ -446,6 +448,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_TYPE_ARCH,
                    Tools.getString("VMSVirtualDomainInfo.Short.Arch"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_TYPE_MACHINE,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Machine"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_ACPI,
                    Tools.getString("VMSVirtualDomainInfo.Short.Acpi"));
@@ -513,6 +518,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH, "x86_64");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE, "pc");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_APIC, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_PAE, "True");
@@ -563,6 +569,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{"kvm", "xen"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_ARCH,
                             new String[]{"x86_64", "i686", ""});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
+                            new String[]{"pc", "pc-0.12", ""});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
                             new String[]{"destroy",
                                          "restart",

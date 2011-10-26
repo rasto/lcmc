@@ -2088,6 +2088,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Arch",
          "Architecture"},
 
+        {"VMSVirtualDomainInfo.Short.Machine",
+         "Machine"},
+
         {"VMSVirtualDomainInfo.Short.Acpi",
          "ACPI"},
 
