@@ -57,7 +57,7 @@ public final class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_VCPU,
                                             VMSXML.VM_PARAM_CURRENTMEMORY,
                                             VMSXML.VM_PARAM_BOOT,
-                                            VMSXML.VM_PARAM_ARCH};
+                                            VMSXML.VM_PARAM_TYPE_ARCH};
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 

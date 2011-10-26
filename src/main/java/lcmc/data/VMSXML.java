@@ -155,7 +155,7 @@ public final class VMSXML extends XML {
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
     /** VM field: arch. */
-    public static final String VM_PARAM_ARCH = "arch";
+    public static final String VM_PARAM_TYPE_ARCH = "arch";
     /** VM field: acpi. */
     public static final String VM_PARAM_ACPI = "acpi";
     /** VM field: apic. */
@@ -592,7 +592,7 @@ public final class VMSXML extends XML {
                                                   doc.createElement("os"));
         final Element typeNode = (Element) osNode.appendChild(
                                                   doc.createElement("type"));
-        typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_ARCH));
+        typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_TYPE_ARCH));
         //typeNode.setAttribute("machine", "pc-0.12");
         typeNode.setAttribute("machine", "pc");
         typeNode.appendChild(doc.createTextNode("hvm"));
@@ -661,7 +661,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
         paths.put(VM_PARAM_VCPU, "vcpu");
         paths.put(VM_PARAM_BOOT, "os/boot");
-        paths.put(VM_PARAM_ARCH, "os/type");
+        paths.put(VM_PARAM_TYPE_ARCH, "os/type");
         paths.put(VM_PARAM_LOADER, "os/loader");
         paths.put(VM_PARAM_CPU_MATCH, "cpu");
         paths.put(VM_PARAM_ACPI, "features");
@@ -700,7 +700,7 @@ public final class VMSXML extends XML {
                     domainNode.removeChild(node);
                 } else if (VM_PARAM_BOOT.equals(param)) {
                     node.setAttribute("dev", value);
-                } else if (VM_PARAM_ARCH.equals(param)) {
+                } else if (VM_PARAM_TYPE_ARCH.equals(param)) {
                     node.setAttribute("arch", value);
                 } else if (VM_PARAM_CPU_MATCH.equals(param)) {
                     if ("".equals(value)) {
@@ -1206,7 +1206,7 @@ public final class VMSXML extends XML {
                                             getAttribute(osOption, "dev"));
                     } else if ("type".equals(osOption.getNodeName())) {
                         parameterValues.put(name,
-                                            VM_PARAM_ARCH,
+                                            VM_PARAM_TYPE_ARCH,
                                             getAttribute(osOption, "arch"));
                     } else {
                         parameterValues.put(name,
