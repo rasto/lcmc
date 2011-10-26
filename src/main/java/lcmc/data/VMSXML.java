@@ -1216,7 +1216,7 @@ public final class VMSXML extends XML {
                     } else if ("type".equals(osOption.getNodeName())) {
                         parameterValues.put(name,
                                             VM_PARAM_TYPE,
-                                            getText(option));
+                                            getText(osOption));
                         parameterValues.put(name,
                                             VM_PARAM_TYPE_ARCH,
                                             getAttribute(osOption, "arch"));
