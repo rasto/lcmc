@@ -599,6 +599,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
                             new String[]{"/usr/bin/kvm",
                                          "/usr/lib/xen/bin/qemu-dm",
+                                         "/usr/lib/xen-4.0/bin/qemu-dm",
                                          "/usr/lib64/xen/bin/qemu-dm",
                                          "/usr/bin/qemu"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPU_MATCH,
