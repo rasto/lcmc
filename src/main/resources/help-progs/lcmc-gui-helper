@@ -747,6 +747,20 @@ sub get_hb_lib_path {
 	return "/usr/lib/heartbeat";
 }
 
+sub get_xen_lib_path {
+	for ("/usr/lib/xen", "/usr/lib64/xen") {
+		if (-e $_) {
+			return $_;
+		}
+	}
+	for (`ls -d /usr/lib*/xen-*`) {
+		if (m!^/usr/lib(?:64)/xen-\d+[.\d]*$!) {
+			return $_;
+		}
+	}
+	return "/usr/lib/xen";
+}
+
 sub get_message {
 	my $socket = shift;
 	my $msg = "";
@@ -1502,6 +1516,7 @@ sub get_cluster_versions {
 	$drbd_version = "" if !$drbd_version;
 	my $drbd_mod_version = `(/sbin/modinfo -F version drbd 2>/dev/null|grep . || /sbin/modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
 	chomp $drbd_mod_version;
+	my $xen_libpath = get_xen_lib_path();
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
@@ -1525,6 +1540,7 @@ sub get_cluster_versions {
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 	       ."hb-lib-path:$libpath\n"
+	       ."xen-lib-path:$xen_libpath\n"
 }
 
 # return -1 if ver1 is smaller than ver2 etc. 1.0.9.1 and 1.0.9 are considered
@@ -1594,8 +1610,8 @@ sub get_vm_info {
 		$libvirt_version = $1;
 	}
 	my $out = "<version>$libvirt_version</version>\n";
-	for (`ls /etc/libvirt/qemu/*.xml 2>/dev/null; ls /etc/xen/vm/*.xml 2>/dev/null`) {
-		my ($name) = /([^\/]+).xml/;
+	for (`/usr/bin/virsh list --all|sed '1,2d'`) {
+		my ($name) = /^\s*\S+\s+(\S+)/;
 		next if !$name;
 		chomp;
 		my $info =
@@ -1612,7 +1628,7 @@ sub get_vm_info {
 		#}
 		my $config;
 		$config = `/usr/bin/virsh dumpxml $name 2>/dev/null` || "";
-		$out.= "<vm name=\"$name\" config=\"$_\"";
+		$out.= "<vm name=\"$name\"";
 		if ($autostart{$name}) {
 			$out.= ' autostart="True"';
 		} else {

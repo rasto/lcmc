@@ -198,6 +198,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Map from target string in the table to vms interface info object. */
     private volatile Map<String, VMSVideoInfo> videoKeyToInfo =
                                        new HashMap<String, VMSVideoInfo>();
+    /** Previous type. */
+    private volatile String prevType = null;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
@@ -208,6 +210,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_VCPU,
                                     VMSXML.VM_PARAM_CURRENTMEMORY,
                                     VMSXML.VM_PARAM_MEMORY,
+                                    VMSXML.VM_PARAM_BOOTLOADER,
                                     VMSXML.VM_PARAM_BOOT,
                                     VMSXML.VM_PARAM_LOADER,
                                     VMSXML.VM_PARAM_AUTOSTART,
@@ -393,6 +396,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_VCPU,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_BOOTLOADER,    VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
@@ -432,6 +436,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_VCPU,
                    Tools.getString("VMSVirtualDomainInfo.Short.Vcpu"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_BOOTLOADER,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Bootloader"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_CURRENTMEMORY,
                    Tools.getString("VMSVirtualDomainInfo.Short.CurrentMemory"));
@@ -568,17 +575,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                      "fd",
                                                      null)});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
-                            new String[]{"", "/usr/lib/xen/boot/hvmloader"});
+                            new String[]{"",
+                                         "/usr/lib/xen/boot/hvmloader",
+                                         "/usr/lib/xen-4.0/boot/hvmloader"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_AUTOSTART,
                             new String[]{"True", "False"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
                             new String[]{"kvm", "xen"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
+                            new String[]{"", "/usr/bin/pygrub"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
                             new String[]{"hvm", "linux"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_ARCH,
-                            new String[]{"x86_64", "i686", ""});
+                            new String[]{"", "x86_64", "i686"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
-                            new String[]{"pc", "pc-0.12", ""});
+                            new String[]{"", "pc", "pc-0.12"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
                             new String[]{"destroy",
                                          "restart",
@@ -636,6 +647,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
                              "0.7.5");
     }
+
     /** Creates the VMSVirtualDomainInfo object. */
     public VMSVirtualDomainInfo(final String name,
                                 final Browser browser) {
@@ -3135,17 +3147,39 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                                      newValue);
             }
         } else if (VMSXML.VM_PARAM_DOMAIN_TYPE.equals(param)) {
-            final GuiComboBox emCB = paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR,
+            final GuiComboBox cb = paramComboBoxGet(param,
                                                       null);
             if (getResource().isNew()
-                && !Tools.areEqual(emCB.getStringValue(), newValue)) {
+                && !Tools.areEqual(prevType, newValue)) {
+                String xenLibPath = "/usr/lib/xen";
+                for (final Host host : getBrowser().getClusterHosts()) {
+                    final String xlp = host.getXenLibPath();
+                    if (xlp != null) {
+                        xenLibPath = xlp;
+                        break;
+                    }
+                }
+                final GuiComboBox emCB = 
+                        paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, "wizard");
+                final GuiComboBox loCB = 
+                            paramComboBoxGet(VMSXML.VM_PARAM_LOADER, "wizard");
                 if (Tools.areEqual("xen", newValue)) {
-                    paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue(
-                                                "/usr/lib/xen/boot/hvmloader");
+                    if (emCB != null) {
+                        emCB.setValue(xenLibPath + "/bin/qemu-dm");
+                    }
+                    if (loCB != null) {
+                        loCB.setValue(xenLibPath + "/boot/hvmloader");
+                    }
                 } else {
-                    paramComboBoxGet(VMSXML.VM_PARAM_LOADER, null).setValue("");
+                    if (emCB != null) {
+                        emCB.setValue("/usr/bin/kvm");
+                    }
+                    if (loCB != null) {
+                        loCB.setValue("");
+                    }
                 }
             }
+            prevType = cb.getStringValue();
         } else if (VMSXML.VM_PARAM_CPU_MATCH.equals(param)) {
             final boolean match = !"".equals(newValue);
             SwingUtilities.invokeLater(new Runnable() {

@@ -2070,6 +2070,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Vcpu",
          "Number of CPUs"},
 
+        {"VMSVirtualDomainInfo.Short.Bootloader",
+         "Bootloader"},
+
         {"VMSVirtualDomainInfo.Short.CurrentMemory",
          "Current Memory"},
 

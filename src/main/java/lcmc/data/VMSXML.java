@@ -144,6 +144,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_DOMAIN_TYPE = "domain-type";
     /** VM field: vcpu. */
     public static final String VM_PARAM_VCPU = "vcpu";
+    /** VM field: bootloader. */
+    public static final String VM_PARAM_BOOTLOADER = "bootloader";
     /** VM field: currentMemory. */
     public static final String VM_PARAM_CURRENTMEMORY = "currentMemory";
     /** VM field: memory. */
@@ -591,6 +593,14 @@ public final class VMSXML extends XML {
             vcpuNode.appendChild(doc.createTextNode(vcpu));
         }
 
+        /* bootloader */
+        final String bootloader = parametersMap.get(VM_PARAM_BOOTLOADER);
+        if (bootloader != null) {
+            final Node bootloaderNode = (Element) root.appendChild(
+                                               doc.createElement("bootloader"));
+            bootloaderNode.appendChild(doc.createTextNode(bootloader));
+        }
+
         /* os */
         final Element osNode = (Element) root.appendChild(
                                                   doc.createElement("os"));
@@ -665,6 +675,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_MEMORY, "memory");
         paths.put(VM_PARAM_CURRENTMEMORY, "currentMemory");
         paths.put(VM_PARAM_VCPU, "vcpu");
+        paths.put(VM_PARAM_BOOTLOADER, "bootloader");
         paths.put(VM_PARAM_BOOT, "os/boot");
         paths.put(VM_PARAM_TYPE, "os/type");
         paths.put(VM_PARAM_TYPE_ARCH, "os/type");
@@ -721,7 +732,13 @@ public final class VMSXML extends XML {
                                                                   param)) {
                     node.setAttribute("threads", value);
                 } else {
-                    getChildNode(node, "#text").setNodeValue(value);
+                    final Node n = getChildNode(node, "#text");
+                    if (n == null) {
+                        node.appendChild(
+                            node.getOwnerDocument().createTextNode(value));
+                    } else {
+                        n.setNodeValue(value);
+                    }
                 }
             }
             addCPUMatchNode(domainNode.getOwnerDocument(),
@@ -1166,14 +1183,14 @@ public final class VMSXML extends XML {
     }
 
     /** Parses the libvirt config file. */
-    private void parseConfig(final Node configNode,
+    private String parseConfig(final Node configNode,
                              final String nameInFilename) {
         if (configNode == null) {
-            return;
+            return null;
         }
         final Node domainNode = getChildNode(configNode, "domain");
         if (domainNode == null) {
-            return;
+            return null;
         }
         final String domainType = getAttribute(domainNode, "type");
         final NodeList options = domainNode.getChildNodes();
@@ -1191,12 +1208,14 @@ public final class VMSXML extends XML {
                 if (!name.equals(nameInFilename)) {
                     Tools.appWarning("unexpected name: " + name
                                      + " != " + nameInFilename);
-                    return;
+                    return domainType;
                 }
             } else if (VM_PARAM_UUID.equals(option.getNodeName())) {
                 parameterValues.put(name, VM_PARAM_UUID, getText(option));
             } else if (VM_PARAM_VCPU.equals(option.getNodeName())) {
                 parameterValues.put(name, VM_PARAM_VCPU, getText(option));
+            } else if (VM_PARAM_BOOTLOADER.equals(option.getNodeName())) {
+                parameterValues.put(name, VM_PARAM_BOOTLOADER, getText(option));
             } else if (VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
                 parameterValues.put(name,
                                     VM_PARAM_CURRENTMEMORY,
@@ -1213,7 +1232,11 @@ public final class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_BOOT,
                                             getAttribute(osOption, "dev"));
-                    } else if ("type".equals(osOption.getNodeName())) {
+                    } else if (VM_PARAM_LOADER.equals(osOption.getNodeName())) {
+                        parameterValues.put(name,
+                                            VM_PARAM_LOADER,
+                                            getText(osOption));
+                    } else if (VM_PARAM_TYPE.equals(osOption.getNodeName())) {
                         parameterValues.put(name,
                                             VM_PARAM_TYPE,
                                             getText(osOption));
@@ -1668,6 +1691,7 @@ public final class VMSXML extends XML {
         if (!tabletOk) {
             Tools.appWarning("you should enable input type tablet for " + name);
         }
+        return domainType;
     }
 
     /** Updates one vm. */
@@ -1677,32 +1701,36 @@ public final class VMSXML extends XML {
             return;
         }
         final Node infoNode = getChildNode(vmNode, "info");
-        final String name = getAttribute(vmNode, VM_PARAM_NAME);
-        final String config = getAttribute(vmNode, "config");
-        configsMap.put(config, name);
-        namesConfigsMap.put(name, config);
+        final String domainName = getAttribute(vmNode, VM_PARAM_NAME);
+
         final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
         if (autostart == null) {
-            parameterValues.put(name, VM_PARAM_AUTOSTART, "false");
+            parameterValues.put(domainName, VM_PARAM_AUTOSTART, "false");
         } else {
-            parameterValues.put(name, VM_PARAM_AUTOSTART, autostart);
+            parameterValues.put(domainName, VM_PARAM_AUTOSTART, autostart);
         }
         if (infoNode != null) {
-            parseInfo(name, getText(infoNode));
+            parseInfo(domainName, getText(infoNode));
         }
         final Node vncdisplayNode = getChildNode(vmNode, "vncdisplay");
-        remotePorts.put(name, -1);
+        remotePorts.put(domainName, -1);
         if (vncdisplayNode != null) {
             final String vncdisplay = getText(vncdisplayNode).trim();
             final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
             if (m.matches()) {
-                remotePorts.put(name, Integer.parseInt(m.group(1)) + 5900);
+                remotePorts.put(domainName, Integer.parseInt(m.group(1)) + 5900);
             }
         }
-        //parseConfig(getXMLDocument(
-        //                    getCDATA(getChildNode(vmNode, "config-in-etc"))),
-        //            name);
-        parseConfig(getChildNode(vmNode, "config"), name);
+        final Node configNode = getChildNode(vmNode, "config");
+        final String type = parseConfig(configNode, domainName);
+        String configName;
+        if ("xen".equals(type)) {
+            configName = "/etc/xen/vm/" + domainName + ".xml";
+        } else {
+            configName = "/etc/libvirt/qemu/" + domainName + ".xml";
+        }
+        configsMap.put(configName, domainName);
+        namesConfigsMap.put(domainName, configName);
     }
 
     /** Updates all data for this domain. */
