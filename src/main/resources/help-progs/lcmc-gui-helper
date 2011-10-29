@@ -1610,7 +1610,7 @@ sub get_vm_info {
 		$libvirt_version = $1;
 	}
 	my $out = "<version>$libvirt_version</version>\n";
-	for (`/usr/bin/virsh list --all|sed '1,2d'`) {
+	for (`/usr/bin/virsh list --all 2>/dev/null|sed '1,2d'`) {
 		my ($name) = /^\s*\S+\s+(\S+)/;
 		next if !$name;
 		chomp;
