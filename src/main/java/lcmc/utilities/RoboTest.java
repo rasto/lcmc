@@ -736,8 +736,9 @@ public final class RoboTest {
         }
     }
 
-    /** Check DRBD test. */
+    /** Check DRBD test on the first two hosts. */
     private static void checkDRBDTest(final String test, final double no) {
+        int h = 1;
         for (final Host host : cluster.getHosts()) {
             if (abortWithMouseMovement()) {
                 return;
@@ -745,6 +746,10 @@ public final class RoboTest {
             if (!aborted) {
                 host.checkDRBDTest(test, no);
             }
+            if (h == 2) {
+                break;
+            }
+            h++;
         }
     }
 

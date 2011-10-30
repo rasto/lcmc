@@ -2461,7 +2461,8 @@ public final class Host {
     boolean checkTest(final String checkCommand,
                       final String test,
                       final double index,
-                      final String name) {
+                      final String name,
+                      final int maxHosts) {
         Tools.sleep(1500);
         final StringBuilder command = new StringBuilder(50);
         command.append(DistResource.SUDO + replaceVars("@GUI-HELPER@"));
@@ -2482,6 +2483,9 @@ public final class Host {
             Tools.debug(this, "host" + h + " = " + host.getName(), 1);
             command.append(' ');
             command.append(host.getName());
+            if (maxHosts > 0 && h >= maxHosts) {
+                break;
+            }
             h++;
         }
         command.append(" 2>&1");
@@ -2514,7 +2518,7 @@ public final class Host {
 
     /** This is part of testsuite, it checks Pacemaker. */
     public boolean checkPCMKTest(final String test, final double index) {
-        return checkTest("gui-test", test, index, null);
+        return checkTest("gui-test", test, index, null, 0);
     }
 
     /** This is part of testsuite, it checks DRBD. */
@@ -2527,14 +2531,14 @@ public final class Host {
             testName.append("novolumes-");
         }
         testName.append(test);
-        return checkTest("gui-drbd-test", testName.toString(), index, null);
+        return checkTest("gui-drbd-test", testName.toString(), index, null, 2);
     }
 
     /** This is part of testsuite, it checks VMs. */
     public boolean checkVMTest(final String test,
                                final double index,
                                final String name) {
-        return checkTest("gui-vm-test", test, index, name);
+        return checkTest("gui-vm-test", test, index, name, 0);
     }
 
     /** Returns color of this host. Null if it is default color. */
