@@ -106,13 +106,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private GuiComboBox resyncAfterParamCB = null;
     /** Whether the drbd resource used by CRM. */
     private ServiceInfo isUsedByCRM;
+    /** Hosts. */
+    private final Set<Host> hosts;
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
      */
     DrbdResourceInfo(final String name,
+                     final Set<Host> hosts,
                      final Browser browser) {
         super(name, browser);
+        this.hosts = hosts;
         setResource(new DrbdResource(name));
         //getResource().setValue(DRBD_RES_PARAM_DEV, drbdDev);
     }
@@ -169,7 +173,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             </host>
         */
         final boolean volumesAvailable = configOnHost.hasVolumes();
-        for (final Host host : getCluster().getHostsArray()) {
+        for (final Host host : getHosts()) {
             final List<String> volumeConfigs = new ArrayList<String>();
             for (final DrbdVolumeInfo dvi : drbdVolumes) {
                 final String volumeConfig = dvi.drbdVolumeConfig(
@@ -418,7 +422,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                             new LinkedHashMap<Host, String>();
                 try {
                     getDrbdInfo().createDrbdConfig(true);
-                    for (final Host h : getCluster().getHostsArray()) {
+                    for (final Host h : getHosts()) {
                         DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
@@ -485,7 +489,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         getBrowser().drbdStatusLock();
                         try {
                             getDrbdInfo().createDrbdConfig(false);
-                            for (final Host h : getCluster().getHostsArray()) {
+                            for (final Host h : getHosts()) {
                                 DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
@@ -639,7 +643,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set networks addresses */
         String hostPort = null;
         final boolean infoPanelOk = infoPanel != null;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             final String hostAddress =
                             dxml.getVirtualInterface(host.getName(), getName());
             final String hp =
@@ -668,7 +672,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set port */
         if (!Tools.areEqual(hostPort, savedPort)) {
             savedPort = hostPort;
-            for (final Host host : getBrowser().getClusterHosts()) {
+            for (final Host host : getHosts()) {
                 host.getBrowser().getDrbdVIPortList().add(savedPort);
             }
             if (infoPanelOk) {
@@ -894,8 +898,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final JPanel panel =
              getParamPanel(Tools.getString("DrbdResourceInfo.HostAddresses"));
         panel.setLayout(new SpringLayout());
-
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             final GuiComboBox cb =
                     new GuiComboBox(
                         null,
@@ -918,7 +921,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* host addresses combo boxes */
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             GuiComboBox cb = addressComboBoxHash.get(host);
             if (wizard) {
                 cb = addressComboBoxHashWizard.get(host);
@@ -942,7 +945,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final List<String> drbdVIPorts = new ArrayList<String>();
         String dp = savedPort;
         int index = -1;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             for (final String port : host.getBrowser().getDrbdVIPortList()) {
                 if (Tools.isNumber(port)) {
                     final int p = Integer.parseInt(port);
@@ -964,7 +967,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         while (i < 10) {
             final String port = Integer.toString(index);
             boolean contains = false;
-            for (final Host host : getBrowser().getClusterHosts()) {
+            for (final Host host : getHosts()) {
                 if (host.getBrowser().getDrbdVIPortList().contains(port)) {
                     contains = true;
                 }
@@ -1027,7 +1030,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Returns true if some of the addresses have changed. */
     private boolean checkHostAddressesFieldsChanged() {
         boolean changed = false;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             final GuiComboBox cb = addressComboBoxHash.get(host);
             if (cb == null) {
                 continue;
@@ -1058,7 +1061,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* port */
         savedPort = portComboBox.getStringValue();
         /* addresses */
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             final GuiComboBox cb = addressComboBoxHash.get(host);
             final String address = cb.getStringValue();
             if (address == null || "".equals(address)) {
@@ -1080,7 +1083,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void addHostAddressListeners(final boolean wizard,
                                            final MyButton thisApplyButton) {
         final String[] params = getParametersFromXML();
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getHosts()) {
             GuiComboBox cb;
             GuiComboBox rcb;
             if (wizard) {
@@ -1229,7 +1232,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
-        for (final Host host : getCluster().getHostsArray()) {
+        final Set<Host> hosts = getHosts();
+        for (final Host host : hosts) {
             host.getBrowser().getDrbdVIPortList().remove(savedPort);
         }
 
@@ -1361,4 +1365,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return isUsedByCRM != null && isUsedByCRM.isManaged(false);
     }
 
+    /** Returns hosts from the first volume. */
+    private Set<Host> getHosts() {
+        return hosts;
+    }
 }

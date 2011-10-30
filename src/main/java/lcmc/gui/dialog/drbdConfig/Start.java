@@ -85,7 +85,11 @@ public final class Start extends WizardDialog {
         boolean newResource = false;
         final Info i = (Info) drbdResourceCB.getValue();
         if (i.getStringValue() == null) {
-            drbdResourceInfo = drbdInfo.getNewDrbdResource();
+            final List<BlockDevInfo> bdis =
+                    new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
+                                                              blockDevInfo2));
+            drbdResourceInfo = drbdInfo.getNewDrbdResource(
+                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis));
             drbdInfo.addDrbdResource(drbdResourceInfo);
             newResource = true;
         } else {

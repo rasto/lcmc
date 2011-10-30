@@ -650,11 +650,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Return new DRBD resoruce info object. */
-    public DrbdResourceInfo getNewDrbdResource() {
+    public DrbdResourceInfo getNewDrbdResource(final Set<Host> hosts) {
         final int index = getNewDrbdResourceIndex();
         final String name = "r" + Integer.toString(index);
         /* search for next available drbd device */
-        return new DrbdResourceInfo(name, getBrowser());
+        return new DrbdResourceInfo(name, hosts, getBrowser());
     }
 
     /** Return new DRBD volume info object. */
@@ -695,7 +695,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
         getBrowser().getDrbdNode().add(drbdResourceNode);
-        dri.getInfoPanel();
         getBrowser().reload(drbdResourceNode, true);
     }
 
@@ -745,9 +744,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
     /** Adds existing drbd resource to the GUI. */
     public DrbdResourceInfo addDrbdResource(final String name,
+                                            final Set<Host> hosts,
                                             final boolean testOnly) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
-        final DrbdResourceInfo dri = new DrbdResourceInfo(name, getBrowser());
+        final DrbdResourceInfo dri =
+                               new DrbdResourceInfo(name, hosts, getBrowser());
         final String[] sections = dxml.getSections();
         for (final String sectionString : sections) {
             /* remove -options */

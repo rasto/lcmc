@@ -33,6 +33,7 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AddDrbdConfigDialog.
@@ -69,15 +70,18 @@ public final class AddDrbdConfigDialog {
             && drbdInfo.atLeastVersion("8.4")) {
             dialog = new Start(null, drbdInfo, blockDevInfo1, blockDevInfo2);
         } else {
-            final DrbdResourceInfo drbdResourceInfo =
-                                                drbdInfo.getNewDrbdResource();
-            drbdInfo.addDrbdResource(drbdResourceInfo);
-            final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
-                                drbdResourceInfo,
+            final List<BlockDevInfo> bdis = 
                                 new ArrayList<BlockDevInfo>(Arrays.asList(
                                                               blockDevInfo1,
-                                                              blockDevInfo2)));
+                                                              blockDevInfo2));
+            final DrbdResourceInfo drbdResourceInfo =
+                        drbdInfo.getNewDrbdResource(
+                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis));
+            final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
+                                                            drbdResourceInfo,
+                                                            bdis);
             drbdResourceInfo.addDrbdVolume(dvi);
+            drbdInfo.addDrbdResource(drbdResourceInfo);
             drbdInfo.addDrbdVolume(dvi);
             dialog = new Resource(null, dvi);
         }

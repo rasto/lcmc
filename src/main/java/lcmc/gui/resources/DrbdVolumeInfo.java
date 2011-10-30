@@ -80,6 +80,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     private String createdFs = null;
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
+    /** Hosts. */
+    private final Set<Host> hosts;
     /** Name of the drbd device parameter. */
     static final String DRBD_VOL_PARAM_DEV = "device";
     /** Name of the drbd volume number parameter. */
@@ -146,6 +148,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         this.drbdResourceInfo = drbdResourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
         this.device = device;
+        hosts = getHostsFromBlockDevices(blockDevInfos);
         setResource(new DrbdVolume(name));
         getResource().setValue(DRBD_VOL_PARAM_DEV, device);
         getResource().setNew(true);
@@ -207,8 +210,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 try {
                     getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
                                                                          true);
-                    for (final Host h
-                         : getDrbdResourceInfo().getCluster().getHostsArray()) {
+                    for (final Host h : getHosts()) {
                         DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
@@ -272,9 +274,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getBrowser().getDrbdGraph().getDrbdInfo()
                                                      .createDrbdConfig(false);
-                            for (final Host h : getDrbdResourceInfo()
-                                                        .getCluster()
-                                                        .getHostsArray()) {
+                            for (final Host h : getHosts()) {
                                 DRBD.adjust(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
@@ -638,7 +638,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                                getDevice(),
                                                getName());
         getBrowser().getDrbdGraph().removeDrbdVolume(this);
-        final Host[] hosts = getDrbdResourceInfo().getCluster().getHostsArray();
+        final Set<Host> hosts = getHosts();
         final boolean lastVolume =
                                 getDrbdResourceInfo().removeDrbdVolume(this);
         if (getDrbdVolume().isCommited()) {
@@ -950,12 +950,18 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
     public Set<Host> getHosts() {
+        return hosts;
+    }
+
+    /** Returns sorted hosts from the specified blockdevices. */
+    public static Set<Host> getHostsFromBlockDevices(
+                                               final List<BlockDevInfo> bdis) {
         final TreeSet<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
             @Override public int compare(final Host h1, final Host h2) {
                 return h1.getName().compareToIgnoreCase(h2.getName());
             }
         });
-        for (final BlockDevInfo bdi : getBlockDevInfos()) {
+        for (final BlockDevInfo bdi : bdis) {
             hosts.add(bdi.getHost());
         }
         return hosts;

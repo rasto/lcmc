@@ -1599,23 +1599,29 @@ public final class ClusterBrowser extends Browser {
                 /* add DRBD resource */
                 DrbdResourceInfo dri = getDrbdResHash().get(resName);
                 putDrbdResHash();
+                final List<BlockDevInfo> bdis =
+                                new ArrayList<BlockDevInfo>(Arrays.asList(bd1,
+                                                                          bd2));
                 if (dri == null) {
-                    dri = drbdInfo.addDrbdResource(resName, testOnly);
+                    dri = drbdInfo.addDrbdResource(
+                               resName,
+                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis),
+                               testOnly);
                     atLeastOneAdded = true;
                 }
-                dri.setParameters();
                 DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
                 if (dvi == null) {
                     dvi = drbdInfo.addDrbdVolume(
                                            dri,
                                            volumeNr,
                                            drbdDev,
-                                           new ArrayList<BlockDevInfo>(
-                                                      Arrays.asList(bd1, bd2)),
+                                           bdis,
                                            testOnly);
                     atLeastOneAdded = true;
                 }
+                dri.setParameters();
                 dvi.setParameters();
+                dri.getInfoPanel();
             }
         }
         if (atLeastOneAdded) {
