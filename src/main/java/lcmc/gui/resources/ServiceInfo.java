@@ -3473,6 +3473,10 @@ public class ServiceInfo extends EditableInfo {
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
                 getService().setIdAndCrmId(id);
+                if (clInfo != null) {
+                    final String clid = clInfo.getComboBoxValue(GUI_ID);
+                    clInfo.getService().setIdAndCrmId(clid);
+                }
                 if (typeRadioGroup != null) {
                     typeRadioGroup.setEnabled(false);
                 }
