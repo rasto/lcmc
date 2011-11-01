@@ -1804,8 +1804,12 @@ public abstract class ResourceGraph {
                 final boolean isLoop = endpoints.getFirst().equals(
                                                         endpoints.getSecond());
                 if (isLoop) {
-                    Tools.appWarning("an ilegal loop");
-                    return null;
+                    Tools.appWarning(
+                                 "an ilegal loop: "
+                                 + vertexToInfoMap.get(endpoints.getFirst())
+                                 + " " + e + " "
+                                 + vertexToInfoMap.get(endpoints.getSecond()));
+                    return EMPTY_SHAPE;
                 }
             }
             if (showHollowArrow((Edge) e)) {
