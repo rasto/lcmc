@@ -52,7 +52,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
     @Override public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String provider = getResourceAgent().getProvider();
-        if (!HB_HEARTBEAT_PROVIDER.equals(provider)
+        if (!ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
             && !"".equals(provider)) {
             s.append(provider);
             s.append(':');

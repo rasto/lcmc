@@ -225,24 +225,17 @@ public final class ClusterBrowser extends Browser {
     public static final ImageIcon REMOVE_ICON_SMALL =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
-    /** Name of ocf style resource (heartbeat 2). */
-    private static final String HB_OCF_CLASS = "ocf";
-    /** Name of heartbeat style resource (heartbeat 1). */
-    public static final String HB_HEARTBEAT_CLASS = "heartbeat";
-    /** Name of lsb style resource (/etc/init.d/*). */
-    public static final String HB_LSB_CLASS = "lsb";
-    /** Name of stonith device class. */
-    public static final String HB_STONITH_CLASS = "stonith";
 
     /** Hash that holds all hb classes with descriptions that appear in the
      * pull down menus. */
     public static final Map<String, String> HB_CLASS_MENU =
                                                 new HashMap<String, String>();
     static {
-        HB_CLASS_MENU.put(HB_OCF_CLASS,       "OCF Resource Agents");
-        HB_CLASS_MENU.put(HB_HEARTBEAT_CLASS, "Heartbeat 1 RAs (deprecated)");
-        HB_CLASS_MENU.put(HB_LSB_CLASS,       "LSB Init Scripts");
-        HB_CLASS_MENU.put(HB_STONITH_CLASS,   "Stonith Devices");
+        HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
+        HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
+                          "Heartbeat 1 RAs (deprecated)");
+        HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
     }
     /** Width of the label in the info panel. */
     public static final int SERVICE_LABEL_WIDTH =
@@ -258,10 +251,10 @@ public final class ClusterBrowser extends Browser {
     /** Name of the boolean type in drbd. */
     public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
     /** String array with all hb classes. */
-    public static final String[] HB_CLASSES = {HB_OCF_CLASS,
-                                               HB_HEARTBEAT_CLASS,
-                                               HB_LSB_CLASS,
-                                               HB_STONITH_CLASS};
+    public static final String[] HB_CLASSES = {ResourceAgent.OCF_CLASS,
+                                               ResourceAgent.HEARTBEAT_CLASS,
+                                               ResourceAgent.LSB_CLASS,
+                                               ResourceAgent.STONITH_CLASS};
 
     /** Hb start operation. */
     private static final String HB_OP_START = "start";

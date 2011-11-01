@@ -168,11 +168,13 @@ public final class CRMXML extends XML {
     private final ResourceAgent pcmkClone;
     /** Predefined drbddisk as heartbeat service. */
     private final ResourceAgent hbDrbddisk =
-                       new ResourceAgent("drbddisk", "heartbeat", "heartbeat");
+                             new ResourceAgent("drbddisk",
+                                               ResourceAgent.HEARTBEAT_PROVIDER,
+                                               ResourceAgent.HEARTBEAT_CLASS);
     /** Predefined linbit::drbd as pacemaker service. */
     private final ResourceAgent hbLinbitDrbd =
-                                    new ResourceAgent("drbd", "linbit", "ocf");
-    /** Mapfrom heartbeat service defined by name and class to the hearbeat
+                  new ResourceAgent("drbd", "linbit", ResourceAgent.OCF_CLASS);
+    /** Mapfrom heartbeat service defined by name and class to the heartbeat
      * service object.
      */
     private final MultiKeyMap<String, ResourceAgent> serviceToResourceAgentMap =
@@ -1696,7 +1698,7 @@ public final class CRMXML extends XML {
         /* class */
         String resourceClass = getAttribute(raNode, "class");
         if (resourceClass == null) {
-            resourceClass = "ocf";
+            resourceClass = ResourceAgent.OCF_CLASS;
         }
         List<ResourceAgent> raList = classToServicesMap.get(resourceClass);
         if (raList == null) {
@@ -1705,10 +1707,10 @@ public final class CRMXML extends XML {
         }
         ResourceAgent ra;
         if ("drbddisk".equals(serviceName)
-            && "heartbeat".equals(resourceClass)) {
+            && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
             ra = hbDrbddisk;
         } else if ("drbd".equals(serviceName)
-                   && "ocf".equals(resourceClass)
+                   && ResourceAgent.OCF_CLASS.equals(resourceClass)
                    && "linbit".equals(provider)) {
             ra = hbLinbitDrbd;
         } else {
@@ -1719,36 +1721,72 @@ public final class CRMXML extends XML {
                                       resourceClass,
                                       ra);
         raList.add(ra);
+        if (ResourceAgent.LSB_CLASS.equals(resourceClass)
+            || ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
+            setLSBResourceAgent(serviceName, resourceClass, ra);
+        } else {
+            /* <version> */
+            final Node versionNode = getChildNode(raNode, "version");
+            if (versionNode != null) {
+                ra.setVersion(getText(versionNode));
+            }
 
-        /* <version> */
-        final Node versionNode = getChildNode(raNode, "version");
-        if (versionNode != null) {
-            ra.setVersion(getText(versionNode));
+            /* <longdesc lang="en"> */
+            final Node longdescNode = getChildNode(raNode, "longdesc");
+            if (longdescNode != null) {
+                ra.setLongDesc(Tools.trimText(getText(longdescNode)));
+            }
+
+            /* <shortdesc lang="en"> */
+            final Node shortdescNode = getChildNode(raNode, "shortdesc");
+            if (shortdescNode != null) {
+                ra.setShortDesc(getText(shortdescNode));
+            }
+
+            /* <parameters> */
+            final Node parametersNode = getChildNode(raNode, "parameters");
+            if (parametersNode != null) {
+                parseParameters(ra, parametersNode);
+            }
+            /* <actions> */
+            final Node actionsNode = getChildNode(raNode, "actions");
+            if (actionsNode != null) {
+                parseActions(ra, actionsNode);
+            }
+            ra.setProbablyMasterSlave(masterSlave);
         }
+    }
 
-        /* <longdesc lang="en"> */
-        final Node longdescNode = getChildNode(raNode, "longdesc");
-        if (longdescNode != null) {
-            ra.setLongDesc(Tools.trimText(getText(longdescNode)));
+    /** Set resource agent to be used as LSB script. */
+    private void setLSBResourceAgent(final String serviceName,
+                                     final String raClass,
+                                     final ResourceAgent ra) {
+        ra.setVersion("0.0");
+        if (ResourceAgent.LSB_CLASS.equals(raClass)) {
+            ra.setLongDesc("LSB resource.");
+            ra.setShortDesc("/etc/init.d/" + serviceName);
+        } else if (ResourceAgent.HEARTBEAT_CLASS.equals(raClass)) {
+            ra.setLongDesc("Heartbeat 1 RA.");
+            ra.setShortDesc("/etc/ha.d/resource.d/" + serviceName);
         }
-
-        /* <shortdesc lang="en"> */
-        final Node shortdescNode = getChildNode(raNode, "shortdesc");
-        if (shortdescNode != null) {
-            ra.setShortDesc(getText(shortdescNode));
-        }
-
-        /* <parameters> */
-        final Node parametersNode = getChildNode(raNode, "parameters");
-        if (parametersNode != null) {
-            parseParameters(ra, parametersNode);
+        for (int i = 1; i < 11; i++) {
+            final String param = Integer.toString(i);
+            ra.addParameter(param);
+            ra.setParamLongDesc(param, param);
+            ra.setParamShortDesc(param, param);
+            ra.setParamType(param, "string");
+            ra.setParamDefault(param, "");
         }
         /* <actions> */
-        final Node actionsNode = getChildNode(raNode, "actions");
-        if (actionsNode != null) {
-            parseActions(ra, actionsNode);
+        for (final String name
+                : new String[]{"start", "stop", "status", "meta-data"}) {
+            ra.addOperationDefault(name, "timeout", "15");
         }
-        ra.setProbablyMasterSlave(masterSlave);
+        final String monitorName = "monitor";
+        ra.addOperationDefault(monitorName, "timeout", "15");
+        ra.addOperationDefault(monitorName, "interval", "15");
+        ra.addOperationDefault(monitorName, "start-delay", "15");
+        ra.setProbablyMasterSlave(false);
     }
 
     /**
@@ -1859,10 +1897,19 @@ public final class CRMXML extends XML {
                                                                provider,
                                                                raClass);
         if (ra == null) {
-            Tools.appWarning(raClass + ":" + provider + ":" + serviceName
-                             + " RA does not exist");
             final ResourceAgent notInstalledRA =
                             new ResourceAgent(serviceName, provider, raClass);
+            if (ResourceAgent.LSB_CLASS.equals(raClass)
+                || ResourceAgent.HEARTBEAT_CLASS.equals(raClass)) {
+                setLSBResourceAgent(serviceName, raClass, notInstalledRA);
+            } else {
+                Tools.appWarning(raClass + ":" + provider + ":" + serviceName
+                                 + " RA does not exist");
+            }
+            serviceToResourceAgentMap.put(serviceName,
+                                          provider,
+                                          raClass,
+                                          notInstalledRA);
             return notInstalledRA;
 
         }
@@ -1879,12 +1926,12 @@ public final class CRMXML extends XML {
         return hbLinbitDrbd;
     }
 
-    /** Returns the heartbeat service object of the hearbeat group. */
+    /** Returns the heartbeat service object of the heartbeat group. */
     public ResourceAgent getHbGroup() {
         return hbGroup;
     }
 
-    /** Returns the heartbeat service object of the hearbeat clone set. */
+    /** Returns the heartbeat service object of the heartbeat clone set. */
     public ResourceAgent getHbClone() {
         return pcmkClone;
     }
@@ -2206,7 +2253,7 @@ public final class CRMXML extends XML {
         final String crmId = getAttribute(primitiveNode, "id");
         String provider = getAttribute(primitiveNode, "provider");
         if (provider == null) {
-            provider = "heartbeat";
+            provider = ResourceAgent.HEARTBEAT_PROVIDER;
         }
         final String type = getAttribute(primitiveNode, "type");
         resourceTypeMap.put(crmId, getResourceAgent(type, provider, raClass));
@@ -2224,7 +2271,7 @@ public final class CRMXML extends XML {
                         operationsIdtoCRMId,
                         metaAttrsIdRefs,
                         metaAttrsIdToCRMId,
-                        "stonith".equals(raClass));
+                        ResourceAgent.STONITH_CLASS.equals(raClass));
     }
 
     /**
@@ -3472,7 +3519,7 @@ public final class CRMXML extends XML {
                     final String raClass = getAttribute(rscNode, "class");
                     String provider = getAttribute(rscNode, "provider");
                     if (provider == null) {
-                        provider = "heartbeat";
+                        provider = ResourceAgent.HEARTBEAT_PROVIDER;
                     }
                     final String type = getAttribute(rscNode, "type");
                     resourceTypeMap.put(crmId, getResourceAgent(type,

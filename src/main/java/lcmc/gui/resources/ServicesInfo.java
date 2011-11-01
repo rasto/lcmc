@@ -1266,8 +1266,8 @@ public final class ServicesInfo extends EditableInfo {
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 final ResourceAgent fsService = crmXML.getResourceAgent(
                                         "Filesystem",
-                                        ServiceInfo.HB_HEARTBEAT_PROVIDER,
-                                        "ocf");
+                                        ResourceAgent.HEARTBEAT_PROVIDER,
+                                        ResourceAgent.OCF_CLASS);
                 if (crmXML.isLinbitDrbdPresent()) { /* just skip it,
                                                        if it is not */
                     final ResourceAgent linbitDrbdService =
@@ -1312,8 +1312,8 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                          "IPaddr2",
-                                         ServiceInfo.HB_HEARTBEAT_PROVIDER,
-                                         "ocf");
+                                         ResourceAgent.HEARTBEAT_PROVIDER,
+                                         ResourceAgent.OCF_CLASS);
                 if (ipService != null) { /* just skip it, if it is not*/
                     final MyMenuItem ipMenuItem =
                          new MyMenuItem(ipService.getMenuName(),

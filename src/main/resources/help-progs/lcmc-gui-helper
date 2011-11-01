@@ -1156,35 +1156,6 @@ sub get_ocf_like_xml {
 	my $xml      = <<XML;
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
 <resource-agent name="$resource" class="$class">
-<version>0.0</version>
-
-<longdesc lang="en">
-$class resource.
-</longdesc>
-<shortdesc lang="en">$dir$resource</shortdesc>
-
-<parameters>
-XML
-	for (1..10) {
-		$xml .= <<XML;
-<parameter name="$_" required="0" unique="0">
-<longdesc lang="en">
-$_
-</longdesc>
-<shortdesc lang="en">$_</shortdesc>
-<content type="string" default="" />
-</parameter>
-XML
-	}
-	$xml .= <<XML;
-</parameters>
-<actions>
-<action name="start"   timeout="15" />
-<action name="stop"    timeout="15" />
-<action name="status"  timeout="15" />
-<action name="monitor" timeout="15" interval="15" start-delay="15" />
-<action name="meta-data"  timeout="5" />
-</actions>
 </resource-agent>
 XML
 	return $xml;

@@ -166,8 +166,6 @@ public class ServiceInfo extends EditableInfo {
     /** Default values internal name. */
     private static final String OPERATIONS_DEFAULT_VALUES = "default";
 
-    /** Name of the heartbeat provider. */
-    static final String HB_HEARTBEAT_PROVIDER = "heartbeat";
     /** Check the cached fields. */
     protected static final String CACHED_FIELD = "cached";
     /** Master / Slave type string. */
@@ -512,7 +510,8 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         final String cl = getService().getResourceClass();
-        if (cl != null && cl.equals(ClusterBrowser.HB_HEARTBEAT_CLASS)) {
+        if (cl != null && (cl.equals(ResourceAgent.HEARTBEAT_CLASS)
+                           || cl.equals(ResourceAgent.LSB_CLASS))) {
             /* in old style resources don't show all the textfields */
             boolean visible = false;
             GuiComboBox cb = null;
@@ -892,7 +891,7 @@ public class ServiceInfo extends EditableInfo {
     @Override public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String provider = resourceAgent.getProvider();
-        if (!HB_HEARTBEAT_PROVIDER.equals(provider)
+        if (!ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
             && !"".equals(provider)) {
             s.append(provider);
             s.append(':');
@@ -3171,9 +3170,9 @@ public class ServiceInfo extends EditableInfo {
 
         pacemakerResAttrs.put("id", heartbeatId);
         pacemakerResAttrs.put("class", raClass);
-        if (!ClusterBrowser.HB_HEARTBEAT_CLASS.equals(raClass)
-            && !raClass.equals(ClusterBrowser.HB_LSB_CLASS)
-            && !raClass.equals(ClusterBrowser.HB_STONITH_CLASS)) {
+        if (!ResourceAgent.HEARTBEAT_CLASS.equals(raClass)
+            && !raClass.equals(ResourceAgent.LSB_CLASS)
+            && !raClass.equals(ResourceAgent.STONITH_CLASS)) {
             pacemakerResAttrs.put("provider", provider);
         }
         pacemakerResAttrs.put("type", type);
@@ -5046,9 +5045,9 @@ public class ServiceInfo extends EditableInfo {
                 final Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 final ResourceAgent fsService =
-                             crmXML.getResourceAgent("Filesystem",
-                                                     HB_HEARTBEAT_PROVIDER,
-                                                     "ocf");
+                     crmXML.getResourceAgent("Filesystem",
+                                             ResourceAgent.HEARTBEAT_PROVIDER,
+                                             ResourceAgent.OCF_CLASS);
                 final MyMenu thisMenu = this;
                 if (crmXML.isLinbitDrbdPresent()) { /* just skip it, if it
                                                        is not */
@@ -5092,9 +5091,9 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
-                                                     "IPaddr2",
-                                                     HB_HEARTBEAT_PROVIDER,
-                                                     "ocf");
+                                         "IPaddr2",
+                                         ResourceAgent.HEARTBEAT_PROVIDER,
+                                         ResourceAgent.OCF_CLASS);
                 if (ipService != null) { /* just skip it, if it is not*/
                     /* ipaddr */
                     try {

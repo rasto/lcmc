@@ -109,6 +109,16 @@ public final class ResourceAgent {
                                        new HashMap<String, GuiComboBox.Type>();
     /** Whether this resource agent is ping or pingd. */
     private final boolean pingService;
+    /** Name of lsb style resource (/etc/init.d/*). */
+    public static final String LSB_CLASS = "lsb";
+    /** Name of heartbeat style resource (heartbeat 1). */
+    public static final String HEARTBEAT_CLASS = "heartbeat";
+    /** Name of ocf style resource (heartbeat 2). */
+    public static final String OCF_CLASS = "ocf";
+    /** Name of stonith device class. */
+    public static final String STONITH_CLASS = "stonith";
+    /** Name of the heartbeat provider. */
+    public static final String HEARTBEAT_PROVIDER = "heartbeat";
     /**
      * Prepares a new <code>ResourceAgent</code> object.
      */
@@ -121,7 +131,7 @@ public final class ResourceAgent {
         operations.addAll(Arrays.asList(ClusterBrowser.HB_OPERATIONS));
         hash = (name == null ? 0 : name.hashCode() * 31)
                + (resourceClass == null ? 0 : resourceClass.hashCode());
-        if ("heartbeat".equals(provider)) {
+        if (HEARTBEAT_PROVIDER.equals(provider)) {
             menuName = name;
         } else {
             menuName = provider + ":" + name;
@@ -415,7 +425,7 @@ public final class ResourceAgent {
 
     /** Returns whether this service is heartbeat drbd ra. */
     public boolean isHbDrbd() {
-        return "drbd".equals(name) && "heartbeat".equals(provider);
+        return "drbd".equals(name) && HEARTBEAT_PROVIDER.equals(provider);
     }
 
 
@@ -462,17 +472,17 @@ public final class ResourceAgent {
 
     /** Returns whether this service/object is stonith device. */
     public boolean isStonith() {
-        return "stonith".equals(resourceClass);
+        return STONITH_CLASS.equals(resourceClass);
     }
 
     /** Returns whether this service is in the heartbeat class. */
     public boolean isHeartbeatClass() {
-        return "heartbeat".equals(resourceClass);
+        return HEARTBEAT_CLASS.equals(resourceClass);
     }
 
     /** Returns whether this service is in the ocf class. */
     public boolean isOCFClass() {
-        return "ocf".equals(resourceClass);
+        return OCF_CLASS.equals(resourceClass);
     }
 
     /**
