@@ -338,6 +338,7 @@ public final class ClustersPanel extends JPanel {
         final String text = upgradeCheck;
         mUpgradeLock.unlock();
         upgradeField.setText(text);
+        upgradeField.setVisible(!"".equals(text));
         return upgradeField;
     }
 
