@@ -2638,27 +2638,27 @@ public final class CRMXML extends XML {
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
             Tools.appWarning("there is no cluster_property_set node");
-            return cibQueryData;
-        }
-        NodeList nvpairs;
-        if (Tools.versionBeforePacemaker(host)) {
-            /* <attributtes> only til 2.1.4 */
-            final Node attrNode = getChildNode(cpsNode, "attributes");
-            nvpairs = attrNode.getChildNodes();
         } else {
-            nvpairs = cpsNode.getChildNodes();
-        }
-        final Map<String, String> crmConfMap = new HashMap<String, String>();
-        /*              <nvpair...> */
-        for (int i = 0; i < nvpairs.getLength(); i++) {
-            final Node optionNode = nvpairs.item(i);
-            if (optionNode.getNodeName().equals("nvpair")) {
-                final String name = getAttribute(optionNode, "name");
-                final String value = getAttribute(optionNode, "value");
-                crmConfMap.put(name, value);
+            NodeList nvpairs;
+            if (Tools.versionBeforePacemaker(host)) {
+                /* <attributtes> only til 2.1.4 */
+                final Node attrNode = getChildNode(cpsNode, "attributes");
+                nvpairs = attrNode.getChildNodes();
+            } else {
+                nvpairs = cpsNode.getChildNodes();
             }
+            final Map<String, String> crmConfMap = new HashMap<String, String>();
+            /*              <nvpair...> */
+            for (int i = 0; i < nvpairs.getLength(); i++) {
+                final Node optionNode = nvpairs.item(i);
+                if (optionNode.getNodeName().equals("nvpair")) {
+                    final String name = getAttribute(optionNode, "name");
+                    final String value = getAttribute(optionNode, "value");
+                    crmConfMap.put(name, value);
+                }
+            }
+            cibQueryData.setCrmConfig(crmConfMap);
         }
-        cibQueryData.setCrmConfig(crmConfMap);
 
         /* <nodes> */
         /* xml node with cluster node make stupid variable names, but let's
