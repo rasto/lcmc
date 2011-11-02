@@ -1164,11 +1164,11 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Process output from cluster. */
-    private void processClusterOutput(final String output,
-                                      final StringBuilder clusterStatusOutput,
-                                      final Host host,
-                                      final CountDownLatch firstTime,
-                                      final boolean testOnly) {
+    void processClusterOutput(final String output,
+                                     final StringBuilder clusterStatusOutput,
+                                     final Host host,
+                                     final CountDownLatch firstTime,
+                                     final boolean testOnly) {
         clStatusLock();
         if (clStatusCanceled) {
             clStatusUnlock();
