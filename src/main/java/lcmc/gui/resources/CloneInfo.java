@@ -276,9 +276,15 @@ final class CloneInfo extends ServiceInfo {
                 for (final String hbId : resources) {
                     final ServiceInfo si =
                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                    texts.add(new Subtext("   " + si.toString(),
-                                          null,
-                                          Color.BLACK));
+                    if (si == null) {
+                        texts.add(new Subtext("   unknown",
+                                              null,
+                                              Color.BLACK));
+                    } else {
+                        texts.add(new Subtext("   " + si.toString(),
+                                              null,
+                                              Color.BLACK));
+                    }
                 }
             }
         }
