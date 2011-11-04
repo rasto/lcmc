@@ -103,9 +103,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     value = defaultValue;
                 }
             }
-            if ("".equals(value) && "usage-count".equals(param)) {
-                value = "yes"; /* we don't get this parameter from
-                                  the dump. */
+            if ("usage-count".equals(param)) {
+                value = getComboBoxValue(param);
+                if ("".equals(value)) {
+                    value = "yes"; /* we don't get this parameter from
+                                      the dump. */
+                }
             }
             final String oldValue = getParamSaved(param);
             final GuiComboBox cb = paramComboBoxGet(param, null);
@@ -155,10 +158,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
                 String value = getComboBoxValue(param);
-                if ("usage-count".equals(param)
-                    && (value == null || "".equals(value))) {
-                    value = "yes";
-                }
                 if (value == null || "".equals(value)) {
                     continue;
                 }
