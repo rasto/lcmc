@@ -163,15 +163,18 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     continue;
                 }
                 if (!value.equals(dxml.getParamDefault(param))) {
-                    if (!volumesAvailable
-                        && (isCheckBox(param)
-                            || "booleanhandler".equals(getParamType(param)))) {
+                    if ("disable-ip-verification".equals(param)
+                        || (!volumesAvailable
+                            && (isCheckBox(param)
+                                || "booleanhandler".equals(
+                                                       getParamType(param))))) {
                         if (value.equals(DrbdXML.CONFIG_YES)) {
                             /* boolean parameter */
                             global.append("\t\t" + param + ";\n");
                         }
                     } else {
                         /* also boolean parameter since 8.4 */
+                        /* except of disable-ip-verification */
                         global.append("\t\t");
                         global.append(param);
                         global.append('\t');
