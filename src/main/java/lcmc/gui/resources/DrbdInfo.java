@@ -159,7 +159,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
             for (final String param : params) {
                 String value = getComboBoxValue(param);
                 if (value == null || "".equals(value)) {
-                    continue;
+                    if ("usage-count".equals(param)) {
+                        value = "yes";
+                    } else {
+                        continue;
+                    }
                 }
                 if (!value.equals(dxml.getParamDefault(param))) {
                     if ("disable-ip-verification".equals(param)
