@@ -642,6 +642,8 @@ public abstract class ResourceGraph {
         private final Vertex origFrom;
         /** Originaly to. */
         private final Vertex origTo;
+        /** Colocation in the same direction as an order. */
+        private boolean wrongColocation = false;
         /** Creates new <code>Edge</code> object. */
         Edge(final Vertex from, final Vertex to) {
             mFrom = from;
@@ -662,7 +664,7 @@ public abstract class ResourceGraph {
 
         /** Reverse direction of the edge. */
         void reverse() {
-            setDirection(origTo, origFrom);
+            setDirection(mTo, mFrom);
         }
 
         /** Sets direction of the edge. */
@@ -693,6 +695,14 @@ public abstract class ResourceGraph {
         /** Returns edge label. */
         @Override public final String toString() {
             return " " + getLabelForEdgeStringer(this) + " ";
+        }
+
+        void setWrongColocation(final boolean wrongColocation) {
+            this.wrongColocation = wrongColocation;
+        }
+
+        boolean isWrongColocation() {
+            return wrongColocation;
         }
     }
 

@@ -471,16 +471,22 @@ public final class HeartbeatGraph extends ResourceGraph {
                 try {
                     lockGraph();
                     edge = getGraph().findEdge(vP0, v0);
-
                     if (edge == null) {
                         edge = getGraph().findEdge(v0, vP0);
                         unlockGraph();
                         if (edge != null) {
                             edge.reverse();
+                            if (edgeIsOrderList.contains(edge)) {
+                                edge.setWrongColocation(true);
+                            } else {
+                                edge.setWrongColocation(false);
+                            }
                         }
                     } else {
+                        if (!edgeIsOrderList.contains(edge)) {
+                            edge.setWrongColocation(false);
+                        }
                         unlockGraph();
-                        edge.reset();
                     }
                 } catch (final Exception e) {
                     unlockGraph();
@@ -607,6 +613,11 @@ public final class HeartbeatGraph extends ResourceGraph {
                     edge = getGraph().findEdge(vWithRsc0, vRsc0);
                     if (edge == null) {
                         edge = getGraph().findEdge(vRsc0, vWithRsc0);
+                        if (edge != null) {
+                            edge.setWrongColocation(true);
+                        }
+                    } else {
+                        edge.setWrongColocation(false);
                     }
                     unlockGraph();
                 } catch (final Exception e) {
@@ -1091,7 +1102,7 @@ public final class HeartbeatGraph extends ResourceGraph {
         }
         final StringBuilder sb = new StringBuilder(15);
         final boolean upsideDown = s1X < s2X;
-        final boolean left = hbci.isWithRsc(s2);
+        final boolean left = hbci.isWithRsc(s2) && !e.isWrongColocation();
         if (edgeIsColocation) {
             if ((left && !upsideDown) || (!left && upsideDown)) {
                 sb.append(leftArrow); /* <- */
