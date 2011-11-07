@@ -776,8 +776,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
         }
         final Map<Host, GuiComboBox> addressComboBoxHashClone =
-                (Map<Host, GuiComboBox>)
-                        ((HashMap<Host, GuiComboBox>) addressComboBoxHash).clone();
+                           new HashMap<Host, GuiComboBox>(addressComboBoxHash);
         for (final Host host : addressComboBoxHashClone.keySet()) {
             final GuiComboBox cb = addressComboBoxHashClone.get(host);
             final GuiComboBox wizardCb = addressComboBoxHashWizard.get(host);
@@ -810,8 +809,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
         }
         final Map<Host, GuiComboBox> addressComboBoxHashClone =
-                (Map<Host, GuiComboBox>)
-                        ((HashMap<Host, GuiComboBox>) addressComboBoxHash).clone();
+                          new HashMap<Host, GuiComboBox>(addressComboBoxHash);
         for (final Host host : addressComboBoxHashClone.keySet()) {
             final GuiComboBox cb = addressComboBoxHashClone.get(host);
             final String haSaved = savedHostAddresses.get(host);
