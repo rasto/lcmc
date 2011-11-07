@@ -88,10 +88,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Name of the drbd resource name parameter. */
     static final String DRBD_RES_PARAM_NAME = "name";
     /** A map from host to the combobox with addresses. */
-    private final Map<Host, GuiComboBox> addressComboBoxHash =
+    private Map<Host, GuiComboBox> addressComboBoxHash =
                                              new HashMap<Host, GuiComboBox>();
     /** A map from host to the combobox with addresses for wizard. */
-    private final Map<Host, GuiComboBox> addressComboBoxHashWizard =
+    private Map<Host, GuiComboBox> addressComboBoxHashWizard =
                                              new HashMap<Host, GuiComboBox>();
     /** A map from host to stored addresses. */
     private final Map<Host, String> savedHostAddresses =
@@ -468,8 +468,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         addHostAddresses(optionsPanel,
                          ClusterBrowser.SERVICE_LABEL_WIDTH,
                          ClusterBrowser.SERVICE_FIELD_WIDTH,
-                         false);
-        addHostAddressListeners(false, getApplyButton());
+                         false,
+                         getApplyButton());
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
@@ -775,8 +775,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 pwizardCb.wrongValue();
             }
         }
-        for (final Host host : addressComboBoxHash.keySet()) {
-            final GuiComboBox cb = addressComboBoxHash.get(host);
+        final Map<Host, GuiComboBox> addressComboBoxHashClone =
+                (Map<Host, GuiComboBox>)
+                        ((HashMap<Host, GuiComboBox>) addressComboBoxHash).clone();
+        for (final Host host : addressComboBoxHashClone.keySet()) {
+            final GuiComboBox cb = addressComboBoxHashClone.get(host);
             final GuiComboBox wizardCb = addressComboBoxHashWizard.get(host);
             if (cb.getValue() == null) {
                 correct = false;
@@ -806,8 +809,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
-        for (final Host host : addressComboBoxHash.keySet()) {
-            final GuiComboBox cb = addressComboBoxHash.get(host);
+        final Map<Host, GuiComboBox> addressComboBoxHashClone =
+                (Map<Host, GuiComboBox>)
+                        ((HashMap<Host, GuiComboBox>) addressComboBoxHash).clone();
+        for (final Host host : addressComboBoxHashClone.keySet()) {
+            final GuiComboBox cb = addressComboBoxHashClone.get(host);
             final String haSaved = savedHostAddresses.get(host);
             if (!Tools.areEqual(cb.getValue(), haSaved)) {
                 final GuiComboBox wizardCb =
@@ -887,14 +893,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void addHostAddresses(final JPanel optionsPanel,
                                  final int leftWidth,
                                  final int rightWidth,
-                                 final boolean wizard) {
+                                 final boolean wizard,
+                                 final MyButton thisApplyButton) {
         int rows = 0;
-        if (wizard) {
-            addressComboBoxHashWizard.clear();
-        } else {
-            addressComboBoxHash.clear();
-        }
-
+        final Map<Host, GuiComboBox> newAddressComboBoxHash =
+                                             new HashMap<Host, GuiComboBox>();
         final JPanel panel =
              getParamPanel(Tools.getString("DrbdResourceInfo.HostAddresses"));
         panel.setLayout(new SpringLayout());
@@ -912,22 +915,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             cb.setEditable(true);
             final String haSaved = savedHostAddresses.get(host);
             cb.setValue(haSaved);
-            if (wizard) {
-                addressComboBoxHashWizard.put(host, cb);
-            } else {
-                addressComboBoxHash.put(host, cb);
-            }
+            newAddressComboBoxHash.put(host, cb);
 
         }
 
         /* host addresses combo boxes */
         for (final Host host : getHosts()) {
-            GuiComboBox cb = addressComboBoxHash.get(host);
-            if (wizard) {
-                cb = addressComboBoxHashWizard.get(host);
-            } else {
-                cb = addressComboBoxHash.get(host);
-            }
+            final GuiComboBox cb = newAddressComboBoxHash.get(host);
             final JLabel label = new JLabel(
                             Tools.getString("DrbdResourceInfo.AddressOnHost")
                             + host.getName());
@@ -1010,6 +1004,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
+        addHostAddressListeners(wizard, thisApplyButton, newAddressComboBoxHash);
+        if (wizard) {
+            addressComboBoxHashWizard = newAddressComboBoxHash;
+        } else {
+            addressComboBoxHash = newAddressComboBoxHash;
+        }
     }
 
     /** Ruturns all net interfaces. */
@@ -1063,6 +1063,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* addresses */
         for (final Host host : getHosts()) {
             final GuiComboBox cb = addressComboBoxHash.get(host);
+            if (cb == null) {
+                continue;
+            }
             final String address = cb.getStringValue();
             if (address == null || "".equals(address)) {
                 savedHostAddresses.remove(host);
@@ -1080,17 +1083,19 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Adds host address listeners. */
-    public void addHostAddressListeners(final boolean wizard,
-                                           final MyButton thisApplyButton) {
+    private void addHostAddressListeners(
+                             final boolean wizard,
+                             final MyButton thisApplyButton,
+                             final Map<Host, GuiComboBox> newAddressComboBoxHash) {
         final String[] params = getParametersFromXML();
         for (final Host host : getHosts()) {
             GuiComboBox cb;
             GuiComboBox rcb;
             if (wizard) {
-                cb = addressComboBoxHashWizard.get(host);
+                cb = newAddressComboBoxHash.get(host); /* wizard cb */
                 rcb = addressComboBoxHash.get(host);
             } else {
-                cb = addressComboBoxHash.get(host);
+                cb = newAddressComboBoxHash.get(host); /* normal cb */
                 rcb = null;
             }
             final GuiComboBox comboBox = cb;

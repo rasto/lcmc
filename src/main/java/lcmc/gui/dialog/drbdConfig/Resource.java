@@ -227,8 +227,8 @@ public final class Resource extends DrbdConfig {
         dri.addHostAddresses(optionsPanel,
                              ClusterBrowser.SERVICE_LABEL_WIDTH,
                              ClusterBrowser.SERVICE_FIELD_WIDTH,
-                             true);
-        dri.addHostAddressListeners(true, buttonClass(nextButton()));
+                             true,
+                             buttonClass(nextButton()));
         dri.addWizardParams(
                   optionsPanel,
                   PARAMS,
