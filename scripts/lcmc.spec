@@ -1,14 +1,14 @@
 %global		_name LCMC
 
 Name:		lcmc
-Version:	1.0.2
+Version:	1.0.4
 Release:	1
 Summary:	Pacemaker/KVM/DRBD HA Cluster GUI
 Group:          Applications/System
 License:	GPLv2+
 URL:		http://lcmc.sourceforge.net
 
-Source0:	http://sourceforge.net/projects/lcmc/files/%{_name}-source-1.0.2.tar.gz
+Source0:	http://sourceforge.net/projects/lcmc/files/%{_name}-source-1.0.4.tar.gz
 Source1:	lcmc.startup.script
 Source2:	lcmc.desktop
 Source3:	lcmc.applications
