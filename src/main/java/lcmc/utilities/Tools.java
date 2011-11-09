@@ -115,10 +115,12 @@ import java.io.InputStreamReader;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class provides tools, that are not classified.
@@ -843,6 +845,58 @@ public final class Tools {
     /** Returns cluster names from the parsed save file. */
     public static void loadXML(final String xml) {
         userConfig.loadXML(xml);
+    }
+
+
+    /** Sets user config from command line options.
+        returns host, for which dns lookup failed. */
+    public static String setUserConfigFromOptions(
+                                    final Map<String, List<String>> clusters,
+                                    final MultiKeyMap<String, Boolean> sudos,
+                                    final MultiKeyMap<String, String> users,
+                                    final MultiKeyMap<String, String> ports) {
+        final Map<String, List<Host>> hostMap =
+                                       new LinkedHashMap<String, List<Host>>();
+        for (final String clusterName : clusters.keySet()) {
+            for (final String hostnameEntered : clusters.get(clusterName)) {
+                InetAddress[] addresses = null;
+                try {
+                    addresses = InetAddress.getAllByName(hostnameEntered);
+                } catch (UnknownHostException e) {
+                }
+                String ip = null;
+                if (addresses != null) {
+                    if (addresses.length == 0) {
+                        Tools.debug("lookup failed");
+                        /* lookup failed */
+                    } else {
+                        ip = addresses[0].getHostAddress();
+                    }
+                }
+                if (ip == null) {
+                    return hostnameEntered;
+                }
+                Boolean useSudo = sudos.get(clusterName, hostnameEntered);
+                userConfig.setHost(hostMap,
+                                   users.get(clusterName, hostnameEntered),
+                                   hostnameEntered,
+                                   ip,
+                                   ports.get(clusterName, hostnameEntered),
+                                   null,
+                                   useSudo != null && useSudo,
+                                   false);
+            }
+        }
+        for (final String clusterName : clusters.keySet()) {
+            final Cluster cluster = new Cluster();
+            cluster.setName(clusterName);
+            cluster.setSavable(false);
+            Tools.getConfigData().addClusterToClusters(cluster);
+            for (final String hostName : clusters.get(clusterName)) {
+                userConfig.setHostCluster(hostMap, cluster, hostName);
+            }
+        }
+        return null;
     }
 
     /** Removes all the hosts and clusters from all the panels and data. */

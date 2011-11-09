@@ -103,6 +103,9 @@ public final class UserConfig extends XML {
         final Element hosts = (Element) root.appendChild(
                                                 doc.createElement("hosts"));
         for (final Host host : Tools.getConfigData().getHosts().getHostSet()) {
+            if (!host.isSavable()) {
+                continue;
+            }
             final String hostName = host.getHostname();
             final String ip = host.getIp();
             final String username = host.getUsername();
@@ -140,6 +143,9 @@ public final class UserConfig extends XML {
         final Set<Cluster> clusterSet =
                         Tools.getConfigData().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
+            if (!cluster.isSavable()) {
+                continue;
+            }
             final String clusterName = cluster.getName();
             final Element clusterNode = (Element) clusters.appendChild(
                                                 doc.createElement("cluster"));
@@ -263,34 +269,14 @@ public final class UserConfig extends XML {
                             final Node usernameNode = getChildNode(hostNode,
                                                                    "user");
                             final String username = getText(usernameNode);
-                            Tools.getConfigData().setLastEnteredUser(username);
-                            final Host host = new Host();
-                            host.setHostname(nodeName);
-                            if (sshPort != null) {
-                                host.setSSHPort(sshPort);
-                                Tools.getConfigData().setLastEnteredSSHPort(
-                                                                      sshPort);
-                            }
-                            if (color != null) {
-                                host.setSavedColor(color);
-                            }
-                            Boolean sudo = false;
-                            if (sudo != null && "true".equals(useSudo)) {
-                                sudo = true;
-                                host.setUseSudo(true);
-                            }
-                            Tools.getConfigData().setLastEnteredUseSudo(sudo);
-                            Tools.getConfigData().addHostToHosts(host);
-
-                            new TerminalPanel(host);
-                            host.setIp(ip);
-                            host.setUsername(username);
-                            List<Host> hostList = hostMap.get(nodeName);
-                            if (hostList == null) {
-                                hostList = new ArrayList<Host>();
-                                hostMap.put(nodeName, hostList);
-                            }
-                            hostList.add(host);
+                            setHost(hostMap,
+                                    username,
+                                    nodeName,
+                                    ip,
+                                    sshPort,
+                                    color,
+                                    "true".equals(useSudo),
+                                    true);
                         }
                     }
                 }
@@ -318,6 +304,64 @@ public final class UserConfig extends XML {
         }
     }
 
+    /** Create host object and initialize it from user config. */
+    public void setHost(final Map<String, List<Host>> hostMap,
+                        String username,
+                        final String nodeName,
+                        final String ip,
+                        String sshPort,
+                        final String color,
+                        final boolean sudo,
+                        final boolean savable) {
+        Tools.getConfigData().setLastEnteredUser(username);
+        final Host host = new Host();
+        host.setSavable(savable);
+        host.setHostname(nodeName);
+        if (sshPort == null) {
+            sshPort = "22";
+        }
+        host.setSSHPort(sshPort);
+        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        if (color != null) {
+            host.setSavedColor(color);
+        }
+        host.setUseSudo(sudo);
+        Tools.getConfigData().setLastEnteredUseSudo(sudo);
+        Tools.getConfigData().addHostToHosts(host);
+
+        new TerminalPanel(host);
+        host.setIp(ip);
+        if (username == null && sudo) {
+            username = System.getProperty("user.name");
+        }
+        if (username == null) {
+            username = "root";
+        }
+        host.setUsername(username);
+        List<Host> hostList = hostMap.get(nodeName);
+        if (hostList == null) {
+            hostList = new ArrayList<Host>();
+            hostMap.put(nodeName, hostList);
+        }
+        hostList.add(host);
+    }
+
+    /** Set host as a cluster host. */
+    public void setHostCluster(final Map<String, List<Host>> hostMap,
+                               final Cluster cluster,
+                               final String nodeName) {
+        final List<Host> hostList = hostMap.get(nodeName);
+        if (hostList == null || hostList.isEmpty()) {
+            return;
+        }
+        final Host host = hostList.get(0);
+        hostList.remove(0);
+        if (host != null && host.getCluster() == null) {
+            host.setCluster(cluster);
+            cluster.addHost(host);
+        }
+    }
+
     /**
      * Loads info about hosts from the specified cluster to the internal data
      * objects.
@@ -331,16 +375,7 @@ public final class UserConfig extends XML {
                 final Node hostNode = hosts.item(i);
                 if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
                     final String nodeName = getText(hostNode);
-                    final List<Host> hostList = hostMap.get(nodeName);
-                    if (hostList == null || hostList.isEmpty()) {
-                        continue;
-                    }
-                    final Host host = hostList.get(0);
-                    hostList.remove(0);
-                    if (host != null && host.getCluster() == null) {
-                        host.setCluster(cluster);
-                        cluster.addHost(host);
-                    }
+                    setHostCluster(hostMap, cluster, nodeName);
                 }
             }
         }

@@ -262,6 +262,8 @@ public final class Host {
     /** Volume group with all lvs in it. */
     private Map<String, Set<String>> volumeGroupsLVS =
                                             new HashMap<String, Set<String>>();
+    /** Whether this cluster should be saved. */
+    private boolean savable = true;
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1213,6 +1215,9 @@ public final class Host {
 
     /** Return first hop ip. */
     public String getFirstIp() {
+        if (ip == null) {
+            return null;
+        }
         final String[] ips = ip.split(",");
         return ips[0];
     }
@@ -2650,4 +2655,15 @@ public final class Host {
     public List<String> getPhysicalVolumes() {
         return physicalVolumes;
     }
+
+    /** Set whether this host should be saved. */
+    public void setSavable(final boolean savable) {
+        this.savable = savable;
+    }
+
+    /** Return whether this host should be saved. */
+    public boolean isSavable() {
+        return savable;
+    }
+
 }

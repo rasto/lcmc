@@ -65,6 +65,9 @@ public final class Cluster {
                                   new Color(255, 100, 0), /* orange */
                                   Color.WHITE,
                                  };
+    /** Whether this cluster should be saved. */
+    private boolean savable = true;
+
 
     /** Prepares a new <code>Cluster</code> object. */
     public Cluster() {
@@ -342,5 +345,15 @@ public final class Cluster {
             }
         }
         return minVersion;
+    }
+
+    /** Set whether this cluster should be saved. */
+    public void setSavable(final boolean savable) {
+        this.savable = savable;
+    }
+
+    /** Return whether this cluster should be saved. */
+    public boolean isSavable() {
+        return savable;
     }
 }

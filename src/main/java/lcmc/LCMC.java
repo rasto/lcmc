@@ -46,18 +46,22 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.Container;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.PrintStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import javax.swing.plaf.metal.OceanTheme;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
-
-
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
@@ -121,6 +125,16 @@ public final class LCMC extends JPanel {
     private static final String OUT_OP = "out";
     /** The --debug option. */
     private static final String DEBUG_OP = "debug";
+    /** The --cluster option. */
+    private static final String CLUSTER_OP = "cluster";
+    /** The --host option. */
+    private static final String HOST_OP = "host";
+    /** The --user option. */
+    private static final String USER_OP = "user";
+    /** The --sudo option. */
+    private static final String SUDO_OP = "sudo";
+    /** The --port option. */
+    private static final String PORT_OP = "port";
 
     /**
      * Private constructor.
@@ -377,6 +391,26 @@ public final class LCMC extends JPanel {
                      DEBUG_OP,
                      true,
                      "debug level, 0 - none, 3 - all");
+        options.addOption("c",
+                          CLUSTER_OP,
+                          true,
+                          "define a cluster");
+        options.addOption("h",
+                          HOST_OP,
+                          true,
+                          "define a cluster, used with --cluster option");
+        options.addOption(null,
+                          SUDO_OP,
+                          false,
+                          "whether to use sudo, used with --cluster option");
+        options.addOption(null,
+                          USER_OP,
+                          true,
+                          "user to use with sudo, used with --cluster option");
+        options.addOption(null,
+                          PORT_OP,
+                          true,
+                          "ssh port, used with --cluster option");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -400,6 +434,9 @@ public final class LCMC extends JPanel {
                     throw new ParseException(
                                         "cannot parse debug level: " + level);
                 }
+            }
+            if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
+                parseClusterOptions(cmd);
             }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
@@ -491,6 +528,78 @@ public final class LCMC extends JPanel {
             System.exit(1);
         }
         return autoArgs;
+    }
+
+    /** Parse cluster options and create cluster button. */
+    private static void parseClusterOptions(final CommandLine cmd)
+    throws ParseException {
+        String clusterName = null;
+        String hostName = null;
+        final Map<String, List<String>> clusters =
+                            new LinkedHashMap<String, List<String>>();
+        final MultiKeyMap<String, Boolean> sudos =
+                                            new MultiKeyMap<String, Boolean>();
+        final MultiKeyMap<String, String> users =
+                                            new MultiKeyMap<String, String>();
+        final MultiKeyMap<String, String> ports =
+                                            new MultiKeyMap<String, String>();
+        for (final Option option : cmd.getOptions()) {
+            final String op = option.getLongOpt();
+            if (CLUSTER_OP.equals(op)) {
+                clusterName = option.getValue();
+                if (clusterName == null) {
+                    throw new ParseException(
+                                "could not parse " + CLUSTER_OP + " option");
+
+                }
+                clusters.put(clusterName, new ArrayList<String>());
+            } else if (HOST_OP.equals(op)) {
+                hostName = option.getValue();
+                if (clusterName == null) {
+                    clusterName = "default";
+                    clusters.put(clusterName, new ArrayList<String>());
+                }
+                if (hostName == null) {
+                    throw new ParseException(
+                                    "could not parse " + HOST_OP + " option");
+                }
+                clusters.get(clusterName).add(hostName);
+            } else if (SUDO_OP.equals(op)) {
+                if (hostName == null) {
+                    throw new ParseException(
+                                SUDO_OP + " must be defined after " + HOST_OP);
+                }
+                sudos.put(clusterName, hostName, true);
+            } else if (USER_OP.equals(op)) {
+                if (hostName == null) {
+                    throw new ParseException(
+                                USER_OP + " must be defined after " + HOST_OP);
+                }
+                final String userName = option.getValue();
+                if (userName == null) {
+                    throw new ParseException(
+                                    "could not parse " + USER_OP + " option");
+                }
+                users.put(clusterName, hostName, userName);
+            } else if (PORT_OP.equals(op)) {
+                if (hostName == null) {
+                    throw new ParseException(
+                                PORT_OP + " must be defined after " + HOST_OP);
+                }
+                final String port = option.getValue();
+                if (port == null) {
+                    throw new ParseException(
+                                    "could not parse " + PORT_OP + " option");
+                }
+                ports.put(clusterName, hostName, port);
+            }
+        }
+        final String failedHost =
+                Tools.setUserConfigFromOptions(clusters, sudos, users, ports);
+        if (failedHost != null) {
+            throw new ParseException("could not resolve host \"" + failedHost
+                                     + "\"");
+        }
     }
 
     /** The main function for starting the application. */
