@@ -25,7 +25,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.Clusters;
-import lcmc.data.DrbdGuiXML;
+import lcmc.data.UserConfig;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.Info;
@@ -155,7 +155,7 @@ public final class Tools {
     /** Gui data object. */
     private static GUIData guiData;
     /** Drbd gui xml object. */
-    private static DrbdGuiXML drbdGuiXML = new DrbdGuiXML();
+    private static UserConfig userConfig = new UserConfig();
     /** String that starts error messages. */
     private static final String ERROR_STRING = "ERROR: ";
     /** String that starts info messages. */
@@ -801,7 +801,7 @@ public final class Tools {
         if (xml == null) {
             return;
         }
-        drbdGuiXML.startClusters(null);
+        userConfig.startClusters(null);
         Tools.getGUIData().allHostsUpdate();
     }
 
@@ -810,7 +810,7 @@ public final class Tools {
      * clusters.
      */
     public static void startClusters(final List<Cluster> selectedClusters) {
-        drbdGuiXML.startClusters(selectedClusters);
+        userConfig.startClusters(selectedClusters);
     }
 
     /** Stops the specified clusters in the gui. */
@@ -842,7 +842,7 @@ public final class Tools {
 
     /** Returns cluster names from the parsed save file. */
     public static void loadXML(final String xml) {
-        drbdGuiXML.loadXML(xml);
+        userConfig.loadXML(xml);
     }
 
     /** Removes all the hosts and clusters from all the panels and data. */
@@ -869,7 +869,7 @@ public final class Tools {
         startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
-            drbdGuiXML.saveXML(fileOut);
+            userConfig.saveXML(fileOut);
             debug("saved: " + filename, 0);
         } catch (IOException e) {
             appError("error saving: " + filename, "", e);

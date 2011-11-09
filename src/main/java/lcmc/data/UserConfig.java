@@ -52,15 +52,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.swing.SwingUtilities;
 
 /**
- * This class parses xml from drbdsetup and drbdadm, stores the
- * information in the hashes and provides methods to get this
- * information.
- * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
+ * This class parses xml from user configs and creates data objects,
+ * that describe the hosts and clusters.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
-public final class DrbdGuiXML extends XML {
+public final class UserConfig extends XML {
     /** Host name attribute string. */
     private static final String HOST_NAME_ATTR = "name";
     /** Host ssh port attribute string. */
