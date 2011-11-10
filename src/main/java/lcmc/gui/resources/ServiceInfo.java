@@ -4455,7 +4455,7 @@ public class ServiceInfo extends EditableInfo {
             final List<Host> dirtyHosts = new ArrayList<Host>();
             for (final Host host : getBrowser().getClusterHosts()) {
                 if (isInLRMOnHost(host.getName(), testOnly)
-                    || failedOnHost(host.getName(), testOnly)) {
+                    || getFailCount(host.getName(), testOnly) != null) {
                     dirtyHosts.add(host);
                 }
             }
