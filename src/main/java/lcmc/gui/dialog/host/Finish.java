@@ -81,7 +81,7 @@ final class Finish extends DialogHost {
     @Override protected void finishDialog() {
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
-            Tools.save(saveFile);
+            Tools.save(saveFile, false);
         }
     }
 

@@ -77,7 +77,8 @@ public final class UserConfig extends XML {
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
 
     /** Saves data about clusters and hosts to the supplied output stream. */
-    public String saveXML(final OutputStream outputStream) throws IOException {
+    public String saveXML(final OutputStream outputStream,
+                          final boolean saveAll) throws IOException {
         final String encoding = "UTF-8";
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;
@@ -103,9 +104,10 @@ public final class UserConfig extends XML {
         final Element hosts = (Element) root.appendChild(
                                                 doc.createElement("hosts"));
         for (final Host host : Tools.getConfigData().getHosts().getHostSet()) {
-            if (!host.isSavable()) {
+            if (!saveAll && !host.isSavable()) {
                 continue;
             }
+            host.setSavable(true);
             final String hostName = host.getHostname();
             final String ip = host.getIp();
             final String username = host.getUsername();
@@ -143,9 +145,10 @@ public final class UserConfig extends XML {
         final Set<Cluster> clusterSet =
                         Tools.getConfigData().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
-            if (!cluster.isSavable()) {
+            if (!saveAll && !cluster.isSavable()) {
                 continue;
             }
+            cluster.setSavable(true);
             final String clusterName = cluster.getName();
             final Element clusterNode = (Element) clusters.appendChild(
                                                 doc.createElement("cluster"));

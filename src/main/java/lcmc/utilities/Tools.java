@@ -913,8 +913,10 @@ public final class Tools {
      *
      * @param filename
      *          filename where are the data stored.
+     * @param saveAll
+                whether to save clusters specified from the command line
      */
-    public static void save(final String filename) {
+    public static void save(final String filename, final boolean saveAll) {
         debug("save");
         final String text =
             Tools.getString("Tools.Saving").replaceAll(
@@ -923,7 +925,7 @@ public final class Tools {
         startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
-            userConfig.saveXML(fileOut);
+            userConfig.saveXML(fileOut, saveAll);
             debug("saved: " + filename, 0);
         } catch (IOException e) {
             appError("error saving: " + filename, "", e);

@@ -304,7 +304,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(
                     new Runnable() {
                         @Override public void run() {
-                            Tools.save(Tools.getConfigData().getSaveFile());
+                            Tools.save(Tools.getConfigData().getSaveFile(),
+                                       true);
                         }
                     }
                  );
@@ -351,7 +352,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      final String name =
                                     fc.getSelectedFile().getAbsolutePath();
                      Tools.getConfigData().setSaveFile(name);
-                     Tools.save(Tools.getConfigData().getSaveFile());
+                     Tools.save(Tools.getConfigData().getSaveFile(), true);
                  }
 
              }

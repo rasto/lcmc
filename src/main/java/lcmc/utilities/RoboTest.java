@@ -4001,7 +4001,7 @@ public final class RoboTest {
     }
 
     private static void saveAndExit() {
-        Tools.save(Tools.getConfigData().getSaveFile());
+        Tools.save(Tools.getConfigData().getSaveFile(), false);
         sleepNoFactor(10000);
         System.exit(0);
     }

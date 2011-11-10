@@ -254,7 +254,7 @@ public final class LCMC extends JPanel {
         t.start();
         Tools.getGUIData().getMainFrame().setVisible(false);
         final String saveFile = Tools.getConfigData().getSaveFile();
-        Tools.save(saveFile);
+        Tools.save(saveFile, false);
         Tools.getConfigData().disconnectAllHosts();
     }
 

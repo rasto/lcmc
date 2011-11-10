@@ -160,7 +160,7 @@ public final class AllHostsInfo extends Info {
                 Tools.stopClusters(selectedRunningClusters);
                 Tools.removeClusters(selectedClusters);
                 final String saveFile = Tools.getConfigData().getSaveFile();
-                Tools.save(saveFile);
+                Tools.save(saveFile, false);
                 mainPanel.repaint();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override public void run() {

@@ -60,7 +60,7 @@ final class Finish extends DialogCluster {
         Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
-            Tools.save(saveFile);
+            Tools.save(saveFile, false);
         }
     }
 
