@@ -597,8 +597,8 @@ public final class LCMC extends JPanel {
         final String failedHost =
                 Tools.setUserConfigFromOptions(clusters, sudos, users, ports);
         if (failedHost != null) {
-            throw new ParseException("could not resolve host \"" + failedHost
-                                     + "\"");
+            Tools.appWarning("could not resolve host \"" + failedHost
+                             + "\" skipping");
         }
     }
 
