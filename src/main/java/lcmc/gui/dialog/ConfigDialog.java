@@ -448,7 +448,7 @@ public abstract class ConfigDialog {
             for (int i = 0; i < buttons.length; i++) {
                 options[i] = new MyButton(buttons[i], icons[i]);
                 options[i].setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
                 allOptions.add(options[i]);
                 buttonToObjectMap.put(buttons[i], options[i]);
                 if (buttons[i].equals(defaultButton())) {

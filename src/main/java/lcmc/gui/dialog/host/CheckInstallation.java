@@ -145,7 +145,7 @@ final class CheckInstallation extends DialogHost {
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 drbdButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                                 Tools.getDefaultColor("ConfigDialog.Button"));
                 drbdButton.setEnabled(false);
                 drbdInstMethodCB.setEnabled(false);
                 pmButton.setEnabled(false);
@@ -198,7 +198,7 @@ final class CheckInstallation extends DialogHost {
         );
 
         hbPmButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
         hbPmButton.addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {
@@ -216,7 +216,7 @@ final class CheckInstallation extends DialogHost {
         );
 
         pmButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
         pmButton.addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {

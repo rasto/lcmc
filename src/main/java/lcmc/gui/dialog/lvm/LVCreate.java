@@ -173,7 +173,7 @@ public final class LVCreate extends LV {
         final JPanel pane = new JPanel(new SpringLayout());
         /* name, size etc. */
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(Browser.STATUS_BACKGROUND);
+        inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
         inputPane.add(new JLabel("Group"));
         inputPane.add(new JLabel(volumeGroup));

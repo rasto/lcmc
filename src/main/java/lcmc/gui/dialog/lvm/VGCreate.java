@@ -200,7 +200,7 @@ public final class VGCreate extends LV {
         final JPanel pane = new JPanel(new SpringLayout());
         /* vg name */
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(Browser.STATUS_BACKGROUND);
+        inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
         /* find next free group volume name */
         String defaultName;

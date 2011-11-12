@@ -994,7 +994,7 @@ public final class ServicesInfo extends EditableInfo {
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+        buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));

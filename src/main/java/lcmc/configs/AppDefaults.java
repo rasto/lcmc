@@ -39,6 +39,8 @@ public final class AppDefaults extends java.util.ListResourceBundle {
 
     /** Light background color. */
     public static final Color BACKGROUND_LIGHT = new Color(227, 227, 227);
+    /** Light blue background color. */
+    public static final Color BACKGROUND_LIGHT2 = new Color(210, 230, 251);
 
 
     /** Get contents. */
@@ -151,6 +153,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"ConfigDialog.Background",          Color.WHITE },
         {"ConfigDialog.Background.Dark",     BACKGROUND },
         {"ConfigDialog.Background.Light",    BACKGROUND_LIGHT },
+        {"ConfigDialog.Button",              BACKGROUND_LIGHT2 },
         {"ConfigDialog.AnswerPane",          Color.BLACK },
         {"ConfigDialog.AnswerPane.Error",    Color.RED },
         {"ProgressBar.Background",           Color.WHITE },

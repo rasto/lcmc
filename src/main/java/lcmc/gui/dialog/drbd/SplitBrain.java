@@ -140,7 +140,7 @@ public final class SplitBrain extends DrbdConfig {
     @Override protected void initDialog() {
         super.initDialog();
         resolveButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -154,7 +154,6 @@ public final class SplitBrain extends DrbdConfig {
      */
     @Override protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
-
         /* host */
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(

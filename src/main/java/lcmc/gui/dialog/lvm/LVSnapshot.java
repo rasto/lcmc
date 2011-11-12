@@ -147,7 +147,7 @@ public final class LVSnapshot extends LV {
         snapshotButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(Browser.STATUS_BACKGROUND);
+        inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
         final String volumeGroup =
                             blockDevInfo.getBlockDevice().getVolumeGroup();

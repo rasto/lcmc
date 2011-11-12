@@ -240,9 +240,6 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Overloaded in order to paint the background. */
     @Override protected final void paintComponent(final Graphics g) {
         if (!isEnabled()) {
-            setContentAreaFilled(false);  // *
-            g.setColor(color2);
-            g.fillRect(0, 0, getWidth(), getHeight());
             super.paintComponent(g);
             return;
         }

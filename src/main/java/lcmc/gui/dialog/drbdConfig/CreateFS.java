@@ -195,7 +195,7 @@ final class CreateFS extends DrbdConfig {
     @Override protected void initDialog() {
         super.initDialog();
         makeFsButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
     }
 

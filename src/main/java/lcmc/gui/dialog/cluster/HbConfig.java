@@ -283,7 +283,7 @@ final class HbConfig extends DialogCluster {
         optionValues.put(AUTOJOIN, new String[]{"", "any", "other", "none"});
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
-                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                              Tools.getDefaultColor("ConfigDialog.Button"));
         makeConfigButton.setEnabled(false);
         makeConfigButton.addActionListener(
             new ActionListener() {
@@ -797,6 +797,8 @@ final class HbConfig extends DialogCluster {
     private MyButton getRemoveButton(final CastAddress c) {
         final MyButton removeButton = new MyButton(
                    Tools.getString("Dialog.Cluster.HbConfig.RemoveIntButton"));
+        removeButton.setBackgroundColor(
+                                Tools.getDefaultColor("ConfigDialog.Button"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH,
                                                   REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH,
@@ -1191,7 +1193,7 @@ final class HbConfig extends DialogCluster {
         addButton = new MyButton(
                       Tools.getString("Dialog.Cluster.HbConfig.AddIntButton"));
         addButton.setBackgroundColor(
-                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                                Tools.getDefaultColor("ConfigDialog.Button"));
         addButton.addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {

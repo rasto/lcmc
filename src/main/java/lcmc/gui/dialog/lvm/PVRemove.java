@@ -120,7 +120,7 @@ public final class PVRemove extends LV {
         removeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(Browser.STATUS_BACKGROUND);
+        inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
         inputPane.add(new JLabel("Block Device:"));
         inputPane.add(new JLabel(blockDevInfo.getName()));

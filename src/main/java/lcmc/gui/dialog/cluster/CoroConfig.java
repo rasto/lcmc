@@ -149,7 +149,7 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
-                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                                  Tools.getDefaultColor("ConfigDialog.Button"));
         makeConfigButton.addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {
@@ -236,7 +236,7 @@ final class CoroConfig extends DialogCluster {
         super.initDialog();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
         configPanel.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background"));
+                           Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -524,7 +524,7 @@ final class CoroConfig extends DialogCluster {
                     l.setBackground(Color.WHITE);
                     final JPanel labelP = new JPanel();
                     labelP.setBackground(
-                            Tools.getDefaultColor("ConfigDialog.Background"));
+                             Tools.getDefaultColor("ConfigDialog.Background"));
                     labelP.setLayout(new BoxLayout(labelP, BoxLayout.Y_AXIS));
                     labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                     labelP.add(l);
@@ -679,7 +679,7 @@ final class CoroConfig extends DialogCluster {
         final MyButton removeButton = new MyButton(
               Tools.getString("Dialog.Cluster.CoroConfig.RemoveIntButton"));
         removeButton.setBackgroundColor(
-                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                            Tools.getDefaultColor("ConfigDialog.Button"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH,
                                                   REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH,
@@ -975,7 +975,7 @@ final class CoroConfig extends DialogCluster {
         addButton = new MyButton(
                      Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));
         addButton.setBackgroundColor(
-                      Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                                Tools.getDefaultColor("ConfigDialog.Button"));
         addButton.addActionListener(
             new ActionListener() {
                 @Override public void actionPerformed(final ActionEvent e) {

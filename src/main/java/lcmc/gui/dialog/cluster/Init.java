@@ -626,7 +626,7 @@ public class Init extends DialogCluster {
             final MyButton drbdb = new MyButton(
                        Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
             drbdb.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
             drbdLoadButtons.add(drbdb);
             drbdLoadButtons.get(i).setVisible(false);
 
@@ -675,7 +675,7 @@ public class Init extends DialogCluster {
                          Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
             button.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
             hbStartButtons.add(button);
             hbStartButtons.get(i).setVisible(false);
 
@@ -731,7 +731,7 @@ public class Init extends DialogCluster {
             final MyButton pmsb = new MyButton(
                       Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
             pmsb.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
             pmStartButtons.add(pmsb);
             pmStartButtons.get(i).setVisible(false);
 

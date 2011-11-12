@@ -181,7 +181,7 @@ public final class HostDrbdInfo extends Info {
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.EAST);
         final JPanel p = new JPanel(new SpringLayout());
-        p.setBackground(HostBrowser.STATUS_BACKGROUND);
+        p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
         p.add(procDrbdButton);
         p.add(drbdProcsButton);

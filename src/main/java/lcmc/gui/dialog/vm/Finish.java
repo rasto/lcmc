@@ -104,7 +104,8 @@ final class Finish extends VMConfig {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         final MyButton createConfigBtn = new MyButton("Create Config");
-        createConfigBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
+        createConfigBtn.setBackgroundColor(
+                                 Tools.getDefaultColor("ConfigDialog.Button"));
         createConfigBtn.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {

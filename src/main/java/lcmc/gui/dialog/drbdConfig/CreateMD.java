@@ -221,7 +221,7 @@ final class CreateMD extends DrbdConfig {
     @Override protected void initDialog() {
         super.initDialog();
         makeMDButton.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+                               Tools.getDefaultColor("ConfigDialog.Button"));
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isHaveToCreateMD()) {
             enableComponentsLater(new JComponent[]{});
         } else {
