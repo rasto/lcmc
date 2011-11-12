@@ -395,10 +395,13 @@ public final class LCMC extends JPanel {
                           CLUSTER_OP,
                           true,
                           "define a cluster");
-        options.addOption("h",
-                          HOST_OP,
-                          true,
-                          "define a cluster, used with --cluster option");
+        final Option hostOp =
+                new Option("h",
+                           HOST_OP,
+                           true,
+                           "define a cluster, used with --cluster option");
+        hostOp.setArgs(10000);
+        options.addOption(hostOp);
         options.addOption(null,
                           SUDO_OP,
                           false,
@@ -534,7 +537,7 @@ public final class LCMC extends JPanel {
     private static void parseClusterOptions(final CommandLine cmd)
     throws ParseException {
         String clusterName = null;
-        String hostName = null;
+        String[] hostNames = null;
         final Map<String, List<String>> clusters =
                             new LinkedHashMap<String, List<String>>();
         final MultiKeyMap<String, Boolean> sudos =
@@ -554,24 +557,28 @@ public final class LCMC extends JPanel {
                 }
                 clusters.put(clusterName, new ArrayList<String>());
             } else if (HOST_OP.equals(op)) {
-                hostName = option.getValue();
+                hostNames = option.getValues();
                 if (clusterName == null) {
                     clusterName = "default";
                     clusters.put(clusterName, new ArrayList<String>());
                 }
-                if (hostName == null) {
+                if (hostNames == null) {
                     throw new ParseException(
                                     "could not parse " + HOST_OP + " option");
                 }
-                clusters.get(clusterName).add(hostName);
+                for (final String hostName : hostNames) {
+                    clusters.get(clusterName).add(hostName);
+                }
             } else if (SUDO_OP.equals(op)) {
-                if (hostName == null) {
+                if (hostNames == null) {
                     throw new ParseException(
                                 SUDO_OP + " must be defined after " + HOST_OP);
                 }
-                sudos.put(clusterName, hostName, true);
+                for (final String hostName : hostNames) {
+                    sudos.put(clusterName, hostName, true);
+                }
             } else if (USER_OP.equals(op)) {
-                if (hostName == null) {
+                if (hostNames == null) {
                     throw new ParseException(
                                 USER_OP + " must be defined after " + HOST_OP);
                 }
@@ -580,9 +587,11 @@ public final class LCMC extends JPanel {
                     throw new ParseException(
                                     "could not parse " + USER_OP + " option");
                 }
-                users.put(clusterName, hostName, userName);
+                for (final String hostName : hostNames) {
+                    users.put(clusterName, hostName, userName);
+                }
             } else if (PORT_OP.equals(op)) {
-                if (hostName == null) {
+                if (hostNames == null) {
                     throw new ParseException(
                                 PORT_OP + " must be defined after " + HOST_OP);
                 }
@@ -591,7 +600,9 @@ public final class LCMC extends JPanel {
                     throw new ParseException(
                                     "could not parse " + PORT_OP + " option");
                 }
-                ports.put(clusterName, hostName, port);
+                for (final String hostName : hostNames) {
+                    ports.put(clusterName, hostName, port);
+                }
             }
         }
         final String failedHost =
