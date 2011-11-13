@@ -15,6 +15,10 @@
 	<property name="spec.file"	value="lcmc.spec"/>
 	<property name="doc.dir"	value="doc"/>
 	<property name="man.file"	value="lcmc.1"/>
+	<property name="rpmbuild.dir"	value="${build.dir}/rpm"/>
+	<property name="startup.script"	value="lcmc.startup.script"/>
+	<property name="lcmc.desktop.script" value="lcmc.desktop"/>
+	<property name="lcmc.applications.script" value="lcmc.applications"/>
 
 	<loadproperties> 
 	<file file="${resources.dir}/release.properties"/> 
@@ -26,6 +30,7 @@
 	<target name="clean">
 		<delete dir="${build.dir}/classes/lcmc/"/>
 		<delete dir="${build.dir}/classes/plugins/"/>
+		<delete dir="${build.dir}/rpm/"/>
 		<delete dir="${jar.dir}"/>
 	</target>
 	
@@ -33,6 +38,7 @@
 		<delete dir="${jar.dir}"/>
 		<delete dir="${signed.dir}"/>
 		<delete dir="${build.dir}/classes/"/>
+		<delete dir="${build.dir}/rpm/"/>
 	</target>
 	
 	<target name="compile">
@@ -62,6 +68,7 @@
 		 target="1.6"
 		>
 		  <classpath>
+		   <pathelement location="/usr/share/java/jai_core.jar"/>
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
@@ -297,7 +304,7 @@
                 </copy>
                 <tar tarfile="${tarball.tar}"
                      basedir="/tmp/"
-                     includes="${project}/src/** ${project}/build.xml ${project}/README ${project}/debian/**" />
+                     includes="${project}/src/** ${project}/build.xml ${project}/README ${project}/debian/** ${project}/LICENSE.txt ${project}/doc/lcmc.1" />
                 <gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
                 <delete file="${tarball.tar}"/>
                 <delete dir="/tmp/${project}"/>
@@ -322,14 +329,6 @@
 			</classpath>
 		</java>
 	</target>
-	<target name="spec">
-		<copy tofile="${scripts.dir}/${spec.file}"
-		      file="${scripts.dir}/${spec.file}.in"
-		      overwrite="yes"/>
-		<replace file="${scripts.dir}/${spec.file}"
-			 token="@LCMC-VERSION@"
-			 value="${release}"/>
-	</target>
 	<target name="man">
 		<copy tofile="${doc.dir}/${man.file}"
 		      file="${doc.dir}/${man.file}.in"
@@ -340,5 +339,33 @@
 		<replace file="${doc.dir}/${man.file}"
 			 token="@LCMC-VERSION@"
 			 value="${release}"/>
+	</target>
+	<target name="rpm" depends="man,dist">
+		<copy tofile="${rpmbuild.dir}/SPECS/${spec.file}"
+		      file="${scripts.dir}/${spec.file}.in"
+		      overwrite="yes"/>
+		<move tofile="${rpmbuild.dir}/SOURCES/${tarball.tar.gz}"
+		      file="${tarball.tar.gz}"
+		      overwrite="yes"/>
+		<replace file="${rpmbuild.dir}/SPECS/${spec.file}"
+			 token="@LCMC-VERSION@"
+			 value="${release}"/>
+		<copy tofile="${rpmbuild.dir}/SOURCES/${startup.script}"
+		      file="${scripts.dir}/${startup.script}"
+		      overwrite="yes"/>
+		<copy tofile="${rpmbuild.dir}/SOURCES/${lcmc.desktop.script}"
+		      file="${scripts.dir}/${lcmc.desktop.script}"
+		      overwrite="yes"/>
+		<copy tofile="${rpmbuild.dir}/SOURCES/${lcmc.applications.script}"
+		      file="${scripts.dir}/${lcmc.applications.script}"
+		      overwrite="yes"/>
+		<rpm specFile="lcmc.spec"
+			topDir="${rpmbuild.dir}"
+			cleanBuildDir="true"
+			failOnError="true"/>
+		<move todir=".">
+		      <fileset dir="${rpmbuild.dir}/RPMS/noarch/"
+		      	       includes="**/*.rpm"/>
+		</move>
 	</target>
 </project>

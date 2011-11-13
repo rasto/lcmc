@@ -28,14 +28,16 @@ BuildArch:	noarch
 Linux Cluster Management Console.
 
 %files
-%doc
-%{_datadir}/*
-%{_datadir}/application-registry/*
-%{_datadir}/pixmaps/lcmc.png
-%{_datadir}/lcmc
+%doc lcmc-%{version}/README
+%doc lcmc-%{version}/LICENSE.txt
+
+%{_datadir}/java/LCMC.jar
+%{_datadir}/application-registry/lcmc.applications
+%{_datadir}/applications/lcmc.desktop
 %{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+%{_datadir}/pixmaps/lcmc.png
+%{_mandir}/man1/lcmc.1.gz
 %{_bindir}/lcmc
-%{_datadir}/lcmc
 
 #--------------------------------------------------------------------
 
@@ -52,14 +54,18 @@ cd lcmc-%{version}
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_datadir}
 install -d $RPM_BUILD_ROOT%{_bindir}
-install -pm 644 lcmc/build/jar/LCMC.jar $RPM_BUILD_ROOT%{_datadir}/LCMC.jar
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/java
+install -pm 644 lcmc-%{version}/build/jar/LCMC.jar $RPM_BUILD_ROOT%{_datadir}/java/LCMC.jar
 install -p -D -m 0755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/lcmc
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/lcmc
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps
-install -m 644 lcmc/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/lcmc.png
-install -m 644 lcmc/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+install -m 644 lcmc-%{version}/doc/lcmc.1 $RPM_BUILD_ROOT%{_mandir}/man1/lcmc.1
+gzip $RPM_BUILD_ROOT%{_mandir}/man1/lcmc.1
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications
 desktop-file-install \
