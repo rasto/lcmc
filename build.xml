@@ -13,6 +13,8 @@
 	<property name="build.coverage.dir"	value="build-coverage"/>
 	<property name="scripts.dir"	value="scripts"/>
 	<property name="spec.file"	value="lcmc.spec"/>
+	<property name="doc.dir"	value="doc"/>
+	<property name="man.file"	value="lcmc.1"/>
 
 	<loadproperties> 
 	<file file="${resources.dir}/release.properties"/> 
@@ -20,7 +22,6 @@
 	
 	<property name="main-class"  value="lcmc.LCMC"/>
 	<tstamp/>
-	<property name="now" value="${DSTAMP}-${TSTAMP}" />
 	
 	<target name="clean">
 		<delete dir="${build.dir}/classes/lcmc/"/>
@@ -326,6 +327,17 @@
 		      file="${scripts.dir}/${spec.file}.in"
 		      overwrite="yes"/>
 		<replace file="${scripts.dir}/${spec.file}"
+			 token="@LCMC-VERSION@"
+			 value="${release}"/>
+	</target>
+	<target name="man">
+		<copy tofile="${doc.dir}/${man.file}"
+		      file="${doc.dir}/${man.file}.in"
+		      overwrite="yes"/>
+		<replace file="${doc.dir}/${man.file}"
+			 token="@LCMC-DATE@"
+			 value="${TODAY}"/>
+		<replace file="${doc.dir}/${man.file}"
 			 token="@LCMC-VERSION@"
 			 value="${release}"/>
 	</target>

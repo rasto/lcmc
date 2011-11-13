@@ -1,4 +1,4 @@
-.TH lcmc "1" "2011-10-01" "lcmc 1.0.4" "User Commands"
+.TH lcmc "1" "@LCMC-DATE@" "lcmc @LCMC-VERSION@" "User Commands"
 
 .SH NAME
 lcmc \- a cluster GUI
@@ -12,6 +12,11 @@ LCMC is a Java GUI that configures, manages and visualizes Linux clusters
 in a way that is not possible to be web-based. Specificaly it manages
 clusters that use one or more of these components: Pacemaker, Corosync,
 Heartbeat, DRBD, KVM, XEN and LVM.
+
+usage:
+lcmc -h host1 host2 ...
+
+lcmc --help
 
 .SH AUTHOR
 Written by Rasto Levrinc.
