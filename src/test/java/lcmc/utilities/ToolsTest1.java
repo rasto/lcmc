@@ -207,7 +207,7 @@ public final class ToolsTest1 extends TestCase {
             assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK",
                                       TestSuite1.INTERACTIVE));
             final String testFile = "/tmp/lcmc-test-file";
-            Tools.save(testFile);
+            Tools.save(testFile, false);
             final String file = Tools.loadFile(testFile,
                                                TestSuite1.INTERACTIVE);
             assertNotNull(file);

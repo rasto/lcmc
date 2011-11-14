@@ -169,7 +169,7 @@ public final class TestSuite1 {
                 host.setCluster(cluster);
                 cluster.addHost(host);
                 final String saveFile = Tools.getConfigData().getSaveFile();
-                Tools.save(saveFile);
+                Tools.save(saveFile, false);
             }
             for (int i = 0; i <= getFactor() / 100; i++) {
                 for (final Host host : HOSTS) {
@@ -196,7 +196,7 @@ public final class TestSuite1 {
 
             Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
             final String saveFile = Tools.getConfigData().getSaveFile();
-            Tools.save(saveFile);
+            Tools.save(saveFile, false);
             Tools.getGUIData().refreshClustersPanel();
 
             Tools.getGUIData().expandTerminalSplitPane(1);
