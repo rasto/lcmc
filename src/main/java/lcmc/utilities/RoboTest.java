@@ -2384,7 +2384,7 @@ public final class RoboTest {
         leftPress(); /* scroll bar */
         moveTo(1100, 502);
         leftRelease();
-        moveTo(956, 445 + yCorr);
+        moveTo(956, 442 + yCorr);
         leftClick(); /* start timeout */
         press(KeyEvent.VK_2);
         sleep(200);
