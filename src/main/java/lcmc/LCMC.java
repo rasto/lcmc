@@ -45,6 +45,7 @@ import javax.swing.JMenuBar;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.Container;
+import java.awt.Image;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -618,8 +619,13 @@ public final class LCMC extends JPanel {
         Tools.init();
         final JFrame mainFrame = new JFrame(
                Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
-        mainFrame.setIconImage(Tools.createImageIcon(
-                                 Tools.getDefault("LCMC.AppIcon")).getImage());
+        final List<Image> il = new ArrayList<Image>();
+        for (final String iconS : new String[]{"LCMC.AppIcon32",
+                                               "LCMC.AppIcon48",
+                                               "LCMC.AppIcon64"}) {
+            il.add(Tools.createImageIcon(Tools.getDefault(iconS)).getImage());
+        }
+        mainFrame.setIconImages(il);
         final String autoArgs = initApp(args);
         mainFrame.setGlassPane(getMainGlassPane());
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

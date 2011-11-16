@@ -330,8 +330,10 @@ public final class AppDefaults extends java.util.ListResourceBundle {
 
         {"MainPanel.HostsIcon",        "Icons/16x16/host_16x16.png"},
 
-        {"LCMC.AppIcon",               "Icons/32x32/lcmc_icon_32x32.png"},
-        {"ClustersPanel.ClustersIcon",  "Icons/32x32/clusters_32x32.png"},
+        {"LCMC.AppIcon32",               "Icons/32x32/lcmc_icon_32x32.png"},
+        {"LCMC.AppIcon48",               "Icons/48x48/lcmc_icon_48x48.png"},
+        {"LCMC.AppIcon64",               "Icons/64x64/lcmc_icon_64x64.png"},
+        {"ClustersPanel.ClustersIcon",   "Icons/32x32/lcmc_icon_32x32.png"},
         {"ClustersPanel.ClusterIcon",    "Icons/32x32/cluster_32x32.png"},
         {"ClusterViewPanel.ClusterIcon", "Icons/32x32/cluster_32x32.png"},
 
