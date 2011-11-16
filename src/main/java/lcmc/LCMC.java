@@ -622,7 +622,9 @@ public final class LCMC extends JPanel {
         final List<Image> il = new ArrayList<Image>();
         for (final String iconS : new String[]{"LCMC.AppIcon32",
                                                "LCMC.AppIcon48",
-                                               "LCMC.AppIcon64"}) {
+                                               "LCMC.AppIcon64",
+                                               "LCMC.AppIcon128",
+                                               "LCMC.AppIcon256"}) {
             il.add(Tools.createImageIcon(Tools.getDefault(iconS)).getImage());
         }
         mainFrame.setIconImages(il);
