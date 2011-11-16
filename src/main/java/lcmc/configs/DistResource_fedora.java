@@ -41,6 +41,8 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"version:Fedora release 11*", "11"},
         {"version:Fedora release 12*", "12"},
         {"version:Fedora release 13*", "13"},
+        {"version:Fedora release 14*", "14"},
+        {"version:Fedora release 15*", "15"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
@@ -59,13 +61,9 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"DrbdInst.install.method.1",       ""},
 
         /* Heartbeat/Pacemaker native */
-        {"HbPmInst.install.text.1",
-         "yum install: 1.1.x/3.0.x"},
+        {"HbPmInst.install.text.1", ""},
 
-        {"HbPmInst.install.1",
-         "yum -y install pacemaker heartbeat "
-         + "&& if ( rpm -qa|grep drbd ); then"
-         + " yum -y install drbd-pacemaker; fi"},
+        {"HbPmInst.install.1", ""},
         /* at least fedora 10 and fedora11 in version 2.1.3 and 2.14 has different
            ocf path. */
         {"Heartbeat.2.1.4.getOCFParameters",
