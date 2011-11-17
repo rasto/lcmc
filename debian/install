@@ -1,12 +1,6 @@
 build/jar/LCMC.jar usr/share/java
 debian/wrappers/lcmc usr/bin
 debian/lcmc.xpm usr/share/pixmaps
-
-src/main/resources/images/Icons/64x64/lcmc.png usr/share/pixmaps
-src/main/resources/images/Icons/32x32/lcmc.png usr/share/icons/hicolor/32x32/apps/
-src/main/resources/images/Icons/48x48/lcmc.png usr/share/icons/hicolor/48x48/apps/
-src/main/resources/images/Icons/64x64/lcmc.png usr/share/icons/hicolor/64x64/apps/
-src/main/resources/images/Icons/128x128/lcmc.png usr/share/icons/hicolor/128x128/apps/
-src/main/resources/images/Icons/256x256/lcmc.png usr/share/icons/hicolor/256x256/apps/
+src/main/resources/images/Icons/128x128/lcmc.png usr/share/pixmaps
 debian/lcmc.schemas usr/share/gconf/schemas
 scripts/lcmc.desktop usr/share/applications

@@ -11,6 +11,8 @@
 	<property name="signed.dir"	value="${build.dir}/signed"/>
 	<property name="buildlib.dir"	value="../build-lib"/>
 	<property name="build.coverage.dir"	value="build-coverage"/>
+	<property name="doc.dir"	value="../doc"/>
+	<property name="man.file"	value="lcmc.1"/>
 
 	<loadproperties> 
 	<file file="${resources.dir}/release.properties"/> 
@@ -81,7 +83,18 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="man">
+		<copy tofile="${doc.dir}/${man.file}"
+		      file="${doc.dir}/${man.file}.in"
+		      overwrite="yes"/>
+		<replace file="${doc.dir}/${man.file}"
+			 token="@LCMC-DATE@"
+			 value="${TODAY}"/>
+		<replace file="${doc.dir}/${man.file}"
+			 token="@LCMC-VERSION@"
+			 value="${release}"/>
+	</target>
+	<target name="jar" depends="compile,man">
 		<mkdir dir="${jar.dir}"/>
 		<jar destfile="${jar.dir}/${ant.project.name}.jar"
 		     excludes="plugins/ lcmc-test.tar"
