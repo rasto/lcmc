@@ -43,6 +43,7 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         {"version:openSUSE 11.1*",    "OPENSUSE11_1"}, // detected
         {"version:openSUSE 11.2*",    "OPENSUSE11_2"}, // detected
         {"version:openSUSE 11.3*",    "OPENSUSE11_3"}, // detected
+        {"version:openSUSE 11.4*",    "OPENSUSE11_4"}, // detected
         {"version:SUSE Linux Enterprise Server 11*", "SLES11"}, // detected
         {"version:sles9",  "SLES9"}, // chosen
         {"version:sles10", "SLES10"}, // chosen
@@ -114,12 +115,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         {"DrbdLog.log",
          "grep @GREPPATTERN@ /var/log/messages | tail -500"},
         {"KVM.emulator",   "/usr/bin/qemu-kvm"},
-
-        /* Heartbeat/Pacemaker native */
-        {"HbPmInst.install.text.2", "zypper install" },
-        {"HbPmInst.install.2",
-         "zypper -n install heartbeat pacemaker"
-         + " && /sbin/chkconfig --add heartbeat"},
 
         /* Openais/Pacemaker native */
         {"PmInst.install.text.2", "zypper install" },
