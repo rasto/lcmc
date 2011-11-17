@@ -78,7 +78,6 @@ public final class DistResource_redhatenterpriseserver
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",

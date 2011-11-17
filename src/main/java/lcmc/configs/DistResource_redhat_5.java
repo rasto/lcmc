@@ -57,10 +57,7 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         + " fi)"},
 
         /* Next Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.2",
@@ -77,10 +74,7 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         + " fi)"},
 
 
         /* Heartbeat/Pacemaker clusterlabs */
@@ -93,16 +87,14 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
          + "/epel-release-5-4.noarch.rpm ; "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
-         + " && /sbin/chkconfig --add heartbeat"},
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
 
         /* old heartbeat */
         {"HbPmInst.install.text.2", "yum install: HB 2.1.3 (obsolete)" },
 
         {"HbPmInst.install.2",
          "/usr/sbin/useradd hacluster 2>/dev/null; "
-         + "/usr/bin/yum -y install heartbeat "
-         + "&& /sbin/chkconfig --add heartbeat"},
+         + "/usr/bin/yum -y install heartbeat "},
 
         {"Openais.startOpenais.i686",
          DistResource.SUDO + "/etc/init.d/openais start"},
@@ -121,7 +113,6 @@ public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
          + "/epel-release-5-4.noarch.rpm ; "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
-         + " && /sbin/chkconfig --add heartbeat"},
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
     };
 }

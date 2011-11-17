@@ -92,7 +92,6 @@ public final class DistResource_redhatenterpriseas_4_0
          + "rm /tmp/drbd-mc-hbinst/heartbeat-ldirectord-*.rpm && "
          + "up2date net-snmp-libs lm_sensors libtool-libs perl-TimeDate && "
          + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
-         + "/sbin/chkconfig --add heartbeat && "
          + "rm -rf /tmp/drbd-mc-hbinst/"},
     };
 }

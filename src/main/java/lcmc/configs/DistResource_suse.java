@@ -86,7 +86,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
@@ -121,8 +120,7 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
         {"PmInst.install.2",
          "zypper -n install pacemaker"
          + " && if [ -e /etc/ais/openais.conf ];then"
-         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"
-         + " && /sbin/chkconfig --add openais"},
+         + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -157,7 +155,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

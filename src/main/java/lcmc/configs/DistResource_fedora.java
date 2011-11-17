@@ -91,10 +91,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " yum -y install drbd-pacemaker; fi"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + "  mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         + " fi"},
         /* corosync/pacemaker from source */
         {"PmInst.install.text.9",
          "from source: latest/1.2.x"},
@@ -148,9 +145,6 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " groupadd haclient;"
          + " useradd -g haclient --shell /bin/false hacluster;"
          + " true)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"

@@ -46,8 +46,7 @@ public final class DistResource_suse_SLES10
         /* Heartbeat */
         {"HbPmInst.install.text.1", "rug install: 2.1.x (obsolete)"},
         {"HbPmInst.install.1",
-         "/usr/bin/zypper -n --no-gpg-checks install heartbeat &&"
-         + "/sbin/chkconfig --add heartbeat"},
+         "/usr/bin/zypper -n --no-gpg-checks install heartbeat"},
 
         /* Drbd install method 2 */
         {"DrbdInst.install.text.2",
@@ -70,7 +69,6 @@ public final class DistResource_suse_SLES10
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

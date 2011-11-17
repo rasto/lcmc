@@ -54,10 +54,7 @@ public final class DistResource_fedora_11 extends java.util.ListResourceBundle {
          + " -x heartbeat-2.1* -x heartbeat-stonith install pacemaker corosync"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         + " fi)"},
 
         /* Heartbeat/Pacemaker clusterlabs*/
         {"HbPmInst.install.text.1",
@@ -67,10 +64,7 @@ public final class DistResource_fedora_11 extends java.util.ListResourceBundle {
          "wget -N -nd -P /etc/yum.repos.d/"
          + " http://www.clusterlabs.org/rpm/fedora-11/clusterlabs.repo && "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker heartbeat"
-         + " && /sbin/chkconfig --del corosync;"
-         + " /sbin/chkconfig --level 2345 heartbeat on"
-         + " && /sbin/chkconfig --level 016 heartbeat off"},
+         + " -x heartbeat-2.1* install pacemaker heartbeat"},
 
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.2",
@@ -113,7 +107,6 @@ public final class DistResource_fedora_11 extends java.util.ListResourceBundle {
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }

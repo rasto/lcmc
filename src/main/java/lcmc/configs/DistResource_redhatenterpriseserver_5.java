@@ -52,8 +52,7 @@ public final class DistResource_redhatenterpriseserver_5
          + " rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386"
          + "/epel-release-5-4.noarch.rpm ; "
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
-         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"
-         + "&& /sbin/chkconfig --add heartbeat"},
+         + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
 
         /* Corosync/Openais/Pacemaker clusterlabs */
         {"PmInst.install.text.1",
@@ -68,10 +67,7 @@ public final class DistResource_redhatenterpriseserver_5
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ corosync.@ARCH@"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
-         + " fi)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"},
+         + " fi)"},
 
         /* Workaround, where aisexec hangs the gui if called directly. */
         {"Openais.startOpenais.i686",

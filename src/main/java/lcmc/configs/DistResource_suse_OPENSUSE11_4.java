@@ -43,7 +43,6 @@ public final class DistResource_suse_OPENSUSE11_4
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.2", "zypper install: 1.0.x/2.99.x" },
         {"HbPmInst.install.2",
-         "zypper -n install heartbeat pacemaker"
-         + " && /sbin/chkconfig --add heartbeat"},
+         "zypper -n install heartbeat pacemaker"},
     };
 }

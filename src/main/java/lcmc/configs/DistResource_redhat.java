@@ -69,7 +69,6 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/sbin/chkconfig --add drbd && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         /* Drbd install method 3 */
@@ -155,9 +154,6 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          + " groupadd haclient;"
          + " useradd -g haclient --shell /bin/false hacluster;"
          + " true)"
-         + " && (/sbin/chkconfig --del heartbeat;"
-         + " /sbin/chkconfig --level 2345 corosync on"
-         + " && /sbin/chkconfig --level 016 corosync off)"
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"

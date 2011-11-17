@@ -86,7 +86,6 @@ public final class DistResource_redhatenterpriseas_4
          + " && up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate"
          + " OpenIPMI-libs"
          + " && rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm"
-         + " && /sbin/chkconfig --add corosync"
          + " && mv /etc/ais/openais.conf /etc/ais/openais.conf.orig;"
          + " if [ -e /etc/ais/openais.conf ];then"
          + " mv /etc/ais/openais.conf /etc/ais/openais.conf.orig; fi;"
@@ -107,7 +106,6 @@ public final class DistResource_redhatenterpriseas_4
          + " && up2date lm_sensors net-snmp-libs libtool-libs perl-TimeDate"
          + " OpenIPMI-libs"
          + " && rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm"
-         + " && /sbin/chkconfig --add heartbeat"
          + " && rm -rf /tmp/drbd-mc-hbinst/"},
     };
 }

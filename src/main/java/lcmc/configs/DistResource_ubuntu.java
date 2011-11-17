@@ -102,7 +102,6 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
 
 
@@ -184,8 +183,6 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
          + " adduser --system --no-create-home --ingroup haclient"
          + " --disabled-login --shell /bin/false --disabled-password hacluster;"
          + " true)"
-         + " && /usr/sbin/update-rc.d corosync start 75 2 3 4 5 ."
-         + " stop 05 0 1 6 . "
          /* pacemaker */
          + " && /usr/bin/wget -N -O /tmp/pminst/pacemaker.tar.bz2"
          + " http://hg.clusterlabs.org/pacemaker/1.1/archive/tip.tar.bz2"

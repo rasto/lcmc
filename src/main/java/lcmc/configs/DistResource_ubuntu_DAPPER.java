@@ -63,7 +63,6 @@ public final class DistResource_ubuntu_DAPPER
          + " --sysconfdir=/etc;"
          + " fi && "
          + "make && make install DESTDIR=/ && "
-         //+ "/usr/sbin/update-rc.d drbd defaults 70 8 && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 }
