@@ -4,7 +4,7 @@
       codebase="http://localhost">
         <information>
                 <title>Linux Cluster Management Console</title>
-                <vendor>LINBIT Ha-Solutions GmbH</vendor>
+                <vendor>Rasto Levrinc</vendor>
                 <update check="always"/>
                 <offline-allowed/>
         </information>
