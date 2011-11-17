@@ -35,6 +35,9 @@ Linux Cluster Management Console.
 %{_datadir}/application-registry/lcmc.applications
 %{_datadir}/applications/lcmc.desktop
 %{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+%{_datadir}/icons/hicolor/64x64/apps/lcmc.png
+%{_datadir}/icons/hicolor/128x128/apps/lcmc.png
+%{_datadir}/icons/hicolor/256x256/apps/lcmc.png
 %{_datadir}/pixmaps/lcmc.png
 %{_mandir}/man1/lcmc.1.gz
 %{_bindir}/lcmc
@@ -61,8 +64,14 @@ install -p -D -m 0755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/lcmc
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/lcmc
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps
-install -m 644 lcmc-%{version}/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/lcmc.png
-install -m 644 lcmc-%{version}/src/main/resources/images/Icons/32x32/lcmc_icon_32x32.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/64x64/apps
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256/apps
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/128x128/lcmc.png $RPM_BUILD_ROOT%{_datadir}/pixmaps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/32x32/lcmc.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/apps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/64x64/lcmc.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/64x64/apps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/128x128/lcmc.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps/lcmc.png
+install -m 644 lcmc-%{version}/src/main/resources/images/Icons/256x256/lcmc.png $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256/apps/lcmc.png
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 install -m 644 lcmc-%{version}/doc/lcmc.1 $RPM_BUILD_ROOT%{_mandir}/man1/lcmc.1
 gzip $RPM_BUILD_ROOT%{_mandir}/man1/lcmc.1
