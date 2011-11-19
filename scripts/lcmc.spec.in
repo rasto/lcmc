@@ -28,7 +28,7 @@ BuildArch:	noarch
 Linux Cluster Management Console.
 
 %files
-%doc lcmc-%{version}/README
+%doc lcmc-%{version}/README.txt
 %doc lcmc-%{version}/LICENSE.txt
 
 %{_datadir}/java/LCMC.jar

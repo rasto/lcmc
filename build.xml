@@ -308,7 +308,7 @@
                 </copy>
                 <tar tarfile="${tarball.tar}"
                      basedir="/tmp/"
-                     includes="${project}/src/** ${project}/build.xml ${project}/README ${project}/debian/** ${project}/LICENSE.txt ${project}/doc/lcmc.1" />
+                     includes="${project}/src/** ${project}/build.xml ${project}/README.txt ${project}/debian/** ${project}/LICENSE.txt ${project}/doc/lcmc.1" />
                 <gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
                 <delete file="${tarball.tar}"/>
                 <delete dir="/tmp/${project}"/>
