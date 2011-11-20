@@ -344,7 +344,18 @@
 			 token="@LCMC-VERSION@"
 			 value="${release}"/>
 	</target>
-	<target name="rpm" depends="man,dist">
+        <target name="rpm-source" depends="init">
+                <copy todir="/tmp/${project}">
+                        <fileset dir="."/>
+                </copy>
+                <tar tarfile="${tarball.tar}"
+                     basedir="/tmp/"
+                     includes="${project}/${buildlib.dir}/** ${project}/src/** ${project}/build.xml ${project}/pom.xml ${project}/README.txt ${project}/debian/** ${project}/LICENSE.txt ${project}/doc/lcmc.1" />
+                <gzip zipfile="${tarball.tar.gz}" src="${tarball.tar}" />
+                <delete file="${tarball.tar}"/>
+                <delete dir="/tmp/${project}"/>
+        </target>
+	<target name="rpm" depends="man,rpm-source">
 		<copy tofile="${rpmbuild.dir}/SPECS/${spec.file}"
 		      file="${scripts.dir}/${spec.file}.in"
 		      overwrite="yes"/>
