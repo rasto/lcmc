@@ -2,7 +2,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>../build/jar/LCMC.jar</jar>
-  <outfile>../lcmc.exe</outfile>
+  <outfile>../LCMC-@LCMC-VERSION@-windows.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
