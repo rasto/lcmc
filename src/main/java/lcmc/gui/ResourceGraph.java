@@ -671,19 +671,15 @@ public abstract class ResourceGraph {
         void setDirection(final Vertex from, final Vertex to) {
             final Edge thisEdge = this;
             if (mFrom != from || mTo != to) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        mGraphLock.lock();
-                        try {
-                            getGraph().removeEdge(thisEdge);
-                            mFrom = from;
-                            mTo   = to;
-                            getGraph().addEdge(thisEdge, mFrom, mTo);
-                        } finally {
-                            mGraphLock.unlock();
-                        }
-                    }
-                });
+                mGraphLock.lock();
+                try {
+                    getGraph().removeEdge(thisEdge);
+                    mFrom = from;
+                    mTo   = to;
+                    getGraph().addEdge(thisEdge, mFrom, mTo);
+                } finally {
+                    mGraphLock.unlock();
+                }
             }
         }
 
