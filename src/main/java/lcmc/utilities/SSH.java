@@ -942,9 +942,8 @@ public final class SSH {
                               serverHostKeyAlgorithm,
                               serverHostKey);
                     } catch (IOException ignore) {
-                        Tools.appError("SSH.AddHostKeyToFile.Failed",
-                                       "",
-                                       ignore);
+                        Tools.appWarning("SSH addHostKeyToFile failed "
+                                         + ignore.getMessage());
                     }
                 }
 
