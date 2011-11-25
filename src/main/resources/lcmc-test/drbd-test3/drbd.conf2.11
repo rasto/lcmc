@@ -16,7 +16,6 @@ common {
 	}
 
 	net {
-		protocol	C;
 		cram-hmac-alg	sha1;
 		shared-secret	SECRET;
 	}
