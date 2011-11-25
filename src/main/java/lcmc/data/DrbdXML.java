@@ -177,6 +177,24 @@ public final class DrbdXML extends XML {
     public static final String CONFIG_YES = "yes";
     /** No / false drbd config value. */
     public static final String CONFIG_NO = "no";
+    /** Hardcoded defaults, for options that have it but we don't get
+        it from the drbdsetup. */
+    static final Map<String, String> HARDCODED_DEFAULTS =
+                                                new HashMap<String, String>();
+    static {
+        HARDCODED_DEFAULTS.put("usage-count", "");
+        HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
+
+        HARDCODED_DEFAULTS.put("protocol", "C");
+        HARDCODED_DEFAULTS.put("after-sb-0pri", "disconnect");
+        HARDCODED_DEFAULTS.put("after-sb-1pri", "disconnect");
+        HARDCODED_DEFAULTS.put("after-sb-2pri", "disconnect");
+        HARDCODED_DEFAULTS.put("rr-conflict", "disconnect");
+        HARDCODED_DEFAULTS.put("on-io-error", "pass_on");
+        HARDCODED_DEFAULTS.put("fencing", "dont-care");
+        HARDCODED_DEFAULTS.put("on-no-data-accessible", "io-error");
+        HARDCODED_DEFAULTS.put("on-congestion", "block");
+    }
 
     /** Prepares a new <code>DrbdXML</code> object. */
     public DrbdXML(final Host[] hosts, final Map<Host, String> drbdParameters) {
@@ -620,6 +638,8 @@ public final class DrbdXML extends XML {
                 }
                 if ("handler".equals(type)) {
                     paramItemsMap.put(name, new ArrayList<Object>());
+                    paramDefaultMap.put(name,
+                                        HARDCODED_DEFAULTS.get(name));
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
                     l.add(CONFIG_YES);
@@ -666,8 +686,6 @@ public final class DrbdXML extends XML {
                     paramItemsMap.put(name, l);
                 }
                 final NodeList optionInfos = optionNode.getChildNodes();
-                paramDefaultMap.put("usage-count", "");
-                paramDefaultMap.put("disable-ip-verification", CONFIG_NO);
                 for (int j = 0; j < optionInfos.getLength(); j++) {
                     final Node optionInfo = optionInfos.item(j);
                     final String tag = optionInfo.getNodeName();
@@ -680,10 +698,6 @@ public final class DrbdXML extends XML {
                                         new BigInteger(getText(optionInfo)));
                     } else if ("handler".equals(tag)) {
                         paramItemsMap.get(name).add(getText(optionInfo));
-                        /* first value is default */
-                        if (!paramDefaultMap.containsKey(name)) {
-                            paramDefaultMap.put(name, getText(optionInfo));
-                        }
                     } else if ("default".equals(tag)) {
                         paramDefaultMap.put(name, getText(optionInfo));
                     } else if ("unit".equals(tag)) {
