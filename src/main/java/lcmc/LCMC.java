@@ -562,8 +562,24 @@ public final class LCMC extends JPanel {
                                     "could not parse " + HOST_OP + " option");
                 }
                 hostsOptions = new ArrayList<HostOptions>();
-                for (final String hostName : hostNames) {
+                for (final String hostNameEntered : hostNames) {
+                    String hostName;
+                    String port = null;
+                    if (hostNameEntered.indexOf(':') > 0) {
+                        final String[] he = hostNameEntered.split(":");
+                        hostName = he[0];
+                        port = he[1];
+                        if ("".equals(port) || !Tools.isNumber(port)) {
+                            throw new ParseException(
+                                    "could not parse " + HOST_OP + " option");
+                        }
+                    } else {
+                        hostName = hostNameEntered;
+                    }
                     final HostOptions ho = new HostOptions(hostName);
+                    if (port != null) {
+                        ho.setPort(port);
+                    }
                     hostsOptions.add(ho);
                     clusters.get(clusterName).add(ho);
                 }
