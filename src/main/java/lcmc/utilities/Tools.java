@@ -26,6 +26,7 @@ import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.Clusters;
 import lcmc.data.UserConfig;
+import lcmc.data.HostOptions;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.Info;
@@ -120,7 +121,6 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class provides tools, that are not classified.
@@ -851,14 +851,12 @@ public final class Tools {
     /** Sets user config from command line options.
         returns host, for which dns lookup failed. */
     public static String setUserConfigFromOptions(
-                                    final Map<String, List<String>> clusters,
-                                    final MultiKeyMap<String, Boolean> sudos,
-                                    final MultiKeyMap<String, String> users,
-                                    final MultiKeyMap<String, String> ports) {
+                               final Map<String, List<HostOptions>> clusters) {
         final Map<String, List<Host>> hostMap =
                                        new LinkedHashMap<String, List<Host>>();
         for (final String clusterName : clusters.keySet()) {
-            for (final String hostnameEntered : clusters.get(clusterName)) {
+            for (final HostOptions hostOptions : clusters.get(clusterName)) {
+                final String hostnameEntered = hostOptions.getHost();
                 InetAddress[] addresses = null;
                 try {
                     addresses = InetAddress.getAllByName(hostnameEntered);
@@ -876,14 +874,13 @@ public final class Tools {
                 if (ip == null) {
                     return hostnameEntered;
                 }
-                Boolean useSudo = sudos.get(clusterName, hostnameEntered);
                 userConfig.setHost(hostMap,
-                                   users.get(clusterName, hostnameEntered),
+                                   hostOptions.getUser(),
                                    hostnameEntered,
                                    ip,
-                                   ports.get(clusterName, hostnameEntered),
+                                   hostOptions.getPort(),
                                    null,
-                                   useSudo != null && useSudo,
+                                   hostOptions.getSudo(),
                                    false);
             }
         }
@@ -892,8 +889,8 @@ public final class Tools {
             cluster.setName(clusterName);
             cluster.setSavable(false);
             Tools.getConfigData().addClusterToClusters(cluster);
-            for (final String hostName : clusters.get(clusterName)) {
-                userConfig.setHostCluster(hostMap, cluster, hostName);
+            for (final HostOptions ho : clusters.get(clusterName)) {
+                userConfig.setHostCluster(hostMap, cluster, ho.getHost());
             }
         }
         return null;
