@@ -393,6 +393,7 @@ final class CloneInfo extends ServiceInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
+            containedService.removeInfo();
             removeInfo();
             getService().doneRemoving();
             return;
