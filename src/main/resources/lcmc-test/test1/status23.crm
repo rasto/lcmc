@@ -4,5 +4,5 @@
 
 Online: [ host1 host2 ]
 
- Master/Slave Set: ms_Stateful_1res_Stateful_1]
+ Master/Slave Set: ms_Stateful_1
      Masters: [ host2 ]

@@ -781,7 +781,7 @@ public final class RoboTest {
 
     /** TEST 1. */
     private static void startTest1() {
-        slowFactor = 0.2f;
+        slowFactor = 0.4f;
         aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
         final int ipX = 235;
@@ -795,7 +795,7 @@ public final class RoboTest {
         String testName = "test1";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test1-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
@@ -1051,11 +1051,11 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
             press(KeyEvent.VK_DOWN); /* choose another dummy */
-            sleep(10000);
+            sleep(20000);
             press(KeyEvent.VK_DOWN);
-            sleep(10000);
+            sleep(20000);
             press(KeyEvent.VK_ENTER);
-            sleep(200);
+            sleep(10000);
             moveTo(809, 144); /* ptest */
             sleep(4000);
             leftClick(); /* apply */
@@ -1068,9 +1068,9 @@ public final class RoboTest {
             sleep(1000);
 
             press(KeyEvent.VK_PAGE_UP); /* choose "nothing selected */
-            sleep(200);
+            sleep(10000);
             press(KeyEvent.VK_ENTER);
-            sleep(200);
+            sleep(10000);
 
             moveTo(809, 144); /* ptest */
             sleep(4000);
@@ -2027,7 +2027,7 @@ public final class RoboTest {
         String testName = "testB";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "testB-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
@@ -2060,7 +2060,7 @@ public final class RoboTest {
         String testName = "testC";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "testC-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
@@ -2188,8 +2188,9 @@ public final class RoboTest {
         disableStonith();
         String testName = "testF";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
+        final String distro = cluster.getHostsArray()[0].getDist();
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "testF-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
@@ -2239,7 +2240,7 @@ public final class RoboTest {
         }
         checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo(1000, 432);
+        moveTo(1000, 429);
         sleep(1000);
         leftClick();
         sleep(1000);
@@ -2814,7 +2815,7 @@ public final class RoboTest {
         String testName = "test3";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1") < 0) {
+            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test3-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {

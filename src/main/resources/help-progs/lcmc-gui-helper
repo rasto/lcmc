@@ -1730,7 +1730,7 @@ sub gui_test {
 		my $online_hosts = join " ", sort @status_hosts;
 		$status =~ s/(Online: \[\s+).*?(\s+\])/$1$online_hosts$2/;
 	}
-	$status =~ s/(Master\/Slave Set:.*?)\s+\[/$1/g;
+	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
 	my $testfile = "/tmp/lcmc-test/$testname/test$index.crm";
 	my $test = "";
@@ -1793,16 +1793,24 @@ sub gui_test {
 	my $status2 = $status;
 	$status2 =~ s/(Started host)(\d+)/$1 . (3 - $2)/ge;
 	$status2 =~ s/((?:Masters|Slaves):\s+\[\s+host)(\d+)/$1 . (3 - $2)/ge;
+	$status2 =~ s/(:\s+Master\s+host)(\d+)/$1 . (3 - $2)/ge;
 	if ($status eq $statustest || $status2 eq $statustest) {
 		print "ok";
 	} else {
 		open STTEST, ">$statustestfile.error" or print "$!";
-		print STTEST $status2;
+		print STTEST $status;
 		close STTEST;
 		my $diff = `diff -ub $statustestfile $statustestfile.error`;
 		print "error\n";
 		print "-------------\n";
 		print $diff;
+		open STTEST, ">$statustestfile.error" or print "$!";
+                print STTEST $status2;
+                close STTEST;
+                $diff = `diff -ub $statustestfile $statustestfile.error`;
+                print "error2\n";
+                print "-------------\n";
+                print $diff;
 		exit 2;
 	}
 }

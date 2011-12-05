@@ -4,7 +4,7 @@
 
 Online: [ host1 host2 ]
 
- Master/Slave Set: ms_drbd_1res_drbd_1]
+ Master/Slave Set: ms_drbd_1
      Masters: [ host2 ]
      Slaves: [ host1 ]
  res_Filesystem_1	(ocf::heartbeat:Filesystem):	Started host2

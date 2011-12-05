@@ -9,5 +9,5 @@ Online: [ host1 host2 ]
      res_Dummy_1	(ocf::heartbeat:Dummy):	Started host2 (unmanaged)
      res_Dummy_2	(ocf::heartbeat:Dummy):	Started host2 (unmanaged)
      res_Dummy_3	(ocf::heartbeat:Dummy):	Started host2 (unmanaged)
- Master/Slave Set: ms_Stateful_1res_Stateful_1]
+ Master/Slave Set: ms_Stateful_1
      Masters: [ host2 ]
