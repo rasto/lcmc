@@ -308,11 +308,12 @@ public final class RoboTest {
                                    .getLastSelectedPathComponent().toString();
                 }
                 if (selected == null) {
+                    final int count = 200;
                     if ("1".equals(index)) {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startGUITest1(100);
+                        startGUITest1(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -320,7 +321,7 @@ public final class RoboTest {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startGUITest2(100);
+                        startGUITest2(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -328,6 +329,7 @@ public final class RoboTest {
                 } else if ("Services".equals(selected)
                     || Tools.getString("ClusterBrowser.ClusterManager").equals(
                                                                    selected)) {
+                    final int count = 200;
                     if ("0".equals(index)) {
                         /* all pacemaker tests */
                         int i = 1;
@@ -342,7 +344,7 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startTest3();
+                            startTest3(4);
                             if (aborted) {
                                 break;
                             }
@@ -350,19 +352,19 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startTest5();
+                            startTest5(5);
                             if (aborted) {
                                 break;
                             }
-                            startTest6();
+                            startTest6(5);
                             if (aborted) {
                                 break;
                             }
-                            startTest7();
+                            startTest7(5);
                             if (aborted) {
                                 break;
                             }
-                            startTest8();
+                            startTest8(5);
                             if (aborted) {
                                 break;
                             }
@@ -370,27 +372,27 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startTestA();
+                            startTestA(5);
                             if (aborted) {
                                 break;
                             }
-                            startTestB();
+                            startTestB(5);
                             if (aborted) {
                                 break;
                             }
-                            startTestC();
+                            startTestC(5);
                             if (aborted) {
                                 break;
                             }
-                            startTestD();
+                            startTestD(5);
                             if (aborted) {
                                 break;
                             }
-                            startTestE();
+                            startTestE(5);
                             if (aborted) {
                                 break;
                             }
-                            startTestF();
+                            startTestF(5);
                             if (aborted) {
                                 break;
                             }
@@ -433,7 +435,7 @@ public final class RoboTest {
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         info("test" + index + " no " + i);
-                        startTest3();
+                        startTest3(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + " no " + i + ", secs: " + secs);
@@ -456,7 +458,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startTest5();
+                            startTest5(10);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -469,7 +471,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startTest6();
+                            startTest6(10);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -480,7 +482,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTest7();
+                        startTest7(100);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -488,7 +490,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTest8();
+                        startTest8(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -496,7 +498,7 @@ public final class RoboTest {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTestA();
+                        startTestA(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -504,7 +506,7 @@ public final class RoboTest {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTestB();
+                        startTestB(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -512,7 +514,7 @@ public final class RoboTest {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTestC();
+                        startTestC(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -520,7 +522,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTestD();
+                        startTestD(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -528,7 +530,7 @@ public final class RoboTest {
                         /* host wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTestE();
+                        startTestE(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -538,7 +540,7 @@ public final class RoboTest {
                             /* cloned group */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startTestF();
+                            startTestF(10);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -1806,7 +1808,7 @@ public final class RoboTest {
     }
 
     /** TEST 5. */
-    private static void startTest5() {
+    private static void startTest5(final int count) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1855,7 +1857,7 @@ public final class RoboTest {
         removeConstraint(dum1PopX, dum1PopY);
         checkTest("test5", 2.5);
         /* constraints */
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= count; i++) {
             addConstraint(dummy1X, dummy1Y, 2, false);
 
             checkTest("test5", 3);
@@ -1879,7 +1881,7 @@ public final class RoboTest {
     }
 
     /** TEST 6. */
-    private static void startTest6() {
+    private static void startTest6(final int count) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 235;
@@ -1904,7 +1906,7 @@ public final class RoboTest {
         chooseDummy(dummy1X, dummy1Y, false, true);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < count; i++) {
             if (i % 5 == 0) {
                 info("test6 i: " + i);
             }
@@ -1921,13 +1923,13 @@ public final class RoboTest {
         resetTerminalAreas();
     }
 
-    private static void startTest7() {
+    private static void startTest7(final int count) {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 207;
         disableStonith();
-        for (int i = 30; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("test7 I: " + i);
             }
@@ -1945,14 +1947,13 @@ public final class RoboTest {
         System.gc();
     }
 
-    private static void startTest8() {
+    private static void startTest8(final int count) {
         slowFactor = 0.2f;
         aborted = false;
         final int dummy1X = 540;
         final int dummy1Y = 202;
         disableStonith();
         checkTest("test8", 1);
-        final int count = 30;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("test8 i: " + i);
@@ -1974,13 +1975,13 @@ public final class RoboTest {
         resetTerminalAreas();
     }
 
-    private static void startTestA() {
+    private static void startTestA(final int count) {
         slowFactor = 0.5f;
         aborted = false;
         final int gx = 235;
         final int gy = 207;
         disableStonith();
-        for (int i = 20; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("testA I: " + i);
             }
@@ -2018,7 +2019,7 @@ public final class RoboTest {
         System.gc();
     }
 
-    private static void startTestB() {
+    private static void startTestB(final int count) {
         slowFactor = 0.5f;
         aborted = false;
         final int dummy1X = 235;
@@ -2033,7 +2034,7 @@ public final class RoboTest {
         } catch (Exceptions.IllegalVersionException e) {
             Tools.appWarning(e.getMessage(), e);
         }
-        for (int i = 20; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
             }
@@ -2052,7 +2053,7 @@ public final class RoboTest {
         System.gc();
     }
 
-    private static void startTestC() {
+    private static void startTestC(final int count) {
         slowFactor = 0.5f;
         final int statefulX = 500;
         final int statefulY = 207;
@@ -2066,7 +2067,7 @@ public final class RoboTest {
         } catch (Exceptions.IllegalVersionException e) {
             Tools.appWarning(e.getMessage(), e);
         }
-        for (int i = 20; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
             }
@@ -2109,10 +2110,9 @@ public final class RoboTest {
     }
 
     /** Pacemaker Leak tests. */
-    private static void startTestD() {
+    private static void startTestD(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        final int count = 20;
         final int dummy1X = 540;
         final int dummy1Y = 202;
         for (int i = count; i > 0; i--) {
@@ -2156,10 +2156,9 @@ public final class RoboTest {
     }
 
     /** Host wizard deadlock. */
-    private static void startTestE() {
+    private static void startTestE(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        final int count = 200;
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
                 info("testE I: " + i);
@@ -2180,7 +2179,7 @@ public final class RoboTest {
     }
 
     /** Cloned group. */
-    private static void startTestF() {
+    private static void startTestF(final int count) {
         slowFactor = 0.2f;
         aborted = false;
         final int gx = 235;
@@ -2212,7 +2211,7 @@ public final class RoboTest {
         final int gyM = 212;
         final int type = 1;
         //int type = 2;
-        for (int i = 2; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             info("I: " + i);
             /* create dummy */
             moveTo(gxM + 46, gyM + 11);
@@ -2808,7 +2807,7 @@ public final class RoboTest {
     }
 
     /** TEST 3. */
-    private static void startTest3() {
+    private static void startTest3(final int count) {
         slowFactor = 0.3f;
         aborted = false;
         disableStonith();
@@ -2821,7 +2820,7 @@ public final class RoboTest {
         } catch (Exceptions.IllegalVersionException e) {
             Tools.appWarning(e.getMessage(), e);
         }
-        for (int i = 20; i > 0; i--) {
+        for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
             }
