@@ -637,9 +637,10 @@ public final class DrbdXML extends XML {
                     continue;
                 }
                 if ("handler".equals(type)) {
-                    paramItemsMap.put(name, new ArrayList<Object>());
-                    paramDefaultMap.put(name,
-                                        HARDCODED_DEFAULTS.get(name));
+                    final List<Object> items = new ArrayList<Object>();
+                    items.add("");
+                    paramItemsMap.put(name, items);
+                    paramDefaultMap.put(name, HARDCODED_DEFAULTS.get(name));
                 } else if ("boolean".equals(type)) {
                     final List<Object> l = new ArrayList<Object>();
                     l.add(CONFIG_YES);
