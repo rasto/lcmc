@@ -364,7 +364,7 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startTest8(5);
+                            startTest8(10);
                             if (aborted) {
                                 break;
                             }
@@ -392,7 +392,7 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startTestF(5);
+                            startTestF(2);
                             if (aborted) {
                                 break;
                             }
@@ -490,7 +490,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        startTest8(200);
+                        startTest8(30);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -540,7 +540,7 @@ public final class RoboTest {
                             /* cloned group */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            startTestF(10);
+                            startTestF(2);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -2386,12 +2386,13 @@ public final class RoboTest {
         leftRelease();
         moveTo(956, 442 + yCorr);
         leftClick(); /* start timeout */
+        sleep(2000);
         press(KeyEvent.VK_2);
-        sleep(200);
+        sleep(2000);
         press(KeyEvent.VK_0);
-        sleep(200);
+        sleep(2000);
         press(KeyEvent.VK_0);
-        sleep(200);
+        sleep(5000);
 
         moveTo(956, 472 + yCorr);
         leftClick(); /* stop timeout */
@@ -2400,7 +2401,7 @@ public final class RoboTest {
         press(KeyEvent.VK_9);
         sleep(200);
         press(KeyEvent.VK_2);
-        sleep(200);
+        sleep(5000);
 
         moveTo(956, 502 + yCorr);
         leftClick(); /* monitor timeout */
@@ -2409,7 +2410,7 @@ public final class RoboTest {
         press(KeyEvent.VK_5);
         sleep(200);
         press(KeyEvent.VK_4);
-        sleep(200);
+        sleep(5000);
 
         moveTo(956, 532 + yCorr);
         leftClick(); /* monitor interval */
@@ -2418,14 +2419,14 @@ public final class RoboTest {
         press(KeyEvent.VK_2);
         sleep(200);
         press(KeyEvent.VK_1);
-        sleep(200);
+        sleep(5000);
         if (migrateTimeouts) {
             moveTo(956, 562 + yCorr);
             leftClick(); /* reload */
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
             press(KeyEvent.VK_BACK_SPACE);
-            sleep(200);
+            sleep(5000);
 
             moveTo(956, 587 + yCorr);
             leftClick(); /* migrate from */
@@ -2434,7 +2435,7 @@ public final class RoboTest {
             press(KeyEvent.VK_2);
             sleep(200);
             press(KeyEvent.VK_3);
-            sleep(200);
+            sleep(5000);
 
             moveTo(956, 617 + yCorr);
             leftClick(); /* migrate to */
@@ -2443,7 +2444,7 @@ public final class RoboTest {
             press(KeyEvent.VK_2);
             sleep(200);
             press(KeyEvent.VK_2);
-            sleep(200);
+            sleep(5000);
         }
 
         moveTo(1100, 302);
