@@ -635,7 +635,8 @@ sub get_cpu_map_info {
 		while (<$cpu_map_fh>) {
 			my ($model) = /<model\s+name=\'(.*)'>/;
 			push @models, $model if $model;
-			my ($vendor) = /<vendor>(.*)</;
+			my ($vendor) = /<vendor>(.*)</
+					|| /<vendor\s+name=\'(.*?)'.*\/>/;
 			$vendors{$vendor} = 1 if $vendor;
 		}
 	}
