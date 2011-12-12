@@ -513,32 +513,32 @@ public final class GuiComboBox extends JPanel {
         if (type != Type.COMBOBOX) {
             return;
         }
-        final JComboBox cb = (JComboBox) component;
-        final Object selectedItem = cb.getSelectedItem();
-        boolean selectedChanged = false;
-        if (selectedValue == null
-            && (selectedItem != null
-                 && selectedItem != GuiComboBox.NOTHING_SELECTED)) {
-            selectedChanged = true;
-        } else if (selectedValue != null
-                   && !selectedValue.equals(selectedItem)) {
-            selectedChanged = true;
-        }
-        final boolean itemsChanged = comboBoxChanged(items);
-        if (!selectedChanged && !itemsChanged) {
-            return;
-        }
-
-        component.setPreferredSize(null);
-        /* removing dupicates */
-
-        final List<Object> comboList = new ArrayList<Object>();
-        final Object selectedValueInfo = addItems(comboList,
-                                                  selectedValue,
-                                                  items);
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
+                final JComboBox cb = (JComboBox) component;
+                final Object selectedItem = cb.getSelectedItem();
+                boolean selectedChanged = false;
+                if (selectedValue == null
+                    && (selectedItem != null
+                         && selectedItem != GuiComboBox.NOTHING_SELECTED)) {
+                    selectedChanged = true;
+                } else if (selectedValue != null
+                           && !selectedValue.equals(selectedItem)) {
+                    selectedChanged = true;
+                }
+                final boolean itemsChanged = comboBoxChanged(items);
+                if (!selectedChanged && !itemsChanged) {
+                    return;
+                }
+
+                component.setPreferredSize(null);
+                /* removing dupicates */
+
+                final List<Object> comboList = new ArrayList<Object>();
+                final Object selectedValueInfo = addItems(comboList,
+                                                          selectedValue,
+                                                          items);
+
                 if (itemsChanged) {
                     final HashSet<String> itemCache = new HashSet<String>();
                     cb.setSelectedIndex(-1);
