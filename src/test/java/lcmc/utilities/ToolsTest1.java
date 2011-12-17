@@ -488,7 +488,7 @@ public final class ToolsTest1 extends TestCase {
         assertEquals("13", Tools.getDistVersionString(
                                         "fedora",
                                         "Fedora release 13 (Goddard)"));
-        assertEquals("Fedora release 14 (Laughlin)",
+        assertEquals("14",
                      Tools.getDistVersionString(
                                         "fedora",
                                         "Fedora release 14 (Laughlin)"));
@@ -532,7 +532,7 @@ public final class ToolsTest1 extends TestCase {
                      Tools.getDistVersionString(
                                   "suse",
                                   "openSUSE 11.3 (x86_64)"));
-        assertEquals("openSUSE 11.4 (x86_64)",
+        assertEquals("OPENSUSE11_4",
                      Tools.getDistVersionString(
                                   "suse",
                                   "openSUSE 11.4 (x86_64)"));
