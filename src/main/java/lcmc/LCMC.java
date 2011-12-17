@@ -136,6 +136,8 @@ public final class LCMC extends JPanel {
     private static final String SUDO_OP = "sudo";
     /** The --port option. */
     private static final String PORT_OP = "port";
+    /** The --advanced option. */
+    private static final String ADVANCED_OP = "advanced";
 
     /**
      * Private constructor.
@@ -415,6 +417,10 @@ public final class LCMC extends JPanel {
                           PORT_OP,
                           true,
                           "ssh port, used with --cluster option");
+        options.addOption(null,
+                          ADVANCED_OP,
+                          false,
+                          "start in an advanced mode");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -455,6 +461,8 @@ public final class LCMC extends JPanel {
                     ultravnc = true;
                 }
             }
+            boolean advanced = cmd.hasOption(ADVANCED_OP);
+            Tools.getConfigData().setAdvancedMode(advanced);
             Tools.getConfigData().setTightvnc(tightvnc);
             Tools.getConfigData().setUltravnc(ultravnc);
             Tools.getConfigData().setRealvnc(realvnc);
