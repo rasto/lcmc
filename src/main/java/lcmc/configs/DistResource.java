@@ -385,7 +385,7 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"HostBrowser.getCrmMon",
          SUDO + "/usr/sbin/crm_mon -1"},
         {"HostBrowser.getCrmConfigureShow",
-         SUDO + "/usr/sbin/crm configure show"},
+         SUDO + "PAGER=cat /usr/sbin/crm configure show"},
 
         {"Logs.hbLog",
          "(grep @GREPPATTERN@ /var/log/ha.log 2>/dev/null"
