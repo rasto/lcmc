@@ -245,7 +245,9 @@ public final class HostTest1 extends TestCase {
     public void testIsDrbdUpgradeAvailable() {
         for (final Host host : TestSuite1.getHosts()) {
             assertFalse(host.isDrbdUpgradeAvailable("8.3.1"));
-
+            if (!TestSuite1.CONNECT_LINBIT) {
+                continue;
+            }
             final ExecCommandThread t = host.execCommand(
                           "DrbdAvailVersions",
                           null, /* ProgressBar */
