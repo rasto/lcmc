@@ -422,13 +422,13 @@ public final class GuiComboBox extends JPanel {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
         cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
-        if (selectedValueInfo != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override public void run() {
+                if (selectedValueInfo != null) {
                     cb.setSelectedItem(selectedValueInfo);
                 }
-            });
-        }
+            }
+        });
         /* workround, so that default button works */
         editor.addKeyListener(new ActivateDefaultButtonListener(cb));
 
@@ -714,6 +714,9 @@ public final class GuiComboBox extends JPanel {
     /** Sets label tooltip text. */
     void setLabelToolTipText(String text) {
         labelToolTipText = text;
+        if (text == null || label == null) {
+            return;
+        }
         String disabledTooltip = null;
         if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
             final boolean accessible =
