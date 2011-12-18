@@ -1387,7 +1387,10 @@ public final class ClusterBrowser extends Browser {
                 setNode(resource);
                 addNode(commonBlockDevicesNode, resource);
             }
-            reload(commonBlockDevicesNode, false);
+            if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
+                reload(commonBlockDevicesNode, false);
+                reloadAllComboBoxes(null);
+            }
         }
     }
 
@@ -2536,6 +2539,7 @@ public final class ClusterBrowser extends Browser {
             }
         });
         updateDrbdResources();
+        updateCommonBlockDevices();
         drbdGraph.repaint();
     }
 
