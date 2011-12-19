@@ -79,6 +79,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
@@ -108,7 +109,7 @@ public class Info implements Comparable {
 
     /** Map from parameter to its user-editable widget. */
     private final Map<String, GuiComboBox> paramComboBoxHash =
-                                        new HashMap<String, GuiComboBox>();
+              Collections.synchronizedMap(new HashMap<String, GuiComboBox>());
     /** popup menu for this object. */
     private JPopupMenu popup;
     /** Popup object lock. */
