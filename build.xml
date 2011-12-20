@@ -19,7 +19,7 @@
 	<property name="startup.script"	value="lcmc.startup.script"/>
 	<property name="lcmc.desktop.script" value="lcmc.desktop"/>
 	<property name="lcmc.applications.script" value="lcmc.applications"/>
-	<property name="launch4j.conf" value="${scripts.dir}/launch4j.xml"/>
+	<property name="launch4j.conf" value="launch4j.xml"/>
 	<property name="scripts.dir"	value="scripts"/>
 	<property name="iss.file"	value="lcmc.iss"/>
 	<loadproperties> 
@@ -36,6 +36,7 @@
 		<delete dir="${jar.dir}"/>
 		<delete file="${doc.dir}/${man.file}"/>
 		<delete file="${scripts.dir}/${iss.file}"/>
+		<delete file="${scripts.dir}/${launch4j.conf}"/>
 	</target>
 	
 	<target name="superclean" depends="clean">
@@ -392,10 +393,18 @@
 			 token="@LCMC-VERSION@"
 			 value="${release}"/>
 	</target>
-	<target name="exe" depends="jar,iss">
+	<target name="launch4j">
+		<copy tofile="${scripts.dir}/${launch4j.conf}"
+		      file="${scripts.dir}/${launch4j.conf}.in"
+		      overwrite="yes"/>
+		<replace file="${scripts.dir}/${launch4j.conf}"
+			 token="@LCMC-VERSION@"
+			 value="${release}"/>
+	</target>
+	<target name="exe" depends="jar,iss,launch4j">
 		<taskdef name="launch4j"
 			 classname="net.sf.launch4j.ant.Launch4jTask"
 			 classpath="misc/launch4j/launch4j.jar"/>
-		<launch4j configFile="${launch4j.conf}"/>
+		<launch4j configFile="${scripts.dir}/${launch4j.conf}"/>
 	</target>
 </project>

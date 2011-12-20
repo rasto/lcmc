@@ -8,19 +8,19 @@ AppUpdatesURL="http://lcmc.sf.net"
 DefaultDirName={pf}\LCMC
 DefaultGroupName="Linux Cluster MC"
 Compression=lzma
-UninstallDisplayIcon={app}\LCMC.exe
+UninstallDisplayIcon={app}\LCMC-@LCMC-VERSION@-windows.exe
 LicenseFile=../LICENSE.txt
 
 [Files]
-Source: "../LCMC.EXE"; DestDir: "{app}"
+Source: "../LCMC-@LCMC-VERSION@-windows.exe"; DestDir: "{app}"
 Source: "../README.txt"; DestDir: "{app}"; Flags: isreadme
 Source: "../LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\LCMC"; Filename: "{app}\LCMC.exe"
+Name: "{group}\LCMC"; Filename: "{app}\LCMC-@LCMC-VERSION@-windows.exe"
 
 [Run]
-Filename: {app}\LCMC.exe; Description: {cm:LaunchProgram,LCMC}; Flags: nowait postinstall skipifsilent
+Filename: {app}\LCMC-@LCMC-VERSION@-windows.exe; Description: {cm:LaunchProgram,LCMC}; Flags: nowait postinstall skipifsilent
 
 [CustomMessages]
 LaunchProgram=Start LCMC after finishing installation
