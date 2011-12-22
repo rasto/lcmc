@@ -35,6 +35,7 @@ import lcmc.data.Subtext;
 import lcmc.data.ClusterStatus;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.PtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
@@ -45,9 +46,12 @@ import lcmc.utilities.SSH;
 import lcmc.utilities.Corosync;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Heartbeat;
+import lcmc.utilities.ButtonCallback;
+import lcmc.gui.HeartbeatGraph;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -61,9 +65,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 import javax.swing.JScrollPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JColorChooser;
+import javax.swing.text.Document;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
 
 /**
  * This class holds info data for a host.
@@ -117,6 +124,10 @@ public final class HostInfo extends Info {
     /** String that is displayed as a tool tip for disabled menu item. */
     private static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
+    /** whether crm mon is showing. */
+    private volatile boolean crmMon = false;
+    /** whether crm show is in progress. */
+    private volatile boolean crmShowInProgress = true;
     /** Prepares a new <code>HostInfo</code> object. */
     public HostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
@@ -155,26 +166,45 @@ public final class HostInfo extends Info {
     /** Returns info panel. */
     @Override public JComponent getInfoPanel() {
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
-        final JTextArea ta = new JTextArea();
+        crmShowInProgress = true;
+        final JTextArea ta = new JTextArea("loading...");
         ta.setFont(f);
 
+        final MyButton crmConfigureCommitButton = new MyButton("commit");
+        final MyButton crmMonButton = new MyButton("status");
+        final MyButton crmConfigureShowButton = new MyButton("reload");
+        crmConfigureCommitButton.setEnabled(false);
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override public void done(final String ans) {
                     ta.setText(ans);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            crmConfigureShowButton.setEnabled(true);
+                            crmMonButton.setEnabled(true);
+                            crmShowInProgress = false;
+                        }
+                    });
                 }
 
                 @Override public void doneError(final String ans,
                                                 final int exitCode) {
                     ta.setText("error");
                     Tools.sshError(host, "", ans, stacktrace, exitCode);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            crmConfigureCommitButton.setEnabled(false);
+                        }
+                    });
                 }
 
             };
-        final MyButton crmMonButton = new MyButton("crm_mon");
         crmMonButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
+                crmMon = true;
+                crmMonButton.setEnabled(false);
+                crmConfigureCommitButton.setEnabled(false);
                 host.execCommand("HostBrowser.getCrmMon",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -183,10 +213,12 @@ public final class HostInfo extends Info {
             }
         });
         host.registerEnableOnConnect(crmMonButton);
-        final MyButton crmConfigureShowButton =
-                                        new MyButton("crm configure show");
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
+                crmShowInProgress = true;
+                crmMon = false;
+                crmConfigureShowButton.setEnabled(false);
+                crmConfigureCommitButton.setEnabled(false);
                 host.execCommand("HostBrowser.getCrmConfigureShow",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -194,7 +226,99 @@ public final class HostInfo extends Info {
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
-        host.registerEnableOnConnect(crmConfigureShowButton);
+        final HeartbeatGraph hg =
+                        getBrowser().getClusterBrowser().getHeartbeatGraph();
+        final Document taDocument = ta.getDocument();
+        taDocument.addDocumentListener(new DocumentListener() {
+            private void update() {
+                if (!crmShowInProgress && !crmMon) {
+                    crmConfigureCommitButton.setEnabled(true);
+                }
+            }
+
+            public void changedUpdate(final DocumentEvent documentEvent) {
+                update();
+            }
+
+            public void insertUpdate(final DocumentEvent documentEvent) {
+                update();
+            }
+
+            public void removeUpdate(final DocumentEvent documentEvent) {
+                update();
+            }
+        });
+
+        final ButtonCallback buttonCallback = new ButtonCallback() {
+            private volatile boolean mouseStillOver = false;
+
+            /**
+             * Whether the whole thing should be enabled.
+             */
+            @Override public boolean isEnabled() {
+                if (Tools.versionBeforePacemaker(host)) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override public void mouseOut() {
+                if (!isEnabled()) {
+                    return;
+                }
+                mouseStillOver = false;
+                hg.stopTestAnimation(crmConfigureCommitButton);
+                crmConfigureCommitButton.setToolTipText(null);
+            }
+
+            @Override public void mouseOver() {
+                if (!isEnabled()) {
+                    return;
+                }
+                mouseStillOver = true;
+                crmConfigureCommitButton.setToolTipText(
+                                        ClusterBrowser.STARTING_PTEST_TOOLTIP);
+                crmConfigureCommitButton.setToolTipBackground(
+                            Tools.getDefaultColor(
+                                    "ClusterBrowser.Test.Tooltip.Background"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                hg.startTestAnimation(crmConfigureCommitButton, startTestLatch);
+                final Host dcHost =
+                                  getBrowser().getClusterBrowser().getDCHost();
+                getBrowser().getClusterBrowser().ptestLockAcquire();
+                final ClusterStatus clStatus =
+                            getBrowser().getClusterBrowser().getClusterStatus();
+                clStatus.setPtestData(null);
+                CRM.crmConfigureCommit(host, ta.getText(), true);
+                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
+                crmConfigureCommitButton.setToolTipText(ptestData.getToolTip());
+                clStatus.setPtestData(ptestData);
+                getBrowser().getClusterBrowser().ptestLockRelease();
+                startTestLatch.countDown();
+            }
+        };
+        addMouseOverListener(crmConfigureCommitButton, buttonCallback);
+        crmConfigureCommitButton.addActionListener(new ActionListener() {
+            @Override public void actionPerformed(final ActionEvent e) {
+                crmConfigureCommitButton.setEnabled(false);
+                final Thread thread = new Thread(
+                    new Runnable() {
+                        @Override public void run() {
+                            getBrowser().getClusterBrowser().clStatusLock();
+                            final String ret =
+                             CRM.crmConfigureCommit(host, ta.getText(), false);
+                            getBrowser().getClusterBrowser().clStatusUnlock();
+                        }
+                    }
+                );
+                thread.start();
+            }
+        });
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
@@ -214,7 +338,8 @@ public final class HostInfo extends Info {
 
         p.add(crmMonButton);
         p.add(crmConfigureShowButton);
-        SpringUtilities.makeCompactGrid(p, 2, 1,  // rows, cols
+        p.add(crmConfigureCommitButton);
+        SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(
@@ -224,7 +349,13 @@ public final class HostInfo extends Info {
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
+        mainPanel.add(new JLabel("experimental remote crm shell"));
         mainPanel.add(new JScrollPane(ta));
+        host.execCommand("HostBrowser.getCrmConfigureShow",
+                         execCallback,
+                         null,  /* ConvertCmdCallback */
+                         true,  /* outputVisible */
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
         return mainPanel;
     }
 

@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
+import java.util.regex.Matcher;
 
 /**
  * This class provides cib commands. There are commands that use cibadmin and
@@ -1280,5 +1281,21 @@ public final class CRM {
         final String command = host.getDistCommand("CRM.erase", replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
+    }
+
+    /** crm configure commit. */
+    public static String crmConfigureCommit(final Host host,
+                                             final String config,
+                                             final boolean testOnly) {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@CONFIG@",
+            Tools.escapeQuotes(Matcher.quoteReplacement(config), 1));
+        final String command = host.getDistCommand("CRM.configureCommit",
+                                                   replaceHash);
+        final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
+        if (ret.getExitCode() == 0) {
+            return ret.getOutput();
+        }
+        return "error";
     }
 }
