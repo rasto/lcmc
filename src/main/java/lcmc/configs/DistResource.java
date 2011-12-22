@@ -301,7 +301,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          + "/usr/sbin/cibadmin --obj_type configuration -R -X '<resources/>'"},
 
         {"CRM.configureCommit",
-         SUDO + "EDITOR=\"echo '@CONFIG@'|cat>\" crm configure edit"},
+         "EDITOR=\"echo '@CONFIG@'|cat>\" " + SUDO + "crm configure edit"},
 
         {"OpenAIS.getAisConfig",
          DistResource.SUDO + "cat /etc/ais/openais.conf"},
