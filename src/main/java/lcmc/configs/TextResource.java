@@ -1779,6 +1779,21 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostInfo.confirmHeartbeatStop.No",
          "Cancel"},
 
+        {"HostInfo.crmShellInfo",
+         "experimental remote CRM shell"},
+
+        {"HostInfo.crmShellCommitButton",
+         "commit"},
+
+        {"HostInfo.crmShellStatusButton",
+         "status"},
+
+        {"HostInfo.crmShellShowButton",
+         "reload"},
+
+        {"HostInfo.crmShellLoading",
+         "loading..."},
+
         {"HostBrowser.CRM.StandByOn",
          "Go Into Standby"},
 

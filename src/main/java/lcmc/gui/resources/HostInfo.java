@@ -167,12 +167,16 @@ public final class HostInfo extends Info {
     @Override public JComponent getInfoPanel() {
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         crmShowInProgress = true;
-        final JTextArea ta = new JTextArea("loading...");
+        final JTextArea ta = new JTextArea(
+                                  Tools.getString("HostInfo.crmShellLoading"));
         ta.setFont(f);
 
-        final MyButton crmConfigureCommitButton = new MyButton("commit");
-        final MyButton crmMonButton = new MyButton("status");
-        final MyButton crmConfigureShowButton = new MyButton("reload");
+        final MyButton crmConfigureCommitButton =
+                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"));
+        final MyButton crmMonButton =
+                new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
+        final MyButton crmConfigureShowButton =
+                  new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
         crmConfigureCommitButton.setEnabled(false);
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
@@ -349,7 +353,7 @@ public final class HostInfo extends Info {
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
-        mainPanel.add(new JLabel("experimental remote crm shell"));
+        mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
         host.execCommand("HostBrowser.getCrmConfigureShow",
                          execCallback,
