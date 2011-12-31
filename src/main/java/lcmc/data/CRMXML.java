@@ -743,6 +743,12 @@ public final class CRMXML extends XML {
         paramGlobalDefaultMap.put("default-resource-failure-stickiness", "0");
         globalRequiredParams.add("default-resource-failure-stickiness");
 
+        paramGlobalPossibleChoices.put("placement-strategy",
+                                       new String[]{"default",
+                                                    "utilization",
+                                                    "minimal",
+                                                    "balanced"});
+
         try {
             if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
                 String clusterRecheckInterval = "cluster-recheck-interval";
