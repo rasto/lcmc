@@ -1730,8 +1730,15 @@ public final class Host {
             command = command.replaceAll("@DRBDDIR@", drbdDir);
         }
         if (command.indexOf("@GUI-HELPER@") > -1) {
+            String dir = "/usr/local/bin";
+            if (username != null && !"root".equals(username)) {
+                final String home = System.getProperty("user.home");
+                if (home != null) {
+                    dir = System.getProperty("user.home");
+                }
+            }
             command = command.replaceAll("@GUI-HELPER@",
-                                         "/usr/local/bin/lcmc-gui-helper-"
+                                         dir + "/lcmc-gui-helper-"
                                          + Tools.getRelease());
         }
         return command;
