@@ -118,9 +118,9 @@ final class CheckInstallation extends DialogHost {
     /** Whether there are drbd methods available. */
     private boolean drbdInstallMethodsAvailable = false;
     /** Label of heartbeat that can be with or without pacemaker. */
-    private final JLabel hbPmJLabel = new JLabel("Pacemaker/HB");
+    private final JLabel hbPmJLabel = new JLabel("Pcmk/Heartbeat");
     /** Label of pacemaker that can be with corosync or openais. */
-    private final JLabel pmJLabel = new JLabel("Pacemaker/Coro");
+    private final JLabel pmJLabel = new JLabel("Pcmk/Corosync");
 
     /** Prepares a new <code>CheckInstallation</code> object. */
     CheckInstallation(final WizardDialog previousDialog,
@@ -400,7 +400,7 @@ final class CheckInstallation extends DialogHost {
                     pmIcon.setIcon(NOT_INSTALLED_ICON);
                     pmLabel.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.PmNotInstalled"));
-                    pmJLabel.setText("Pacemaker/Coro");
+                    pmJLabel.setText("Pcmk/Corosync");
                 }
             });
         } else {
@@ -410,10 +410,10 @@ final class CheckInstallation extends DialogHost {
                     String coroAisVersion = "no";
                     pmIcon.setIcon(INSTALLED_ICON);
                     if (corosyncVersion != null) {
-                        pmJLabel.setText("Pacemaker/Coro");
+                        pmJLabel.setText("Pcmk/Corosync");
                         coroAisVersion = corosyncVersion;
                     } else if (aisVersion != null) {
-                        pmJLabel.setText("Pacemaker/AIS");
+                        pmJLabel.setText("Pcmk/AIS");
                         coroAisVersion = aisVersion;
                     }
                     pmJLabel.repaint();
