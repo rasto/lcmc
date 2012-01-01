@@ -1727,8 +1727,11 @@ public final class Tools {
                 final Thread thread = new Thread(new Runnable() {
                     @Override public void run() {
                         int pIndex = list.locationToIndex(evt.getPoint());
-                        if (!list.getCellBounds(pIndex, pIndex).contains(
-                                                         evt.getPoint())) {
+                        final Rectangle r = list.getCellBounds(pIndex, pIndex);
+                        if (r == null) {
+                            return;
+                        }
+                        if (!r.contains(evt.getPoint())) {
                             pIndex = -1;
                         }
                         final int index = pIndex;
