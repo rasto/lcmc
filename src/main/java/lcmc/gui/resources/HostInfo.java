@@ -172,11 +172,14 @@ public final class HostInfo extends Info {
         ta.setFont(f);
 
         final MyButton crmConfigureCommitButton =
-                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"));
+                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"),
+                             Browser.APPLY_ICON);
         final MyButton crmMonButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
+        crmMonButton.miniButton();
         final MyButton crmConfigureShowButton =
                   new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
+        crmConfigureShowButton.miniButton();
         crmConfigureCommitButton.setEnabled(false);
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
@@ -355,7 +358,7 @@ public final class HostInfo extends Info {
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
-        host.execCommand("HostBrowser.getCrmConfigureShow",
+        host.execCommand("HostBrowser.getCrmMon",
                          execCallback,
                          null,  /* ConvertCmdCallback */
                          true,  /* outputVisible */
