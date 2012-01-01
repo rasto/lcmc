@@ -1170,7 +1170,7 @@ public final class ClusterBrowser extends Browser {
                                      final CountDownLatch firstTime,
                                      final boolean testOnly) {
         clStatusLock();
-        if (clStatusCanceled) {
+        if (clStatusCanceled || clusterStatus == null) {
             clStatusUnlock();
             firstTime.countDown();
             return;
