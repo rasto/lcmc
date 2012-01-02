@@ -280,17 +280,17 @@ public final class AllHostsInfo extends Info {
         infoPanel.add(clustersPane);
         if (Tools.getConfigData().getAutoHosts().isEmpty()
             && !Tools.getConfigData().getAutoClusters().isEmpty()) {
-            for (final Cluster cl : allLoadButtons.keySet()) {
-                if (cl.getClusterTab() == null
-                    && Tools.getConfigData().getAutoClusters().contains(
-                                                               cl.getName())) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override public void run() {
+                    for (final Cluster cl : allLoadButtons.keySet()) {
+                        if (cl.getClusterTab() == null
+                            && Tools.getConfigData().getAutoClusters().contains(
+                                                                cl.getName())) {
                             allLoadButtons.get(cl).pressButton();
                         }
-                    });
+                    }
                 }
-            }
+            });
         }
         return infoPanel;
     }
