@@ -196,6 +196,11 @@ public final class HostDrbdInfo extends Info {
                 Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JScrollPane(ta));
+        host.execCommand("DRBD.getProcDrbd",
+                         execCallback,
+                         null,  /* ConvertCmdCallback */
+                         true,  /* outputVisible */
+                         SSH.DEFAULT_COMMAND_TIMEOUT);
         return mainPanel;
     }
 

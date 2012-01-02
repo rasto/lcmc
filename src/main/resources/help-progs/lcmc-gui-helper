@@ -2047,7 +2047,9 @@ sub get_proc_drbd {
 					print "$name: $value\n";
 				}
 			}
-			print "\n\n";
+			if (/ns:/ && /nr:/ && /dr:/) {
+				print "\n\n";
+			}
 		}
 		close $pfh;
 	}
