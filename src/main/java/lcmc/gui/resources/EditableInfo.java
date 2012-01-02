@@ -70,7 +70,6 @@ public abstract class EditableInfo extends Info {
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
-
     /** Returns section in which is this parameter. */
     protected abstract String getSection(String param);
     /** Returns whether this parameter is required. */
@@ -1068,7 +1067,9 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Hide/Show advanced panels. */
+    @Override
     public void updateAdvancedPanels() {
+        super.updateAdvancedPanels();
         final boolean advancedMode = Tools.getConfigData().isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {

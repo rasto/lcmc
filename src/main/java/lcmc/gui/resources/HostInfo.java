@@ -169,11 +169,17 @@ public final class HostInfo extends Info {
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
                                   Tools.getString("HostInfo.crmShellLoading"));
+        registerComponentAccessMode(ta,
+                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                                   false));
         ta.setFont(f);
 
         final MyButton crmConfigureCommitButton =
                 new MyButton(Tools.getString("HostInfo.crmShellCommitButton"),
                              Browser.APPLY_ICON);
+        registerComponentAccessMode(crmConfigureCommitButton,
+                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                                   false));
         final MyButton crmMonButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
         crmMonButton.miniButton();

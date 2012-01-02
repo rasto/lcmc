@@ -2499,6 +2499,11 @@ public final class ClusterBrowser extends Browser {
             hbci.checkResourceFieldsChanged(null, hbci.getParametersFromXML());
             hbci.updateAdvancedPanels();
         }
+
+        for (final Host clusterHost : getClusterHosts()) {
+            final HostBrowser hostBrowser = clusterHost.getBrowser();
+            hostBrowser.getHostInfo().updateAdvancedPanels();
+        }
     }
 
 

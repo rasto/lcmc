@@ -25,6 +25,8 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.gui.GuiComboBox;
 import lcmc.data.resources.Resource;
+import lcmc.data.ConfigData;
+import lcmc.data.AccessMode;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.Unit;
 import lcmc.utilities.Tools;
@@ -136,6 +138,10 @@ public class Info implements Comparable {
     /** Log file icon. */
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
                                   Tools.getDefault("Info.LogIcon"));
+    /** Hash from component to the access mode. */
+    private final Map<JComponent, AccessMode> componentToAccessMode =
+                                         new HashMap<JComponent, AccessMode>();
+
     /**
      * Prepares a new <code>Info</code> object.
      *
@@ -1129,4 +1135,18 @@ public class Info implements Comparable {
         return toString();
     }
 
+    /** Register component access mode. */
+    protected void registerComponentAccessMode(final JComponent component,
+                                               final AccessMode mode) {
+        componentToAccessMode.put(component, mode);
+    }
+
+    /** Process Access Lists. */
+    public void updateAdvancedPanels() {
+        for (final JComponent c : componentToAccessMode.keySet()) {
+            final boolean accessible = Tools.getConfigData().isAccessible(
+                                                 componentToAccessMode.get(c));
+            c.setEnabled(accessible);
+        }
+    }
 }
