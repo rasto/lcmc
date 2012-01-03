@@ -187,7 +187,6 @@ public final class HostInfo extends Info {
                   new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
         crmConfigureShowButton.miniButton();
         crmConfigureCommitButton.setEnabled(false);
-        final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override public void done(final String ans) {
@@ -204,7 +203,7 @@ public final class HostInfo extends Info {
                 @Override public void doneError(final String ans,
                                                 final int exitCode) {
                     ta.setText("error");
-                    Tools.sshError(host, "", ans, stacktrace, exitCode);
+                    Tools.sshError(host, "", ans, "", exitCode);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);
