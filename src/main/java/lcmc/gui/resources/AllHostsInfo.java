@@ -278,20 +278,27 @@ public final class AllHostsInfo extends Info {
                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         infoPanel.add(clustersPane);
-        if (Tools.getConfigData().getAutoHosts().isEmpty()
-            && !Tools.getConfigData().getAutoClusters().isEmpty()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
-                    for (final Cluster cl : allLoadButtons.keySet()) {
-                        if (cl.getClusterTab() == null
-                            && Tools.getConfigData().getAutoClusters().contains(
-                                                                cl.getName())) {
-                            allLoadButtons.get(cl).pressButton();
+        final Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Tools.sleep(3000);
+                if (Tools.getConfigData().getAutoHosts().isEmpty()
+                    && !Tools.getConfigData().getAutoClusters().isEmpty()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override public void run() {
+                            for (final Cluster cl : allLoadButtons.keySet()) {
+                                if (cl.getClusterTab() == null
+                                    && Tools.getConfigData().getAutoClusters()
+                                                    .contains(cl.getName())) {
+                                    allLoadButtons.get(cl).pressButton();
+                                }
+                            }
                         }
-                    }
+                    });
                 }
-            });
-        }
+            }
+        });
+        t.start();
         return infoPanel;
     }
 
