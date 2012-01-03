@@ -169,15 +169,14 @@ public final class HostInfo extends Info {
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
                                   Tools.getString("HostInfo.crmShellLoading"));
-        registerComponentAccessMode(ta,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
-                                                   false));
+        ta.setEditable(false);
         ta.setFont(f);
 
         final MyButton crmConfigureCommitButton =
                 new MyButton(Tools.getString("HostInfo.crmShellCommitButton"),
                              Browser.APPLY_ICON);
-        registerComponentAccessMode(crmConfigureCommitButton,
+        registerComponentEnableAccessMode(
+                                    crmConfigureCommitButton,
                                     new AccessMode(ConfigData.AccessType.ADMIN,
                                                    false));
         final MyButton crmMonButton =
@@ -214,6 +213,10 @@ public final class HostInfo extends Info {
             };
         crmMonButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
+                registerComponentEditAccessMode(
+                                ta,
+                                new AccessMode(ConfigData.AccessType.GOD,
+                                               false));
                 crmMon = true;
                 crmMonButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
@@ -227,6 +230,11 @@ public final class HostInfo extends Info {
         host.registerEnableOnConnect(crmMonButton);
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override public void actionPerformed(final ActionEvent e) {
+                registerComponentEditAccessMode(
+                                    ta,
+                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                                   false));
+                updateAdvancedPanels();
                 crmShowInProgress = true;
                 crmMon = false;
                 crmConfigureShowButton.setEnabled(false);

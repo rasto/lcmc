@@ -40,6 +40,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
+import javax.swing.text.JTextComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.SwingUtilities;
@@ -138,8 +139,11 @@ public class Info implements Comparable {
     /** Log file icon. */
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
                                   Tools.getDefault("Info.LogIcon"));
-    /** Hash from component to the access mode. */
-    private final Map<JComponent, AccessMode> componentToAccessMode =
+    /** Hash from component to the edit access mode. */
+    private final Map<JTextComponent, AccessMode> componentToEditAccessMode =
+                                     new HashMap<JTextComponent, AccessMode>();
+    /** Hash from component to the enable access mode. */
+    private final Map<JComponent, AccessMode> componentToEnableAccessMode =
                                          new HashMap<JComponent, AccessMode>();
 
     /**
@@ -1135,18 +1139,30 @@ public class Info implements Comparable {
         return toString();
     }
 
-    /** Register component access mode. */
-    protected void registerComponentAccessMode(final JComponent component,
-                                               final AccessMode mode) {
-        componentToAccessMode.put(component, mode);
+    /** Register component edit access mode. */
+    protected void registerComponentEditAccessMode(
+                                                final JTextComponent component,
+                                                final AccessMode mode) {
+        componentToEditAccessMode.put(component, mode);
     }
 
-    /** Process Access Lists. */
+    /** Register component enable access mode. */
+    protected void registerComponentEnableAccessMode(final JComponent component,
+                                                     final AccessMode mode) {
+        componentToEnableAccessMode.put(component, mode);
+    }
+
+    /** Process access lists. TODO: rename.*/
     public void updateAdvancedPanels() {
-        for (final JComponent c : componentToAccessMode.keySet()) {
+        for (final JComponent c : componentToEnableAccessMode.keySet()) {
             final boolean accessible = Tools.getConfigData().isAccessible(
-                                                 componentToAccessMode.get(c));
+                                           componentToEnableAccessMode.get(c));
             c.setEnabled(accessible);
+        }
+        for (final JTextComponent c : componentToEditAccessMode.keySet()) {
+            final boolean accessible = Tools.getConfigData().isAccessible(
+                                             componentToEditAccessMode.get(c));
+            c.setEditable(accessible);
         }
     }
 }
