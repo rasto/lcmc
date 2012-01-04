@@ -121,7 +121,11 @@ public final class CRM {
         }
         M_PTEST_READLOCK.unlock();
         final String command =
-                DistResource.SUDO + "/usr/sbin/ptest -VVVV -S -x "
+                "export PROG=/usr/sbin/crm_simulate;"
+                + "if [ -e /usr/sbin/ptest ];"
+                + " then export PROG=/usr/sbin/ptest; "
+                + "fi;"
+                + DistResource.SUDO + "$PROG -VVVV -S -x "
                 + LCMC_TEST_FILE
                 + " 2>&1;echo '"
                 + PTEST_END_DELIM

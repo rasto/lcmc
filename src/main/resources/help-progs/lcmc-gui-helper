@@ -906,7 +906,16 @@ sub get_resource_status {
 	my %unmanaged;
 	my %resources;
 	my @fenced_nodes;
-	for my $line (`/usr/sbin/ptest -VVVV -L 2>&1`) {
+	my $prog = "/usr/sbin/crm_simulate";
+	my $errors = ""; # TODO: error handling
+	my $ptest_prog = "/usr/sbin/ptest";
+	if (-e $ptest_prog) {
+		$prog = $ptest_prog; # default, because crm_simulate
+				     # crashes sometimes
+	} elsif (!-e $prog) {
+		$errors .= "could not find $prog\n";
+	}
+	for my $line (`$prog -S -VVVV -L 2>&1`) {
 		my $what;
 		my $on;
 		my $res;
