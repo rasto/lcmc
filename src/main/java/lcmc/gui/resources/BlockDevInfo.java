@@ -776,7 +776,7 @@ public final class BlockDevInfo extends EditableInfo {
     void discardData(final boolean testOnly) {
         DRBD.discardData(getHost(),
                          drbdVolumeInfo.getDrbdResourceInfo().getName(),
-                         drbdVolumeInfo.getName(),
+                         null,
                          testOnly);
     }
 
