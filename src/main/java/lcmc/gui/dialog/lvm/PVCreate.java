@@ -152,6 +152,7 @@ public final class PVCreate extends WizardDialog {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
             } else if (oBdi == null
+                       || oBdi.getBlockDevice().isDrbd()
                        || oBdi.getBlockDevice().isPhysicalVolume()) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(false);

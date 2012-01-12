@@ -82,6 +82,8 @@ public final class BlockDevice extends Resource {
     private String vgOnPhysicalVolume = null;
     /** Logical volume. */
     private String logicalVolume = null;
+    /** DRBD block device. */
+    private BlockDevice drbdBlockDevice = null;
     /** States that means that we are connected. */
     private static final Set<String> CONNECTED_STATES =
         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
@@ -214,7 +216,10 @@ public final class BlockDevice extends Resource {
      * not used by CRM.
      */
     public boolean isAvailable() {
-        return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk();
+        return !isMounted()
+               && !isUsedByCRM
+               && !isDrbdMetaDisk()
+               && !isVolumeGroupOnPhysicalVolume();
     }
 
 
@@ -562,5 +567,26 @@ public final class BlockDevice extends Resource {
     /** Returns logical volume. */
     public String getLogicalVolume() {
         return logicalVolume;
+    }
+
+    /** Returns DRBD block device. */
+    public final BlockDevice getDrbdBlockDevice() {
+        return drbdBlockDevice;
+    }
+
+    /** Return whether the drbd block device is a physical volume. */
+    public final boolean isDrbdPhysicalVolume() {
+        return drbdBlockDevice != null && drbdBlockDevice.isPhysicalVolume();
+    }
+
+    /** Returns whether there's a volume group on the drbd physical volume. */
+    public boolean isDrbdVolumeGroupOnPhysicalVolume() {
+        return drbdBlockDevice != null
+               && drbdBlockDevice.isVolumeGroupOnPhysicalVolume();
+    }
+
+    /** Sets DRBD block device. */
+    public final void setDrbdBlockDevice(final BlockDevice drbdBlockDevice) {
+        this.drbdBlockDevice = drbdBlockDevice;
     }
 }

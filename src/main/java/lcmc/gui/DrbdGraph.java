@@ -240,14 +240,20 @@ public final class DrbdGraph extends ResourceGraph {
                 bdv = blockDeviceToVertexMap.get(bdi.getBlockDevice());
             }
             if (prevBdi != null
+                && bdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()
+                && bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume().equals(
+                                       prevBdi.getBlockDevice()
+                                          .getVolumeGroupOnPhysicalVolume())) {
+                devYPos -= 8;
+            } else if (prevBdi != null
                 && (!bdi.getBlockDevice().isDrbd()
                     || !prevBdi.getBlockDevice().isDrbd())) {
                 devYPos -= 4;
             } else if (prevBdi != null
-                && bdi.getBlockDevice().isDrbd()
-                && prevBdi.getBlockDevice().isDrbd()
-                && bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
-                   == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
+                      && bdi.getBlockDevice().isDrbd()
+                      && prevBdi.getBlockDevice().isDrbd()
+                      && bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
+                         == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
                 devYPos -= 6;
             }
             Point2D pos = null; // getSavedPosition(bdi);

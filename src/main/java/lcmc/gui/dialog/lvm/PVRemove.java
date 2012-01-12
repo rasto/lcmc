@@ -96,7 +96,8 @@ public final class PVRemove extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
+        if (blockDevInfo.getBlockDevice().isPhysicalVolume()
+            || blockDevInfo.getBlockDevice().isDrbdPhysicalVolume()) {
             SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
         }
     }
@@ -147,8 +148,9 @@ public final class PVRemove extends LV {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
             } else if (oBdi == null
+                       || oBdi.getBlockDevice().isDrbd()
                        || !oBdi.getBlockDevice().isPhysicalVolume()
-                 || oBdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
+                    || oBdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(false);
             } else {

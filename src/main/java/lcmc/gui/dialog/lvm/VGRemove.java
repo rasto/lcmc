@@ -101,9 +101,7 @@ public final class VGRemove extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        if (blockDevInfo.getBlockDevice().isPhysicalVolume()) {
-            SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
-        }
+        SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
     }
 
     private class EnableRemoveRunnable implements Runnable {
@@ -128,8 +126,14 @@ public final class VGRemove extends LV {
         inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
         inputPane.add(new JLabel("Volume Group: "));
-        final String vgName = blockDevInfo.getBlockDevice()
+        String vgName;
+        if (blockDevInfo.getBlockDevice().isDrbd()) {
+            vgName = blockDevInfo.getBlockDevice().getDrbdBlockDevice()
                                         .getVolumeGroupOnPhysicalVolume();
+        } else {
+            vgName = blockDevInfo.getBlockDevice()
+                                        .getVolumeGroupOnPhysicalVolume();
+        }
         inputPane.add(new JLabel(vgName));
         removeButton.addActionListener(new RemoveActionListener());
         inputPane.add(removeButton);
@@ -149,6 +153,16 @@ public final class VGRemove extends LV {
             }
 
         }
+        if (blockDevInfo.getBlockDevice().isDrbd()) {
+            for (final BlockDevice bd
+                              : blockDevInfo.getHost().getDrbdBlockDevices()) {
+                final String thisVG = bd.getVolumeGroupOnPhysicalVolume();
+                if (vgName.equals(thisVG)) {
+                    bds.add(bd.getName());
+                }
+
+            }
+        }
         bdPane.add(new JLabel(Tools.join(", ", bds)));
         pane.add(bdPane);
         final JPanel hostsPane = new JPanel(
@@ -163,7 +177,8 @@ public final class VGRemove extends LV {
             if (blockDevInfo.getHost() == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
-            } else if (!vgs.contains(vgName)) {
+            } else if (blockDevInfo.getBlockDevice().isDrbd()
+                       || !vgs.contains(vgName)) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(false);
             } else {
@@ -194,8 +209,15 @@ public final class VGRemove extends LV {
                     disableComponents();
                     getProgressBar().start(REMOVE_TIMEOUT
                                            * hostCheckBoxes.size());
-                    final String vgName = blockDevInfo.getBlockDevice()
+                    String vgName;
+                    if (blockDevInfo.getBlockDevice().isDrbd()) {
+                        vgName = blockDevInfo.getBlockDevice()
+                                        .getDrbdBlockDevice()
                                              .getVolumeGroupOnPhysicalVolume();
+                    } else {
+                        vgName = blockDevInfo.getBlockDevice()
+                                             .getVolumeGroupOnPhysicalVolume();
+                    }
                     boolean oneFailed = false;
                     for (final Host h : hostCheckBoxes.keySet()) {
                         if (hostCheckBoxes.get(h).isSelected()) {

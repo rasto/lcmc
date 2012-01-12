@@ -488,7 +488,7 @@ sub get_disk_info {
 		next if /^major / || /^$/; # skip header
 		chomp;
 		my ($major, $minor, $blocks, $name) = split;
-		next if $$devs_with_lvm{$name} || $$devs_in_raid{$name};
+		next if $$devs_in_raid{$name};
 		my $device;
 		my $lvm_group;
 		my $lv_name;
@@ -526,7 +526,7 @@ sub get_disk_info {
 		} elsif ($major == 9 || $major == 254) { # raid
 			$device = "/dev/$name";
 		} elsif ($name =~ /^drbd/) {
-			next;
+			$device = "/dev/$name";
 		} else {
 			disk_info_warning("unknown partition: $_");
 			$device = "/dev/$name";

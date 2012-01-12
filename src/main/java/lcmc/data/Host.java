@@ -44,6 +44,7 @@ import java.awt.geom.Point2D;
 
 import java.awt.Color;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -138,6 +139,9 @@ public final class Host {
     private Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
     private Map<String, BlockDevice> blockDevices =
+                                      new LinkedHashMap<String, BlockDevice>();
+    /** List of drbd block devices of this host. */
+    private Map<String, BlockDevice> drbdBlockDevices =
                                       new LinkedHashMap<String, BlockDevice>();
     /** Color of this host in graphs. */
     private Color defaultColor;
@@ -255,8 +259,12 @@ public final class Host {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
+    /** Block device with number pattern. */
+    public static final Pattern BDP = Pattern.compile("(\\D+)\\d+");
+    /** DRBD bd pattern. */
+    public static final Pattern DRBDP = Pattern.compile(".*\\/drbd\\d+$");
     /** Physical volumes on this host. */
-    private List<String> physicalVolumes = new ArrayList<String>();
+    private List<BlockDevice> physicalVolumes = new ArrayList<BlockDevice>();
     /** Volume group information on this host. */
     private Map<String, Long> volumeGroups = new LinkedHashMap<String, Long>();
     /** Volume group with all lvs in it. */
@@ -1772,13 +1780,16 @@ public final class Host {
         final List<String> versionLines = new ArrayList<String>();
         final Map<String, BlockDevice> newBlockDevices =
                                      new LinkedHashMap<String, BlockDevice>();
+        final Map<String, BlockDevice> newDrbdBlockDevices =
+                                     new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
         final Map<String, Long> newVolumeGroups =
                                      new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS =
                                      new HashMap<String, Set<String>>();
-        final List<String> newPhysicalVolumes = new ArrayList<String>();
+        final List<BlockDevice> newPhysicalVolumes =
+                                                 new ArrayList<BlockDevice>();
         final Set<String> newFileSystems = new TreeSet<String>();
         final Set<String> newCryptoModules = new TreeSet<String>();
         final Set<String> newQemuKeymaps = new TreeSet<String>();
@@ -1801,7 +1812,6 @@ public final class Host {
 
         newMountPoints.add("/mnt/");
 
-        final Pattern bdP = Pattern.compile("(\\D+)\\d+");
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
@@ -1834,18 +1844,29 @@ public final class Host {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String name = blockDevice.getName();
                 if (name != null) {
-                    if (blockDevices.containsKey(name)) {
-                        /* get the existing block device object,
-                           forget the new one. */
-                        blockDevice = blockDevices.get(name);
-                        blockDevice.update(line);
-                    }
-                    newBlockDevices.put(name, blockDevice);
-                    if (blockDevice.getVolumeGroup() == null
-                        && name.length() > 5 && name.indexOf('/', 5) < 0) {
-                        final Matcher m = bdP.matcher(name);
-                        if (m.matches()) {
-                            newBlockDevices.remove(m.group(1));
+                    final Matcher drbdM = DRBDP.matcher(name);
+                    if (drbdM.matches()) {
+                        if (drbdBlockDevices.containsKey(name)) {
+                            /* get the existing block device object,
+                               forget the new one. */
+                            blockDevice = drbdBlockDevices.get(name);
+                            blockDevice.update(line);
+                        }
+                        newDrbdBlockDevices.put(name, blockDevice);
+                    } else {
+                        if (blockDevices.containsKey(name)) {
+                            /* get the existing block device object,
+                               forget the new one. */
+                            blockDevice = blockDevices.get(name);
+                            blockDevice.update(line);
+                        }
+                        newBlockDevices.put(name, blockDevice);
+                        if (blockDevice.getVolumeGroup() == null
+                            && name.length() > 5 && name.indexOf('/', 5) < 0) {
+                            final Matcher m = BDP.matcher(name);
+                            if (m.matches()) {
+                                newBlockDevices.remove(m.group(1));
+                            }
                         }
                     }
                 }
@@ -1862,7 +1883,7 @@ public final class Host {
                     }
                 }
                 if (blockDevice.isPhysicalVolume()) {
-                    newPhysicalVolumes.add(name);
+                    newPhysicalVolumes.add(blockDevice);
                 }
                 diskInfo = true;
             } else if ("vg-info".equals(type)) {
@@ -1909,6 +1930,7 @@ public final class Host {
 
         if (diskInfo) {
             blockDevices = newBlockDevices;
+            drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsLVS = newVolumeGroupsLVS;
         }
@@ -2659,7 +2681,7 @@ public final class Host {
     }
 
     /** Returns physical volumes. */
-    public List<String> getPhysicalVolumes() {
+    public List<BlockDevice> getPhysicalVolumes() {
         return physicalVolumes;
     }
 
@@ -2673,4 +2695,13 @@ public final class Host {
         return savable;
     }
 
+    /** Return block device object of the drbd device. */
+    public BlockDevice getDrbdBlockDevice(final String device) {
+        return drbdBlockDevices.get(device);
+    }
+
+    /** Return DRBD block device objects. */
+    public Collection<BlockDevice> getDrbdBlockDevices() {
+        return drbdBlockDevices.values();
+    }
 }

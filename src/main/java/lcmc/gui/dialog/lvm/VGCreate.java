@@ -26,6 +26,7 @@ import lcmc.data.Host;
 import lcmc.data.AccessMode;
 import lcmc.data.ConfigData;
 import lcmc.data.Cluster;
+import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.resources.BlockDevInfo;
@@ -35,6 +36,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.LVM;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -158,7 +160,8 @@ public final class VGCreate extends LV {
     private Map<String, JCheckBox> getPVCheckBoxes(final String selectedPV) {
         final Map<String, JCheckBox> components =
                                     new LinkedHashMap<String, JCheckBox>();
-        for (final String pvName : host.getPhysicalVolumes()) {
+        for (final BlockDevice pv : host.getPhysicalVolumes()) {
+            final String pvName = pv.getName();
             final JCheckBox button =
                            new JCheckBox(pvName, pvName.equals(selectedPV));
             button.setBackground(
@@ -170,7 +173,11 @@ public final class VGCreate extends LV {
 
     /** Returns true if the specified host has specified PVs without VGs. */
     private boolean hostHasPVS(final Host host) {
-        final List<String> oPVS = host.getPhysicalVolumes();
+        final Map<String, BlockDevice> oPVS =
+                                            new HashMap<String, BlockDevice>();
+        for (final BlockDevice bd : host.getPhysicalVolumes()) {
+            oPVS.put(bd.getName(), bd);
+        }
         final Set<String> pvs = pvCheckBoxes.keySet();
         int selected = 0;
         for (final String pv : pvs) {
@@ -178,16 +185,12 @@ public final class VGCreate extends LV {
                 continue;
             }
             selected++;
-            if (!oPVS.contains(pv)) {
+            final BlockDevice opv = oPVS.get(pv);
+            if (opv == null) {
                 return false;
             }
-            final BlockDevInfo oBdi =
-                host.getBrowser().getDrbdGraph().findBlockDevInfo(
-                                                             host.getName(),
-                                                             pv);
-            if (oBdi == null
-                || !oBdi.getBlockDevice().isPhysicalVolume()
-                || oBdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
+            if (!opv.isPhysicalVolume()
+                || opv.isVolumeGroupOnPhysicalVolume()) {
                 return false;
             }
         }
@@ -237,7 +240,13 @@ public final class VGCreate extends LV {
         final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         String selectedPV = null;
         if (selectedBlockDevInfo != null) {
-            selectedPV = selectedBlockDevInfo.getName();
+            if (selectedBlockDevInfo.getBlockDevice().isDrbd()) {
+                selectedPV =
+                        selectedBlockDevInfo.getBlockDevice()
+                                            .getDrbdBlockDevice().getName();
+            } else {
+                selectedPV = selectedBlockDevInfo.getName();
+            }
         }
         pvCheckBoxes = getPVCheckBoxes(selectedPV);
         pvsPane.add(new JLabel("Select physical volumes: "));
@@ -261,6 +270,10 @@ public final class VGCreate extends LV {
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
+            } else if (selectedBlockDevInfo != null
+                       && selectedBlockDevInfo.getBlockDevice().isDrbd()) {
+                hostCheckBoxes.get(h).setEnabled(false);
+                hostCheckBoxes.get(h).setSelected(false);
             } else if (hostHasPVS(h)) {
                 hostCheckBoxes.get(h).setEnabled(true);
                 hostCheckBoxes.get(h).setSelected(false);
