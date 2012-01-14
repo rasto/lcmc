@@ -274,23 +274,98 @@ public final class BlockDevInfo extends EditableInfo {
         return ret.toString();
     }
 
+    /** Append hierarchy  of block devices in the string buffer using HTML. */
+    private void appendBlockDeviceHierarchy(final BlockDevice bd,
+                                            final StringBuilder tt,
+                                            final int shift) {
+        String tab = "";
+        for (int i = 0; i != shift; ++i) {
+            tab += "    ";
+        }
+        /* physical volumes */
+        String vg = null;
+        String selectedPV = null;
+        if (bd.isVolumeGroupOnPhysicalVolume()) {
+            vg = bd.getVolumeGroupOnPhysicalVolume();
+            selectedPV = bd.getName();
+        }  else if (isLVM()) {
+            vg = bd.getVolumeGroup();
+        }
+        if (vg != null) {
+            for (final BlockDevice pv : getHost().getPhysicalVolumes(vg)) {
+                if (pv.equals(selectedPV)) {
+                    tt.append("<b>");
+                    tt.append(tab + pv);
+                    tt.append("</b>");
+                } else {
+                    tt.append(tab + pv);
+                }
+                tt.append('\n');
+            }
+        }
+        /* volume groups */
+        String selectedLV = null;
+        if (vg != null) {
+            if (bd.isVolumeGroupOnPhysicalVolume()) {
+                tt.append("<b>");
+                tt.append("    " + tab + vg);
+                tt.append("</b>\n");
+            } else if (isLVM()) {
+                tt.append("    " + tab);
+                tt.append(vg);
+                tt.append('\n');
+                selectedLV = bd.getName();
+            }
+            final Set<String> lvs =
+                             getHost().getLogicalVolumesFromVolumeGroup(vg);
+            if (lvs != null) {
+                for (final String lv : lvs) {
+                    tt.append("        " + tab);
+                    final String lvName = "/dev/" + vg + "/" + lv;
+                    if (lvName.equals(selectedLV)) {
+                        if (bd.isDrbd()) {
+                            tt.append(lv);
+                            tt.append("\n");
+                            final BlockDevice drbdBD = bd.getDrbdBlockDevice();
+                            if (drbdBD != null) {
+                                appendBlockDeviceHierarchy(drbdBD,
+                                                           tt,
+                                                           shift + 3);
+                            }
+                        } else {
+                            tt.append("<b>");
+                            tt.append(lv);
+                            tt.append("</b>\n");
+                        }
+                    } else {
+                        tt.append(lv);
+                        tt.append('\n');
+                    }
+                }
+            }
+        } else {
+            final BlockDevice drbdBD = bd.getDrbdBlockDevice();
+            if (drbdBD != null) {
+                tt.append(tab + bd.getName());
+                tt.append('\n');
+                appendBlockDeviceHierarchy(drbdBD, tt, shift + 1);
+            } else {
+                tt.append("<b>");
+                tt.append(tab + bd.getName());
+                tt.append("</b>\n");
+            }
+        }
+    }
+
     /** Returns tool tip for this block device. */
     @Override public String getToolTipForGraph(final boolean testOnly) {
         final StringBuilder tt = new StringBuilder(60);
 
-        if (getBlockDevice().isDrbd()) {
-            tt.append("<b>");
-            tt.append(drbdVolumeInfo.getDevice());
-            tt.append("</b> (");
-            tt.append(getBlockDevice().getName());
-            tt.append(')');
-        } else {
-            tt.append("<b>");
-            tt.append(getBlockDevice().getName());
-            tt.append("</b>");
-        }
-        tt.append("</b>");
-        if (getBlockDevice().isDrbdMetaDisk()) {
+        final BlockDevice bd = getBlockDevice();
+        tt.append("<pre>");
+        appendBlockDeviceHierarchy(bd, tt, 0);
+        tt.append("</pre>");
+        if (bd.isDrbdMetaDisk()) {
             tt.append(" (Meta Disk)\n");
             for (final BlockDevice mb
                          : getBlockDevice().getMetaDiskOfBlockDevices()) {
@@ -298,14 +373,13 @@ public final class BlockDevInfo extends EditableInfo {
                 tt.append(mb.getName());
                 tt.append('\n');
             }
-
         }
 
-        if (getBlockDevice().isDrbd()) {
+        if (bd.isDrbd()) {
             if (getHost().isDrbdStatus()) {
-                String cs = getBlockDevice().getConnectionState();
-                String st = getBlockDevice().getNodeState();
-                String ds = getBlockDevice().getDiskState();
+                String cs = bd.getConnectionState();
+                String st = bd.getNodeState();
+                String ds = bd.getDiskState();
                 if (cs == null) {
                     cs = "not available";
                 }

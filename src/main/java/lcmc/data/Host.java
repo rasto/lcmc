@@ -2704,4 +2704,19 @@ public final class Host {
     public Collection<BlockDevice> getDrbdBlockDevices() {
         return drbdBlockDevices.values();
     }
+
+    /** Return list of block devices that have the specified VG. */
+    public List<BlockDevice> getPhysicalVolumes(final String vg) {
+        final List<BlockDevice> bds = new ArrayList<BlockDevice>();
+        if (vg == null) {
+            return bds;
+        }
+        for (final BlockDevice b : physicalVolumes) {
+            if (vg.equals(b.getVolumeGroupOnPhysicalVolume())) {
+                bds.add(b);
+            }
+        }
+        return bds;
+    }
 }
+
