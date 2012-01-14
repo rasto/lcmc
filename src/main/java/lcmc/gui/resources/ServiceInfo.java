@@ -5545,8 +5545,10 @@ public class ServiceInfo extends EditableInfo {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     } else if (getService().isRemoved()) {
                         return IS_BEING_REMOVED_STRING;
-                    } else if (isRunning(testOnly)) {
-                        return "cannot remove running resource";
+                    } else if (isRunning(testOnly)
+                               && !Tools.getConfigData().isAdvancedMode()) {
+                        return "cannot remove running resource<br>"
+                               + "(advanced mode only)";
                     }
                     if (groupInfo == null) {
                         return null;
