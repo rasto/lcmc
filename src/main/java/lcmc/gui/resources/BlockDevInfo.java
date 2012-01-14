@@ -2190,6 +2190,7 @@ public final class BlockDevInfo extends EditableInfo {
         } else {
             oName = ((BlockDevInfo) o).getName();
         }
+        /* drbds up */
         if (getBlockDevice().isDrbd()
             && !obdi.getBlockDevice().isDrbd()) {
             return -1;
@@ -2197,6 +2198,15 @@ public final class BlockDevInfo extends EditableInfo {
         if (!getBlockDevice().isDrbd()
             && obdi.getBlockDevice().isDrbd()) {
             return 1;
+        }
+        /* volume groups down */
+        if (getBlockDevice().isVolumeGroupOnPhysicalVolume()
+            && !obdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
+            return 1;
+        }
+        if (!getBlockDevice().isVolumeGroupOnPhysicalVolume()
+            && obdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
+            return -1;
         }
         final int ret = name.compareToIgnoreCase(oName);
         if (ret == 0) {
