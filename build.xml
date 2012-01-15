@@ -78,6 +78,7 @@
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="/usr/share/java/xalan2.jar"/>
 		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
 		   <pathelement location="${buildlib.dir}/j3dcore.jar"/>
 		   <pathelement location="${buildlib.dir}/j3dutils.jar"/>
