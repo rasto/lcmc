@@ -71,6 +71,7 @@
 		 encoding="utf8"
 		 source="1.6"
 		 target="1.6"
+		 includeantruntime="false"
 		>
 		  <classpath>
 		   <pathelement location="/usr/share/java/jai_core.jar"/>
@@ -96,6 +97,7 @@
 		 encoding="utf8"
 		 source="1.6"
 		 target="1.6"
+		 includeantruntime="false"
 		>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xlint"/> 

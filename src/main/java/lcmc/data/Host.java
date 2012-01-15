@@ -935,6 +935,18 @@ public final class Host {
     }
 
     /**
+     *  Gets list of strings that are specific to the distribution
+     *  distribution.
+     */
+    public List<String> getDistStrings(final String commandString) {
+        return Tools.getDistStrings(commandString,
+                                    dist,
+                                    distVersionString,
+                                    arch);
+    }
+
+
+    /**
      * Converts command string to real command for a distribution, specifying
      * what-with-what hash.
      */

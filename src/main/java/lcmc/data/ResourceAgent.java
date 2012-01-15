@@ -539,8 +539,8 @@ public final class ResourceAgent {
     }
 
     /** Returns resource agent string like ocf:linbit:drbd. */
-    String getRAString() {
-        return resourceClass + "::" + provider + ":" + name;
+    public String getRAString() {
+        return resourceClass + ":" + provider + ":" + name;
     }
 
     /** Returns whether this resource agent is ping or pingd. */

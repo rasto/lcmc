@@ -47,6 +47,7 @@ import lcmc.utilities.MyList;
 import lcmc.utilities.MyListModel;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.pacemaker.ServiceLogs;
+import lcmc.gui.dialog.EditConfig;
 
 import java.awt.Color;
 import java.awt.event.MouseListener;
@@ -5616,8 +5617,8 @@ public class ServiceInfo extends EditableInfo {
             }
         };
         items.add(viewLogMenu);
-        /* advanced options */
-        final MyMenu advancedSubmenu = new MyMenu(
+        /* more migrate options */
+        final MyMenu migrateSubmenu = new MyMenu(
                         Tools.getString("ClusterBrowser.MigrateSubmenu"),
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -5626,8 +5627,27 @@ public class ServiceInfo extends EditableInfo {
                 return null; //TODO: enable only if it has items
             }
         };
-        items.add(advancedSubmenu);
-        addAdvancedMenu(advancedSubmenu);
+        items.add(migrateSubmenu);
+        addMoreMigrateMenuItems(migrateSubmenu);
+
+        /* config files */
+        final MyMenu filesSubmenu = new MyMenu(
+                        Tools.getString("ClusterBrowser.FilesSubmenu"),
+                        new AccessMode(ConfigData.AccessType.ADMIN, false),
+                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public String enablePredicate() {
+                return null; //TODO: enable only if it has items
+            }
+            @Override
+            public void update() {
+                super.update();
+                removeAll();
+                addFilesMenuItems(this);
+            }
+        };
+        items.add(filesSubmenu);
         return items;
     }
 
@@ -5891,14 +5911,88 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /** Adds advanced submenu. */
-    final void addAdvancedMenu(final MyMenu submenu) {
-        if (submenu.getItemCount() > 0) {
-            return;
+    /** Return config files defined in DistResource config files. */
+    private List<String> getConfigFiles() {
+        String raName;
+        final ServiceInfo cs = getContainedService();
+        if (cs == null) {
+            raName = getResourceAgent().getRAString();
+        } else {
+            raName = cs.getResourceAgent().getRAString();
         }
-        addMoreMigrateMenuItems(submenu);
+        final Host[] hosts = getBrowser().getCluster().getHostsArray();
+        final List<String> cfs = hosts[0].getDistStrings(raName + ".files");
+        final List<String> params =
+            new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
+        params.add("configfile");
+        params.add("config");
+        params.add("conffile");
+        for (final String param : params) {
+            String value;
+            if (cs == null) {
+                final GuiComboBox cb = paramComboBoxGet(param, null);
+                if (cb == null) {
+                    value = getParamSaved(param);
+                } else {
+                    value = cb.getStringValue();
+                }
+            } else {
+                final GuiComboBox cb = cs.paramComboBoxGet(param, null);
+                if (cb == null) {
+                    value = cs.getParamSaved(param);
+                } else {
+                    value = cb.getStringValue();
+                }
+            }
+            if (value != null && !"".equals(value)) {
+                cfs.add(value);
+            }
+        }
+        return cfs;
     }
 
+    /** Adds config files menuitems to the submenu. */
+    protected void addFilesMenuItems(final MyMenu submenu) {
+        final boolean testOnly = false;
+        final ServiceInfo thisClass = this;
+        final List<String> configFiles = getConfigFiles();
+        for (final String configFile : configFiles) {
+            final MyMenuItem fileItem =
+               new MyMenuItem(
+                          configFile,
+                          null,
+                          null,
+                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public boolean predicate() {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean visiblePredicate() {
+                        return true;
+                    }
+
+                    @Override
+                    public String enablePredicate() {
+                        return null;
+                    }
+
+                    @Override
+                    public void action() {
+                        final EditConfig ed =
+                          new EditConfig(configFile,
+                                         getBrowser().getCluster().getHosts());
+                        ed.showDialog();
+
+                    }
+                };
+            submenu.add(fileItem);
+        }
+    }
 
     /** Returns tool tip for the service. */
     @Override public String getToolTipText(final boolean testOnly) {

@@ -104,7 +104,9 @@ public abstract class ConfigDialog {
     private boolean skipButtonShouldBeEnabled = true;
     /** Option buttons. */
     private final MyButton[] options = new MyButton[buttons().length];
-
+    /** Additional options. */
+    private final List<JComponent> additionalOptions =
+                                                   new ArrayList<JComponent>();
     /** Gets dialogPanel. */
     protected final JDialog getDialogPanel() {
         return dialogPanel;
@@ -433,7 +435,8 @@ public abstract class ConfigDialog {
         if (dialogPanel == null) {
             final ImageIcon[] icons = getIcons();
             MyButton defaultButtonClass = null;
-            final List<JComponent> allOptions = new ArrayList<JComponent>();
+            final List<JComponent> allOptions =
+                                new ArrayList<JComponent>(additionalOptions);
             if (skipButtonEnabled()) {
                 skipButton = new JCheckBox(Tools.getString(
                                             "Dialog.ConfigDialog.SkipButton"));
@@ -679,5 +682,10 @@ public abstract class ConfigDialog {
     /** Close dialog other than pressing button. */
     protected final void disposeDialog() {
         dialogGate.countDown();
+    }
+
+    /** Add the compoment to the options. */
+    protected final void addToOptions(final JComponent c) {
+        additionalOptions.add(c);
     }
 }

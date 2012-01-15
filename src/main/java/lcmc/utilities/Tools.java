@@ -1122,6 +1122,35 @@ public final class Tools {
         return ret;
     }
 
+    /** Returns string that is specific to a distribution and version. */
+    public static List<String> getDistStrings(final String text,
+                                              String dist,
+                                              String version,
+                                              final String arch) {
+        if (dist == null) {
+            dist = "";
+        }
+        if (version == null) {
+            version = "";
+        }
+        final Locale locale = new Locale(dist, version);
+        debug("getDistStrings text: "
+              + text
+              + " dist: "
+              + dist
+              + " version: "
+              + version, 2);
+        final ResourceBundle resourceString =
+                ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
+        List<String> ret;
+        try {
+            ret = (List<String>) resourceString.getObject(text);
+        } catch (Exception e) {
+            ret = new ArrayList<String>();
+        }
+        return ret;
+    }
+
     /**
      * Returns command from DistResource resource bundle for specific
      * distribution and version.

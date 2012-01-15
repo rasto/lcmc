@@ -22,6 +22,8 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.ArrayList;
 
 /**
  * Here are common commands for all linuxes.
@@ -463,5 +465,17 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"LVM.lvsnapshot",
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
+
+        {"ocf:heartbeat:LVM.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/lvm/lvm.conf")))},
+
+        {"ocf:heartbeat:apache.param.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "configfile")))},
+
+        {"ocf:heartbeat:Dummy.param.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "state")))},
     };
 }

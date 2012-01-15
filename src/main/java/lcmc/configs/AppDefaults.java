@@ -152,6 +152,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
 
         {"ConfigDialog.Background",          Color.WHITE },
         {"ConfigDialog.Background.Dark",     BACKGROUND },
+        {"ConfigDialog.Background.Darker",   BACKGROUND_DARKER },
         {"ConfigDialog.Background.Light",    BACKGROUND_LIGHT },
         {"ConfigDialog.Button",              BACKGROUND_LIGHT2 },
         {"ConfigDialog.AnswerPane",          Color.BLACK },

@@ -194,6 +194,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.Dialog.Ok",
          "OK"},
 
+        {"Dialog.Dialog.Save",
+         "Save"},
+
         {"Dialog.Host.NewHost.Title",
          "Host Wizard"},
 
@@ -887,6 +890,20 @@ public final class TextResource extends java.util.ListResourceBundle {
 + "* realvnc, released under the terms of the GPL License\n"
          },
 
+        {"Dialog.EditConfig.Title",
+         "Edit "},
+
+        {"Dialog.EditConfig.Backup.Button",
+         "Make Backup"},
+
+        {"Dialog.EditConfig.Loading",
+         "loading..."},
+
+        {"Dialog.EditConfig.NewConfig",
+         "<new config>"},
+
+        {"Dialog.EditConfig.DifferentFiles",
+         "WARNING: files differ across nodes"},
 
         {"Dialog.Cluster.Finish.Title",
          "Finish"},
@@ -1182,6 +1199,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"ClusterBrowser.MigrateSubmenu",
          "More Migration Options"},
+
+        {"ClusterBrowser.FilesSubmenu",
+         "Edit Config Files"},
 
         {"ClusterBrowser.Host.Offline",
          "Offline"},
