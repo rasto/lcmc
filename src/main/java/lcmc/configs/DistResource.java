@@ -466,16 +466,61 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"LVM.lvsnapshot",
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
 
+        /* config files */
         {"ocf:heartbeat:LVM.files",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "/etc/lvm/lvm.conf")))},
 
-        {"ocf:heartbeat:apache.param.files",
-         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
-              "configfile")))},
-
-        {"ocf:heartbeat:Dummy.param.files",
+        {"ocf:heartbeat:Dummy.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "state")))},
+
+        {"ocf:heartbeat:CTDB.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/sysconfig/ctdb",
+              "/etc/ctdb/nodes",
+              "/etc/ctdb/public_addresses",
+              "/etc/exports"
+              )))},
+
+        {"ocf:heartbeat:CTDB.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "smb_conf")))},
+
+        {"ocf:heartbeat:drbd.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "drbdconf")))},
+
+        {"ocf:linbit:drbd.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "drbdconf")))},
+
+        {"ocf:heartbeat:eDir88.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "eDir_config_file")))},
+
+        {"ocf:heartbeat:mysql-proxy.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "defaults_file")))},
+
+        {"ocf:heartbeat:nfsserver.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/exports")))},
+
+        {"ocf:heartbeat:Raid1.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "raidconf")))},
+
+        {"ocf:heartbeat:Squid.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "squid_conf")))},
+
+        {"ocf:heartbeat:vmware.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "vmxpath")))},
+
+        {"ocf:heartbeat:Xen.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "xmfile")))},
     };
 }
