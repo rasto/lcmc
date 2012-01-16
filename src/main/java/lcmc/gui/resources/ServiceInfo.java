@@ -5921,7 +5921,8 @@ public class ServiceInfo extends EditableInfo {
             raName = cs.getResourceAgent().getRAString();
         }
         final Host[] hosts = getBrowser().getCluster().getHostsArray();
-        final List<String> cfs = hosts[0].getDistStrings(raName + ".files");
+        final List<String> cfs =
+             new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
         final List<String> params =
             new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
         params.add("configfile");
