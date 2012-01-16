@@ -31,7 +31,6 @@ import lcmc.data.ClusterStatus;
 import lcmc.data.resources.Service;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
-import lcmc.utilities.Tools;
 
 import java.util.Map;
 import java.util.HashMap;

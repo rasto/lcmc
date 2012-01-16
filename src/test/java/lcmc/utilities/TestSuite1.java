@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
-import lcmc.utilities.Tools;
 import lcmc.gui.TerminalPanel;
 import lcmc.data.Host;
 import lcmc.data.Cluster;

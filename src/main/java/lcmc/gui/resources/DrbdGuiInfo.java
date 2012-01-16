@@ -33,8 +33,6 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 
-import javax.swing.ImageIcon;
-
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.

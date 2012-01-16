@@ -497,7 +497,7 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
-    /** Executes the drbdadm -- --clear-bitmap new-current-uuid */
+    /** Executes the drbdadm -- --clear-bitmap new-current-uuid. */
     public static boolean skipInitialFullSync(final Host host,
                                               final String resource,
                                               final String volume,
@@ -505,7 +505,7 @@ public final class DRBD {
         return skipInitialFullSync(host, resource, volume, null, testOnly);
     }
 
-    /** Executes the drbdadm -- --clear-bitmap new-current-uuid */
+    /** Executes the drbdadm -- --clear-bitmap new-current-uuid. */
     public static boolean skipInitialFullSync(final Host host,
                                               final String resource,
                                               final String volume,

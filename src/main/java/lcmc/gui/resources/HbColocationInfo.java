@@ -31,13 +31,11 @@ import lcmc.data.ClusterStatus;
 import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
-import lcmc.utilities.Tools;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
-import javax.swing.SwingUtilities;
 
 /**
  * Object that holds a colocation constraint information.

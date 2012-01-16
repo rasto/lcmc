@@ -28,9 +28,7 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.EditClusterDialog;
 
-
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 
@@ -46,10 +44,6 @@ import java.awt.event.ItemEvent;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.SwingUtilities;
-
-import java.util.ArrayList;
-
-
 
 /**
  * An implementation of a custer view with tree of services.

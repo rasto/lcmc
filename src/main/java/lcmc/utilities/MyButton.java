@@ -29,8 +29,6 @@ import java.awt.RenderingHints;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
-import java.awt.Font;
-import java.awt.Insets;
 import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;

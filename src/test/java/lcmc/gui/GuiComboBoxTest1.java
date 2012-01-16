@@ -6,8 +6,6 @@ import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
 import lcmc.utilities.TestSuite1;
-import lcmc.utilities.Tools;
-import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 

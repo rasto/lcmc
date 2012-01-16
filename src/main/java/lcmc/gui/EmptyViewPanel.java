@@ -30,10 +30,7 @@ import lcmc.utilities.MyButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.BoxLayout;
-import javax.swing.JEditorPane;
 
 import java.awt.FlowLayout;
 import java.awt.Color;

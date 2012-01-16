@@ -60,8 +60,6 @@ import java.awt.event.ActionEvent;
 import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 
 

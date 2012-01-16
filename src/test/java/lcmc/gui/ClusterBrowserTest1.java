@@ -7,22 +7,11 @@ import org.junit.Before;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.awt.Color;
 import java.util.concurrent.CountDownLatch;
 
 import lcmc.utilities.TestSuite1;
 import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.gui.ClusterBrowser;
 import lcmc.data.Host;
-import lcmc.gui.resources.ServiceInfo;
-import lcmc.data.ResourceAgent;
 
 public final class ClusterBrowserTest1 extends TestCase {
     @Before

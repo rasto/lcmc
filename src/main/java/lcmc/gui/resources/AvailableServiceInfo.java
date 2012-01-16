@@ -34,8 +34,6 @@ import lcmc.utilities.UpdatableItem;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
