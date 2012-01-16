@@ -528,6 +528,14 @@ public final class DistResource extends java.util.ListResourceBundle {
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "/etc/exports")))},
 
+        {"ocf:lsb:nfs-common.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/exports")))},
+
+        {"ocf:lsb:nfs-kernel-server.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/exports")))},
+
         {"ocf:heartbeat:oracle.files",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "/etc/oratab")))},
