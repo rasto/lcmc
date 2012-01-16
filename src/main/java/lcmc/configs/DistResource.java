@@ -467,6 +467,10 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
 
         /* config files */
+        {"ocf:heartbeat:apache.params",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "envfiles")))},
+
         {"ocf:heartbeat:LVM.files",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "/etc/lvm/lvm.conf")))},
@@ -499,17 +503,58 @@ public final class DistResource extends java.util.ListResourceBundle {
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "eDir_config_file")))},
 
+        {"ocf:heartbeat:exportfs.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/exports")))},
+
+        {"ocf:heartbeat:Filesystem.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/fstab")))},
+
+        {"ocf:heartbeat:iSCSITarget.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/initiators.deny",
+              "/etc/initiators.allow")))},
+
         {"ocf:heartbeat:mysql-proxy.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "defaults_file")))},
+
+        {"ocf:heartbeat:ManageRAID.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/conf.d/HB-ManageRAID")))},
 
         {"ocf:heartbeat:nfsserver.files",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "/etc/exports")))},
 
+        {"ocf:heartbeat:oracle.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/oratab")))},
+
+        {"ocf:heartbeat:oralsnr.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/oratab")))},
+
+        {"ocf:heartbeat:portblock.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/csync2/csync2.cfg")))},
+
+        {"ocf:heartbeat:postfix.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/postfix/main.cf")))},
+
         {"ocf:heartbeat:Raid1.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "raidconf")))},
+
+        {"ocf:heartbeat:SAPDatabase.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/opt/sdb")))},
+
+        {"ocf:heartbeat:SAPInstance.files",
+         Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
+              "/etc/opt/sdb")))},
 
         {"ocf:heartbeat:Squid.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
