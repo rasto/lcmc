@@ -1123,6 +1123,7 @@ public final class Tools {
     }
 
     /** Returns string that is specific to a distribution and version. */
+    @SuppressWarnings("unchecked")
     public static List<String> getDistStrings(final String text,
                                               String dist,
                                               String version,
