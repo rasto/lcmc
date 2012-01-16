@@ -42,7 +42,8 @@ public final class ComboInfo {
     }
 
     /** Returns the name. It will be shown to the user. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return name;
     }
 

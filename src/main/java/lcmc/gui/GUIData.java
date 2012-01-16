@@ -190,12 +190,14 @@ public final class GUIData  {
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
                     if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
                         SwingUtilities.invokeLater(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 expandTerminalSplitPane(1);
                             }
                         });
@@ -221,7 +223,8 @@ public final class GUIData  {
             return;
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final int height = (int)
                     terminalSplitPane.getBottomComponent().getSize()
                                                           .getHeight();
@@ -252,7 +255,8 @@ public final class GUIData  {
     /** Repaints hosts and clusters panels. */
     void repaintWithNewData() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 clustersPanel.repaintTabs();
             }
         });
@@ -261,7 +265,8 @@ public final class GUIData  {
     /** Adds tab with new cluster to the clusters panel. */
     public void addClusterTab(final Cluster cluster) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 clustersPanel.addTab(cluster);
             }
         });
@@ -270,7 +275,8 @@ public final class GUIData  {
     /** changes name of the selected cluster tab. */
     public void renameSelectedClusterTab(final String newName) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 clustersPanel.renameSelectedTab(newName);
             }
         });
@@ -282,7 +288,8 @@ public final class GUIData  {
      */
     public void removeSelectedClusterTab() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 clustersPanel.removeTab();
             }
         });
@@ -291,7 +298,8 @@ public final class GUIData  {
     /** Revalidates and repaints clusters panel. */
     public void refreshClustersPanel() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 clustersPanel.refresh();
             }
         });
@@ -347,7 +355,8 @@ public final class GUIData  {
         final boolean enabled =
                             Tools.getConfigData().danglingHostsCount() >= 1;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mAddClusterButtonListReadLock.lock();
                 try {
                     for (final JComponent addClusterButton
@@ -364,7 +373,8 @@ public final class GUIData  {
     /** Enable/Disable all 'Add Cluster' buttons. */
     public void enableAddClusterButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mAddClusterButtonListReadLock.lock();
                 try {
                     for (JComponent addClusterButton : addClusterButtonList) {
@@ -380,7 +390,8 @@ public final class GUIData  {
     /** Enable/Disable all 'Add Host' buttons. */
     public void enableAddHostButtons(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mAddHostButtonListReadLock.lock();
                 try {
                     for (JComponent addHostButton : addHostButtonList) {

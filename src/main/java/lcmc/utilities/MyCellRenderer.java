@@ -51,7 +51,8 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
     /**
      * Sets background color and padding in jlabels for every cell.
      */
-    @Override public final Component getTableCellRendererComponent(
+    @Override
+    public final Component getTableCellRendererComponent(
                                                       final JTable table,
                                                       final Object value,
                                                       final boolean isSelected,

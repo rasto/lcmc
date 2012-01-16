@@ -210,12 +210,14 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * Returns long description of the parameter, that is used for
      * tool tips.
      */
-    @Override protected String getParamLongDesc(final String param) {
+    @Override
+    protected String getParamLongDesc(final String param) {
         return null;
     }
 
     /** Returns short description of the parameter, that is used as * label. */
-    @Override protected String getParamShortDesc(final String param) {
+    @Override
+    protected String getParamShortDesc(final String param) {
         return null;
     }
 
@@ -223,23 +225,26 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * Checks if the new value is correct for the parameter type and
      * constraints.
      */
-    @Override protected boolean checkParam(final String param,
-                                           final String newValue) {
+    @Override
+    protected boolean checkParam(final String param, final String newValue) {
         return true;
     }
 
     /** Returns default for this parameter. */
-    @Override public String getParamDefault(final String param) {
+    @Override
+    public String getParamDefault(final String param) {
         return "default";
     }
 
     /** Returns preferred value for this parameter. */
-    @Override protected String getParamPreferred(final String param) {
+    @Override
+    protected String getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns lsit of all parameters as an array. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         return new String[]{};
     }
 
@@ -247,17 +252,20 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * Possible choices for pulldown menus, or null if it is not a pull
      * down menu.
      */
-    @Override protected Object[] getParamPossibleChoices(final String param) {
+    @Override
+    protected Object[] getParamPossibleChoices(final String param) {
         return null;
     }
 
     /** Returns parameter type, boolean etc. */
-    @Override protected String getParamType(final String param) {
+    @Override
+    protected String getParamType(final String param) {
         return null;
     }
 
     /** Returns section to which the global belongs. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return null;
     }
 
@@ -265,43 +273,50 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    @Override protected boolean isCheckBox(final String param) {
+    @Override
+    protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    @Override protected boolean isTimeType(final String param) {
+    @Override
+    protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is integer. */
-    @Override protected boolean isInteger(final String param) {
+    @Override
+    protected boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is required. */
-    @Override protected boolean isRequired(final String param) {
+    @Override
+    protected boolean isRequired(final String param) {
         return true;
     }
 
     /** Applies changes to the placeholder. */
-    @Override void apply(final Host dcHost, final boolean testOnly) {
+    @Override
+    void apply(final Host dcHost, final boolean testOnly) {
         /* apply is in resource set info object. */
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected boolean isAdvanced(final String param) {
+    @Override
+    protected boolean isAdvanced(final String param) {
         return true;
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(
-                                                        final String param) {
+    @Override
+    protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Returns name of this placeholder. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getName() +  " (" + getService().getId() + ")";
     }
 
@@ -310,7 +325,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * TODO: this id is used for stored position info, should be named
      * differently.
      */
-    @Override public String getId() {
+    @Override
+    public String getId() {
         String ordId = "";
         String colId = "";
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
@@ -325,18 +341,21 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Return information panel. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
         return prsi.getInfoPanel(this);
     }
 
     /** Returns tool tip for the placeholder. */
-    @Override public String getToolTipText(final boolean testOnly) {
+    @Override
+    public String getToolTipText(final boolean testOnly) {
         return Tools.getString("ConstraintPHInfo.ToolTip");
     }
 
     /** Return list of popup items. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         addDependencyMenuItems(items, true, testOnly);
@@ -349,7 +368,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 } else if (getService().isRemoved()) {
@@ -358,7 +378,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 removeMyself(false);
                 getBrowser().getHeartbeatGraph().repaint();
@@ -366,10 +387,12 @@ public final class ConstraintPHInfo extends ServiceInfo {
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
                 getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
-            @Override public boolean isEnabled() {
+            @Override
+            public boolean isEnabled() {
                 return super.isEnabled() && !getService().isNew();
             }
-            @Override public void action(final Host dcHost) {
+            @Override
+            public void action(final Host dcHost) {
                 removeMyselfNoConfirm(dcHost, true); /* test only */
             }
         };
@@ -379,8 +402,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Removes the placeholder without confirmation dialog. */
-    @Override protected void removeMyselfNoConfirm(final Host dcHost,
-                                                   final boolean testOnly) {
+    @Override
+    protected void removeMyselfNoConfirm(final Host dcHost,
+                                         final boolean testOnly) {
         if (getService().isNew()) {
             if (!testOnly) {
                 setUpdated(true);
@@ -422,7 +446,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Removes this placeholder from the crm with confirmation dialog. */
-    @Override public void removeMyself(final boolean testOnly) {
+    @Override
+    public void removeMyself(final boolean testOnly) {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
@@ -442,7 +467,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Sets whether the info object is being updated. */
-    @Override public void setUpdated(final boolean updated) {
+    @Override
+    public void setUpdated(final boolean updated) {
         if (updated && !isUpdated()) {
             getBrowser().getHeartbeatGraph().startAnimation(this);
         } else if (!updated) {
@@ -452,7 +478,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Whether this class is a constraint placeholder. */
-    @Override public boolean isConstraintPH() {
+    @Override
+    public boolean isConstraintPH() {
         return true;
     }
 
@@ -828,7 +855,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Hide/Show advanced panels. */
-    @Override public void updateAdvancedPanels() {
+    @Override
+    public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
         final PcmkRscSetsInfo prsi = pcmkRscSetsInfo;
         if (prsi != null) {
@@ -932,21 +960,25 @@ public final class ConstraintPHInfo extends ServiceInfo {
     }
 
     /** Returns the main text that appears in the graph. */
-    @Override public String getMainTextForGraph() {
+    @Override
+    public String getMainTextForGraph() {
         return getService().getId();
     }
 
     /** Returns text that appears above the icon in the graph. */
-    @Override public String getIconTextForGraph(final boolean testOnly) {
+    @Override
+    public String getIconTextForGraph(final boolean testOnly) {
         return "   PH";
     }
     /** Returns text with lines as array that appears in the cluster graph. */
-    @Override public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    @Override
+    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         return null;
     }
 
     /** Stops resource in crm. */
-    @Override void stopResource(final Host dcHost, final boolean testOnly) {
+    @Override
+    void stopResource(final Host dcHost, final boolean testOnly) {
         /* cannot stop placeholder */
     }
 }

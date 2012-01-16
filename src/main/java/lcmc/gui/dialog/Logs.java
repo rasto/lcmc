@@ -110,7 +110,8 @@ class Logs extends ConfigDialog {
     }
 
     /** Inits the dialog. */
-    @Override protected final void initDialog() {
+    @Override
+    protected final void initDialog() {
         super.initDialog();
         enableAllComponents(false);
         refreshLogsThread();
@@ -120,7 +121,8 @@ class Logs extends ConfigDialog {
     private void refreshLogsThread() {
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (!mRefreshLock.tryLock()) {
                         return;
                     }
@@ -142,7 +144,8 @@ class Logs extends ConfigDialog {
     /** Enables/disables all the components. */
     private void enableAllComponents(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 refreshBtn.setEnabled(enable);
                 for (final String name : checkBoxMap.keySet()) {
                     checkBoxMap.get(name).setEnabled(enable);
@@ -174,10 +177,12 @@ class Logs extends ConfigDialog {
             threads[index] = host.execCommandRaw(command,
                          (ProgressBar) null,
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  texts[index] = ans;
                              }
-                             @Override public void doneError(final String ans,
+                             @Override
+                             public void doneError(final String ans,
                                                    final int exitCode) {
                                  texts[index] = host.getName()
                                                 + ": "
@@ -298,7 +303,8 @@ class Logs extends ConfigDialog {
     }
 
     /** Gets the title of the dialog as string. */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
@@ -306,7 +312,8 @@ class Logs extends ConfigDialog {
      * Returns description for dialog. This can be HTML defined in
      * TextResource.
      */
-    @Override protected final String getDescription() {
+    @Override
+    protected final String getDescription() {
         return "";
     }
 
@@ -338,14 +345,16 @@ class Logs extends ConfigDialog {
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             checkBoxMap.put(name, cb);
             cb.addItemListener(new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     refreshLogsThread();
                 }
             });
             pane.add(cb);
         }
         refreshBtn.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 refreshLogsThread();
             }
         });
@@ -354,7 +363,8 @@ class Logs extends ConfigDialog {
     }
 
     /** Returns panel for logs. */
-    @Override protected final JComponent getInputPane() {
+    @Override
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.setBackground(
@@ -371,7 +381,8 @@ class Logs extends ConfigDialog {
     }
 
     /** Returns an icon. */
-    @Override protected final ImageIcon icon() {
+    @Override
+    protected final ImageIcon icon() {
         return Info.LOGFILE_ICON;
     }
 }

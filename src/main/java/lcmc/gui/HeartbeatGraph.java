@@ -178,7 +178,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Inits the graph. */
-    @Override protected void initGraph() {
+    @Override
+    protected void initGraph() {
         super.initGraph(new DirectedSparseGraph<Vertex, Edge>());
     }
 
@@ -343,7 +344,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns id that is used for saving of the vertex positions to a file. */
-    @Override protected String getId(final Info i) {
+    @Override
+    protected String getId(final Info i) {
         final String id = i.getId();
         if (id == null) {
             return null;
@@ -420,7 +422,8 @@ public final class HeartbeatGraph extends ResourceGraph {
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 repaint();
             }
         });
@@ -676,8 +679,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns label for service vertex. */
-    @Override protected String getMainText(final Vertex v,
-                                           final boolean testOnly) {
+    @Override
+    protected String getMainText(final Vertex v, final boolean testOnly) {
         String str;
         if (vertexToHostMap.containsKey(v)) {
             str = vertexToHostMap.get(v).toString();
@@ -706,9 +709,9 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns shape of the service vertex. */
-    @Override protected Shape getVertexShape(
-                                    final Vertex v,
-                                    final VertexShapeFactory<Vertex> factory) {
+    @Override
+    protected Shape getVertexShape(final Vertex v,
+                                   final VertexShapeFactory<Vertex> factory) {
         if (vertexToHostMap.containsKey(v)) {
             return factory.getRectangle(v);
         } else if (vertexToConstraintPHMap.containsKey(v)) {
@@ -726,7 +729,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Picks info. */
-    @Override public void pickInfo(final Info i) {
+    @Override
+    public void pickInfo(final Info i) {
         final GroupInfo groupInfo = ((ServiceInfo) i).getGroupInfo();
         if (groupInfo == null) {
             super.pickInfo(i);
@@ -744,8 +748,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Handles right click on the service vertex and creates popup menu. */
-    @Override protected JPopupMenu handlePopupVertex(final Vertex v,
-                                                     final Point2D p) {
+    @Override
+    protected JPopupMenu handlePopupVertex(final Vertex v, final Point2D p) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = (HostInfo) getInfo(v);
             if (hi == null) {
@@ -792,7 +796,8 @@ public final class HeartbeatGraph extends ResourceGraph {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
-                @Override public void action() {
+                @Override
+                public void action() {
                     si.addServicePanel(asi,
                                        null,
                                        false, /* TODO: colocation only */
@@ -819,7 +824,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Handles right click on the edge and creates popup menu. */
-    @Override protected JPopupMenu handlePopupEdge(final Edge edge) {
+    @Override
+    protected JPopupMenu handlePopupEdge(final Edge edge) {
         mHbConnectionReadLock.lock();
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
         mHbConnectionReadLock.unlock();
@@ -830,7 +836,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Handles right click on the background and creates popup menu. */
-    @Override protected JPopupMenu handlePopupBackground(final Point2D pos) {
+    @Override
+    protected JPopupMenu handlePopupBackground(final Point2D pos) {
         return getClusterBrowser().getServicesInfo().getPopup(pos);
     }
 
@@ -839,7 +846,8 @@ public final class HeartbeatGraph extends ResourceGraph {
      * there, so that it doesn't jump back. If position is outside of the view,
      * bring the vertex back in the view.
      */
-    @Override protected void vertexReleased(final Vertex v, final Point2D pos) {
+    @Override
+    protected void vertexReleased(final Vertex v, final Point2D pos) {
         double x = pos.getX();
         double y = pos.getY();
         final double minPos = (getVertexWidth(v)
@@ -858,7 +866,8 @@ public final class HeartbeatGraph extends ResourceGraph {
      * Selects Info in the view if a service vertex was pressed. If more
      * vertices were selected, it does not do anything.
      */
-    @Override protected void oneVertexPressed(final Vertex v) {
+    @Override
+    protected void oneVertexPressed(final Vertex v) {
         pickVertex(v);
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
@@ -884,12 +893,14 @@ public final class HeartbeatGraph extends ResourceGraph {
      * Is called, when background of the graph is clicked. It deselects
      * selected node.
      */
-    @Override protected void backgroundClicked() {
+    @Override
+    protected void backgroundClicked() {
         getClusterBrowser().getServicesInfo().selectMyself();
     }
 
     /** Returns tool tip when mouse is over a service vertex. */
-    @Override String getVertexToolTip(final Vertex v) {
+    @Override
+    String getVertexToolTip(final Vertex v) {
         final boolean tOnly = isTestOnly();
 
         if (vertexToHostMap.containsKey(v)) {
@@ -905,7 +916,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns the tool tip for the edge. */
-    @Override String getEdgeToolTip(final Edge edge) {
+    @Override
+    String getEdgeToolTip(final Edge edge) {
         // TODO: move this to the clusterbrowser
         final Pair<Vertex> p = getGraph().getEndpoints(edge);
         final boolean edgeIsOrder = edgeIsOrderList.contains(edge);
@@ -955,7 +967,8 @@ public final class HeartbeatGraph extends ResourceGraph {
      * Returns color of the vertex, depending if the service is configured,
      * removed or color of the host.
      */
-    @Override protected Color getVertexFillColor(final Vertex v) {
+    @Override
+    protected Color getVertexFillColor(final Vertex v) {
         final boolean tOnly = isTestOnly();
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getHost().getPmColors()[0];
@@ -1001,7 +1014,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns label that describes the edge. */
-    @Override protected String getLabelForEdgeStringer(final Edge e) {
+    @Override
+    protected String getLabelForEdgeStringer(final Edge e) {
         if (isTestEdge(e)) {
             return "ptest...";
         }
@@ -1142,7 +1156,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns paint of the edge. */
-    @Override protected Paint getEdgeDrawPaint(final Edge e) {
+    @Override
+    protected Paint getEdgeDrawPaint(final Edge e) {
         mHbConnectionReadLock.lock();
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
         mHbConnectionReadLock.unlock();
@@ -1160,7 +1175,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns paint of the picked edge. */
-    @Override protected Paint getEdgePickedPaint(final Edge e) {
+    @Override
+    protected Paint getEdgePickedPaint(final Edge e) {
         mHbConnectionReadLock.lock();
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
         mHbConnectionReadLock.unlock();
@@ -1345,7 +1361,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Mark vertex and its edges to be removed later. */
-    @Override protected void removeInfo(final Info i) {
+    @Override
+    protected void removeInfo(final Info i) {
         final Vertex v = getVertex(i);
         /* remove edges */
 
@@ -1415,9 +1432,9 @@ public final class HeartbeatGraph extends ResourceGraph {
     //}
 
     /** Returns an icon for the vertex. */
-    @Override protected List<ImageIcon> getIconsForVertex(
-                                                    final Vertex v,
-                                                    final boolean testOnly) {
+    @Override
+    protected List<ImageIcon> getIconsForVertex(final Vertex v,
+                                                final boolean testOnly) {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         final HostInfo hi = vertexToHostMap.get(v);
         if (hi != null) {
@@ -1469,7 +1486,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns whether to show an edge arrow. */
-    @Override protected boolean showEdgeArrow(final Edge e) {
+    @Override
+    protected boolean showEdgeArrow(final Edge e) {
         if (edgeIsOrderList.contains(e)) {
             mHbConnectionReadLock.lock();
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
@@ -1480,7 +1498,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns whether to show a hollow arrow. */
-    @Override protected boolean showHollowArrow(final Edge e) {
+    @Override
+    protected boolean showHollowArrow(final Edge e) {
         if (edgeIsOrderList.contains(e)) {
             mHbConnectionReadLock.lock();
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
@@ -1502,7 +1521,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Is called after an edge was pressed. */
-    @Override protected void oneEdgePressed(final Edge e) {
+    @Override
+    protected void oneEdgePressed(final Edge e) {
         mHbConnectionReadLock.lock();
         final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
         mHbConnectionReadLock.unlock();
@@ -1706,8 +1726,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Small text that appears above the icon. */
-    @Override protected String getIconText(final Vertex v,
-                                           final boolean testOnly) {
+    @Override
+    protected String getIconText(final Vertex v, final boolean testOnly) {
         if (isTestOnlyAnimation()) {
             return "ptest...";
         }
@@ -1724,7 +1744,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Small text that appears in the right corner. */
-    @Override protected Subtext getRightCornerText(final Vertex v,
+    @Override
+    protected Subtext getRightCornerText(final Vertex v,
                                          final boolean testOnly) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
@@ -1740,8 +1761,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Small text that appears down. */
-    @Override protected Subtext[] getSubtexts(final Vertex v,
-                                    final boolean testOnly) {
+    @Override
+    protected Subtext[] getSubtexts(final Vertex v, final boolean testOnly) {
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getSubtextsForGraph(testOnly);
         } else if (vertexToConstraintPHMap.containsKey(v)) {
@@ -1777,11 +1798,12 @@ public final class HeartbeatGraph extends ResourceGraph {
      * This method draws how much of the vertex is used for something.
      * It draws more colors for verteces that have more background colors.
      */
-    @Override protected void drawInside(final Vertex v,
-                                        final Graphics2D g2d,
-                                        final double x,
-                                        final double y,
-                                        final Shape shape) {
+    @Override
+    protected void drawInside(final Vertex v,
+                              final Graphics2D g2d,
+                              final double x,
+                              final double y,
+                              final Shape shape) {
         final boolean tOnly = isTestOnly();
         final float height = (float) shape.getBounds().getHeight();
         final float width = (float) shape.getBounds().getWidth();
@@ -1869,7 +1891,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     /**
      * Returns the vertex that represents the specified resource or its group.
      */
-    @Override protected Vertex getVertex(final Info i) {
+    @Override
+    protected Vertex getVertex(final Info i) {
         if (i == null) {
             return null;
         }
@@ -1922,7 +1945,8 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Returns height of the vertex. */
-    @Override protected int getDefaultVertexHeight(final Vertex v) {
+    @Override
+    protected int getDefaultVertexHeight(final Vertex v) {
         if (vertexToConstraintPHMap.containsKey(v)) {
             return 50;
         } else {
@@ -1932,7 +1956,8 @@ public final class HeartbeatGraph extends ResourceGraph {
 
 
     /** Returns the width of the service vertex shape. */
-    @Override protected int getDefaultVertexWidth(final Vertex v) {
+    @Override
+    protected int getDefaultVertexWidth(final Vertex v) {
         if (vertexToConstraintPHMap.containsKey(v)) {
             return 50;
         } else {
@@ -1941,12 +1966,14 @@ public final class HeartbeatGraph extends ResourceGraph {
     }
 
     /** Sets the vertex width. */
-    @Override protected void setVertexWidth(final Vertex v, final int size) {
+    @Override
+    protected void setVertexWidth(final Vertex v, final int size) {
         super.setVertexWidth(v, size);
     }
 
     /** Sets the vertex height. */
-    @Override protected void setVertexHeight(final Vertex v, final int size) {
+    @Override
+    protected void setVertexHeight(final Vertex v, final int size) {
         super.setVertexHeight(v, size);
     }
 }

@@ -637,7 +637,8 @@ public final class ClusterBrowser extends Browser {
         /* networks */
         updateNetworks();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 heartbeatGraph.scale();
             }
         });
@@ -652,13 +653,15 @@ public final class ClusterBrowser extends Browser {
     /** Starts everything. */
     private void updateHeartbeatDrbdThread() {
         final Thread tt = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
                     host.waitForServerStatusLatch();
                 }
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(
                                                                 false);
                         selectServices();
@@ -668,7 +671,8 @@ public final class ClusterBrowser extends Browser {
         });
         tt.start();
         final Runnable runnable = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 Host firstHost = null;
                 final Host[] hosts = cluster.getHostsArray();
                 Tools.invokeAndWait(new Runnable() {
@@ -742,7 +746,8 @@ public final class ClusterBrowser extends Browser {
                 //try { Thread.sleep(10000); }
                 //catch (InterruptedException ex) {}
                 //SwingUtilities.invokeLater(new Runnable() {
-                //    @Override public void run() {
+                //    @Override
+                //    public void run() {
                 //        drbdGraph.getDrbdInfo().getInfoPanel();
                 //    }
                 //});
@@ -768,7 +773,8 @@ public final class ClusterBrowser extends Browser {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     startServerStatus(host);
                 }
             });
@@ -874,7 +880,8 @@ public final class ClusterBrowser extends Browser {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     startConnectionStatus(host);
                 }
             });
@@ -887,7 +894,8 @@ public final class ClusterBrowser extends Browser {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     startDrbdStatus(host);
                 }
             });
@@ -910,20 +918,22 @@ public final class ClusterBrowser extends Browser {
     /** Starts connection status. */
     void startConnectionStatus(final Host host) {
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 while (true) {
                     host.execConnectionStatusCommand(
                           new ExecCallback() {
-                               @Override public void done(final String ans) {
+                               @Override
+                               public void done(final String ans) {
                                    Tools.debug(this, "connection ok on "
                                                      + host.getName(),
                                                2);
                                    host.setConnected();
                                }
 
-                               @Override public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
+                               @Override
+                               public void doneError(final String ans,
+                                                     final int exitCode) {
                                    Tools.debug(this, "connection lost on "
                                                      + host.getName()
                                                      + "exit code: "
@@ -950,7 +960,8 @@ public final class ClusterBrowser extends Browser {
                         hostName,
                         Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     firstTime.await();
                 } catch (InterruptedException ignored) {
@@ -972,7 +983,8 @@ public final class ClusterBrowser extends Browser {
         while (true) {
             host.execDrbdStatusCommand(
                   new ExecCallback() {
-                       @Override public void done(final String ans) {
+                       @Override
+                       public void done(final String ans) {
                            if (!host.isDrbdStatus()) {
                                host.setDrbdStatus(true);
                                drbdGraph.repaint();
@@ -983,8 +995,9 @@ public final class ClusterBrowser extends Browser {
                            }
                        }
 
-                       @Override public void doneError(final String ans,
-                                                       final int exitCode) {
+                       @Override
+                       public void doneError(final String ans,
+                                             final int exitCode) {
                            Tools.debug(this, "drbd status failed: "
                                              + host.getName()
                                              + " exit code: "
@@ -1016,7 +1029,8 @@ public final class ClusterBrowser extends Browser {
                    },
 
                    new NewOutputCallback() {
-                       @Override public void output(final String output) {
+                       @Override
+                       public void output(final String output) {
                            drbdStatusLock();
                            firstTime.countDown();
                            boolean updated = false;
@@ -1073,12 +1087,14 @@ public final class ClusterBrowser extends Browser {
                                                 ClusterHostsInfo.MAIN_TABLE);
                                final Thread thread = new Thread(
                                    new Runnable() {
-                                       @Override public void run() {
+                                       @Override
+                                       public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
                                            SwingUtilities.invokeLater(
                                                new Runnable() {
-                                                   @Override public void run() {
+                                                   @Override
+                                                   public void run() {
                                                        repaintTree();
                                                    }
                                                }
@@ -1248,7 +1264,8 @@ public final class ClusterBrowser extends Browser {
         startClStatusProgressIndicator(clusterName);
         final boolean testOnly = false;
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 try {
                     firstTime.await();
                 } catch (InterruptedException ignored) {
@@ -1259,7 +1276,8 @@ public final class ClusterBrowser extends Browser {
                                                    "Cluster status failed");
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                            heartbeatGraph.scale();
                        }
                     });
@@ -1283,15 +1301,17 @@ public final class ClusterBrowser extends Browser {
             //clStatusCanceled = false;
             host.execClStatusCommand(
                  new ExecCallback() {
-                     @Override public void done(final String ans) {
+                     @Override
+                     public void done(final String ans) {
                          final String online =
                                     clusterStatus.isOnlineNode(host.getName());
                          setClStatus(host, "yes".equals(online));
                          firstTime.countDown();
                      }
 
-                     @Override public void doneError(final String ans,
-                                                     final int exitCode) {
+                     @Override
+                     public void doneError(final String ans,
+                                           final int exitCode) {
                          if (firstTime.getCount() == 1) {
                              Tools.debug(this, "hb status failed: "
                                            + host.getName()
@@ -1317,7 +1337,8 @@ public final class ClusterBrowser extends Browser {
                      //TODO: check this buffer's size
                      private StringBuilder clusterStatusOutput =
                                                         new StringBuilder(300);
-                     @Override public void output(final String output) {
+                     @Override
+                     public void output(final String output) {
                          processClusterOutput(output,
                                               clusterStatusOutput,
                                               host,
@@ -1623,7 +1644,8 @@ public final class ClusterBrowser extends Browser {
         if (atLeastOneAdded) {
             drbdInfo.getInfoPanel();
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     drbdInfo.setAllApplyButtons();
                 }
             });
@@ -2101,7 +2123,8 @@ public final class ClusterBrowser extends Browser {
         }
 
         /** Can be overwritten to disable the whole thing. */
-        @Override public boolean isEnabled() {
+        @Override
+        public boolean isEnabled() {
             Host h;
             if (menuHost == null) {
                 h = getDCHost();
@@ -2115,7 +2138,8 @@ public final class ClusterBrowser extends Browser {
         }
 
         /** Mouse out, stops animation. */
-        @Override public final void mouseOut() {
+        @Override
+        public final void mouseOut() {
             if (isEnabled()) {
                 mouseStillOver = false;
                 heartbeatGraph.stopTestAnimation((JComponent) component);
@@ -2124,7 +2148,8 @@ public final class ClusterBrowser extends Browser {
         }
 
         /** Mouse over, starts animation, calls action() and sets tooltip. */
-        @Override public final void mouseOver() {
+        @Override
+        public final void mouseOver() {
             if (isEnabled()) {
                 mouseStillOver = true;
                 component.setToolTipText(STARTING_PTEST_TOOLTIP);
@@ -2177,12 +2202,14 @@ public final class ClusterBrowser extends Browser {
         }
 
         /** Whether the whole thing should be enabled. */
-        @Override public final boolean isEnabled() {
+        @Override
+        public final boolean isEnabled() {
             return true;
         }
 
         /** Mouse out, stops animation. */
-        @Override public final void mouseOut() {
+        @Override
+        public final void mouseOut() {
             if (!isEnabled()) {
                 return;
             }
@@ -2192,7 +2219,8 @@ public final class ClusterBrowser extends Browser {
         }
 
         /** Mouse over, starts animation, calls action() and sets tooltip. */
-        @Override public final void mouseOver() {
+        @Override
+        public final void mouseOver() {
             if (!isEnabled()) {
                 return;
             }

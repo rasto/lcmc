@@ -52,17 +52,20 @@ final class Connect extends DialogCluster {
     }
 
     /** Returns the next dialog which is ClusterDrbdConf. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new CommStack(getPreviousDialog(), getCluster());
     }
 
     /** Returns cluster dialog title. */
-    @Override protected String getClusterDialogTitle() {
+    @Override
+    protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Connect.Title");
     }
 
     /** Returns description. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Connect.Description");
     }
 
@@ -98,7 +101,8 @@ final class Connect extends DialogCluster {
              }
 
              SwingUtilities.invokeLater(new Runnable() {
-                 @Override public void run() {
+                 @Override
+                 public void run() {
                     buttonClass(nextButton()).pressButton();
                  }
              });
@@ -115,15 +119,18 @@ final class Connect extends DialogCluster {
     }
 
     /** Inits the dialog and connects the hosts. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         final Thread t = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 connectHosts();
             }
         });
@@ -131,7 +138,8 @@ final class Connect extends DialogCluster {
     }
 
     /** Returns the connect hosts dialog content. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final StringBuilder text = new StringBuilder();
         for (final Host host : getCluster().getHosts()) {
@@ -147,7 +155,8 @@ final class Connect extends DialogCluster {
     }
 
     /** Enable skip button. */
-    @Override protected boolean skipButtonEnabled() {
+    @Override
+    protected boolean skipButtonEnabled() {
         return true;
     }
 }

@@ -203,7 +203,8 @@ public final class UserConfig extends XML {
                     continue;
                 }
                 final Runnable runnable = new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }

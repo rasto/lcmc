@@ -50,19 +50,22 @@ public final class DrbdLog extends HostLogs {
      * Returns a command name from the DistResource that gets the drbd log file.
      * "DrbdLog.log"
      */
-    @Override protected String logFileCommand() {
+    @Override
+    protected String logFileCommand() {
         return "DrbdLog.log";
     }
 
     /** Returns which pattern names are selected by default. */
-    @Override protected Set<String> getSelectedSet() {
+    @Override
+    protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
         selected.add(deviceName);
         return selected;
     }
 
     /** Returns a map from pattern name to its pattern. */
-    @Override protected Map<String, String> getPatternMap() {
+    @Override
+    protected Map<String, String> getPatternMap() {
         final Map<String, String> pm = new LinkedHashMap<String, String>();
         pm.put(deviceName, wordBoundary(deviceName));
         return pm;

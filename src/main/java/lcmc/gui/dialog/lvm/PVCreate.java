@@ -113,7 +113,8 @@ public final class PVCreate extends WizardDialog {
             this.enable = enable;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             final boolean e = enable;
             createButton.setEnabled(e);
         }
@@ -177,14 +178,16 @@ public final class PVCreate extends WizardDialog {
 
     /** Create action listener. */
     private class CreateActionListener implements ActionListener {
-        @Override public void actionPerformed(final ActionEvent e) {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new CreateRunnable());
             thread.start();
         }
     }
 
     private class CreateRunnable implements Runnable {
-        @Override public void run() {
+        @Override
+        public void run() {
             Tools.invokeAndWait(new EnableCreateRunnable(false));
             disableComponents();
             getProgressBar().start(CREATE_TIMEOUT
@@ -248,7 +251,8 @@ public final class PVCreate extends WizardDialog {
             super();
             this.onDeselect = onDeselect;
         }
-        @Override public void itemStateChanged(final ItemEvent e) {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED
                 || onDeselect) {
                 checkButtons();

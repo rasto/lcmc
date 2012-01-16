@@ -202,7 +202,8 @@ public final class ResourceAgent {
     }
 
     /** Returns the hash code. */
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return hash;
     }
 
@@ -210,7 +211,8 @@ public final class ResourceAgent {
      * Returns whethet two service equal. They have the same name and are from
      * the same hb class.
      */
-    @Override public boolean equals(final Object oth) {
+    @Override
+    public boolean equals(final Object oth) {
         if (this == oth) {
             return true;
         }

@@ -42,7 +42,8 @@ final class DrbdAvailFiles extends lcmc.gui.dialog.host.DrbdAvailFiles {
     }
 
     /** Returns the next dialog.drbdUpgrade.DrbdLinbitInst. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new DrbdLinbitInst(this, getHost());
     }
 }

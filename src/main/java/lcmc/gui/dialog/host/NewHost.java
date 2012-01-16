@@ -77,7 +77,8 @@ public final class NewHost extends DialogHost {
     }
 
     /** Finishes the dialog, stores the values and adds the host tab. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         final String hostnameEntered = hostField.getStringValue().trim();
         getHost().setHostnameEntered(hostnameEntered);
         final String username = usernameField.getStringValue().trim();
@@ -98,7 +99,8 @@ public final class NewHost extends DialogHost {
     }
 
     /** Sets nextDialog to Configuration. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new Configuration(this, getHost());
     }
 
@@ -106,7 +108,8 @@ public final class NewHost extends DialogHost {
      * Checks host and username field and if both are not empty enables
      * next and finish buttons.
      */
-    @Override protected void checkFields(final GuiComboBox field) {
+    @Override
+    protected void checkFields(final GuiComboBox field) {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
@@ -142,7 +145,8 @@ public final class NewHost extends DialogHost {
 
         if (hf) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     hostField.setBackground(getHost().getHostnameEntered(),
                                             getHost().getHostnameEntered(),
                                             true);
@@ -154,7 +158,8 @@ public final class NewHost extends DialogHost {
 
         if (uf) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     usernameField.setBackground(getHost().getUsername(),
                                                 getHost().getUsername(),
                                                 true);
@@ -174,7 +179,8 @@ public final class NewHost extends DialogHost {
 
         if (pf) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     sshPortField.setBackground(getHost().getSSHPort(),
                                                getHost().getSSHPort(),
                                                true);
@@ -188,7 +194,8 @@ public final class NewHost extends DialogHost {
         final boolean userField = hf;
         final boolean sshPortField = pf;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 buttonClass(nextButton()).setEnabled(hostField
                                                      && userField
                                                      && sshPortField);
@@ -200,7 +207,8 @@ public final class NewHost extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.Host.NewHost.Title in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.NewHost.Title");
     }
 
@@ -208,28 +216,33 @@ public final class NewHost extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.Host.NewHost.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.NewHost.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         checkFields((GuiComboBox) null);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 hostField.requestFocus();
             }
         });
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     hostField.setValue(
                                 Tools.getConfigData().getAutoHosts().get(0));
                 }
@@ -243,7 +256,8 @@ public final class NewHost extends DialogHost {
      * Returns an input pane where user can enter a host and username. Username
      * is normally root and host can be entered either as ip or node name etc.
      */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(Tools.getDefaultColor(

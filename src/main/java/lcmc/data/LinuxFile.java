@@ -83,12 +83,14 @@ public final class LinuxFile extends File {
     }
 
     /** Returns whether it is a file. */
-    @Override public boolean isFile() {
+    @Override
+    public boolean isFile() {
         return true;
     }
 
     /** Returns whether it exists. */
-    @Override public boolean exists() {
+    @Override
+    public boolean exists() {
         if (existCache != null) {
             return existCache;
         }
@@ -107,44 +109,52 @@ public final class LinuxFile extends File {
     }
 
     /** Returns whether it readable. */
-    @Override public boolean canRead() {
+    @Override
+    public boolean canRead() {
         return true;
     }
 
     /** Returns whether it executable. */
-    @Override public boolean canExecute() {
+    @Override
+    public boolean canExecute() {
         return true;
     }
 
     /** Returns whether it is directory. */
-    @Override public boolean isDirectory() {
+    @Override
+    public boolean isDirectory() {
         return directory;
     }
 
     /** Returns last modified time. */
-    @Override public long lastModified() {
+    @Override
+    public long lastModified() {
         return lastModified;
     }
 
     /** Returns length of the file. */
-    @Override public long length() {
+    @Override
+    public long length() {
         return fileLength;
     }
 
     /** Returns file with absolute path. */
-    @Override public File getAbsoluteFile() {
+    @Override
+    public File getAbsoluteFile() {
         final String absPath = getAbsolutePath();
         return vmsHardwareInfo.getLinuxDir(absPath, host);
     }
 
     /** Returns cannonical file name. */
-    @Override public File getCanonicalFile() throws IOException {
+    @Override
+    public File getCanonicalFile() throws IOException {
         final String canonPath = getCanonicalPath();
         return vmsHardwareInfo.getLinuxDir(canonPath, host);
     }
 
     /** Returns parent dir. */
-    @Override public File getParentFile() {
+    @Override
+    public File getParentFile() {
         final String p = getParent();
         if (p == null) {
             return null;

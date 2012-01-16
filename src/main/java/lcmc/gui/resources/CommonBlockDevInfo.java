@@ -47,17 +47,20 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     }
 
     /** Returns icon for common block devices menu category. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
     /** Returns device name of this block device. */
-    @Override public String getDevice() {
+    @Override
+    public String getDevice() {
         return getCommonBlockDevice().getDevice();
     }
 
     /** Returns info for this block device. */
-    @Override String getInfo() {
+    @Override
+    String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + "\n";
     }
 
@@ -65,7 +68,8 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
      * Returns string representation of the block devices, used in the pull
      * down menu.
      */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         String name = getName();
         if (name == null || "".equals(name)) {
             name = Tools.getString("ClusterBrowser.CommonBlockDevUnconfigured");
@@ -74,7 +78,8 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     }
 
     /** Sets this block device on all nodes ass used by crm. */
-    @Override public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
+    @Override
+    public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         for (BlockDevice bd : blockDevices) {
             bd.setUsedByCRM(isUsedByCRM != null);
         }
@@ -84,7 +89,8 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
      * Returns if all of the block devices are used by crm.
      * TODO: or any is used by hb?
      */
-    @Override public boolean isUsedByCRM() {
+    @Override
+    public boolean isUsedByCRM() {
         boolean is = true;
         for (int i = 0; i < blockDevices.length; i++) {
             is = is && blockDevices[i].isUsedByCRM();
@@ -98,12 +104,14 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     }
 
     /** Returns the last created filesystem. */
-    @Override public String getCreatedFs() {
+    @Override
+    public String getCreatedFs() {
         return null;
     }
 
     /** Returns how much of the filesystem is used. */
-    @Override public int getUsed() {
+    @Override
+    public int getUsed() {
         int used = -1;
         for (BlockDevice bd : blockDevices) {
             if (bd.getUsed() > used) {

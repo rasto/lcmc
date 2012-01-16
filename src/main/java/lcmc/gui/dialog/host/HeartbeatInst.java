@@ -72,13 +72,15 @@ final class HeartbeatInst extends DialogHost {
     }
 
     /** Inits the dialog and starts the installation procedure. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         installHeartbeat();
     }
 
@@ -105,12 +107,13 @@ final class HeartbeatInst extends DialogHost {
                          installCommand,
                          getProgressBar(),
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  checkAnswer(ans, installMethod);
                              }
-                             @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  printErrorAndRetry(Tools.getString(
                                          "Dialog.Host.HeartbeatInst.InstError"),
                                                     ans,
@@ -118,8 +121,8 @@ final class HeartbeatInst extends DialogHost {
                              }
                          },
                          new ConvertCmdCallback() {
-                             @Override public String convert(
-                                                        final String command) {
+                             @Override
+                             public String convert(final String command) {
                                  return command.replaceAll("@ARCH@",
                                                            archString);
                              }
@@ -129,7 +132,8 @@ final class HeartbeatInst extends DialogHost {
     }
 
     /** Returns the next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -137,7 +141,8 @@ final class HeartbeatInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.HeartbeatInst.Description in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.HeartbeatInst.Title");
     }
 
@@ -145,12 +150,14 @@ final class HeartbeatInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.HeartbeatInst.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.HeartbeatInst.Description");
     }
 
     /** Returns the input pane with info about the installation progress. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

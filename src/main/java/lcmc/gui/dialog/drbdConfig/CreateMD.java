@@ -76,7 +76,8 @@ final class CreateMD extends DrbdConfig {
     /** Creates meta-data and checks the results. */
     private void createMetadata(final boolean destroyData) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 makeMDButton.setEnabled(false);
             }
         });
@@ -92,12 +93,15 @@ final class CreateMD extends DrbdConfig {
             returnCode[index] = -1;
             thread[i] = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     final ExecCallback execCallback =
                         new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         makeMDButton.setEnabled(false);
                                     }
                                 });
@@ -105,7 +109,8 @@ final class CreateMD extends DrbdConfig {
                                 returnCode[index] = 0;
                             }
 
-                            @Override public void doneError(final String ans,
+                            @Override
+                            public void doneError(final String ans,
                                                   final int exitCode) {
                                 answer[index] = ans;
                                 returnCode[index] = exitCode;
@@ -169,7 +174,8 @@ final class CreateMD extends DrbdConfig {
             answerPaneSetTextError(Tools.join("\n", answer));
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     makeMDButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
                     if (Tools.getConfigData().getAutoOptionGlobal(
@@ -186,7 +192,8 @@ final class CreateMD extends DrbdConfig {
      * Returns next dialog plus it calls drbd up command for both devices and
      * returns the drbd config create fs dialog.
      */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
@@ -205,7 +212,8 @@ final class CreateMD extends DrbdConfig {
      * Returns the title of the dialog. This is specified as
      * Dialog.DrbdConfig.CreateMD.Title in the TextResources.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.CreateMD.Title");
     }
 
@@ -213,12 +221,14 @@ final class CreateMD extends DrbdConfig {
      * Returns the description of the dialog. This is specified as
      * Dialog.DrbdConfig.CreateMD.Description in the TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.CreateMD.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         makeMDButton.setBackgroundColor(
                                Tools.getDefaultColor("ConfigDialog.Button"));
@@ -230,11 +240,13 @@ final class CreateMD extends DrbdConfig {
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     makeMDButton.pressButton();
                 }
             });
@@ -242,7 +254,8 @@ final class CreateMD extends DrbdConfig {
     }
 
     /** Returns input pane with choices what to do with meta-data. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
 
@@ -300,7 +313,8 @@ final class CreateMD extends DrbdConfig {
         inputPane.add(metadataCB);
         metadataCB.addListeners(
             new  ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         if (metadataCB.getStringValue().equals(
                                                     useExistingMetadata)) {
@@ -316,9 +330,11 @@ final class CreateMD extends DrbdConfig {
             null);
 
         makeMDButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         getProgressBar().start(10000);
                         if (metadataCB.getStringValue().equals(
                                               createNewMetadataDestroyData)) {

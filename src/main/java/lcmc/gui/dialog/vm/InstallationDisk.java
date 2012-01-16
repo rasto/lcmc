@@ -68,7 +68,8 @@ final class InstallationDisk extends VMConfig {
     }
 
     /** Next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         if (skipButtonIsSelected()) {
             vmsdi.removeMyself(true);
         }
@@ -82,7 +83,8 @@ final class InstallationDisk extends VMConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.vm.Domain.Title in TextResources.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.InstallationDisk.Title");
     }
 
@@ -90,29 +92,34 @@ final class InstallationDisk extends VMConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.vm.Domain.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.vm.InstallationDisk.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
     /** Returns input pane where user can configure a vm. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         if (vmsdi != null) {
             vmsdi.selectMyself();
         }
@@ -155,7 +162,8 @@ final class InstallationDisk extends VMConfig {
     }
 
     /** Enable skip button. */
-    @Override protected boolean skipButtonEnabled() {
+    @Override
+    protected boolean skipButtonEnabled() {
         return true;
     }
 }

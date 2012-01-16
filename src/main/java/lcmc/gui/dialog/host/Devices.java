@@ -72,27 +72,31 @@ final class Devices extends DialogHost {
     }
 
     /** Inits the dialog and starts the info collecting thread. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getProgressBar().start(6000);
                     final ExecCommandThread t = getHost().execCommand(
                              "installGuiHelper",
                              (ProgressBar) null, //getProgressBar(),
                              new ExecCallback() {
-                                 @Override public void done(final String ans) {
+                                 @Override
+                                 public void done(final String ans) {
                                      getAllInfo();
                                  }
-                                 @Override public void doneError(
-                                                        final String ans,
-                                                        final int exitCode) {
+                                 @Override
+                                 public void doneError(final String ans,
+                                                       final int exitCode) {
                                      /* in case of error, the next command will
                                         find out, so it's not checked here. Gui
                                         Helper can be installed anyway. */
@@ -114,13 +118,14 @@ final class Devices extends DialogHost {
         final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
                          (ProgressBar) null, //getProgressBar(),
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  checkAnswer(ans);
                              }
 
-                             @Override public void doneError(
-                                                        final String ans,
-                                                        final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  printErrorAndRetry(Tools.getString(
                                             "Dialog.Host.Devices.CheckError"),
                                                     ans,
@@ -134,7 +139,8 @@ final class Devices extends DialogHost {
     }
 
     /** Returns the next dialog object. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new DistDetection(this, getHost());
     }
 
@@ -142,7 +148,8 @@ final class Devices extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.Devices.Title in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.Devices.Title");
     }
 
@@ -150,12 +157,14 @@ final class Devices extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.Devices.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.Devices.Description");
     }
 
     /** Returns pane where collected info is displayed. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

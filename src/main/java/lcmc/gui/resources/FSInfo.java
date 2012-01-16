@@ -44,29 +44,35 @@ public final class FSInfo extends Info {
     }
 
     /** Returns browser object of this info. */
-    @Override protected HostBrowser getBrowser() {
+    @Override
+    protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
     /** Returns file system icon for the menu. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return FS_ICON;
     }
 
     /** Returns type of the info text. text/plain or text/html. */
-    @Override protected String getInfoType() {
+    @Override
+    protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns info, before it is updated. */
-    @Override String getInfo() {
+    @Override
+    String getInfo() {
         return "<html><pre>" + getName() + "</html></pre>";
     }
 
     /** Updates info of the file system. */
-    @Override public void updateInfo(final JEditorPane ep) {
+    @Override
+    public void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (modinfo == null) {
                     final SSH.SSHOutput ret =
                               Tools.execCommand(getBrowser().getHost(),

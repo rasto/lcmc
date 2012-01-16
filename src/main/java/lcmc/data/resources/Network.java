@@ -66,7 +66,8 @@ public final class Network extends Resource {
     }
 
     /** Returns value of the parameter. */
-    @Override public String getValue(final String parameter) {
+    @Override
+    public String getValue(final String parameter) {
         Tools.appError("Wrong call to getValue");
         return "???";
     }

@@ -68,9 +68,8 @@ public final class PatternDocument extends DefaultStyledDocument {
 
 
     /** Inserts the string if the resulting string matches the pattern. */
-    @Override public void insertString(final int offs,
-                                       String s,
-                                       final AttributeSet a)
+    @Override
+    public void insertString(final int offs, String s, final AttributeSet a)
     throws BadLocationException {
         try {
             final String text = getText(0, getLength());

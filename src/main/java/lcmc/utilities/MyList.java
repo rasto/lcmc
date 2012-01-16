@@ -81,12 +81,14 @@ public final class MyList extends JList implements ComponentWithTest {
     }
 
     /** Sets tooltip's background color. */
-    @Override public void setToolTipBackground(final Color toolTipBackground) {
+    @Override
+    public void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    @Override public void setToolTipText(final String toolTipText) {
+    @Override
+    public void setToolTipText(final String toolTipText) {
         if (toolTipText == null) {
             return;
         }
@@ -119,7 +121,8 @@ public final class MyList extends JList implements ComponentWithTest {
      * Returns location of the tooltip, so that it does not cover the menu
      * item.
      */
-    @Override public Point getToolTipLocation(final MouseEvent event) {
+    @Override
+    public Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();

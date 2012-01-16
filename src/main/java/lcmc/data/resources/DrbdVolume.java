@@ -48,7 +48,8 @@ implements ClusterBlockDeviceInterface {
     }
 
     /** Returns drbd device. */
-    @Override public String getDevice() {
+    @Override
+    public String getDevice() {
         return device;
     }
 

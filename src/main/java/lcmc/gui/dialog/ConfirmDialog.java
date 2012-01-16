@@ -86,12 +86,14 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /** Returns the default button. It is "No" by default. */
-    @Override protected String defaultButton() {
+    @Override
+    protected String defaultButton() {
         return noButton();
     }
 
     /** Returns an icon for this dialog. Null by default. */
-    @Override protected ImageIcon icon() {
+    @Override
+    protected ImageIcon icon() {
         return null;
     }
 
@@ -99,7 +101,8 @@ public final class ConfirmDialog extends ConfigDialog {
      * Returns width of the dialog.
      * ConfirmDialog.width from AppDefaults by default.
      */
-    @Override protected int dialogWidth() {
+    @Override
+    protected int dialogWidth() {
         return Tools.getDefaultInt("ConfirmDialog.width");
     }
 
@@ -107,14 +110,16 @@ public final class ConfirmDialog extends ConfigDialog {
      * Returns height of the dialog.
      * ConfirmDialog.height from AppDefaults by default.
      */
-    @Override protected int dialogHeight() {
+    @Override
+    protected int dialogHeight() {
         return Tools.getDefaultInt("ConfirmDialog.height");
     }
 
     /**
      * Returns the type of the message JOptionPane.WARNING_MESSAGE by default.
      */
-    @Override protected int getMessageType() {
+    @Override
+    protected int getMessageType() {
         return JOptionPane.WARNING_MESSAGE;
     }
 
@@ -124,19 +129,22 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /** Returns array with 'yes' and 'no' buttons. */
-    @Override protected String[] buttons() {
+    @Override
+    protected String[] buttons() {
         return new String[]{yesButton(), noButton()};
     }
 
     /**
      * Returns icons for yes and no buttons. Null, null by default, (for now).
      */
-    @Override protected ImageIcon[] getIcons() {
+    @Override
+    protected ImageIcon[] getIcons() {
         return new ImageIcon[]{null, null};
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
@@ -148,7 +156,8 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /** Inits the dialog after it is visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -161,7 +170,8 @@ public final class ConfirmDialog extends ConfigDialog {
      * Returns the dialog title. ConfirmDialog.Title from TextResources by
      * default.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         if (title == null) {
             return Tools.getString("ConfirmDialog.Title");
         } else {
@@ -174,7 +184,8 @@ public final class ConfirmDialog extends ConfigDialog {
      * in the constructor.
      * ConfirmDialog.Description from TextResources by * default.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         if (description == null) {
             return Tools.getString("ConfirmDialog.Description");
         } else {
@@ -183,7 +194,8 @@ public final class ConfirmDialog extends ConfigDialog {
     }
 
     /** Returns pane where user input can be defined. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         return null;
     }
 }

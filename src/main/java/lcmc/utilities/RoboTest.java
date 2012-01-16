@@ -150,7 +150,8 @@ public final class RoboTest {
         info("start click test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 sleepNoFactor(10000);
                 Robot rbt = null;
                 try {
@@ -202,7 +203,8 @@ public final class RoboTest {
         info("start mouse move test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 sleepNoFactor(10000);
                 Robot rbt = null;
                 try {
@@ -289,7 +291,8 @@ public final class RoboTest {
             }
         }
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 sleepNoFactor(3000);
                 robot = null;
                 try {
@@ -3028,7 +3031,8 @@ public final class RoboTest {
         info("start register movement in 3 seconds");
         sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 Point2D prevP = new Point2D.Double(0, 0);
                 Point2D prevPrevP = new Point2D.Double(0, 0);
                 while (true) {
@@ -3376,7 +3380,7 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(1000);
-        moveTo(1000, 615 + correctionY + correctionYPlus);/* max buffers unit */
+        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit*/
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3486,7 +3490,7 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_8);
         sleep(500);
-        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit */
+        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit*/
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);

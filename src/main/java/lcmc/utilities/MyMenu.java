@@ -57,7 +57,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Stores the position. */
-    @Override public final void setPos(final Point2D pos) {
+    @Override
+    public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
 
@@ -89,13 +90,16 @@ public class MyMenu extends JMenu implements UpdatableItem {
      * This function is usually overriden and is called when the menu and its
      * items are to be updated.
      */
-    @Override public void update() {
+    @Override
+    public void update() {
         processAccessMode();
         final Thread t = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final List<Component> copy = new ArrayList<Component>();
                 Tools.invokeAndWait(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         for (final Component m : getMenuComponents()) {
                             copy.add(m);
                         }
@@ -117,13 +121,15 @@ public class MyMenu extends JMenu implements UpdatableItem {
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setEnabled(disableTooltip == null && accessible);
             }
         });
         if (isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {
                         String advanced = "";
@@ -150,7 +156,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Cleanup. */
-    @Override public final void cleanup() {
+    @Override
+    public final void cleanup() {
         for (final java.awt.Component m : getMenuComponents()) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).cleanup();
@@ -161,7 +168,8 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Remove all items. */
-    @Override public final void removeAll() {
+    @Override
+    public final void removeAll() {
         for (int i = 0; i < getItemCount(); i++) {
             final JMenuItem item = getItem(i);
             if (item instanceof MyMenuItem) {

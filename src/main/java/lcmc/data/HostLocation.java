@@ -73,7 +73,8 @@ public final class HostLocation {
     }
 
     /** Return whether the two objects are equal. */
-    @Override public boolean equals(final Object other) {
+    @Override
+    public boolean equals(final Object other) {
         if (other == null) {
             return (score == null || "".equals(score))
                    && (op == null || "".equals(op))

@@ -30,7 +30,8 @@ import java.util.Arrays;
 public final class TextResource_en_US extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    @Override protected Object[][] getContents() {
+    @Override
+    protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

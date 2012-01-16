@@ -90,13 +90,15 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Adds disk table with only this disk to the main panel. */
-    @Override protected void addHardwareTable(final JPanel mainPanel) {
+    @Override
+    protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Input Devices",
                                    VMSVirtualDomainInfo.INPUTDEVS_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     tablePanel.setVisible(false);
                 }
             });
@@ -105,12 +107,14 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns long description of the specified parameter. */
-    @Override protected String getParamLongDesc(final String param) {
+    @Override
+    protected String getParamLongDesc(final String param) {
         return getParamShortDesc(param);
     }
 
     /** Returns short description of the specified parameter. */
-    @Override protected String getParamShortDesc(final String param) {
+    @Override
+    protected String getParamShortDesc(final String param) {
         final String name = SHORTNAME_MAP.get(param);
         if (name == null) {
             return param;
@@ -119,77 +123,92 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns preferred value for specified parameter. */
-    @Override protected String getParamPreferred(final String param) {
+    @Override
+    protected String getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value for specified parameter. */
-    @Override protected String getParamDefault(final String param) {
+    @Override
+    protected String getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
     /** Returns parameters. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         return PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */
-    @Override protected Object[] getParamPossibleChoices(final String param) {
+    @Override
+    protected Object[] getParamPossibleChoices(final String param) {
         return POSSIBLE_VALUES.get(param);
     }
 
     /** Returns section to which the specified parameter belongs. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return "Input Device Options";
     }
 
     /** Returns true if the specified parameter is required. */
-    @Override protected boolean isRequired(final String param) {
+    @Override
+    protected boolean isRequired(final String param) {
         return IS_REQUIRED.contains(param);
     }
 
     /** Returns true if the specified parameter is integer. */
-    @Override protected boolean isInteger(final String param) {
+    @Override
+    protected boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is label. */
-    @Override protected boolean isLabel(final String param) {
+    @Override
+    protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    @Override protected boolean isTimeType(final String param) {
+    @Override
+    protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns whether parameter is checkbox. */
-    @Override protected boolean isCheckBox(final String param) {
+    @Override
+    protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns the type of the parameter. */
-    @Override protected String getParamType(final String param) {
+    @Override
+    protected String getParamType(final String param) {
         return "undef"; // TODO:
     }
 
     /** Returns the regexp of the parameter. */
-    @Override protected String getParamRegexp(final String param) {
+    @Override
+    protected String getParamRegexp(final String param) {
         return null;
     }
 
     /** Returns type of the field. */
-    @Override protected GuiComboBox.Type getFieldType(final String param) {
+    @Override
+    protected GuiComboBox.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
     /** Applies the changes. */
-    @Override void apply(final boolean testOnly) {
+    @Override
+    void apply(final boolean testOnly) {
         if (testOnly) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 getApplyButton().setEnabled(false);
                 getRevertButton().setEnabled(false);
             }
@@ -218,7 +237,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
             getBrowser().periodicalVMSUpdate(h);
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 tablePanel.setVisible(true);
             }
         });
@@ -230,8 +250,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParameters(
-                                                    final boolean allParams) {
+    @Override
+    protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> params = super.getHWParameters(allParams);
         setName(getParamSaved(InputDevData.TYPE)
                 + ":"
@@ -240,7 +260,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.INPUTDEVS_TABLE.equals(tableName)) {
@@ -257,12 +278,14 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected boolean isAdvanced(final String param) {
+    @Override
+    protected boolean isAdvanced(final String param) {
         return false;
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected String isEnabled(final String param) {
+    @Override
+    protected String isEnabled(final String param) {
         if (getResource().isNew() || !InputDevData.TYPE.equals(param)) {
             return null;
         } else {
@@ -271,20 +294,20 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected boolean isEnabledOnlyInAdvancedMode(
-                                                        final String param) {
+    @Override
+    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
          return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(
-                                                        final String param) {
+    @Override
+    protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
-    @Override protected boolean checkParam(final String param,
-                                           final String newValue) {
+    @Override
+    protected boolean checkParam(final String param, final String newValue) {
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
@@ -329,7 +352,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Returns string representation. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String type = getParamSaved(InputDevData.TYPE);
         if (type == null) {
@@ -348,7 +372,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Removes this input device without confirmation dialog. */
-    @Override protected void removeMyselfNoConfirm(final boolean testOnly) {
+    @Override
+    protected void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
         }
@@ -375,7 +400,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     /**
      * Returns whether this item is removeable (null), or string why it isn't.
      */
-    @Override protected String isRemoveable() {
+    @Override
+    protected String isRemoveable() {
         final String type = getParamSaved(InputDevData.TYPE);
         if (type != null && "mouse".equals(type)) {
             final String bus = getParamSaved(InputDevData.BUS);
@@ -390,9 +416,11 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Input Device");
         newBtn.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         vdi.addInputDevPanel();
                     }
                 });
@@ -403,10 +431,11 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Modify device xml. */
-    @Override protected void modifyXML(final VMSXML vmsxml,
-                                       final Node node,
-                                       final String domainName,
-                                       final Map<String, String> params) {
+    @Override
+    protected void modifyXML(final VMSXML vmsxml,
+                             final Node node,
+                             final String domainName,
+                             final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifyInputDevXML(node, domainName, params);
         }

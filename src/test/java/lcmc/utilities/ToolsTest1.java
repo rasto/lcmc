@@ -86,9 +86,9 @@ public final class ToolsTest1 extends TestCase {
         Tools.debug(new Object(), "test d1", 1);
         Tools.debug(new Object(), "test d0", 0);
         final Pattern p = Pattern.compile("^" + TestSuite1.DEBUG_STRING
-                 + "\\(1\\) \\[\\d+s\\] test d1 \\(java\\.lang\\.Object\\)\\s+"
-                 + TestSuite1.DEBUG_STRING + ".*"
-                 + "\\(0\\) \\[\\d+s\\] test d0 \\(java\\.lang\\.Object\\)\\s+");
+                + "\\(1\\) \\[\\d+s\\] test d1 \\(java\\.lang\\.Object\\)\\s+"
+                + TestSuite1.DEBUG_STRING + ".*"
+                + "\\(0\\) \\[\\d+s\\] test d0 \\(java\\.lang\\.Object\\)\\s+");
         final Matcher m = p.matcher(TestSuite1.getStdout());
         assertTrue(m.matches());
         TestSuite1.clearStdout();
@@ -346,7 +346,8 @@ public final class ToolsTest1 extends TestCase {
         TestSuite1.clearStdout();
         final lcmc.utilities.ConvertCmdCallback ccc =
                                     new lcmc.utilities.ConvertCmdCallback() {
-            @Override public String convert(final String command) {
+            @Override
+            public String convert(final String command) {
                 return command.replaceAll(lcmc.configs.DistResource.SUDO,
                                           "sudo ");
             }

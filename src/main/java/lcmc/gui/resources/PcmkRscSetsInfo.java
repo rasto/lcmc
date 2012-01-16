@@ -100,7 +100,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Returns panal with user visible info. */
-    @Override protected JPanel getLabels(final HbConstraintInterface c) {
+    @Override
+    protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
         final int rows = 1;
@@ -164,7 +165,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Applies changes to the placeholders. */
-    @Override void apply(final Host dcHost, final boolean testOnly) {
+    @Override
+    void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
         final Map<String, ServiceInfo> idToInfoHash =
              getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
@@ -283,8 +285,9 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Check order and colocation constraints. */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         boolean oneIsNew = false;
         mConstraintPHLock.lock();
         try {
@@ -302,7 +305,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Return list of popup items. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = super.createPopup();
         // TODO: make submenus for all cphis
         return items;

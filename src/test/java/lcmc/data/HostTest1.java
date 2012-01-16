@@ -252,14 +252,15 @@ public final class HostTest1 extends TestCase {
                           "DrbdAvailVersions",
                           null, /* ProgressBar */
                           new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                 final String[] items = ans.split("\\r?\\n");
                                 host.setDrbdVersionToInstall(
                                                         Tools.shellList(items));
                             }
-                            @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                            @Override
+                            public void doneError(final String ans,
+                                                  final int exitCode) {
                                 Tools.info("error");
                             }
                           },
@@ -275,14 +276,15 @@ public final class HostTest1 extends TestCase {
                           "DrbdAvailVersionsForDist",
                           null, /* ProgressBar */
                           new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                 host.setAvailableDrbdVersions(
                                                          ans.split("\\r?\\n"));
                             }
 
-                            @Override public void doneError(
-                                                       final String ans,
-                                                       final int exitCode) {
+                            @Override
+                            public void doneError(final String ans,
+                                                  final int exitCode) {
                                 Tools.info("error");
                             }
                           },

@@ -58,21 +58,25 @@ public final class Name extends DialogCluster {
     }
 
     /** Called before the dialog is finished. It saves the value. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         getCluster().setName(nameField.getStringValue().trim());
     }
 
     /** Returns the next dialog after this dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new ClusterHosts(this, getCluster());
     }
 
     /** Checks the field if it is correct and renames the tab. */
-    @Override protected void checkFields(final GuiComboBox field) {
+    @Override
+    protected void checkFields(final GuiComboBox field) {
         final boolean isValid =
                             (nameField.getStringValue().trim().length() > 0);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
             }
         });
@@ -81,17 +85,20 @@ public final class Name extends DialogCluster {
     }
 
     /** Returns the title of the dialog. */
-    @Override protected String getClusterDialogTitle() {
+    @Override
+    protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Name.Title");
     }
 
     /** Returns the description of the dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Name.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
@@ -103,9 +110,11 @@ public final class Name extends DialogCluster {
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 nameField.requestFocus();
             }
         });
@@ -113,13 +122,15 @@ public final class Name extends DialogCluster {
             final String name = Tools.getConfigData().getAutoClusters().get(0);
             if (!".".equals(name)) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         nameField.setValue(name);
                     }
                 });
             }
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     pressNextButton();
                 }
             });
@@ -127,7 +138,8 @@ public final class Name extends DialogCluster {
     }
 
     /** Returns panel where user can enter a cluster name. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         /* Name */
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel pane = new JPanel(new SpringLayout());

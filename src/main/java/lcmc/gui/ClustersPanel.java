@@ -262,15 +262,16 @@ public final class ClustersPanel extends JPanel {
     static class MyTabbedPaneUI
                         extends javax.swing.plaf.basic.BasicTabbedPaneUI {
         /** Sets insets. */
-        @Override protected final Insets getContentBorderInsets(
-                                                    final int tabPlacement) {
+        @Override
+        protected final Insets getContentBorderInsets(final int tabPlacement) {
             return new Insets(0, 0, 0, 0);
         }
 
         /** Overrides the content border painting with nothing. */
-        @Override protected void paintContentBorder(final Graphics g,
-                                                    final int tabPlacement,
-                                                    final int selectedIndex) {
+        @Override
+        protected void paintContentBorder(final Graphics g,
+                                          final int tabPlacement,
+                                          final int selectedIndex) {
             /* No border */
         }
     }
@@ -278,7 +279,8 @@ public final class ClustersPanel extends JPanel {
     /** Starts upgrade check. */
     private void startUpgradeCheck() {
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final String latestVersion = Tools.getLatestVersion();
                 mUpgradeLock.lock();
                 if (latestVersion == null) {
@@ -302,7 +304,8 @@ public final class ClustersPanel extends JPanel {
                 final String text = upgradeCheck;
                 mUpgradeLock.unlock();
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         for (final JEditorPane field : upgradeTextFields) {
                             field.setText(text);
                             field.setVisible(!"".equals(text));
@@ -326,7 +329,8 @@ public final class ClustersPanel extends JPanel {
         Tools.setEditorFont(upgradeField);
         upgradeField.setEditable(false);
         upgradeField.addHyperlinkListener(new HyperlinkListener() {
-            @Override public void hyperlinkUpdate(final HyperlinkEvent e) {
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     Tools.openBrowser(e.getURL().toString());
                 }

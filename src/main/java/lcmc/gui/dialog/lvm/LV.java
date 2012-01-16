@@ -44,23 +44,27 @@ class LV extends WizardDialog {
     }
 
     /** Returns the next dialog. */
-    @Override public final WizardDialog nextDialog() {
+    @Override
+    public final WizardDialog nextDialog() {
         return null;
     }
 
     /** Returns the input pane. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         return null;
     }
 
     /** Returns the title of the dialog. */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return null;
     }
 
 
     /** Returns the description of the dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return null;
     }
 }

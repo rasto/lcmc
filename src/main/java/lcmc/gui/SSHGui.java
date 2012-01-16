@@ -238,7 +238,8 @@ public final class SSHGui {
             }
 
             final KeyAdapter kl = new KeyAdapter() {
-                @Override public void keyTyped(final KeyEvent e) {
+                @Override
+                public void keyTyped(final KeyEvent e) {
                     if (e.getKeyChar() == '\n') {
                         finish();
                     }

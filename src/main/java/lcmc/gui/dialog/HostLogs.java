@@ -48,7 +48,8 @@ public class HostLogs extends Logs {
     }
 
     /** Returns this host. */
-    @Override protected final Host[] getHosts() {
+    @Override
+    protected final Host[] getHosts() {
         return new Host[]{host};
     }
 
@@ -56,7 +57,8 @@ public class HostLogs extends Logs {
      * Returns a command name from the DistResource that gets the drbd log file.
      * "HostLogs.hbLog"
      */
-    @Override protected String logFileCommand() {
+    @Override
+    protected String logFileCommand() {
         return "Logs.hbLog";
     }
 
@@ -64,7 +66,8 @@ public class HostLogs extends Logs {
      * Gets the title of the dialog, defined as Dialog.Logs.Title in
      * TextResources.
      */
-    @Override protected final String getDialogTitle() {
+    @Override
+    protected final String getDialogTitle() {
         return Tools.getString("Dialog.HostLogs.Title");
     }
 }

@@ -49,7 +49,8 @@ public final class UcastLink extends Resource {
     }
 
     /** Rerurns the string. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return host.getName() + ":" + netInterface.getName();
     }
 

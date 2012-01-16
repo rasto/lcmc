@@ -658,12 +658,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns browser object of this info. */
-    @Override public ClusterBrowser getBrowser() {
+    @Override
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /** Returns a name of the service with virtual domain name. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         if (getResource().isNew()) {
             return "new domain...";
         } else {
@@ -1493,14 +1495,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         hostBtn.miniButton();
         final MyButton hBtn = hostBtn;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
             }
         });
         hostBtn.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         final VMSXML vxml = getBrowser().getVMSXML(host);
                         if (vxml != null) {
                             if (hBtn.getIcon() == VNC_ICON) {
@@ -1511,7 +1516,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             } else if (hBtn.getIcon()
                                        == HostBrowser.HOST_ON_ICON) {
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         hBtn.setEnabled(false);
                                     }
                                 });
@@ -1714,7 +1720,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(PARALLEL_TABLE);
         updateTable(VIDEO_TABLE);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setApplyButtons(null, getParametersFromXML());
                 getBrowser().repaintTree();
             }
@@ -1779,14 +1786,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final GuiComboBox realParamCb = rpcb;
             if (!host.isConnected()) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         cb.setEnabled(false);
                     }
                 });
             }
             cb.addListeners(
                 new ItemListener() {
-                    @Override public void itemStateChanged(final ItemEvent e) {
+                    @Override
+                    public void itemStateChanged(final ItemEvent e) {
                         if (cb.isCheckBox()
                             || e.getStateChange() == ItemEvent.SELECTED) {
                             checkParameterFields(cb,
@@ -1818,7 +1827,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns info panel. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -1852,9 +1862,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (!abExisted) {
             getApplyButton().addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getBrowser().clStatusLock();
                                 apply(false);
                                 getBrowser().clStatusUnlock();
@@ -1866,9 +1878,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             );
             getRevertButton().addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getBrowser().clStatusLock();
                                 revert();
                                 getBrowser().clStatusUnlock();
@@ -1890,7 +1904,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         overviewButton.miniButton();
         overviewButton.setPreferredSize(new Dimension(130, 50));
         overviewButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 getBrowser().getVMSInfo().selectMyself();
             }
         });
@@ -1956,7 +1971,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                               + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setApplyButtons(null, params);
             }
         });
@@ -2426,13 +2442,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 Tools.invokeAndWait(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         removeAll();
                     }
                 });
@@ -2444,7 +2463,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addDiskPanel();
                     }
@@ -2459,7 +2479,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addInterfacePanel();
                     }
@@ -2474,7 +2495,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addGraphicsPanel();
                     }
@@ -2489,7 +2511,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addInputDevPanel();
                     }
@@ -2504,7 +2527,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addSoundsPanel();
                     }
@@ -2519,7 +2543,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addSerialsPanel();
                     }
@@ -2534,7 +2559,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, false),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addParallelsPanel();
                     }
@@ -2549,7 +2575,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.ADMIN, true),
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
-                    @Override public void action() {
+                    @Override
+                    public void action() {
                         hidePopup();
                         addVideosPanel();
                     }
@@ -2574,21 +2601,24 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
                        && !vmsxml.isRunning(getDomainName());
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2612,21 +2642,24 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
                        && vmsxml.isRunning(getDomainName());
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2650,21 +2683,24 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
                        && vmsxml.isRunning(getDomainName());
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2688,14 +2724,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 return vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
                        && vmsxml.isSuspended(getDomainName());
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getResource().isNew()) {
                     return NOT_APPLIED;
                 }
@@ -2711,7 +2749,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 //       && vmsxml.isSuspended(getDomainName());
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2738,7 +2777,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
 
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
@@ -2756,7 +2796,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2780,7 +2821,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getResource().isNew()) {
                     return NOT_APPLIED;
                 }
@@ -2798,7 +2840,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2822,7 +2865,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getResource().isNew()) {
                     return NOT_APPLIED;
                 }
@@ -2840,7 +2884,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null && host != null) {
@@ -2852,7 +2897,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns list of menu items for VM. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* vnc viewers */
         for (final Host h : getBrowser().getClusterHosts()) {
@@ -2892,7 +2938,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
         };
@@ -2919,10 +2966,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                        new AccessMode(ConfigData.AccessType.ADMIN, false),
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                             private static final long serialVersionUID = 1L;
-                            @Override public boolean predicate() {
+                            @Override
+                            public boolean predicate() {
                                 return !getResource().isNew();
                             }
-                            @Override public String enablePredicate() {
+                            @Override
+                            public String enablePredicate() {
                                 if (!Tools.getConfigData().isAdvancedMode()
                                     && isUsedByCRM()) {
                                     return IS_USED_BY_CRM_STRING;
@@ -2941,7 +2990,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 return null;
                             }
 
-                            @Override public void action() {
+                            @Override
+                            public void action() {
                                 hidePopup();
                                 removeMyself(false);
                             }
@@ -2951,7 +3001,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns service icon in the menu. It can be started or stopped. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null && vmsxml.isRunning(getDomainName())) {
@@ -2962,7 +3013,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns category icon. */
-    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
         return getMenuIcon(testOnly);
     }
 
@@ -2982,7 +3034,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getResource().isNew()) {
                         return NOT_APPLIED;
                     }
@@ -2996,7 +3049,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
@@ -3023,7 +3077,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getResource().isNew()) {
                         return NOT_APPLIED;
                     }
@@ -3037,7 +3092,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
@@ -3064,7 +3120,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getResource().isNew()) {
                         return NOT_APPLIED;
                     }
@@ -3078,7 +3135,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     hidePopup();
                     final VMSXML vxml = getBrowser().getVMSXML(host);
                     if (vxml != null) {
@@ -3096,17 +3154,20 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns long description of the specified parameter. */
-    @Override protected String getParamLongDesc(final String param) {
+    @Override
+    protected String getParamLongDesc(final String param) {
         return SHORTNAME_MAP.get(param);
     }
 
     /** Returns short description of the specified parameter. */
-    @Override protected String getParamShortDesc(final String param) {
+    @Override
+    protected String getParamShortDesc(final String param) {
         return SHORTNAME_MAP.get(param);
     }
 
     /** Returns preferred value for specified parameter. */
-    @Override protected String getParamPreferred(final String param) {
+    @Override
+    protected String getParamPreferred(final String param) {
         if (preferredEmulator != null
             && VMSXML.VM_PARAM_EMULATOR.equals(param)) {
             return preferredEmulator;
@@ -3115,13 +3176,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns default value for specified parameter. */
-    @Override protected String getParamDefault(final String param) {
+    @Override
+    protected String getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
     /** Returns true if the value of the parameter is ok. */
-    @Override protected boolean checkParam(final String param,
-                                           final String newValue) {
+    @Override
+    protected boolean checkParam(final String param, final String newValue) {
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
@@ -3159,9 +3221,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         break;
                     }
                 }
-                final GuiComboBox emCB = 
+                final GuiComboBox emCB =
                         paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, "wizard");
-                final GuiComboBox loCB = 
+                final GuiComboBox loCB =
                             paramComboBoxGet(VMSXML.VM_PARAM_LOADER, "wizard");
                 if (Tools.areEqual("xen", newValue)) {
                     if (emCB != null) {
@@ -3183,7 +3245,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         } else if (VMSXML.VM_PARAM_CPU_MATCH.equals(param)) {
             final boolean match = !"".equals(newValue);
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     for (final String p : new String[]{
                                     VMSXML.VM_PARAM_CPUMATCH_MODEL,
                                     VMSXML.VM_PARAM_CPUMATCH_VENDOR,
@@ -3201,12 +3264,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns parameters. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         return VM_PARAMETERS.clone();
     }
 
     /** Returns possible choices for drop down lists. */
-    @Override protected Object[] getParamPossibleChoices(final String param) {
+    @Override
+    protected Object[] getParamPossibleChoices(final String param) {
         if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
             final Set<String> models = new LinkedHashSet<String>();
             models.add("");
@@ -3226,42 +3291,50 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns section to which the specified parameter belongs. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return SECTION_MAP.get(param);
     }
 
     /** Returns true if the specified parameter is required. */
-    @Override protected boolean isRequired(final String param) {
+    @Override
+    protected boolean isRequired(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is integer. */
-    @Override protected boolean isInteger(final String param) {
+    @Override
+    protected boolean isInteger(final String param) {
         return IS_INTEGER.contains(param);
     }
 
     /** Returns true if the specified parameter is a label. */
-    @Override protected boolean isLabel(final String param) {
+    @Override
+    protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    @Override protected boolean isTimeType(final String param) {
+    @Override
+    protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns whether parameter is checkbox. */
-    @Override protected boolean isCheckBox(final String param) {
+    @Override
+    protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns the type of the parameter. */
-    @Override protected String getParamType(final String param) {
+    @Override
+    protected String getParamType(final String param) {
         return "undef"; // TODO:
     }
 
     /** Returns type of the field. */
-    @Override protected GuiComboBox.Type getFieldType(final String param) {
+    @Override
+    protected GuiComboBox.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -3271,7 +3344,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 getApplyButton().setEnabled(false);
                 getRevertButton().setEnabled(false);
             }
@@ -3377,7 +3451,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         if (getResource().isNew()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     final DefaultMutableTreeNode thisNode = getNode();
                     final Enumeration eee = thisNode.children();
                     while (eee.hasMoreElements()) {
@@ -3426,12 +3501,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter has a unit prefix. */
-    @Override protected boolean hasUnitPrefix(final String param) {
+    @Override
+    protected boolean hasUnitPrefix(final String param) {
         return HAS_UNIT_PREFIX.containsKey(param) && HAS_UNIT_PREFIX.get(param);
     }
 
     /** Returns units. */
-    @Override protected Unit[] getUnits() {
+    @Override
+    protected Unit[] getUnits() {
         return new Unit[]{
                    //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),
@@ -3457,7 +3534,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns columns for the table. */
-    @Override protected String[] getColumnNames(final String tableName) {
+    @Override
+    protected String[] getColumnNames(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
             return new String[]{"Name", "Defined on", "Status", "Memory", ""};
         } else if (DISK_TABLE.equals(tableName)) {
@@ -3481,7 +3559,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
             return getMainTableData();
         } else if (DISK_TABLE.equals(tableName)) {
@@ -4099,12 +4178,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    @Override protected void rowClicked(final String tableName,
-                                        final String key,
-                                        final int column) {
+    @Override
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         if (HEADER_TABLE.equals(tableName)) {
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
                         removeMyself(false);
                     } else {
@@ -4119,7 +4200,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mDiskToInfoLock.unlock();
             if (vdi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
                             vdi.removeMyself(false);
                         } else {
@@ -4135,7 +4217,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mInterfaceToInfoLock.unlock();
             if (vii != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
                             vii.removeMyself(false);
                         } else {
@@ -4151,7 +4234,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mInputDevToInfoLock.unlock();
             if (vidi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
                             vidi.removeMyself(false);
                         } else {
@@ -4167,7 +4251,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mGraphicsToInfoLock.unlock();
             if (vgi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
                             vgi.removeMyself(false);
                         } else {
@@ -4183,7 +4268,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mSoundToInfoLock.unlock();
             if (vsi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
                             vsi.removeMyself(false);
                         } else {
@@ -4199,7 +4285,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mSerialToInfoLock.unlock();
             if (vsi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
                             vsi.removeMyself(false);
                         } else {
@@ -4215,7 +4302,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mParallelToInfoLock.unlock();
             if (vpi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
                             vpi.removeMyself(false);
                         } else {
@@ -4231,7 +4319,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mVideoToInfoLock.unlock();
             if (vvi != null) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
                             vvi.removeMyself(false);
                         } else {
@@ -4245,8 +4334,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Retrurns color for some rows. */
-    @Override protected Color getTableRowColor(final String tableName,
-                                               final String key) {
+    @Override
+    protected Color getTableRowColor(final String tableName, final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             return rowColor;
         }
@@ -4254,8 +4343,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Alignment for the specified column. */
-    @Override protected int getTableColumnAlignment(final String tableName,
-                                                    final int column) {
+    @Override
+    protected int getTableColumnAlignment(final String tableName,
+                                          final int column) {
 
         if (column == 3 && HEADER_TABLE.equals(tableName)) {
             return SwingConstants.RIGHT;
@@ -4264,8 +4354,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns info object for this row. */
-    @Override protected Info getTableInfo(final String tableName,
-                                          final String key) {
+    @Override
+    protected Info getTableInfo(final String tableName, final String key) {
         if (HEADER_TABLE.equals(tableName)) {
             return this;
         } else if (DISK_TABLE.equals(tableName)) {
@@ -4300,7 +4390,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected boolean isAdvanced(final String param) {
+    @Override
+    protected boolean isAdvanced(final String param) {
         if (!getResource().isNew() && VMSXML.VM_PARAM_NAME.equals(param)) {
             return true;
         }
@@ -4308,7 +4399,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected String isEnabled(final String param) {
+    @Override
+    protected String isEnabled(final String param) {
         final String libvirtVersion =
                             getBrowser().getCluster().getMinLibvirtVersion();
         if (!getResource().isNew() && VMSXML.VM_PARAM_NAME.equals(param)) {
@@ -4333,8 +4425,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected boolean isEnabledOnlyInAdvancedMode(
-                                                         final String param) {
+    @Override
+    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
          if (VMSXML.VM_PARAM_MEMORY.equals(param)) {
              return true;
          }
@@ -4343,13 +4435,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(
-                                                         final String param) {
+    @Override
+    protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Returns the regexp of the parameter. */
-    @Override protected String getParamRegexp(final String param) {
+    @Override
+    protected String getParamRegexp(final String param) {
         if (VMSXML.VM_PARAM_NAME.equals(param)) {
             return "^[\\w-]+$";
         } else {
@@ -4361,8 +4454,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
      * Returns whether the specified parameter or any of the parameters
      * have changed.
      */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
@@ -4405,8 +4499,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns whether all the parameters are correct. */
-    @Override public boolean checkResourceFieldsCorrect(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return false;
@@ -4459,9 +4554,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns combo box for parameter. */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                     final String prefix,
-                                                     final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         final GuiComboBox paramCB =
                                  super.getParamComboBox(param, prefix, width);
         if (VMSXML.VM_PARAM_BOOT.equals(param)) {
@@ -4471,7 +4567,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Removes this domain. */
-    @Override public void removeMyself(final boolean testOnly) {
+    @Override
+    public void removeMyself(final boolean testOnly) {
         if (getResource().isNew()) {
             super.removeMyself(testOnly);
             getResource().setNew(false);
@@ -4512,8 +4609,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    @Override protected Map<Integer, Integer> getDefaultWidths(
-                                                    final String tableName) {
+    @Override
+    protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
         if (HEADER_TABLE.equals(tableName)) {
             return HEADER_DEFAULT_WIDTHS;
         } else if (DISK_TABLE.equals(tableName)) {
@@ -4537,8 +4634,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns default widths for columns. Null for computed width. */
-    @Override protected boolean isControlButton(final String tableName,
-                                                final int column) {
+    @Override
+    protected boolean isControlButton(final String tableName,
+                                      final int column) {
         if (HEADER_TABLE.equals(tableName)) {
             return HEADER_DEFAULT_WIDTHS.containsKey(column);
         } else if (DISK_TABLE.equals(tableName)) {
@@ -4562,11 +4660,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Returns tool tip text in the table. */
-    @Override protected String getTableToolTip(final String tableName,
-                                               final String key,
-                                               final Object object,
-                                               final int raw,
-                                               final int column) {
+    @Override
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
         if (HEADER_TABLE.equals(tableName)) {
             if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
                 return "Remove domain " + key + ".";
@@ -4615,7 +4714,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (hostCB != null) {
             final boolean enable = host.isConnected();
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     hostCB.setTFButtonEnabled(enable && stopped);
                     hostBtn.setText("Start");
                     hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
@@ -4632,7 +4732,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (hostCB != null) {
             final boolean enable = host.isConnected();
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     hostCB.setTFButtonEnabled(enable);
                     hostBtn.setText("View");
                     hostBtn.setIcon(VNC_ICON);
@@ -4649,7 +4750,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        final MyButton hostBtn) {
         if (hostCB != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     hostCB.setTFButtonEnabled(false);
                     hostBtn.setIcon(null);
                     hostBtn.setToolTipText("not defined on " + host.getName());
@@ -4686,7 +4788,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Revert valus. */
-    @Override public void revert() {
+    @Override
+    public void revert() {
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;

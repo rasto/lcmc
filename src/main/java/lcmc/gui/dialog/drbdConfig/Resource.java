@@ -98,7 +98,8 @@ public final class Resource extends DrbdConfig {
     }
 
     /** Applies the changes and returns next dialog (BlockDev). */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
@@ -123,7 +124,8 @@ public final class Resource extends DrbdConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.DrbdConfig.Resource.Title in TextResources.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Title");
     }
 
@@ -131,18 +133,21 @@ public final class Resource extends DrbdConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.DrbdConfig.Resource.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
         final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
@@ -159,7 +164,8 @@ public final class Resource extends DrbdConfig {
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     pressNextButton();
                 }
             });
@@ -167,7 +173,8 @@ public final class Resource extends DrbdConfig {
     }
 
     /** Returns input pane where user can configure a drbd resource. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         dri.getInfoPanel();

@@ -241,7 +241,8 @@ public final class LCMC extends JPanel {
     /** Cleanup before closing. */
     public static void cleanupBeforeClosing() {
         final Thread t = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 // TODO: don't try to reconnect when exiting
                 System.out.println("saving...");
                 for (int i = 0; i < 10; i++) {
@@ -655,7 +656,8 @@ public final class LCMC extends JPanel {
         mainFrame.setJMenuBar(getMenuBar());
         mainFrame.setContentPane(getMainPanel());
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 createAndShowGUI((Container) mainFrame);
             }
         });

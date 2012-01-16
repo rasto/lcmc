@@ -107,8 +107,9 @@ final class FilesystemInfo extends ServiceInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    @Override boolean checkResourceFieldsCorrect(final String param,
-                                                 final String[] params) {
+    @Override
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params) {
         final boolean ret = super.checkResourceFieldsCorrect(param, params);
         if (!ret) {
             return false;
@@ -121,10 +122,12 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Applies changes to the Filesystem service parameters. */
-    @Override void apply(final Host dcHost, final boolean testOnly) {
+    @Override
+    void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
@@ -182,11 +185,13 @@ final class FilesystemInfo extends ServiceInfo {
     private void addParamComboListeners(final GuiComboBox paramCb) {
         paramCb.addListeners(
             new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED
                         && fstypeParamCb != null) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 if (!(e.getItem() instanceof Info)) {
                                     return;
                                 }
@@ -220,9 +225,10 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Returns editable element for the parameter. */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                     final String prefix,
-                                                     final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         GuiComboBox paramCb;
         if (FS_RES_PARAM_DEV.equals(param)) {
             String selectedValue = getPreviouslySelected(param, prefix);
@@ -326,7 +332,8 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Returns string representation of the filesystem service. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         String id = getService().getId();
         if (id == null) {
             return super.toString(); /* this is for 'new Filesystem' */
@@ -355,8 +362,9 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Removes the service without confirmation dialog. */
-    @Override protected void removeMyselfNoConfirm(final Host dcHost,
-                                                   final boolean testOnly) {
+    @Override
+    protected void removeMyselfNoConfirm(final Host dcHost,
+                                         final boolean testOnly) {
         final DrbdVolumeInfo oldDvi =
                     getBrowser().getDrbdDevHash().get(
                                             getParamSaved(FS_RES_PARAM_DEV));
@@ -364,7 +372,8 @@ final class FilesystemInfo extends ServiceInfo {
         super.removeMyselfNoConfirm(dcHost, testOnly);
         if (oldDvi != null && !testOnly) {
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     oldDvi.updateMenus(null);
                 }
             });
@@ -376,8 +385,8 @@ final class FilesystemInfo extends ServiceInfo {
      * Adds DrbddiskInfo before the filesysteminfo is added, returns true
      * if something was added.
      */
-    @Override void addResourceBefore(final Host dcHost,
-                                     final boolean testOnly) {
+    @Override
+    void addResourceBefore(final Host dcHost, final boolean testOnly) {
         if (getGroupInfo() != null) {
             // TODO: disabled for now
             return;
@@ -410,14 +419,16 @@ final class FilesystemInfo extends ServiceInfo {
                 oldDvi.removeLinbitDrbd(this, dcHost, testOnly);
             }
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     oldDvi.updateMenus(null);
                 }
             });
             t.start();
             oldDvi.getDrbdResourceInfo().setUsedByCRM(null);
             //final Thread t = new Thread(new Runnable() {
-            //    @Override public void run() {
+            //    @Override
+            //    public void run() {
             //        oldDvi.updateMenus(null);
             //    }
             //});
@@ -430,7 +441,8 @@ final class FilesystemInfo extends ServiceInfo {
         if (newDvi != null) {
             //newDvi.getDrbdResourceInfo().setUsedByCRM(true);
             //final Thread t = new Thread(new Runnable() {
-            //    @Override public void run() {
+            //    @Override
+            //    public void run() {
             //        newDvi.updateMenus(null);
             //    }
             //});
@@ -444,7 +456,8 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Returns how much of the filesystem is used. */
-    @Override public int getUsed() {
+    @Override
+    public int getUsed() {
         if (blockDeviceParamCb != null) {
             final Object value = blockDeviceParamCb.getValue();
             if (Tools.isStringClass(value)) {
@@ -468,7 +481,8 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Reload combo boxes. */
-    @Override public void reloadComboBoxes() {
+    @Override
+    public void reloadComboBoxes() {
         super.reloadComboBoxes();
         final DrbdVolumeInfo selectedInfo =
                           getBrowser().getDrbdDevHash().get(

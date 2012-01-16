@@ -238,7 +238,8 @@ public final class TerminalPanel extends JScrollPane {
         final DefaultCaret caret = new DefaultCaret() {
             private static final long serialVersionUID = 1L;
 
-            @Override protected synchronized void damage(final Rectangle r) {
+            @Override
+            protected synchronized void damage(final Rectangle r) {
                 if (r != null) {
                     x = r.x;
                     y = r.y;
@@ -248,7 +249,8 @@ public final class TerminalPanel extends JScrollPane {
                 }
             }
 
-            @Override public void paint(final Graphics g) {
+            @Override
+            public void paint(final Graphics g) {
                 /* painting cursor. If it is not visible it is out of focus, we
                  * make it barely visible. */
                 try {
@@ -278,7 +280,8 @@ public final class TerminalPanel extends JScrollPane {
         };
         terminalArea.setCaret(caret);
         terminalArea.addCaretListener(new CaretListener() {
-            @Override public void caretUpdate(final CaretEvent e) {
+            @Override
+            public void caretUpdate(final CaretEvent e) {
                 /* don't do this if caret moved because of selection */
                 mPosLock.lock();
                 try {
@@ -471,15 +474,16 @@ public final class TerminalPanel extends JScrollPane {
         }
         host.execCommandRaw(command,
              new ExecCallback() {
-                 @Override public void done(final String ans) {
+                 @Override
+                 public void done(final String ans) {
                      if (!"".equals(command)) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
                  }
 
-                 @Override public void doneError(final String ans,
-                                                 final int exitCode) {
+                 @Override
+                 public void doneError(final String ans, final int exitCode) {
                      if (!"".equals(command)) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
@@ -516,7 +520,8 @@ public final class TerminalPanel extends JScrollPane {
      */
     public void nextCommand() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 append(prompt(), promptColor);
             }
         });
@@ -527,7 +532,8 @@ public final class TerminalPanel extends JScrollPane {
         final String[] lines = command.split("\\r?\\n");
 
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 append(lines[0], commandColor);
                 for (int i = 1; i < lines.length; i++) {
 
@@ -541,7 +547,8 @@ public final class TerminalPanel extends JScrollPane {
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 append(output, outputColor);
             }
         });
@@ -550,7 +557,8 @@ public final class TerminalPanel extends JScrollPane {
     /** Adds array of command output to the terminal textarea and scrolls up. */
     void addCommandOutput(final String[] output) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (int i = 0; i < output.length; i++) {
                     if (output[i] != null) {
                         String newLine = "";
@@ -567,7 +575,8 @@ public final class TerminalPanel extends JScrollPane {
     /** Adds content string (output of a command) to the terminal area. */
     public void addContent(final String c) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 append(c, outputColor);
             }
         });
@@ -576,7 +585,8 @@ public final class TerminalPanel extends JScrollPane {
     /** Adds content to the terminal textarea and scrolls up. */
     public void addContentErr(final String c) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 append(c, errorColor);
             }
         });
@@ -594,9 +604,10 @@ public final class TerminalPanel extends JScrollPane {
         /**
          * Is called while a string is inserted. It checks if a cheat code is
          * in the string. */
-        @Override public void insertString(int offs,
-                                           final String s,
-                                           final AttributeSet a)
+        @Override
+        public void insertString(int offs,
+                                 final String s,
+                                 final AttributeSet a)
             throws BadLocationException {
             mPosLock.lock();
             if (offs < commandOffset) {
@@ -641,9 +652,9 @@ public final class TerminalPanel extends JScrollPane {
         }
 
         /** Is called while characters is removed. */
-        @Override public void remove(
-                                 final int offs,
-                                 final int len) throws BadLocationException {
+        @Override
+        public void remove(final int offs,
+                           final int len) throws BadLocationException {
             mPosLock.lock();
             if (offs >= commandOffset) {
 
@@ -690,7 +701,8 @@ public final class TerminalPanel extends JScrollPane {
             Tools.info("run gc");
         } else if (ALLOCATE_10.equals(cheat)) {
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     Tools.info("allocate mem");
                     Byte[] b = new Byte[1024000];
                     Tools.info("allocate mem done.");

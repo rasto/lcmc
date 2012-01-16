@@ -32,7 +32,8 @@ public final class DistResource extends java.util.ListResourceBundle {
     /** Sudo placeholder. */
     public static final String SUDO = "@DMCSUDO@";
     /** Get contents. */
-    @Override protected Object[][] getContents() {
+    @Override
+    protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

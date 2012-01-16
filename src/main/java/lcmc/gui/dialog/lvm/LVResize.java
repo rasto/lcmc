@@ -178,7 +178,8 @@ public final class LVResize extends LV {
             this.enable = enable;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             boolean e = enable;
             if (enable) {
                 final long oldSize = Tools.convertToKilobytes(
@@ -257,9 +258,11 @@ public final class LVResize extends LV {
         inputPane.add(sizeLabel);
         inputPane.add(sizeCB);
         resizeButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         if (checkDRBD()) {
                             Tools.invokeAndWait(
                                                new EnableResizeRunnable(false));
@@ -360,7 +363,8 @@ public final class LVResize extends LV {
             super();
             this.onDeselect = onDeselect;
         }
-        @Override public void itemStateChanged(final ItemEvent e) {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED
                 || onDeselect) {
                 checkButtons();
@@ -375,15 +379,18 @@ public final class LVResize extends LV {
             checkButtons();
         }
 
-        @Override public void insertUpdate(final DocumentEvent e) {
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void removeUpdate(final DocumentEvent e) {
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void changedUpdate(final DocumentEvent e) {
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
             check();
         }
     }

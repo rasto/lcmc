@@ -389,7 +389,8 @@ public final class SSH {
                                                true),
                                   2);
                 thisSession.execCommand("bash -c '"
-                                        + Tools.escapeSingleQuotes("export LC_ALL=C;"
+                                        + Tools.escapeSingleQuotes(
+                                                            "export LC_ALL=C;"
                                         + host.getSudoCommand(
                                                host.getHoppedCommand(command),
                                                false), 1) + "'");
@@ -593,7 +594,8 @@ public final class SSH {
          * Reconnects, connects if there is no connection and executes a
          * command.
          */
-        @Override public void run() {
+        @Override
+        public void run() {
             if (reconnect()) {
                 mConnectionLock.lock();
                 if (connection == null) {
@@ -619,7 +621,8 @@ public final class SSH {
                 final Boolean[] cancelTimeout = new Boolean[1];
                 cancelTimeout[0] = false;
                 final Thread tt = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         Tools.sleep(10000);
                         if (!cancelTimeout[0]) {
                             Tools.debug(this,
@@ -702,13 +705,14 @@ public final class SSH {
             execCommandThread = new ExecCommandThread(
                             command,
                             new ExecCallback() {
-                                @Override public void done(final String ans) {
+                                @Override
+                                public void done(final String ans) {
                                     answer[0] = ans;
                                     exitCode[0] = 0;
                                 }
-                                @Override public void doneError(
-                                                            final String ans,
-                                                            final int ec) {
+                                @Override
+                                public void doneError(final String ans,
+                                                      final int ec) {
                                     answer[0] = ans;
                                     exitCode[0] = ec;
                                 }
@@ -1077,7 +1081,8 @@ public final class SSH {
         }
 
         /** Start connection in the thread. */
-        @Override public void run() {
+        @Override
+        public void run() {
             if (callback != null && isConnected()) {
                 callback.done(1);
             }
@@ -1420,7 +1425,8 @@ public final class SSH {
                     mConnectionLock.unlock();
                     host.setConnected();
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             host.getTerminalPanel().nextCommand();
                         }
                     });
@@ -1629,10 +1635,12 @@ public final class SSH {
                                 + commandTail, 1)
                             + "\"",
                             new ExecCallback() {
-                                @Override public void done(final String ans) {
+                                @Override
+                                public void done(final String ans) {
                                     /* ok */
                                 }
-                                @Override public void doneError(
+                                @Override
+                                public void doneError(
                                                          final String ans,
                                                          final int exitCode) {
                                     if (ans == null) {
@@ -1646,7 +1654,8 @@ public final class SSH {
                                         }
                                         final Thread t = new Thread(
                                         new Runnable() {
-                                            @Override public void run() {
+                                            @Override
+                                            public void run() {
                                                 Tools.progressIndicatorFailed(
                                                                 host.getName(),
                                                                 line,

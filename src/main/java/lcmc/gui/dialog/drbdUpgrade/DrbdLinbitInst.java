@@ -41,7 +41,8 @@ final class DrbdLinbitInst extends lcmc.gui.dialog.host.DrbdLinbitInst {
     }
 
     /** Returns the next dialog.cluster.InitForUpgrade. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new InitForUpgrade(null, getHost().getCluster());
     }
 }

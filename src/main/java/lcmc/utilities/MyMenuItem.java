@@ -100,7 +100,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 toolTip.setTipText(text);
             }
         });
@@ -135,7 +136,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         if (shortDesc != null && !"".equals(shortDesc)) {
             toolTip = createToolTip();
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     toolTip.setTipText(shortDesc);
                 }
             });
@@ -199,7 +201,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * Sets the pos of the click that can be used in the overriden action
      * method.
      */
-    @Override public final void setPos(final Point2D pos) {
+    @Override
+    public final void setPos(final Point2D pos) {
         this.pos = pos;
     }
 
@@ -215,7 +218,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setFont(new Font(name, style, size));
             }
         });
@@ -228,7 +232,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setFont(new Font(name, style, size));
             }
         });
@@ -260,10 +265,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Updates the menu item, checking the predicate and enablePredicate. */
-    @Override public void update() {
+    @Override
+    public void update() {
         if (predicate()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     setText(text1);
                     if (icon1 != null) {
                         setIcon(icon1);
@@ -277,7 +284,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             });
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     setText(text2);
                     if (icon1 != null) { /* icon1 is here on purpose */
                         setIcon(icon2);
@@ -300,7 +308,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setEnabled(disableTooltip == null && accessible);
                 setVisible(visible
                            && Tools.getConfigData().isAccessible(
@@ -309,7 +318,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         });
         if (toolTip != null && isVisible()) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (!accessible && enableAccessMode.getAccessType()
                                        != ConfigData.AccessType.NEVER) {
                         String advanced = "";
@@ -341,10 +351,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * When an item was selected this calls an action method that can be
      * overridden.
      */
-    @Override public void actionPerformed(final ActionEvent e) {
+    @Override
+    public void actionPerformed(final ActionEvent e) {
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     action();
                 }
             }
@@ -353,12 +365,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Returns the text of the menu item. */
-    @Override public final String toString() {
+    @Override
+    public final String toString() {
         return getText();
     }
 
     /** Creates tooltip. */
-    @Override public final JToolTip createToolTip() {
+    @Override
+    public final JToolTip createToolTip() {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }
@@ -370,14 +384,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip's background color. */
-    @Override public final void setToolTipBackground(
-                                              final Color toolTipBackground) {
+    @Override
+    public final void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
     /** Returns location of the tooltip, so that it does not cover the menu
      * item. */
-    @Override public Point getToolTipLocation(final MouseEvent event) {
+    @Override
+    public Point getToolTipLocation(final MouseEvent event) {
         final Point screenLocation = getLocationOnScreen();
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();
@@ -390,7 +405,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    @Override public final void setToolTipText(final String toolTipText) {
+    @Override
+    public final void setToolTipText(final String toolTipText) {
         if (toolTip == null || toolTipText == null) {
             return;
         }
@@ -437,7 +453,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         super.setToolTipText(toolTipText);
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     Tools.sleep(1000); /* well, doesn't work all the time */
                     moveMouse();
                     Tools.sleep(2000);
@@ -449,7 +466,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Clean up. */
-    @Override public final void cleanup() {
+    @Override
+    public final void cleanup() {
         if (toolTip != null) {
             toolTip.setComponent(null);
         }

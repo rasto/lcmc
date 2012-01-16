@@ -164,7 +164,8 @@ public final class NetInterface extends Resource {
     }
 
     /** Returns value for parameter. */
-    @Override public String getValue(final String parameter) {
+    @Override
+    public String getValue(final String parameter) {
         if ("ip".equals(parameter)) {
             return ip;
         }

@@ -54,7 +54,8 @@ public final class ServiceLogs extends ClusterLogs {
     }
 
     /** Returns a map from pattern name to its pattern. */
-    @Override protected Map<String, String> getPatternMap() {
+    @Override
+    protected Map<String, String> getPatternMap() {
         final Map<String, String> pm = new LinkedHashMap<String, String>();
         pm.put("lrmd", wordBoundary("lrmd"));
         pm.put(serviceType, wordBoundary(serviceType));
@@ -64,7 +65,8 @@ public final class ServiceLogs extends ClusterLogs {
     }
 
     /** Returns which pattern names are selected by default. */
-    @Override protected Set<String> getSelectedSet() {
+    @Override
+    protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
         selected.add(serviceType); // TODO: till pacemaker 1.0.8
         selected.add("ERROR");

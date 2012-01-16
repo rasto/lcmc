@@ -67,7 +67,8 @@ public final class ClusterTab extends JPanel {
     }
 
     /** Returns name of the cluster. */
-    @Override public String getName() {
+    @Override
+    public String getName() {
         if (cluster == null) {
             return null;
         }

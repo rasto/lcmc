@@ -81,7 +81,8 @@ final class ClusterHosts extends DialogCluster {
     }
 
     /** It is executed after the dialog is applied. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         getCluster().clearHosts();
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -94,7 +95,8 @@ final class ClusterHosts extends DialogCluster {
     }
 
     /** Returns the next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         boolean allConnected = true;
         for (final Host host : getCluster().getHosts()) {
             if (!host.isConnected()) {
@@ -138,7 +140,8 @@ final class ClusterHosts extends DialogCluster {
         }
         final boolean enableButton = enable;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
@@ -149,23 +152,27 @@ final class ClusterHosts extends DialogCluster {
     }
 
     /** Returns the title of the dialog. */
-    @Override protected String getClusterDialogTitle() {
+    @Override
+    protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Title");
     }
 
     /** Returns the description of the dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     checkCheckBoxes();
                 }
             });
@@ -173,19 +180,22 @@ final class ClusterHosts extends DialogCluster {
     }
 
     /** Inits dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
     }
 
     /** Returns the panel with hosts that can be selected. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         /* Hosts */
         final ScrollableFlowPanel p1 =
             new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
         final Hosts hosts = Tools.getConfigData().getHosts();
 
         final ItemListener chListener = new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     checkCheckBoxes();
                 }
             };
@@ -250,7 +260,8 @@ final class ClusterHosts extends DialogCluster {
 
         //        public final void componentMoved(final ComponentEvent e) {
         //            SwingUtilities.invokeLater(new Runnable() {
-        //                @Override public void run() {
+        //                @Override
+        //                public void run() {
         //                    if (alreadyMoved) {
         //                        return;
         //                    }
@@ -282,43 +293,48 @@ final class ClusterHosts extends DialogCluster {
             super(layout);
         }
 
-        @Override public void setBounds(final int x,
-                                        final int y,
-                                        final int width,
-                                        final int height) {
+        @Override
+        public void setBounds(final int x,
+                              final int y,
+                              final int width,
+                              final int height) {
             super.setBounds(x, y, getParent().getWidth(), height);
         }
 
-        @Override public Dimension getPreferredSize() {
+        @Override
+        public Dimension getPreferredSize() {
             return new Dimension(getWidth(), getPreferredHeight());
         }
 
-        @Override public Dimension getPreferredScrollableViewportSize() {
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
             return super.getPreferredSize();
         }
 
-        @Override public int getScrollableUnitIncrement(
-                                                   final Rectangle visibleRect,
-                                                   final int orientation,
-                                                   final int direction) {
+        @Override
+        public int getScrollableUnitIncrement(final Rectangle visibleRect,
+                                              final int orientation,
+                                              final int direction) {
             final int hundredth = (orientation ==  SwingConstants.VERTICAL
                     ? getParent().getHeight() : getParent().getWidth()) / 100;
             return (hundredth == 0 ? 1 : hundredth);
         }
 
-        @Override public int getScrollableBlockIncrement(
-                                                   final Rectangle visibleRect,
-                                                   final int orientation,
-                                                   final int direction) {
+        @Override
+        public int getScrollableBlockIncrement(final Rectangle visibleRect,
+                                               final int orientation,
+                                               final int direction) {
             return orientation == SwingConstants.VERTICAL
                             ? getParent().getHeight() : getParent().getWidth();
         }
 
-        @Override public boolean getScrollableTracksViewportWidth() {
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
             return true;
         }
 
-        @Override public boolean getScrollableTracksViewportHeight() {
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
             return false;
         }
 

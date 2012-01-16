@@ -203,7 +203,8 @@ public final class BlockDevInfo extends EditableInfo {
 
 
     /** Returns browser object of this info. */
-    @Override public HostBrowser getBrowser() {
+    @Override
+    public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
@@ -217,7 +218,8 @@ public final class BlockDevInfo extends EditableInfo {
      *
      * TODO: check this
      */
-    @Override public void removeMyself(final boolean testOnly) {
+    @Override
+    public void removeMyself(final boolean testOnly) {
         getBlockDevice().setValue(DRBD_MD_PARAM, null);
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(testOnly);
@@ -233,12 +235,14 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns block device icon for the menu. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
     /** Returns info of this block device as string. */
-    @Override String getInfo() {
+    @Override
+    String getInfo() {
         final StringBuilder ret = new StringBuilder(120);
         ret.append("Host            : ");
         ret.append(getHost().getName());
@@ -358,7 +362,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns tool tip for this block device. */
-    @Override public String getToolTipForGraph(final boolean testOnly) {
+    @Override
+    public String getToolTipForGraph(final boolean testOnly) {
         final StringBuilder tt = new StringBuilder(60);
 
         final BlockDevice bd = getBlockDevice();
@@ -449,12 +454,14 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns section of this paramter. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return getBlockDevice().getSection(param);
     }
 
     /** Returns possible choices of this paramter. */
-    @Override protected Object[] getPossibleChoices(final String param) {
+    @Override
+    protected Object[] getPossibleChoices(final String param) {
         return getBlockDevice().getPossibleChoices(param);
     }
 
@@ -464,16 +471,18 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns combobox for this parameter. */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                     final String prefix,
-                                                     final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         GuiComboBox paramCb;
         if (DRBD_MD_INDEX_PARAM.equals(param)) {
             final GuiComboBox gcb =
                                 super.getParamComboBox(param, prefix, width);
             paramCb = gcb;
             //SwingUtilities.invokeLater(new Runnable() {
-            //    @Override public void run() {
+            //    @Override
+            //    public void run() {
             //        gcb.setAlwaysEditable(true);
             //    }
             //});
@@ -482,7 +491,8 @@ public final class BlockDevInfo extends EditableInfo {
                                  super.getParamComboBox(param, prefix, width);
             paramCb = gcb;
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     gcb.setEditable(false);
                 }
             });
@@ -491,7 +501,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns true if a paramter is correct. */
-    @Override protected boolean checkParam(final String param, String value) {
+    @Override
+    protected boolean checkParam(final String param, String value) {
         boolean ret = true;
         if (value == null) {
             value = "";
@@ -515,13 +526,15 @@ public final class BlockDevInfo extends EditableInfo {
                         }
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             ind.setEnabled(!internal);
                         }
                     });
                     if (indW != null) {
                         SwingUtilities.invokeLater(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 indW.setEnabled(!internal);
                             }
                         });
@@ -545,65 +558,75 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter is required. */
-    @Override protected boolean isRequired(final String param) {
+    @Override
+    protected boolean isRequired(final String param) {
         return true;
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected boolean isAdvanced(final String param) {
+    @Override
+    protected boolean isAdvanced(final String param) {
         return false;
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(
-                                                         final String param) {
+    @Override
+    protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected String isEnabled(final String param) {
+    @Override
+    protected String isEnabled(final String param) {
         return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected boolean isEnabledOnlyInAdvancedMode(
-                                                        final String param) {
+    @Override
+    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
     }
 
     /** Returns whether this type is integer. */
-    @Override protected boolean isInteger(final String param) {
+    @Override
+    protected boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns whether this type is a label. */
-    @Override protected boolean isLabel(final String param) {
+    @Override
+    protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Returns whether this parameter is of a time type. */
-    @Override protected boolean isTimeType(final String param) {
+    @Override
+    protected boolean isTimeType(final String param) {
         /* not required */
         return false;
     }
 
     /** Returns whether this parameter is a checkbox. */
-    @Override protected boolean isCheckBox(final String param) {
+    @Override
+    protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns type of this parameter. */
-    @Override protected String getParamType(final String param) {
+    @Override
+    protected String getParamType(final String param) {
         return null;
     }
 
     /** Returns the regexp of the parameter. */
-    @Override protected String getParamRegexp(final String param) {
+    @Override
+    protected String getParamRegexp(final String param) {
         return null;
     }
 
     /** Returns possible choices for the parameter. */
-    @Override protected Object[] getParamPossibleChoices(final String param) {
+    @Override
+    protected Object[] getParamPossibleChoices(final String param) {
         if (DRBD_MD_PARAM.equals(param)) {
             /* meta disk */
             final StringInfo internalMetaDisk =
@@ -656,17 +679,20 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns default for this parameter. */
-    @Override protected String getParamDefault(final String param) {
+    @Override
+    protected String getParamDefault(final String param) {
         return getBlockDevice().getDefaultValue(param);
     }
 
     /** Returns preferred value of this parameter. */
-    @Override protected String getParamPreferred(final String param) {
+    @Override
+    protected String getParamPreferred(final String param) {
         return getBlockDevice().getPreferredValue(param);
     }
 
     /** Return whether the value is correct from the cache. */
-    @Override protected boolean checkParamCache(final String param) {
+    @Override
+    protected boolean checkParamCache(final String param) {
         final Boolean cv = paramCorrectValueMap.get(param);
         if (cv == null) {
             return false;
@@ -886,7 +912,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns the graphical view. */
-    @Override public JPanel getGraphicalView() {
+    @Override
+    public JPanel getGraphicalView() {
         if (getBlockDevice().isDrbd()) {
             getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(this);
         }
@@ -894,19 +921,22 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Set the terminal panel. */
-    @Override protected void setTerminalPanel() {
+    @Override
+    protected void setTerminalPanel() {
         if (getHost() != null) {
             Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
     /** Returns the info panel. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         return getInfoPanelBD();
     }
 
     /** Returns all parameters. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         final String[] params = {
                             DRBD_MD_PARAM,
                             DRBD_MD_INDEX_PARAM,
@@ -919,7 +949,8 @@ public final class BlockDevInfo extends EditableInfo {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
@@ -957,11 +988,13 @@ public final class BlockDevInfo extends EditableInfo {
             /**
              * Whether the whole thing should be enabled.
              */
-            @Override public boolean isEnabled() {
+            @Override
+            public boolean isEnabled() {
                 return true;
             }
 
-            @Override public void mouseOut() {
+            @Override
+            public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -971,7 +1004,8 @@ public final class BlockDevInfo extends EditableInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public void mouseOver() {
+            @Override
+            public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -1042,11 +1076,14 @@ public final class BlockDevInfo extends EditableInfo {
 
             /* apply button */
             getApplyButton().addActionListener(new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             Tools.invokeAndWait(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     getApplyButton().setEnabled(false);
                                     getRevertButton().setEnabled(false);
                                 }
@@ -1075,9 +1112,11 @@ public final class BlockDevInfo extends EditableInfo {
             });
             getRevertButton().addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 revert();
                             }
                         });
@@ -1110,7 +1149,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** TODO: dead code? */
-    @Override boolean selectAutomaticallyInTreeMenu() {
+    @Override
+    boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
@@ -1136,12 +1176,14 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns short description of the parameter. */
-    @Override protected String getParamShortDesc(final String param) {
+    @Override
+    protected String getParamShortDesc(final String param) {
         return Tools.getString(param);
     }
 
     /** Returns long description of the parameter. */
-    @Override protected String getParamLongDesc(final String param) {
+    @Override
+    protected String getParamLongDesc(final String param) {
         return Tools.getString(param + ".Long");
     }
 
@@ -1156,7 +1198,8 @@ public final class BlockDevInfo extends EditableInfo {
                                              false),
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            @Override public void action() {
+            @Override
+            public void action() {
                 final DrbdInfo drbdInfo =
                                     getBrowser().getDrbdGraph().getDrbdInfo();
                 cleanup();
@@ -1181,13 +1224,15 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 return !isLVM()
                        && !getBlockDevice().isPhysicalVolume()
                        && !getBlockDevice().isDrbdPhysicalVolume();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getBlockDevice().isDrbd()
                     && !getBlockDevice().isPrimary()) {
                     return "must be primary";
@@ -1195,7 +1240,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final PVCreate pvCreate = new PVCreate(thisBDI);
                 while (true) {
                     pvCreate.showDialog();
@@ -1220,7 +1266,8 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
                     if (!getBlockDevice().isPrimary()) {
@@ -1238,7 +1285,8 @@ public final class BlockDevInfo extends EditableInfo {
 
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getBlockDevice().isDrbd()
                     && !getBlockDevice().isDrbdPhysicalVolume()) {
                     return "DRBD is on it";
@@ -1246,7 +1294,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final PVRemove pvRemove = new PVRemove(thisBDI);
                 while (true) {
                     pvRemove.showDialog();
@@ -1293,7 +1342,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final VGCreate vgCreate = new VGCreate(getHost(), thisBDI);
                 while (true) {
                     vgCreate.showDialog();
@@ -1318,7 +1368,8 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
                     if (!getBlockDevice().isPrimary()) {
@@ -1334,7 +1385,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return bd.isVolumeGroupOnPhysicalVolume();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 final String vg =
                               getBlockDevice().getVolumeGroupOnPhysicalVolume();
                 if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
@@ -1343,7 +1395,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final VGRemove vgRemove = new VGRemove(thisBDI);
                 while (true) {
                     vgRemove.showDialog();
@@ -1374,7 +1427,7 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             private String getVolumeGroup() {
-                BlockDevice bd; 
+                BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
                     bd = getBlockDevice().getDrbdBlockDevice();
                     if (bd == null) {
@@ -1393,18 +1446,21 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 final String vg = getVolumeGroup();
                 return vg != null
                        && !"".equals(vg)
                        && getHost().getVolumeGroupNames().contains(vg);
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final LVCreate lvCreate = new LVCreate(getHost(),
                                                        getVolumeGroup());
                 while (true) {
@@ -1418,7 +1474,8 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 setText1(LV_CREATE_MENU_ITEM + getVolumeGroup());
                 super.update();
             }
@@ -1436,22 +1493,26 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean predicate() {
+            @Override
+            public boolean predicate() {
                 return true;
             }
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 return isLVM();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getBlockDevice().isDrbd()) {
                     return "DRBD is on it";
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 if (Tools.confirmDialog(
                         "Remove Logical Volume",
                         "Remove logical volume and DESTROY all the data on it?",
@@ -1482,7 +1543,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final LVResize lvmrd = new LVResize(thisBDI);
                 while (true) {
                     lvmrd.showDialog();
@@ -1507,15 +1569,18 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 return isLVM();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final LVSnapshot lvsd = new LVSnapshot(thisBDI);
                 while (true) {
                     lvsd.showDialog();
@@ -1531,7 +1596,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Creates popup for the block device. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final BlockDevInfo thisClass = this;
         final boolean testOnly = false;
@@ -1541,7 +1607,8 @@ public final class BlockDevInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (drbdVolumeInfo != null) {
                     return "it is already a drbd resouce";
                 } else if (!getHost().isConnected()) {
@@ -1558,7 +1625,8 @@ public final class BlockDevInfo extends EditableInfo {
                 return null;
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 super.update();
                 Cluster cluster = getHost().getCluster();
                 Host[] otherHosts = cluster.getHostsArray();
@@ -1576,7 +1644,8 @@ public final class BlockDevInfo extends EditableInfo {
                                                     false)) {
                         private static final long serialVersionUID = 1L;
 
-                        @Override public String enablePredicate() {
+                        @Override
+                        public String enablePredicate() {
                             if (!oHost.isConnected()) {
                                 return Host.NOT_CONNECTED_STRING;
                             } else if (!oHost.isDrbdLoaded()) {
@@ -1588,10 +1657,12 @@ public final class BlockDevInfo extends EditableInfo {
                             //       && oHost.isDrbdLoaded();
                         }
 
-                        @Override public void update() {
+                        @Override
+                        public void update() {
                             super.update();
                             Tools.invokeAndWait(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     removeAll();
                                 }
                             });
@@ -1625,7 +1696,8 @@ public final class BlockDevInfo extends EditableInfo {
                     hostMenus.add(hostMenu);
                 }
                 Tools.invokeAndWait(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         removeAll();
                         for (final MyMenu hostMenu : hostMenus) {
                             add(hostMenu);
@@ -1664,16 +1736,19 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean predicate() {
+                @Override
+                public boolean predicate() {
                     return !getBlockDevice().isDrbd()
                            || getBlockDevice().isAttached();
                 }
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1687,7 +1762,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     if (this.getText().equals(
                                 Tools.getString("HostBrowser.Drbd.Attach"))) {
                         attach(testOnly);
@@ -1700,7 +1776,8 @@ public final class BlockDevInfo extends EditableInfo {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
                             cb.new DRBDMenuItemCallback(attachMenu, getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     if (isDiskless(false)) {
                         attach(true);
                     } else {
@@ -1724,15 +1801,18 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean predicate() {
+                @Override
+                public boolean predicate() {
                     return isConnectedOrWF(testOnly);
                 }
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1752,7 +1832,8 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     if (this.getText().equals(
                             Tools.getString("HostBrowser.Drbd.Connect"))) {
                         connect(testOnly);
@@ -1765,7 +1846,8 @@ public final class BlockDevInfo extends EditableInfo {
             final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
                                cb.new DRBDMenuItemCallback(connectMenu,
                                                            getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     if (isConnectedOrWF(false)) {
                         disconnect(true);
                     } else {
@@ -1792,7 +1874,8 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean predicate() {
+                @Override
+                public boolean predicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return false;
                     }
@@ -1800,11 +1883,13 @@ public final class BlockDevInfo extends EditableInfo {
                          && getOtherBlockDevInfo().getBlockDevice().isPrimary();
                 }
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1818,7 +1903,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     BlockDevInfo oBdi = getOtherBlockDevInfo();
                     if (oBdi != null && oBdi.getBlockDevice().isPrimary()
                         && !"yes".equals(
@@ -1841,11 +1927,13 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1859,7 +1947,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     setSecondary(testOnly);
                 }
             };
@@ -1875,11 +1964,13 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1890,7 +1981,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     forcePrimary(testOnly);
                 }
             };
@@ -1906,11 +1998,13 @@ public final class BlockDevInfo extends EditableInfo {
                    new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1929,7 +2023,8 @@ public final class BlockDevInfo extends EditableInfo {
                     //       && !getDrbdVolumeInfo().isVerifying();
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     invalidateBD(testOnly);
                 }
             };
@@ -1949,16 +2044,19 @@ public final class BlockDevInfo extends EditableInfo {
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean predicate() {
+                @Override
+                public boolean predicate() {
                     return getBlockDevice().isSyncing()
                            && getBlockDevice().isPausedSync();
                 }
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -1972,7 +2070,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     if (this.getText().equals(
                             Tools.getString("HostBrowser.Drbd.ResumeSync"))) {
                         resumeSync(testOnly);
@@ -1992,11 +2091,13 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -2010,7 +2111,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     resizeDrbd(testOnly);
                 }
             };
@@ -2026,11 +2128,13 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getBlockDevice().isDrbd()) {
                         return NO_DRBD_RESOURCE_STRING;
                     }
@@ -2053,7 +2157,8 @@ public final class BlockDevInfo extends EditableInfo {
                     //       && !getBlockDevice().isPrimary();
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     discardData(testOnly);
                 }
             };
@@ -2068,15 +2173,18 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public boolean visiblePredicate() {
+                @Override
+                public boolean visiblePredicate() {
                     return getBlockDevice().isDrbd();
                 }
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     String device = getDrbdVolumeInfo().getDevice();
                     DrbdLog l = new DrbdLog(getHost(), device);
                     l.showDialog();
@@ -2088,7 +2196,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns how much of the block device is used. */
-    @Override public int getUsed() {
+    @Override
+    public int getUsed() {
         final DrbdVolumeInfo dvi = drbdVolumeInfo;
         if (dvi != null) {
             return dvi.getUsed();
@@ -2238,7 +2347,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Compares ignoring case and using drbd device names if available. */
-    @Override public int compareTo(final Object o) {
+    @Override
+    public int compareTo(final Object o) {
         String name;
         String oName;
         int volume = 0;
@@ -2342,8 +2452,9 @@ public final class BlockDevInfo extends EditableInfo {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         return checkResourceFieldsChanged(param, params, false, false, false);
     }
 
@@ -2374,8 +2485,9 @@ public final class BlockDevInfo extends EditableInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    @Override public boolean checkResourceFieldsCorrect(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         return checkResourceFieldsCorrect(param, params, false, false, false);
     }
 

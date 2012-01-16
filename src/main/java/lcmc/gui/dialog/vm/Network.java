@@ -67,7 +67,8 @@ final class Network extends VMConfig {
     }
 
     /** Next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             nextDialogObject = new Display(this, getVMSVirtualDomainInfo());
         }
@@ -78,7 +79,8 @@ final class Network extends VMConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.vm.Domain.Title in TextResources.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Network.Title");
     }
 
@@ -86,21 +88,25 @@ final class Network extends VMConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.vm.Domain.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.vm.Network.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final boolean enable = vmsii.checkResourceFieldsCorrect(
                                             null,
                                             vmsii.getRealParametersFromXML());
@@ -110,7 +116,8 @@ final class Network extends VMConfig {
     }
 
     /** Returns input pane where user can configure a vm. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         if (vmsii != null) {
             vmsii.selectMyself();
         }

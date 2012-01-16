@@ -47,12 +47,14 @@ public final class StringInfo extends Info {
     }
 
     /** Returns the name. It will be shown to the user. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getName();
     }
 
     /** Returns the string that is used internally. */
-    @Override public String getStringValue() {
+    @Override
+    public String getStringValue() {
         return string;
     }
 }

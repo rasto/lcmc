@@ -30,7 +30,8 @@ public final class DistResource_suse_OPENSUSE11_2
                                         extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    @Override protected Object[][] getContents() {
+    @Override
+    protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

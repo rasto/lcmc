@@ -42,7 +42,8 @@ final class LinbitLogin extends lcmc.gui.dialog.host.LinbitLogin {
     }
 
     /** Returns the next dialog.drbdUpgrade.DrbdAvailFiles. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new DrbdAvailFiles(this, getHost());
     }
 

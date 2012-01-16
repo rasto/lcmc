@@ -91,7 +91,8 @@ final class CreateFS extends DrbdConfig {
      * Finishes the dialog. If primary bd was choosen it is forced to be a
      * primary.
      */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
             final boolean testOnly = false;
@@ -134,12 +135,14 @@ final class CreateFS extends DrbdConfig {
     /** Creates the file system. */
     protected void createFilesystem() {
         final Runnable runnable = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 getProgressBar().start(1);
                 answerPaneSetText(
                         Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         buttonClass(finishButton()).setEnabled(false);
                         makeFsButton.setEnabled(false);
                     }
@@ -170,7 +173,8 @@ final class CreateFS extends DrbdConfig {
     }
 
     /** Returns the next dialog, null in this dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return null;
     }
 
@@ -178,7 +182,8 @@ final class CreateFS extends DrbdConfig {
      * Returns title of the dialog.
      * It is defined in TextResources as "Dialog.DrbdConfig.CreateFS.Title"
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.CreateFS.Title");
     }
 
@@ -187,12 +192,14 @@ final class CreateFS extends DrbdConfig {
      * It is defined in TextResources as
      * "Dialog.DrbdConfig.CreateFS.Description"
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.CreateFS.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         makeFsButton.setBackgroundColor(
                                Tools.getDefaultColor("ConfigDialog.Button"));
@@ -200,11 +207,13 @@ final class CreateFS extends DrbdConfig {
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     makeFsButton.pressButton();
                 }
             });
@@ -220,7 +229,8 @@ final class CreateFS extends DrbdConfig {
         final boolean noFileSystem = filesystemCB.getStringValue().equals(
                                                         NO_FILESYSTEM_STRING);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (noHost) {
                     skipSyncCB.setEnabled(false);
                     skipSyncLabel.setEnabled(false);
@@ -235,7 +245,8 @@ final class CreateFS extends DrbdConfig {
         });
         if (noFileSystem) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     buttonClass(finishButton()).setEnabled(true);
                     makeFsButton.setEnabled(false);
                     skipSyncCB.setValue(SKIP_SYNC_FALSE);
@@ -243,14 +254,16 @@ final class CreateFS extends DrbdConfig {
             });
         } else if (noHost) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     buttonClass(finishButton()).setEnabled(false);
                 }
             });
             makeFsButton.setEnabled(false);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     buttonClass(finishButton()).setEnabled(false);
                     makeFsButton.setEnabled(true);
                     if (skipSyncAvailable()) {
@@ -266,7 +279,8 @@ final class CreateFS extends DrbdConfig {
      * Returns input pane, where file system can be created on the selected
      * host.
      */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         makeFsButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -296,10 +310,12 @@ final class CreateFS extends DrbdConfig {
                                                 false)); /* only adv. mode */
         hostCB.addListeners(
             new  ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 checkButtons();
                             }
                         });
@@ -336,10 +352,12 @@ final class CreateFS extends DrbdConfig {
         inputPane.add(filesystemCB);
         filesystemCB.addListeners(
             new  ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 if (NO_HOST_STRING.equals(
                                                 hostCB.getStringValue())
                                     && !NO_FILESYSTEM_STRING.equals(
@@ -357,7 +375,8 @@ final class CreateFS extends DrbdConfig {
             null);
 
         makeFsButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 createFilesystem();
             }
         });
@@ -403,9 +422,9 @@ final class CreateFS extends DrbdConfig {
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         try {
             return Tools.compareVersions(
-                                    bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
+                                bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
                    && Tools.compareVersions(
-                                    bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
+                                bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
             Tools.appWarning(e.getMessage(), e);
             return false;

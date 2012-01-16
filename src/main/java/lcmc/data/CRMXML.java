@@ -2653,7 +2653,8 @@ public final class CRMXML extends XML {
             } else {
                 nvpairs = cpsNode.getChildNodes();
             }
-            final Map<String, String> crmConfMap = new HashMap<String, String>();
+            final Map<String, String> crmConfMap =
+                                                new HashMap<String, String>();
             /*              <nvpair...> */
             for (int i = 0; i < nvpairs.getLength(); i++) {
                 final Node optionNode = nvpairs.item(i);
@@ -3805,7 +3806,8 @@ public final class CRMXML extends XML {
         }
 
         /** String represantation of the resources set. */
-        @Override public String toString() {
+        @Override
+        public String toString() {
             final StringBuilder s = new StringBuilder(20);
             s.append("rscset id: ");
             s.append(id);
@@ -3985,7 +3987,8 @@ public final class CRMXML extends XML {
         }
 
         /** String represantation of the resource set data. */
-        @Override public String toString() {
+        @Override
+        public String toString() {
             final StringBuilder s = new StringBuilder(100);
             s.append("rsc set conn id: ");
             s.append(constraintId);

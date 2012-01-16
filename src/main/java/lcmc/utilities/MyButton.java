@@ -155,7 +155,8 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Creates tooltip. */
-    @Override public final JToolTip createToolTip() {
+    @Override
+    public final JToolTip createToolTip() {
         toolTip = super.createToolTip();
         if (toolTipBackground != null) {
             toolTip.setBackground(toolTipBackground);
@@ -164,13 +165,14 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Sets tooltip's background color. */
-    @Override public final void setToolTipBackground(
-                                            final Color toolTipBackground) {
+    @Override
+    public final void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    @Override public final void setToolTipText(final String toolTipText) {
+    @Override
+    public final void setToolTipText(final String toolTipText) {
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             super.setToolTipText(toolTipText);
             final GraphicsDevice[] devices =
@@ -229,7 +231,8 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Gets background of the button. */
-    @Override public final Color getBackground() {
+    @Override
+    public final Color getBackground() {
         if (color2 == null) {
             return DEFAULT_COLOR;
             //return super.getBackground();
@@ -238,7 +241,8 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Overloaded in order to paint the background. */
-    @Override protected final void paintComponent(final Graphics g) {
+    @Override
+    protected final void paintComponent(final Graphics g) {
         if (!isEnabled()) {
             super.paintComponent(g);
             return;

@@ -142,8 +142,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                    final List<BlockDevInfo> blockDevInfos,
                    final Browser browser) {
         super(name, browser);
-        assert(drbdResourceInfo != null);
-        assert(blockDevInfos.size() >= 2);
+        assert (drbdResourceInfo != null);
+        assert (blockDevInfos.size() >= 2);
 
         this.drbdResourceInfo = drbdResourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
@@ -154,7 +154,8 @@ public final class DrbdVolumeInfo extends EditableInfo
         getResource().setNew(true);
     }
     /** Returns info panel. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         getBrowser().getDrbdGraph().pickInfo(this);
         final JComponent driPanel = getDrbdResourceInfo().getInfoPanel();
         getInfoPanelVolume();
@@ -173,11 +174,13 @@ public final class DrbdVolumeInfo extends EditableInfo
             /**
              * Whether the whole thing should be enabled.
              */
-            @Override public boolean isEnabled() {
+            @Override
+            public boolean isEnabled() {
                 return true;
             }
 
-            @Override public void mouseOut() {
+            @Override
+            public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -186,7 +189,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public void mouseOver() {
+            @Override
+            public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -261,11 +265,14 @@ public final class DrbdVolumeInfo extends EditableInfo
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         Tools.invokeAndWait(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getApplyButton().setEnabled(false);
                                 getRevertButton().setEnabled(false);
                             }
@@ -292,9 +299,11 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         getRevertButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             getBrowser().drbdStatusLock();
                             revert();
                             getBrowser().drbdStatusUnlock();
@@ -353,7 +362,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns the list of items for the popup menu for drbd volume. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final boolean testOnly = false;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final DrbdVolumeInfo thisClass = this;
@@ -373,11 +383,13 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean predicate() {
+            @Override
+            public boolean predicate() {
                 return !isConnected(testOnly);
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
@@ -388,7 +400,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -410,7 +423,8 @@ public final class DrbdVolumeInfo extends EditableInfo
         };
         final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
                getBrowser().new DRBDMenuItemCallback(connectMenu, null) {
-            @Override public void action(final Host host) {
+            @Override
+            public void action(final Host host) {
                 final BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 final BlockDevInfo destBDI =
@@ -446,17 +460,20 @@ public final class DrbdVolumeInfo extends EditableInfo
            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean predicate() {
+            @Override
+            public boolean predicate() {
                 return isPausedSync();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!isSyncing()) {
                     return "it is not syncing";
                 }
                 return null;
             }
-            @Override public void action() {
+            @Override
+            public void action() {
                 BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 BlockDevInfo destBDI =
@@ -488,7 +505,8 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (isSplitBrain()) {
                     return null;
                 } else {
@@ -496,7 +514,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 resolveSplitBrain();
             }
         };
@@ -512,7 +531,8 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!isConnected(testOnly)) {
                     return "not connected";
                 }
@@ -525,7 +545,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 verify(testOnly);
             }
         };
@@ -539,14 +560,16 @@ public final class DrbdVolumeInfo extends EditableInfo
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            @Override public void action() {
+            @Override
+            public void action() {
                 /* this drbdResourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
                 removeMyself(testOnly);
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!Tools.getConfigData().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
@@ -566,11 +589,13 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 final String device = getDevice();
                 DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(),
@@ -583,7 +608,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns tool tip when mouse is over the volume edge. */
-    @Override public String getToolTipForGraph(final boolean testOnly) {
+    @Override
+    public String getToolTipForGraph(final boolean testOnly) {
         final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>Resource: ");
         s.append(getDrbdResourceInfo().getName());
@@ -707,7 +733,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Removes this drbd resource with confirmation dialog. */
-    @Override public void removeMyself(final boolean testOnly) {
+    @Override
+    public void removeMyself(final boolean testOnly) {
         if (!getDrbdVolume().isCommited()) {
             removeMyselfNoConfirm(testOnly);
             return;
@@ -732,12 +759,14 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns device name, like /dev/drbd0. */
-    @Override public String getDevice() {
+    @Override
+    public String getDevice() {
         return device;
     }
 
     /** Returns the last created filesystem. */
-    @Override public String getCreatedFs() {
+    @Override
+    public String getCreatedFs() {
         return createdFs;
     }
 
@@ -816,7 +845,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns how much diskspace is used on the primary. */
-    @Override public int getUsed() {
+    @Override
+    public int getUsed() {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi.getBlockDevice().isPrimary()) {
                 return bdi.getBlockDevice().getUsed();
@@ -957,7 +987,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     public static Set<Host> getHostsFromBlockDevices(
                                                final List<BlockDevInfo> bdis) {
         final TreeSet<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
-            @Override public int compare(final Host h1, final Host h2) {
+            @Override
+            public int compare(final Host h1, final Host h2) {
                 return h1.getName().compareToIgnoreCase(h2.getName());
             }
         });
@@ -976,7 +1007,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns string of the drbd volume. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final String resName = getDrbdResourceInfo().getName();
         final String name = getName();
         if (resName == null || name == null || "".equals(name)) {
@@ -986,17 +1018,20 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns drbd graphical view. */
-    @Override public JPanel getGraphicalView() {
+    @Override
+    public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
 
     /** Returns all parameters. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         return PARAMS;
     }
 
-    @Override public boolean checkResourceFieldsCorrect(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         return checkResourceFieldsCorrect(param, params, false, false);
     }
 
@@ -1026,8 +1061,9 @@ public final class DrbdVolumeInfo extends EditableInfo
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
 
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         return checkResourceFieldsChanged(param, params, false, false);
     }
 
@@ -1068,7 +1104,8 @@ public final class DrbdVolumeInfo extends EditableInfo
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
@@ -1093,11 +1130,13 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns section to which this drbd parameter belongs. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return SECTION_STRING;
     }
 
-    @Override protected boolean isInteger(final String param) {
+    @Override
+    protected boolean isInteger(final String param) {
         if (DRBD_VOL_PARAM_NUMBER.equals(param)) {
             return true;
         }
@@ -1105,14 +1144,16 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns browser object of this info. */
-    @Override public ClusterBrowser getBrowser() {
+    @Override
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /**
      * Returns a long description of the parameter that is used for tool tip.
      */
-    @Override protected String getParamLongDesc(final String param) {
+    @Override
+    protected String getParamLongDesc(final String param) {
         return LONG_DESC.get(param);
     }
 
@@ -1120,17 +1161,20 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns the short description of the drbd parameter that is used as
      * a label.
      */
-    @Override protected String getParamShortDesc(final String param) {
+    @Override
+    protected String getParamShortDesc(final String param) {
         return SHORT_DESC.get(param);
     }
 
     /** Returns the preferred value for the drbd parameter. */
-    @Override protected String getParamPreferred(final String param) {
+    @Override
+    protected String getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value of the parameter. */
-    @Override public String getParamDefault(final String param) {
+    @Override
+    public String getParamDefault(final String param) {
         return null;
     }
 
@@ -1138,18 +1182,20 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Checks the new value of the parameter if it is conforms to its type
      * and other constraints.
      */
-    @Override protected boolean checkParam(final String param,
-                                       final String newValue) {
+    @Override
+    protected boolean checkParam(final String param, final String newValue) {
         return getBrowser().getDrbdXML().checkParam(param, newValue);
     }
 
     /** Returns the possible values for the pulldown menus, if applicable. */
-    @Override protected Object[] getParamPossibleChoices(final String param) {
+    @Override
+    protected Object[] getParamPossibleChoices(final String param) {
         return POSSIBLE_CHOICES.get(param);
     }
 
     /** Returns the type of the parameter (like boolean). */
-    @Override protected String getParamType(final String param) {
+    @Override
+    protected String getParamType(final String param) {
         return null;
     }
 
@@ -1157,34 +1203,38 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    @Override protected boolean isCheckBox(final String param) {
+    @Override
+    protected boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns whether this drbd parameter is of time type. */
-    @Override protected boolean isTimeType(final String param) {
+    @Override
+    protected boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns whether this drbd parameter is of label type. */
-    @Override protected boolean isLabel(final String param) {
+    @Override
+    protected boolean isLabel(final String param) {
         return false;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected boolean isEnabledOnlyInAdvancedMode(
-                                                         final String param) {
+    @Override
+    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
         return false;
     }
 
     /** Returns access type of this parameter. */
-    @Override protected ConfigData.AccessType getAccessType(
-                                                         final String param) {
+    @Override
+    protected ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected String isEnabled(final String param) {
+    @Override
+    protected String isEnabled(final String param) {
         if (DRBD_VOL_PARAM_NUMBER.equals(param)
             && !getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
             return "available in DRBD 8.4";
@@ -1197,12 +1247,14 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected boolean isAdvanced(final String param) {
+    @Override
+    protected boolean isAdvanced(final String param) {
         return false;
     }
 
     /** Returns whether this drbd parameter is required parameter. */
-    @Override protected boolean isRequired(final String param) {
+    @Override
+    protected boolean isRequired(final String param) {
         return true;
     }
 
@@ -1260,7 +1312,8 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns device name that is used as the string value of the device in
      * the filesystem resource.
      */
-    @Override public String getStringValue() {
+    @Override
+    public String getStringValue() {
         return getDevice();
     }
 

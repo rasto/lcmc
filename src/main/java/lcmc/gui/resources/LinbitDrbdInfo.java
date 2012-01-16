@@ -49,7 +49,8 @@ final class LinbitDrbdInfo extends ServiceInfo {
     }
 
     /** Returns string representation of the linbit::drbd service. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String provider = getResourceAgent().getProvider();
         if (!ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
@@ -82,8 +83,9 @@ final class LinbitDrbdInfo extends ServiceInfo {
     }
 
     /** Removes the linbit::drbd service. */
-    @Override public void removeMyselfNoConfirm(final Host dcHost,
-                                                final boolean testOnly) {
+    @Override
+    public void removeMyselfNoConfirm(final Host dcHost,
+                                      final boolean testOnly) {
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
@@ -94,7 +96,8 @@ final class LinbitDrbdInfo extends ServiceInfo {
     }
 
     /** Sets service parameters with values from resourceNode hash. */
-    @Override void setParameters(final Map<String, String> resourceNode) {
+    @Override
+    void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -106,7 +109,8 @@ final class LinbitDrbdInfo extends ServiceInfo {
                 dri.setUsedByCRM(null);
             }
             //final Thread t = new Thread(new Runnable() {
-            //    @Override public void run() {
+            //    @Override
+            //    public void run() {
             //        dri.updateMenus(null);
             //    }
             //});

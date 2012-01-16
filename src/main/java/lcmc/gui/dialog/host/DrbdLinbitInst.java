@@ -52,22 +52,26 @@ public class DrbdLinbitInst extends DialogHost {
     }
 
     /** Inits dialog and starts the drbd install procedure. */
-    @Override protected final void initDialog() {
+    @Override
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         getProgressBar().start(50000);
 
         getHost().execCommand("DrbdInst.mkdir",
                           getProgressBar(),
                           new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                checkFile(ans);
                             }
-                            @Override public void doneError(
+                            @Override
+                            public void doneError(
                                                           final String ans,
                                                           final int exitCode) {
                                 printErrorAndRetry(Tools.getString(
@@ -91,14 +95,15 @@ public class DrbdLinbitInst extends DialogHost {
                               // TODO: exchange here done and doneError
                               // TODO: treat file exist differently as other
                               // errors.
-                              @Override public void done(final String ans) {
+                              @Override
+                              public void done(final String ans) {
                                   answerPaneSetText(Tools.getString(
                                      "Dialog.Host.DrbdLinbitInst.FileExists"));
                                   installDrbd();
                               }
-                              @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                              @Override
+                              public void doneError(final String ans,
+                                                    final int exitCode) {
                                   downloadDrbd();
                               }
                           },
@@ -114,12 +119,13 @@ public class DrbdLinbitInst extends DialogHost {
         getHost().execCommand("DrbdInst.wget",
                           getProgressBar(),
                           new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                installDrbd();
                             }
-                            @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                            @Override
+                            public void doneError(final String ans,
+                                                  final int exitCode) {
                                 printErrorAndRetry(Tools.getString(
                                         "Dialog.Host.DrbdLinbitInst.WgetError"),
                                                    ans,
@@ -144,12 +150,13 @@ public class DrbdLinbitInst extends DialogHost {
         getHost().execCommandInBash("DrbdInst.install;;;DRBD.load",
                           getProgressBar(),
                           new ExecCallback() {
-                            @Override public void done(final String ans) {
+                            @Override
+                            public void done(final String ans) {
                                installationDone();
                             }
-                            @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                            @Override
+                            public void doneError(final String ans,
+                                                  final int exitCode) {
                                 printErrorAndRetry(Tools.getString(
                                "Dialog.Host.DrbdLinbitInst.InstallationFailed"),
                                                    ans,
@@ -178,7 +185,8 @@ public class DrbdLinbitInst extends DialogHost {
     }
 
     /** Returns the next dialog object. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -186,7 +194,8 @@ public class DrbdLinbitInst extends DialogHost {
      * Returns the title of the dialog defined as
      * Dialog.Host.DrbdLinbitInst.Title in TextResources.
      */
-    @Override protected final String getHostDialogTitle() {
+    @Override
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdLinbitInst.Title");
     }
 
@@ -194,12 +203,14 @@ public class DrbdLinbitInst extends DialogHost {
      * Returns the description of the dialog defined as
      * Dialog.Host.DrbdLinbitInst.Description in TextResources.
      */
-    @Override protected final String getDescription() {
+    @Override
+    protected final String getDescription() {
         return Tools.getString("Dialog.Host.DrbdLinbitInst.Description");
     }
 
     /** Returns an input pane with progress of the drbd installation. */
-    @Override protected final JComponent getInputPane() {
+    @Override
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(

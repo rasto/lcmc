@@ -1718,7 +1718,8 @@ public final class VMSXML extends XML {
             final String vncdisplay = getText(vncdisplayNode).trim();
             final Matcher m = DISPLAY_PATTERN.matcher(vncdisplay);
             if (m.matches()) {
-                remotePorts.put(domainName, Integer.parseInt(m.group(1)) + 5900);
+                remotePorts.put(domainName,
+                                Integer.parseInt(m.group(1)) + 5900);
             }
         }
         final Node configNode = getChildNode(vmNode, "config");
@@ -1950,9 +1951,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getDiskDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 Element el = null;
                 final String targetDev = parameters.get(
                                                 DiskData.SAVED_TARGET_DEVICE);
@@ -1972,9 +1973,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getInterfaceDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String macAddress = parameters.get(
                                               InterfaceData.SAVED_MAC_ADDRESS);
                 Element el = null;
@@ -1995,9 +1996,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getInputDevDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String type = parameters.get(InputDevData.SAVED_TYPE);
                 final String bus = parameters.get(InputDevData.SAVED_BUS);
                 Element el = null;
@@ -2019,9 +2020,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getGraphicsDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String type = parameters.get(GraphicsData.SAVED_TYPE);
                 Element el = null;
                 if (type != null) {
@@ -2041,9 +2042,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getSoundDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String model = parameters.get(SoundData.SAVED_MODEL);
                 Element el = null;
                 if (model != null) {
@@ -2063,9 +2064,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getSerialDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String type = parameters.get(SerialData.SAVED_TYPE);
                 Element el = null;
                 if (type != null) {
@@ -2085,9 +2086,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getParallelDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 final String type = parameters.get(ParallelData.SAVED_TYPE);
                 Element el = null;
                 if (type != null) {
@@ -2107,9 +2108,9 @@ public final class VMSXML extends XML {
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getVideoDataComparator() {
         return new VirtualHardwareComparator() {
-            @Override public Element getElement(
-                                    final NodeList nodes,
-                                    final Map<String, String> parameters) {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
                 Element el = null;
                 final String modelType = parameters.get(
                                                 VideoData.SAVED_MODEL_TYPE);

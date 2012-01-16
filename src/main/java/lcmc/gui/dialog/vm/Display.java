@@ -68,7 +68,8 @@ final class Display extends VMConfig {
     }
 
     /** Next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             nextDialogObject = new Finish(this, getVMSVirtualDomainInfo());
         }
@@ -79,7 +80,8 @@ final class Display extends VMConfig {
      * Returns the title of the dialog. It is defined as
      * Dialog.vm.Domain.Title in TextResources.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Display.Title");
     }
 
@@ -87,21 +89,25 @@ final class Display extends VMConfig {
      * Returns the description of the dialog. It is defined as
      * Dialog.vm.Domain.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.vm.Display.Description");
     }
 
     /** Inits dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final boolean enable = vmsgi.checkResourceFieldsCorrect(
                                             null,
                                             vmsgi.getRealParametersFromXML());
@@ -111,7 +117,8 @@ final class Display extends VMConfig {
     }
 
     /** Returns input pane where user can configure a vm. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         if (vmsgi != null) {
             vmsgi.selectMyself();
         }

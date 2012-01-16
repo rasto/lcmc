@@ -71,28 +71,33 @@ public final class LVSnapshot extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return "LV Snapshot ";
     }
 
     /** Returns the description of the dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return SNAPSHOT_DESCRIPTION;
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocusLater(sizeCB);
     }
@@ -109,7 +114,8 @@ public final class LVSnapshot extends LV {
             this.enable = enable;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             boolean e = enable;
             if (enable) {
                 final long size = Tools.convertToKilobytes(
@@ -200,9 +206,11 @@ public final class LVSnapshot extends LV {
         inputPane.add(sizeLabel);
         inputPane.add(sizeCB);
         snapshotButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         Tools.invokeAndWait(new EnableSnapshotRunnable(false));
                         disableComponents();
                         getProgressBar().start(SNAPSHOT_TIMEOUT);
@@ -262,7 +270,8 @@ public final class LVSnapshot extends LV {
 
     /** Size combo box item listener. */
     private class SizeItemListener implements ItemListener {
-        @Override public void itemStateChanged(final ItemEvent e) {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 checkButtons();
             }
@@ -275,15 +284,18 @@ public final class LVSnapshot extends LV {
             checkButtons();
         }
 
-        @Override public void insertUpdate(final DocumentEvent e) {
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void removeUpdate(final DocumentEvent e) {
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void changedUpdate(final DocumentEvent e) {
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
             check();
         }
     }

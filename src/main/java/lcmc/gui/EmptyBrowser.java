@@ -104,7 +104,8 @@ public final class EmptyBrowser extends Browser {
         final Host[] allHosts =
                               Tools.getConfigData().getHosts().getHostsArray();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 DefaultMutableTreeNode resource;
                 allHostsNode.removeAllChildren();
                 for (Host host : allHosts) {

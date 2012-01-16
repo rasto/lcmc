@@ -60,12 +60,14 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     }
 
     /** Returns columns for the table. */
-    @Override protected String[] getColumnNames(final String tableName) {
+    @Override
+    protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Provider"};
     }
 
     /** Returns data for the table. */
-    @Override  protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
@@ -78,14 +80,16 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     }
 
     /** Returns name as it appears in the menu. */
-    @Override  public String toString() {
+    @Override
+    public String toString() {
         return getName().toUpperCase();
     }
 
     /** Execute when row in the table was clicked. */
-    @Override  protected void rowClicked(final String tableName,
-                                         final String key,
-                                         final int column) {
+    @Override
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         final ResourceAgent ra = raMap.get(key);
         if (ra != null) {
             final AvailableServiceInfo asi =
@@ -97,7 +101,8 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     }
 
     /** Returns back button. */
-    @Override  protected JComponent getBackButton() {
+    @Override
+    protected JComponent getBackButton() {
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
                                                              0,
                                                              0));
@@ -110,7 +115,8 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
                      BACK_ICON);
         overviewButton.setPreferredSize(new Dimension(180, 50));
         overviewButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 getBrowser().getAvailableServicesInfo().selectMyself();
             }
         });

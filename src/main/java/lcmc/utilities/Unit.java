@@ -74,7 +74,8 @@ public final class Unit {
     }
 
     /** Returns the unit, plural if it should be in plural. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         if (empty) {
             return "";
         }
@@ -85,7 +86,8 @@ public final class Unit {
     }
 
     /** Returns true if units are equals. */
-    @Override public boolean equals(final Object o) {
+    @Override
+    public boolean equals(final Object o) {
         if (o == null) {
             return false;
         }
@@ -100,7 +102,8 @@ public final class Unit {
     }
 
     /** Hash code. */
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return name.hashCode();
     }
 

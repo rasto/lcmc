@@ -318,7 +318,8 @@ public class Info implements Comparable {
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         ria.setText(newInfo);
                     }
                 });
@@ -397,7 +398,8 @@ public class Info implements Comparable {
     }
 
     /** Returns name of the object. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return name;
     }
 
@@ -477,11 +479,13 @@ public class Info implements Comparable {
                                 final int x,
                                 final int y) {
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             pm.show(c, x, y);
                         }
                     });
@@ -508,7 +512,8 @@ public class Info implements Comparable {
         mPopupLock.unlock();
         if (popup0 != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     popup0.setVisible(false);
                 }
             });
@@ -527,7 +532,8 @@ public class Info implements Comparable {
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             popup = new JPopupMenu();
                         }
                     });
@@ -537,7 +543,8 @@ public class Info implements Comparable {
                     Tools.printStackTrace();
                 }
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         for (final UpdatableItem u : items) {
                             popup.add((JMenuItem) u);
                         }
@@ -562,7 +569,8 @@ public class Info implements Comparable {
                 registerAllMenuItems(items);
                 try {
                     SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             popup = new JPopupMenu();
                         }
                     });
@@ -573,7 +581,8 @@ public class Info implements Comparable {
                 }
                 for (final UpdatableItem u : items) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             popup.add((JMenuItem) u);
                         }
                     });
@@ -593,23 +602,24 @@ public class Info implements Comparable {
     private void addPopupMenuListener(final JPopupMenu pm,
                                       final AbstractButton b) {
         pm.addPopupMenuListener(new PopupMenuListener() {
-            @Override public void popupMenuCanceled(final PopupMenuEvent e) {
+            @Override
+            public void popupMenuCanceled(final PopupMenuEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         b.setSelected(false);
                     }
                 });
             }
-            @Override public void popupMenuWillBecomeInvisible(
-                                                    final PopupMenuEvent e) {
+            @Override
+            public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         b.setSelected(false);
                     }
                 });
             }
-            @Override public void popupMenuWillBecomeVisible(
-                                                    final PopupMenuEvent e) {
+            @Override
+            public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
             }
         });
     }
@@ -638,7 +648,8 @@ public class Info implements Comparable {
         Tools.makeMiniButton(b);
         b.addMouseListener(
             new MouseAdapter() {
-                @Override public void mousePressed(final MouseEvent e) {
+                @Override
+                public void mousePressed(final MouseEvent e) {
                     final JToggleButton source =
                                               (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
@@ -649,7 +660,8 @@ public class Info implements Comparable {
                         });
                     } else {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
                                     SwingUtilities.invokeLater(new Runnable() {
@@ -734,14 +746,17 @@ public class Info implements Comparable {
             return;
         }
         c.addMouseListener(new MouseListener() {
-            @Override public void mouseClicked(final MouseEvent e) {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
                 /* do nothing */
             }
 
-            @Override public void mouseEntered(final MouseEvent e) {
+            @Override
+            public void mouseEntered(final MouseEvent e) {
                 if (c.isShowing() && c.isEnabled()) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             bc.mouseOver();
                         }
                     });
@@ -749,28 +764,33 @@ public class Info implements Comparable {
                 }
             }
 
-            @Override public void mouseExited(final MouseEvent e) {
+            @Override
+            public void mouseExited(final MouseEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         bc.mouseOut();
                     }
                 });
                 t.start();
             }
 
-            @Override public void mousePressed(final MouseEvent e) {
+            @Override
+            public void mousePressed(final MouseEvent e) {
                 mouseExited(e);
                 /* do nothing */
             }
 
-            @Override public void mouseReleased(final MouseEvent e) {
+            @Override
+            public void mouseReleased(final MouseEvent e) {
                 /* do nothing */
             }
         });
     }
 
     /** Compares ignoring case. */
-    @Override public int compareTo(final Object o) {
+    @Override
+    public int compareTo(final Object o) {
         return toString().compareToIgnoreCase(o.toString());
     }
 
@@ -905,7 +925,8 @@ public class Info implements Comparable {
             table.addMouseMotionListener(new MouseMotionListener() {
                 private int row;
 
-                @Override public void mouseMoved(final MouseEvent me) {
+                @Override
+                public void mouseMoved(final MouseEvent me) {
                    final Point p = me.getPoint();
                    final int newRow = table.rowAtPoint(p);
                    if (row >= 0 && newRow != row) {
@@ -932,7 +953,8 @@ public class Info implements Comparable {
                        }
                    }
                 }
-                @Override public void mouseDragged(final MouseEvent me) {
+                @Override
+                public void mouseDragged(final MouseEvent me) {
                     /* nothing */
                 }
             });
@@ -941,7 +963,8 @@ public class Info implements Comparable {
                 private boolean paintIt = false;
                 private boolean paintItMouseOver = false;
 
-                @Override public final void mouseClicked(final MouseEvent e) {
+                @Override
+                public final void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() > 1
                         || SwingUtilities.isRightMouseButton(e)) {
                         return;
@@ -954,7 +977,8 @@ public class Info implements Comparable {
                     rowClicked(tableName, keyB.getText(), column);
                 }
 
-                @Override public final void mousePressed(final MouseEvent e) {
+                @Override
+                public final void mousePressed(final MouseEvent e) {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     row = table.rowAtPoint(p);
@@ -977,7 +1001,8 @@ public class Info implements Comparable {
                     paintIt = true;
                 }
 
-                @Override public final void mouseReleased(final MouseEvent e) {
+                @Override
+                public final void mouseReleased(final MouseEvent e) {
                     if (paintIt) {
                         for (int c = 0; c < table.getColumnCount(); c++) {
                             final Object v = table.getValueAt(row, c);
@@ -991,7 +1016,8 @@ public class Info implements Comparable {
                     paintIt = false;
                 }
 
-                @Override public final void mouseEntered(final MouseEvent e) {
+                @Override
+                public final void mouseEntered(final MouseEvent e) {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
                     final int row = table.rowAtPoint(p);
@@ -1009,7 +1035,8 @@ public class Info implements Comparable {
                     }
                 }
 
-                @Override public final void mouseExited(final MouseEvent e) {
+                @Override
+                public final void mouseExited(final MouseEvent e) {
                     if (paintItMouseOver) {
                         for (int i = 0; i < table.getRowCount(); i++) {
                             for (int c = 0; c < table.getColumnCount(); c++) {
@@ -1062,7 +1089,8 @@ public class Info implements Comparable {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         final Object[][] data = getTableData(tableName);
                         Tools.debug(this, "update table in: " + getName(), 1);
                         tableModel.setDataVector(data, colNames);

@@ -111,7 +111,8 @@ public final class VGRemove extends LV {
             this.enable = enable;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             final boolean e = enable;
             removeButton.setEnabled(e);
         }
@@ -202,9 +203,11 @@ public final class VGRemove extends LV {
 
     /** Remove action listener. */
     private class RemoveActionListener implements ActionListener {
-        @Override public void actionPerformed(final ActionEvent e) {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     Tools.invokeAndWait(new EnableRemoveRunnable(false));
                     disableComponents();
                     getProgressBar().start(REMOVE_TIMEOUT
@@ -271,7 +274,8 @@ public final class VGRemove extends LV {
             super();
             this.onDeselect = onDeselect;
         }
-        @Override public void itemStateChanged(final ItemEvent e) {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED
                 || onDeselect) {
                 checkButtons();

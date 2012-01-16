@@ -126,7 +126,8 @@ public final class VGCreate extends LV {
             this.enable = enable;
         }
 
-        @Override public void run() {
+        @Override
+        public void run() {
             boolean e = enable;
             if (enable) {
                 boolean vgNameCorrect = true;
@@ -198,7 +199,8 @@ public final class VGCreate extends LV {
     }
 
     /** Returns the input pane. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         /* vg name */
@@ -304,7 +306,8 @@ public final class VGCreate extends LV {
             super();
             this.onDeselect = onDeselect;
         }
-        @Override public void itemStateChanged(final ItemEvent e) {
+        @Override
+        public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED
                 || onDeselect) {
                 checkButtons();
@@ -318,29 +321,34 @@ public final class VGCreate extends LV {
             checkButtons();
         }
 
-        @Override public void insertUpdate(final DocumentEvent e) {
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void removeUpdate(final DocumentEvent e) {
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
             check();
         }
 
-        @Override public void changedUpdate(final DocumentEvent e) {
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
             check();
         }
     }
 
     /** Create action listener. */
     private class CreateActionListener implements ActionListener {
-        @Override public void actionPerformed(final ActionEvent e) {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
             final Thread thread = new Thread(new CreateRunnable());
             thread.start();
         }
     }
 
     private class CreateRunnable implements Runnable {
-        @Override public void run() {
+        @Override
+        public void run() {
             Tools.invokeAndWait(new EnableCreateRunnable(false));
             disableComponents();
             getProgressBar().start(CREATE_TIMEOUT

@@ -423,7 +423,8 @@ public final class GuiComboBox extends JPanel {
         }
         cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (selectedValueInfo != null) {
                     cb.setSelectedItem(selectedValueInfo);
                 }
@@ -434,7 +435,8 @@ public final class GuiComboBox extends JPanel {
 
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
-            @Override public void focusGained(final FocusEvent e) {
+            @Override
+            public void focusGained(final FocusEvent e) {
                 //Object o = (GuiComboBox) e.getSource()).getValue();
                 Object o = getValue();
                 if (o != null && !Tools.isStringClass(o)
@@ -443,27 +445,30 @@ public final class GuiComboBox extends JPanel {
                 }
                 if (o == null) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             editor.setText("");
                         }
                     });
                 }
             }
 
-            @Override public void focusLost(final FocusEvent e) {
+            @Override
+            public void focusLost(final FocusEvent e) {
                 /* do nothing */
             }
         });
         cb.addPopupMenuListener(new PopupMenuListener() {
-            @Override public void popupMenuCanceled(final PopupMenuEvent pe) {
+            @Override
+            public void popupMenuCanceled(final PopupMenuEvent pe) {
                 /* do nothing */
             }
-            @Override public void popupMenuWillBecomeInvisible(
-                                                     final PopupMenuEvent pe) {
+            @Override
+            public void popupMenuWillBecomeInvisible(final PopupMenuEvent pe) {
                 /* do nothing */
             }
-            @Override public void popupMenuWillBecomeVisible(
-                                                    final PopupMenuEvent pe) {
+            @Override
+            public void popupMenuWillBecomeVisible(final PopupMenuEvent pe) {
                 /* workaround to have items with bigger widths than jcombobox */
                 final JComboBox thisCB = (JComboBox) pe.getSource();
                 final Object c = thisCB.getUI().getAccessibleChild(thisCB, 0);
@@ -514,7 +519,8 @@ public final class GuiComboBox extends JPanel {
             return;
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final JComboBox cb = (JComboBox) component;
                 final Object selectedItem = cb.getSelectedItem();
                 boolean selectedChanged = false;
@@ -617,7 +623,8 @@ public final class GuiComboBox extends JPanel {
             }
 
             rb.addActionListener(new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     mComponentsReadLock.lock();
                     final Object item =
                                     radioGroupHash.get(e.getActionCommand());
@@ -650,7 +657,8 @@ public final class GuiComboBox extends JPanel {
         mComponentsReadLock.unlock();
         if (c != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     c.setEnabled(enablePredicate && accessible);
                 }
             });
@@ -683,7 +691,8 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Sets the tooltip text. */
-    @Override public void setToolTipText(String text) {
+    @Override
+    public void setToolTipText(String text) {
         toolTipText = text;
         final String disabledReason0 = disabledReason;
         if (disabledReason0 != null) {
@@ -783,7 +792,8 @@ public final class GuiComboBox extends JPanel {
         }
         final JComponent comp = c;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 switch(type) {
                     case LABELFIELD:
                         break;
@@ -918,7 +928,8 @@ public final class GuiComboBox extends JPanel {
                             u.setEmpty(true);
                             unitEnabled = false;
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     unitComboBox.repaint();
                                     unitComboBox.setEnabled(false);
                                 }
@@ -930,7 +941,8 @@ public final class GuiComboBox extends JPanel {
                             if (textFieldPart.isEnabled()) {
                                 unitEnabled = true;
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         unitComboBox.repaint();
                                         unitComboBox.setEnabled(accessible);
                                     }
@@ -966,7 +978,8 @@ public final class GuiComboBox extends JPanel {
 
             case COMBOBOX:
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         ((JComboBox) component).removeAllItems();
                     }
                 });
@@ -983,7 +996,8 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Sets component visible or invisible and remembers this state. */
-    @Override public void setVisible(final boolean visible) {
+    @Override
+    public void setVisible(final boolean visible) {
         setComponentsVisible(visible);
     }
 
@@ -998,7 +1012,8 @@ public final class GuiComboBox extends JPanel {
         final JComponent comp = c;
         super.setVisible(visible);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (label != null) {
                     label.setVisible(visible);
                 }
@@ -1026,7 +1041,8 @@ public final class GuiComboBox extends JPanel {
 
 
     /** Sets component enabled or disabled and remembers this state. */
-    @Override public void setEnabled(final boolean enabled) {
+    @Override
+    public void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
         setComponentsEnabled(
                    enablePredicate
@@ -1042,7 +1058,8 @@ public final class GuiComboBox extends JPanel {
     /** Sets component enabled or disabled. */
     private void setComponentsEnabled(final boolean enabled) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 component.setEnabled(enabled);
                 mComponentsReadLock.lock();
                 for (final JComponent c : componentsHash.values()) {
@@ -1200,7 +1217,8 @@ public final class GuiComboBox extends JPanel {
     /** Sets item/value in the component. */
     public void setValue(final Object item) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setValueAndWait(item);
             }
         });
@@ -1303,7 +1321,8 @@ public final class GuiComboBox extends JPanel {
                 final int pos = p + 3;
                 if (pos >= 0 && pos < ip.length()) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             tc.select(pos, ip.length());
                         }
                     });
@@ -1501,7 +1520,8 @@ public final class GuiComboBox extends JPanel {
         }
 
         /** Is called when a key was pressed. */
-        @Override public void keyPressed(final KeyEvent e) {
+        @Override
+        public void keyPressed(final KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 /* Simulte click on default button. */
                 doClick(e);
@@ -1509,7 +1529,8 @@ public final class GuiComboBox extends JPanel {
         }
 
         /** Is called when an action was performed. */
-        @Override public void actionPerformed(final ActionEvent e) {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
             doClick(e);
         }
 
@@ -1553,7 +1574,8 @@ public final class GuiComboBox extends JPanel {
         }
 
         /** Focus event. */
-        @Override protected void processFocusEvent(final FocusEvent e) {
+        @Override
+        protected void processFocusEvent(final FocusEvent e) {
             super.processFocusEvent(e);
             if (!selected) {
                 selected = true;
@@ -1571,7 +1593,8 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Requests focus if applicable. */
-    @Override public void requestFocus() {
+    @Override
+    public void requestFocus() {
         JComponent comp;
         if (fieldButton == null) {
             comp = component;
@@ -1667,7 +1690,8 @@ public final class GuiComboBox extends JPanel {
         }
         final JComponent comp = c;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setBackground(bg);
                 switch(type) {
                     case LABELFIELD:

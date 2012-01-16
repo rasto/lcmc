@@ -51,12 +51,14 @@ final class Finish extends DialogCluster {
     }
 
     /** Returns next dialog. Null in this case. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return null;
     }
 
     /** Finishes the dialog, and saves the cluster. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getConfigData().getSaveFile();
@@ -65,14 +67,16 @@ final class Finish extends DialogCluster {
     }
 
     /** Inits dialog and enables the finish button. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
             Tools.getConfigData().removeAutoCluster();
@@ -82,17 +86,20 @@ final class Finish extends DialogCluster {
     }
 
     /** Returns the title of the dialog. */
-    @Override protected String getClusterDialogTitle() {
+    @Override
+    protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Finish.Title");
     }
 
     /** Returns the description of the dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Finish.Description");
     }
 
     /** Returns the input panel. */
-    @Override protected JPanel getInputPane() {
+    @Override
+    protected JPanel getInputPane() {
         final JPanel pane = new JPanel();
         /* Save checkbox */
         pane.add(saveCB);

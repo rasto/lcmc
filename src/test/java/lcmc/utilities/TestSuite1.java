@@ -108,17 +108,20 @@ public final class TestSuite1 {
     private static StringBuilder stdout = new StringBuilder();
 
     private static OutputStream out = new OutputStream() {
-         @Override public void write(final int b) throws IOException {
+         @Override
+         public void write(final int b) throws IOException {
              stdout.append(String.valueOf((char) b));
          }
 
-         @Override public void write(final byte[] b,
-                                     final int off,
-                                     final int len) throws IOException {
+         @Override
+         public void write(final byte[] b,
+                           final int off,
+                           final int len) throws IOException {
              stdout.append(new String(b, off, len));
          }
 
-         @Override public void write(final byte[] b) throws IOException {
+         @Override
+         public void write(final byte[] b) throws IOException {
              write(b, 0, b.length);
          }
     };

@@ -58,7 +58,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 }
             }
         }
-        int i = 0; 
+        int i = 0;
         String emptyCib = null;
         final StringBuilder nodes = new StringBuilder("<nodes>\n");
         for (final Host host : TestSuite1.getHosts()) {

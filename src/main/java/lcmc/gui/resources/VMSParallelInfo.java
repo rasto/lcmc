@@ -46,7 +46,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
         } else if (VMSVirtualDomainInfo.PARALLEL_TABLE.equals(tableName)) {
@@ -63,7 +64,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Updates parameters. */
-    @Override void updateParameters() {
+    @Override
+    void updateParameters() {
         final Map<String, ParallelData> parallels =
                               getVMSVirtualDomainInfo().getParallels();
         if (parallels != null) {
@@ -100,7 +102,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns string representation. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String type = getParamSaved(ParallelData.TYPE);
         if (type == null) {
@@ -112,7 +115,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Removes this parallel device without confirmation dialog. */
-    @Override protected void removeMyselfNoConfirm(final boolean testOnly) {
+    @Override
+    protected void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;
         }
@@ -135,7 +139,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Returns "add new" button. */
-    @Override protected MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
+    @Override
+    protected MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
         return getNewBtn(vdi);
     }
 
@@ -143,9 +148,11 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Parallel Device");
         newBtn.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         vdi.addParallelsPanel();
                     }
                 });
@@ -156,28 +163,31 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     }
 
     /** Modify device xml. */
-    @Override protected void modifyXML(final VMSXML vmsxml,
-                                       final Node node,
-                                       final String domainName,
-                                       final Map<String, String> params) {
+    @Override
+    protected void modifyXML(final VMSXML vmsxml,
+                             final Node node,
+                             final String domainName,
+                             final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifyParallelXML(node, domainName, params);
         }
     }
 
     /** Return table name that appears on the screen. */
-    @Override protected String getTableScreenName() {
+    @Override
+    protected String getTableScreenName() {
         return "Parallel Device";
     }
 
     /** Return table name. */
-    @Override protected String getTableName() {
+    @Override
+    protected String getTableName() {
         return VMSVirtualDomainInfo.PARALLEL_TABLE;
     }
 
     /** Returns device parameters. */
-    @Override protected Map<String, String> getHWParameters(
-                                                   final boolean allParams) {
+    @Override
+    protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> parameters =
                                         super.getHWParameters(allParams);
         setName("parallel "

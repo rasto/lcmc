@@ -58,7 +58,8 @@ public final class SSH extends DialogHost {
 
         getHost().connect(sshGui, getProgressBar(),
                      new ConnectionCallback() {
-                         @Override public void done(final int flag) {
+                         @Override
+                         public void done(final int flag) {
                              /* flag 0 now connected
                               * flag 1 already connected. */
                              Tools.debug(this,
@@ -69,17 +70,19 @@ public final class SSH extends DialogHost {
                                 Tools.getString("Dialog.Host.SSH.Connected"));
                              //enableComponents();
                              SwingUtilities.invokeLater(new Runnable() {
-                                 @Override public void run() {
+                                 @Override
+                                 public void run() {
                                     buttonClass(nextButton()).pressButton();
                                  }
                              });
                          }
 
-                         @Override public void doneError(
-                                                    final String errorText) {
+                         @Override
+                         public void doneError(final String errorText) {
                              getHost().setConnected();
                              SwingUtilities.invokeLater(new Runnable() {
-                                 @Override public void run() {
+                                 @Override
+                                 public void run() {
                                     printErrorAndRetry(Tools.getString(
                                                 "Dialog.Host.SSH.NotConnected")
                                                 + "\n" + errorText);
@@ -93,21 +96,25 @@ public final class SSH extends DialogHost {
     }
 
     /** Returns the next dialog. Devices */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new Devices(getPreviousDialog(), getHost());
     }
 
     /** Inits the dialog and start connecting to the hosts. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     connectHost();
                 }
             });
@@ -118,7 +125,8 @@ public final class SSH extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.Host.SSH.Title in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.SSH.Title");
     }
 
@@ -126,18 +134,21 @@ public final class SSH extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.Host.SSH.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.SSH.Description");
     }
 
     /** Returns a pane where ssh connection will be attempted. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         //final JPanel pane = new JPanel(new SpringLayout());
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         pane.add(getProgressBarPane(
                     new CancelCallback() {
-                        @Override public void cancel() {
+                        @Override
+                        public void cancel() {
                             Tools.debug(this, "cancel callback");
                             getHost().getSSH().cancelConnection();
                         }

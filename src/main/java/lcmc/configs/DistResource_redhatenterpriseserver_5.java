@@ -30,7 +30,8 @@ public final class DistResource_redhatenterpriseserver_5
                                         extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    @Override protected Object[][] getContents() {
+    @Override
+    protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

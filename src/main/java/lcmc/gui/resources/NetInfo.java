@@ -49,14 +49,17 @@ public final class NetInfo extends Info {
     }
 
     /** Returns browser object of this info. */
-    @Override protected HostBrowser getBrowser() {
+    @Override
+    protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
     /** Returns info of this net interface, which is updatable. */
-    @Override public void updateInfo(final JEditorPane ep) {
+    @Override
+    public void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final SSH.SSHOutput ret =
                               Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/ifconfig "
@@ -73,7 +76,8 @@ public final class NetInfo extends Info {
     }
 
     /** Returns string representation of the net interface. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final StringBuilder s = new StringBuilder(getName());
         final String ip = getNetInterface().getIp();
         if (ip != null) {
@@ -83,12 +87,14 @@ public final class NetInfo extends Info {
     }
 
     /** Returns icon of the net interface for the menu. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return NET_I_ICON;
     }
 
     /** Returns ip of the net interface. */
-    @Override public String getStringValue() {
+    @Override
+    public String getStringValue() {
         return getNetInterface().getIp();
     }
 
@@ -98,7 +104,8 @@ public final class NetInfo extends Info {
     }
 
     /** Returns whether ips equal. */
-    @Override public boolean equals(final Object value) {
+    @Override
+    public boolean equals(final Object value) {
         if (Tools.isStringClass(value)) {
             // TODO: race is here
             final NetInterface ni = getNetInterface();

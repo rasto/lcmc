@@ -38,12 +38,14 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
     }
 
     /** Returns columns for the table. */
-    @Override protected String[] getColumnNames(final String tableName) {
+    @Override
+    protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Description"};
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -55,9 +57,10 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    @Override protected void rowClicked(final String tableName,
-                                        final String key,
-                                        final int column) {
+    @Override
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         final ResourceAgentClassInfo raci =
                      getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
         if (raci != null) {

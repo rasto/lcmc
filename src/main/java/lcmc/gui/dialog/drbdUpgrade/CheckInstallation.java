@@ -86,14 +86,16 @@ final class CheckInstallation extends DialogHost {
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         drbdOk = false;
         final CheckInstallation thisClass = this;
         DRBD_BUTTON.setEnabled(false);
         DRBD_BUTTON.addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     if (drbdOk) {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
@@ -107,16 +109,18 @@ final class CheckInstallation extends DialogHost {
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         getHost().execCommand("DrbdCheck.version",
                          getProgressBar(),
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  checkDrbd(ans);
                              }
-                             @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  checkDrbd(""); /* not installed */
                              }
                          },
@@ -157,7 +161,8 @@ final class CheckInstallation extends DialogHost {
     }
 
     /** Returns the next dialog object. It is set dynamicaly. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
@@ -165,7 +170,8 @@ final class CheckInstallation extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Title in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.CheckInstallation.Title");
     }
 
@@ -173,7 +179,8 @@ final class CheckInstallation extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.CheckInstallation.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.CheckInstallation.Description");
     }
 
@@ -195,7 +202,8 @@ final class CheckInstallation extends DialogHost {
     }
 
     /** Returns input pane with installation pane and answer pane. */
-    @Override protected JPanel getInputPane() {
+    @Override
+    protected JPanel getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());

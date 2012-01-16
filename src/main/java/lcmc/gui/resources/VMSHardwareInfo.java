@@ -99,12 +99,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns browser object of this info. */
-    @Override protected final ClusterBrowser getBrowser() {
+    @Override
+    protected final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /** Returns info panel. */
-    @Override public final JComponent getInfoPanel() {
+    @Override
+    public final JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -136,9 +138,11 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (!abExisted) {
             getApplyButton().addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getBrowser().clStatusLock();
                                 apply(false);
                                 getBrowser().clStatusUnlock();
@@ -150,9 +154,11 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             );
             getRevertButton().addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getBrowser().clStatusLock();
                                 revert();
                                 getBrowser().clStatusUnlock();
@@ -175,7 +181,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         overviewButton.setPreferredSize(new Dimension(130, 50));
         //overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 vmsVirtualDomainInfo.selectMyself();
             }
         });
@@ -198,7 +205,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                   + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
         newPanel.add(new JScrollPane(mainPanel));
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 getApplyButton().setVisible(
                             !getVMSVirtualDomainInfo().getResource().isNew());
                 setApplyButtons(null, params);
@@ -210,12 +218,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter has a unit prefix. */
-    @Override protected final boolean hasUnitPrefix(final String param) {
+    @Override
+    protected final boolean hasUnitPrefix(final String param) {
         return HAS_UNIT.containsKey(param) && HAS_UNIT.get(param);
     }
 
     /** Returns units. */
-    @Override protected final Unit[] getUnits() {
+    @Override
+    protected final Unit[] getUnits() {
         return new Unit[]{
                    //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),
@@ -231,16 +241,19 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns columns for the table. */
-    @Override protected final String[] getColumnNames(final String tableName) {
+    @Override
+    protected final String[] getColumnNames(final String tableName) {
         return vmsVirtualDomainInfo.getColumnNames(tableName);
     }
 
     /** Execute when row in the table was clicked. */
-    @Override protected final void rowClicked(final String tableName,
+    @Override
+    protected final void rowClicked(final String tableName,
                                     final String key,
                                     final int column) {
         final Thread thread = new Thread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (isControlButton(tableName, column)) {
                     vmsVirtualDomainInfo.rowClicked(tableName, key, column);
                 } else {
@@ -252,8 +265,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Retrurns color for some rows. */
-    @Override protected final Color getTableRowColor(final String tableName,
-                                                     final String key) {
+    @Override
+    protected final Color getTableRowColor(final String tableName,
+                                           final String key) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getTableRowColor(tableName, key);
         }
@@ -261,9 +275,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Alignment for the specified column. */
-    @Override protected final int getTableColumnAlignment(
-                                                        final String tableName,
-                                                        final int column) {
+    @Override
+    protected final int getTableColumnAlignment(final String tableName,
+                                                final int column) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getTableColumnAlignment(tableName,
                                                                 column);
@@ -272,8 +286,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns info object for this row. */
-    @Override protected final Info getTableInfo(final String tableName,
-                                                final String key) {
+    @Override
+    protected final Info getTableInfo(final String tableName,
+                                      final String key) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo;
         }
@@ -305,7 +320,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     abstract void updateParameters();
 
     /** Returns list of menu items. */
-    @Override public final List<UpdatableItem> createPopup() {
+    @Override
+    public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final boolean testOnly = false;
         /* remove service */
@@ -320,18 +336,21 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public boolean predicate() {
+            @Override
+            public boolean predicate() {
                 return !getResource().isNew();
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (getResource().isNew()) {
                     return null;
                 }
                 return isRemoveable();
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 hidePopup();
                 removeMyself(false);
             }
@@ -342,7 +361,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Removes this hardware from the libvirt with confirmation dialog. */
-    @Override public final void removeMyself(final boolean testOnly) {
+    @Override
+    public final void removeMyself(final boolean testOnly) {
         if (getResource().isNew()) {
             super.removeMyself(testOnly);
             getResource().setNew(false);
@@ -379,7 +399,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                       final Map<String, String> params);
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    @Override protected final Map<Integer, Integer> getDefaultWidths(
+    @Override
+    protected final Map<Integer, Integer> getDefaultWidths(
                                                     final String tableName) {
         return vmsVirtualDomainInfo.getDefaultWidths(tableName);
     }
@@ -409,17 +430,19 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
 
     /** Returns default widths for columns. Null for computed width. */
-    @Override protected final boolean isControlButton(final String tableName,
-                                                      final int column) {
+    @Override
+    protected final boolean isControlButton(final String tableName,
+                                            final int column) {
         return vmsVirtualDomainInfo.isControlButton(tableName, column);
     }
 
     /** Returns tool tip text in the table. */
-    @Override protected String getTableToolTip(final String tableName,
-                                               final String key,
-                                               final Object object,
-                                               final int raw,
-                                               final int column) {
+    @Override
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
         return vmsVirtualDomainInfo.getTableToolTip(tableName,
                                                     key,
                                                     object,
@@ -442,11 +465,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                              final String directory) {
         final VMSHardwareInfo thisClass = this;
         return new FileSystemView() {
-            @Override public final File[] getRoots() {
+            @Override
+            public final File[] getRoots() {
                 return new LinuxFile[]{getLinuxDir("/", host)};
             }
 
-            @Override public final boolean isRoot(final File f) {
+            @Override
+            public final boolean isRoot(final File f) {
                 final String path = Tools.getUnixPath(f.toString());
                 if ("/".equals(path)) {
                     return true;
@@ -454,16 +479,18 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                 return false;
             }
 
-            @Override public final File createNewFolder(
-                                                    final File containingDir) {
+            @Override
+            public final File createNewFolder(final File containingDir) {
                 return null;
             }
 
-            @Override public final File getHomeDirectory() {
+            @Override
+            public final File getHomeDirectory() {
                 return getLinuxDir(directory, host);
             }
 
-            @Override public final Boolean isTraversable(final File f) {
+            @Override
+            public final Boolean isTraversable(final File f) {
                 final LinuxFile lf = linuxFileCache.get(f.toString());
                 if (lf != null) {
                     return lf.isDirectory();
@@ -471,11 +498,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                 return true;
             }
 
-            @Override public final File getParentDirectory(final File dir) {
+            @Override
+            public final File getParentDirectory(final File dir) {
                 return getLinuxDir(dir.getParent(), host);
             }
 
-            @Override public final File[] getFiles(final File dir,
+            @Override
+            public final File[] getFiles(final File dir,
                                          final boolean useFileHiding) {
                 final StringBuilder dirSB = new StringBuilder(dir.toString());
                 if ("/".equals(dir.toString())) {
@@ -543,8 +572,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                     getFileSystemView(host, directory)) {
             /** Serial version UID. */
             private static final long serialVersionUID = 1L;
-                @Override public final void setCurrentDirectory(
-                                                            final File dir) {
+                @Override
+                public final void setCurrentDirectory(final File dir) {
                     super.setCurrentDirectory(new LinuxFile(
                                                     thisClass,
                                                     host,
@@ -577,8 +606,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * Returns whether the specified parameter or any of the parameters
      * have changed. Don't check the invisible for the type parameters.
      */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
 
@@ -604,8 +634,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Returns whether all the parameters are correct. */
-    @Override public boolean checkResourceFieldsCorrect(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }
 
@@ -628,7 +659,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     /** Checks one parameter. */
-    @Override protected final void checkOneParam(final String param) {
+    @Override
+    protected final void checkOneParam(final String param) {
         checkResourceFieldsCorrect(param, new String[]{param}, true);
     }
 

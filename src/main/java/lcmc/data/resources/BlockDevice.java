@@ -570,12 +570,12 @@ public final class BlockDevice extends Resource {
     }
 
     /** Returns DRBD block device. */
-    public final BlockDevice getDrbdBlockDevice() {
+    public BlockDevice getDrbdBlockDevice() {
         return drbdBlockDevice;
     }
 
     /** Return whether the drbd block device is a physical volume. */
-    public final boolean isDrbdPhysicalVolume() {
+    public boolean isDrbdPhysicalVolume() {
         return drbdBlockDevice != null && drbdBlockDevice.isPhysicalVolume();
     }
 
@@ -586,7 +586,7 @@ public final class BlockDevice extends Resource {
     }
 
     /** Sets DRBD block device. */
-    public final void setDrbdBlockDevice(final BlockDevice drbdBlockDevice) {
+    public void setDrbdBlockDevice(final BlockDevice drbdBlockDevice) {
         this.drbdBlockDevice = drbdBlockDevice;
     }
 }

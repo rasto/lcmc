@@ -41,17 +41,20 @@ public final class CRMInfo extends HbCategoryInfo {
     }
 
     /** Returns icon for the heartbeat menu item. */
-    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
         return CRM_ICON;
     }
 
     /** Returns type of the info text. text/plain or text/html. */
-    @Override protected String getInfoType() {
+    @Override
+    protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns editable info panel for global crm config. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         return getBrowser().getServicesInfo().getInfoPanel();
     }
 }

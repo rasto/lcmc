@@ -94,7 +94,8 @@ public class Resource {
     }
 
     /** Gets name of this resource. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return name;
     }
 

@@ -101,7 +101,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns browser object of this info. */
-    @Override protected final ClusterBrowser getBrowser() {
+    @Override
+    protected final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -124,12 +125,14 @@ public class HbConnectionInfo extends EditableInfo {
      * Returns long description of the parameter, that is used for
      * tool tips.
      */
-    @Override protected final String getParamLongDesc(final String param) {
+    @Override
+    protected final String getParamLongDesc(final String param) {
         return null;
     }
 
     /** Returns short description of the parameter, that is used as * label. */
-    @Override protected final String getParamShortDesc(final String param) {
+    @Override
+    protected final String getParamShortDesc(final String param) {
         return null;
     }
 
@@ -137,23 +140,27 @@ public class HbConnectionInfo extends EditableInfo {
      * Checks if the new value is correct for the parameter type and
      * constraints.
      */
-    @Override protected final boolean checkParam(final String param,
-                                           final String newValue) {
+    @Override
+    protected final boolean checkParam(final String param,
+                                       final String newValue) {
         return false;
     }
 
     /** Returns default for this parameter. */
-    @Override protected final String getParamDefault(final String param) {
+    @Override
+    protected final String getParamDefault(final String param) {
         return null;
     }
 
     /** Returns preferred value for this parameter. */
-    @Override protected final String getParamPreferred(final String param) {
+    @Override
+    protected final String getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns lsit of all parameters as an array. */
-    @Override public final String[] getParametersFromXML() {
+    @Override
+    public final String[] getParametersFromXML() {
         return null;
     }
 
@@ -161,18 +168,20 @@ public class HbConnectionInfo extends EditableInfo {
      * Possible choices for pulldown menus, or null if it is not a pull
      * down menu.
      */
-    @Override protected final Object[] getParamPossibleChoices(
-                                                         final String param) {
+    @Override
+    protected final Object[] getParamPossibleChoices(final String param) {
         return null;
     }
 
     /** Returns parameter type, boolean etc. */
-    @Override protected final String getParamType(final String param) {
+    @Override
+    protected final String getParamType(final String param) {
         return null;
     }
 
     /** Returns section to which the global belongs. */
-    @Override protected final String getSection(final String param) {
+    @Override
+    protected final String getSection(final String param) {
         return null;
     }
 
@@ -180,27 +189,32 @@ public class HbConnectionInfo extends EditableInfo {
      * Returns whether the parameter is of the boolean type and needs the
      * checkbox.
      */
-    @Override protected final boolean isCheckBox(final String param) {
+    @Override
+    protected final boolean isCheckBox(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is of time type. */
-    @Override protected final boolean isTimeType(final String param) {
+    @Override
+    protected final boolean isTimeType(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is integer. */
-    @Override protected final boolean isInteger(final String param) {
+    @Override
+    protected final boolean isInteger(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is label. */
-    @Override protected final boolean isLabel(final String param) {
+    @Override
+    protected final boolean isLabel(final String param) {
         return false;
     }
 
     /** Returns true if the specified parameter is required. */
-    @Override protected final boolean isRequired(final String param) {
+    @Override
+    protected final boolean isRequired(final String param) {
         return true;
     }
 
@@ -225,7 +239,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns heartbeat graphical view. */
-    @Override public final JPanel getGraphicalView() {
+    @Override
+    public final JPanel getGraphicalView() {
         return getBrowser().getHeartbeatGraph().getGraphPanel();
     }
 
@@ -233,7 +248,8 @@ public class HbConnectionInfo extends EditableInfo {
     void apply(final Host dcHost, final boolean testOnly) {
         if (!testOnly) {
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
@@ -260,8 +276,9 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Check order and colocation constraints. */
-    @Override boolean checkResourceFieldsCorrect(final String param,
-                                                 final String[] params) {
+    @Override
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params) {
         boolean correct = true;
         mConstraintsReadLock.lock();
         try {
@@ -282,8 +299,9 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Check order and colocation constraints. */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         boolean changed = false;
         mConstraintsReadLock.lock();
         try {
@@ -337,7 +355,8 @@ public class HbConnectionInfo extends EditableInfo {
      * Returns info panel for hb connection (order and/or colocation
      * constraint.
      */
-    @Override public final JComponent getInfoPanel() {
+    @Override
+    public final JComponent getInfoPanel() {
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -346,7 +365,8 @@ public class HbConnectionInfo extends EditableInfo {
             private volatile boolean mouseStillOver = false;
 
             /** Whether the whole thing should be enabled. */
-            @Override public final boolean isEnabled() {
+            @Override
+            public final boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
                     return false;
@@ -357,7 +377,8 @@ public class HbConnectionInfo extends EditableInfo {
                 return true;
             }
 
-            @Override public final void mouseOut() {
+            @Override
+            public final void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -367,7 +388,8 @@ public class HbConnectionInfo extends EditableInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public final void mouseOver() {
+            @Override
+            public final void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -449,9 +471,11 @@ public class HbConnectionInfo extends EditableInfo {
         }
         getApplyButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             getBrowser().clStatusLock();
                             apply(getBrowser().getDCHost(), false);
                             getBrowser().clStatusUnlock();
@@ -463,9 +487,11 @@ public class HbConnectionInfo extends EditableInfo {
         );
         getRevertButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             getBrowser().clStatusLock();
                             revert();
                             getBrowser().clStatusUnlock();
@@ -480,7 +506,8 @@ public class HbConnectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setApplyButtons(null, null);
             }
         });
@@ -511,7 +538,8 @@ public class HbConnectionInfo extends EditableInfo {
      * Creates popup menu for heartbeat order and colocation dependencies.
      * These are the edges in the graph.
      */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         final HbConnectionInfo thisClass = this;
@@ -525,14 +553,16 @@ public class HbConnectionInfo extends EditableInfo {
                      new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public final String enablePredicate() {
+            @Override
+            public final String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
             }
 
-            @Override public final void action() {
+            @Override
+            public final void action() {
                 getBrowser().getHeartbeatGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
@@ -541,10 +571,12 @@ public class HbConnectionInfo extends EditableInfo {
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
                   getBrowser().new ClMenuItemCallback(removeEdgeItem, null) {
-            @Override public final boolean isEnabled() {
+            @Override
+            public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
-            @Override public void action(final Host dcHost) {
+            @Override
+            public void action(final Host dcHost) {
                 if (!isNew()) {
                     getBrowser().getHeartbeatGraph().removeConnection(
                                                                   thisClass,
@@ -569,18 +601,21 @@ public class HbConnectionInfo extends EditableInfo {
                 new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public final boolean predicate() {
+            @Override
+            public final boolean predicate() {
                 return getBrowser().getHeartbeatGraph().isOrder(thisClass);
             }
 
-            @Override public final String enablePredicate() {
+            @Override
+            public final String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
             }
 
-            @Override public final void action() {
+            @Override
+            public final void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
                     getBrowser().getHeartbeatGraph().removeOrder(
@@ -606,7 +641,8 @@ public class HbConnectionInfo extends EditableInfo {
             public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
-            @Override public void action(final Host dcHost) {
+            @Override
+            public void action(final Host dcHost) {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isOrder(thisClass)) {
                         getBrowser().getHeartbeatGraph().removeOrder(
@@ -646,18 +682,21 @@ public class HbConnectionInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public final boolean predicate() {
+            @Override
+            public final boolean predicate() {
                 return getBrowser().getHeartbeatGraph().isColocation(thisClass);
             }
 
-            @Override public final String enablePredicate() {
+            @Override
+            public final String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
             }
 
-            @Override public final void action() {
+            @Override
+            public final void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
                     getBrowser().getHeartbeatGraph().removeColocation(
@@ -682,10 +721,12 @@ public class HbConnectionInfo extends EditableInfo {
         final ClusterBrowser.ClMenuItemCallback removeColocationCallback =
             getBrowser().new ClMenuItemCallback(removeColocationItem, null) {
 
-            @Override public final boolean isEnabled() {
+            @Override
+            public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
-            @Override public final void action(final Host dcHost) {
+            @Override
+            public final void action(final Host dcHost) {
                 if (!isNew()) {
                     if (getBrowser().getHeartbeatGraph().isColocation(
                                                                 thisClass)) {
@@ -898,7 +939,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Selects the node in the menu and reloads everything underneath. */
-    @Override public final void selectMyself() {
+    @Override
+    public final void selectMyself() {
         super.selectMyself();
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                         getBrowser().getTree().getLastSelectedPathComponent();
@@ -911,29 +953,32 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns whether this parameter is advanced. */
-    @Override protected final boolean isAdvanced(final String param) {
+    @Override
+    protected final boolean isAdvanced(final String param) {
         return false;
     }
 
     /** Returns access type of this parameter. */
-    @Override protected final ConfigData.AccessType getAccessType(
-                                                        final String param) {
+    @Override
+    protected final ConfigData.AccessType getAccessType(final String param) {
         return ConfigData.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected final String isEnabled(final String param) {
+    @Override
+    protected final String isEnabled(final String param) {
         return null;
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
-    @Override protected final boolean isEnabledOnlyInAdvancedMode(
-                                                        final String param) {
+    @Override
+    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
     }
 
     /** Hide/Show advanced panels. */
-    @Override public final void updateAdvancedPanels() {
+    @Override
+    public final void updateAdvancedPanels() {
         super.updateAdvancedPanels();
         mConstraintsReadLock.lock();
         try {
@@ -1047,7 +1092,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Revert all values. */
-    @Override public final void revert() {
+    @Override
+    public final void revert() {
         super.revert();
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();

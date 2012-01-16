@@ -287,13 +287,16 @@ final class HbConfig extends DialogCluster {
         makeConfigButton.setEnabled(false);
         makeConfigButton.addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(
                         new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 fieldCheckLatch = new CountDownLatch(1);
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         makeConfigButton.setEnabled(false);
                                     }
                                 });
@@ -349,27 +352,32 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Returns the successor of this dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new Init(this, getCluster());
     }
 
     /** Returns title of this dialog. */
-    @Override protected String getClusterDialogTitle() {
+    @Override
+    protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.HbConfig.Title");
     }
 
     /** Returns description of this dialog. */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Cluster.HbConfig.Description");
     }
 
     /** Returns localized string of Next button. */
-    @Override public String nextButton() {
+    @Override
+    public String nextButton() {
         return Tools.getString("Dialog.Cluster.HbConfig.NextButton");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
         configPanel.setBackground(
@@ -378,13 +386,16 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         final Thread thread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     boolean configOk = updateOldHbConfig();
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             makeConfigButton.setEnabled(false);
                         }
                     });
@@ -503,12 +514,13 @@ final class HbConfig extends DialogCluster {
             ts[i] = h.execCommand("Heartbeat.getHbConfig",
                              (ProgressBar) null,
                              new ExecCallback() {
-                                 @Override public void done(final String ans) {
+                                 @Override
+                                 public void done(final String ans) {
                                      configs[index] = ans;
                                  }
-                                 @Override public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
+                                 @Override
+                                 public void doneError(final String ans,
+                                                       final int exitCode) {
                                      configs[index] = HA_CF_ERROR_STRING;
                                  }
                              },
@@ -528,7 +540,8 @@ final class HbConfig extends DialogCluster {
 
         if (configs[0].equals(HA_CF_ERROR_STRING)) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     configStatus.setText(hosts[0] + ": " + Tools.getString(
                                      "Dialog.Cluster.HbConfig.NoConfigFound"));
                 }
@@ -545,7 +558,8 @@ final class HbConfig extends DialogCluster {
                 final Host host = hosts[j];
                 if (configs[j].equals(HA_CF_ERROR_STRING)) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             configStatus.setText(host + ": "
                                                  + Tools.getString(
                                       "Dialog.Cluster.HbConfig.NoConfigFound"));
@@ -554,7 +568,8 @@ final class HbConfig extends DialogCluster {
                     break;
                 } else if (!configs[0].equals(configs[j])) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             configStatus.setText(Tools.getString(
                                   "Dialog.Cluster.HbConfig.ConfigsNotTheSame"));
                         }
@@ -573,7 +588,8 @@ final class HbConfig extends DialogCluster {
                 }
                 final boolean editableConfig = generated;
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         configStatus.setText(
                            Tools.getString("Dialog.Cluster.HbConfig.ha.cf.ok"));
                         configCheckbox.setSelected(false);
@@ -599,7 +615,8 @@ final class HbConfig extends DialogCluster {
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (noConfigsF) {
                         configCheckbox.setText(SEE_EXISTING_STRING);
                         configCheckbox.setSelected(false);
@@ -620,7 +637,8 @@ final class HbConfig extends DialogCluster {
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 fieldCheckLatch.countDown();
             }
         });
@@ -631,7 +649,8 @@ final class HbConfig extends DialogCluster {
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 makeConfigButton.setEnabled(false);
                 configPanel.removeAll();
                 final JPanel insideConfigPanel = new JPanel(
@@ -677,7 +696,8 @@ final class HbConfig extends DialogCluster {
         }
         this.configChanged = configChanged;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (!configChanged) {
                     makeConfigButton.setEnabled(false);
                 }
@@ -707,15 +727,16 @@ final class HbConfig extends DialogCluster {
                     configPanel.add(l);
                     final JLabel label = l;
                     label.addComponentListener(new ComponentListener() {
-                        @Override public void componentHidden(
-                                                    final ComponentEvent e) {
+                        @Override
+                        public void componentHidden(final ComponentEvent e) {
                             /* do nothing */
                         }
 
-                        @Override public void componentMoved(
-                                                      final ComponentEvent e) {
+                        @Override
+                        public void componentMoved(final ComponentEvent e) {
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     if (alreadyMoved) {
                                         return;
                                     }
@@ -727,13 +748,13 @@ final class HbConfig extends DialogCluster {
                             });
                         }
 
-                        @Override public void componentResized(
-                                                      final ComponentEvent e) {
+                        @Override
+                        public void componentResized(final ComponentEvent e) {
                             /* do nothing */
                         }
 
-                        @Override public void componentShown(
-                                                      final ComponentEvent e) {
+                        @Override
+                        public void componentShown(final ComponentEvent e) {
                             /* do nothing */
                         }
                     });
@@ -805,9 +826,11 @@ final class HbConfig extends DialogCluster {
                                                     REMOVE_BUTTON_HEIGHT));
         removeButton.addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread t = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             castAddresses.remove(c);
                             updateConfigPanelEditable(true);
                             checkInterface();
@@ -843,7 +866,8 @@ final class HbConfig extends DialogCluster {
             ucastLink2 = (UcastLink) ucastLink2CB.getValue();
             if (ucastLink1.getHost() == ucastLink2.getHost()) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         addButton.setEnabled(false);
                     }
                 });
@@ -856,7 +880,8 @@ final class HbConfig extends DialogCluster {
         for (final CastAddress c : castAddresses) {
             if (c.equals(type, iface, addr, serial)) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         addButton.setEnabled(false);
                     }
                 });
@@ -864,7 +889,8 @@ final class HbConfig extends DialogCluster {
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 addButton.setEnabled(true);
             }
         });
@@ -970,7 +996,8 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Returns panel where user can edit the config. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         optionsCB.clear();
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -1066,12 +1093,14 @@ final class HbConfig extends DialogCluster {
                                                 false)); /* only adv. mode */
 
         final ItemListener typeL = new ItemListener() {
-            @Override public void itemStateChanged(final ItemEvent e) {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final String type = typeCB.getStringValue();
                     if (type != null) {
                         Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 if (MCAST_TYPE.equals(type)
                                     || BCAST_TYPE.equals(type)) {
                                     ifaceCB.setVisible(true);
@@ -1097,7 +1126,8 @@ final class HbConfig extends DialogCluster {
                                     ucastLink2CB.setVisible(false);
                                 }
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         mcast.setMaximumSize(
                                                     mcast.getPreferredSize());
                                     }
@@ -1114,10 +1144,12 @@ final class HbConfig extends DialogCluster {
         typeCB.addListeners(typeL, null);
 
         final ItemListener ifaceL = new ItemListener() {
-            @Override public void itemStateChanged(final ItemEvent e) {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             checkInterface();
                         }
                     });
@@ -1129,10 +1161,12 @@ final class HbConfig extends DialogCluster {
         ifaceCB.addListeners(ifaceL, null);
 
         final ItemListener serialL = new ItemListener() {
-            @Override public void itemStateChanged(final ItemEvent e) {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             checkInterface();
                         }
                     });
@@ -1145,10 +1179,12 @@ final class HbConfig extends DialogCluster {
         serialCB.addListeners(serialL, null);
 
         final ItemListener ucastLinkL = new ItemListener() {
-            @Override public void itemStateChanged(final ItemEvent e) {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             checkInterface();
                         }
                     });
@@ -1165,25 +1201,26 @@ final class HbConfig extends DialogCluster {
         final DocumentListener addrL = new DocumentListener() {
                         private void check() {
                             Thread thread = new Thread(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     checkInterface();
                                 }
                             });
                             thread.start();
                         }
 
-                        @Override public void insertUpdate(
-                                                       final DocumentEvent e) {
+                        @Override
+                        public void insertUpdate(final DocumentEvent e) {
                             check();
                         }
 
-                        @Override public void removeUpdate(
-                                                       final DocumentEvent e) {
+                        @Override
+                        public void removeUpdate(final DocumentEvent e) {
                             check();
                         }
 
-                        @Override public void changedUpdate(
-                                                       final DocumentEvent e) {
+                        @Override
+                        public void changedUpdate(final DocumentEvent e) {
                             check();
                         }
                     };
@@ -1196,10 +1233,12 @@ final class HbConfig extends DialogCluster {
                                 Tools.getDefaultColor("ConfigDialog.Button"));
         addButton.addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final String type = typeCB.getStringValue();
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             addInterface(type);
                         }
                     });
@@ -1224,15 +1263,18 @@ final class HbConfig extends DialogCluster {
         Tools.getGUIData().setAccessible(configCheckbox,
                                          ConfigData.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
-            @Override public void itemStateChanged(final ItemEvent e) {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
                 final String text = configCheckbox.getText();
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             if (EDIT_CONFIG_STRING.equals(text)) {
                                 updateConfigPanelEditable(configChanged);
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         configCheckbox.setText(
                                                         SEE_EXISTING_STRING);
                                         configCheckbox.setSelected(false);
@@ -1243,7 +1285,8 @@ final class HbConfig extends DialogCluster {
                             } else if (SEE_EXISTING_STRING.equals(text)) {
                                 updateConfigPanelExisting();
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override public void run() {
+                                    @Override
+                                    public void run() {
                                         configCheckbox.setText(
                                                         EDIT_CONFIG_STRING);
                                         configCheckbox.setSelected(false);
@@ -1309,9 +1352,11 @@ final class HbConfig extends DialogCluster {
             Tools.getString("Dialog.Cluster.HbConfig.UseDopdCheckBox.ToolTip"));
         dopdCB.addItemListener(
             new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             updateConfigPanelEditable(true);
                         }
                     });
@@ -1329,9 +1374,11 @@ final class HbConfig extends DialogCluster {
            Tools.getString("Dialog.Cluster.HbConfig.UseMgmtdCheckBox.ToolTip"));
         mgmtdCB.addItemListener(
             new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             updateConfigPanelEditable(true);
                         }
                     });
@@ -1344,7 +1391,8 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Enable skip button. */
-    @Override protected boolean skipButtonEnabled() {
+    @Override
+    protected boolean skipButtonEnabled() {
         return true;
     }
 
@@ -1356,7 +1404,8 @@ final class HbConfig extends DialogCluster {
                     return;
                 }
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         for (final String option : OPTIONS) {
                             final GuiComboBox cb = optionsCB.get(option);
                             if (cb != null) {
@@ -1376,15 +1425,18 @@ final class HbConfig extends DialogCluster {
                 t.start();
             }
 
-            @Override public void insertUpdate(final DocumentEvent e) {
+            @Override
+            public void insertUpdate(final DocumentEvent e) {
                 check();
             }
 
-            @Override public void removeUpdate(final DocumentEvent e) {
+            @Override
+            public void removeUpdate(final DocumentEvent e) {
                 check();
             }
 
-            @Override public void changedUpdate(final DocumentEvent e) {
+            @Override
+            public void changedUpdate(final DocumentEvent e) {
                 check();
             }
         };

@@ -75,17 +75,20 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns browser object of this info. */
-    @Override protected ClusterBrowser getBrowser() {
+    @Override
+    protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /** Returns columns for the table. */
-    @Override protected String[] getColumnNames(final String tableName) {
+    @Override
+    protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Defined on", "Status", "Memory", ""};
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getBrowser().getClusterHosts()) {
@@ -137,19 +140,21 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns info object for the key. */
-    @Override protected Info getTableInfo(final String tableName,
-                                final String key) {
+    @Override
+    protected Info getTableInfo(final String tableName, final String key) {
         return domainToInfo.get(key);
     }
 
     /** Execute when row in the table was clicked. */
-    @Override protected void rowClicked(final String tableName,
-                                        final String key,
-                                        final int column) {
+    @Override
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     if (DEFAULT_WIDTHS.containsKey(column)) {
                         /* remove button */
                         vmsvdi.removeMyself(false);
@@ -163,8 +168,9 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Alignment for the specified column. */
-    @Override protected int getTableColumnAlignment(final String tableName,
-                                                    final int column) {
+    @Override
+    protected int getTableColumnAlignment(final String tableName,
+                                          final int column) {
         if (column == 3) {
             return SwingConstants.RIGHT;
         }
@@ -172,15 +178,16 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Selects the node in the menu. */
-    @Override public void selectMyself() {
+    @Override
+    public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }
 
     /** Returns comparator for column. */
-    @Override protected Comparator<Object> getColComparator(
-                                                        final String tableName,
-                                                        final int col) {
+    @Override
+    protected Comparator<Object> getColComparator(final String tableName,
+                                                  final int col) {
         if (col == 0) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
@@ -211,8 +218,8 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Retrurns color for some rows. */
-    @Override protected Color getTableRowColor(final String tableName,
-                                               final String key) {
+    @Override
+    protected Color getTableRowColor(final String tableName, final String key) {
         final Color c = domainToColor.get(key);
         if (c == null) {
             return Browser.PANEL_BACKGROUND;
@@ -222,13 +229,16 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns new button. */
-    @Override protected JComponent getNewButton() {
+    @Override
+    protected JComponent getNewButton() {
         final MyButton newButton = new MyButton(
                                      Tools.getString("VMSInfo.AddNewDomain"));
         newButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         addDomainPanel();
                     }
                 });
@@ -254,11 +264,13 @@ public final class VMSInfo extends CategoryInfo {
         getNode().add(resource);
         getBrowser().reload(getNode(), true);
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 vmsdi.getInfoPanel();
                 vmsdi.selectMyself();
                 final Thread t = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
                         avmcd.showDialogs();
                     }
@@ -269,7 +281,8 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns list of menu items for VM. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* New domain */
         final MyMenuItem newDomainMenuItem = new MyMenuItem(
@@ -278,7 +291,8 @@ public final class VMSInfo extends CategoryInfo {
                        new AccessMode(ConfigData.AccessType.ADMIN, false),
                        new AccessMode(ConfigData.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
-                        @Override public void action() {
+                        @Override
+                        public void action() {
                             hidePopup();
                             addDomainPanel();
                         }
@@ -288,23 +302,25 @@ public final class VMSInfo extends CategoryInfo {
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */
-    @Override protected Map<Integer, Integer> getDefaultWidths(
-                                                    final String tableName) {
+    @Override
+    protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
         return DEFAULT_WIDTHS;
     }
 
     /** Returns if this column contains remove button. */
-    @Override protected boolean isControlButton(final String tableName,
-                                                final int column) {
+    @Override
+    protected boolean isControlButton(final String tableName,
+                                      final int column) {
         return DEFAULT_WIDTHS.containsKey(column);
     }
 
     /** Returns tool tip text in the table. */
-    @Override protected String getTableToolTip(final String tableName,
-                                               final String key,
-                                               final Object object,
-                                               final int raw,
-                                               final int column) {
+    @Override
+    protected String getTableToolTip(final String tableName,
+                                     final String key,
+                                     final Object object,
+                                     final int raw,
+                                     final int column) {
         if (DEFAULT_WIDTHS.containsKey(column)) {
             return "Remove domain " + key + ".";
         }

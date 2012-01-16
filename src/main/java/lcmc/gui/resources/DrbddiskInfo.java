@@ -59,7 +59,8 @@ final class DrbddiskInfo extends ServiceInfo {
     }
 
     /** Returns string representation of the drbddisk service. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getName() + " (" + getParamSaved("1") + ")";
     }
 
@@ -74,8 +75,9 @@ final class DrbddiskInfo extends ServiceInfo {
     }
 
     /** Removes the drbddisk service. */
-    @Override public void removeMyselfNoConfirm(final Host dcHost,
-                                                final boolean testOnly) {
+    @Override
+    public void removeMyselfNoConfirm(final Host dcHost,
+                                      final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
@@ -98,7 +100,8 @@ final class DrbddiskInfo extends ServiceInfo {
                 dri.setUsedByCRM(null);
             }
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     dri.updateMenus(null);
                 }
             });

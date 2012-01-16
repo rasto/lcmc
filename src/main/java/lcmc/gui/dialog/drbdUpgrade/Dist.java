@@ -43,7 +43,8 @@ public final class Dist extends DrbdLinbitAvailPackages {
     }
 
     /** Returns the next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new CheckInstallation(this, getHost());
     }
 }

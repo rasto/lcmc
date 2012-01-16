@@ -47,7 +47,8 @@ final class DistDetection extends DialogHost {
     }
 
     /** Inits dialog and starts the distribution detection. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final String support =
@@ -62,7 +63,8 @@ final class DistDetection extends DialogHost {
     }
 
     /** Inits dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
@@ -71,7 +73,8 @@ final class DistDetection extends DialogHost {
     }
 
     /** Returns the next dialog which is CheckInstallation. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new CheckInstallation(this, getHost());
     }
 
@@ -79,7 +82,8 @@ final class DistDetection extends DialogHost {
      * Returns the title of the dialog. It is defined as
      * Dialog.Host.DistDetection.Title in TextResources.
      */
-    @Override protected String getHostDialogTitle() {
+    @Override
+    protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DistDetection.Title");
     }
 
@@ -87,12 +91,14 @@ final class DistDetection extends DialogHost {
      * Returns the description of the dialog. It is defined as
      * Dialog.Host.DistDetection.Description in TextResources.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Host.DistDetection.Description");
     }
 
     /** Returns the input pane with check boxes and other info. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getAnswerPane(Tools.getString(
                                       "Dialog.Host.DistDetection.Executing")));

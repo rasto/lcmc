@@ -413,14 +413,16 @@ public final class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
@@ -446,14 +448,16 @@ public final class HostBrowser extends Browser {
                     new AccessMode(ConfigData.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelReboot";

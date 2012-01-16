@@ -204,9 +204,11 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Exit action listener. */
     private ActionListener exitActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  final Thread t = new Thread(new Runnable() {
-                     @Override public void run() {
+                     @Override
+                     public void run() {
                          Tools.getConfigData().disconnectAllHosts();
                          System.exit(0);
                      }
@@ -219,12 +221,14 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Add new host action listener. */
     private ActionListener newHostActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  if (turnOff) {
                      return;
                  }
                  final Thread t = new Thread(new Runnable() {
-                     @Override public void run() {
+                     @Override
+                     public void run() {
                          final AddHostDialog h = new AddHostDialog();
                          h.showDialogs();
                      }
@@ -237,7 +241,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Load from file action listener. */
     private ActionListener loadActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  if (turnOff) {
                      return;
                  }
@@ -281,10 +286,12 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Remove everything action listener. */
     private ActionListener removeEverythingActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  final Thread thread = new Thread(
                     new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             Tools.removeEverything();
                         }
                     }
@@ -297,13 +304,15 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Save to file action listener. */
     private ActionListener saveActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  if (turnOff) {
                      return;
                  }
                  final Thread thread = new Thread(
                     new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             Tools.save(Tools.getConfigData().getSaveFile(),
                                        true);
                         }
@@ -317,7 +326,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** 'Save as' action listener. */
     private ActionListener saveAsActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  if (turnOff) {
                      return;
                  }
@@ -362,12 +372,14 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Add a new cluster action listener. */
     private ActionListener newClusterActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  if (turnOff) {
                      return;
                  }
                  final Thread t = new Thread(new Runnable() {
-                     @Override public void run() {
+                     @Override
+                     public void run() {
                          final AddClusterDialog c = new AddClusterDialog();
                          c.showDialogs();
                      }
@@ -380,7 +392,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Change look and feel action listener. */
     private ActionListener lookAndFeelActionListener() {
         return new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 if (turnOff) {
                      return;
                 }
@@ -412,9 +425,11 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** About action listener. */
     private ActionListener aboutActionListener() {
         return new ActionListener() {
-             @Override public void actionPerformed(final ActionEvent e) {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
                  final Thread t = new Thread(new Runnable() {
-                     @Override public void run() {
+                     @Override
+                     public void run() {
                          final About a = new About();
                          a.showDialog();
                      }
@@ -430,7 +445,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     /** Action performed, to catch not implemented actions. */
-    @Override public void actionPerformed(final ActionEvent e) {
+    @Override
+    public void actionPerformed(final ActionEvent e) {
         final JMenuItem source = (JMenuItem) (e.getSource());
         Tools.appError("action \"" + source.getText() + "\" not implemented");
     }

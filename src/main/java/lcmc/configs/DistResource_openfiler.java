@@ -29,7 +29,8 @@ import java.util.Arrays;
 public final class DistResource_openfiler extends java.util.ListResourceBundle {
 
     /** Get contents. */
-    @Override protected Object[][] getContents() {
+    @Override
+    protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
 

@@ -958,7 +958,8 @@ public final class Host {
                     distVersionString,
                     arch,
                     new ConvertCmdCallback() {
-                        @Override public String convert(String command) {
+                        @Override
+                        public String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
                                 if (tag != null && command.indexOf(tag) > -1) {
                                     final String s = replaceHash.get(tag);
@@ -1339,7 +1340,8 @@ public final class Host {
     }
 
     /** Returns the host name. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return getName();
     }
 
@@ -1454,7 +1456,8 @@ public final class Host {
             enableOnConnectList.add(c);
         }
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 c.setEnabled(isConnected());
             }
         });
@@ -1468,7 +1471,8 @@ public final class Host {
     public void setConnected() {
         final boolean con = isConnected();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (final JComponent c : enableOnConnectList) {
                     c.setEnabled(con);
                 }
@@ -1509,7 +1513,8 @@ public final class Host {
 
             connect(sshGui,
                     new ConnectionCallback() {
-                        @Override public void done(final int flag) {
+                        @Override
+                        public void done(final int flag) {
                             setConnected();
                             getSSH().execCommandAndWait(":", /* activate sudo */
                                     false,
@@ -1525,8 +1530,8 @@ public final class Host {
                             }
                         }
 
-                        @Override public void doneError(
-                                                    final String errorText) {
+                        @Override
+                        public void doneError(final String errorText) {
                             setLoadingError();
                             setConnected();
                             if (progressIndicator) {
@@ -1552,14 +1557,15 @@ public final class Host {
     void getAllInfo() {
         final Thread t = execCommand("GetHostAllInfo",
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  parseHostInfo(ans);
                                  setLoadingDone();
                              }
 
-                             @Override public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  setLoadingError();
                              }
                          },
@@ -1579,7 +1585,8 @@ public final class Host {
         final long thisTS = ++timestamp;
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  if (thisTS != timestamp) {
                                      return;
                                  }
@@ -1599,9 +1606,9 @@ public final class Host {
                                  setLoadingDone();
                              }
 
-                             @Override public void doneError(
-                                                          final String ans,
-                                                          final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  if (thisTS != timestamp) {
                                      return;
                                  }
@@ -1625,7 +1632,8 @@ public final class Host {
         final long thisTS = timestamp;
         final Thread t = execCommand("GetHostHWInfoLazy",
                          new ExecCallback() {
-                             @Override public void done(final String ans) {
+                             @Override
+                             public void done(final String ans) {
                                  if (thisTS != timestamp) {
                                      return;
                                  }
@@ -1645,9 +1653,9 @@ public final class Host {
                                  setLoadingDone();
                              }
 
-                             @Override public void doneError(
-                                                        final String ans,
-                                                        final int exitCode) {
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
                                  if (thisTS != timestamp) {
                                      return;
                                  }

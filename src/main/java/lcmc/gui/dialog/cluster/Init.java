@@ -158,45 +158,53 @@ public class Init extends DialogCluster {
      * Returns previous dialog. It is used to get with the back button to
      * the dialog before this one.
      */
-    @Override public final WizardDialog getPreviousDialog() {
+    @Override
+    public final WizardDialog getPreviousDialog() {
         stopCheckCluster();
         return super.getPreviousDialog();
     }
 
     /** After the dialog is finished. */
-    @Override protected final void finishDialog() {
+    @Override
+    protected final void finishDialog() {
         stopCheckCluster();
     }
 
     /** Is called before the dialog is canceled. It stops all the checks. */
-    @Override public final void cancelDialog() {
+    @Override
+    public final void cancelDialog() {
         stopCheckCluster();
     }
 
     /** Returns the next dialog. */
-    @Override public final WizardDialog nextDialog() {
+    @Override
+    public final WizardDialog nextDialog() {
         stopCheckCluster();
         return new Finish(this, getCluster());
     }
 
     /** Returns the title of the dialog. */
-    @Override protected final String getClusterDialogTitle() {
+    @Override
+    protected final String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Init.Title");
     }
 
     /** Returns the description of the dialog. */
-    @Override protected final String getDescription() {
+    @Override
+    protected final String getDescription() {
         return Tools.getString("Dialog.Cluster.Init.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected final void initDialog() {
+    @Override
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         lastDrbdLoaded = null;
         lastPmStarted = null;
         lastPmRc = null;
@@ -205,7 +213,8 @@ public class Init extends DialogCluster {
         checkClusterStopped = false;
         checkClusterThread = new Thread(
             new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     while (!checkClusterStopped) {
                         checkCluster(true);
                         if (!checkClusterStopped) {
@@ -233,16 +242,17 @@ public class Init extends DialogCluster {
             infoThreads[i] = h.execCommand("Cluster.Init.getInstallationInfo",
                              (ProgressBar) null,
                              new ExecCallback() {
-                                 @Override public void done(final String ans) {
+                                 @Override
+                                 public void done(final String ans) {
                                      //drbdLoaded[index] = true;
                                      for (final String line
                                                     : ans.split("\\r?\\n")) {
                                          h.parseInstallationInfo(line);
                                      }
                                  }
-                                 @Override public void doneError(
-                                                        final String ans,
-                                                        final int exitCode) {
+                                 @Override
+                                 public void doneError(final String ans,
+                                                       final int exitCode) {
                                      Tools.appWarning(
                                                 "could not get install info");
                                  }
@@ -308,7 +318,8 @@ public class Init extends DialogCluster {
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             drbdLoadedInfo.setText(Tools.getString(
                                            "Dialog.Cluster.Init.DrbdIsLoaded"));
                             drbdLoadedInfo.setForeground(Color.BLACK);
@@ -320,7 +331,8 @@ public class Init extends DialogCluster {
                 if (drbdLoadedChanged) {
                     final MyButton drbdLoadButton = drbdLoadButtons.get(i);
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             drbdLoadedInfo.setText(Tools.getString(
                                         "Dialog.Cluster.Init.DrbdIsNotLoaded"));
                             drbdLoadedInfo.setForeground(Color.RED);
@@ -417,7 +429,8 @@ public class Init extends DialogCluster {
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             pmStartedInfo.setText(
                                 initScript + Tools.getString(
                                         "Dialog.Cluster.Init.CsAisIsRunning"));
@@ -442,7 +455,8 @@ public class Init extends DialogCluster {
                 csAisFailed = true;
                 if (csAisChanged || hbChanged) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
                                 csAisStartButton.setText(CS_AIS_BUTTON_SWITCH);
                             } else {
@@ -484,7 +498,8 @@ public class Init extends DialogCluster {
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             hbStartedInfo.setText(Tools.getString(
                                            "Dialog.Cluster.Init.HbIsRunning"));
                             hbStartedInfo.setForeground(Color.BLACK);
@@ -507,7 +522,8 @@ public class Init extends DialogCluster {
                 hbFailed = true;
                 if (hbChanged || csAisChanged) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             if (csAisRunning || csAisIsRc) {
                                 hbStartButton.setText(HB_BUTTON_SWITCH);
                             } else {
@@ -546,14 +562,16 @@ public class Init extends DialogCluster {
         }
         final boolean nob = needOpenaisButton;
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 useOpenaisButton.setEnabled(nob);
             }
         });
 
         if (oneChanged || !periodic) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     mainPanel.invalidate();
                     mainPanel.validate();
                     mainPanel.repaint();
@@ -562,7 +580,8 @@ public class Init extends DialogCluster {
 
             if (oneFailed) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         buttonClass(button).setEnabled(false);
                     }
                 });
@@ -582,7 +601,8 @@ public class Init extends DialogCluster {
      * Returns the input pane with status information about drbd and heartbeat
      * and some buttons.
      */
-    @Override protected final JComponent getInputPane() {
+    @Override
+    protected final JComponent getInputPane() {
         /* Waiting for check cluster thread to finish. To avoid all races. This
          * can happen after clicking the back button from the next dialog. */
         final Thread t = checkClusterThread;
@@ -632,12 +652,15 @@ public class Init extends DialogCluster {
 
             drbdLoadButtons.get(i).addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(
                             new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
+                                        @Override
+                                        public void run() {
                                             drbdLoadButtons.get(
                                                       index).setVisible(false);
                                         }
@@ -681,13 +704,16 @@ public class Init extends DialogCluster {
 
             hbStartButtons.get(i).addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(
                             new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     disableComponents();
                                     SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
+                                        @Override
+                                        public void run() {
                                             hbStartButtons.get(
                                                       index).setVisible(false);
                                         }
@@ -737,13 +763,16 @@ public class Init extends DialogCluster {
 
             pmStartButtons.get(i).addActionListener(
                 new ActionListener() {
-                    @Override public void actionPerformed(final ActionEvent e) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
                         final Thread thread = new Thread(
                             new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     disableComponents();
                                     SwingUtilities.invokeLater(new Runnable() {
-                                        @Override public void run() {
+                                        @Override
+                                        public void run() {
                                             pmStartButtons.get(
                                                       index).setVisible(false);
                                         }
@@ -818,7 +847,8 @@ public class Init extends DialogCluster {
     }
 
     /** Enable skip button. */
-    @Override protected final boolean skipButtonEnabled() {
+    @Override
+    protected final boolean skipButtonEnabled() {
         return true;
     }
 

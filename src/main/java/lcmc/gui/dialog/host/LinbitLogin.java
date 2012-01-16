@@ -63,7 +63,8 @@ public class LinbitLogin extends DialogHost {
     }
 
     /** Finishes the dialog and sets the information. */
-    @Override protected final void finishDialog() {
+    @Override
+    protected final void finishDialog() {
         Tools.getConfigData().setDownloadLogin(
                                 downloadUserField.getStringValue().trim(),
                                 downloadPasswordField.getStringValue().trim(),
@@ -71,7 +72,8 @@ public class LinbitLogin extends DialogHost {
     }
 
     /** Returns the next dialog. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return new DrbdLinbitInst(this, getHost());
     }
 
@@ -81,7 +83,8 @@ public class LinbitLogin extends DialogHost {
      */
     protected final void checkFields() {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
                 v = v & (downloadPasswordField.getStringValue().trim().length()
@@ -92,9 +95,11 @@ public class LinbitLogin extends DialogHost {
     }
 
     /** Check all fields if they are correct. */
-    @Override protected final void checkFields(final GuiComboBox field) {
+    @Override
+    protected final void checkFields(final GuiComboBox field) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
                 v = v & (downloadPasswordField.getStringValue().trim().length()
@@ -108,7 +113,8 @@ public class LinbitLogin extends DialogHost {
      * Returns the title of the dialog, defined as
      * Dialog.Host.LinbitLogin.Title in TextResources.
      */
-    @Override protected final String getHostDialogTitle() {
+    @Override
+    protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.LinbitLogin.Title");
     }
 
@@ -116,22 +122,26 @@ public class LinbitLogin extends DialogHost {
      * Returns the description of the dialog, defined as
      * Dialog.Host.LinbitLogin.Description in TextResources.
      */
-    @Override protected final String getDescription() {
+    @Override
+    protected final String getDescription() {
         return Tools.getString("Dialog.Host.LinbitLogin.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected final void initDialog() {
+    @Override
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
         checkFields();
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 downloadUserField.requestFocus();
             }
         });
@@ -145,7 +155,8 @@ public class LinbitLogin extends DialogHost {
      * Returns the input pane, where user can enter the user name, password and
      * can select a check box to save the info for later.
      */
-    @Override protected final JComponent getInputPane() {
+    @Override
+    protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(

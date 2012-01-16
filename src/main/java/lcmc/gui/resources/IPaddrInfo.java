@@ -56,8 +56,9 @@ final class IPaddrInfo extends ServiceInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    @Override boolean checkResourceFieldsCorrect(final String param,
-                                                 final String[] params) {
+    @Override
+    boolean checkResourceFieldsCorrect(final String param,
+                                       final String[] params) {
         boolean ret = super.checkResourceFieldsCorrect(param, params);
         final GuiComboBox cb;
         if (getResourceAgent().isHeartbeatClass()) {
@@ -82,9 +83,10 @@ final class IPaddrInfo extends ServiceInfo {
     }
 
     /** Returns combo box for parameter. */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                     final String prefix,
-                                                     final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         GuiComboBox paramCb;
         if ("ip".equals(param)) {
             /* get networks */
@@ -130,7 +132,8 @@ final class IPaddrInfo extends ServiceInfo {
      * Returns string representation of the ip address.
      * In the form of 'ip (interface)'
      */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         final String id = getService().getId();
         if (id == null) {
             return super.toString(); /* this is for 'new IPaddrInfo' */

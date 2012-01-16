@@ -76,7 +76,8 @@ public final class SplitBrain extends DrbdConfig {
         final String h = hostCB.getStringValue();
 
         final Runnable runnable = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 Host hostPri;
                 Host hostSec;
                 if (h.equals(h1.getName())) {
@@ -113,7 +114,8 @@ public final class SplitBrain extends DrbdConfig {
     }
 
     /** Returns next dialog which is null. */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         return null;
     }
 
@@ -121,7 +123,8 @@ public final class SplitBrain extends DrbdConfig {
      * Returns the title for the dialog. It is defined in TextResources as
      * Dialog.Drbd.SplitBrain.Title.
      */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Title");
     }
 
@@ -129,19 +132,22 @@ public final class SplitBrain extends DrbdConfig {
      * Returns the description for the dialog. It is defined in TextResources
      * as Dialog.Drbd.SplitBrain.Description.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         resolveButton.setBackgroundColor(
                                Tools.getDefaultColor("ConfigDialog.Button"));
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
     }
 
@@ -149,7 +155,8 @@ public final class SplitBrain extends DrbdConfig {
      * Returns an input pane, where user can select the host with more recent
      * data.
      */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
         /* host */
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
@@ -167,7 +174,8 @@ public final class SplitBrain extends DrbdConfig {
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         resolveButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 resolve();
             }
         });

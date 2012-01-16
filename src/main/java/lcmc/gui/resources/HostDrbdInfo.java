@@ -93,22 +93,26 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns browser object of this info. */
-    @Override protected HostBrowser getBrowser() {
+    @Override
+    protected HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
     /** Returns a host icon for the menu. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
     /** Returns id, which is name of the host. */
-    @Override public String getId() {
+    @Override
+    public String getId() {
         return host.getName();
     }
 
     /** Returns a host icon for the category in the menu. */
-    @Override public ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
         return HostBrowser.HOST_ICON;
     }
 
@@ -119,12 +123,14 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns tooltip for the host. */
-    @Override public String getToolTipForGraph(final boolean testOnly) {
+    @Override
+    public String getToolTipForGraph(final boolean testOnly) {
         return getBrowser().getHostToolTip(host);
     }
 
     /** Returns the info panel. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         final JTextArea ta = new JTextArea();
         ta.setFont(f);
@@ -132,12 +138,13 @@ public final class HostDrbdInfo extends Info {
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
-                @Override public void done(final String ans) {
+                @Override
+                public void done(final String ans) {
                     ta.setText(ans);
                 }
 
-                @Override public void doneError(final String ans,
-                                                final int exitCode) {
+                @Override
+                public void doneError(final String ans, final int exitCode) {
                     ta.setText("error");
                     Tools.sshError(host, "", ans, stacktrace, exitCode);
                 }
@@ -146,7 +153,8 @@ public final class HostDrbdInfo extends Info {
         // TODO: disable buttons if disconnected?
         final MyButton procDrbdButton = new MyButton("/proc/drbd");
         procDrbdButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 host.execCommand("DRBD.getProcDrbd",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -157,7 +165,8 @@ public final class HostDrbdInfo extends Info {
         host.registerEnableOnConnect(procDrbdButton);
         final MyButton drbdProcsButton = new MyButton("DRBD Processes");
         drbdProcsButton.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 host.execCommand("DRBD.getProcesses",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
@@ -225,17 +234,20 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns string representation of the host. It's same as name. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return host.getName();
     }
 
     /** Returns name of the host. */
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return host.getName();
     }
 
     /** Creates the popup for the host. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
@@ -249,11 +261,13 @@ public final class HostDrbdInfo extends Info {
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
                 }
@@ -270,7 +284,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isConnected()) {
                         if (getHost().isDrbdStatus()) {
                             return "already loaded";
@@ -282,7 +297,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.load(getHost(), testOnly);
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
@@ -299,7 +315,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isConnected()) {
                         return null;
                     } else {
@@ -307,7 +324,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.adjust(getHost(), DRBD.ALL, null, testOnly);
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
@@ -318,7 +336,8 @@ public final class HostDrbdInfo extends Info {
             final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
                             cb.new DRBDMenuItemCallback(adjustAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.adjust(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -334,14 +353,16 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getHost().isDrbdStatus()) {
                         return NO_DRBD_STATUS_STRING;
                     }
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.up(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -350,7 +371,8 @@ public final class HostDrbdInfo extends Info {
             final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
                             cb.new DRBDMenuItemCallback(upAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.up(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -367,14 +389,16 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     upgradeDrbd();
                 }
             };
@@ -389,11 +413,13 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
                                             "Choose " + host.getName()
@@ -415,14 +441,16 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (!getHost().isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DrbdsLog l = new DrbdsLog(host);
                     l.showDialog();
                 }
@@ -438,7 +466,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -446,7 +475,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.connect(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -455,7 +485,8 @@ public final class HostDrbdInfo extends Info {
             final ClusterBrowser.DRBDMenuItemCallback connectAllItemCallback =
                             cb.new DRBDMenuItemCallback(connectAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.connect(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -471,7 +502,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -479,7 +511,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.disconnect(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -489,7 +522,8 @@ public final class HostDrbdInfo extends Info {
                     disconnectAllItemCallback =
                             cb.new DRBDMenuItemCallback(disconnectAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.disconnect(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -505,7 +539,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -513,7 +548,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.attach(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -523,7 +559,8 @@ public final class HostDrbdInfo extends Info {
                     attachAllItemCallback =
                             cb.new DRBDMenuItemCallback(attachAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.attach(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -539,7 +576,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -547,7 +585,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.detach(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -557,7 +596,8 @@ public final class HostDrbdInfo extends Info {
                     detachAllItemCallback =
                             cb.new DRBDMenuItemCallback(detachAllItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.detach(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -577,7 +617,8 @@ public final class HostDrbdInfo extends Info {
                                    false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -585,7 +626,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.setPrimary(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -595,7 +637,8 @@ public final class HostDrbdInfo extends Info {
                     setAllPrimaryItemCallback =
                             cb.new DRBDMenuItemCallback(setAllPrimaryItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.setPrimary(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -611,7 +654,8 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().isDrbdStatus()) {
                         return null;
                     } else {
@@ -619,7 +663,8 @@ public final class HostDrbdInfo extends Info {
                     }
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     DRBD.setSecondary(getHost(), DRBD.ALL, null, testOnly);
                 }
             };
@@ -629,7 +674,8 @@ public final class HostDrbdInfo extends Info {
                     setAllSecondaryItemCallback =
                             cb.new DRBDMenuItemCallback(setAllSecondaryItem,
                                                         getHost()) {
-                @Override public void action(final Host host) {
+                @Override
+                public void action(final Host host) {
                     DRBD.setSecondary(getHost(), DRBD.ALL, null, true);
                 }
             };
@@ -646,14 +692,16 @@ public final class HostDrbdInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     if (getHost().getCluster() != null) {
                         return "it is a member of a cluster";
                     }
                     return null;
                 }
 
-                @Override public void action() {
+                @Override
+                public void action() {
                     getHost().disconnect();
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
@@ -668,14 +716,16 @@ public final class HostDrbdInfo extends Info {
                                 new AccessMode(ConfigData.AccessType.OP,
                                                false)) {
             private static final long serialVersionUID = 1L;
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 if (!host.isConnected()) {
                     return Host.NOT_CONNECTED_STRING;
                 }
                 return null;
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 super.update();
                 getBrowser().addAdvancedMenu(this);
             }
@@ -691,11 +741,13 @@ public final class HostDrbdInfo extends Info {
                           new AccessMode(ConfigData.AccessType.OP, true),
                           new AccessMode(ConfigData.AccessType.OP, true)) {
             private static final long serialVersionUID = 1L;
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 super.update();
                 addLVMMenu(this);
             }
@@ -729,7 +781,8 @@ public final class HostDrbdInfo extends Info {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final VGCreate vgCreate = new VGCreate(getHost(), null);
                 while (true) {
                     vgCreate.showDialog();
@@ -756,16 +809,19 @@ public final class HostDrbdInfo extends Info {
                              new AccessMode(ConfigData.AccessType.OP, false),
                              new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            @Override public boolean visiblePredicate() {
+            @Override
+            public boolean visiblePredicate() {
                 return !"".equals(volumeGroup)
                        && getHost().getVolumeGroupNames().contains(volumeGroup);
             }
 
-            @Override public String enablePredicate() {
+            @Override
+            public String enablePredicate() {
                 return null;
             }
 
-            @Override public void action() {
+            @Override
+            public void action() {
                 final LVCreate lvCreate = new LVCreate(getHost(), volumeGroup);
                 while (true) {
                     lvCreate.showDialog();
@@ -778,7 +834,8 @@ public final class HostDrbdInfo extends Info {
                 }
             }
 
-            @Override public void update() {
+            @Override
+            public void update() {
                 setText1(LV_CREATE_MENU_ITEM + volumeGroup);
                 super.update();
             }
@@ -789,7 +846,8 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns grahical view if there is any. */
-    @Override public JPanel getGraphicalView() {
+    @Override
+    public JPanel getGraphicalView() {
         final DrbdGraph dg = getBrowser().getDrbdGraph();
         if (dg == null) {
             return null;

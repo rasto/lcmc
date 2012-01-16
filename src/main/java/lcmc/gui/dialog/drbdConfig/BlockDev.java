@@ -64,7 +64,8 @@ final class BlockDev extends DrbdConfig {
     }
 
     /** Applies the changes to the blockDevInfo object. */
-    @Override protected void finishDialog() {
+    @Override
+    protected void finishDialog() {
         Tools.waitForSwing();
         blockDevInfo.apply(false);
     }
@@ -85,7 +86,8 @@ final class BlockDev extends DrbdConfig {
      * drbd config create md dialog. In the second case the drbd admin adjust
      * is called.
      */
-    @Override public WizardDialog nextDialog() {
+    @Override
+    public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi =
                     getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
@@ -114,25 +116,29 @@ final class BlockDev extends DrbdConfig {
     }
 
     /** Returns title of the dialog. */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Title");
     }
 
     /**
      * Returns description of the dialog.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Description");
     }
 
     /** Inits the dialog. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
-    @Override protected void initDialogAfterVisible() {
+    @Override
+    protected void initDialogAfterVisible() {
         enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();
@@ -144,7 +150,8 @@ final class BlockDev extends DrbdConfig {
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     pressNextButton();
                 }
             });
@@ -152,7 +159,8 @@ final class BlockDev extends DrbdConfig {
     }
 
     /** Returns the input pane with block device parameters. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));

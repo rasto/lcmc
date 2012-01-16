@@ -39,13 +39,15 @@ public final class About extends ConfigDialog {
     private static final long serialVersionUID = 1L;
 
     /** Inits the dialog and enables all the components. */
-    @Override protected void initDialog() {
+    @Override
+    protected void initDialog() {
         super.initDialog();
         enableComponents();
     }
 
     /** Gets the title of the dialog as string. */
-    @Override protected String getDialogTitle() {
+    @Override
+    protected String getDialogTitle() {
         return Tools.getString("Dialog.About.Title") + Tools.getRelease();
     }
 
@@ -53,19 +55,22 @@ public final class About extends ConfigDialog {
      * Returns description for dialog. This can be HTML defined in
      * TextResource.
      */
-    @Override protected String getDescription() {
+    @Override
+    protected String getDescription() {
         return Tools.getString("Dialog.About.Description");
     }
 
     /** Returns the content of the about dialog. */
-    @Override protected JComponent getInputPane() {
+    @Override
+    protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JScrollPane sp =
                       getAnswerPane(Tools.getString("Dialog.About.Licences"));
 
         pane.add(sp);
         //SwingUtilities.invokeLater(new Runnable() {
-        //    @Override public void run() {
+        //    @Override
+        //    public void run() {
         //        sp.getVerticalScrollBar().setValue(0);
         //    }
         //});

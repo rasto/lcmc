@@ -213,17 +213,20 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Clears info panel cache. */
-    @Override public boolean selectAutomaticallyInTreeMenu() {
+    @Override
+    public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
     /** Returns drbd graphical view. */
-    @Override public JPanel getGraphicalView() {
+    @Override
+    public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
 
     /** Returns all parameters. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         return getBrowser().getDrbdXML().getParameters();
     }
 
@@ -231,7 +234,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * Checks the new value of the parameter if it is conforms to its type
      * and other constraints.
      */
-    @Override protected boolean checkParam(final String param,
+    @Override
+    protected boolean checkParam(final String param,
                                                  final String newValue) {
         if (DRBD_RES_PARAM_AFTER.equals(param)
             || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
@@ -243,7 +247,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns the default value for the drbd parameter. */
-    @Override public String getParamDefault(final String param) {
+    @Override
+    public String getParamDefault(final String param) {
         final String common = getDrbdInfo().getParamSaved(param);
         if (common != null) {
             return common;
@@ -252,12 +257,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns section to which this drbd parameter belongs. */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         return getBrowser().getDrbdXML().getSection(param);
     }
 
     /** Whether the parameter should be enabled. */
-    @Override protected String isEnabled(final String param) {
+    @Override
+    protected String isEnabled(final String param) {
         if (getDrbdResource().isCommited()
             && DRBD_RES_PARAM_NAME.equals(param)) {
             return "";
@@ -266,9 +273,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns the widget that is used to edit this parameter. */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                           final String prefix,
-                                                           final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         GuiComboBox paramCb;
         if (DRBD_RES_PARAM_NAME.equals(param)) {
             String resName;
@@ -344,7 +352,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                 }
@@ -376,7 +385,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns panel with form to configure a drbd resource. */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         //getBrowser().getDrbdGraph().pickInfo(this);
         if (infoPanel != null) {
             return infoPanel;
@@ -386,11 +396,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             /**
              * Whether the whole thing should be enabled.
              */
-            @Override public boolean isEnabled() {
+            @Override
+            public boolean isEnabled() {
                 return true;
             }
 
-            @Override public void mouseOut() {
+            @Override
+            public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -399,7 +411,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public void mouseOver() {
+            @Override
+            public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -477,11 +490,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {
-            @Override public void actionPerformed(final ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
                 final Thread thread = new Thread(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         Tools.invokeAndWait(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 getApplyButton().setEnabled(false);
                                 getRevertButton().setEnabled(false);
                             }
@@ -507,9 +523,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
         getRevertButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             getBrowser().drbdStatusLock();
                             revert();
                             getBrowser().drbdStatusUnlock();
@@ -558,7 +576,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns string of the drbd resource. */
-    @Override public String toString() {
+    @Override
+    public String toString() {
         String name = getName();
         if (name == null || "".equals(name)) {
             name = Tools.getString("ClusterBrowser.DrbdResUnconfigured");
@@ -567,7 +586,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns whether two drbd resources are equal. */
-    @Override public boolean equals(final Object value) {
+    @Override
+    public boolean equals(final Object value) {
         if (value == null) {
             return false;
         }
@@ -582,7 +602,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         //}
     }
 
-    //@Override int hashCode() {
+    //@Override
+    //int hashCode() {
     //    return toString().hashCode();
     //}
 
@@ -693,8 +714,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
 
@@ -727,8 +749,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    @Override public boolean checkResourceFieldsCorrect(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsCorrect(final String param,
+                                              final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }
 
@@ -799,7 +822,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Revert all values. */
-    @Override public void revert() {
+    @Override
+    public void revert() {
         super.revert();
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
@@ -835,7 +859,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Sets if dialog was started. It disables the apply button. */
-    @Override public void setDialogStarted(final boolean dialogStarted) {
+    @Override
+    public void setDialogStarted(final boolean dialogStarted) {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null) {
@@ -1002,7 +1027,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
-        addHostAddressListeners(wizard, thisApplyButton, newAddressComboBoxHash);
+        addHostAddressListeners(wizard,
+                                thisApplyButton,
+                                newAddressComboBoxHash);
         if (wizard) {
             addressComboBoxHashWizard = newAddressComboBoxHash;
         } else {
@@ -1082,9 +1109,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Adds host address listeners. */
     private void addHostAddressListeners(
-                             final boolean wizard,
-                             final MyButton thisApplyButton,
-                             final Map<Host, GuiComboBox> newAddressComboBoxHash) {
+                         final boolean wizard,
+                         final MyButton thisApplyButton,
+                         final Map<Host, GuiComboBox> newAddressComboBoxHash) {
         final String[] params = getParametersFromXML();
         for (final Host host : getHosts()) {
             GuiComboBox cb;
@@ -1100,10 +1127,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final GuiComboBox realComboBox = rcb;
             comboBox.addListeners(
                 new ItemListener() {
-                    @Override public void itemStateChanged(final ItemEvent e) {
+                    @Override
+                    public void itemStateChanged(final ItemEvent e) {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
                             final Thread thread = new Thread(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     if (e.getStateChange()
                                         == ItemEvent.SELECTED) {
                                         checkParameterFields(comboBox,
@@ -1122,7 +1151,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 new DocumentListener() {
                     private void check() {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 checkParameterFields(comboBox,
                                                      realComboBox,
                                                      null,
@@ -1133,15 +1163,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         thread.start();
                     }
 
-                    @Override public void insertUpdate(final DocumentEvent e) {
+                    @Override
+                    public void insertUpdate(final DocumentEvent e) {
                         check();
                     }
 
-                    @Override public void removeUpdate(final DocumentEvent e) {
+                    @Override
+                    public void removeUpdate(final DocumentEvent e) {
                         check();
                     }
 
-                    @Override public void changedUpdate(final DocumentEvent e) {
+                    @Override
+                    public void changedUpdate(final DocumentEvent e) {
                         check();
                     }
                 }
@@ -1160,10 +1193,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final GuiComboBox realComboBox = prcb;
         pcb.addListeners(
             new ItemListener() {
-                @Override public void itemStateChanged(final ItemEvent e) {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         final Thread thread = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 if (e.getStateChange() == ItemEvent.SELECTED) {
                                     checkParameterFields(comboBox,
                                                          realComboBox,
@@ -1181,7 +1216,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             new DocumentListener() {
                 private void check() {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             checkParameterFields(comboBox,
                                                  realComboBox,
                                                  null,
@@ -1192,15 +1228,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     thread.start();
                 }
 
-                @Override public void insertUpdate(final DocumentEvent e) {
+                @Override
+                public void insertUpdate(final DocumentEvent e) {
                     check();
                 }
 
-                @Override public void removeUpdate(final DocumentEvent e) {
+                @Override
+                public void removeUpdate(final DocumentEvent e) {
                     check();
                 }
 
-                @Override public void changedUpdate(final DocumentEvent e) {
+                @Override
+                public void changedUpdate(final DocumentEvent e) {
                     check();
                 }
             });
@@ -1258,7 +1297,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Reload combo boxes. */
-    @Override public void reloadComboBoxes() {
+    @Override
+    public void reloadComboBoxes() {
         super.reloadComboBoxes();
         String param = DRBD_RES_PARAM_AFTER;
         if (!getDrbdInfo().atLeastVersion("8.4")) {
@@ -1296,7 +1336,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
     }
     /** Creates popup for the block device. */
-    @Override public List<UpdatableItem> createPopup() {
+    @Override
+    public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             final MyMenu volumesMenu = new MyMenu(
@@ -1306,13 +1347,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 private static final long serialVersionUID = 1L;
                 private final Lock mUpdateLock = new ReentrantLock();
 
-                @Override public String enablePredicate() {
+                @Override
+                public String enablePredicate() {
                     return null;
                 }
 
-                @Override public void update() {
+                @Override
+                public void update() {
                     final Thread t = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             if (mUpdateLock.tryLock()) {
                                 try {
                                     updateThread();
@@ -1327,12 +1371,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
                 public void updateThread() {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             setEnabled(false);
                         }
                     });
                     Tools.invokeAndWait(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             removeAll();
                         }
                     });
@@ -1343,7 +1389,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         u.update();
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             for (final UpdatableItem u
                                                  : volumeMenus) {
                                 add((JMenuItem) u);

@@ -40,17 +40,20 @@ public final class ClusterHostsInfo extends CategoryInfo {
     }
 
     /** Returns browser object of this info. */
-    @Override protected ClusterBrowser getBrowser() {
+    @Override
+    protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
     /** Returns columns for the table. */
-    @Override protected String[] getColumnNames(final String tableName) {
+    @Override
+    protected String[] getColumnNames(final String tableName) {
         return new String[]{"Host", "DRBD", "Cluster Software"};
     }
 
     /** Returns data for the table. */
-    @Override protected Object[][] getTableData(final String tableName) {
+    @Override
+    protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final MyButton hostLabel = new MyButton(
@@ -65,9 +68,10 @@ public final class ClusterHostsInfo extends CategoryInfo {
     }
 
     /** Execute when row in the table was clicked. */
-    @Override protected void rowClicked(final String tableName,
-                                        final String key,
-                                        final int column) {
+    @Override
+    protected void rowClicked(final String tableName,
+                              final String key,
+                              final int column) {
         // TODO: does not work
         final Host host = getBrowser().getCluster().getHostByName(key);
         final HostInfo hi = host.getBrowser().getHostInfo();
@@ -77,8 +81,8 @@ public final class ClusterHostsInfo extends CategoryInfo {
     }
 
     /** Retrurns color for some rows. */
-    @Override protected Color getTableRowColor(final String tableName,
-                                               final String key) {
+    @Override
+    protected Color getTableRowColor(final String tableName, final String key) {
         final Host host = getBrowser().getCluster().getHostByName(key);
         final Color c = host.getPmColors()[0];
         if (c == null) {

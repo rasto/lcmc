@@ -130,9 +130,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * Gets combo box for paremeter in te global config. usage-count is
      * disabled.
      */
-    @Override protected GuiComboBox getParamComboBox(final String param,
-                                                           final String prefix,
-                                                           final int width) {
+    @Override
+    protected GuiComboBox getParamComboBox(final String param,
+                                           final String prefix,
+                                           final int width) {
         final GuiComboBox cb = super.getParamComboBox(param, prefix, width);
         if ("usage-count".equals(param)) {
             cb.setEnabled(false);
@@ -312,7 +313,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Returns lsit of all parameters as an array. */
-    @Override public String[] getParametersFromXML() {
+    @Override
+    public String[] getParametersFromXML() {
         final DrbdXML drbdXML = getBrowser().getDrbdXML();
         if (drbdXML == null) {
             return null;
@@ -324,7 +326,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * Returns section to which this parameter belongs.
      * This is used for grouping in the info panel.
      */
-    @Override protected String getSection(final String param) {
+    @Override
+    protected String getSection(final String param) {
         final String section = getBrowser().getDrbdXML().getSection(param);
         if (DrbdXML.GLOBAL_SECTION.equals(section)) {
             return section;
@@ -338,7 +341,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
                     getApplyButton().setToolTipText(null);
@@ -349,7 +353,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 dri.setParameters();
             }
             SwingUtilities.invokeLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     setAllApplyButtons();
                 }
             });
@@ -360,7 +365,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * Returns info panel for drbd. If a block device was selected, its
      * info panel is shown.
      */
-    @Override public JComponent getInfoPanel() {
+    @Override
+    public JComponent getInfoPanel() {
         if (selectedBD != null) { /* block device is not in drbd */
             return selectedBD.getInfoPanel();
         }
@@ -376,7 +382,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
             private volatile boolean mouseStillOver = false;
 
             /** Whether the whole thing should be enabled. */
-            @Override public boolean isEnabled() {
+            @Override
+            public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
                 if (dcHost == null) {
                     return false;
@@ -387,7 +394,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 return true;
             }
 
-            @Override public void mouseOut() {
+            @Override
+            public void mouseOut() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -396,7 +404,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 getApplyButton().setToolTipText(null);
             }
 
-            @Override public void mouseOver() {
+            @Override
+            public void mouseOver() {
                 if (!isEnabled()) {
                     return;
                 }
@@ -465,11 +474,14 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
         getApplyButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             Tools.invokeAndWait(new Runnable() {
-                                @Override public void run() {
+                                @Override
+                                public void run() {
                                     getApplyButton().setEnabled(false);
                                     getRevertButton().setEnabled(false);
                                 }
@@ -497,9 +509,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
         );
         getRevertButton().addActionListener(
             new ActionListener() {
-                @Override public void actionPerformed(final ActionEvent e) {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
                     final Thread thread = new Thread(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             getBrowser().drbdStatusLock();
                             revert();
                             getBrowser().drbdStatusUnlock();
@@ -533,12 +547,14 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * Clears info panel cache.
      * TODO: should select something.
      */
-    @Override boolean selectAutomaticallyInTreeMenu() {
+    @Override
+    boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
     /** Returns drbd graph in a panel. */
-    @Override public JPanel getGraphicalView() {
+    @Override
+    public JPanel getGraphicalView() {
         if (selectedBD != null) {
             getBrowser().getDrbdGraph().pickBlockDevice(selectedBD);
         }
@@ -550,7 +566,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * because block devices don't have here their own node, but
      * views change depending on selectedNode variable.
      */
-    @Override public void selectMyself() {
+    @Override
+    public void selectMyself() {
         if (selectedBD == null || !selectedBD.getBlockDevice().isDrbd()) {
             getBrowser().reload(getNode(), true);
             getBrowser().nodeChanged(getNode());
@@ -613,7 +630,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
             final DrbdInfo thisClass = this;
             final Thread thread = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     //getBrowser().reload(drbdResourceNode, true);
                     AddDrbdConfigDialog adrd = new AddDrbdConfigDialog(
                                                                     thisClass,
@@ -784,8 +802,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    @Override public boolean checkResourceFieldsChanged(final String param,
-                                                        final String[] params) {
+    @Override
+    public boolean checkResourceFieldsChanged(final String param,
+                                              final String[] params) {
         boolean changed = false;
         for (final DrbdResourceInfo dri : getDrbdResources()) {
             if (dri.checkResourceFieldsChanged(param,
@@ -829,7 +848,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Revert all values. */
-    @Override public void revert() {
+    @Override
+    public void revert() {
         super.revert();
         for (final DrbdResourceInfo dri : getDrbdResources()) {
             dri.revert();
@@ -888,12 +908,14 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Returns menu icon for drbd resource. */
-    @Override public final ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return DRBD_ICON;
     }
 
     /** Menu icon. */
-    @Override public final ImageIcon getCategoryIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getCategoryIcon(final boolean testOnly) {
         return DRBD_ICON;
     }
 

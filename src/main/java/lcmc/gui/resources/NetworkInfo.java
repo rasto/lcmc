@@ -44,7 +44,8 @@ public final class NetworkInfo extends Info {
     }
 
     /** Returns network info. */
-    @Override String getInfo() {
+    @Override
+    String getInfo() {
         final String ret = "Network: " + getNetwork().getName()
                            + "\n    IPs: " + getNetwork().getIps()
                            + "\nNetmask: " + getNetwork().getNetMask()
@@ -58,7 +59,8 @@ public final class NetworkInfo extends Info {
     }
 
     /** Returns menu icon for network. */
-    @Override public ImageIcon getMenuIcon(final boolean testOnly) {
+    @Override
+    public ImageIcon getMenuIcon(final boolean testOnly) {
         return NETWORK_ICON;
     }
 }

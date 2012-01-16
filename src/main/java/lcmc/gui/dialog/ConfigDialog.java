@@ -161,7 +161,8 @@ public abstract class ConfigDialog {
     /** Sets text to the answer pane. */
     protected final void answerPaneSetText(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 final int l = answerPaneText.length();
                 if (l > 1) {
                     answerPaneText.delete(0, l);
@@ -175,7 +176,8 @@ public abstract class ConfigDialog {
     /** Appends text to the answer pane. */
     protected final void answerPaneAddText(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 answerPaneText.append('\n');
                 answerPaneText.append(text);
                 answerPaneSetText(answerPaneText.toString());
@@ -189,7 +191,8 @@ public abstract class ConfigDialog {
      */
     protected final void answerPaneSetTextError(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 answerPane.setForeground(
                        Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
                 final int l = answerPaneText.length();
@@ -205,7 +208,8 @@ public abstract class ConfigDialog {
     /** Appends the error text to the answer pane. */
     protected final void answerPaneAddTextError(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 answerPaneText.append('\n');
                 answerPaneText.append(text);
                 answerPaneSetTextError(answerPaneText.toString());
@@ -344,27 +348,33 @@ public abstract class ConfigDialog {
     protected final void addCheckField(final GuiComboBox field) {
         field.getDocument().addDocumentListener(
                 new DocumentListener() {
-                    @Override public void insertUpdate(final DocumentEvent e) {
+                    @Override
+                    public void insertUpdate(final DocumentEvent e) {
                         final Thread t = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 checkFields(field);
                             }
                         });
                         t.start();
                     }
 
-                    @Override public void removeUpdate(final DocumentEvent e) {
+                    @Override
+                    public void removeUpdate(final DocumentEvent e) {
                         final Thread t = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 checkFields(field);
                             }
                         });
                         t.start();
                     }
 
-                    @Override public void changedUpdate(final DocumentEvent e) {
+                    @Override
+                    public void changedUpdate(final DocumentEvent e) {
                         final Thread t = new Thread(new Runnable() {
-                            @Override public void run() {
+                            @Override
+                            public void run() {
                                 checkFields(field);
                             }
                         });
@@ -512,8 +522,8 @@ public abstract class ConfigDialog {
 
         final PropertyChangeListener propertyChangeListener =
             new PropertyChangeListener() {
-                @Override public void propertyChange(
-                                            final PropertyChangeEvent evt) {
+                @Override
+                public void propertyChange(final PropertyChangeEvent evt) {
                     if (JOptionPane.VALUE_PROPERTY.equals(
                                                         evt.getPropertyName())
                         && !"uninitializedValue".equals(evt.getNewValue())) {
@@ -574,7 +584,8 @@ public abstract class ConfigDialog {
      */
     protected final void disableComponents(final JComponent[] components) {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (final String b : buttons()) {
                     final JComponent option = buttonClass(b);
                     if (option.isEnabled()) {
@@ -609,7 +620,8 @@ public abstract class ConfigDialog {
         final HashSet<JComponent> ctdHash =
                 new HashSet<JComponent>(Arrays.asList(componentsToDisable));
         SwingUtilities.invokeLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 for (final JComponent dc : disabledComponents) {
                     if (!ctdHash.contains(dc)) {
                         dc.setEnabled(true);
@@ -651,11 +663,14 @@ public abstract class ConfigDialog {
         /**
          * Action performered on custom button.
          */
-        @Override public void actionPerformed(final ActionEvent event) {
+        @Override
+        public void actionPerformed(final ActionEvent event) {
             final Thread t = new Thread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             optionPane.setValue(
                                       ((JButton) event.getSource()).getText());
                         }

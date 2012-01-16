@@ -70,7 +70,7 @@ public final class AddDrbdConfigDialog {
             && drbdInfo.atLeastVersion("8.4")) {
             dialog = new Start(null, drbdInfo, blockDevInfo1, blockDevInfo2);
         } else {
-            final List<BlockDevInfo> bdis = 
+            final List<BlockDevInfo> bdis =
                                 new ArrayList<BlockDevInfo>(Arrays.asList(
                                                               blockDevInfo1,
                                                               blockDevInfo2));

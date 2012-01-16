@@ -67,7 +67,8 @@ public abstract class DialogHost extends WizardDialog {
      */
     public final JPanel getProgressBarPane(final String title) {
         final CancelCallback cancelCallback = new CancelCallback() {
-            @Override public void cancel() {
+            @Override
+            public void cancel() {
                 if (commandThread != null) {
                     host.getSSH().cancelSession(commandThread);
                 }
@@ -82,7 +83,8 @@ public abstract class DialogHost extends WizardDialog {
      */
     protected final JPanel getProgressBarPane() {
         final CancelCallback cancelCallback = new CancelCallback() {
-            @Override public void cancel() {
+            @Override
+            public void cancel() {
                 if (commandThread != null) {
                     host.getSSH().cancelSession(commandThread);
                 }
@@ -95,7 +97,8 @@ public abstract class DialogHost extends WizardDialog {
      * Prints error text in the answer pane, stops progress bar, reenables
      * buttons and adds retry button.
      */
-    @Override public final void printErrorAndRetry(final String text) {
+    @Override
+    public final void printErrorAndRetry(final String text) {
         super.printErrorAndRetry(text);
         progressBarDone();
     }
@@ -104,7 +107,8 @@ public abstract class DialogHost extends WizardDialog {
      * Cancels the dialog. It removes the host tab.
      * TODO: deprecated?
      */
-    @Override public final void cancelDialog() {
+    @Override
+    public final void cancelDialog() {
     //    Tools.getGUIData().removeSelectedHostTab();
     }
 
@@ -112,7 +116,8 @@ public abstract class DialogHost extends WizardDialog {
      * Returns title of the dialog, if host was already specified, the hostname
      * will appear in the dialog as well.
      */
-    @Override protected final String getDialogTitle() {
+    @Override
+    protected final String getDialogTitle() {
         final StringBuilder s = new StringBuilder(50);
         s.append(getHostDialogTitle());
         if (host != null

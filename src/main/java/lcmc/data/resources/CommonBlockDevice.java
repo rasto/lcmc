@@ -52,7 +52,8 @@ public final class CommonBlockDevice extends Resource {
     }
 
     /** Return value for parameter. */
-    @Override public String getValue(final String parameter) {
+    @Override
+    public String getValue(final String parameter) {
         if ("device".equals(parameter)) {
             return getName();
         } else {
@@ -70,7 +71,8 @@ public final class CommonBlockDevice extends Resource {
      *
      * @return null
      */
-    @Override public String[] getPossibleChoices(final String param) {
+    @Override
+    public String[] getPossibleChoices(final String param) {
         Tools.appError("Wrong call to getPossibleValues");
         return new String[]{};
     }

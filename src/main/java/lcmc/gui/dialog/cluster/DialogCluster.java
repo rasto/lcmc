@@ -50,7 +50,8 @@ public abstract class DialogCluster extends WizardDialog {
     }
 
     /** Returns dialog title with cluster name attached. */
-    @Override protected final String getDialogTitle() {
+    @Override
+    protected final String getDialogTitle() {
         final StringBuilder s = new StringBuilder(40);
         s.append(getClusterDialogTitle());
         if (cluster != null && cluster.getName() != null) {
