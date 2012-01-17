@@ -48,14 +48,13 @@ public final class VIRSH {
         /* Cannot be instantiated. */
     }
 
-    /** Executes the specified virsh commands on the specified hosts. */
-    private static boolean execCommand(final Host[] hosts,
-                                      final String commands,
-                                      final boolean outputVisible) {
-        boolean exitCode = false;
-        for (final Host host : hosts) {
-            if (host.isConnected()) {
-                final SSH.SSHOutput ret =
+
+    /** Executes the specified virsh commands on the specified host. */
+    private static boolean execCommand(final Host host,
+                                       final String commands,
+                                       final boolean outputVisible) {
+        if (host.isConnected()) {
+            final SSH.SSHOutput ret =
                             Tools.execCommandProgressIndicator(
                                  host,
                                  commands,
@@ -66,49 +65,65 @@ public final class VIRSH {
                                  + commands.replaceAll(DistResource.SUDO, " ")
                                  + "...",
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
-                if (ret.getExitCode() != 0) {
-                    return false;
-                }
-                exitCode = true;
+            if (ret.getExitCode() != 0) {
+                return false;
             }
         }
-        return exitCode;
+        return true;
+    }
+
+    /** Executes the specified virsh commands on the specified hosts. */
+    private static boolean execCommand(final Host[] hosts,
+                                       final Map<Host, String> hostCommands,
+                                       final boolean outputVisible) {
+        boolean exitCode = false;
+        for (final Host host : hosts) {
+            final String commands = hostCommands.get(host);
+            if (commands.length() > 0) {
+                if (!execCommand(host, commands, outputVisible)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /** Sets paramters with virsh command. */
     public static void setParameters(final Host[] hosts,
                                      final String domainName,
                                      final Map<String, String> parameters) {
-        final StringBuilder commands = new StringBuilder(100);
-        for (final String param : parameters.keySet()) {
-            String command = VIRSH_COMMANDS.get(param);
-            if (command == null) {
-                continue;
-            }
-            if (command.indexOf("@DOMAIN@") >= 0) {
-                command = command.replaceAll(
-                                          "@DOMAIN@",
-                                          Matcher.quoteReplacement(domainName));
-            }
-            if (command.indexOf("@VALUE@") >= 0) {
-                String value = parameters.get(param);
-                if ("autostart".equals(param)) {
-                    if ("true".equalsIgnoreCase(value)) {
-                        value = "";
-                    } else {
-                        value = "--disable";
-                    }
+        final Map<Host, String> hostCommands = new HashMap<Host, String>();
+        for (final Host host : hosts) {
+            final StringBuilder commands = new StringBuilder(100);
+            for (final String param : parameters.keySet()) {
+                String command = VIRSH_COMMANDS.get(param);
+                if (command == null) {
+                    continue;
                 }
-                command = command.replaceAll("@VALUE@", value);
+                if (command.indexOf("@DOMAIN@") >= 0) {
+                    command = command.replaceAll(
+                                              "@DOMAIN@",
+                                              Matcher.quoteReplacement(domainName));
+                }
+                if (command.indexOf("@VALUE@") >= 0) {
+                    String value = parameters.get(param);
+                    if ("autostart".equals(param)) {
+                        if (value == null || !value.equals(host.getName())) {
+                            value = "--disable";
+                        } else {
+                            value = "";
+                        }
+                    }
+                    command = command.replaceAll("@VALUE@", value);
+                }
+                if (commands.length() > 0) {
+                    commands.append(" && ");
+                }
+                commands.append(command);
+                hostCommands.put(host, commands.toString());
             }
-            if (commands.length() > 0) {
-                commands.append(" && ");
-            }
-            commands.append(command);
         }
-        if (commands.length() > 0) {
-            execCommand(hosts, commands.toString(), false);
-        }
+        execCommand(hosts, hostCommands, true);
     }
 
     /** Starts virtual domain. */
@@ -117,7 +132,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Start",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Shuts down virtual domain. */
@@ -126,7 +141,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Shutdown",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Reboots virtual domain. */
@@ -135,7 +150,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Reboot",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Destroys virtual domain. */
@@ -144,7 +159,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Destroy",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Suspends virtual domain. */
@@ -153,7 +168,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Suspend",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Resumes virtual domain. */
@@ -162,7 +177,7 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Resume",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /**
@@ -174,7 +189,7 @@ public final class VIRSH {
         replaceHash.put("@CONFIG@", config);
         final String command = host.getDistCommand("VIRSH.Define",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 
     /** Returns command that defines virtual domain. */
@@ -193,6 +208,6 @@ public final class VIRSH {
         replaceHash.put("@DOMAIN@", domain);
         final String command = host.getDistCommand("VIRSH.Undefine",
                                                    replaceHash);
-        return execCommand(new Host[]{host}, command, true);
+        return execCommand(host, command, true);
     }
 }
