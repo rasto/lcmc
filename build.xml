@@ -83,6 +83,9 @@
 		   <pathelement location="${buildlib.dir}/j3dcore.jar"/>
 		   <pathelement location="${buildlib.dir}/j3dutils.jar"/>
 		   <pathelement location="${buildlib.dir}/vecmath.jar"/>
+		   <pathelement location="/usr/share/java/xml-commons-apis.jar"/>
+		   <pathelement location="/usr/share/java/xerces-j2.jar"/>
+
 		  </classpath>
 		  <compilerarg value="-Xmaxerrs"/> 
 		  <compilerarg value="1000"/> 
