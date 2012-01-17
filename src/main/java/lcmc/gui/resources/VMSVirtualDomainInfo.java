@@ -198,6 +198,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSVideoInfo>();
     /** Previous type. */
     private volatile String prevType = null;
+    /** Autostart possible values - hosts */
+    private final String[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** All parameters. */
@@ -519,7 +521,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         GuiComboBox.Type.TEXTFIELDWITHUNIT);
         FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY,
                         GuiComboBox.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_AUTOSTART, GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_APIC, GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_ACPI, GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, GuiComboBox.Type.CHECKBOX);
@@ -537,7 +538,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_REBOOT, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, "False");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, "kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
@@ -576,8 +577,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{"",
                                          "/usr/lib/xen/boot/hvmloader",
                                          "/usr/lib/xen-4.0/boot/hvmloader"});
-        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_AUTOSTART,
-                            new String[]{"True", "False"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
                             new String[]{"kvm", "xen"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
@@ -650,8 +649,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     public VMSVirtualDomainInfo(final String name,
                                 final Browser browser) {
         super(name, browser);
-        final Host h = ((ClusterBrowser) browser).getClusterHosts()[0];
-        preferredEmulator = h.getDistString("KVM.emulator");
+        final Host firstHost = getBrowser().getClusterHosts()[0];
+        preferredEmulator = firstHost.getDistString("KVM.emulator");
+        final List<String> hostsList = new ArrayList<String>();
+        hostsList.add(null);
+        for (final Host h : getBrowser().getClusterHosts()) {
+            hostsList.add(h.getName());
+        }
+        autostartPossibleValues =
+                              hostsList.toArray(new String[hostsList.size()]);
+
         setResource(new Resource(name));
     }
 
@@ -1657,11 +1664,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         for (final String param : getParametersFromXML()) {
             final String oldValue = getParamSaved(param);
-            String value = getParamSaved(param);
+            String value = null;
             final GuiComboBox cb = paramComboBoxGet(param, null);
             for (final Host h : getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
+                if (vmsxml != null && value == null) {
+                    value = getParamSaved(param);
                     final String savedValue =
                                        vmsxml.getValue(getDomainName(), param);
                     if (savedValue == null) {
@@ -3270,7 +3278,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns possible choices for drop down lists. */
     @Override
     protected Object[] getParamPossibleChoices(final String param) {
-        if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
+        if (VMSXML.VM_PARAM_AUTOSTART.equals(param)) {
+            return autostartPossibleValues;
+        } else if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
             final Set<String> models = new LinkedHashSet<String>();
             models.add("");
             for (final Host host : getBrowser().getClusterHosts()) {

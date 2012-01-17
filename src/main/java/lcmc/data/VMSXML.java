@@ -1702,12 +1702,11 @@ public final class VMSXML extends XML {
         }
         final Node infoNode = getChildNode(vmNode, "info");
         final String domainName = getAttribute(vmNode, VM_PARAM_NAME);
-
         final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
-        if (autostart == null) {
-            parameterValues.put(domainName, VM_PARAM_AUTOSTART, "false");
+        if (autostart != null && "True".equals(autostart)) {
+            parameterValues.put(domainName, VM_PARAM_AUTOSTART, host.getName());
         } else {
-            parameterValues.put(domainName, VM_PARAM_AUTOSTART, autostart);
+            parameterValues.put(domainName, VM_PARAM_AUTOSTART, null);
         }
         if (infoNode != null) {
             parseInfo(domainName, getText(infoNode));
