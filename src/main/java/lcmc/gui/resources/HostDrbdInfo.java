@@ -156,7 +156,7 @@ public final class HostDrbdInfo extends Info {
                 host.execCommand("DRBD.getProcDrbd",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
+                                 false,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
@@ -168,7 +168,7 @@ public final class HostDrbdInfo extends Info {
                 host.execCommand("DRBD.getProcesses",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
+                                 false,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
@@ -206,7 +206,7 @@ public final class HostDrbdInfo extends Info {
         host.execCommand("DRBD.getProcDrbd",
                          execCallback,
                          null,  /* ConvertCmdCallback */
-                         true,  /* outputVisible */
+                         false,  /* outputVisible */
                          SSH.DEFAULT_COMMAND_TIMEOUT);
         return mainPanel;
     }

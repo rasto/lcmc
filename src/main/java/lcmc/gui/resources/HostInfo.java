@@ -231,7 +231,7 @@ public final class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCrmMon",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
+                                 false,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
@@ -251,7 +251,7 @@ public final class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCrmConfigureShow",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
+                                 false,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
@@ -388,7 +388,7 @@ public final class HostInfo extends Info {
         host.execCommand("HostBrowser.getCrmMon",
                          execCallback,
                          null,  /* ConvertCmdCallback */
-                         true,  /* outputVisible */
+                         false,  /* outputVisible */
                          SSH.DEFAULT_COMMAND_TIMEOUT);
         return mainPanel;
     }
