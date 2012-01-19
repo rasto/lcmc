@@ -1170,6 +1170,7 @@ public final class BlockDevInfo extends EditableInfo {
     /** Removes this block device from drbd data structures. */
     void removeFromDrbd() {
         setDrbd(false);
+        getBlockDevice().setDrbdBlockDevice(null);
         setDrbdVolumeInfo(null);
     }
 

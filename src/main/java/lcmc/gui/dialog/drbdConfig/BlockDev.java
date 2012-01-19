@@ -28,6 +28,7 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
+import lcmc.gui.ClusterBrowser;
 import lcmc.Exceptions;
 
 import javax.swing.JLabel;
@@ -106,8 +107,11 @@ final class BlockDev extends DrbdConfig {
                     getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
                                                                           true);
                 }
-                getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser()
-                                                    .reloadAllComboBoxes(null);
+                final ClusterBrowser browser = 
+                        getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
+                browser.reloadAllComboBoxes(null);
+                Tools.getGUIData().expandTerminalSplitPane(1);
+                Tools.getGUIData().getMainFrame().requestFocus();
             } catch (Exceptions.DrbdConfigException dce) {
                 Tools.appError("config failed", dce);
             }

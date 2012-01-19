@@ -24,6 +24,7 @@ package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
@@ -69,8 +70,8 @@ final class CreateMD extends DrbdConfig {
 
     /** Prepares a new <code>CreateMD</code> object. */
     CreateMD(final WizardDialog previousDialog,
-                       final DrbdVolumeInfo dli) {
-        super(previousDialog, dli);
+                       final DrbdVolumeInfo dvi) {
+        super(previousDialog, dvi);
     }
 
     /** Creates meta-data and checks the results. */
@@ -197,6 +198,8 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final boolean testOnly = false;
+        final String clusterName = bdi1.getHost().getCluster().getName();
+        Tools.startProgressIndicator(clusterName, "scanning block devices...");
         DRBD.adjust(bdi1.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
@@ -205,6 +208,16 @@ final class CreateMD extends DrbdConfig {
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);
+        final String device = getDrbdVolumeInfo().getDevice();
+        final ClusterBrowser browser = 
+                        getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
+        browser.updateHWInfo(bdi1.getHost());
+        browser.updateHWInfo(bdi2.getHost());
+        bdi1.getBlockDevice().setDrbdBlockDevice(
+                                bdi1.getHost().getDrbdBlockDevice(device));
+        bdi2.getBlockDevice().setDrbdBlockDevice(
+                                bdi2.getHost().getDrbdBlockDevice(device));
+        Tools.stopProgressIndicator(clusterName, "scanning block devices...");
         return new CreateFS(this, getDrbdVolumeInfo());
     }
 

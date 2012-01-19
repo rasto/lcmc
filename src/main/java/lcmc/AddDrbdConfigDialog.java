@@ -77,9 +77,8 @@ public final class AddDrbdConfigDialog {
             final DrbdResourceInfo drbdResourceInfo =
                         drbdInfo.getNewDrbdResource(
                                DrbdVolumeInfo.getHostsFromBlockDevices(bdis));
-            final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
-                                                            drbdResourceInfo,
-                                                            bdis);
+            final DrbdVolumeInfo dvi =
+                            drbdInfo.getNewDrbdVolume(drbdResourceInfo, bdis);
             drbdResourceInfo.addDrbdVolume(dvi);
             drbdInfo.addDrbdResource(drbdResourceInfo);
             drbdInfo.addDrbdVolume(dvi);
@@ -102,8 +101,6 @@ public final class AddDrbdConfigDialog {
         }
         //dri.setDialogStarted(false);
         //dri.getBrowser().reloadAllComboBoxes(null);
-        Tools.getGUIData().expandTerminalSplitPane(1);
-        Tools.getGUIData().getMainFrame().requestFocus();
     }
 
     /** Returns whether the wizard was canceled. */
