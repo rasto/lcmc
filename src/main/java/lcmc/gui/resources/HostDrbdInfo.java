@@ -36,6 +36,7 @@ import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
@@ -756,8 +757,17 @@ public final class HostDrbdInfo extends Info {
     public void addLVMMenu(final MyMenu submenu) {
         submenu.removeAll();
         submenu.add(getVGCreateItem());
-        for (final String vg : getHost().getVolumeGroupNames()) {
-            submenu.add(getLVMCreateItem(vg));
+        for (final BlockDevice bd : getHost().getBlockDevices()) {
+            String vg;
+            final BlockDevice drbdBD = bd.getDrbdBlockDevice();
+            if (drbdBD == null) {
+                vg = bd.getVolumeGroupOnPhysicalVolume();
+            } else {
+                vg = drbdBD.getVolumeGroupOnPhysicalVolume();
+            }
+            if (vg != null) {
+                submenu.add(getLVMCreateItem(vg, bd));
+            }
         }
     }
 
@@ -798,7 +808,8 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Return create LV menu item. */
-    private MyMenuItem getLVMCreateItem(final String volumeGroup) {
+    private MyMenuItem getLVMCreateItem(final String volumeGroup,
+                                        final BlockDevice blockDevice) {
         final String name = LV_CREATE_MENU_ITEM + volumeGroup;
         final MyMenuItem mi = new MyMenuItem(
                              name,
@@ -820,7 +831,9 @@ public final class HostDrbdInfo extends Info {
 
             @Override
             public void action() {
-                final LVCreate lvCreate = new LVCreate(getHost(), volumeGroup);
+                final LVCreate lvCreate = new LVCreate(getHost(),
+                                                       volumeGroup,
+                                                       blockDevice);
                 while (true) {
                     lvCreate.showDialog();
                     if (lvCreate.isPressedCancelButton()) {

@@ -25,6 +25,7 @@ package lcmc.gui.dialog.lvm;
 import lcmc.gui.Browser;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.SpringUtilities;
+import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.LVM;
@@ -67,16 +68,22 @@ public final class LVCreate extends LV {
     private final String volumeGroup;
     /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
+    /** Selected block device */
+    private BlockDevice selectedBlockDevice;
+
     /** Description create LV. */
     private static final String LV_CREATE_DESCRIPTION =
                        "Create a logical volume in an existing volume group.";
     /** LV create timeout. */
     private static final int CREATE_TIMEOUT = 5000;
     /** Create new LVCreate object. */
-    public LVCreate(final Host host, final String volumeGroup) {
+    public LVCreate(final Host host,
+                    final String volumeGroup,
+                    final BlockDevice selectedBlockDevice) {
         super(null);
         this.host = host;
         this.volumeGroup = volumeGroup;
+        this.selectedBlockDevice = selectedBlockDevice;
     }
 
     /** Finishes the dialog and sets the information. */
@@ -297,6 +304,10 @@ public final class LVCreate extends LV {
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
+            } else if (selectedBlockDevice != null
+                       && selectedBlockDevice.isDrbd()) {
+                hostCheckBoxes.get(h).setEnabled(false);
+                hostCheckBoxes.get(h).setSelected(false);
             } else if (!h.getVolumeGroupNames().contains(volumeGroup)) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(false);

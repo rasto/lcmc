@@ -1386,12 +1386,13 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                String vg = null;
+                String vg;
                 final BlockDevice bd = getBlockDevice();
-                if (bd.isVolumeGroupOnPhysicalVolume()) {
+                final BlockDevice drbdBD = bd.getDrbdBlockDevice();
+                if (drbdBD == null) {
                     vg = bd.getVolumeGroupOnPhysicalVolume();
-                }  else if (isLVM()) {
-                    vg = bd.getVolumeGroup();
+                } else {
+                    vg = drbdBD.getVolumeGroupOnPhysicalVolume();
                 }
                 if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
                     return "has LV on it";
@@ -1422,6 +1423,7 @@ public final class BlockDevInfo extends EditableInfo {
         if (vgName != null) {
             name += vgName;
         }
+        final BlockDevInfo thisClass = this;
 
         final MyMenuItem mi = new MyMenuItem(
                            name,
@@ -1465,8 +1467,10 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                final LVCreate lvCreate = new LVCreate(getHost(),
-                                                       getVolumeGroup());
+                final LVCreate lvCreate = new LVCreate(
+                                                   getHost(),
+                                                   getVolumeGroup(),
+                                                   thisClass.getBlockDevice());
                 while (true) {
                     lvCreate.showDialog();
                     if (lvCreate.isPressedCancelButton()) {
