@@ -1386,8 +1386,13 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                final String vg =
-                              getBlockDevice().getVolumeGroupOnPhysicalVolume();
+                String vg = null;
+                final BlockDevice bd = getBlockDevice();
+                if (bd.isVolumeGroupOnPhysicalVolume()) {
+                    vg = bd.getVolumeGroupOnPhysicalVolume();
+                }  else if (isLVM()) {
+                    vg = bd.getVolumeGroup();
+                }
                 if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
                     return "has LV on it";
                 }
