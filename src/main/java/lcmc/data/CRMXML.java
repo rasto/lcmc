@@ -2675,6 +2675,7 @@ public final class CRMXML extends XML {
                                             new MultiKeyMap<String, String>();
         final Node nodesNode = getChildNode(confNode, "nodes");
         final Map<String, String> nodeOnline = new HashMap<String, String>();
+        final Map<String, String> nodeID = new HashMap<String, String>();
         if (nodesNode != null) {
             final NodeList nodes = nodesNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
@@ -2683,9 +2684,12 @@ public final class CRMXML extends XML {
                     /* TODO: doing nothing with the info, just getting the dc,
                      * for now.
                      */
-                    final String uuid = getAttribute(nodeNode, "id");
+                    final String id = getAttribute(nodeNode, "id");
                     final String uname = getAttribute(nodeNode, "uname");
-                    if (dcUuid != null && dcUuid.equals(uuid)) {
+                    if (!nodeID.containsKey(uname)) {
+                        nodeID.put(uname, id);
+                    }
+                    if (dcUuid != null && dcUuid.equals(id)) {
                         dc = uname;
                     }
                     parseNode(uname, nodeNode, nodeParametersMap);
@@ -3093,6 +3097,10 @@ public final class CRMXML extends XML {
                 final Node nodeStateNode = nodes.item(i);
                 if ("node_state".equals(nodeStateNode.getNodeName())) {
                     final String uname = getAttribute(nodeStateNode, "uname");
+                    final String id = getAttribute(nodeStateNode, "id");
+                    if (!id.equals(nodeID.get(uname))) {
+                        Tools.appWarning("skipping " + uname + " " + id);
+                    }
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
                     final String inCCM = getAttribute(nodeStateNode, "in_ccm");
