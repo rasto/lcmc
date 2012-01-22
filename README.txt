@@ -22,8 +22,8 @@ installation on Redhat/Fedora/Suse etc.
 rpm -Uvh lcmc-*.rpm
 type "lcmc" to run it, or run it from menu.
 
-sudoers file (if you must)
-==========================
+sudoers file
+============
 for sudo you would need at least this commands in the sudoers file:
 
 rasto ALL=SETENV: /usr/local/bin/lcmc-gui-helper-*, /sbin/drbdadm,
@@ -34,23 +34,6 @@ Some things like creating of VM and DRBD config files wouldn't work
 unless you allow the "bash" command. A user may not be able to see
 log files in the GUI if he doesn't have permissions to read them. 
 
-Copyright
-=========
-Copyright (C) 2011 - Rasto Levrinc
-Copyright (C) 2007 - 2011 Rasto Levrinc, LINBIT HA-Solutions GmbH.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-   
-
+author
+======
+Rasto Levrinc

@@ -1,6 +1,6 @@
 Linux Cluster Management Console
 
-Copyright (C) 2011 - Rasto Levrinc
+Copyright (C) 2011 - 2012 Rasto Levrinc
 Copyright (C) 2007 - 2011 Rasto Levrinc, LINBIT HA-Solutions GmbH.
 
 This program is free software; you can redistribute it and/or modify
