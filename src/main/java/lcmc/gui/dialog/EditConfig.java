@@ -25,6 +25,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.data.Host;
+import lcmc.configs.DistResource;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -179,7 +180,7 @@ public final class EditConfig extends ConfigDialog {
                     }
 
                 };
-            threads[i] = host.execCommandRaw("cat " + file,
+            threads[i] = host.execCommandRaw(DistResource.SUDO + "cat " + file,
                                              execCallback,
                                              false, /* outputVisible */
                                              true,  /* commandVisible */
