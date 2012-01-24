@@ -308,6 +308,9 @@ public final class CRMXML extends XML {
     /** List of meta attributes that are not advanced. */
     private static final List<String> M_A_NOT_ADVANCED =
                                                        new ArrayList<String>();
+    /** List of group meta attributes that are not advanced. */
+    private static final List<String> GROUP_M_A_NOT_ADVANCED =
+                                                       new ArrayList<String>();
     /** Access type of meta attributes. */
     private static final Map<String, ConfigData.AccessType> M_A_ACCESS_TYPE =
                                   new HashMap<String, ConfigData.AccessType>();
@@ -356,6 +359,7 @@ public final class CRMXML extends XML {
                           Tools.getString("CRMXML.TargetRole.LongDesc"));
         M_A_DEFAULT.put(TARGET_ROLE_META_ATTR, null);
         M_A_NOT_ADVANCED.add(TARGET_ROLE_META_ATTR);
+        GROUP_M_A_NOT_ADVANCED.add(TARGET_ROLE_META_ATTR);
 
         /* is-managed */
         M_A_POSSIBLE_CHOICES.put(IS_MANAGED_META_ATTR, PCMK_BOOLEAN_VALUES);
@@ -1150,7 +1154,9 @@ public final class CRMXML extends XML {
     /** Checks if parameter is advanced or not. */
     public boolean isAdvanced(final ResourceAgent ra, final String param) {
         if (isMetaAttr(ra, param)) {
-            if (ra == hbGroup || ra == pcmkClone) {
+            if (ra == hbGroup) {
+                return !GROUP_M_A_NOT_ADVANCED.contains(param);
+            } else if (ra == pcmkClone) {
                 return true;
             }
             return !M_A_NOT_ADVANCED.contains(param);
