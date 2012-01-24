@@ -28,7 +28,8 @@ for sudo you would need at least this commands in the sudoers file:
 
 rasto ALL=SETENV: /usr/local/bin/lcmc-gui-helper-*, /sbin/drbdadm,
 /usr/sbin/cibadmin, /usr/sbin/crm_resource, /usr/sbin/crm_attribute,
-/usr/sbin/ptest
+/usr/sbin/ptest, /usr/sbin/crm_simulate, /usr/sbin/crm_mon,
+/usr/sbin/crm
 
 Some things like creating of VM and DRBD config files wouldn't work
 unless you allow the "bash" command. A user may not be able to see
