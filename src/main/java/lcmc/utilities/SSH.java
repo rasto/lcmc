@@ -1495,14 +1495,7 @@ public final class SSH {
             final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
-                scp(file,
-                    "@GUI-HELPER@",
-                    "0700",
-                    false,
-                    null,
-                    null,
-                    null,
-                    false); /* no sudo */
+                scp(file, "@GUI-HELPER@", "0700", false, null, null, null);
             }
         }
     }
@@ -1557,8 +1550,7 @@ public final class SSH {
             makeBackup,
             null, /* install command */
             preCommand,
-            postCommand,
-            true);
+            postCommand);
     }
 
     /**
@@ -1575,8 +1567,7 @@ public final class SSH {
                     final boolean makeBackup,
                     String installCommand,
                     final String preCommand,
-                    final String postCommand,
-                    final boolean sudo) {
+                    final String postCommand) {
         final StringBuilder commands = new StringBuilder(40);
         if (preCommand != null) {
             commands.append(preCommand);
@@ -1635,12 +1626,8 @@ public final class SSH {
                           + "echo \""
                           + "..."
                           + commandTail, 1);
-        String sudoPrefix = "";
-        if (sudo) {
-            sudoPrefix = DistResource.SUDO;
-        }
         final Thread t = execCommand(
-                            sudoPrefix + "bash -c \""
+                            DistResource.SUDO + "bash -c \""
                             + Tools.escapeQuotes(
                                 commands.toString()
                                 + "echo \""

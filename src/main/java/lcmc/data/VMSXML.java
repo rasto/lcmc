@@ -423,8 +423,7 @@ public final class VMSXML extends XML {
                               true,
                               defineCommand,
                               null,
-                              null,
-                              true);
+                              null);
         }
     }
 
