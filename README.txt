@@ -26,7 +26,7 @@ sudoers file
 ============
 for sudo you would need at least this commands in the sudoers file:
 
-rasto ALL=SETENV: /usr/local/bin/lcmc-gui-helper-*, /sbin/drbdadm,
+rasto ALL=SETENV: /home/rasto/lcmc-gui-helper-*, /sbin/drbdadm,
 /usr/sbin/cibadmin, /usr/sbin/crm_resource, /usr/sbin/crm_attribute,
 /usr/sbin/ptest
 

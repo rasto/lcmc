@@ -115,7 +115,8 @@ final class PacemakerInst extends DialogHost {
                                                true,
                                                null,
                                                null,
-                                               null);
+                                               null,
+                                               true);
                     }
                     i += 3;
                 }
