@@ -1760,13 +1760,14 @@ public final class Host {
         if (command.indexOf("@GUI-HELPER@") > -1) {
             String dir = "/usr/local/bin";
             if (username != null && !"root".equals(username)) {
-                dir = "$HOME";
+                final String home = System.getProperty("user.home");
+                if (home != null) {
+                    dir = System.getProperty("user.home");
+                }
             }
-            command = command.replaceAll(
-                            "@GUI-HELPER@",
-                            Matcher.quoteReplacement(dir
-                                                     + "/lcmc-gui-helper-"
-                                                     + Tools.getRelease()));
+            command = command.replaceAll("@GUI-HELPER@",
+                                         dir + "/lcmc-gui-helper-"
+                                         + Tools.getRelease());
         }
         return command;
     }
