@@ -134,23 +134,12 @@
 
 	<target name="error">
 		<mkdir dir="${classes.dir}"/>
-		<copy todir="${classes.dir}/images">
-			<fileset dir="${java.dir}/lcmc/images"/>
+		<copy todir="${classes.dir}">
+			<fileset dir="${resources.dir}/"/>
 		</copy>
-		
-		<copy todir="${classes.dir}/help-progs">
-			<fileset dir="${java.dir}/lcmc/help-progs"/>
-		</copy>
-		<tar tarfile="${java.dir}/lcmc/lcmc-test.tar"
-		     basedir="${java.dir}/lcmc/"
+		<tar tarfile="${classes.dir}/lcmc-test.tar"
+		     basedir="${classes.dir}/"
 		     includes="lcmc-test/**"/>
-		<move tofile="${classes.dir}/lcmc-test.tar"
-			file="${java.dir}/lcmc/lcmc-test.tar"
-			overwrite="yes"/>
-		
-		<copy tofile="${classes.dir}/lcmc/release.properties"
-		      file="release"
-		      overwrite="yes"/>
 		<javac 
 		 fork="true" 
 		 debug="true"
@@ -162,11 +151,17 @@
 		 target="1.6"
 		>
 		  <classpath>
+		   <pathelement location="/usr/share/java/jai_core.jar"/>
 		   <pathelement location="/usr/share/java/j3dcore.jar"/>
 		   <pathelement location="/usr/share/java/j3dutils.jar"/>
 		   <pathelement location="/usr/share/java/vecmath.jar"/>
+		   <pathelement location="/usr/share/java/xalan2.jar"/>
 		   <pathelement location="${buildlib.dir}/jai_core.jar"/>
-		   <pathelement location="${buildlib.dir}/junit.jar"/>
+		   <pathelement location="${buildlib.dir}/j3dcore.jar"/>
+		   <pathelement location="${buildlib.dir}/j3dutils.jar"/>
+		   <pathelement location="${buildlib.dir}/vecmath.jar"/>
+		   <pathelement location="/usr/share/java/xml-commons-apis.jar"/>
+		   <pathelement location="/usr/share/java/xerces-j2.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xmaxerrs"/> 
