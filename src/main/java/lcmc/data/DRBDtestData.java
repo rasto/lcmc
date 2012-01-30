@@ -72,6 +72,9 @@ public final class DRBDtestData {
             sb.append(host.getName());
             sb.append("</b><br>");
             final String raw = testOutput.get(host);
+            if (raw == null) {
+                continue;
+            }
             for (final String line : raw.split("\\r?\\n")) {
                 final Matcher m = DRBD_D_PATTERN.matcher(line);
                 if (m.matches()) {

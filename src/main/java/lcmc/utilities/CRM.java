@@ -57,6 +57,11 @@ public final class CRM {
     public static final String PTEST_END_DELIM = "--- PTEST END ---";
     /** Location of lcmc-test.xml file. */
     public static final String LCMC_TEST_FILE = "/tmp/lcmc-test.xml";
+    /** Test only boolean variable. */
+    public static final boolean TESTONLY = true;
+    /** Live boolean variable. */
+    public static final boolean LIVE = false;
+
     /**
      * No instantiation.
      */
@@ -1253,26 +1258,30 @@ public final class CRM {
     }
 
     /** Makes heartbeat stand by. */
-    public static boolean standByOn(final Host host, final boolean testOnly) {
+    public static boolean standByOn(final Host host,
+                                    final Host standByHost,
+                                    final boolean testOnly) {
         String cmd = "CRM.standByOn";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.standByOn";
         }
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@HOST@", host.getName());
+        replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;
     }
 
     /** Undoes heartbeat stand by. */
-    public static boolean standByOff(final Host host, final boolean testOnly) {
+    public static boolean standByOff(final Host host,
+                                     final Host standByHost,
+                                     final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         String cmd = "CRM.standByOff";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.standByOff";
         }
-        replaceHash.put("@HOST@", host.getName());
+        replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
         final SSH.SSHOutput ret = execCommand(host, command, true, testOnly);
         return ret.getExitCode() == 0;

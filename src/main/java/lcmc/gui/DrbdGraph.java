@@ -31,6 +31,7 @@ import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.Info;
+import lcmc.gui.resources.DrbdMultiSelectionInfo;
 
 import java.awt.Shape;
 import java.awt.Graphics2D;
@@ -41,6 +42,7 @@ import java.awt.BasicStroke;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
+import edu.uci.ics.jung.visualization.picking.PickedState;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -85,6 +87,8 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Drbd info object to which this graph belongs. */
     private DrbdInfo drbdInfo;
+    /** Interval beetween two animation frames. */
+    private Info multiSelectionInfo = null;
 
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
@@ -544,7 +548,16 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Handles popup in when block device vertex is clicked. */
-    protected JPopupMenu handlePopupVertex(final Vertex v, final Point2D p) {
+    @Override
+    protected JPopupMenu handlePopupVertex(final Vertex v,
+                                           final List<Vertex> pickedV,
+                                           final Point2D p) {
+        if (pickedV.size() > 1) {
+            final Info msi = multiSelectionInfo;
+            if (msi != null) {
+                return msi.getPopup();
+            }
+        }
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi == null) {
@@ -1116,5 +1129,20 @@ public final class DrbdGraph extends ResourceGraph {
             return false;
         }
         return !dvi.isConnected(isTestOnly());
+    }
+
+    /** Select multiple elements. */
+    @Override
+    protected void multiSelection() {
+        final List<Info> selectedInfos = new ArrayList<Info>();
+        final PickedState<Vertex> ps =
+                getVisualizationViewer().getRenderContext()
+                                                    .getPickedVertexState();
+        for (final Vertex v : ps.getPicked()) {
+            selectedInfos.add(getInfo(v));
+        }
+        multiSelectionInfo = new DrbdMultiSelectionInfo(selectedInfos,
+                                                        getClusterBrowser());
+        getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 }

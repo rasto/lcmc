@@ -80,9 +80,6 @@ public final class DRBD {
                                              final ExecCallback execCallback,
                                              final boolean outputVisible,
                                              final boolean testOnly) {
-        M_DRBD_TEST_WRITELOCK.lock();
-        drbdtestOutput = null;
-        M_DRBD_TEST_WRITELOCK.unlock();
         if (testOnly) {
             if (command.indexOf("@DRYRUN@") < 0) {
                 /* it would be very bad */
@@ -101,7 +98,11 @@ public final class DRBD {
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             M_DRBD_TEST_WRITELOCK.lock();
-            drbdtestOutput = output.getOutput();
+            if (drbdtestOutput == null) {
+                drbdtestOutput = output.getOutput();
+            } else {
+                drbdtestOutput += output.getOutput();
+            }
             M_DRBD_TEST_WRITELOCK.unlock();
             return output;
         } else {
@@ -129,6 +130,7 @@ public final class DRBD {
     public static String getDRBDtest() {
         M_DRBD_TEST_READLOCK.lock();
         final String out = drbdtestOutput;
+        drbdtestOutput = null;
         M_DRBD_TEST_READLOCK.unlock();
         return out;
     }

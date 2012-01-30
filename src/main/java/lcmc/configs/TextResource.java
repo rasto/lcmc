@@ -2384,5 +2384,128 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdVolumeInfo.Device",
          "Device"},
+
+        {"PcmkMultiSelectionInfo.Selection",
+         "<h3>Selection:</h3>"},
+
+        {"PcmkMultiSelectionInfo.StopSelectedResources",
+         "Stop Selected Services"},
+
+        {"PcmkMultiSelectionInfo.StartSelectedResources",
+         "Start Selected Services"},
+
+        {"PcmkMultiSelectionInfo.StandByOn",
+         "Standby Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StandByOff",
+         "Online Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StopCorosync",
+         "Stop Corosync on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StopOpenais",
+         "Stop Openais on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StopHeartbeat",
+         "Stop Heartbeat on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StartCorosync",
+         "Start Corosync on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StartPacemaker",
+         "Start Pacemakerd on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StartOpenais",
+         "Start Openais on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.StartHeartbeat",
+         "Start Heartbeat on Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.ChangeHostColor",
+         "Change Color of Selected Hosts"},
+
+        {"PcmkMultiSelectionInfo.confirmRemove.Title",
+         "Remove Selected Services"},
+
+        {"PcmkMultiSelectionInfo.confirmRemove.Desc",
+         "Are you sure you want to remove the selected services?"},
+
+        {"PcmkMultiSelectionInfo.confirmRemove.Yes",
+         "Remove"},
+
+        {"PcmkMultiSelectionInfo.confirmRemove.No",
+         "Cancel"},
+
+        {"PcmkMultiSelectionInfo.CleanUpFailedResource",
+         "Restart Failed (Clean Up)"},
+
+        {"PcmkMultiSelectionInfo.CleanUpResource",
+         "Reset Fail-Counts (Clean Up)"},
+
+        {"PcmkMultiSelectionInfo.ManageResource",
+         "Manage by CRM"},
+
+        {"PcmkMultiSelectionInfo.UnmanageResource",
+         "Do not manage by CRM"},
+
+        {"PcmkMultiSelectionInfo.MigrateFromResource",
+         "Migrate FROM"},
+
+        {"PcmkMultiSelectionInfo.UnmigrateResource",
+         "Remove Migration Constraints"},
+
+        {"PcmkMultiSelectionInfo.RemoveService",
+         "Remove Selected Services"},
+
+        {"DrbdMultiSelectionInfo.Selection",
+         "<h3>Selection:</h3>"},
+
+        {"DrbdMultiSelectionInfo.ChangeHostColor",
+         "Change Color of Selected Hosts"},
+
+        {"DrbdMultiSelectionInfo.LoadDrbd",
+         "Load DRBD Module on Selected Hosts"},
+
+        {"DrbdMultiSelectionInfo.AdjustAllDrbd",
+         "Load DRBD Config on Selected Hosts (Adjust)"},
+
+        {"DrbdMultiSelectionInfo.UpAll",
+         "Start All DRBDs on Selected Hosts (up)"},
+
+        {"DrbdMultiSelectionInfo.Detach",
+         "Detach Selected BDs"},
+
+        {"DrbdMultiSelectionInfo.Attach",
+         "Attach Selected BDs"},
+
+        {"DrbdMultiSelectionInfo.Connect",
+         "Connect Resources To Peers"},
+
+        {"DrbdMultiSelectionInfo.Disconnect",
+         "Disconnect Resources From Peers"},
+
+        {"DrbdMultiSelectionInfo.SetPrimary",
+         "Promote Selected BDs To Primary"},
+
+        {"DrbdMultiSelectionInfo.SetSecondary",
+         "Demote Selected BDs To Secondary"},
+
+        {"DrbdMultiSelectionInfo.ForcePrimary",
+         "Force Promotion To Primary"},
+
+        {"DrbdMultiSelectionInfo.Invalidate",
+         "Invalidate Selected BDs"},
+
+        {"DrbdMultiSelectionInfo.ResumeSync",
+         "Resume Syncs"},
+
+        {"DrbdMultiSelectionInfo.PauseSync",
+         "Pause Syncs"},
+
+        {"DrbdMultiSelectionInfo.Resize",
+         "Resize selected BDs"},
+
+        {"DrbdMultiSelectionInfo.DiscardData",
+         "Discard Data on selected BDs"},
     };
 }

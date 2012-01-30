@@ -184,7 +184,6 @@ public abstract class ResourceGraph {
     private volatile Edge existingTestEdge = null;
     /** Lock for test edge list. */
     private final Lock mTestEdgeLock = new ReentrantLock();
-    /** Interval beetween two animation frames. */
     private final int animInterval =
                              (int) (1000 / Tools.getConfigData().getAnimFPS());
     /** Singleton instance of the Line2D edge shape. */
@@ -845,7 +844,8 @@ public abstract class ResourceGraph {
     }
 
     /** Handles right click on the vertex. */
-    protected abstract JPopupMenu handlePopupVertex(final Vertex v,
+    protected abstract JPopupMenu handlePopupVertex(final Vertex vertex,
+                                                    final List<Vertex> pickedV,
                                                     final Point2D p);
 
     /** Adds popup menu item for vertex. */
@@ -909,6 +909,22 @@ public abstract class ResourceGraph {
             super(modifiers);
         }
 
+
+        /**
+         * Is called when mouse was released. Create a multi selection
+         * object. */
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final PickedState<Vertex> ps =
+                            vv.getRenderContext().getPickedVertexState();
+                    if (ps.getPicked().size() > 1) {
+                        multiSelection();
+                    }
+                }
+            });
+        }
 
         /** Is called when mouse was clicked. */
         @Override
@@ -975,19 +991,23 @@ public abstract class ResourceGraph {
                             oneEdgePressed(edge);
                         }
                     } else {
+                        final PickedState<Vertex> ps =
+                                vv.getRenderContext().getPickedVertexState();
+                        final List<Vertex> pickedV =
+                                        new ArrayList<Vertex>(ps.getPicked());
                         final JPopupMenu vertexPopup =
-                                                handlePopupVertex(v, popP);
+                                           handlePopupVertex(v, pickedV, popP);
                         if (vertexPopup != null) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     vertexPopup.show(vv, posX, posY);
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            vertexPopup.pack();
-                                        }
-                                    });
+                                    //SwingUtilities.invokeLater(new Runnable() {
+                                    //    @Override
+                                    //    public void run() {
+                                    //        vertexPopup.pack();
+                                    //    }
+                                    //});
                                 }
                             });
                             SwingUtilities.invokeLater(new Runnable() {
@@ -997,7 +1017,9 @@ public abstract class ResourceGraph {
                                 }
                             });
                         }
-                        oneVertexPressed(v); /* select this vertex */
+                        if (pickedV.size() < 2) {
+                            oneVertexPressed(v); /* select this vertex */
+                        }
                     }
                 }
             });
@@ -1129,14 +1151,15 @@ public abstract class ResourceGraph {
         public void graphPressed(final V v, final MouseEvent me) {
             final Thread t = new Thread(new Runnable() {
                 public void run() {
-            final PickedState<Vertex> psVertex =
+                    final PickedState<Vertex> psVertex =
                                   vv.getRenderContext().getPickedVertexState();
-            if ((me.getModifiers() & MouseEvent.CTRL_MASK) != 0) {
-                    /* ctrl-click */
-                psVertex.pick((Vertex) v, true);
-            } else if (psVertex.getPicked().size() == 1) {
-                oneVertexPressed((Vertex) v);
-            }
+                    if ((me.getModifiers() & MouseEvent.CTRL_MASK) != 0) {
+                            /* ctrl-click */
+                        psVertex.pick((Vertex) v, true);
+                    } else if (psVertex.getPicked().size() == 1
+                               || !psVertex.getPicked().contains(v)) {
+                        oneVertexPressed((Vertex) v);
+                    }
                 }
             });
             t.start();
@@ -1650,6 +1673,9 @@ public abstract class ResourceGraph {
 
     /** Returns id that is used for saving of the vertex positions to a file. */
     protected abstract String getId(final Info i);
+
+    /** Select multiple services. */
+    protected abstract void multiSelection();
 
     /** Returns saved position for the specified resource. */
     final Point2D getSavedPosition(final Info info) {

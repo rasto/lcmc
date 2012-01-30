@@ -2537,4 +2537,10 @@ public final class BlockDevInfo extends EditableInfo {
         }
         return drbdVolumes.iterator().next() == getDrbdVolumeInfo();
     }
+
+    /** Return whether two primaries are allowed. */
+    boolean allowTwoPrimaries() {
+        final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+        return "yes".equals(dri.getParamSaved(ALLOW_TWO_PRIMARIES));
+    }
 }

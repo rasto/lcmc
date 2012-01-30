@@ -171,10 +171,10 @@ public class ServiceInfo extends EditableInfo {
     /** Master / Slave type string. */
     static final String MASTER_SLAVE_TYPE_STRING = "Master/Slave";
     /** Manage by CRM icon. */
-    private static final ImageIcon MANAGE_BY_CRM_ICON = Tools.createImageIcon(
+    static final ImageIcon MANAGE_BY_CRM_ICON = Tools.createImageIcon(
                   Tools.getDefault("ServiceInfo.ManageByCRMIcon"));
     /** Don't Manage by CRM icon. */
-    private static final ImageIcon UNMANAGE_BY_CRM_ICON = Tools.createImageIcon(
+    static final ImageIcon UNMANAGE_BY_CRM_ICON = Tools.createImageIcon(
                  Tools.getDefault("ServiceInfo.UnmanageByCRMIcon"));
     /** Unmanage service icon. */
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
@@ -204,15 +204,15 @@ public class ServiceInfo extends EditableInfo {
                            Tools.createImageIcon(Tools.getDefault(
                               "ServiceInfo.ServiceStoppedFailedIconSmall"));
     /** Running service icon. */
-    private static final ImageIcon SERVICE_RUNNING_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("HeartbeatGraph.ServiceRunningIcon"));
+    static final ImageIcon SERVICE_RUNNING_ICON =
+                Tools.createImageIcon(
+                        Tools.getDefault("HeartbeatGraph.ServiceRunningIcon"));
     /** Not running service icon. */
     private static final ImageIcon SERVICE_STOPPED_ICON =
             Tools.createImageIcon(
                         Tools.getDefault("HeartbeatGraph.ServiceStoppedIcon"));
     /** Start service icon. */
-    private static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
+    static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
     /** Stop service icon. */
     static final ImageIcon STOP_ICON  = SERVICE_STOPPED_ICON;
     /** Migrate icon. */
@@ -4557,6 +4557,7 @@ public class ServiceInfo extends EditableInfo {
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         if (!testOnly) {
+            System.out.println("remove myself: " + toString());
             if (!getService().isNew()) {
                 setUpdated(true);
             }

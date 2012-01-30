@@ -80,18 +80,18 @@ public final class HostInfo extends Info {
     /** Host data. */
     private final Host host;
     /** Host standby icon. */
-    private static final ImageIcon HOST_STANDBY_ICON =
+    static final ImageIcon HOST_STANDBY_ICON =
      Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
     /** Host standby off icon. */
-    private static final ImageIcon HOST_STANDBY_OFF_ICON =
+    static final ImageIcon HOST_STANDBY_OFF_ICON =
              Tools.createImageIcon(
                         Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
     /** Stop comm layer icon. */
-    private static final ImageIcon HOST_STOP_COMM_LAYER_ICON =
+    static final ImageIcon HOST_STOP_COMM_LAYER_ICON =
              Tools.createImageIcon(
                      Tools.getDefault("HeartbeatGraph.HostStopCommLayerIcon"));
     /** Start comm layer icon. */
-    private static final ImageIcon HOST_START_COMM_LAYER_ICON =
+    static final ImageIcon HOST_START_COMM_LAYER_ICON =
              Tools.createImageIcon(
                     Tools.getDefault("HeartbeatGraph.HostStartCommLayerIcon"));
     /** Offline subtext. */
@@ -122,7 +122,7 @@ public final class HostInfo extends Info {
     private static final Subtext STARTING_SUBTEXT =
                                   new Subtext("starting...", null, Color.BLUE);
     /** String that is displayed as a tool tip for disabled menu item. */
-    private static final String NO_PCMK_STATUS_STRING =
+    static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
     /** whether crm mon is showing. */
     private volatile boolean crmMon = false;
@@ -480,10 +480,12 @@ public final class HostInfo extends Info {
 
                 @Override
                 public void action() {
+                    final Host dcHost =
+                                  getBrowser().getClusterBrowser().getDCHost();
                     if (isStandby(testOnly)) {
-                        CRM.standByOff(host, testOnly);
+                        CRM.standByOff(dcHost, host, testOnly);
                     } else {
-                        CRM.standByOn(host, testOnly);
+                        CRM.standByOn(dcHost, host, testOnly);
                     }
                 }
             };
@@ -492,11 +494,11 @@ public final class HostInfo extends Info {
             final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
                               cb.new ClMenuItemCallback(standbyItem, host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     if (isStandby(false)) {
-                        CRM.standByOff(host, true);
+                        CRM.standByOff(dcHost, host, true);
                     } else {
-                        CRM.standByOn(host, true);
+                        CRM.standByOn(dcHost, host, true);
                     }
                 }
             };
@@ -627,9 +629,9 @@ public final class HostInfo extends Info {
             final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
                             cb.new ClMenuItemCallback(stopCorosyncItem, host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     if (!isStandby(false)) {
-                        CRM.standByOn(host, true);
+                        CRM.standByOn(dcHost, host, true);
                     }
                 }
             };
@@ -669,9 +671,9 @@ public final class HostInfo extends Info {
             final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
                             cb.new ClMenuItemCallback(stopHeartbeatItem, host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     if (!isStandby(false)) {
-                        CRM.standByOn(host, true);
+                        CRM.standByOn(dcHost, host, true);
                     }
                 }
             };

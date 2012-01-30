@@ -71,8 +71,7 @@ public final class HostDrbdInfo extends Info {
     /** Host data. */
     private final Host host;
     /** String that is displayed as a tool tip for disabled menu item. */
-    private static final String NO_DRBD_STATUS_STRING =
-                                                "drbd status is not available";
+    static final String NO_DRBD_STATUS_STRING = "drbd status is not available";
     /** LVM menu. */
     private static final String LVM_MENU = "LVM";
     /** Name of the create VG menu item. */

@@ -29,6 +29,7 @@ import lcmc.gui.resources.GroupInfo;
 import lcmc.gui.resources.HbConnectionInfo;
 import lcmc.gui.resources.HostInfo;
 import lcmc.gui.resources.ConstraintPHInfo;
+import lcmc.gui.resources.PcmkMultiSelectionInfo;
 import lcmc.data.Subtext;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
@@ -123,6 +124,8 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
+    /** Interval beetween two animation frames. */
+    private Info multiSelectionInfo = null;
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
     /** Y position of the host. */
@@ -749,7 +752,15 @@ public final class HeartbeatGraph extends ResourceGraph {
 
     /** Handles right click on the service vertex and creates popup menu. */
     @Override
-    protected JPopupMenu handlePopupVertex(final Vertex v, final Point2D p) {
+    protected JPopupMenu handlePopupVertex(final Vertex v,
+                                           final List<Vertex> pickedV,
+                                           final Point2D p) {
+        if (pickedV.size() > 1) {
+            final Info msi = multiSelectionInfo;
+            if (msi != null) {
+                return msi.getPopup();
+            }
+        }
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = (HostInfo) getInfo(v);
             if (hi == null) {
@@ -1976,4 +1987,20 @@ public final class HeartbeatGraph extends ResourceGraph {
     protected void setVertexHeight(final Vertex v, final int size) {
         super.setVertexHeight(v, size);
     }
+
+    /** Select multiple services. */
+    @Override
+    protected void multiSelection() {
+        final List<Info> selectedInfos = new ArrayList<Info>();
+        final PickedState<Vertex> ps =
+                getVisualizationViewer().getRenderContext()
+                                                    .getPickedVertexState();
+        for (final Vertex v : ps.getPicked()) {
+            selectedInfos.add(getInfo(v));
+        }
+        multiSelectionInfo = new PcmkMultiSelectionInfo(selectedInfos,
+                                                        getClusterBrowser());
+        getClusterBrowser().setRightComponentInView(multiSelectionInfo);
+    }
+
 }
