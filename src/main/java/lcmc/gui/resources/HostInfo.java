@@ -171,6 +171,9 @@ public final class HostInfo extends Info {
     /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
+        if (getBrowser().getClusterBrowser() == null) {
+            return new JPanel();
+        }
         final Font f = new Font("Monospaced", Font.PLAIN, 12);
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
