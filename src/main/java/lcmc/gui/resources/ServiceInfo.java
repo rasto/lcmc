@@ -4557,7 +4557,6 @@ public class ServiceInfo extends EditableInfo {
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         if (!testOnly) {
-            System.out.println("remove myself: " + toString());
             if (!getService().isNew()) {
                 setUpdated(true);
             }
