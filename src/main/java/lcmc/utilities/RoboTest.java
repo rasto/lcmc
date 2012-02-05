@@ -1422,6 +1422,69 @@ public final class RoboTest {
         unmigrateResource(1020, 132, 55); /* actions menu unmigrate */
         sleep(5000);
         checkTest(testName, 28);
+
+        moveTo(700, 450); /* rectangle */
+        leftPress();
+        moveTo(220, 115);
+        leftRelease();
+
+        moveTo(ipX, ipY);
+        rightClick();
+        sleep(500);
+
+        moveTo(ipX + 30, ipY); /* ptest */
+        moveToSlowly(ipX + 30, ipY + 350);
+        moveTo(ipX, ipY);
+
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* standby selected hosts */
+        checkTest(testName, 28.1);
+
+        moveTo(700, 450);
+        leftPress();
+        moveTo(220, 115);
+        leftRelease();
+        moveTo(ipX, ipY);
+        rightClick();
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* online selected hosts */
+        checkTest(testName, 28.2);
+
+        moveTo(700, 450);
+        leftPress();
+        moveTo(220, 115);
+        leftRelease();
+        moveTo(ipX, ipY);
+        rightClick();
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* stop selected resources */
+        checkTest(testName, 28.3);
+
+        moveTo(700, 450);
+        leftPress();
+        moveTo(220, 115);
+        leftRelease();
+        moveTo(ipX, ipY);
+        rightClick();
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* start selected resources */
+        checkTest(testName, 28.4);
+
         stopResource(ipX, ipY, 0);
         sleep(5000);
         moveTo(gx, gy);
@@ -2961,6 +3024,12 @@ public final class RoboTest {
         return !expected;
     }
 
+    private static void moveToSlowly(final int toX, final int toY) {
+        slowFactor *= 50;
+        moveTo(toX, toY);
+        slowFactor /= 50;
+    }
+
     /** Move to position. */
     private static void moveTo(final int toX, final int toY) {
         if (aborted) {
@@ -3342,6 +3411,39 @@ public final class RoboTest {
             offset += 40;
         }
         checkDRBDTest(drbdTest, 2);
+
+        moveTo(730, 475); /* rectangle */
+        leftPress();
+        moveTo(225, 115);
+        leftRelease();
+
+        moveTo(334, blockDevY);
+        rightClick();
+        moveToSlowly(400, blockDevY + 160);
+
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* detach */
+        checkDRBDTest(drbdTest, 2.01);
+
+        moveTo(400, blockDevY);
+        rightClick();
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* attach */
+        checkDRBDTest(drbdTest, 2.02);
 
         moveTo(480, 202); /* select r0 */
         leftClick();

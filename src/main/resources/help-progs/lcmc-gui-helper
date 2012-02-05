@@ -1797,6 +1797,9 @@ sub gui_test {
 	if (pcmk_version_smaller_than("1.1.5")) {
 		$statustest =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;
 	}
+	for ($cib, $test) {
+		s/\s*\n\s*attributes standby="off"\s*/\n/g;
+	}
 	if ($hb_version eq "2.1.3" || $hb_version eq "2.1.4") {
 		print "na ";
 	} elsif ($cib eq $test) {
@@ -1815,6 +1818,9 @@ sub gui_test {
 	$status2 =~ s/(Started host)(\d+)/$1 . (3 - $2)/ge;
 	$status2 =~ s/((?:Masters|Slaves):\s+\[\s+host)(\d+)/$1 . (3 - $2)/ge;
 	$status2 =~ s/(:\s+Master\s+host)(\d+)/$1 . (3 - $2)/ge;
+	for ($status, $status2, $statustest) {
+		s/\s+$//;
+	}
 	if ($status eq $statustest || $status2 eq $statustest) {
 		print "ok";
 	} else {
