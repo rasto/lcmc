@@ -60,6 +60,8 @@ import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -244,8 +246,6 @@ public final class Host {
     private String xenLibPath = null;
     /** MD5 checksum of VM Info from server. */
     private String vmInfoMD5 = null;
-    /** Previous hw info output. */
-    private String oldHwInfo = null;
     /** Index of this host in its cluster. */
     private int index = 0;
     /** Whether the last connection check was positive. */
@@ -272,6 +272,12 @@ public final class Host {
                                             new HashMap<String, Set<String>>();
     /** Whether this cluster should be saved. */
     private boolean savable = true;
+    /** Ping is set every 10s. */
+    private volatile AtomicBoolean ping = new AtomicBoolean(false);
+    /** Timeout after which the connection is considered to be dead. */
+    private final int PING_TIMEOUT = 30000;
+    /** ping string. */
+    private static final String PING_STRING = "--ping--";
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1099,34 +1105,6 @@ public final class Host {
                                commandTimeout);
     }
 
-    /** Executes connection status command. */
-    public void execConnectionStatusCommand(final ExecCallback execCallback) {
-        if (connectionStatusThread == null) {
-            connectionStatusThread = ssh.execCommand(
-                                Tools.getDistCommand(
-                                                "Host.getConnectionStatus",
-                                                dist,
-                                                distVersionString,
-                                                arch,
-                                                null, /* ConvertCmdCallback */
-                                                false), /* in bash */
-                                    execCallback,
-                                    null,
-                                    false,
-                                    false,
-                                    10000);
-            try {
-                connectionStatusThread.join(0);
-            } catch (java.lang.InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            connectionStatusThread = null;
-        } else {
-            Tools.appWarning(getName()
-                             + ": trying to start started connection status");
-        }
-    }
-
     /**
      * Executes get status command which runs in the background and updates the
      * block device object. The command is 'drbdsetup /dev/drbdX events'
@@ -1582,26 +1560,19 @@ public final class Host {
     /** Gets and stores hardware info about the host. */
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
                           final ResourceGraph[] graphs) {
-        final long thisTS = ++timestamp;
         final Thread t = execCommand("GetHostHWInfo",
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
-                                 if (thisTS != timestamp) {
-                                     return;
+                                 parseHostInfo(ans);
+                                 for (final CategoryInfo ci
+                                                     : infosToUpdate) {
+                                     ci.updateTable(CategoryInfo.MAIN_TABLE);
                                  }
-                                 if (!ans.equals(oldHwInfo)) {
-                                    parseHostInfo(ans);
-                                    oldHwInfo = ans;
-                                    for (final CategoryInfo ci
-                                                        : infosToUpdate) {
-                                        ci.updateTable(CategoryInfo.MAIN_TABLE);
-                                    }
-                                    for (final ResourceGraph g : graphs) {
-                                        if (g != null) {
-                                            g.repaint();
-                                        }
-                                    }
+                                 for (final ResourceGraph g : graphs) {
+                                     if (g != null) {
+                                         g.repaint();
+                                     }
                                  }
                                  setLoadingDone();
                              }
@@ -1609,10 +1580,8 @@ public final class Host {
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 if (thisTS != timestamp) {
-                                     return;
-                                 }
                                  setLoadingError();
+                                 getSSH().forceReconnect();
                              }
                          },
                          null, /* ConvertCmdCallback */
@@ -1625,30 +1594,45 @@ public final class Host {
         }
     }
 
-    /** Gets and stores hardware info about the host. Return true if something
-     * has changed. */
-    public void getHWInfoLazy(final CategoryInfo[] infosToUpdate,
-                              final ResourceGraph[] graphs) {
-        final long thisTS = timestamp;
-        final Thread t = execCommand("GetHostHWInfoLazy",
+    public String getOutput(final String type, final StringBuffer buffer) {
+        final String infoStart = "--" + type + "-info-start--";
+        final String infoEnd = "--" + type + "-info-end--";
+        int infoStartLength = infoStart.length();
+        int s = buffer.indexOf(infoStart);
+        int e = buffer.indexOf(infoEnd, s);
+        int infoEndLength = infoEnd.length();
+        String out = null;
+        if (s > -1 && e > -1 && s < e) {
+            out = buffer.substring(s + infoStartLength + 2, e);
+            buffer.delete(0, e + infoEndLength + 2);
+        }
+        return out;
+    }
+
+    /** Gets and stores hardware info about the host. */
+    public void startHWInfoDaemon(final CategoryInfo[] infosToUpdate,
+                                  final ResourceGraph[] graphs) {
+        final Host host = this;
+        final Thread t = ssh.execCommand(
+                                Tools.getDistCommand(
+                                                "HostHWInfoDaemon",
+                                                dist,
+                                                distVersionString,
+                                                arch,
+                                                null, /* ConvertCmdCallback */
+                                                false), /* in bash */
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
-                                 if (thisTS != timestamp) {
-                                     return;
+                                 parseHostInfo(ans);
+                                 for (final CategoryInfo ci
+                                                     : infosToUpdate) {
+                                     ci.updateTable(CategoryInfo.MAIN_TABLE);
                                  }
-                                 if (!ans.equals(oldHwInfo)) {
-                                    parseHostInfo(ans);
-                                    oldHwInfo = ans;
-                                    for (final CategoryInfo ci
-                                                        : infosToUpdate) {
-                                        ci.updateTable(CategoryInfo.MAIN_TABLE);
-                                    }
-                                    for (final ResourceGraph g : graphs) {
-                                        if (g != null) {
-                                            g.repaint();
-                                        }
-                                    }
+                                 for (final ResourceGraph g : graphs) {
+                                     if (g != null) {
+                                         g.repaint();
+                                     }
                                  }
                                  setLoadingDone();
                              }
@@ -1656,13 +1640,77 @@ public final class Host {
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 if (thisTS != timestamp) {
-                                     return;
-                                 }
                                  setLoadingError();
                              }
                          },
-                         null, /* ConvertCmdCallback */
+                         new NewOutputCallback() {
+                             private StringBuffer outputBuffer =
+                                                        new StringBuffer(300);
+                             @Override
+                             public void output(final String output) {
+                                 outputBuffer.append(output);
+                                 int ps = outputBuffer.indexOf(PING_STRING);
+                                 while (ps > -1) {
+                                     outputBuffer.delete(
+                                            ps, ps + PING_STRING.length() + 2);
+                                     ping.set(true);
+                                     ps = outputBuffer.indexOf(PING_STRING);
+                                 }
+                                 final ClusterBrowser cb =
+                                              getBrowser().getClusterBrowser();
+                                 int i = 0;
+                                 String hw, vm, drbdConfig;
+                                 String hwUpdate = null;
+                                 String vmUpdate = null;
+                                 String drbdUpdate = null;
+                                 do {
+                                     i++;
+                                     hw = getOutput("hw", outputBuffer); 
+                                     if (hw != null) {
+                                         hwUpdate = hw;
+                                     }
+                                     vm = getOutput("vm", outputBuffer); 
+                                     if (vm != null) {
+                                         vmUpdate = vm;
+                                     }
+                                     drbdConfig = getOutput("drbd",
+                                                            outputBuffer); 
+                                     if (drbdConfig != null) {
+                                         drbdUpdate = drbdConfig;
+                                     }
+                                 } while (hw != null
+                                          || vm != null
+                                          || drbdConfig != null);
+
+                                 if (hwUpdate != null) {
+                                     parseHostInfo(hwUpdate);
+                                 }
+                                 if (vmUpdate != null) {
+                                     final VMSXML newVMSXML =
+                                                        new VMSXML(host);
+                                     if (newVMSXML.update(vmUpdate)) {
+                                         cb.vmsXMLPut(host, newVMSXML);
+                                         cb.updateVMS();
+                                     }
+                                 }
+                                 if (drbdUpdate != null) {
+                                     final DrbdXML dxml =
+                                           new DrbdXML(cluster.getHostsArray(),
+                                                       cb.getDrbdParameters());
+                                     dxml.update(drbdUpdate);
+                                     cb.setDrbdXML(dxml);
+                                     cb.getDrbdGraph().getDrbdInfo().setParameters();
+                                     cb.updateDrbdResources();
+                                 }
+                                 if (drbdUpdate != null
+                                     || hwUpdate != null
+                                     || vmUpdate != null) {
+                                     cb.updateHWInfo(host);
+                                     cb.updateServerStatus(host);
+                                 }
+                             }
+                         },
+                         false,
                          false,
                          SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
@@ -1672,7 +1720,30 @@ public final class Host {
         }
     }
 
-
+    /** Starts connection status. */
+    public void startConnectionStatus() {
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (ping.get()) {
+                       Tools.debug(this, "connection ok on " + getName(),
+                                   2);
+                       setConnected();
+                       ping.set(false);
+                    } else {
+                       Tools.debug(this, "connection lost on "
+                                         + getName(),
+                                   2);
+                       getSSH().forceReconnect();
+                       setConnected();
+                    }
+                    Tools.sleep(PING_TIMEOUT);
+                }
+            }
+        });
+        thread.start();
+    }
 
     /** Returns whether host ssh connection was established. */
     public boolean isConnected() {

@@ -40,91 +40,60 @@ for (keys %ENV) {
 }
 
 our $DEBUG = 0;
+our $HW_INFO_INTERVAL = 5;
+
 my $option = shift || die;
 
 if ($option eq "all") {
 	print "net-info\n";
-	get_net_info();
+	print get_net_info();
 	print "disk-info\n";
-	get_disk_info();
+	print get_disk_info();
 	print "vg-info\n";
-	get_vg_info();
+	print get_vg_info();
 	print "filesystems-info\n";
-	get_filesystems_info();
+	print get_filesystems_info();
 	print "crypto-info\n";
-	get_crypto_info();
+	print get_crypto_info();
 	print "qemu-keymaps-info\n";
-	get_qemu_keymaps_info();
-	get_cpu_map_info();
+	print get_qemu_keymaps_info();
+	print get_cpu_map_info();
 	print "mount-points-info\n";
-	get_mount_points_info();
+	print get_mount_points_info();
 	print "gui-info\n";
-	get_gui_info();
+	print get_gui_info();
 	print "installation-info\n";
-	get_installation_info();
+	print get_installation_info();
 	print "version-info\n";
-	get_version_info();
+	print get_version_info();
+} elsif ($option eq "hw-info-daemon") {
+	start_hw_info_daemon();
 } elsif ($option eq "hw-info") {
-	print "net-info\n";
-	get_net_info();
-	print "disk-info\n";
-	get_disk_info();
-	print "vg-info\n";
-	get_vg_info();
-	print "filesystems-info\n";
-	get_filesystems_info();
-	print "crypto-info\n";
-	get_crypto_info();
-	print "qemu-keymaps-info\n";
-	get_qemu_keymaps_info();
-	get_cpu_map_info();
-	print "mount-points-info\n";
-	get_mount_points_info();
-	#print "gui-info\n";
-	#get_gui_info();
-	print "installation-info\n";
-	get_installation_info();
-	print "version-info\n";
-	get_version_info();
+	print get_hw_info();
 } elsif ($option eq "hw-info-lazy") {
-	print "net-info\n";
-	get_net_info();
-	sleep 1;
-	print "disk-info\n";
-	get_disk_info();
-	print "vg-info\n";
-	get_vg_info();
-	sleep 1;
-	print "filesystems-info\n";
-	get_filesystems_info();
-	sleep 1;
-	print "mount-points-info\n";
-	get_mount_points_info();
-	sleep 1;
-	print "installation-info\n";
-	get_installation_info();
+	print get_hw_info_lazy();
 } elsif ($option eq "installation-info") {
-	get_installation_info();
+	print get_installation_info();
 } elsif ($option eq "get-net-info") {
-	get_net_info();
+	print get_net_info();
 } elsif ($option eq "get-disk-info") {
-	get_disk_info();
+	print get_disk_info();
 } elsif ($option eq "get-vg-info") {
-	get_vg_info();
+	print get_vg_info();
 } elsif ($option eq "get-filesystems-info") {
-	get_filesystems_info();
+	print get_filesystems_info();
 } elsif ($option eq "get-crypto-info") {
-	get_crypto_info();
+	print get_crypto_info();
 } elsif ($option eq "get-qemu-keymaps-info") {
-	get_qemu_keymaps_info();
+	print get_qemu_keymaps_info();
 } elsif ($option eq "get-cpu-map-info") {
-	get_cpu_map_info();
+	print get_cpu_map_info();
 } elsif ($option eq "get-gui-info") {
-	get_gui_info();
+	print get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
-	get_mount_points_info();
-#} elsif ($option eq "get-drbd-info") {
-#	get_drbd_info();
+	print get_mount_points_info();
+} elsif ($option eq "get-drbd-info") {
+	print get_drbd_info();
 } elsif ($option eq "get-drbd-events") {
 	get_drbd_events();
 } elsif ($option eq "get-old-style-resources") {
@@ -148,7 +117,7 @@ if ($option eq "all") {
 } elsif ($option eq "get-cluster-versions") {
 	print get_cluster_versions();
 } elsif ($option eq "get-vm-info") {
-	get_vm_info();
+	print get_vm_info();
 } elsif ($option eq "gui-test") {
 	gui_test(@ARGV);
 } elsif ($option eq "gui-drbd-test") {
@@ -159,6 +128,97 @@ if ($option eq "all") {
 	get_proc_drbd();
 } else {
 	die "unknown command";
+}
+
+# periodic stuff
+sub start_hw_info_daemon {
+	my $prev_hw_info = 0;
+	my $prev_hw_info_lazy = 0;
+	my $prev_vm_info = 0;
+	my $prev_drbd_info = 0;
+	my $count = 0;
+	while (1) {
+		print "--ping--\n";
+		if ($count % 5 == 0) {
+			my $hw_info = get_hw_info();
+			if ($hw_info ne $prev_hw_info) {
+				print "--hw-info-start--\n";
+				print $hw_info;
+				$prev_hw_info = $hw_info;
+				print "--hw-info-end--\n";
+			}
+			$count = 0;
+		} else {
+			my $hw_info_lazy = get_hw_info_lazy();
+			if ($hw_info_lazy ne $prev_hw_info_lazy) {
+				print "--hw-info-start--\n";
+				print $hw_info_lazy;
+				print "--hw-info-end--\n";
+				$prev_hw_info_lazy = $hw_info_lazy;
+			}
+		}
+		my $vm_info = get_vm_info();
+		if ($vm_info ne $prev_vm_info) {
+			print "--vm-info-start--\n";
+			print $vm_info;
+			print "--vm-info-end--\n";
+			$prev_vm_info = $vm_info;
+		}
+		my $drbd_info = get_drbd_info();
+		if ($drbd_info ne $prev_drbd_info) {
+			print "--drbd-info-start--\n";
+			print $drbd_info;
+			print "--drbd-info-end--\n";
+			$prev_drbd_info = $drbd_info;
+		}
+		sleep $HW_INFO_INTERVAL;
+		$count++;
+	}
+}
+
+sub get_hw_info {
+	my $out = "net-info\n";
+	$out .= get_net_info();
+	$out .= "disk-info\n";
+	$out .= get_disk_info();
+	$out .= "vg-info\n";
+	$out .= get_vg_info();
+	$out .= "filesystems-info\n";
+	$out .= get_filesystems_info();
+	$out .= "crypto-info\n";
+	$out .= get_crypto_info();
+	$out .= "qemu-keymaps-info\n";
+	$out .= get_qemu_keymaps_info();
+	$out .= get_cpu_map_info();
+	$out .= "mount-points-info\n";
+	$out .= get_mount_points_info();
+	#$out .= "gui-info\n";
+	#$out .= get_gui_info();
+	$out .= "installation-info\n";
+	$out .= get_installation_info();
+	$out .= "version-info\n";
+	$out .= get_version_info();
+	return $out;
+}
+
+sub get_hw_info_lazy {
+	my $out = "net-info\n";
+	$out .= get_net_info();
+	$out .= "disk-info\n";
+	$out .= get_disk_info();
+	$out .= "vg-info\n";
+	$out .= get_vg_info();
+	$out .= "filesystems-info\n";
+	$out .= get_filesystems_info();
+	$out .= "mount-points-info\n";
+	$out .= get_mount_points_info();
+	$out .= "installation-info\n";
+	$out .= get_installation_info();
+	return $out;
+}
+
+sub get_drbd_info {
+	return `/sbin/drbdadm dump-xml 2>/dev/null`;
 }
 
 sub print_debug {
@@ -201,6 +261,7 @@ sub get_net_info {
 	my $ip   = "";
 	my $mask = "";
 	my $bridges = get_bridges();
+	my $out = "";
 	for (`/sbin/ifconfig`) {
 		if (!$dev) {
 			($dev) = /^(\S+)/ or net_info_error("no dev");
@@ -214,11 +275,11 @@ sub get_net_info {
 		}
 		if (/^$/) {
 			if ($dev && $dev ne "lo" && $ip && $mac && $mask) {
-				print "$dev $ip $mac $mask";
+				$out .= "$dev $ip $mac $mask";
 				if ($$bridges{$dev}) {
-					print " bridge\n";
+					$out .= " bridge\n";
 				} else {
-					print "\n";
+					$out .= "\n";
 				}
 			}
 			$dev = "";
@@ -227,6 +288,7 @@ sub get_net_info {
 			$mask = "";
 		}
 	}
+	return $out;
 }
 
 sub disk_info_error {
@@ -546,7 +608,7 @@ sub get_disk_info {
 	}
 	close PT;
 	
-	print join "", map { $_->[0] } 
+	return join "", map { $_->[0] } 
 	  sort { 
 	   (($a->[1] =~ /(^\D+)/)[0] || "") cmp (($b->[1]  =~ /(^\D+)/)[0] || "")
 				||
@@ -560,23 +622,27 @@ sub get_vg_info {
 	if (-e "/sbin/pvdisplay") {
 		$path = "/sbin";
 	}
+	my $out = "";
 	for (`$path/vgdisplay -C --noheadings --units b -o name,free 2>/dev/null`) {
 		my ($name, $free) = split;
 		$free =~ s/B$//;
-		print "$name $free\n";
+		$out .= "$name $free\n";
 	}
+	return $out;
 }
 
 # get_filesystems_info
 #
 # prints available filesystems on this host.
 sub get_filesystems_info {
+	my $out = "";
 	for (`ls /sbin/mkfs.* 2>/dev/null`) {
 		chomp;
 		my ($fs) = /([^\.]+)$/;
 		`/sbin/modinfo $fs >/dev/null 2>&1 || grep '\\<$fs\\>' /proc/filesystems`;
-		print "$fs\n" if !$?;
+		$out .= "$fs\n" if !$?;
 	}
+	return $out;
 }
 
 # get_mount_points_info
@@ -584,10 +650,12 @@ sub get_filesystems_info {
 # prints directories in the /mnt directory
 sub get_mount_points_info {
 	my $dir = "/mnt";
+	my $out = "";
 	if (opendir(DIR, $dir)) {
-		print "$dir/$_\n" for (sort grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
+		$out .= "$dir/$_\n" for (sort grep { $_ !~ /^\./ && -d "$dir/$_" } readdir(DIR));
 		closedir DIR;
 	}
+	return $out;
 }
 
 # get_crypto_info
@@ -612,9 +680,11 @@ sub get_crypto_info {
 			push @modules, $cr;
 		}
 	}
+	my $out = "";
 	for (@modules) {
-		print "$_\n";
+		$out .= "$_\n";
 	}
+	return $out;
 }
 
 # get_crypto_info
@@ -623,9 +693,11 @@ sub get_crypto_info {
 sub get_qemu_keymaps_info {
 	my @modules;
 	my %module_exists;
+	my $out = "";
 	for (`ls /usr/share/qemu*/keymaps/ 2>/dev/null`) {
-		print;
+		$out .= $_;
 	}
+	return $out;
 }
 
 sub get_cpu_map_info {
@@ -640,34 +712,39 @@ sub get_cpu_map_info {
 			$vendors{$vendor} = 1 if $vendor;
 		}
 	}
-	print "cpu-map-model-info\n";
+	my $out = "";
+	$out .= "cpu-map-model-info\n";
 	for (@models) {
-		print "$_\n";
+		$out .= "$_\n";
 	}
-	print "cpu-map-vendor-info\n";
+	$out .= "cpu-map-vendor-info\n";
 	for (sort keys %vendors) {
-		print "$_\n";
+		$out .= "$_\n";
 	}
+	return $out;
 }
 
 # get_gui_info()
 #
 sub get_gui_info {
+	my $out = "";
 	if (open FH, "/var/lib/heartbeat/drbdgui.cf") {
 		while (<FH>) {
-			print;
+			$out .= "$_";
 		}
 		close FH;
 	}
+	return $out;
 }
 
 # get_installation_info()
 #
 sub get_installation_info {
-	print get_cluster_versions();
+	my $out = get_cluster_versions();
 	my $hn = `hostname`;
 	chomp $hn;
-	print "hn:$hn\n";
+	$out .= "hn:$hn\n";
+	return $out;
 }
 # get_version_info()
 #
@@ -685,29 +762,40 @@ sub get_version_info {
 	 .'| perl -lne "print lc((split /:\s*/)[1])";'
 	 .'cut -d ":" /etc/system-release-cpe -f 4,5 2>/dev/null|sed "s/:/\n/"'
 	 .'| sed "s/enterprise_linux/redhatenterpriseserver/" ';
-	 print `$cmd`;
+	 return `$cmd`;
 }
 
 sub get_drbd_events {
 	if (! -e "/proc/drbd") {
 	       print "nm\n";
 	       exit 101;
+	} print "empty\n";
+	my ($v1, $v2, $v3) = get_drbd_version();
+	my $command;
+	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
+		$command = "/sbin/drbdsetup /dev/drbd0 events -a -u";
+	} else {
+		$command = "/sbin/drbdsetup all events";
 	}
-	my $kidpid;
-	my $pid = $$;
-	die "can't fork: $!" unless defined($kidpid = fork());
-	if ($kidpid) {
-		print "empty\n";
-		my ($v1, $v2, $v3) = get_drbd_version();
-		if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
-			exec("/sbin/drbdsetup /dev/drbd0 events -a -u");
-		} else {
-			exec("/sbin/drbdsetup all events");
+	my $prev_drbd_info = 0;
+	if (!open EVENTS, "$command|") {
+		print "can't execute $command\n";
+		return;
+	} else {
+		while (<EVENTS>) {
+			my $drbd_info = get_drbd_info();
+			if ($drbd_info ne $prev_drbd_info) {
+				print "--config-info-start--\n";
+				print $drbd_info;
+				print "--config-info-end--\n";
+				$prev_drbd_info = $drbd_info;
+			}
+			print "--event-info-start--\n";
+			print "$_";
+			print "--event-info-end--\n";
 		}
-	#} else {
-	#	sleep 20;
-	#	kill("TERM", $pid);
 	}
+	close EVENTS;
 }
 
 sub is_smaller_v {
@@ -1647,9 +1735,10 @@ sub get_vm_info {
 		$out .= $networks;
 	}
 	my $md5 = md5_hex($out);
-	print "<vms md5=\"$md5\">\n";
-	print $out;
-	print "</vms>\n";
+	my $ret = "<vms md5=\"$md5\">\n";
+	$ret .= $out;
+	$ret .= "</vms>\n";
+	return $ret;
 }
 
 sub gui_test {

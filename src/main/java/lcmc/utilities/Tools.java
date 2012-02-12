@@ -2269,7 +2269,7 @@ public final class Tools {
             /* this is special case, because this object represents devices in
              * filesystem ra and also after field in drbd.conf. */
             final String device = ((DrbdResourceInfo) o1).getStringValue();
-            if (device.equals(o2)) {
+            if (device != null && device.equals(o2)) {
                 return true;
             }
             final String res = ((DrbdResourceInfo) o1).getName();

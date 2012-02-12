@@ -345,6 +345,7 @@ public final class SSH {
         */
         private SSHOutput execOneCommand(final String command,
                                          final boolean outputVisible) {
+            
             if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
                 Tools.appWarning(sshCommandTimeout + " to small for timeout? "
                                  + command);

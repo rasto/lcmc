@@ -3252,7 +3252,7 @@ public final class RoboTest {
         leftClick(); /* finish */
         sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             info("i: " + i);
             removeDrbdVolume(false);
         }

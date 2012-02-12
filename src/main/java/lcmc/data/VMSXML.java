@@ -1082,6 +1082,10 @@ public final class VMSXML extends XML {
         if (output == null) {
             return false;
         }
+        return update(output);
+    }
+
+    public boolean update(final String output) {
         final Document document = getXMLDocument(output);
         mXMLDocumentWriteLock.lock();
         xmlDocument = document;
@@ -1091,8 +1095,7 @@ public final class VMSXML extends XML {
         }
         final Node vmsNode = getChildNode(document, "vms");
         final String md5 = getAttribute(vmsNode, "md5");
-        if (md5 == null
-            || md5.equals(host.getVMInfoMD5())) {
+        if (md5 == null || md5.equals(host.getVMInfoMD5())) {
             return false;
         }
         host.setVMInfoMD5(md5);

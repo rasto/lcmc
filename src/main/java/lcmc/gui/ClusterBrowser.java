@@ -201,9 +201,6 @@ public final class ClusterBrowser extends Browser {
     private Host realDcHost = null;
     /** Panel that holds this browser. */
     private ClusterViewPanel clusterViewPanel = null;
-    /** Previous drbd configs. */
-    private final Map<Host, String> oldDrbdConfigString =
-                                                  new HashMap<Host, String>();
     /** Map to ResourceAgentClassInfo. */
     private final Map<String, ResourceAgentClassInfo> classInfoMap =
                                 new HashMap<String, ResourceAgentClassInfo>();
@@ -723,12 +720,7 @@ public final class ClusterBrowser extends Browser {
                 initOperations();
                 final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray(),
                                                        drbdParameters);
-                for (final Host h : cluster.getHostsArray()) {
-                    final String configString = newDrbdXML.getConfig(h);
-                    newDrbdXML.update(configString);
-                }
                 drbdXML = newDrbdXML;
-                getDrbdGraph().getDrbdInfo().setParameters();
                 /* available services */
                 final String clusterName = getCluster().getName();
                 Tools.startProgressIndicator(clusterName,
@@ -739,18 +731,6 @@ public final class ClusterBrowser extends Browser {
                     Tools.getString("ClusterBrowser.HbUpdateResources"));
                 Tools.startProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
-                Tools.debug(this, "start update drbd resources", 2);
-                updateDrbdResources();
-                Tools.debug(this, "update drbd resources done", 2);
-                //drbdGraph.scale();
-                //try { Thread.sleep(10000); }
-                //catch (InterruptedException ex) {}
-                //SwingUtilities.invokeLater(new Runnable() {
-                //    @Override
-                //    public void run() {
-                //        drbdGraph.getDrbdInfo().getInfoPanel();
-                //    }
-                //});
                 Tools.stopProgressIndicator(clusterName,
                     Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startConnectionStatus();
@@ -760,7 +740,6 @@ public final class ClusterBrowser extends Browser {
             }
         };
         final Thread thread = new Thread(runnable);
-        //thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 
@@ -796,52 +775,48 @@ public final class ClusterBrowser extends Browser {
             }
 
             host.setIsLoading();
-            if (host.isServerStatusLatch() || count % 5 == 0) {
-                host.getHWInfo(infosToUpdate,
-                               new ResourceGraph[]{drbdGraph, heartbeatGraph});
-            } else {
-                host.getHWInfoLazy(infosToUpdate,
+            host.startHWInfoDaemon(infosToUpdate,
                                    new ResourceGraph[]{drbdGraph,
                                                        heartbeatGraph});
-            }
-            Tools.invokeAndWait(new Runnable() {
-                public void run() {
-                    drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
-                }
-            });
-            if (mDRBDStatusLock.tryLock()) {
-                updateDrbdResources();
-                drbdStatusUnlock();
-            }
-            if (host.isServerStatusLatch()) {
-                Tools.stopProgressIndicator(
-                        hostName,
-                        Tools.getString("ClusterBrowser.UpdatingServerInfo"));
-                Tools.startProgressIndicator(
-                        hostName,
-                        Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
-            }
-            periodicalVMSUpdate(host);
-            if (host.isServerStatusLatch()) {
-                Tools.stopProgressIndicator(
-                        hostName,
-                        Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
-
-            }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    drbdGraph.scale();
-                }
-            });
-            host.serverStatusLatchDone();
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-            count++;
             if (!serverStatus) {
                 break;
+            }
+        }
+    }
+
+    public void updateServerStatus(final Host host) {
+        final String hostName = host.getName();
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
+            }
+        });
+        if (host.isServerStatusLatch()) {
+            Tools.stopProgressIndicator(
+                    hostName,
+                    Tools.getString("ClusterBrowser.UpdatingServerInfo"));
+            Tools.startProgressIndicator(
+                    hostName,
+                    Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
+        }
+        if (host.isServerStatusLatch()) {
+            Tools.stopProgressIndicator(
+                    hostName,
+                    Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
+
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                drbdGraph.scale();
+            }
+        });
+        host.serverStatusLatchDone();
+        clusterHostsInfo.updateTable(CategoryInfo.MAIN_TABLE);
+        for (final ResourceGraph g : new ResourceGraph[]{drbdGraph,
+                                                         heartbeatGraph}) {
+            if (g != null) {
+                g.repaint();
+                g.updatePopupMenus();
             }
         }
     }
@@ -850,12 +825,7 @@ public final class ClusterBrowser extends Browser {
     public void periodicalVMSUpdate(final Host host) {
         final VMSXML newVMSXML = new VMSXML(host);
         if (newVMSXML.update()) {
-            mVMSWriteLock.lock();
-            try {
-                vmsXML.put(host, newVMSXML);
-            } finally {
-                mVMSWriteLock.unlock();
-            }
+            vmsXMLPut(host, newVMSXML);
             updateVMS();
         }
     }
@@ -882,7 +852,7 @@ public final class ClusterBrowser extends Browser {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    startConnectionStatus(host);
+                    host.startConnectionStatus();
                 }
             });
             thread.start();
@@ -913,41 +883,6 @@ public final class ClusterBrowser extends Browser {
         for (Host host : hosts) {
             host.waitOnDrbdStatus();
         }
-    }
-
-    /** Starts connection status. */
-    void startConnectionStatus(final Host host) {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    host.execConnectionStatusCommand(
-                          new ExecCallback() {
-                               @Override
-                               public void done(final String ans) {
-                                   Tools.debug(this, "connection ok on "
-                                                     + host.getName(),
-                                               2);
-                                   host.setConnected();
-                               }
-
-                               @Override
-                               public void doneError(final String ans,
-                                                     final int exitCode) {
-                                   Tools.debug(this, "connection lost on "
-                                                     + host.getName()
-                                                     + "exit code: "
-                                                     + exitCode,
-                                               2);
-                                   host.getSSH().forceReconnect();
-                                   host.setConnected();
-                               }
-                           });
-                    Tools.sleep(10000);
-                }
-            }
-        });
-        thread.start();
     }
 
     /** Starts drbd status on host. */
@@ -1029,11 +964,11 @@ public final class ClusterBrowser extends Browser {
                    },
 
                    new NewOutputCallback() {
+                       private StringBuffer outputBuffer =
+                                                        new StringBuffer(300);
                        @Override
                        public void output(final String output) {
-                           drbdStatusLock();
                            firstTime.countDown();
-                           boolean updated = false;
                            if ("nm".equals(output.trim())) {
                                if (host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
@@ -1043,43 +978,46 @@ public final class ClusterBrowser extends Browser {
                                    clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                                }
-                               drbdStatusUnlock();
                                return;
-                           } else {
-                               if (!host.isDrbdStatus()) {
-                                   Tools.debug(this, "drbd status update: "
-                                                 + host.getName(), 1);
-                                   host.setDrbdStatus(true);
-                                   drbdGraph.repaint();
-                                   clusterHostsInfo.updateTable(
-                                                ClusterHostsInfo.MAIN_TABLE);
+                           } 
+                           if (!host.isDrbdStatus()) {
+                               Tools.debug(this, "drbd status update: "
+                                             + host.getName(), 1);
+                               host.setDrbdStatus(true);
+                               drbdGraph.repaint();
+                               clusterHostsInfo.updateTable(
+                                                  ClusterHostsInfo.MAIN_TABLE);
+                           }
+                           outputBuffer.append(output);
+                           String drbdConfig, event;
+                           boolean drbdUpdate = false;
+                           boolean eventUpdate = false;
+                           do {
+                               drbdConfig =
+                                        host.getOutput("config", outputBuffer); 
+                               if (drbdConfig != null) {
+                                   final DrbdXML newDrbdXML =
+                                                new DrbdXML(cluster.getHostsArray(),
+                                                            drbdParameters);
+                                   newDrbdXML.update(drbdConfig);
+                                   drbdXML = newDrbdXML;
+                                   drbdUpdate = true;
                                }
-                           }
-                           final String[] lines = output.split("\n");
-                           final DrbdXML newDrbdXML =
-                                          new DrbdXML(cluster.getHostsArray(),
-                                                      drbdParameters);
-
-                           final String configString =
-                                                   newDrbdXML.getConfig(host);
-                           boolean configUpdated = false;
-                           if (!Tools.areEqual(configString,
-                                           oldDrbdConfigString.get(host))) {
-                               oldDrbdConfigString.put(host, configString);
-                               configUpdated = true;
-                           }
-                           newDrbdXML.update(configString);
-                           for (final String line : lines) {
-                               if (newDrbdXML.parseDrbdEvent(host.getName(),
-                                                             drbdGraph,
-                                                             line)) {
-                                   updated = true;
-                                   host.setDrbdStatus(true);
+                               event = host.getOutput("event", outputBuffer); 
+                               if (event != null) {
+                                   if (drbdXML.parseDrbdEvent(host.getName(),
+                                                              drbdGraph,
+                                                              event)) {
+                                       host.setDrbdStatus(true);
+                                       eventUpdate = true;
+                                   }
                                }
-                           }
-                           if (updated || configUpdated) {
-                               drbdXML = newDrbdXML;
+                           } while (event != null || drbdConfig != null);
+                           if (drbdUpdate) {
                                getDrbdGraph().getDrbdInfo().setParameters();
+                               updateDrbdResources();
+                           }
+                           if (eventUpdate) {
                                drbdGraph.repaint();
                                Tools.debug(this, "drbd status update: "
                                              + host.getName(), 1);
@@ -1103,7 +1041,6 @@ public final class ClusterBrowser extends Browser {
                                    });
                                thread.start();
                            }
-                           drbdStatusUnlock();
                        }
                    });
             firstTime.countDown();
@@ -1444,7 +1381,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates VM nodes. */
-    void updateVMS() {
+    public void updateVMS() {
         mUpdateVMSlock.lock();
         Tools.debug(this, "VM status update", 1);
         final Set<String> domainNames = new TreeSet<String>();
@@ -1554,26 +1491,18 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates drbd resources. */
-    private void updateDrbdResources() {
-        final DrbdXML dxml = new DrbdXML(cluster.getHostsArray(),
-                                         drbdParameters);
-        boolean configUpdated = false;
-        for (final Host host : cluster.getHostsArray()) {
-            final String configString = dxml.getConfig(host);
-            if (!Tools.areEqual(configString,
-                            oldDrbdConfigString.get(host))) {
-                oldDrbdConfigString.put(host, configString);
-                configUpdated = true;
-            }
-            dxml.update(configString);
-        }
-        drbdXML = dxml;
-        if (!configUpdated) {
+    public void updateDrbdResources() {
+        if (!mDRBDStatusLock.tryLock()) {
             return;
         }
+        drbdStatusUnlock();
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
+        final DrbdXML dxml = drbdXML;
+        if (dxml == null) {
+            return;
+        }
         for (final Object k : dxml.getResourceDeviceMap().keySet()) {
             final String resName = (String) ((MultiKey) k).getKey(0);
             final String volumeNr = (String) ((MultiKey) k).getKey(1);
@@ -2571,7 +2500,6 @@ public final class ClusterBrowser extends Browser {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
-        updateDrbdResources();
         updateCommonBlockDevices();
         drbdGraph.repaint();
     }

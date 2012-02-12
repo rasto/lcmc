@@ -1282,7 +1282,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final DrbdResourceInfo dri = drbdResHash.get(getName());
         drbdResHash.remove(getName());
         getBrowser().putDrbdResHash();
-        dri.setName(null);
+        if (dri != null) {
+            dri.setName(null);
+        }
         if (!testOnly) {
             removeNode();
         }

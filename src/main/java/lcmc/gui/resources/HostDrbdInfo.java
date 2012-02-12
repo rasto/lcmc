@@ -285,7 +285,7 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public String enablePredicate() {
                     if (getHost().isConnected()) {
-                        if (getHost().isDrbdStatus()) {
+                        if (getHost().isDrbdLoaded()) {
                             return "already loaded";
                         } else {
                             return null;
