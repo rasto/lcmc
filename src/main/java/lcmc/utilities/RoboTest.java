@@ -3936,37 +3936,39 @@ public final class RoboTest {
             checkVMTest(vmTest, 2, name);
 
             if (cluster.getHosts().size() > 1) {
-                /* two hosts */
-                moveTo(410, 326); /* deselect first */
-                leftClick();
-                sleep(2000);
-                moveTo(560, 362 + yMoreHosts); /* create config */
-                sleep(2000);
-                leftClick();
-                checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
-                checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
+                for (int i = 0; i < 3; i ++) {
+                    /* two hosts */
+                    moveTo(410, 326); /* deselect first */
+                    leftClick();
+                    sleep(2000);
+                    moveTo(560, 362 + yMoreHosts); /* create config */
+                    sleep(2000);
+                    leftClick();
+                    checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
+                    checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
 
-                moveTo(410, 326); /* select first */
-                sleep(1000);
-                leftClick();
-                sleep(1000);
-                moveTo(410, 361); /* deselect second */
-                sleep(1000);
-                leftClick();
-                sleep(1000);
-                moveTo(560, 362 + yMoreHosts); /* create config */
-                sleep(2000);
-                leftClick();
-                checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
-                checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
+                    moveTo(410, 326); /* select first */
+                    sleep(1000);
+                    leftClick();
+                    sleep(1000);
+                    moveTo(410, 361); /* deselect second */
+                    sleep(1000);
+                    leftClick();
+                    sleep(1000);
+                    moveTo(560, 362 + yMoreHosts); /* create config */
+                    sleep(2000);
+                    leftClick();
+                    checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
+                    checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
 
-                moveTo(410, 361); /* select second */
-                leftClick();
-                sleep(2000);
-                moveTo(560, 362 + yMoreHosts); /* create config */
-                sleep(4000);
-                leftClick();
-                checkVMTest(vmTest, 2, name);
+                    moveTo(410, 361); /* select second */
+                    leftClick();
+                    sleep(2000);
+                    moveTo(560, 362 + yMoreHosts); /* create config */
+                    sleep(4000);
+                    leftClick();
+                    checkVMTest(vmTest, 2, name);
+                }
             }
 
             sleepNoFactor(2000);

@@ -3374,6 +3374,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final Map<VMSHardwareInfo, Map<String, String>> allHWP =
                                                       getAllHWParameters(true);
         final Map<Node, VMSXML> domainNodesToSave = new HashMap<Node, VMSXML>();
+        getBrowser().vmStatusLock();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
               definedOnHostComboBoxHash.get(host.getName()).getStringValue();
@@ -3462,16 +3463,18 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode thisNode = getNode();
-                    final Enumeration eee = thisNode.children();
-                    while (eee.hasMoreElements()) {
-                        final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) eee.nextElement();
-                        final VMSHardwareInfo vmshi =
-                                        (VMSHardwareInfo) node.getUserObject();
-                        if (vmshi != null) {
-                            final MyButton mb = vmshi.getApplyButton();
-                            if (mb != null) {
-                                mb.setVisible(true);
+                    if (thisNode != null) {
+                        final Enumeration eee = thisNode.children();
+                        while (eee.hasMoreElements()) {
+                            final DefaultMutableTreeNode node =
+                                        (DefaultMutableTreeNode) eee.nextElement();
+                            final VMSHardwareInfo vmshi =
+                                            (VMSHardwareInfo) node.getUserObject();
+                            if (vmshi != null) {
+                                final MyButton mb = vmshi.getApplyButton();
+                                if (mb != null) {
+                                    mb.setVisible(true);
+                                }
                             }
                         }
                     }
@@ -3486,6 +3489,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(host);
         }
+        getBrowser().vmStatusUnlock();
         updateParameters();
     }
 

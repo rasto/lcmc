@@ -1686,11 +1686,14 @@ public final class Host {
                                      parseHostInfo(hwUpdate);
                                  }
                                  if (vmUpdate != null) {
-                                     final VMSXML newVMSXML =
-                                                        new VMSXML(host);
-                                     if (newVMSXML.update(vmUpdate)) {
-                                         cb.vmsXMLPut(host, newVMSXML);
-                                         cb.updateVMS();
+                                     if (cb.vmStatusTryLock()) {
+                                         cb.vmStatusUnlock();
+                                         final VMSXML newVMSXML =
+                                                            new VMSXML(host);
+                                         if (newVMSXML.update(vmUpdate)) {
+                                             cb.vmsXMLPut(host, newVMSXML);
+                                             cb.updateVMS();
+                                         }
                                      }
                                  }
                                  if (drbdUpdate != null) {

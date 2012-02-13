@@ -1382,7 +1382,6 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates VM nodes. */
     public void updateVMS() {
-        mUpdateVMSlock.lock();
         Tools.debug(this, "VM status update", 1);
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
@@ -1430,7 +1429,6 @@ public final class ClusterBrowser extends Browser {
         });
 
         if (vmsNode == null) {
-            mUpdateVMSlock.unlock();
             return;
         }
         for (final String domainName : domainNames) {
@@ -1482,7 +1480,6 @@ public final class ClusterBrowser extends Browser {
         if (vmsi != null) {
             vmsi.updateTable(VMSInfo.MAIN_TABLE);
         }
-        mUpdateVMSlock.unlock();
     }
 
     /** Returns vmsinfo object. */
@@ -1728,6 +1725,22 @@ public final class ClusterBrowser extends Browser {
     public void drbdStatusUnlock() {
         mDRBDStatusLock.unlock();
     }
+
+    /** vmStatusLock global lock. */
+    public void vmStatusLock() {
+        mUpdateVMSlock.lock();
+    }
+
+    /** vmStatusLock try global lock. */
+    public boolean vmStatusTryLock() {
+        return mUpdateVMSlock.tryLock();
+    }
+
+    /** vmStatusLock global unlock. */
+    public void vmStatusUnlock() {
+        mUpdateVMSlock.unlock();
+    }
+
 
     /** Highlights drbd node. */
     void selectDrbd() {
