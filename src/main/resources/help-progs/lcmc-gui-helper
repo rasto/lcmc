@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-# This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH,
-# written by Rasto Levrinc.
+# This file is part of Linux Cluster Management Console by Rasto Levrinc.
 #
-# Copyright (C) 2009 - 2010, LINBIT HA-Solutions GmbH.
-# Copyright (C) 2010, Rastislav Levrinc.
+# Copyright (C) 2011 - 2012, Rastislav Levrinc.
+# Copyright (C) 2009 - 2011, LINBIT HA-Solutions GmbH.
 #
 # DRBD Management Console is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
@@ -40,7 +39,9 @@ for (keys %ENV) {
 }
 
 our $DEBUG = 0;
-our $HW_INFO_INTERVAL = 5;
+our $HW_INFO_INTERVAL = 10;
+our $DRBD_INFO_INTERVAL = 10;
+our $CLUSTER_INFO_INTERVAL = 10;
 
 my $option = shift || die;
 
@@ -138,7 +139,6 @@ sub start_hw_info_daemon {
 	my $prev_drbd_info = 0;
 	my $count = 0;
 	while (1) {
-		print "--ping--\n";
 		if ($count % 5 == 0) {
 			my $hw_info = get_hw_info();
 			if ($hw_info ne $prev_hw_info) {
@@ -766,10 +766,27 @@ sub get_version_info {
 }
 
 sub get_drbd_events {
+	my $kidpid;
+	my $pid = $$;
+	die "can't fork: $!" unless defined($kidpid = fork());
+	if ($kidpid) {
+		while (1) {
+			do_drbd_events();
+			sleep $DRBD_INFO_INTERVAL;
+		}
+	} else {
+		while (1) {
+			print "\n"; # reset timeout
+			sleep $DRBD_INFO_INTERVAL;
+		}
+	}
+}
+
+sub do_drbd_events {
 	if (! -e "/proc/drbd") {
-	       print "nm\n";
-	       exit 101;
-	} print "empty\n";
+	       print "--nm--\n";
+	       return;
+	}
 	my ($v1, $v2, $v3) = get_drbd_version();
 	my $command;
 	if ($v1 < 7 || ($v1 == 8 && $v2 < 4)) { # < 8.4.0
@@ -783,16 +800,18 @@ sub get_drbd_events {
 		return;
 	} else {
 		while (<EVENTS>) {
-			my $drbd_info = get_drbd_info();
-			if ($drbd_info ne $prev_drbd_info) {
-				print "--config-info-start--\n";
-				print $drbd_info;
-				print "--config-info-end--\n";
-				$prev_drbd_info = $drbd_info;
+			if ($_ && $_ !~ /\d+\s+ZZ/) {
+				my $drbd_info = get_drbd_info();
+				if ($drbd_info ne $prev_drbd_info) {
+					print "--config-info-start--\n";
+					print $drbd_info;
+					print "--config-info-end--\n";
+					$prev_drbd_info = $drbd_info;
+				}
+				print "--event-info-start--\n";
+				print "$_";
+				print "--event-info-end--\n";
 			}
-			print "--event-info-start--\n";
-			print "$_";
-			print "--event-info-end--\n";
 		}
 	}
 	close EVENTS;
@@ -874,9 +893,26 @@ sub get_message {
 }
 
 #
-# Prints heartbeat info.
+# Prints cib info.
 #
 sub get_cluster_events {
+	my $kidpid;
+	my $pid = $$;
+	die "can't fork: $!" unless defined($kidpid = fork());
+	if ($kidpid) {
+		while (1) {
+			do_cluster_events();
+			sleep $CLUSTER_INFO_INTERVAL;
+		}
+	} else {
+		while (1) {
+			print "\n"; # reset timeout
+			sleep $CLUSTER_INFO_INTERVAL;
+		}
+	}
+}
+
+sub do_cluster_events {
 	my $info = get_cluster_info();
 	if ($info) {
 		print "---start---\n";
@@ -945,6 +981,7 @@ sub get_cluster_events {
 		my $rout;
 		my $len = 0;
 		vec($rin, fileno($CB),1) = 1;
+		my $prev_info = 0;
 		while (1) {
 			$len = sysread($CB, $buf, 1024, length($buf));
 			$cibevent++ if ($buf && $buf =~ /(%|<){3}\n/);
@@ -958,9 +995,12 @@ sub get_cluster_events {
 
 			if ($cibevent > 0) {
 				my $info = get_cluster_info();
-				print "---start---\n";
-				print $info;
-				print "---done---\n";
+				if ($info ne $prev_info) {
+					print "---start---\n";
+					print $info;
+					print "---done---\n";
+					$prev_info = $info;
+				}
 				$cibevent = 0;
 				next;
 			}
