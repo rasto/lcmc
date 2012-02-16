@@ -275,9 +275,9 @@ public final class Host {
     /** Ping is set every 10s. */
     private volatile AtomicBoolean ping = new AtomicBoolean(false);
     /** Timeout after which the connection is considered to be dead. */
-    private final int PING_TIMEOUT = 30000;
-    /** ping string. */
-    private static final String PING_STRING = "--ping--";
+    private final int PING_TIMEOUT = 20000;
+    private final int DRBD_EVENTS_TIMEOUT = 30000;
+    private final int CLUSTER_EVENTS_TIMEOUT = 30000;
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1125,7 +1125,7 @@ public final class Host {
                                     outputCallback,
                                     false,
                                     false,
-                                    0);
+                                    DRBD_EVENTS_TIMEOUT);
         } else {
             Tools.appWarning("trying to start started drbd status");
         }
@@ -1170,7 +1170,7 @@ public final class Host {
                                 outputCallback,
                                 false,
                                 false,
-                                0);
+                                CLUSTER_EVENTS_TIMEOUT);
         } else {
             Tools.appWarning("trying to start started hb status");
         }
@@ -1609,6 +1609,41 @@ public final class Host {
         return out;
     }
 
+    public void startPing() {
+        final Thread t = ssh.execCommand(
+                                Tools.getDistCommand(
+                                                "PingCommand",
+                                                dist,
+                                                distVersionString,
+                                                arch,
+                                                null, /* ConvertCmdCallback */
+                                                true), /* in bash */
+                         new ExecCallback() {
+                             @Override
+                             public void done(final String ans) {
+                             }
+
+                             @Override
+                             public void doneError(final String ans,
+                                                   final int exitCode) {
+                             }
+                         },
+                         new NewOutputCallback() {
+                             @Override
+                             public void output(final String output) {
+                                 ping.set(true);
+                             }
+                         },
+                         false,
+                         false,
+                         PING_TIMEOUT);
+        try {
+            t.join();
+        } catch (java.lang.InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     /** Gets and stores hardware info about the host. */
     public void startHWInfoDaemon(final CategoryInfo[] infosToUpdate,
                                   final ResourceGraph[] graphs) {
@@ -1649,13 +1684,6 @@ public final class Host {
                              @Override
                              public void output(final String output) {
                                  outputBuffer.append(output);
-                                 int ps = outputBuffer.indexOf(PING_STRING);
-                                 while (ps > -1) {
-                                     outputBuffer.delete(
-                                            ps, ps + PING_STRING.length() + 2);
-                                     ping.set(true);
-                                     ps = outputBuffer.indexOf(PING_STRING);
-                                 }
                                  final ClusterBrowser cb =
                                               getBrowser().getClusterBrowser();
                                  int i = 0;
@@ -1697,13 +1725,16 @@ public final class Host {
                                      }
                                  }
                                  if (drbdUpdate != null) {
-                                     final DrbdXML dxml =
-                                           new DrbdXML(cluster.getHostsArray(),
-                                                       cb.getDrbdParameters());
-                                     dxml.update(drbdUpdate);
-                                     cb.setDrbdXML(dxml);
-                                     cb.getDrbdGraph().getDrbdInfo().setParameters();
-                                     cb.updateDrbdResources();
+                                     if (cb.drbdStatusTryLock()) {
+                                         final DrbdXML dxml =
+                                               new DrbdXML(cluster.getHostsArray(),
+                                                           cb.getDrbdParameters());
+                                         dxml.update(drbdUpdate);
+                                         cb.setDrbdXML(dxml);
+                                         cb.getDrbdGraph().getDrbdInfo().setParameters();
+                                         cb.updateDrbdResources();
+                                         cb.drbdStatusUnlock();
+                                     }
                                  }
                                  if (drbdUpdate != null
                                      || hwUpdate != null
@@ -1715,7 +1746,7 @@ public final class Host {
                          },
                          false,
                          false,
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         20000);
         try {
             t.join(0);
         } catch (java.lang.InterruptedException e) {

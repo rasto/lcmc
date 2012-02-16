@@ -168,6 +168,8 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"GetHostHWInfoLazy", "nice -n 19 " + SUDO + "@GUI-HELPER@ hw-info-lazy"},
         {"GetNetInfo",  SUDO + "@GUI-HELPER@ get-net-info"},
 
+        {"PingCommand", "while true; do echo \"p\"; sleep 5; done"},
+
         /* heartbeat crm commands */
         {"CRM.cleanupResource", SUDO + "/usr/sbin/crm_resource -C -r @ID@ -H @HOST@"},
 

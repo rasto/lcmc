@@ -91,6 +91,8 @@ public final class SSH {
     /** Default timeout for SSH commands. */
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                Tools.getDefaultInt("SSH.Command.Timeout.Long");
+    /** No timeout for SSH commands. */
+    public static final int NO_COMMAND_TIMEOUT = 0;
     /** Sudo prompt. */
     public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
 
@@ -514,6 +516,11 @@ public final class SSH {
                     res.append(errOutput);
 
                     if (newOutputCallback != null && !cancelIt) {
+                        Tools.debug(this, "output" + exitCode + ": "
+                                          + host.getName()
+                                          + ": "
+                                          + output.toString(),
+                                          0);
                         newOutputCallback.output(output.toString());
                     }
 
@@ -546,7 +553,7 @@ public final class SSH {
                               + host.getName()
                               + ": "
                               + outputString,
-                              3);
+                              0);
             return new SSHOutput(outputString, exitCode);
         }
 
@@ -572,6 +579,7 @@ public final class SSH {
         throws java.io.IOException {
             super();
             this.command = command;
+            Tools.debug(this, "command: " + command, 0);
             this.execCallback = execCallback;
             this.newOutputCallback = newOutputCallback;
             this.outputVisible = outputVisible;

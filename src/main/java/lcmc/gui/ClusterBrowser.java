@@ -761,7 +761,17 @@ public final class ClusterBrowser extends Browser {
         }
     }
 
-    /** Starts polling of the server status on one host. */
+    private void startPing(final Host host) {
+        while (true) {
+            host.startPing();
+            Tools.sleep(10000);
+            if (!serverStatus) {
+                break;
+            }
+        }
+    }
+
+    /** Start polling of the server status on one host. */
     void startServerStatus(final Host host) {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate =
@@ -778,6 +788,7 @@ public final class ClusterBrowser extends Browser {
             host.startHWInfoDaemon(infosToUpdate,
                                    new ResourceGraph[]{drbdGraph,
                                                        heartbeatGraph});
+            Tools.sleep(10000);
             if (!serverStatus) {
                 break;
             }
@@ -849,6 +860,13 @@ public final class ClusterBrowser extends Browser {
     void startConnectionStatus() {
         final Host[] hosts = cluster.getHostsArray();
         for (final Host host : hosts) {
+            final Thread pingThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    startPing(host);
+                }
+            });
+            pingThread.start();
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -969,7 +987,7 @@ public final class ClusterBrowser extends Browser {
                        @Override
                        public void output(final String output) {
                            firstTime.countDown();
-                           if ("nm".equals(output.trim())) {
+                           if ("--nm--".equals(output.trim())) {
                                if (host.isDrbdStatus()) {
                                    Tools.debug(this, "drbd status update: "
                                                  + host.getName(), 1);
@@ -992,6 +1010,7 @@ public final class ClusterBrowser extends Browser {
                            String drbdConfig, event;
                            boolean drbdUpdate = false;
                            boolean eventUpdate = false;
+                           drbdStatusLock();
                            do {
                                drbdConfig =
                                         host.getOutput("config", outputBuffer); 
@@ -1041,6 +1060,7 @@ public final class ClusterBrowser extends Browser {
                                    });
                                thread.start();
                            }
+                           drbdStatusUnlock();
                        }
                    });
             firstTime.countDown();
@@ -1118,10 +1138,10 @@ public final class ClusterBrowser extends Browser {
 
     /** Process output from cluster. */
     void processClusterOutput(final String output,
-                                     final StringBuilder clusterStatusOutput,
-                                     final Host host,
-                                     final CountDownLatch firstTime,
-                                     final boolean testOnly) {
+                              final StringBuilder clusterStatusOutput,
+                              final Host host,
+                              final CountDownLatch firstTime,
+                              final boolean testOnly) {
         clStatusLock();
         if (clStatusCanceled || clusterStatus == null) {
             clStatusUnlock();
@@ -1287,13 +1307,10 @@ public final class ClusterBrowser extends Browser {
             if (clStatusCanceled) {
                 break;
             }
-            final boolean hbSt = clStatusFailed();
-            if (hbSt) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -1489,10 +1506,6 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates drbd resources. */
     public void updateDrbdResources() {
-        if (!mDRBDStatusLock.tryLock()) {
-            return;
-        }
-        drbdStatusUnlock();
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
@@ -1714,6 +1727,11 @@ public final class ClusterBrowser extends Browser {
     /** clStatusLock global unlock. */
     public void clStatusUnlock() {
         mClStatusLock.unlock();
+    }
+
+    /** drbdStatusTryLock global lock. */
+    public boolean drbdStatusTryLock() {
+        return mDRBDStatusLock.tryLock();
     }
 
     /** drbdStatusLock global lock. */
