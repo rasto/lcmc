@@ -98,8 +98,7 @@ public final class BlockDevice extends Resource {
                                                            "PausedSyncS",
                                                            "PausedSyncT",
                                                            "VerifyS",
-                                                           "VerifyT",
-                                                           "WFReportParams")));
+                                                           "VerifyT")));
 
     /** Syncing states. */
     private static final Set<String> SYNCING_STATES =
