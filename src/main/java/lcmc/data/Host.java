@@ -1668,12 +1668,22 @@ public final class Host {
                                          g.repaint();
                                      }
                                  }
+                                 if (host.isServerStatusLatch()) {
+                                     final ClusterBrowser cb =
+                                              getBrowser().getClusterBrowser();
+                                     cb.updateServerStatus(host);
+                                 }
                                  setLoadingDone();
                              }
 
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
+                                 if (host.isServerStatusLatch()) {
+                                     final ClusterBrowser cb =
+                                              getBrowser().getClusterBrowser();
+                                     cb.updateServerStatus(host);
+                                 }
                                  setLoadingError();
                              }
                          },
@@ -1742,6 +1752,10 @@ public final class Host {
                                      cb.updateHWInfo(host);
                                      cb.updateServerStatus(host);
                                  }
+                                 if (host.isServerStatusLatch()) {
+                                     cb.updateServerStatus(host);
+                                 }
+                                 setLoadingDone();
                              }
                          },
                          false,

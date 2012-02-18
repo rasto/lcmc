@@ -806,15 +806,6 @@ public final class ClusterBrowser extends Browser {
             Tools.stopProgressIndicator(
                     hostName,
                     Tools.getString("ClusterBrowser.UpdatingServerInfo"));
-            Tools.startProgressIndicator(
-                    hostName,
-                    Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
-        }
-        if (host.isServerStatusLatch()) {
-            Tools.stopProgressIndicator(
-                    hostName,
-                    Tools.getString("ClusterBrowser.UpdatingVMsStatus"));
-
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
