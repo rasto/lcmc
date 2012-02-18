@@ -1032,6 +1032,7 @@ public final class ClusterBrowser extends Browser {
                                    }
                                }
                            } while (event != null || drbdConfig != null);
+                           Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
                                getDrbdGraph().getDrbdInfo().setParameters();
                                updateDrbdResources();
@@ -1138,7 +1139,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Process output from cluster. */
     void processClusterOutput(final String output,
-                              final StringBuilder clusterStatusOutput,
+                              final StringBuffer clusterStatusOutput,
                               final Host host,
                               final CountDownLatch firstTime,
                               final boolean testOnly) {
@@ -1210,6 +1211,7 @@ public final class ClusterBrowser extends Browser {
                     }
                 }
             }
+            Tools.chomp(clusterStatusOutput);
         }
         clStatusUnlock();
     }
@@ -1292,8 +1294,8 @@ public final class ClusterBrowser extends Browser {
 
                  new NewOutputCallback() {
                      //TODO: check this buffer's size
-                     private StringBuilder clusterStatusOutput =
-                                                        new StringBuilder(300);
+                     private StringBuffer clusterStatusOutput =
+                                                        new StringBuffer(300);
                      @Override
                      public void output(final String output) {
                          processClusterOutput(output,

@@ -75,7 +75,7 @@ public final class ClusterBrowserTest1 extends TestCase {
 
         for (final String file : files) {
             i++;
-            if (i > 100) {
+            if (i > 200) {
                 break;
             }
             Tools.startProgressIndicator(i + ": " + file);
@@ -107,7 +107,7 @@ public final class ClusterBrowserTest1 extends TestCase {
             for (final Host host : TestSuite1.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.processClusterOutput(cib,
-                                        new StringBuilder(""),
+                                        new StringBuffer(""),
                                         host,
                                         firstTime,
                                         testOnly);
@@ -120,7 +120,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 Tools.waitForSwing();
                 cb.processClusterOutput(emptyCib,
-                                        new StringBuilder(""),
+                                        new StringBuffer(""),
                                         host,
                                         firstTime,
                                         testOnly);

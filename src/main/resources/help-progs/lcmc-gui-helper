@@ -139,6 +139,7 @@ sub start_hw_info_daemon {
 	my $prev_drbd_info = 0;
 	my $count = 0;
 	while (1) {
+		print "\n";
 		if ($count % 5 == 0) {
 			my $hw_info = get_hw_info();
 			if ($hw_info ne $prev_hw_info) {

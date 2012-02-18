@@ -520,7 +520,7 @@ public final class SSH {
                                           + host.getName()
                                           + ": "
                                           + output.toString(),
-                                          0);
+                                          2);
                         newOutputCallback.output(output.toString());
                     }
 
@@ -553,7 +553,7 @@ public final class SSH {
                               + host.getName()
                               + ": "
                               + outputString,
-                              0);
+                              2);
             return new SSHOutput(outputString, exitCode);
         }
 
@@ -579,7 +579,7 @@ public final class SSH {
         throws java.io.IOException {
             super();
             this.command = command;
-            Tools.debug(this, "command: " + command, 0);
+            Tools.debug(this, "command: " + command, 1);
             this.execCallback = execCallback;
             this.newOutputCallback = newOutputCallback;
             this.outputVisible = outputVisible;

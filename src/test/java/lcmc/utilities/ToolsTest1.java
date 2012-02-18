@@ -1381,4 +1381,22 @@ public final class ToolsTest1 extends TestCase {
             Tools.versionBeforePacemaker(h);
         }
     }
+
+    private String ssb(final String s) {
+        final StringBuffer sb = new StringBuffer(s);
+        Tools.chomp(sb);
+        return sb.toString();
+    }
+
+    @Test
+    public void testComp() {
+        assertEquals("",      ssb(""));
+        assertEquals("\n",      ssb("\n\n\n"));
+        assertEquals(" ",      ssb(" "));
+        assertEquals("a",     ssb("a"));
+        assertEquals("a\nb",  ssb("a\nb"));
+        assertEquals(" a\n",    ssb(" a\n"));
+        assertEquals(" a\n",    ssb(" a\n\n"));
+        assertEquals(" a \n",    ssb(" a \n"));
+    }
 }

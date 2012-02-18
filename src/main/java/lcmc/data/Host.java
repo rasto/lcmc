@@ -254,8 +254,6 @@ public final class Host {
     private Boolean corosyncHeartbeatRunning = null;
     /** Libvirt version. */
     private String libvirtVersion = null;
-    /** Timestamp, to ensure that older hwinfo is discarded. */
-    private volatile long timestamp = 0;
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
@@ -273,11 +271,12 @@ public final class Host {
     /** Whether this cluster should be saved. */
     private boolean savable = true;
     /** Ping is set every 10s. */
-    private volatile AtomicBoolean ping = new AtomicBoolean(false);
+    private volatile AtomicBoolean ping = new AtomicBoolean(true);
     /** Timeout after which the connection is considered to be dead. */
-    private final int PING_TIMEOUT = 20000;
-    private final int DRBD_EVENTS_TIMEOUT = 30000;
-    private final int CLUSTER_EVENTS_TIMEOUT = 30000;
+    private final int PING_TIMEOUT           = 40000;
+    private final int DRBD_EVENTS_TIMEOUT    = 40000;
+    private final int CLUSTER_EVENTS_TIMEOUT = 40000;
+    private final int HW_INFO_TIMEOUT        = 40000;
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1710,6 +1709,7 @@ public final class Host {
                                           || vm != null
                                           || drbdConfig != null);
 
+                                 Tools.chomp(outputBuffer);
                                  if (hwUpdate != null) {
                                      parseHostInfo(hwUpdate);
                                  }
@@ -1746,7 +1746,7 @@ public final class Host {
                          },
                          false,
                          false,
-                         20000);
+                         HW_INFO_TIMEOUT);
         try {
             t.join(0);
         } catch (java.lang.InterruptedException e) {

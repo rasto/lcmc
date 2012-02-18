@@ -2810,4 +2810,17 @@ public final class Tools {
         ab.setMargin(new Insets(2, 2, 2, 2));
         ab.setIconTextGap(0);
     }
+
+    /** Trim the white space (' ', '\n') at the end of the string buffer.*/
+    public static void chomp(final StringBuffer sb) {
+        final int l = sb.length();
+        int i = l;
+
+        while (i > 0 && (sb.charAt(i - 1) == '\n')) {
+            i--;
+        }
+        if (i >=0 && i < l - 1) {
+            sb.delete(i, l - 1);
+        }
+    }
 }
