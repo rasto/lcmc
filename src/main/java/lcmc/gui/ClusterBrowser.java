@@ -1303,6 +1303,7 @@ public final class ClusterBrowser extends Browser {
                                               host,
                                               firstTime,
                                               testOnly);
+                         firstTime.countDown();
                      }
                  });
             host.waitOnClStatus();
