@@ -197,6 +197,9 @@ public final class UserConfig extends XML {
                     continue;
                 }
                 Tools.getGUIData().addClusterTab(cluster);
+                if (cluster.getHosts().isEmpty()) {
+                    continue;
+                }
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
                     Tools.getGUIData().getClustersPanel().removeTab(cluster);
