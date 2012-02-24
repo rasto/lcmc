@@ -320,7 +320,7 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         /* drbd commands */
         {"Drbd.getParameters", SUDO + "@GUI-HELPER@ get-drbd-xml"},
-        {"Drbd.getConfig",     "echo|" + SUDO + "/sbin/drbdadm dump-xml"},
+        {"Drbd.getConfig",     SUDO + "@GUI-HELPER@ get-drbd-info"},
 
         {"DRBD.get-gi",        "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ get-gi @RES-VOL@"},
         {"DRBD.attach",        "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ attach @RES-VOL@"},

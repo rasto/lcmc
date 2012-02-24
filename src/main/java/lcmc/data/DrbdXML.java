@@ -44,6 +44,8 @@ import java.util.regex.Matcher;
 
 import java.math.BigInteger;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.keyvalue.MultiKey;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -113,7 +115,7 @@ public final class DrbdXML extends XML {
     private final List<String> resourceList = new ArrayList<String>();
     /** Map from drbd resource name to the drbd device. */
     private final MultiKeyMap<String, String> resourceDeviceMap =
-                                  new MultiKeyMap<String, String>();
+             MultiKeyMap.decorate(new LinkedMap<MultiKey<String>, String>());
     /** Map from drbd device to the drbd resource name. */
     private final Map<String, String> deviceResourceMap =
                                                 new HashMap<String, String>();
@@ -278,7 +280,9 @@ public final class DrbdXML extends XML {
                                                 false,  /* outputVisible */
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() == 0) {
-            return ret.getOutput();
+            final StringBuffer confSB = new StringBuffer(ret.getOutput());
+            final String conf = host.getOutput("drbd", confSB);
+            return conf;
         }
         return null;
     }

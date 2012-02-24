@@ -656,11 +656,15 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         new DrbdXML(getBrowser().getCluster().getHostsArray(),
                                     getBrowser().getDrbdParameters());
                     final String configString1 =
-                                    newDrbdXML.getConfig(bd1.getHost());
-                    newDrbdXML.update(configString1);
+                                           newDrbdXML.getConfig(bd1.getHost());
+                    if (configString1 != null) {
+                        newDrbdXML.update(configString1);
+                    }
                     final String configString2 =
-                                    newDrbdXML.getConfig(bd2.getHost());
-                    newDrbdXML.update(configString2);
+                                           newDrbdXML.getConfig(bd2.getHost());
+                    if (configString2 != null) {
+                        newDrbdXML.update(configString2);
+                    }
                     getBrowser().setDrbdXML(newDrbdXML);
                     getBrowser().resetFilesystems();
                 }

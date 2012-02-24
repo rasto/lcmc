@@ -36,6 +36,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.ConfigData;
 import lcmc.data.resources.DrbdVolume;
 import lcmc.data.Host;
+import lcmc.data.DrbdXML;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.Exceptions;
 import lcmc.AddDrbdSplitBrainDialog;
@@ -656,12 +657,13 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    void removeMyselfNoConfirm(final boolean testOnly) {
-        getBrowser().drbdStatusLock();
-        getBrowser().getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
+    public void removeMyselfNoConfirm(final boolean testOnly) {
+        final ClusterBrowser cb = getBrowser();
+        cb.drbdStatusLock();
+        cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
                                                getDevice(),
                                                getName());
-        getBrowser().getDrbdGraph().removeDrbdVolume(this);
+        cb.getDrbdGraph().removeDrbdVolume(this);
         final Set<Host> hosts = getHosts();
         final boolean lastVolume =
                                 getDrbdResourceInfo().removeDrbdVolume(this);
@@ -699,9 +701,9 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
         }
         super.removeMyself(testOnly);
-        getBrowser().reload(getBrowser().getDrbdNode(), true);
-        getBrowser().getDrbdDevHash().remove(getDevice());
-        getBrowser().putDrbdDevHash();
+        cb.reload(cb.getDrbdNode(), true);
+        cb.getDrbdDevHash().remove(getDevice());
+        cb.putDrbdDevHash();
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             bdi.removeFromDrbd();
             bdi.removeMyself(testOnly);
@@ -709,25 +711,35 @@ public final class DrbdVolumeInfo extends EditableInfo
         if (lastVolume) {
             getDrbdResourceInfo().removeMyself(testOnly);
         }
-        getBrowser().updateCommonBlockDevices();
+        cb.updateCommonBlockDevices();
 
         try {
-            getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
-                                                                     testOnly);
+            cb.getDrbdGraph().getDrbdInfo().createDrbdConfig(testOnly);
         } catch (Exceptions.DrbdConfigException dce) {
-            getBrowser().drbdStatusUnlock();
+            cb.drbdStatusUnlock();
             Tools.appError("config failed", dce);
             return;
         }
-        getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(null);
-        getBrowser().getDrbdGraph().getDrbdInfo().selectMyself();
-        getBrowser().getDrbdGraph().updatePopupMenus();
-        getBrowser().resetFilesystems();
-        getBrowser().drbdStatusUnlock();
+        cb.getDrbdGraph().getDrbdInfo().setSelectedNode(null);
+        cb.getDrbdGraph().getDrbdInfo().selectMyself();
+        cb.getDrbdGraph().updatePopupMenus();
+        cb.resetFilesystems();
+
+        final DrbdXML dxml = new DrbdXML(hosts.toArray(new Host[hosts.size()]),
+                                         cb.getDrbdParameters());
+        for (final Host host : hosts) {
+            final String conf = dxml.getConfig(host);
+            if (conf != null) {
+                dxml.update(conf);
+            }
+        }
+        cb.setDrbdXML(dxml);
+        cb.drbdStatusUnlock();
+        cb.updateDrbdResources();
         if (!testOnly) {
             removeNode();
         }
-        getBrowser().getDrbdGraph().scale();
+        cb.getDrbdGraph().scale();
     }
 
     /** Removes this drbd resource with confirmation dialog. */

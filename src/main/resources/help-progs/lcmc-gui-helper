@@ -23,6 +23,10 @@ use strict;
 use warnings;
 $| = 1;
 
+BEGIN {
+	eval "require Time::HiRes; Time::HiRes->import('time')";
+}
+
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use POSIX qw(:errno_h); # EAGAIN
 use Digest::MD5 "md5_hex";
@@ -143,7 +147,8 @@ sub start_hw_info_daemon {
 		if ($count % 5 == 0) {
 			my $hw_info = get_hw_info();
 			if ($hw_info ne $prev_hw_info) {
-				print "--hw-info-start--\n";
+				print "--hw-info-start--";
+				print time()."\n";
 				print $hw_info;
 				$prev_hw_info = $hw_info;
 				print "--hw-info-end--\n";
@@ -152,7 +157,8 @@ sub start_hw_info_daemon {
 		} else {
 			my $hw_info_lazy = get_hw_info_lazy();
 			if ($hw_info_lazy ne $prev_hw_info_lazy) {
-				print "--hw-info-start--\n";
+				print "--hw-info-start--";
+				print time()."\n";
 				print $hw_info_lazy;
 				print "--hw-info-end--\n";
 				$prev_hw_info_lazy = $hw_info_lazy;
@@ -160,14 +166,16 @@ sub start_hw_info_daemon {
 		}
 		my $vm_info = get_vm_info();
 		if ($vm_info ne $prev_vm_info) {
-			print "--vm-info-start--\n";
+			print "--vm-info-start--";
+			print time()."\n";
 			print $vm_info;
 			print "--vm-info-end--\n";
 			$prev_vm_info = $vm_info;
 		}
-		my $drbd_info = get_drbd_info();
+		my $drbd_info = get_drbd_dump_xml();
 		if ($drbd_info ne $prev_drbd_info) {
-			print "--drbd-info-start--\n";
+			print "--drbd-info-start--";
+			print time()."\n";
 			print $drbd_info;
 			print "--drbd-info-end--\n";
 			$prev_drbd_info = $drbd_info;
@@ -219,6 +227,13 @@ sub get_hw_info_lazy {
 }
 
 sub get_drbd_info {
+	print "--drbd-info-start--";
+	print time()."\n";
+	print get_drbd_dump_xml();
+	print "--drbd-info-end--\n";
+}
+
+sub get_drbd_dump_xml {
 	return `/sbin/drbdadm dump-xml 2>/dev/null`;
 }
 
@@ -802,14 +817,16 @@ sub do_drbd_events {
 	} else {
 		while (<EVENTS>) {
 			if ($_ && $_ !~ /\d+\s+ZZ/) {
-				my $drbd_info = get_drbd_info();
+				my $drbd_info = get_drbd_dump_xml();
 				if ($drbd_info ne $prev_drbd_info) {
-					print "--config-info-start--\n";
+					print "--drbd-info-start--";
+					print time()."\n";
 					print $drbd_info;
-					print "--config-info-end--\n";
+					print "--drbd-info-end--\n";
 					$prev_drbd_info = $drbd_info;
 				}
-				print "--event-info-start--\n";
+				print "--event-info-start--";
+				print time()."\n";
 				print "$_";
 				print "--event-info-end--\n";
 			}

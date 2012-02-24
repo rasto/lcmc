@@ -61,6 +61,10 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -272,6 +276,15 @@ public final class Host {
     private boolean savable = true;
     /** Ping is set every 10s. */
     private volatile AtomicBoolean ping = new AtomicBoolean(true);
+    /** Global drbd status lock. */
+    private final Lock mDRBDStatusLock = new ReentrantLock();
+    /** Update VMS lock. */
+    private final Lock mUpdateVMSlock = new ReentrantLock();
+    /** Time stamp lock */
+    private final Lock mInfoTimestampLock = new ReentrantLock();
+    /** Time stamp hash. */
+    private final Map<String, Double> infoTimestamp =
+                                                new HashMap<String, Double>();
     /** Timeout after which the connection is considered to be dead. */
     private final int PING_TIMEOUT           = 40000;
     private final int DRBD_EVENTS_TIMEOUT    = 40000;
@@ -1597,12 +1610,28 @@ public final class Host {
         final String infoStart = "--" + type + "-info-start--";
         final String infoEnd = "--" + type + "-info-end--";
         int infoStartLength = infoStart.length();
-        int s = buffer.indexOf(infoStart);
-        int e = buffer.indexOf(infoEnd, s);
         int infoEndLength = infoEnd.length();
+        int s = buffer.indexOf(infoStart);
+        int s2 = buffer.indexOf("\r\n", s);
+        int e = buffer.indexOf(infoEnd, s);
         String out = null;
-        if (s > -1 && e > -1 && s < e) {
-            out = buffer.substring(s + infoStartLength + 2, e);
+        if (s > -1 && s < s2 && s2 <= e) {
+            Double timestamp = null;
+            final String ts = buffer.substring(s + infoStartLength, s2);
+            try {
+                timestamp = Double.parseDouble(ts);
+            }  catch (final NumberFormatException nfe) {
+                Tools.debug(this, "could not parse: " + ts + " " + nfe);
+            }
+            mInfoTimestampLock.lock();
+            if (!infoTimestamp.containsKey(type)
+                || (timestamp != null && timestamp > infoTimestamp.get(type))) {
+                infoTimestamp.put(type, timestamp);
+                mInfoTimestampLock.unlock();
+                out = buffer.substring(s2 + 2, e);
+            } else {
+                mInfoTimestampLock.unlock();
+            }
             buffer.delete(0, e + infoEndLength + 2);
         }
         return out;
@@ -1706,15 +1735,19 @@ public final class Host {
                                      if (hw != null) {
                                          hwUpdate = hw;
                                      }
+                                     vmStatusLock();
                                      vm = getOutput("vm", outputBuffer); 
                                      if (vm != null) {
                                          vmUpdate = vm;
                                      }
+                                     vmStatusUnlock();
+                                     drbdStatusLock();
                                      drbdConfig = getOutput("drbd",
                                                             outputBuffer); 
                                      if (drbdConfig != null) {
                                          drbdUpdate = drbdConfig;
                                      }
+                                     drbdStatusUnlock();
                                  } while (hw != null
                                           || vm != null
                                           || drbdConfig != null);
@@ -1724,35 +1757,31 @@ public final class Host {
                                      parseHostInfo(hwUpdate);
                                  }
                                  if (vmUpdate != null) {
-                                     if (cb.vmStatusTryLock()) {
-                                         cb.vmStatusUnlock();
-                                         final VMSXML newVMSXML =
-                                                            new VMSXML(host);
-                                         if (newVMSXML.update(vmUpdate)) {
-                                             cb.vmsXMLPut(host, newVMSXML);
-                                             cb.updateVMS();
-                                         }
+                                     final VMSXML newVMSXML =
+                                                        new VMSXML(host);
+                                     if (newVMSXML.update(vmUpdate)) {
+                                         cb.vmsXMLPut(host, newVMSXML);
+                                         cb.updateVMS();
                                      }
                                  }
                                  if (drbdUpdate != null) {
-                                     if (cb.drbdStatusTryLock()) {
-                                         final DrbdXML dxml =
-                                               new DrbdXML(cluster.getHostsArray(),
-                                                           cb.getDrbdParameters());
-                                         dxml.update(drbdUpdate);
-                                         cb.setDrbdXML(dxml);
-                                         cb.getDrbdGraph().getDrbdInfo().setParameters();
-                                         cb.updateDrbdResources();
-                                         cb.drbdStatusUnlock();
-                                     }
+                                     final DrbdXML dxml =
+                                           new DrbdXML(cluster.getHostsArray(),
+                                                       cb.getDrbdParameters());
+                                     dxml.update(drbdUpdate);
+                                     cb.setDrbdXML(dxml);
+                                     cb.getDrbdGraph().getDrbdInfo().setParameters();
+                                     cb.updateDrbdResources();
                                  }
                                  if (drbdUpdate != null
                                      || hwUpdate != null
                                      || vmUpdate != null) {
                                      cb.updateHWInfo(host);
+                                 }
+                                 if (drbdUpdate != null) {
                                      cb.updateServerStatus(host);
                                  }
-                                 if (host.isServerStatusLatch()) {
+                                 if (isServerStatusLatch()) {
                                      cb.updateServerStatus(host);
                                  }
                                  setLoadingDone();
@@ -2849,6 +2878,36 @@ public final class Host {
             }
         }
         return bds;
+    }
+
+    /** drbdStatusTryLock global lock. */
+    public boolean drbdStatusTryLock() {
+        return mDRBDStatusLock.tryLock();
+    }
+
+    /** drbdStatusLock global lock. */
+    public void drbdStatusLock() {
+        mDRBDStatusLock.lock();
+    }
+
+    /** drbdStatusLock global unlock. */
+    public void drbdStatusUnlock() {
+        mDRBDStatusLock.unlock();
+    }
+
+    /** vmStatusLock global lock. */
+    public void vmStatusLock() {
+        mUpdateVMSlock.lock();
+    }
+
+    /** vmStatusLock try global lock. */
+    public boolean vmStatusTryLock() {
+        return mUpdateVMSlock.tryLock();
+    }
+
+    /** vmStatusLock global unlock. */
+    public void vmStatusUnlock() {
+        mUpdateVMSlock.unlock();
     }
 }
 

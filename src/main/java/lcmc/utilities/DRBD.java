@@ -61,6 +61,10 @@ public final class DRBD {
                                                   M_DRBD_TEST_LOCK.writeLock();
     /** "All resources" string for drbdadm commands. */
     public static final String ALL = "all";
+    /** Test only boolean variable. */
+    public static final boolean TESTONLY = true;
+    /** Live boolean variable. */
+    public static final boolean LIVE = false;
 
     /** Private constructor, cannot be instantiated. */
     private DRBD() {
