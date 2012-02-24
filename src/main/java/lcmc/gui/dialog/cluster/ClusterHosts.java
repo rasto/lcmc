@@ -121,7 +121,9 @@ final class ClusterHosts extends DialogCluster {
         }
         boolean enable = true;
         final List<String> hostnames = new ArrayList<String>();
-        if (selected < 1) {
+        if (selected < 1
+            || (selected == 1
+                && !Tools.getConfigData().isOneHostCluster())) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all

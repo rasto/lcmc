@@ -160,6 +160,8 @@ public final class ConfigData {
     private boolean upgradeCheckEnabled = true;
     /** Whether big drbd.conf and not drbd.d/ should be used. */
     private boolean bigDRBDConf = false;
+    /** Allow one host cluster. */
+    private boolean oneHostCluster = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -631,5 +633,15 @@ public final class ConfigData {
     /** Sets whether big drbd.conf and not drbd.d/ should be used. */
     public void setBigDRBDConf(final boolean bigDRBDConf) {
         this.bigDRBDConf = bigDRBDConf;
+    }
+
+    /** Return whether one host cluster is allowed. */
+    public final boolean isOneHostCluster() {
+        return oneHostCluster;
+    }
+
+    /** Set whether one host cluster is allowed. */
+    public final void setOneHostCluster(final boolean oneHostCluster) {
+        this.oneHostCluster = oneHostCluster;
     }
 }

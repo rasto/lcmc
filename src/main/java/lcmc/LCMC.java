@@ -138,6 +138,8 @@ public final class LCMC extends JPanel {
     private static final String PORT_OP = "port";
     /** The --advanced option. */
     private static final String ADVANCED_OP = "advanced";
+    /** The --one-host-cluster option. */
+    private static final String ONE_HOST_CLUSTER_OP = "one-host-cluster";
 
     /**
      * Private constructor.
@@ -422,6 +424,10 @@ public final class LCMC extends JPanel {
                           ADVANCED_OP,
                           false,
                           "start in an advanced mode");
+        options.addOption(null,
+                          ONE_HOST_CLUSTER_OP,
+                          false,
+                          "allow one host cluster");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -445,9 +451,6 @@ public final class LCMC extends JPanel {
                     throw new ParseException(
                                         "cannot parse debug level: " + level);
                 }
-            }
-            if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
-                parseClusterOptions(cmd);
             }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
@@ -478,6 +481,8 @@ public final class LCMC extends JPanel {
                                           cmd.hasOption(STAGING_PACEMAKER_OP));
             Tools.getConfigData().setNoLRM(cmd.hasOption(NOLRM_OP));
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
+            Tools.getConfigData().setOneHostCluster(
+                                           cmd.hasOption(ONE_HOST_CLUSTER_OP));
             final String pwd = System.getProperty("user.home");
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
                                                         pwd + "/.ssh/id_dsa");
@@ -536,6 +541,9 @@ public final class LCMC extends JPanel {
                                         Integer.parseInt(vncPortOffsetString));
             }
             Tools.getConfigData().setAnimFPS(fps);
+            if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
+                parseClusterOptions(cmd);
+            }
         } catch (ParseException exp) {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
@@ -625,6 +633,16 @@ public final class LCMC extends JPanel {
                 }
                 for (final HostOptions ho : hostsOptions) {
                     ho.setPort(port);
+                }
+            }
+        }
+        for (final String cn : clusters.keySet()) {
+            for (final HostOptions hostOptions : clusters.get(cn)) {
+                if (hostsOptions.size() < 1
+                    || (hostsOptions.size() == 1
+                        && !Tools.getConfigData().isOneHostCluster())) {
+                    throw new ParseException("not enough hosts for cluster: "
+                                             + cn);
                 }
             }
         }
