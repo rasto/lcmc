@@ -1373,7 +1373,7 @@ public final class Host {
     }
 
     /** Sets name of the host as it will be identified. */
-    void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -2446,6 +2446,9 @@ public final class Host {
 
     /** Waits on the 'is loading' latch. */
     public void waitOnLoading() {
+        if (isLoadingGate == null) {
+            return;
+        }
         try {
             isLoadingGate.await();
         } catch (InterruptedException ignored) {

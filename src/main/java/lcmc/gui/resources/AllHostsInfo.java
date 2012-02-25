@@ -23,10 +23,13 @@ package lcmc.gui.resources;
 
 import lcmc.AddHostDialog;
 import lcmc.gui.Browser;
+import lcmc.gui.GuiComboBox;
+import lcmc.gui.TerminalPanel;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.HostOptions;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
@@ -41,11 +44,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -85,6 +94,12 @@ public final class AllHostsInfo extends Info {
     /** Cluster icon. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                    Tools.getDefault("ClusterTab.ClusterIcon"));
+    /** Title over quick connect box. */
+    private static final String QUICK_CLUSTER_TITLE = "add configured pacemaker cluster";
+    /** Place holder for cluster name in the textfield. */
+    private static final String CLUSTER_NAME_PH = "cluster name...";
+    /** Default cluster name. */
+    private static final String DEFAULT_CLUSTER_NAME = "default";
     /** Start marked clusters button. */
     private final MyButton loadMarkedClustersBtn = new MyButton(
               Tools.getString("EmptyBrowser.LoadMarkedClusters"),
@@ -231,6 +246,8 @@ public final class AllHostsInfo extends Info {
             for (final Cluster cluster : clusters) {
                 addClusterBox(cluster);
             }
+            /* quick cluster box. */
+            addQuickClusterBox();
 
             /* start marked clusters action listener */
             loadMarkedClustersBtn.addActionListener(new ActionListener() {
@@ -339,11 +356,22 @@ public final class AllHostsInfo extends Info {
         left.add(markCB);
         left.add(label);
         startPanel.add(left, BorderLayout.LINE_START);
+        final MyButton loadClusterBtn = loadClusterButton(cluster, markCB);
+        startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        mainPanel.add(startPanel, c);
+        c.gridx++;
+        if (c.gridx > 2) {
+            c.gridx = 0;
+            c.gridy++;
+        }
+    }
+
+    private MyButton loadClusterButton(final Cluster cluster,
+                                       final JCheckBox markCB) {
         /* Load cluster button */
         final MyButton loadClusterBtn = new MyButton(
            Tools.getString("EmptyBrowser.LoadClusterButton"));
-        loadClusterBtn.setEnabled(cluster.getClusterTab() == null);
-        allLoadButtons.put(cluster, loadClusterBtn);
         loadClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -378,6 +406,41 @@ public final class AllHostsInfo extends Info {
                 t.start();
             }
         });
+        return loadClusterBtn;
+    }
+
+    /** Adds quick cluster box to the main cluster, where a user can enter
+     * hosts via textfield. */
+    public void addQuickClusterBox() {
+        final JPanel label = new JPanel();
+        label.setBackground(Browser.PANEL_BACKGROUND);
+        label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
+        final JTextField clusterTF =
+                                new GuiComboBox.MTextField(CLUSTER_NAME_PH);
+        label.add(clusterTF);
+        final List<JTextField> hostsTF = new ArrayList<JTextField>();
+        for (int i = 1; i < 3; i++) {
+            final JTextField nl =
+                            new GuiComboBox.MTextField("node" + i + "...", 15);
+            hostsTF.add(nl);
+            nl.selectAll();
+            final Font font = nl.getFont();
+            final Font newFont = font.deriveFont(
+                                           Font.PLAIN,
+                                           (float) (font.getSize() / 1.2));
+            nl.setFont(newFont);
+            label.add(nl);
+        }
+        final JPanel startPanel = new JPanel(new BorderLayout());
+
+        startPanel.setBackground(Browser.PANEL_BACKGROUND);
+        final TitledBorder titleBorder = Tools.getBorder(QUICK_CLUSTER_TITLE);
+        startPanel.setBorder(titleBorder);
+        final JPanel left = new JPanel();
+        left.setBackground(Browser.PANEL_BACKGROUND);
+        left.add(label);
+        startPanel.add(left, BorderLayout.LINE_START);
+        final MyButton loadClusterBtn = quickClusterButton(clusterTF, hostsTF);
         startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
         c.fill = GridBagConstraints.HORIZONTAL;
         mainPanel.add(startPanel, c);
@@ -388,29 +451,116 @@ public final class AllHostsInfo extends Info {
         }
     }
 
+    /** Return quick connect button. */
+    private MyButton quickClusterButton(final JTextField clusterTF,
+                                        final List<JTextField> hostsTF) {
+        /* Quick cluster button */
+        final MyButton quickClusterBtn = new MyButton(
+                           Tools.getString("EmptyBrowser.LoadClusterButton"));
+        quickClusterBtn.setEnabled(false);
+
+        quickClusterBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String clusterName = clusterTF.getText();
+                        final List<String> hostNames = new ArrayList<String>();
+                        final Cluster cluster = new Cluster();
+                        if (CLUSTER_NAME_PH.equals(clusterName)) {
+                            cluster.setName(DEFAULT_CLUSTER_NAME);
+                        } else {
+                            cluster.setName(clusterName);
+                        }
+                        Tools.getConfigData().addClusterToClusters(cluster);
+                        for (final JTextField hostTF : hostsTF) {
+                            final Host host = new Host(hostTF.getText());
+                            new TerminalPanel(host);
+                            host.setCluster(cluster);
+                            host.setHostname(hostTF.getText());
+                            host.setUsername("root");
+                            host.setSSHPort("22");
+                            cluster.addHost(host);
+                            Tools.getConfigData().addHostToHosts(host);
+                            Tools.getGUIData().allHostsUpdate();
+                        }
+                        Tools.getConfigData().addClusterToClusters(cluster);
+                        List<Cluster> selectedClusters =
+                                                 new ArrayList<Cluster>();
+                        selectedClusters.add(cluster);
+                        Tools.startClusters(selectedClusters);
+                    }
+                });
+                t.start();
+            }
+        });
+
+        textfieldListener(clusterTF, quickClusterBtn);
+        for (final JTextField htf : hostsTF) {
+            textfieldListener(htf, quickClusterBtn);
+        }
+        return quickClusterBtn;
+    }
+
+    /** Add listeners that enablle the quick connect button. */
+    private void textfieldListener(final JTextField textfield,
+                                   final MyButton button) {
+        textfield.getDocument().addDocumentListener(new DocumentListener() {
+                    private void check() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                button.setEnabled(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void insertUpdate(final DocumentEvent e) {
+                        check();
+                    }
+
+                    @Override
+                    public void removeUpdate(final DocumentEvent e) {
+                        check();
+                    }
+
+                    @Override
+                    public void changedUpdate(final DocumentEvent e) {
+                        check();
+                    }
+                });
+    }
+
     /**
      * Sets this cluster as connected. It is called after user enters a
      * cluster through the dialogs.
      */
     public void setConnected(final Cluster cluster) {
+        final MyButton loadButton = allLoadButtons.get(cluster);
+        if (loadButton == null) {
+            return;
+        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                allLoadButtons.get(cluster).setEnabled(false);
-                clusterBackgrounds.get(cluster).setBackground(
-                                                   Color.GREEN);
+                loadButton.setEnabled(false);
+                clusterBackgrounds.get(cluster).setBackground(Color.GREEN);
             }
         });
     }
 
     /** Sets this cluster as disconnected. */
     public void setDisconnected(final Cluster cluster) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                allLoadButtons.get(cluster).setEnabled(true);
-            }
-        });
+        final MyButton loadButton = allLoadButtons.get(cluster);
+        if (loadButton != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    loadButton.setEnabled(true);
+                }
+            });
+        }
     }
 
     /** Adds checkbox listener for this cluster's checkbox. */
@@ -454,12 +604,15 @@ public final class AllHostsInfo extends Info {
                     selectedClusters.add(cluster);
                     setConnected(cluster);
                 } else if (cluster.getClusterTab() == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            allLoadButtons.get(cluster).setEnabled(true);
-                        }
-                    });
+                    final MyButton loadButton = allLoadButtons.get(cluster);
+                    if (loadButton != null) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadButton.setEnabled(true);
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -531,7 +684,11 @@ public final class AllHostsInfo extends Info {
                 public void run() {
                     if (notRunningCount >= 1) {
                         for (final Cluster cluster : clusters) {
-                            allLoadButtons.get(cluster).setEnabled(false);
+                            final MyButton loadButton =
+                                                  allLoadButtons.get(cluster);
+                            if (loadButton != null) {
+                                loadButton.setEnabled(false);
+                            }
                         }
                         /* enable start etc marked clusters button */
                         loadMarkedClustersBtn.setEnabled(runningCount == 0);
@@ -551,9 +708,12 @@ public final class AllHostsInfo extends Info {
                 public void run() {
                     if (notRunningCount == 0) {
                         for (final Cluster cluster : clusters) {
-                            if (cluster.getClusterTab() == null) {
-                                allLoadButtons.get(cluster).setEnabled(
-                                                                    true);
+                            final MyButton loadButton =
+                                                  allLoadButtons.get(cluster);
+                            if (loadButton != null) {
+                                if (cluster.getClusterTab() == null) {
+                                    loadButton.setEnabled(true);
+                                }
                             }
                         }
                         loadMarkedClustersBtn.setEnabled(false);

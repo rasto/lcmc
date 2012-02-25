@@ -1555,15 +1555,21 @@ public final class GuiComboBox extends JPanel {
     /**
      * TextField that selects all when focused.
      */
-    private class MTextField extends JTextField {
+    public static class MTextField extends JTextField {
         /** Serial Version UID. */
         private static final long serialVersionUID = 1L;
         /** To select all only once. */
         private volatile boolean selected = false;
 
         /** Creates a new MTextField object. */
-        MTextField(final String text) {
+        public MTextField(final String text) {
             super(text);
+        }
+
+        /** Creates a new MTextField object. */
+        public MTextField(final String text,
+                          final int columns) {
+            super(text, columns);
         }
 
         /** Creates a new MTextField object. */
