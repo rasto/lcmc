@@ -341,6 +341,9 @@ public final class CRMXML extends XML {
                                                 new HashMap<String, String>();
     /** Array of boolean values names in the cluster manager. */
     private static final String[] PCMK_BOOLEAN_VALUES = {PCMK_TRUE, PCMK_FALSE};
+
+    private static final List<String> IGNORE_DEFAULTS_FOR =
+                                                    new ArrayList<String>();
     static {
         /* target-role */
         M_A_POSSIBLE_CHOICES.put(
@@ -511,6 +514,10 @@ public final class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(GROUP_ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_ORDERED_META_ATTR,
                                          ConfigData.AccessType.ADMIN);
+
+        /* ignore defaults for this RAs. It means that default values will be
+         * saved in the cib. */
+        IGNORE_DEFAULTS_FOR.add("iSCSITarget");
     }
 
     /** Prepares a new <code>CRMXML</code> object. */
@@ -1673,6 +1680,10 @@ public final class CRMXML extends XML {
             final Node actionNode = actions.item(i);
             if (actionNode.getNodeName().equals("action")) {
                 final String name = getAttribute(actionNode, "name");
+                if ("status ".equals(name)) {
+                    /* workaround for iSCSITarget RA */
+                    continue;
+                }
                 final String depth = getAttribute(actionNode, "depth");
                 final String timeout = getAttribute(actionNode, "timeout");
                 final String interval = getAttribute(actionNode, "interval");
@@ -1727,6 +1738,9 @@ public final class CRMXML extends XML {
             ra = hbLinbitDrbd;
         } else {
             ra = new ResourceAgent(serviceName, provider, resourceClass);
+            if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
+                ra.setIgnoreDefaults(true);
+            }
         }
         serviceToResourceAgentMap.put(serviceName,
                                       provider,

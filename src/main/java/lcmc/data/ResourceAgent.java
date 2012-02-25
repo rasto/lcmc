@@ -109,6 +109,9 @@ public final class ResourceAgent {
                                        new HashMap<String, GuiComboBox.Type>();
     /** Whether this resource agent is ping or pingd. */
     private final boolean pingService;
+    /** Whether to ignore defaults, show them, but don't assume they are
+     * defaults. */
+    private boolean ignoreDefaults = false;
     /** Name of lsb style resource (/etc/init.d/*). */
     public static final String LSB_CLASS = "lsb";
     /** Name of heartbeat style resource (heartbeat 1). */
@@ -548,5 +551,15 @@ public final class ResourceAgent {
     /** Returns whether this resource agent is ping or pingd. */
     public boolean isPingService() {
         return pingService;
+    }
+
+    /** Set whether the default should be used. */
+    public void setIgnoreDefaults(final boolean ignoreDefaults) {
+        this.ignoreDefaults = ignoreDefaults;
+    }
+
+    /** Whether the default should be used. */
+    public boolean isIgnoreDefaults() {
+        return ignoreDefaults;
     }
 }

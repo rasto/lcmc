@@ -3274,7 +3274,8 @@ public class ServiceInfo extends EditableInfo {
             if (value == null) {
                 value = "";
             }
-            if (value.equals(getParamDefault(param))) {
+            if (!resourceAgent.isIgnoreDefaults()
+                && value.equals(getParamDefault(param))) {
                 continue;
             }
             if (!"".equals(value)) {
