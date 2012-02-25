@@ -168,6 +168,7 @@ public final class NewHost extends DialogHost {
                             useSudoField.setValueAndWait("false");
                             useSudoField.setEnabled(false);
                         } else {
+                            useSudoField.setValueAndWait("true");
                             useSudoField.setEnabled(true);
                         }
                     }
