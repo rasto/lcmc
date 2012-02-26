@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 my $dfile = shift || "";
-my $dir = "src/java/lcmc/configs/";
+my $dir = "src/main/java/lcmc/configs/";
 opendir DIR, $dir or die "$!";
 my %all;
 for my $file (sort readdir DIR) {
