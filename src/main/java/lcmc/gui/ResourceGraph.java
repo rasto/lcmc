@@ -924,6 +924,13 @@ public abstract class ResourceGraph {
                     }
                 }
             });
+            if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        handlePopup0(e);
+                    }
+                });
+            }
         }
 
         /** Is called when mouse was clicked. */
@@ -950,6 +957,11 @@ public abstract class ResourceGraph {
 
         /** Creates and displays popup menus for vertices and edges. */
         protected void handlePopup(final MouseEvent me) {
+            /* doesn't work on Windows along the mouseReleased handler. */
+        }
+
+        /** Creates and displays popup menus for vertices and edges. */
+        private void handlePopup0(final MouseEvent me) {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
