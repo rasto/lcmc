@@ -98,7 +98,7 @@ public final class Cluster {
     public void removeCluster() {
         final ClusterBrowser cb = clusterBrowser;
         if (cb != null) {
-            clusterBrowser.cancelServerStatus();
+            clusterBrowser.stopServerStatus();
             clusterBrowser.stopDrbdStatus();
             clusterBrowser.stopClStatus();
         }

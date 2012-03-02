@@ -188,7 +188,7 @@ public final class ClusterBrowser extends Browser {
     /** DRBD test data lock. */
     private final Lock mDRBDtestdataLock = new ReentrantLock();
     /** Can be used to cancel server status. */
-    private volatile boolean serverStatus = true;
+    private volatile boolean serverStatusCanceled = false;
     /** last dc host detected. */
     private Host lastDcHost = null;
     /** dc host as reported by crm. */
@@ -764,7 +764,7 @@ public final class ClusterBrowser extends Browser {
         while (true) {
             host.startPing();
             Tools.sleep(10000);
-            if (!serverStatus) {
+            if (serverStatusCanceled) {
                 break;
             }
         }
@@ -787,8 +787,11 @@ public final class ClusterBrowser extends Browser {
             host.startHWInfoDaemon(infosToUpdate,
                                    new ResourceGraph[]{drbdGraph,
                                                        heartbeatGraph});
+            if (serverStatusCanceled) {
+                break;
+            }
             Tools.sleep(10000);
-            if (!serverStatus) {
+            if (serverStatusCanceled) {
                 break;
             }
         }
@@ -839,9 +842,9 @@ public final class ClusterBrowser extends Browser {
         }
     }
 
-    /** Cancels the server status. */
-    public void cancelServerStatus() {
-        serverStatus = false;
+    /** Returns wheter server status. */
+    public boolean isCancelServerStatus() {
+        return serverStatusCanceled;
     }
 
     /** Starts connection status on all hosts. */
@@ -1075,8 +1078,17 @@ public final class ClusterBrowser extends Browser {
     public void stopClStatus() {
         clStatusCanceled = true;
         final Host[] hosts = cluster.getHostsArray();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             host.stopClStatus();
+        }
+    }
+
+    /** Stops server status. */
+    public void stopServerStatus() {
+        serverStatusCanceled = true;
+        final Host[] hosts = cluster.getHostsArray();
+        for (final Host host : hosts) {
+            host.stopServerStatus();
         }
     }
 

@@ -372,6 +372,7 @@ public final class AllHostsInfo extends Info {
         /* Load cluster button */
         final MyButton loadClusterBtn = new MyButton(
            Tools.getString("EmptyBrowser.LoadClusterButton"));
+        allLoadButtons.put(cluster, loadClusterBtn);
         loadClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

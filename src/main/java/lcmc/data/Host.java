@@ -159,6 +159,8 @@ public final class Host {
     private ExecCommandThread drbdStatusThread = null;
     /** Thread where hb status command is running. */
     private ExecCommandThread clStatusThread = null;
+    /** Thread where server status command is running. */
+    private ExecCommandThread serverStatusThread = null;
     /** List of positions of the services.
      *  Question is this: the saved positions can be different on different
      *  hosts, but only one can be used in the hb graph.
@@ -1143,6 +1145,16 @@ public final class Host {
         }
     }
 
+    /** Stops server (hw) status background process. */
+    public void stopServerStatus() {
+        if (serverStatusThread == null) {
+            Tools.appWarning("trying to stop stopped server status");
+            return;
+        }
+        serverStatusThread.cancel();
+        serverStatusThread = null;
+    }
+
     /** Stops drbd status background process. */
     public void stopDrbdStatus() {
         if (drbdStatusThread == null) {
@@ -1561,9 +1573,9 @@ public final class Host {
                          },
                          null, /* ConvertCmdCallback */
                          false,
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         HW_INFO_TIMEOUT);
         try {
-            t.join(0);
+            t.join();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -1598,9 +1610,9 @@ public final class Host {
                          },
                          null, /* ConvertCmdCallback */
                          false,
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         HW_INFO_TIMEOUT);
         try {
-            t.join(0);
+            t.join();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -1676,7 +1688,7 @@ public final class Host {
     public void startHWInfoDaemon(final CategoryInfo[] infosToUpdate,
                                   final ResourceGraph[] graphs) {
         final Host host = this;
-        final Thread t = ssh.execCommand(
+        serverStatusThread = ssh.execCommand(
                                 Tools.getDistCommand(
                                                 "HostHWInfoDaemon",
                                                 dist,
@@ -1774,7 +1786,6 @@ public final class Host {
                                      cb.updateDrbdResources();
                                  }
                                  if (drbdUpdate != null
-                                     || hwUpdate != null
                                      || vmUpdate != null) {
                                      cb.updateHWInfo(host);
                                  }
@@ -1791,7 +1802,7 @@ public final class Host {
                          false,
                          HW_INFO_TIMEOUT);
         try {
-            t.join(0);
+            serverStatusThread.join();
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -1816,6 +1827,9 @@ public final class Host {
                        setConnected();
                     }
                     Tools.sleep(PING_TIMEOUT);
+                    if (getBrowser().getClusterBrowser().isCancelServerStatus()) {
+                        break;
+                    }
                 }
             }
         });
