@@ -336,6 +336,8 @@ public final class ClusterBrowser extends Browser {
                                        new ArrayList<String>(
                                                Arrays.asList(HB_PAR_TIMEOUT,
                                                              HB_PAR_INTERVAL));
+    private static final String RESET_STRING = "---reset---\r\n";
+    private static int RESET_STRING_LEN = RESET_STRING.length();
     /** Prepares a new <code>CusterBrowser</code> object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
@@ -1160,6 +1162,12 @@ public final class ClusterBrowser extends Browser {
         } else {
             // TODO: if we get ERROR:... show it somewhere
             clusterStatusOutput.append(output);
+            /* removes the string from the output. */
+            int s = clusterStatusOutput.indexOf(RESET_STRING);
+            while (s >= 0) {
+                clusterStatusOutput.delete(s, s + RESET_STRING_LEN);
+                s = clusterStatusOutput.indexOf(RESET_STRING);
+            }
             if (clusterStatusOutput.length() > 12) {
                 final String e = clusterStatusOutput.substring(
                                            clusterStatusOutput.length() - 12);

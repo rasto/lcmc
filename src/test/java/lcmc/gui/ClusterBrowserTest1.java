@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 
 import lcmc.utilities.TestSuite1;
 import lcmc.utilities.Tools;
+import lcmc.utilities.CRM;
 import lcmc.data.Host;
 
 public final class ClusterBrowserTest1 extends TestCase {
@@ -28,6 +29,44 @@ public final class ClusterBrowserTest1 extends TestCase {
 
     @Test
     public void testProcessClusterOutput() {
+        final CountDownLatch nolatch = new CountDownLatch(0);
+        for (final Host host : TestSuite1.getHosts()) {
+            final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
+
+            StringBuffer buffer = new StringBuffer("cd");
+            cb.processClusterOutput("a---reset---\r\nb",
+                                    buffer,
+                                    host,
+                                    nolatch,
+                                    CRM.LIVE);
+            assertEquals("cdab", buffer.toString());
+
+            buffer = new StringBuffer("");
+            cb.processClusterOutput("a---reset---\r\nb",
+                                    buffer,
+                                    host,
+                                    nolatch,
+                                    CRM.LIVE);
+            assertEquals("ab", buffer.toString());
+
+            buffer = new StringBuffer("cd");
+            cb.processClusterOutput("a---reset---\r\nb",
+                                    buffer,
+                                    host,
+                                    nolatch,
+                                    CRM.LIVE);
+            assertEquals("cdab", buffer.toString());
+
+            buffer = new StringBuffer("cd");
+            cb.processClusterOutput("a---reset---\r\nb---reset---\r\nc",
+                                    buffer,
+                                    host,
+                                    nolatch,
+                                    CRM.LIVE);
+            assertEquals("cdabc", buffer.toString());
+        }
+                    
+        
         if (TestSuite1.QUICK) {
             return;
         }

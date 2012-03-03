@@ -1621,11 +1621,11 @@ public final class Host {
     public String getOutput(final String type, final StringBuffer buffer) {
         final String infoStart = "--" + type + "-info-start--";
         final String infoEnd = "--" + type + "-info-end--";
-        int infoStartLength = infoStart.length();
-        int infoEndLength = infoEnd.length();
-        int s = buffer.indexOf(infoStart);
-        int s2 = buffer.indexOf("\r\n", s);
-        int e = buffer.indexOf(infoEnd, s);
+        final int infoStartLength = infoStart.length();
+        final int infoEndLength = infoEnd.length();
+        final int s = buffer.indexOf(infoStart);
+        final int s2 = buffer.indexOf("\r\n", s);
+        final int e = buffer.indexOf(infoEnd, s);
         String out = null;
         if (s > -1 && s < s2 && s2 <= e) {
             Double timestamp = null;

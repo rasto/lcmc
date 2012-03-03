@@ -924,7 +924,7 @@ sub get_cluster_events {
 		}
 	} else {
 		while (1) {
-			print "\n"; # reset timeout
+			print "---reset---\n"; # reset timeout
 			sleep $CLUSTER_INFO_INTERVAL;
 		}
 	}
