@@ -2,7 +2,7 @@
 5 Resources configured.
 ============
 
-Online: [ host1 host2 ]
+Online: [ host host ]
 
  Master/Slave Set: ms_Stateful_1
-     Masters: [ host2 ]
+     Masters: [ host ]

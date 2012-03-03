@@ -1880,23 +1880,13 @@ sub gui_test {
 			exit $ret;
 		}
 	}
-	if ($status =~ /Online: \[\s+(.*?)\s+\]/) {
-		my @status_hosts = split /\s+/, $1;
-		for ($status) {
-			s/\\$//mg;
-			s/^\s+//;
-			s/\s+$//;
-			my $i = 1;
-			for my $host (@status_hosts) {
-				s/$host\b/host$i/gi;
-				$i++;
-			}
+	for ($status) {
+		s/\\$//mg;
+		s/^\s+//;
+		s/\s+$//;
+		for my $host (@hosts) {
+			s/$host\b/host/gi;
 		}
-	}
-	if ($status =~ /Online: \[\s+(.*?)\s+\]/) {
-		my @status_hosts = split /\s+/, $1;
-		my $online_hosts = join " ", sort @status_hosts;
-		$status =~ s/(Online: \[\s+).*?(\s+\])/$1$online_hosts$2/;
 	}
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
@@ -1961,14 +1951,10 @@ sub gui_test {
 		print $diff;
 		exit 1;
 	}
-	my $status2 = $status;
-	$status2 =~ s/(Started host)(\d+)/$1 . (3 - $2)/ge;
-	$status2 =~ s/((?:Masters|Slaves):\s+\[\s+host)(\d+)/$1 . (3 - $2)/ge;
-	$status2 =~ s/(:\s+Master\s+host)(\d+)/$1 . (3 - $2)/ge;
-	for ($status, $status2, $statustest) {
+	for ($status, $statustest) {
 		s/\s+$//;
 	}
-	if ($status eq $statustest || $status2 eq $statustest) {
+	if ($status eq $statustest) {
 		print "ok";
 	} else {
 		open STTEST, ">$statustestfile.error" or print "$!";
@@ -1978,13 +1964,6 @@ sub gui_test {
 		print "error\n";
 		print "-------------\n";
 		print $diff;
-		open STTEST, ">$statustestfile.error" or print "$!";
-                print STTEST $status2;
-                close STTEST;
-                $diff = `diff -ub $statustestfile $statustestfile.error`;
-                print "error2\n";
-                print "-------------\n";
-                print $diff;
 		exit 2;
 	}
 }

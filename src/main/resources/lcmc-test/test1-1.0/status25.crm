@@ -2,12 +2,12 @@
 3 Resources configured.
 ============
 
-Online: [ host1 host2 ]
+Online: [ host host ]
 
- res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Started host1
+ res_IPaddr2_1	(ocf::heartbeat:IPaddr2):	Started host
  Resource Group: grp_1
-     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host1 (unmanaged)
-     res_Dummy_2	(ocf::heartbeat:Dummy):	Started host1 (unmanaged)
-     res_Dummy_3	(ocf::heartbeat:Dummy):	Started host1 (unmanaged)
+     res_Dummy_1	(ocf::heartbeat:Dummy):	Started host (unmanaged)
+     res_Dummy_2	(ocf::heartbeat:Dummy):	Started host (unmanaged)
+     res_Dummy_3	(ocf::heartbeat:Dummy):	Started host (unmanaged)
  Master/Slave Set: ms_Stateful_1
-     Masters: [ host2 ]
+     Masters: [ host ]

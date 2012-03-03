@@ -2,7 +2,7 @@
 1 Resources configured.
 ============
 
-Online: [ host1 host2 ]
+Online: [ host host ]
 
  Clone Set: cl_Dummy_1
-     Started: [ host1 host2 ]
+     Started: [ host host ]
