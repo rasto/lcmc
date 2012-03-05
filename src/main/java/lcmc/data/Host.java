@@ -292,6 +292,9 @@ public final class Host {
     private final int DRBD_EVENTS_TIMEOUT    = 40000;
     private final int CLUSTER_EVENTS_TIMEOUT = 40000;
     private final int HW_INFO_TIMEOUT        = 40000;
+
+    /** Root user name. */
+    public static final String ROOT_USER = "root";
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -2925,6 +2928,11 @@ public final class Host {
     /** vmStatusLock global unlock. */
     public void vmStatusUnlock() {
         mUpdateVMSlock.unlock();
+    }
+
+    /** Return whether the user is root */
+    public boolean isRoot() {
+        return ROOT_USER.equals(username);
     }
 }
 

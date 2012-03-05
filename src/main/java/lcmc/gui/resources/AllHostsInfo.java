@@ -95,7 +95,8 @@ public final class AllHostsInfo extends Info {
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                    Tools.getDefault("ClusterTab.ClusterIcon"));
     /** Title over quick connect box. */
-    private static final String QUICK_CLUSTER_TITLE = "add configured pacemaker cluster";
+    private static final String QUICK_CLUSTER_TITLE =
+                                  Tools.getString("AllHostsInfo.QuickCluster");
     /** Place holder for cluster name in the textfield. */
     private static final String CLUSTER_NAME_PH = "cluster name...";
     /** Default cluster name. */
@@ -334,7 +335,19 @@ public final class AllHostsInfo extends Info {
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
         label.add(new JLabel(cluster.getName()));
         for (final Host host : cluster.getHosts()) {
-            final JLabel nl = new JLabel("   " + host.getName());
+            final StringBuilder hostLabel = new StringBuilder();
+            if (!host.isRoot()) {
+                hostLabel.append(host.getUsername());
+                hostLabel.append('@');
+            }
+            hostLabel.append(host.getName());
+            final String port = host.getSSHPort();
+            if (port != null) {
+                hostLabel.append(':');
+                hostLabel.append(port);
+            }
+
+            final JLabel nl = new JLabel("   " + hostLabel);
             final Font font = nl.getFont();
             final Font newFont = font.deriveFont(
                                            Font.PLAIN,

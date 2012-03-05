@@ -2507,5 +2507,8 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdMultiSelectionInfo.DiscardData",
          "Discard Data on selected BDs"},
+
+        {"AllHostsInfo.QuickCluster",
+         "add configured pacemaker cluster"},
     };
 }
