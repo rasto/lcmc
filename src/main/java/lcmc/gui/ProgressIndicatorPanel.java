@@ -200,6 +200,7 @@ public final class ProgressIndicatorPanel extends JComponent
         }
         failuresMap.add(text);
         start(text, null);
+        Tools.sleep(8000);
         stop(text);
     }
 
