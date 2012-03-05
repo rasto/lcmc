@@ -430,7 +430,11 @@ public final class SSH {
 
                         if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                                 /* A timeout occured. */
-                                Tools.info("SSH timeout: " + command);
+                                Tools.appWarning("SSH timeout: " + command);
+                                Tools.progressIndicatorFailed(
+                                   host.getName(),
+                                   "SSH timeout: "
+                                   + command.replaceAll(DistResource.SUDO, ""));
                                 throw new IOException(
                                   "Timeout while waiting for data from peer.");
                         }
