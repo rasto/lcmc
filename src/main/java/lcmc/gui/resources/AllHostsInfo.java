@@ -436,6 +436,10 @@ public final class AllHostsInfo extends Info {
         for (int i = 1; i < 3; i++) {
             final JTextField nl =
                             new GuiComboBox.MTextField("node" + i + "...", 15);
+            nl.setToolTipText("<html><b>enter the node name or ip</b><br>node"
+                              + i + "<br>or ...<br>"
+                              + System.getProperty("user.name")
+                              + "@node" + i + ":22..." + "<br>");
             hostsTF.add(nl);
             nl.selectAll();
             final Font font = nl.getFont();
@@ -488,12 +492,39 @@ public final class AllHostsInfo extends Info {
                         }
                         Tools.getConfigData().addClusterToClusters(cluster);
                         for (final JTextField hostTF : hostsTF) {
-                            final Host host = new Host(hostTF.getText());
+                            final String entered = hostTF.getText();
+                            String hostName = null;
+                            String username = null;
+                            String port = null;
+                            final int a = entered.indexOf('@');
+                            if (a > 0) {
+                                username = entered.substring(0, a);
+                                hostName = entered.substring(
+                                                    a + 1, entered.length());
+                            } else {
+                                hostName = entered;
+                            }
+                            final int p = hostName.indexOf(':');
+                            if (p > 0) {
+                                port = hostName.substring(
+                                                p + 1, hostName.length());
+                                hostName = hostName.substring(0, p);
+                            }
+                            final Host host = new Host(hostName);
+                            if (username == null) {
+                                host.setUsername(Host.ROOT_USER);
+                            } else {
+                                host.setUseSudo(true);
+                                host.setUsername(username);
+                            }
+                            if (port == null) {
+                                host.setSSHPort(Host.DEFAULT_SSH_PORT);
+                            } else {
+                                host.setSSHPort(port);
+                            }
                             new TerminalPanel(host);
                             host.setCluster(cluster);
-                            host.setHostname(hostTF.getText());
-                            host.setUsername(Host.ROOT_USER);
-                            host.setSSHPort(Host.DEFAULT_SSH_PORT);
+                            host.setHostname(hostName);
                             cluster.addHost(host);
                             Tools.getConfigData().addHostToHosts(host);
                             Tools.getGUIData().allHostsUpdate();
