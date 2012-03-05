@@ -457,12 +457,11 @@ public final class AllHostsInfo extends Info {
         final MyButton loadClusterBtn = quickClusterButton(clusterTF, hostsTF);
         startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
         c.fill = GridBagConstraints.HORIZONTAL;
-        mainPanel.add(startPanel, c);
-        c.gridx++;
-        if (c.gridx > 2) {
+        if (c.gridx != 0) {
             c.gridx = 0;
             c.gridy++;
         }
+        mainPanel.add(startPanel, c);
     }
 
     /** Return quick connect button. */
