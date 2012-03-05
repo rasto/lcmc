@@ -164,7 +164,7 @@ public final class NewHost extends DialogHost {
                                                 getHost().getUsername(),
                                                 true);
                     if (useSudoField != null) {
-                        if ("root".equals(us)) {
+                        if (Host.ROOT_USER.equals(us)) {
                             useSudoField.setValueAndWait("false");
                             useSudoField.setEnabled(false);
                         } else {

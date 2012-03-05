@@ -295,6 +295,8 @@ public final class Host {
 
     /** Root user name. */
     public static final String ROOT_USER = "root";
+    /** Default SSH port. */
+    public static final String DEFAULT_SSH_PORT = "22";
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1323,7 +1325,7 @@ public final class Host {
             if (i < usernames.length) {
                 s.append(usernames[i]);
             } else {
-                s.append("root");
+                s.append(ROOT_USER);
             }
             s.append(' ');
             s.append(ips[i]);

@@ -342,7 +342,7 @@ public final class UserConfig extends XML {
             username = System.getProperty("user.name");
         }
         if (username == null) {
-            username = "root";
+            username = Host.ROOT_USER;
         }
         host.setUsername(username);
         List<Host> hostList = hostMap.get(nodeName);

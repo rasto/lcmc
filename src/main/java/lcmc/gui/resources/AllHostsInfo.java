@@ -493,8 +493,8 @@ public final class AllHostsInfo extends Info {
                             new TerminalPanel(host);
                             host.setCluster(cluster);
                             host.setHostname(hostTF.getText());
-                            host.setUsername("root");
-                            host.setSSHPort("22");
+                            host.setUsername(Host.ROOT_USER);
+                            host.setSSHPort(Host.DEFAULT_SSH_PORT);
                             cluster.addHost(host);
                             Tools.getConfigData().addHostToHosts(host);
                             Tools.getGUIData().allHostsUpdate();
