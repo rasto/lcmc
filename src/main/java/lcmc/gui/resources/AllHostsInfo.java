@@ -342,7 +342,7 @@ public final class AllHostsInfo extends Info {
             }
             hostLabel.append(host.getName());
             final String port = host.getSSHPort();
-            if (port != null) {
+            if (port != null && !"22".equals(port)) {
                 hostLabel.append(':');
                 hostLabel.append(port);
             }
