@@ -182,7 +182,7 @@ public final class CRMXML extends XML {
     /** Whether drbddisk ra is present. */
     private boolean drbddiskPresent;
     /** Whether linbit::drbd ra is present. */
-    private final boolean linbitDrbdPresent;
+    private boolean linbitDrbdPresent;
     /** Choices for combo box in stonith hostlists. */
     private final List<String> hostlistChoices = new ArrayList<String>();
 
@@ -524,7 +524,6 @@ public final class CRMXML extends XML {
     public CRMXML(final Host host) {
         super();
         this.host = host;
-        String command = null;
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
         final String hbBooleanTrue = booleanValues[0];
         final String hbBooleanFalse = booleanValues[1];
@@ -563,121 +562,6 @@ public final class CRMXML extends XML {
                              metaAttr,
                              metaAttrParams.get(metaAttr),
                              false);
-        }
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-        try {
-            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
-                command = host.getDistCommand(
-                                            "Heartbeat.2.1.3.getOCFParameters",
-                                            (ConvertCmdCallback) null);
-                if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
-                    command = null;
-                }
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
-        try {
-            if ((command == null || "".equals(command))
-                && pcmkV == null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                command = host.getDistCommand(
-                                           "Heartbeat.2.1.4.getOCFParameters",
-                                           (ConvertCmdCallback) null);
-                if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
-                    command = null;
-                }
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
-
-        if (command == null || "".equals(command)) {
-            command = host.getDistCommand("Heartbeat.getOCFParameters",
-                                          (ConvertCmdCallback) null);
-        }
-        final SSH.SSHOutput ret =
-                    Tools.execCommandProgressIndicator(
-                            host,
-                            command,
-                            null,  /* ExecCallback */
-                            false, /* outputVisible */
-                            Tools.getString("CRMXML.GetOCFParameters"),
-                            300000);
-        boolean linbitDrbdPresent0 = false;
-        boolean drbddiskPresent0 = false;
-        if (ret.getExitCode() != 0) {
-            drbddiskPresent = drbddiskPresent0;
-            linbitDrbdPresent = linbitDrbdPresent0;
-            return;
-        }
-        final String output = ret.getOutput();
-        if (output == null) {
-            drbddiskPresent = drbddiskPresent0;
-            linbitDrbdPresent = linbitDrbdPresent0;
-            return;
-        }
-        final String[] lines = output.split("\\r?\\n");
-        final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
-        final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
-        final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
-        final Pattern ep = Pattern.compile("^</resource-agent>$");
-        final StringBuilder xml = new StringBuilder("");
-        String provider = null;
-        String serviceName = null;
-        boolean masterSlave = false; /* is probably m/s ...*/
-        for (int i = 0; i < lines.length; i++) {
-            /*
-            <resource-agent name="AudibleAlarm">
-             ...
-            </resource-agent>
-            */
-            final Matcher pm = pp.matcher(lines[i]);
-            if (pm.matches()) {
-                provider = pm.group(1);
-                continue;
-            }
-            final Matcher mm = mp.matcher(lines[i]);
-            if (mm.matches()) {
-                if ("".equals(mm.group(1))) {
-                    masterSlave = false;
-                } else {
-                    masterSlave = true;
-                }
-                continue;
-            }
-            final Matcher m = bp.matcher(lines[i]);
-            if (m.matches()) {
-                serviceName = m.group(1);
-            }
-            if (serviceName != null) {
-                xml.append(lines[i]);
-                xml.append('\n');
-                final Matcher m2 = ep.matcher(lines[i]);
-                if (m2.matches()) {
-                    if ("drbddisk".equals(serviceName)) {
-                        drbddiskPresent0 = true;
-                    } else if ("drbd".equals(serviceName)
-                               && "linbit".equals(provider)) {
-                        linbitDrbdPresent0 = true;
-                    }
-                    parseMetaData(serviceName,
-                                  provider,
-                                  xml.toString(),
-                                  masterSlave);
-                    serviceName = null;
-                    xml.delete(0, xml.length());
-                }
-            }
-        }
-        drbddiskPresent = drbddiskPresent0;
-        if (!drbddiskPresent) {
-            Tools.appWarning("drbddisk heartbeat script is not present");
-        }
-        linbitDrbdPresent = linbitDrbdPresent0;
-        if (!linbitDrbdPresent) {
-            Tools.appWarning("linbit::drbd ocf ra is not present");
         }
 
         /* Hardcoding global params */
@@ -760,6 +644,8 @@ public final class CRMXML extends XML {
                                                     "minimal",
                                                     "balanced"});
 
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
         try {
             if (pcmkV != null || Tools.compareVersions(hbV, "2.1.3") >= 0) {
                 String clusterRecheckInterval = "cluster-recheck-interval";
@@ -963,6 +849,128 @@ public final class CRMXML extends XML {
         paramColDefaultMap.put("sequential", hbBooleanTrue);
         paramColPossibleChoices.put("sequential", booleanValues);
         paramColPreferredMap.put("sequential", hbBooleanFalse);
+
+        initOCFMetaData();
+    }
+
+    /** Initialize resource agents with their meta data. */
+    private void initOCFMetaData() {
+        String command = null;
+        final String hbV = host.getHeartbeatVersion();
+        final String pcmkV = host.getPacemakerVersion();
+        try {
+            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
+                command = host.getDistCommand(
+                                            "Heartbeat.2.1.3.getOCFParameters",
+                                            (ConvertCmdCallback) null);
+                if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
+                    command = null;
+                }
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
+        try {
+            if ((command == null || "".equals(command))
+                && pcmkV == null
+                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
+                command = host.getDistCommand(
+                                           "Heartbeat.2.1.4.getOCFParameters",
+                                           (ConvertCmdCallback) null);
+                if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
+                    command = null;
+                }
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
+
+        if (command == null || "".equals(command)) {
+            command = host.getDistCommand("Heartbeat.getOCFParameters",
+                                          (ConvertCmdCallback) null);
+        }
+        final SSH.SSHOutput ret =
+                    Tools.execCommandProgressIndicator(
+                            host,
+                            command,
+                            null,  /* ExecCallback */
+                            false, /* outputVisible */
+                            Tools.getString("CRMXML.GetOCFParameters"),
+                            300000);
+        boolean linbitDrbdPresent0 = false;
+        boolean drbddiskPresent0 = false;
+        if (ret.getExitCode() != 0) {
+            drbddiskPresent = drbddiskPresent0;
+            linbitDrbdPresent = linbitDrbdPresent0;
+            return;
+        }
+        final String output = ret.getOutput();
+        if (output == null) {
+            drbddiskPresent = drbddiskPresent0;
+            linbitDrbdPresent = linbitDrbdPresent0;
+            return;
+        }
+        final String[] lines = output.split("\\r?\\n");
+        final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
+        final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
+        final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
+        final Pattern ep = Pattern.compile("^</resource-agent>$");
+        final StringBuilder xml = new StringBuilder("");
+        String provider = null;
+        String serviceName = null;
+        boolean masterSlave = false; /* is probably m/s ...*/
+        for (int i = 0; i < lines.length; i++) {
+            /*
+            <resource-agent name="AudibleAlarm">
+             ...
+            </resource-agent>
+            */
+            final Matcher pm = pp.matcher(lines[i]);
+            if (pm.matches()) {
+                provider = pm.group(1);
+                continue;
+            }
+            final Matcher mm = mp.matcher(lines[i]);
+            if (mm.matches()) {
+                if ("".equals(mm.group(1))) {
+                    masterSlave = false;
+                } else {
+                    masterSlave = true;
+                }
+                continue;
+            }
+            final Matcher m = bp.matcher(lines[i]);
+            if (m.matches()) {
+                serviceName = m.group(1);
+            }
+            if (serviceName != null) {
+                xml.append(lines[i]);
+                xml.append('\n');
+                final Matcher m2 = ep.matcher(lines[i]);
+                if (m2.matches()) {
+                    if ("drbddisk".equals(serviceName)) {
+                        drbddiskPresent0 = true;
+                    } else if ("drbd".equals(serviceName)
+                               && "linbit".equals(provider)) {
+                        linbitDrbdPresent0 = true;
+                    }
+                    parseMetaData(serviceName,
+                                  provider,
+                                  xml.toString(),
+                                  masterSlave);
+                    serviceName = null;
+                    xml.delete(0, xml.length());
+                }
+            }
+        }
+        drbddiskPresent = drbddiskPresent0;
+        if (!drbddiskPresent) {
+            Tools.appWarning("drbddisk heartbeat script is not present");
+        }
+        linbitDrbdPresent = linbitDrbdPresent0;
+        if (!linbitDrbdPresent) {
+            Tools.appWarning("linbit::drbd ocf ra is not present");
+        }
     }
 
     /** Returns choices for check box. (True, False). */
