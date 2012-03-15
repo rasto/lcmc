@@ -583,6 +583,9 @@ public final class ServicesInfo extends EditableInfo {
      */
     public void setAllResources(final boolean testOnly) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
+        if (clStatus == null) {
+            return;
+        }
         final Set<String> allGroupsAndClones = clStatus.getAllGroups();
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
         final List<ServiceInfo> groupServiceIsPresent =
