@@ -1247,7 +1247,7 @@ sub get_resource_agents {
 	print "class:stonith\n";
         get_stonith_devices($type, $existing_rscs_stonith);
 	if ("configured" ne $type) {
-		print "class:stonith\n";
+		print "class:heartbeat\n";
 		get_old_style_resources($type);
 		print "class:lsb\n";
 		get_lsb_resources($type);
