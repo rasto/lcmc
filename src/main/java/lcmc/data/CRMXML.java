@@ -24,6 +24,8 @@ package lcmc.data;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
+import lcmc.utilities.CRM;
+import lcmc.gui.resources.ServicesInfo;
 import lcmc.Exceptions;
 
 import org.w3c.dom.Document;
@@ -521,7 +523,7 @@ public final class CRMXML extends XML {
     }
 
     /** Prepares a new <code>CRMXML</code> object. */
-    public CRMXML(final Host host) {
+    public CRMXML(final Host host, final ServicesInfo ssi) {
         super();
         this.host = host;
         final String[] booleanValues = PCMK_BOOLEAN_VALUES;
@@ -540,6 +542,7 @@ public final class CRMXML extends XML {
         pcmkClone = new ResourceAgent(ConfigData.PM_CLONE_SET_NAME,
                                       "",
                                       "clone");
+        pcmkClone.setMetaDataLoaded(true);
         addMetaAttribute(pcmkClone, MASTER_MAX_META_ATTR,      null, true);
         addMetaAttribute(pcmkClone, MASTER_NODE_MAX_META_ATTR, null, true);
         addMetaAttribute(pcmkClone, CLONE_MAX_META_ATTR,       null, false);
@@ -849,54 +852,38 @@ public final class CRMXML extends XML {
         paramColDefaultMap.put("sequential", hbBooleanTrue);
         paramColPossibleChoices.put("sequential", booleanValues);
         paramColPreferredMap.put("sequential", hbBooleanFalse);
-
-        initOCFMetaData();
+        hbGroup.setMetaDataLoaded(true);
+       
+        initOCFMetaDataQuick();
+        initOCFMetaDataConfigured();
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                initOCFMetaDataAll();
+                final String hn = host.getName();
+                final String text =
+                                Tools.getString("CRMXML.GetRAMetaData.Done");
+                Tools.startProgressIndicator(hn, text);
+                ssi.setAllResources(CRM.LIVE);
+                ssi.getBrowser().getClusterViewPanel().reloadRightComponent();
+                Tools.stopProgressIndicator(hn, text);
+            }
+        });
+        t.start();
     }
 
-    /** Initialize resource agents with their meta data. */
-    private void initOCFMetaData() {
-        String command = null;
-        final String hbV = host.getHeartbeatVersion();
-        final String pcmkV = host.getPacemakerVersion();
-        try {
-            if (pcmkV == null && Tools.compareVersions(hbV, "2.1.3") <= 0) {
-                command = host.getDistCommand(
-                                            "Heartbeat.2.1.3.getOCFParameters",
-                                            (ConvertCmdCallback) null);
-                if ("Heartbeat.2.1.3.getOCFParameters".equals(command)) {
-                    command = null;
-                }
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
-        try {
-            if ((command == null || "".equals(command))
-                && pcmkV == null
-                && Tools.compareVersions(hbV, "2.1.4") <= 0) {
-                command = host.getDistCommand(
-                                           "Heartbeat.2.1.4.getOCFParameters",
-                                           (ConvertCmdCallback) null);
-                if ("Heartbeat.2.1.4.getOCFParameters".equals(command)) {
-                    command = null;
-                }
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
-
-        if (command == null || "".equals(command)) {
-            command = host.getDistCommand("Heartbeat.getOCFParameters",
-                                          (ConvertCmdCallback) null);
-        }
+    /** Initialize resource agents WITHOUT their meta data. */
+    private void initOCFMetaDataQuick() {
+        final String command =
+                    host.getDistCommand("Heartbeat.getOCFParametersQuick",
+                                        (ConvertCmdCallback) null);
         final SSH.SSHOutput ret =
                     Tools.execCommandProgressIndicator(
                             host,
                             command,
                             null,  /* ExecCallback */
                             false, /* outputVisible */
-                            Tools.getString("CRMXML.GetOCFParameters"),
-                            300000);
+                            Tools.getString("CRMXML.GetRAMetaData"),
+                            60000);
         boolean linbitDrbdPresent0 = false;
         boolean drbddiskPresent0 = false;
         if (ret.getExitCode() != 0) {
@@ -911,10 +898,107 @@ public final class CRMXML extends XML {
             return;
         }
         final String[] lines = output.split("\\r?\\n");
+        final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
+        final Pattern cp = Pattern.compile("^class:\\s*(.*?)\\s*$");
+        final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
+        final Pattern sp = Pattern.compile("^ra:\\s*(.*?)\\s*$");
+        final StringBuilder xml = new StringBuilder("");
+        String resourceClass = null;
+        String provider = null;
+        String serviceName = null;
+        boolean masterSlave = false; /* is probably m/s ...*/
+        for (int i = 0; i < lines.length; i++) {
+            final Matcher cm = cp.matcher(lines[i]);
+            if (cm.matches()) {
+                resourceClass = cm.group(1);
+                continue;
+            }
+            final Matcher pm = pp.matcher(lines[i]);
+            if (pm.matches()) {
+                provider = pm.group(1);
+                continue;
+            }
+            final Matcher sm = sp.matcher(lines[i]);
+            if (sm.matches()) {
+                serviceName = sm.group(1);
+            }
+            if (serviceName != null) {
+                xml.append(lines[i]);
+                xml.append('\n');
+                if ("drbddisk".equals(serviceName)) {
+                    drbddiskPresent0 = true;
+                } else if ("drbd".equals(serviceName)
+                           && "linbit".equals(provider)) {
+                    linbitDrbdPresent0 = true;
+                }
+                ResourceAgent ra;
+                if ("drbddisk".equals(serviceName)
+                    && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
+                    ra = hbDrbddisk;
+                } else if ("drbd".equals(serviceName)
+                           && ResourceAgent.OCF_CLASS.equals(resourceClass)
+                           && "linbit".equals(provider)) {
+                    ra = hbLinbitDrbd;
+                } else {
+                    ra = new ResourceAgent(serviceName, provider, resourceClass);
+                    if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
+                        ra.setIgnoreDefaults(true);
+                    }
+                }
+                serviceToResourceAgentMap.put(serviceName,
+                                              provider,
+                                              resourceClass,
+                                              ra);
+                List<ResourceAgent> raList =
+                                        classToServicesMap.get(resourceClass);
+                if (raList == null) {
+                    raList = new ArrayList<ResourceAgent>();
+                    classToServicesMap.put(resourceClass, raList);
+                }
+                raList.add(ra);
+                serviceName = null;
+                xml.delete(0, xml.length());
+            }
+        }
+        drbddiskPresent = drbddiskPresent0;
+        linbitDrbdPresent = linbitDrbdPresent0;
+    }
+
+    /**
+     * Initialize resource agents with their meta data, the configured ones.
+     * For faster start up.
+     */
+    private void initOCFMetaDataConfigured() {
+        initOCFMetaData(
+                    host.getDistCommand("Heartbeat.getOCFParametersConfigured",
+                                        (ConvertCmdCallback) null));
+    }
+
+    /** Initialize resource agents with their meta data. */
+    private void initOCFMetaDataAll() {
+        initOCFMetaData(host.getDistCommand("Heartbeat.getOCFParameters",
+                                            (ConvertCmdCallback) null));
+    }
+
+    /** Initialize resource agents with their meta data. */
+    private void initOCFMetaData(final String command) {
+        final SSH.SSHOutput ret = Tools.execCommand(host,
+                                                    command,
+                                                    null,  /* ExecCallback */
+                                                    false, /* outputVisible */
+                                                    300000);
+        if (ret.getExitCode() != 0) {
+            return;
+        }
+        final String output = ret.getOutput();
+        if (output == null) {
+            return;
+        }
+        final String[] lines = output.split("\\r?\\n");
         final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
         final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
-        final Pattern bp = Pattern.compile("^<resource-agent name=\"(.*?)\".*");
-        final Pattern ep = Pattern.compile("^</resource-agent>$");
+        final Pattern bp = Pattern.compile("<resource-agent.*\\s+name=\"(.*?)\".*");
+        final Pattern ep = Pattern.compile("</resource-agent>");
         final StringBuilder xml = new StringBuilder("");
         String provider = null;
         String serviceName = null;
@@ -948,12 +1032,6 @@ public final class CRMXML extends XML {
                 xml.append('\n');
                 final Matcher m2 = ep.matcher(lines[i]);
                 if (m2.matches()) {
-                    if ("drbddisk".equals(serviceName)) {
-                        drbddiskPresent0 = true;
-                    } else if ("drbd".equals(serviceName)
-                               && "linbit".equals(provider)) {
-                        linbitDrbdPresent0 = true;
-                    }
                     parseMetaData(serviceName,
                                   provider,
                                   xml.toString(),
@@ -963,13 +1041,8 @@ public final class CRMXML extends XML {
                 }
             }
         }
-        drbddiskPresent = drbddiskPresent0;
         if (!drbddiskPresent) {
             Tools.appWarning("drbddisk heartbeat script is not present");
-        }
-        linbitDrbdPresent = linbitDrbdPresent0;
-        if (!linbitDrbdPresent) {
-            Tools.appWarning("linbit::drbd ocf ra is not present");
         }
     }
 
@@ -1731,30 +1804,18 @@ public final class CRMXML extends XML {
         if (resourceClass == null) {
             resourceClass = ResourceAgent.OCF_CLASS;
         }
-        List<ResourceAgent> raList = classToServicesMap.get(resourceClass);
-        if (raList == null) {
-            raList = new ArrayList<ResourceAgent>();
-            classToServicesMap.put(resourceClass, raList);
+        final ResourceAgent ra = serviceToResourceAgentMap.get(serviceName,
+                                                               provider,
+                                                               resourceClass);
+        if (ra == null) {
+            Tools.appWarning("cannot save meta-data for: "
+                             + resourceClass + ":" + provider + ":"
+                             + serviceName);
+            return;
         }
-        ResourceAgent ra;
-        if ("drbddisk".equals(serviceName)
-            && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
-            ra = hbDrbddisk;
-        } else if ("drbd".equals(serviceName)
-                   && ResourceAgent.OCF_CLASS.equals(resourceClass)
-                   && "linbit".equals(provider)) {
-            ra = hbLinbitDrbd;
-        } else {
-            ra = new ResourceAgent(serviceName, provider, resourceClass);
-            if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
-                ra.setIgnoreDefaults(true);
-            }
+        if (ra.isMetaDataLoaded()) {
+            return;
         }
-        serviceToResourceAgentMap.put(serviceName,
-                                      provider,
-                                      resourceClass,
-                                      ra);
-        raList.add(ra);
         if (ResourceAgent.LSB_CLASS.equals(resourceClass)
             || ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
             setLSBResourceAgent(serviceName, resourceClass, ra);
@@ -1789,6 +1850,7 @@ public final class CRMXML extends XML {
             }
             ra.setProbablyMasterSlave(masterSlave);
         }
+        ra.setMetaDataLoaded(true);
     }
 
     /** Set resource agent to be used as LSB script. */

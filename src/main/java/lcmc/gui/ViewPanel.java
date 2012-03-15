@@ -57,7 +57,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version $Id$
  *
  */
-class ViewPanel extends JPanel {
+public class ViewPanel extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** This view split pane. */
@@ -75,6 +75,8 @@ class ViewPanel extends JPanel {
     private volatile boolean disabledDuringLoad = true;
     /** Update VMS lock. */
     private final Lock mSetPanelLock = new ReentrantLock();
+    /** Last selected info object in the right pane. */
+    private Info lastSelectedInfo = null;
 
     /** Prepares a new <code>ViewPanel</code> object. */
     ViewPanel() {
@@ -222,6 +224,9 @@ class ViewPanel extends JPanel {
         }
 
         final Object nodeInfo = node.getUserObject();
+        if (nodeInfo instanceof Info) {
+            lastSelectedInfo = (Info) nodeInfo;
+        }
         if (nodeInfo != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -252,6 +257,7 @@ class ViewPanel extends JPanel {
                         return;
                     }
                     final JComponent p = browser.getInfoPanel(nodeInfo);
+                    lastSelectedInfo = nodeInfo;
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);
@@ -262,4 +268,12 @@ class ViewPanel extends JPanel {
             });
         }
     }
+
+    public final void reloadRightComponent() {
+        final Info lsi = lastSelectedInfo;
+        if (lsi != null) {
+            lsi.selectMyself();
+        }
+    }
+
 }

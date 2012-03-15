@@ -52,7 +52,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
+public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */

@@ -1879,8 +1879,11 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"CRMXML.OptionalOptions",
          "Advanced Options"},
 
-        {"CRMXML.GetOCFParameters",
-         "Getting OCF parameters..."},
+        {"CRMXML.GetRAMetaData",
+         "Loading resource agents..."},
+
+        {"CRMXML.GetRAMetaData.Done",
+         "Resource agent meta data loaded."},
 
         {"CRMXML.TargetRole.ShortDesc",
          "Target Role"},

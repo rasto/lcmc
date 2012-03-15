@@ -112,6 +112,8 @@ public final class ResourceAgent {
     /** Whether to ignore defaults, show them, but don't assume they are
      * defaults. */
     private boolean ignoreDefaults = false;
+    /** Whether meta-data has been loaded. */
+    private boolean metaDataLoaded = false;
     /** Name of lsb style resource (/etc/init.d/*). */
     public static final String LSB_CLASS = "lsb";
     /** Name of heartbeat style resource (heartbeat 1). */
@@ -561,5 +563,15 @@ public final class ResourceAgent {
     /** Whether the default should be used. */
     public boolean isIgnoreDefaults() {
         return ignoreDefaults;
+    }
+
+    /** Whether the meta data are loaded. */
+    public final boolean isMetaDataLoaded() {
+        return metaDataLoaded;
+    }
+
+    /** Set whether the meta data are loaded. */
+    public final void setMetaDataLoaded(final boolean metaDataLoaded) {
+        this.metaDataLoaded = metaDataLoaded;
     }
 }

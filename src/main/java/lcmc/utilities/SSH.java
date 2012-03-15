@@ -550,6 +550,8 @@ public final class SSH {
                 thisSession.close();
                 sess = null;
             } catch (IOException e) {
+                Tools.appWarning(host.getName() + ":" + e.getMessage()
+                               + ":"  + command);
                 exitCode = ERROR_EXIT_CODE;
             }
             final String outputString = res.toString();

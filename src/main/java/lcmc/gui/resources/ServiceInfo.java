@@ -2770,6 +2770,11 @@ public class ServiceInfo extends EditableInfo {
     /** Returns info panel with comboboxes for service parameters. */
     @Override
     public JComponent getInfoPanel() {
+        if (!getResourceAgent().isMetaDataLoaded()) {
+            final JPanel p = new JPanel();
+            p.add(new JLabel("Loading meta data..."));
+            return p;
+        }
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
             getBrowser().getHeartbeatGraph().pickInfo(this);

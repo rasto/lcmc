@@ -426,7 +426,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns cluster view panel. */
-    ClusterViewPanel getClusterViewPanel() {
+    public ClusterViewPanel getClusterViewPanel() {
         return clusterViewPanel;
     }
 
@@ -716,7 +716,7 @@ public final class ClusterBrowser extends Browser {
                     return;
                 }
 
-                crmXML = new CRMXML(firstHost);
+                crmXML = new CRMXML(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
                 final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray(),

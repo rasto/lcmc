@@ -207,30 +207,15 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"CRM.unmigrateResource",
          SUDO + "/usr/sbin/crm_resource -r @ID@ --un-migrate"},
 
-        /* gets all ocf resources and theirs meta-data */
-        /* TODO: buggy xml in heartbeat 2.0.8 in ftp and mysql */
-        /* TODO: implement version overwrite */
-        {"Heartbeat.2.0.8.getOCFParameters",
-         "export OCF_ROOT=/usr/lib/ocf;"
-         + "for s in `ls -1 /usr/lib/ocf/resource.d/heartbeat/"
-         + " | grep -v Pure-FTPd|grep -v mysql`;"
-         + " do /usr/lib/ocf/resource.d/heartbeat/$s meta-data 2>/dev/null;"
-         + "done"},
+        {"Heartbeat.getOCFParametersQuick",
+         SUDO + "@GUI-HELPER@ get-resource-agents quick;"},
+
+        {"Heartbeat.getOCFParametersConfigured",
+         SUDO + "@GUI-HELPER@ get-resource-agents configured;"},
 
         {"Heartbeat.getOCFParameters",
-         "export OCF_RESKEY_vmxpath=a;export OCF_ROOT=/usr/lib/ocf;"
-         + "for prov in `ls -1 /usr/lib/ocf/resource.d/`; do "
-         +  "for s in `ls -1 /usr/lib/ocf/resource.d/$prov/ `; do "
-         +  "echo -n 'provider:'; echo $prov;"
-         +  "echo -n 'master:';"
-         +  "grep -wl crm_master /usr/lib/ocf/resource.d/$prov/$s;echo;"
-         +   "/usr/lib/ocf/resource.d/$prov/$s meta-data 2>/dev/null; done;"
-         + "done;"
-         + "echo 'provider:heartbeat';"
-         + "echo 'master:';"
-         + SUDO + "@GUI-HELPER@ get-stonith-devices;"
-         + SUDO + "@GUI-HELPER@ get-old-style-resources;"
-         + SUDO + "@GUI-HELPER@ get-lsb-resources"},
+         SUDO + "@GUI-HELPER@ get-resource-agents;"},
+
         /* vmxpath env is needed so that vmware meta-data does not hang */
         {"Heartbeat.getClusterMetadata",
          SUDO + "@GUI-HELPER@ get-cluster-metadata"},
