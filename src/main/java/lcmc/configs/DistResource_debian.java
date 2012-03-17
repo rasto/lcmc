@@ -128,12 +128,12 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
          DistResource.SUDO + "/usr/sbin/update-rc.d -f openais remove"},
 
         /* corosync/pacemaker from source */
-        {"PmInst.install.text.2",
+        {"PmInst.install.text.3",
          "from source: latest/1.1.x"},
 
-        {"PmInst.install.staging.2", "true"},
+        {"PmInst.install.staging.3", "true"},
 
-        {"PmInst.install.2",
+        {"PmInst.install.3",
          "export LCRSODIR=/usr/libexec/lcrso;"
          + "export CLUSTER_USER=hacluster;"
          + "export CLUSTER_GROUP=haclient;"

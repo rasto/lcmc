@@ -63,9 +63,8 @@ public final class DistResource_debian_LENNY
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
 
-        {"HbPmInst.install.text.1", "apt-get install: HB 2.1.x (obsolete)"},
-        {"HbPmInst.install.1",
-         "apt-get update && /usr/bin/apt-get -y -q install -o 'DPkg::Options::force=--force-confnew' heartbeat-2"},
+        {"PmInst.install.text.1",
+         ""},
 
         /* heartbeat apt-get install */
         {"HbPmInst.install.text.2",

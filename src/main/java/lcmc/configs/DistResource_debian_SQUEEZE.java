@@ -45,5 +45,34 @@ public final class DistResource_debian_SQUEEZE
 
         /* support */
         {"Support", "debian-SQUEEZE"},
+
+        /* corosync/pacemaker backports */
+        {"HbPmInst.install.text.2",
+         "Backports repo: 1.1.x/3.0.x"},
+
+        {"HbPmInst.install.2",
+         "echo 'deb http://backports.debian.org/debian-backports"
+         + " squeeze-backports main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -t squeeze-backports -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},
+
+        /* corosync/pacemaker madkiss */
+        {"PmInst.install.text.2",
+         "Backports repo: 1.1.x/1.4.x"},
+
+        {"PmInst.install.2",
+         "echo 'deb http://backports.debian.org/debian-backports"
+         + " squeeze-backports main'"
+         + " > /etc/apt/sources.list.d/ha-clustering.list "
+         + " && apt-get update"
+         + " && apt-get -t squeeze-backports -y -q  --allow-unauthenticated install"
+         + " -o 'DPkg::Options::force=--force-confnew' pacemaker corosync"
+         + " && sed -i 's/\\(START=\\)no/\\1yes/' /etc/default/corosync"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
+
     };
 }
