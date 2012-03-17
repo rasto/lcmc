@@ -540,6 +540,11 @@ public final class ResourceAgent {
         return sectionMap.get(param);
     }
 
+    /** Set section of some of the parameters. */
+    void setSection(final String param, final String section) {
+        sectionMap.put(param, section);
+    }
+
     /** Returns field type of the param. */
     public GuiComboBox.Type getFieldType(final String param) {
         return fieldType.get(param);

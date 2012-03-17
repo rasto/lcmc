@@ -187,6 +187,9 @@ public final class CRMXML extends XML {
     private boolean linbitDrbdPresent;
     /** Choices for combo box in stonith hostlists. */
     private final List<String> hostlistChoices = new ArrayList<String>();
+    /** Parameters of some RAs that are not advanced. */
+    private static final MultiKeyMap<String, String> RA_PARAM_SECTION =
+                                            new MultiKeyMap<String, String>();
 
     /** Pacemaker "true" string. */
     static final String PCMK_TRUE = "true";
@@ -520,6 +523,11 @@ public final class CRMXML extends XML {
         /* ignore defaults for this RAs. It means that default values will be
          * saved in the cib. */
         IGNORE_DEFAULTS_FOR.add("iSCSITarget");
+
+        RA_PARAM_SECTION.put("IPaddr2",
+                             "cidr_netmask",
+                             Tools.getString("CRMXML.OtherOptions"));
+
     }
 
     /** Prepares a new <code>CRMXML</code> object. */
@@ -944,7 +952,9 @@ public final class CRMXML extends XML {
                            && "linbit".equals(provider)) {
                     ra = hbLinbitDrbd;
                 } else {
-                    ra = new ResourceAgent(serviceName, provider, resourceClass);
+                    ra = new ResourceAgent(serviceName,
+                                           provider,
+                                           resourceClass);
                     if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
                         ra.setIgnoreDefaults(true);
                     }
@@ -1257,6 +1267,9 @@ public final class CRMXML extends XML {
                 return true;
             }
             return !M_A_NOT_ADVANCED.contains(param);
+        }
+        if (RA_PARAM_SECTION.containsKey(ra.getName(), param)) {
+            return false;
         }
         return !isRequired(ra, param);
     }
@@ -1735,6 +1748,11 @@ public final class CRMXML extends XML {
                              param,
                              hostlistChoices.toArray(
                                           new String[hostlistChoices.size()]));
+                }
+                final String section = RA_PARAM_SECTION.get(ra.getName(),
+                                                            param);
+                if (section != null) {
+                    ra.setSection(param, section);
                 }
             }
         }

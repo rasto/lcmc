@@ -1879,6 +1879,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"CRMXML.OptionalOptions",
          "Advanced Options"},
 
+        {"CRMXML.OtherOptions",
+         "Other Options"},
+
         {"CRMXML.GetRAMetaData",
          "Loading resource agents..."},
 
