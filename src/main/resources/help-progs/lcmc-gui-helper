@@ -1246,7 +1246,7 @@ sub get_resource_agents {
         print "master:\n";
 	print "class:stonith\n";
         get_stonith_devices($type, $existing_rscs_stonith);
-	if ("configured" ne $type) {
+	if ("quick" eq $type) {
 		print "class:heartbeat\n";
 		get_old_style_resources($type);
 		print "class:lsb\n";
@@ -1302,8 +1302,7 @@ sub get_old_style_resources {
 	}
 	my $dir = "/etc/ha.d/resource.d/";
 	for (`ls $dir 2>/dev/null`) {
-		chomp;
-		print get_ocf_like_xml($_, $dir, "heartbeat", $quick);
+		print "ra:$_";
 	}
 }
 
@@ -1315,8 +1314,7 @@ sub get_lsb_resources {
 	}
 	my $dir = "/etc/init.d/";
 	for (`find $dir -perm -u=x -xtype f -printf "%f\n"`) {
-		chomp;
-		print get_ocf_like_xml($_, $dir, "lsb", $quick);
+		print "ra:$_";
 	}
 }
 
@@ -1431,22 +1429,6 @@ $parameters
 </actions>
 </resource-agent>
 XML
-}
-
-sub get_ocf_like_xml {
-	my $resource = shift;
-	my $dir      = shift;
-	my $class    = shift;
-	my $quick    = shift || "";
-	if ($quick) {
-		return "ra:$resource\n";
-	}
-	my $xml      = <<XML;
-<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
-<resource-agent name="$resource" class="$class">
-</resource-agent>
-XML
-	return $xml;
 }
 
 sub get_drbd_xml {

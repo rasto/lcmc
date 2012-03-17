@@ -647,6 +647,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Starts everything. */
     private void updateHeartbeatDrbdThread() {
+        Tools.debug(this, "load cluster", 0);
         final Thread tt = new Thread(new Runnable() {
             @Override
             public void run() {

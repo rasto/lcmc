@@ -856,6 +856,7 @@ public final class CRMXML extends XML {
        
         initOCFMetaDataQuick();
         initOCFMetaDataConfigured();
+        Tools.debug(this, "cluster loaded", 0);
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 initOCFMetaDataAll();
@@ -866,6 +867,7 @@ public final class CRMXML extends XML {
                 ssi.setAllResources(CRM.LIVE);
                 ssi.getBrowser().getClusterViewPanel().reloadRightComponent();
                 Tools.stopProgressIndicator(hn, text);
+                Tools.debug(this, "RAs loaded", 0);
             }
         });
         t.start();
@@ -935,6 +937,8 @@ public final class CRMXML extends XML {
                 if ("drbddisk".equals(serviceName)
                     && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
                     ra = hbDrbddisk;
+                    ra.setMetaDataLoaded(true);
+                    setLSBResourceAgent(serviceName, resourceClass, ra);
                 } else if ("drbd".equals(serviceName)
                            && ResourceAgent.OCF_CLASS.equals(resourceClass)
                            && "linbit".equals(provider)) {
@@ -943,6 +947,11 @@ public final class CRMXML extends XML {
                     ra = new ResourceAgent(serviceName, provider, resourceClass);
                     if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
                         ra.setIgnoreDefaults(true);
+                    }
+                    if (ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)
+                        || ResourceAgent.LSB_CLASS.equals(resourceClass)) {
+                        ra.setMetaDataLoaded(true);
+                        setLSBResourceAgent(serviceName, resourceClass, ra);
                     }
                 }
                 serviceToResourceAgentMap.put(serviceName,
