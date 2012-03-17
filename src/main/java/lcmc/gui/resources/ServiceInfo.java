@@ -2772,7 +2772,7 @@ public class ServiceInfo extends EditableInfo {
     public JComponent getInfoPanel() {
         if (!getResourceAgent().isMetaDataLoaded()) {
             final JPanel p = new JPanel();
-            p.add(new JLabel("Loading meta data..."));
+            p.add(new JLabel(Tools.getString("ServiceInfo.LoadingMetaData")));
             return p;
         }
         final CloneInfo ci = getCloneInfo();

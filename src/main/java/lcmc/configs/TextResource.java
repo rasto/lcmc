@@ -2367,6 +2367,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ServiceInfo.AlreadyStopped",
          "it is already stopped"},
 
+        {"ServiceInfo.LoadingMetaData",
+         "Loading meta data..."},
+
         {"DrbdInfo.CommonSection",
          "common "},
 
