@@ -1156,7 +1156,7 @@ public final class ClusterBrowser extends Browser {
             firstTime.countDown();
             return;
         }
-        if (output == null) {
+        if (output == null || "".equals(output)) {
             clusterStatus.setOnlineNode(host.getName(), "no");
             setClStatus(host, false);
             firstTime.countDown();

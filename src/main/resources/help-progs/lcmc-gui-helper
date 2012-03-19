@@ -1199,7 +1199,7 @@ sub get_cluster_info {
 		       ."$cibquery\nok\n<pcmk>\n$fenced_nodes$cibinfo</pcmk>\n"
 		       .">>>$cibquery\n";
 	}
-	return "";
+	return "\n";
 }
 
 sub get_cluster_metadata {
