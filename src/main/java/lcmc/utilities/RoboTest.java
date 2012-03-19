@@ -843,12 +843,8 @@ public final class RoboTest {
         leftClick(); /* apply */
         /* CIDR netmask 24 */
         sleep(10000);
-        moveTo(1080, 81); /* advanced */
-        sleep(2000);
-        leftClick();
-        sleep(2000);
 
-        moveTo(960, 427); /* CIDR */
+        moveTo(960, 412); /* CIDR */
         sleep(3000);
         leftClick();
         sleep(2000);
@@ -856,11 +852,6 @@ public final class RoboTest {
         sleep(200);
         press(KeyEvent.VK_4);
         sleep(1000);
-
-        moveTo(1080, 81); /* not advanced */
-        sleep(2000);
-        leftClick();
-        sleep(2000);
 
         moveTo(814, 141);
         sleep(6000); /* ptest */
