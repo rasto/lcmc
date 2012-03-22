@@ -2,6 +2,6 @@
 5 Resources configured.
 ============
 
-Node fedora16-b.home: standby
-Node fedora16-a.home: standby
+Node host: standby
+Node host: standby
 

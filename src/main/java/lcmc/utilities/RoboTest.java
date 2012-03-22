@@ -2653,9 +2653,9 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* select */
 
-        moveTo(1070, 448);
+        moveTo(1070, 498);
         leftClick(); /* pull down */
-        moveTo(1044, 472);
+        moveTo(1044, 522);
         leftClick(); /* choose */
         moveTo(814, 141);
         sleep(6000); /* ptest */
