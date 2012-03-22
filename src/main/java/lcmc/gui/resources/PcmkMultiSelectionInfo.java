@@ -638,6 +638,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                     boolean allStarted = true;
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (!si.isStarted(CRM.LIVE)) {
                             allStarted = false;
                         }
@@ -658,6 +663,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.startResource(dcHost, CRM.LIVE);
                     }
                 }
@@ -667,6 +677,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
+                    if (si.isConstraintPH()
+                        || si.getService().isNew()
+                        || si.getService().isOrphaned()) {
+                        continue;
+                    }
                     si.startResource(dcHost, CRM.TESTONLY);
                 }
             }
@@ -695,6 +710,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                     boolean allStopped = true;
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (!si.isStopped(CRM.LIVE)) {
                             allStopped = false;
                         }
@@ -715,6 +735,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.stopResource(dcHost, CRM.LIVE);
                     }
                 }
@@ -724,6 +749,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
+                    if (si.isConstraintPH()
+                        || si.getService().isNew()
+                        || si.getService().isOrphaned()) {
+                        continue;
+                    }
                     si.stopResource(dcHost, CRM.TESTONLY);
                 }
             }
@@ -763,6 +793,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                     boolean failCount = false;
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (si.isOneFailedCount(CRM.LIVE)) {
                             failCount = true;
                         }
@@ -771,6 +806,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         return "no fail count";
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         final String avail =
                                         si.getService().isAvailableWithText();
                         if (avail != null) {
@@ -785,6 +825,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.cleanupResource(dcHost, CRM.LIVE);
                     }
                 }
@@ -806,6 +851,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 @Override
                 public boolean visiblePredicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (!si.isManaged(CRM.LIVE)) {
                             return true;
                         }
@@ -818,6 +868,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         final String avail =
                                         si.getService().isAvailableWithText();
                         if (avail != null) {
@@ -832,6 +887,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.setManaged(true, dcHost, CRM.LIVE);
                     }
                 }
@@ -841,6 +901,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
+                    if (si.isConstraintPH()
+                        || si.getService().isNew()
+                        || si.getService().isOrphaned()) {
+                        continue;
+                    }
                     si.setManaged(true, dcHost, CRM.TESTONLY);
                 }
             }
@@ -861,6 +926,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 @Override
                 public boolean visiblePredicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (si.isManaged(CRM.LIVE)) {
                             return true;
                         }
@@ -873,6 +943,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         final String avail =
                                         si.getService().isAvailableWithText();
                         if (avail != null) {
@@ -887,6 +962,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.setManaged(false, dcHost, CRM.LIVE);
                     }
                 }
@@ -896,6 +976,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
+                    if (si.isConstraintPH()
+                        || si.getService().isNew()
+                        || si.getService().isOrphaned()) {
+                        continue;
+                    }
                     si.setManaged(false, dcHost, CRM.TESTONLY);
                 }
             }
@@ -935,6 +1020,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     @Override
                     public String enablePredicate() {
                         for (final ServiceInfo si : selectedServiceInfos) {
+                            if (si.isConstraintPH()
+                                || si.getService().isNew()
+                                || si.getService().isOrphaned()) {
+                                continue;
+                            }
                             if (getBrowser().clStatusFailed()
                                 || !host.isClStatus()) {
                                 return "not available on this host";
@@ -968,6 +1058,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         hidePopup();
                         final Host dcHost = getBrowser().getDCHost();
                         for (final ServiceInfo si : selectedServiceInfos) {
+                            if (si.isConstraintPH()
+                                || si.getService().isNew()
+                                || si.getService().isOrphaned()) {
+                                continue;
+                            }
                             si.migrateFromResource(dcHost, hostName, CRM.LIVE);
                         }
                     }
@@ -977,6 +1072,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action(final Host dcHost) {
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.migrateFromResource(dcHost, hostName, CRM.TESTONLY);
                     }
                 }
@@ -1004,6 +1104,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public String enablePredicate() {
                     // TODO: if it was migrated
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         if (!getBrowser().clStatusFailed()
                              && si.getService().isAvailable()
                              && (si.getMigratedTo(CRM.LIVE) != null
@@ -1021,6 +1126,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
+                        if (si.isConstraintPH()
+                            || si.getService().isNew()
+                            || si.getService().isOrphaned()) {
+                            continue;
+                        }
                         si.unmigrateResource(dcHost, CRM.LIVE);
                     }
                 }
@@ -1030,6 +1140,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
+                    if (si.isConstraintPH()
+                        || si.getService().isNew()
+                        || si.getService().isOrphaned()) {
+                        continue;
+                    }
                     si.unmigrateResource(dcHost, CRM.TESTONLY);
                 }
             }
