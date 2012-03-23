@@ -1,5 +1,5 @@
-node host1
-node host2
+node host
+node host
 primitive res_Dummy_2 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_2-operations" 
 	op start interval="0" timeout="200" 

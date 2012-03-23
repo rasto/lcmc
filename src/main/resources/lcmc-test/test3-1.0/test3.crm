@@ -1,5 +1,5 @@
-node host1
-node host2
+node host
+node host
 primitive res_Filesystem_1 ocf:heartbeat:Filesystem 
 	params device="/dev/drbd0" directory="/mnt/" fstype="ext3" 
 	operations $id="res_Filesystem_1-operations" 

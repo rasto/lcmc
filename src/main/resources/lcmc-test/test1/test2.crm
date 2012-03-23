@@ -1,5 +1,5 @@
-node host1
-node host2
+node host
+node host
 primitive res_IPaddr2_1 ocf:heartbeat:IPaddr2 
 	params ip="192.168.133.100" cidr_netmask="24" 
 	operations $id="res_IPaddr2_1-operations" 

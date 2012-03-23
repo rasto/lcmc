@@ -1,5 +1,5 @@
-node host1
-node host2
+node host
+node host
 primitive res_Dummy_1 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_1-operations" 
 	op start interval="0" timeout="200" 
@@ -38,7 +38,7 @@ group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 ms ms_Stateful_1 res_Stateful_1 
 	meta clone-max="1" notify="true"
 location cli-standby-res_IPaddr2_1 res_IPaddr2_1 
-	rule $id="cli-standby-rule-res_IPaddr2_1" -inf: #uname eq host2
+	rule $id="cli-standby-rule-res_IPaddr2_1" -inf: #uname eq host
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
 property $id="cib-bootstrap-options" 

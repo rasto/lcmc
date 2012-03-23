@@ -1,6 +1,6 @@
-node host1 
+node host 
 	attributes standby="off"
-node host2 
+node host 
 	attributes standby="off"
 primitive res_Dummy_1 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_1-operations" 
