@@ -232,10 +232,10 @@ public final class ClusterBrowser extends Browser {
     }
     /** Width of the label in the info panel. */
     public static final int SERVICE_LABEL_WIDTH =
-                    Tools.getDefaultInt("ClusterBrowser.ServiceLabelWidth");
+                    Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
     /** Width of the field in the info panel. */
     public static final int SERVICE_FIELD_WIDTH =
-                    Tools.getDefaultInt("ClusterBrowser.ServiceFieldWidth");
+                    Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
     /** Color for stopped services. */
     public static final Color FILL_PAINT_STOPPED =
                       Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");

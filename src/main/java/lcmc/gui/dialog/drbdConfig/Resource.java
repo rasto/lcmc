@@ -240,8 +240,8 @@ public final class Resource extends DrbdConfig {
                   optionsPanel,
                   PARAMS,
                   buttonClass(nextButton()),
-                  Tools.getDefaultInt("Dialog.DrbdConfig.Resource.LabelWidth"),
-                  Tools.getDefaultInt("Dialog.DrbdConfig.Resource.FieldWidth"),
+                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
                   null);
 
         inputPane.add(optionsPanel);

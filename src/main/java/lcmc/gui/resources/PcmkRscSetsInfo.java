@@ -105,7 +105,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
         final int rows = 1;
-        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+        final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
                         c.getService().getHeartbeatId(),

@@ -162,6 +162,8 @@ public final class ConfigData {
     private boolean bigDRBDConf = false;
     /** Allow one host cluster. */
     private boolean oneHostCluster = false;
+    /** Scale for fonts and GUI elements. 100 is the same size. */
+    private int scale = 100;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -643,5 +645,20 @@ public final class ConfigData {
     /** Set whether one host cluster is allowed. */
     public final void setOneHostCluster(final boolean oneHostCluster) {
         this.oneHostCluster = oneHostCluster;
+    }
+
+    /** Return scaled size. */
+    public final int scaled(final int size) {
+        return size * scale / 100;
+    }
+
+    /** Returns scale for fonts and GUI elements. */
+    public final int getScale() {
+        return scale;
+    }
+
+    /** Sets scale. */
+    public final void setScale(final int scale) {
+        this.scale = scale;
     }
 }

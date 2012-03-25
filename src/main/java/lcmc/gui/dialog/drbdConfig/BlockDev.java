@@ -177,8 +177,8 @@ final class BlockDev extends DrbdConfig {
                  optionsPanel,
                  params,
                  buttonClass(nextButton()),
-                 Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.LabelWidth"),
-                 Tools.getDefaultInt("Dialog.DrbdConfig.BlockDev.FieldWidth"),
+                 Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
+                 Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
                  null);
 
         final JPanel p = new JPanel();

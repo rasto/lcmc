@@ -346,14 +346,17 @@ public class Info implements Comparable {
             panel.setBackground(Browser.PANEL_BACKGROUND);
             return panel;
         } else {
-            final Font f = new Font("Monospaced", Font.PLAIN, 12);
+            final Font f = new Font(
+                                "Monospaced",
+                                Font.PLAIN,
+                                Tools.getConfigData().scaled(12));
             resourceInfoArea = new JEditorPane(getInfoType(), info);
             resourceInfoArea.setMinimumSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
             resourceInfoArea.setPreferredSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
             resourceInfoArea.setEditable(false);
             resourceInfoArea.setFont(f);
             resourceInfoArea.setBackground(Browser.PANEL_BACKGROUND);

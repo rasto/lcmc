@@ -259,8 +259,8 @@ public final class DrbdVolumeInfo extends EditableInfo
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
+                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {

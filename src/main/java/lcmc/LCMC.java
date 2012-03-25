@@ -493,6 +493,7 @@ public final class LCMC extends JPanel {
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
                 final int scale = Integer.parseInt(scaleOp);
+                Tools.getConfigData().setScale(scale);
                 Tools.resizeFonts(scale);
             } catch (java.lang.NumberFormatException e) {
                 Tools.appWarning("cannot parse scale: " + scaleOp);

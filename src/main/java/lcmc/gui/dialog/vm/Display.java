@@ -142,8 +142,8 @@ final class Display extends VMConfig {
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
-                      Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
         //vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
 

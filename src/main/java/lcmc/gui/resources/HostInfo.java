@@ -174,7 +174,9 @@ public final class HostInfo extends Info {
         if (getBrowser().getClusterBrowser() == null) {
             return new JPanel();
         }
-        final Font f = new Font("Monospaced", Font.PLAIN, 12);
+        final Font f = new Font("Monospaced",
+                                Font.PLAIN,
+                                Tools.getConfigData().scaled(12));
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
                                   Tools.getString("HostInfo.crmShellLoading"));
@@ -380,11 +382,11 @@ public final class HostInfo extends Info {
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         mainPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));

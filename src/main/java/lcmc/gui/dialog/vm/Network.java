@@ -142,8 +142,8 @@ final class Network extends VMConfig {
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
-                      Tools.getDefaultInt("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultInt("Dialog.vm.Resource.FieldWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
         vmsii.paramComboBoxGet(InterfaceData.MODEL_TYPE, "wizard").setValue("");
 

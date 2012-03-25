@@ -228,7 +228,7 @@ public abstract class EditableInfo extends Info {
                                int height) {
         /* right component with fixed width. */
         if (height == 0) {
-            height = Tools.getDefaultInt("Browser.FieldHeight");
+            height = Tools.getDefaultSize("Browser.FieldHeight");
         }
         Tools.setSize(left,
                       leftWidth,
@@ -395,7 +395,7 @@ public abstract class EditableInfo extends Info {
             });
             int height = 0;
             if (paramCb.getType() == GuiComboBox.Type.LABELFIELD) {
-                height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+                height = Tools.getDefaultSize("Browser.LabelFieldHeight");
             }
             addField(panel, label, paramCb, leftWidth, rightWidth, height);
         }
@@ -411,7 +411,7 @@ public abstract class EditableInfo extends Info {
                 }
                 int height = 0;
                 if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
-                    height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+                    height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
                 final GuiComboBox rpcb0 = rpcb;
                 SwingUtilities.invokeLater(new Runnable() {

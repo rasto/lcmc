@@ -1020,6 +1020,14 @@ public final class Tools {
 
     /**
      * Returns default value for integer option from AppDefaults resource
+     * bundle and scales it according the --scale option.
+     */
+    public static int getDefaultSize(final String option) {
+        return getConfigData().scaled(getDefaultInt(option));
+    }
+
+    /**
+     * Returns default value for integer option from AppDefaults resource
      * bundle.
      *
      * @param option
@@ -2808,7 +2816,7 @@ public final class Tools {
         final String name = font.getFontName();
         final int style = font.getStyle();
         final int size = font.getSize();
-        ab.setFont(new Font(name, style, 10));
+        ab.setFont(new Font(name, style, getConfigData().scaled(10)));
         ab.setMargin(new Insets(2, 2, 2, 2));
         ab.setIconTextGap(0);
     }
@@ -2847,9 +2855,10 @@ public final class Tools {
             if (value instanceof Font)    {
                 final Font f = (Font) value;
                 UIManager.put(key,
-                              new FontUIResource(f.getName(),
-                                                 f.getStyle(),
-                                                 f.getSize() * scale / 100)); 
+                              new FontUIResource(
+                                         f.getName(),
+                                         f.getStyle(),
+                                         getConfigData().scaled(f.getSize()))); 
             }
         }
     }

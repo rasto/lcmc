@@ -1067,8 +1067,8 @@ public final class BlockDevInfo extends EditableInfo {
 
             addParams(optionsPanel,
                       params,
-                      Tools.getDefaultInt("HostBrowser.DrbdDevLabelWidth"),
-                      Tools.getDefaultInt("HostBrowser.DrbdDevFieldWidth"),
+                      Tools.getDefaultSize("HostBrowser.DrbdDevLabelWidth"),
+                      Tools.getDefaultSize("HostBrowser.DrbdDevFieldWidth"),
                       null);
 
 
@@ -1127,7 +1127,9 @@ public final class BlockDevInfo extends EditableInfo {
         }
 
         /* info */
-        final Font f = new Font("Monospaced", Font.PLAIN, 12);
+        final Font f = new Font("Monospaced",
+                                Font.PLAIN,
+                                Tools.getConfigData().scaled(12));
         final JPanel riaPanel = new JPanel();
         riaPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
         riaPanel.setAlignmentX(Component.LEFT_ALIGNMENT);

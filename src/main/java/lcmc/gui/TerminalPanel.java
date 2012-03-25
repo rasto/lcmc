@@ -232,7 +232,9 @@ public final class TerminalPanel extends JScrollPane {
                          Tools.getDefaultColor("TerminalPanel.TerminalPurple"));
         terminalColor.put("36",
                           Tools.getDefaultColor("TerminalPanel.TerminalCyan"));
-        final Font f = new Font("Monospaced", Font.PLAIN, 14);
+        final Font f = new Font("Monospaced",
+                                Font.PLAIN,
+                                Tools.getConfigData().scaled(14));
         terminalArea = new JTextPane();
         terminalArea.setStyledDocument(new MyDocument());
         final DefaultCaret caret = new DefaultCaret() {

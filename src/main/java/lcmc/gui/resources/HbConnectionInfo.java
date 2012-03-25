@@ -324,7 +324,7 @@ public class HbConnectionInfo extends EditableInfo {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
         final int rows = 3;
-        final int height = Tools.getDefaultInt("Browser.LabelFieldHeight");
+        final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
                         c.getService().getHeartbeatId(),
@@ -522,11 +522,11 @@ public class HbConnectionInfo extends EditableInfo {
         }
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         newPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultInt("HostBrowser.ResourceInfoArea.Height")));
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;

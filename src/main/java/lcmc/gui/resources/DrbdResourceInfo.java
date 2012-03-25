@@ -483,8 +483,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                          getApplyButton());
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth"),
+                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {
@@ -547,8 +547,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
-              Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
-              + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
+              Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth")
+              + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
         infoPanelDone();
