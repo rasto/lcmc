@@ -116,6 +116,8 @@ public final class LCMC extends JPanel {
     private static final String RESTORE_MOUSE_OP = "restore-mouse";
     /** The --keep-helper option. */
     private static final String KEEP_HELPER_OP = "keep-helper";
+    /** The --scale option. */
+    private static final String SCALE_OP = "scale";
     /** The --id-dsa option. */
     private static final String ID_DSA_OP = "id-dsa";
     /** The --id-rsa option. */
@@ -375,6 +377,10 @@ public final class LCMC extends JPanel {
                           false,
                           "for testing");
         options.addOption(null,
+                          SCALE_OP,
+                          true,
+                          "scale fonts and sizes of elements in percent (100)");
+        options.addOption(null,
                           ID_DSA_OP,
                           true,
                           "location of id_dsa file ($HOME/.ssh/id_dsa)");
@@ -484,6 +490,14 @@ public final class LCMC extends JPanel {
             Tools.getConfigData().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
             final String pwd = System.getProperty("user.home");
+            final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
+            try {
+                final int scale = Integer.parseInt(scaleOp);
+                Tools.resizeFonts(scale);
+            } catch (java.lang.NumberFormatException e) {
+                Tools.appWarning("cannot parse scale: " + scaleOp);
+            }
+
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
                                                         pwd + "/.ssh/id_dsa");
             final String idRsaPath = cmd.getOptionValue(ID_RSA_OP,

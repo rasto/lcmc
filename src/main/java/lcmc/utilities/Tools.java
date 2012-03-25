@@ -121,6 +121,8 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
+import java.awt.Font;
+import javax.swing.plaf.FontUIResource;
 
 /**
  * This class provides tools, that are not classified.
@@ -2821,6 +2823,34 @@ public final class Tools {
         }
         if (i >=0 && i < l - 1) {
             sb.delete(i, l - 1);
+        }
+    }
+
+    /**
+     * Resize all fonts. Must be called before GUI is started.
+     * @param scale in percent 100% - is the same size.
+     */
+    public static void resizeFonts(int scale) {
+        if (scale == 100) {
+            return;
+        }
+        if (scale < 5) {
+            scale = 5;
+        }
+        if (scale > 10000) {
+            scale = 10000;
+        }
+        for (final Enumeration e = UIManager.getDefaults().keys();
+             e.hasMoreElements();) {
+            final Object key = e.nextElement();
+            final Object value = UIManager.get(key);
+            if (value instanceof Font)    {
+                final Font f = (Font) value;
+                UIManager.put(key,
+                              new FontUIResource(f.getName(),
+                                                 f.getStyle(),
+                                                 f.getSize() * scale / 100)); 
+            }
         }
     }
 }
