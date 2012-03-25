@@ -175,6 +175,8 @@ public final class ClusterBrowser extends Browser {
     private final Lock mVMSReadLock = mVMSLock.readLock();
     /** VMS write lock. */
     private final Lock mVMSWriteLock = mVMSLock.writeLock();
+    /** Update lock. */
+    private final Lock mVMSUpdateLock = new ReentrantLock();
     /** Object that hosts status of all VMs. */
     private final Map<Host, VMSXML> vmsXML = new HashMap<Host, VMSXML>();
     /** Object that has drbd test data. */
@@ -1428,6 +1430,7 @@ public final class ClusterBrowser extends Browser {
         final List<VMSVirtualDomainInfo> currentVMSVDIs =
                                         new ArrayList<VMSVirtualDomainInfo>();
 
+        mVMSUpdateLock.lock();
         if (vmsNode != null) {
             final Enumeration ee = vmsNode.children();
             while (ee.hasMoreElements()) {
@@ -1461,6 +1464,7 @@ public final class ClusterBrowser extends Browser {
         });
 
         if (vmsNode == null) {
+            mVMSUpdateLock.unlock();
             return;
         }
         for (final String domainName : domainNames) {
@@ -1495,6 +1499,7 @@ public final class ClusterBrowser extends Browser {
             });
             nodeChanged = true;
         }
+        mVMSUpdateLock.unlock();
         if (nodeChanged) {
             reload(vmsNode, false);
         }
