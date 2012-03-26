@@ -2251,8 +2251,11 @@ public class ServiceInfo extends EditableInfo {
             value = clStatus.getParameter(getService().getHeartbeatId(),
                                     param,
                                     false);
+            System.out.println(this + " get param saved: " + param + " " + value);
             if (value == null) {
-                value = getParamPreferred(param);
+                if (getService().isNew()) {
+                    value = getParamPreferred(param);
+                }
                 if (value == null) {
                     return getParamDefault(param);
                 }
