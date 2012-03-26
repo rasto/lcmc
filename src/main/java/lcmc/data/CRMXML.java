@@ -506,6 +506,7 @@ public final class CRMXML extends XML {
         M_A_SECTION.put(INTERLEAVE_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(INTERLEAVE_META_ATTR,
                                          ConfigData.AccessType.GOD);
+        M_A_PREFERRED.put(INTERLEAVE_META_ATTR, PCMK_TRUE);
         /* Group collocated */
         M_A_SHORT_DESC.put(GROUP_COLLOCATED_META_ATTR, "Collocated");
         M_A_DEFAULT.put(GROUP_COLLOCATED_META_ATTR, PCMK_TRUE);

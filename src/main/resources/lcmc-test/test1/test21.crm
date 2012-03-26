@@ -4,11 +4,11 @@ primitive res_Dummy_1 ocf:heartbeat:Dummy
 	operations $id="res_Dummy_1-operations" 
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
+	op monitor interval="121" timeout="154" start-delay="0"2
 	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122"
-primitive res_Dummy_2 ocf:heartbeat:Dummy 
-	operations $id="res_Dummy_2-operations" 
+	op migrate_from interval="0" timeout="1222
+primitive res_Dummy_2 ocf:heartbeat:Dummy2
+	operations $id="res_Dummy_2-opera2ions" 
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
 	op monitor interval="121" timeout="154" start-delay="0" 
@@ -36,7 +36,7 @@ primitive res_Stateful_1 ocf:heartbeat:Stateful
 	meta target-role="started" is-managed="true"
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 ms ms_Stateful_1 res_Stateful_1 
-	meta clone-max="1" notify="true"
+	meta clone-max="1" notify="true" interleave="true"
 location cli-standby-res_IPaddr2_1 res_IPaddr2_1 
 	rule $id="cli-standby-rule-res_IPaddr2_1" -inf: #uname eq host
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1

@@ -8,7 +8,7 @@ primitive res_Dummy_1 ocf:heartbeat:Dummy
 	op migrate_to interval="0" timeout="123" 
 	op migrate_from interval="0" timeout="122"
 clone cl_Dummy_1 res_Dummy_1 
-	meta clone-max="2" notify="true"
+	meta clone-max="2" notify="true" interleave="true"
 property $id="cib-bootstrap-options" 
 	stonith-enabled="false" 
 	no-quorum-policy="ignore"

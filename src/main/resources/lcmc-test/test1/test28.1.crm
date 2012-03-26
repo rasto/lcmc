@@ -4,11 +4,11 @@ node host
 	attributes standby="on"
 primitive res_Dummy_1 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_1-operations" 
-	op start interval="0" timeout="200" 
+	op start interval="0" timeout="200"2
 	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0" 
-	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122" 
+	op monitor interval="121" timeout="254" start-delay="0" 
+	op migrate_to interval="0" timeout=2123" 
+	op migrate_from interval="0" timeou2="122" 
 	meta target-role="started" is-managed="true"
 primitive res_Dummy_2 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_2-operations" 
@@ -41,7 +41,7 @@ primitive res_Stateful_1 ocf:heartbeat:Stateful
 	meta target-role="started" is-managed="true"
 group grp_1 res_Dummy_1 res_Dummy_2 res_Dummy_3
 ms ms_Stateful_1 res_Stateful_1 
-	meta clone-max="1" notify="true"
+	meta clone-max="1" notify="true" interleave="true"
 colocation col_res_IPaddr2_1_grp_1 inf: res_IPaddr2_1 grp_1
 order ord_grp_1_res_IPaddr2_1 inf: grp_1 res_IPaddr2_1
 property $id="cib-bootstrap-options" 
