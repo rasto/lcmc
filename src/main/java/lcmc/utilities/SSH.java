@@ -638,7 +638,7 @@ public final class SSH {
                 final Thread tt = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.sleep(10000);
+                        Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
                         if (!cancelTimeout[0]) {
                             Tools.debug(this,
                                         host.getName()
