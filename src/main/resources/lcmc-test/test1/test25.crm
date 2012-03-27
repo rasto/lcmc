@@ -4,11 +4,11 @@ primitive res_Dummy_1 ocf:heartbeat:Dummy
 	operations $id="res_Dummy_1-operations" 
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
-	op monitor interval="121" timeout="154" start-delay="0"2
+	op monitor interval="121" timeout="154" start-delay="0" 
 	op migrate_to interval="0" timeout="123" 
-	op migrate_from interval="0" timeout="122"2
-	meta target-role="started" is-managed="fal2e"
-primitive res_Dummy_2 ocf:heartbeat:Dummy2
+	op migrate_from interval="0" timeout="122" 
+	meta target-role="started" is-managed="false"
+primitive res_Dummy_2 ocf:heartbeat:Dummy 
 	operations $id="res_Dummy_2-operations" 
 	op start interval="0" timeout="200" 
 	op stop interval="0" timeout="192" 
