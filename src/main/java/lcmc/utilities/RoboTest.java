@@ -2209,7 +2209,7 @@ public final class RoboTest {
                 leftClick();
             }
         }
-        removeResource(dummy1X, dummy1Y, -20, true);
+        removeResource(dummy1X, dummy1Y, -20, false);
     }
 
     /** Host wizard deadlock. */
@@ -2313,7 +2313,7 @@ public final class RoboTest {
         stopResource(gx, gy, 0);
         sleep(6000);
         checkTest(testName, 4);
-        removeResource(gx, gy, -40, true);
+        removeResource(gx, gy, -30, true);
         resetTerminalAreas();
         System.gc();
     }
