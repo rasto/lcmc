@@ -563,6 +563,9 @@ public final class LCMC extends JPanel {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
         }
+        Tools.debug(null, "max mem: "
+                          + Runtime.getRuntime().maxMemory() / 1024 / 1024
+                          + "m", 1);
         return autoArgs;
     }
 
