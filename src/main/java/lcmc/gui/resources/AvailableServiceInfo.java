@@ -122,7 +122,9 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
         final MyButton overviewButton = new MyButton(
                          Tools.getString("ClusterBrowser.RAsOverviewButton"),
                          BACK_ICON);
-        overviewButton.setPreferredSize(new Dimension(180, 50));
+        overviewButton.setPreferredSize(
+                            new Dimension(Tools.getConfigData().scaled(180),
+                                          Tools.getConfigData().scaled(50)));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

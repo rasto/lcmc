@@ -182,9 +182,12 @@ public final class HostDrbdInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 50));
-        buttonPanel.setPreferredSize(new Dimension(0, 50));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        buttonPanel.setMinimumSize(
+                        new Dimension(0, Tools.getConfigData().scaled(50)));
+        buttonPanel.setPreferredSize(
+                        new Dimension(0, Tools.getConfigData().scaled(50)));
+        buttonPanel.setMaximumSize(
+             new Dimension(Short.MAX_VALUE, Tools.getConfigData().scaled(50)));
         mainPanel.add(buttonPanel);
 
         /* Actions */
