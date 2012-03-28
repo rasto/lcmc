@@ -1246,8 +1246,9 @@ public final class ClusterBrowser extends Browser {
                     Thread.currentThread().interrupt();
                 }
                 if (clStatusFailed()) {
-                     Tools.progressIndicatorFailed(clusterName,
-                                                   "Cluster status failed");
+                     Tools.progressIndicatorFailed(
+                        clusterName,
+                        Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override

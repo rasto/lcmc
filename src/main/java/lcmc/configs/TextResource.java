@@ -1616,6 +1616,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterBrowser.ClassesOverviewButton",
          "Classes Overview"},
 
+        {"ClusterBrowser.ClusterStatusFailed",
+         "Pacemaker status not available"},
+
         {"ServicesInfo.AddConstraintPlaceholder",
           "Add Constraint Placeholder"},
 
