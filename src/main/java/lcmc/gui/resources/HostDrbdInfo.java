@@ -885,7 +885,7 @@ public final class HostDrbdInfo extends Info {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
-               texts.add(new Subtext("waiting for cluster status...",
+               texts.add(new Subtext("waiting for DRBD...",
                                      null,
                                      Color.BLACK));
             }

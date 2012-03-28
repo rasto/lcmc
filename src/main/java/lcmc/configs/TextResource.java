@@ -1389,7 +1389,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Available Services"},
 
         {"ClusterBrowser.ClStatusFailed",
-         "<h2>Waiting for cluster status...</h2>"},
+         "<h2>Waiting for Pacemaker...</h2>"},
 
         {"ClusterBrowser.Hb.RemoveAllServices",
          "Remove All Services"},
@@ -1507,7 +1507,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Do not manage by CRM"},
 
         {"ClusterBrowser.Hb.NoInfoAvailable",
-         "no info available"},
+         "unknown..."},
 
         {"ClusterBrowser.Hb.GroupStopped",
          "stopped (group)"},
@@ -1534,10 +1534,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Order Only"},
 
         {"ClusterBrowser.HbUpdateResources",
-         "updating cluster resources..."},
+         "updating resource agents..."},
 
         {"ClusterBrowser.HbUpdateStatus",
-         "updating cluster status..."},
+         "updating Pacemaker status..."},
 
         {"ClusterBrowser.Drbd.RemoveEdge",
          "Remove DRBD Volume"},
@@ -1638,7 +1638,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Host Wizard"},
 
         {"HostBrowser.Drbd.NoInfoAvailable",
-         "no info available"},
+         "unknown..."},
 
         {"HostBrowser.Drbd.AddDrbdResource",
          "Add Mirrored Disk"},
@@ -1844,7 +1844,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Select..."},
 
         {"HostBrowser.Hb.NoInfoAvailable",
-         "no info available"},
+         "unknown..."},
 
         {"HostDrbdInfo.LVMMenu",
          "LVM"},
