@@ -85,7 +85,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         /* Corosync/Pacemaker native */
         {"PmInst.install.text.1",
-         "yum install: 1.1.x/1.3.x"},
+         "yum install: 1.1.x/1.4.x"},
         {"PmInst.install.1",
          "yum -y install pacemaker corosync"
          + "&& if ( rpm -qa|grep drbd ); then"
