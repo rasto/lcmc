@@ -2658,6 +2658,7 @@ public final class CRMXML extends XML {
                                                              ordPos,
                                                              false);
                         ordPos++;
+                        rscSetConnections.add(0, rscSetConnectionData);
                     } else {
                         /* colocation */
                         rscSetConnectionData =
@@ -2667,8 +2668,8 @@ public final class CRMXML extends XML {
                                                              colPos,
                                                              true);
                         colPos++;
+                        rscSetConnections.add(rscSetConnectionData);
                     }
-                    rscSetConnections.add(rscSetConnectionData);
                 }
                 prevRscSet = rscSet;
                 rscSetCount++;
