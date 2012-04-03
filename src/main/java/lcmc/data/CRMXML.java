@@ -307,6 +307,11 @@ public final class CRMXML extends XML {
     /** Name of the collocated group meta attribute. */
     private static final String GROUP_COLLOCATED_META_ATTR = "collocated";
 
+    /** Require all "true" value. */
+    public static final String REQUIRE_ALL_TRUE = PCMK_TRUE;
+    /** Name of the require-all resource set attribute. */
+    public static final String REQUIRE_ALL_ATTR = "require-all";
+
     /** Section for meta attributes in rsc_defaults. */
     private static final Map<String, String> M_A_SECTION =
                                                  new HashMap<String, String>();
@@ -846,6 +851,13 @@ public final class CRMXML extends XML {
         paramOrdDefaultMap.put("sequential", hbBooleanTrue);
         paramOrdPossibleChoices.put("sequential", booleanValues);
         paramOrdPreferredMap.put("sequential", hbBooleanFalse);
+
+        rscSetOrdConnectionParams.add(REQUIRE_ALL_ATTR);
+        paramOrdShortDescMap.put(REQUIRE_ALL_ATTR, "require all");
+        paramOrdLongDescMap.put(REQUIRE_ALL_ATTR, "require all");
+        paramOrdTypeMap.put(REQUIRE_ALL_ATTR, PARAM_TYPE_BOOLEAN);
+        paramOrdDefaultMap.put(REQUIRE_ALL_ATTR, REQUIRE_ALL_TRUE);
+        paramOrdPossibleChoices.put(REQUIRE_ALL_ATTR, booleanValues);
 
         rscSetColConnectionParams.add("role");
         paramColShortDescMap.put("role", "col role");
@@ -2615,6 +2627,8 @@ public final class CRMXML extends XML {
                 final String id = getAttribute(rscSetNode, "id");
                 final String sequential = getAttribute(rscSetNode,
                                                        "sequential");
+                final String requireAll = getAttribute(rscSetNode,
+                                                       REQUIRE_ALL_ATTR);
                 final String orderAction = getAttribute(rscSetNode, "action");
                 final String colocationRole = getAttribute(rscSetNode, "role");
                 final NodeList rscNodes = rscSetNode.getChildNodes();
@@ -2629,6 +2643,7 @@ public final class CRMXML extends XML {
                 final RscSet rscSet = new RscSet(id,
                                                  rscIds,
                                                  sequential,
+                                                 requireAll,
                                                  orderAction,
                                                  colocationRole);
                 rscSets.add(rscSet);
@@ -3818,6 +3833,8 @@ public final class CRMXML extends XML {
         private final Lock mRscIdsWriteLock = mRscIdsLock.writeLock();
         /** String whether the resource set is sequential or not. */
         private final String sequential;
+        /** And/or resource set feature. */
+        private final String requireAll;
         /** order action. */
         private final String orderAction;
         /** colocation role. */
@@ -3827,11 +3844,13 @@ public final class CRMXML extends XML {
         public RscSet(final String id,
                       final List<String> rscIds,
                       final String sequential,
+                      final String requireAll,
                       final String orderAction,
                       final String colocationRole) {
             this.id = id;
             this.rscIds = rscIds;
             this.sequential = sequential;
+            this.requireAll = requireAll;
             this.orderAction = orderAction;
             this.colocationRole = colocationRole;
         }
@@ -3857,6 +3876,12 @@ public final class CRMXML extends XML {
         /** Returns whether the resource set is sequential or not. */
         public String getSequential() {
             return sequential;
+        }
+
+        /** Returns whether all resources in the resource set are required to
+         * be started. */
+        public String getRequireAll() {
+            return requireAll;
         }
 
         /** Returns whether this resource set is subset of the supplied
@@ -3955,6 +3980,12 @@ public final class CRMXML extends XML {
         /** Returns whether the resouce set is sequential. */
         public boolean isSequential() {
             return sequential == null || "true".equals(sequential);
+        }
+
+        /** Returns whether the resouce set requires all resources to be
+         *  started . */
+        public boolean isRequireAll() {
+            return requireAll == null || REQUIRE_ALL_TRUE.equals(requireAll);
         }
     }
 

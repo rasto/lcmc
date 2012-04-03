@@ -2283,6 +2283,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ConstraintPHInfo.confirmRemove.No",
          "Cancel"},
 
+        {"ConstraintPHInfo.And",
+         "AND"},
+
+        {"ConstraintPHInfo.Or",
+         "OR"},
+
         {"ConfigData.OpMode.RO",
          "Read-Only"},
 

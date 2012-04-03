@@ -102,6 +102,7 @@ final class HbOrderInfo extends EditableInfo
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
             }
             resourceNode.put("sequential", rscSet.getSequential());
+            resourceNode.put(CRMXML.REQUIRE_ALL_ATTR, rscSet.getRequireAll());
             resourceNode.put("action", rscSet.getOrderAction());
         } else {
             final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);

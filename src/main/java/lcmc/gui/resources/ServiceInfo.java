@@ -3922,6 +3922,7 @@ public class ServiceInfo extends EditableInfo {
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),
+                                                   rscSet.getRequireAll(),
                                                    rscSet.getOrderAction(),
                                                    rscSet.getColocationRole());
                             rscSetsOrdAttrs.put(newRscSet, null);
@@ -4101,6 +4102,7 @@ public class ServiceInfo extends EditableInfo {
                                                    rscSet.getId(),
                                                    newRscIds,
                                                    rscSet.getSequential(),
+                                                   rscSet.getRequireAll(),
                                                    rscSet.getOrderAction(),
                                                    rscSet.getColocationRole());
                             rscSetsColAttrs.put(newRscSet, null);
