@@ -719,7 +719,10 @@ public final class ServicesInfo extends EditableInfo {
                     cphi.setRscSetConnectionData(rdata);
                 }
                 if (cphi == null) {
-                    cphi = new ConstraintPHInfo(getBrowser(), rdata);
+                    cphi = new ConstraintPHInfo(
+                                            getBrowser(),
+                                            rdata,
+                                            ConstraintPHInfo.Preference.AND);
                     if (prsi == null) {
                         prsi = new PcmkRscSetsInfo(getBrowser());
                     }
@@ -1505,13 +1508,13 @@ public final class ServicesInfo extends EditableInfo {
         };
         items.add((UpdatableItem) addServiceMenuItem);
 
-        /* add constraint placeholder */
-        final MyMenuItem addConstraintPlaceholder =
+        /* add constraint placeholder (and) */
+        final MyMenuItem addConstraintPlaceholderAnd =
             new MyMenuItem(Tools.getString(
-                                     "ServicesInfo.AddConstraintPlaceholder"),
+                                 "ServicesInfo.AddConstraintPlaceholderAnd"),
                            null,
                            Tools.getString(
-                             "ServicesInfo.AddConstraintPlaceholder.ToolTip"),
+                            "ServicesInfo.AddConstraintPlaceholderAnd.ToolTip"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           false),
                            new AccessMode(ConfigData.AccessType.OP,
@@ -1531,12 +1534,12 @@ public final class ServicesInfo extends EditableInfo {
                     hidePopup();
                     final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
                     final ConstraintPHInfo cphi =
-                                      new ConstraintPHInfo(getBrowser(), null);
+                         new ConstraintPHInfo(getBrowser(),
+                                              null,
+                                              ConstraintPHInfo.Preference.AND);
                     cphi.getService().setNew(true);
                     getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi,
-                                                getPos(),
-                                                testOnly);
+                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
@@ -1548,7 +1551,52 @@ public final class ServicesInfo extends EditableInfo {
                     });
                 }
             };
-        items.add((UpdatableItem) addConstraintPlaceholder);
+        items.add((UpdatableItem) addConstraintPlaceholderAnd);
+
+        /* add constraint placeholder (or) */
+        final MyMenuItem addConstraintPlaceholderOr =
+            new MyMenuItem(Tools.getString(
+                                 "ServicesInfo.AddConstraintPlaceholderOr"),
+                           null,
+                           Tools.getString(
+                            "ServicesInfo.AddConstraintPlaceholderOr.ToolTip"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          false),
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public String enablePredicate() {
+                    if (getBrowser().clStatusFailed()) {
+                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                    }
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    hidePopup();
+                    final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+                    final ConstraintPHInfo cphi =
+                         new ConstraintPHInfo(getBrowser(),
+                                              null,
+                                              ConstraintPHInfo.Preference.OR);
+                    cphi.getService().setNew(true);
+                    getBrowser().addNameToServiceInfoHash(cphi);
+                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
+                    final PcmkRscSetsInfo prsi =
+                                      new PcmkRscSetsInfo(getBrowser(), cphi);
+                    cphi.setPcmkRscSetsInfo(prsi);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            hg.scale();
+                        }
+                    });
+                }
+            };
+        items.add((UpdatableItem) addConstraintPlaceholderOr);
 
         /* stop all services. */
         final MyMenuItem stopAllMenuItem = new MyMenuItem(

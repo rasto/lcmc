@@ -309,6 +309,8 @@ public final class CRMXML extends XML {
 
     /** Require all "true" value. */
     public static final String REQUIRE_ALL_TRUE = PCMK_TRUE;
+    /** Require all "false" value. */
+    public static final String REQUIRE_ALL_FALSE = PCMK_FALSE;
     /** Name of the require-all resource set attribute. */
     public static final String REQUIRE_ALL_ATTR = "require-all";
 

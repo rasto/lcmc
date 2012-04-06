@@ -1619,10 +1619,16 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterBrowser.ClusterStatusFailed",
          "Pacemaker status not available"},
 
-        {"ServicesInfo.AddConstraintPlaceholder",
-          "Add Constraint Placeholder"},
+        {"ServicesInfo.AddConstraintPlaceholderAnd",
+          "Add Constraint Placeholder (AND)"},
 
-        {"ServicesInfo.AddConstraintPlaceholder.ToolTip",
+        {"ServicesInfo.AddConstraintPlaceholderOr",
+          "Add Constraint Placeholder (OR)"},
+
+        {"ServicesInfo.AddConstraintPlaceholderAnd.ToolTip",
+          "Add constraint placeholder to create a resource set."},
+
+        {"ServicesInfo.AddConstraintPlaceholderOr.ToolTip",
           "Add constraint placeholder to create a resource set."},
 
         {"PtestData.ToolTip",
