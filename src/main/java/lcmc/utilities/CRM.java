@@ -522,6 +522,10 @@ public final class CRM {
             if (sequential != null) {
                 attrs.put("sequential", sequential);
             }
+            final String requireAll = rscSet.getRequireAll();
+            if (requireAll != null) {
+                attrs.put(CRMXML.REQUIRE_ALL_ATTR, requireAll);
+            }
         }
         for (final String attr : attrs.keySet()) {
             final String value = attrs.get(attr);

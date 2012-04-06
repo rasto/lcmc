@@ -31,6 +31,7 @@ import lcmc.data.ClusterStatus;
 import lcmc.data.resources.Service;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
+import lcmc.utilities.Tools;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -300,7 +301,7 @@ final class HbOrderInfo extends EditableInfo
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         for (final String param : params) {
             final String value = getComboBoxValue(param);
-            if (!value.equals(getParamDefault(param))) {
+            if (!Tools.areEqual(value, getParamDefault(param))) {
                 attrs.put(param, value);
             }
         }

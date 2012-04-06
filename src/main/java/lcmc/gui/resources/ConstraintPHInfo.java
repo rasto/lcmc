@@ -909,7 +909,6 @@ public final class ConstraintPHInfo extends ServiceInfo {
         if (rscd == null) {
             return;
         }
-        final Map<String, String> attrs = new LinkedHashMap<String, String>();
         CRMXML.RscSet rscSet;
         if (first) {
             rscSet = rscd.getRscSet1();
