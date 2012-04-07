@@ -197,6 +197,10 @@ public abstract class ResourceGraph {
     /** Edge picked paint. */
     private static final Paint EDGE_PICKED_PAINT =
                 (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
+    /** Cache for text layouts. */
+    final private Map<String, TextLayout> textLayoutCache =
+                                            new HashMap<String, TextLayout>();
+
     static {
         final float d = 0.05f;
         for (float i = 0; i < 1.0f; i += d) {
@@ -1424,6 +1428,7 @@ public abstract class ResourceGraph {
             final Graphics2D g2d = rc.getGraphicsContext().getDelegate();
             int shapeWidth = getDefaultVertexWidth((Vertex) v);
             int shapeHeight = getDefaultVertexHeight((Vertex) v);
+
             /* icons */
             final List<ImageIcon> icons =
                                    getIconsForVertex((Vertex) v, isTestOnly());
@@ -1531,6 +1536,7 @@ public abstract class ResourceGraph {
                     });
                 }
             }
+
             /* shape */
             super.paintShapeForVertex(rc, v, shape);
             Point2D loc = layout.transform((Vertex) v);
@@ -1717,13 +1723,19 @@ public abstract class ResourceGraph {
     private TextLayout getVertexTextLayout(final Graphics2D g2d,
                                            final String text,
                                            final double fontSizeFactor) {
+        final TextLayout ctl = textLayoutCache.get(fontSizeFactor + ':' + text);
+        if (ctl != null) {
+            return ctl;
+        }
         final Font font = Tools.getGUIData().getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
-        return new TextLayout(text,
+        TextLayout tl = new TextLayout(text,
                               new Font(font.getName(),
                                        font.getStyle(),
                                        (int) (font.getSize() * fontSizeFactor)),
                               context);
+        textLayoutCache.put(fontSizeFactor + ':' + text, tl);
+        return tl;
     }
 
     /** Draws text on the vertex. */
