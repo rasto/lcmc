@@ -523,7 +523,8 @@ public final class CRM {
                 attrs.put("sequential", sequential);
             }
             final String requireAll = rscSet.getRequireAll();
-            if (requireAll != null) {
+            if (requireAll != null
+                && !requireAll.equals(CRMXML.REQUIRE_ALL_TRUE)) {
                 attrs.put(CRMXML.REQUIRE_ALL_ATTR, requireAll);
             }
         }
