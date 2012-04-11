@@ -44,6 +44,7 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.MyList;
 import lcmc.utilities.MyListModel;
+import lcmc.Exceptions;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -1568,6 +1569,18 @@ public final class ServicesInfo extends EditableInfo {
 
                 @Override
                 public String enablePredicate() {
+                    final String pmV =
+                                getBrowser().getDCHost().getPacemakerVersion();
+                    try {
+                        //TODO: get this from constraints-.rng files
+                        if (pmV == null
+                            || Tools.compareVersions(pmV, "1.1.7") <= 0) {
+                            return HbOrderInfo.NOT_AVAIL_FOR_PCMK_VERSION;
+                        }
+                    } catch (Exceptions.IllegalVersionException e) {
+                        Tools.appWarning("unkonwn version: " + pmV);
+                        /* enable it, if version check doesn't work */
+                    }
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }

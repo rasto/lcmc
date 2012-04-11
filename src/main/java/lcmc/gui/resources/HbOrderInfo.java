@@ -32,6 +32,7 @@ import lcmc.data.resources.Service;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
+import lcmc.Exceptions;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -49,6 +50,9 @@ final class HbOrderInfo extends EditableInfo
     private ServiceInfo serviceInfoChild;
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
+    /** Text of disabled item. */
+    public static final String NOT_AVAIL_FOR_PCMK_VERSION =
+                    Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
 
     /** Prepares a new <code>HbOrderInfo</code> object. */
     HbOrderInfo(final HbConnectionInfo connectionInfo,
@@ -436,6 +440,18 @@ final class HbOrderInfo extends EditableInfo
     /** Whether the parameter should be enabled. */
     @Override
     protected String isEnabled(final String param) {
+        if (CRMXML.REQUIRE_ALL_ATTR.equals(param)) {
+            final String pmV = getBrowser().getDCHost().getPacemakerVersion();
+            try {
+                //TODO: get this from constraints-.rng files
+                if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {
+                    return NOT_AVAIL_FOR_PCMK_VERSION;
+                }
+            } catch (Exceptions.IllegalVersionException e) {
+                Tools.appWarning("unkonwn version: " + pmV);
+                /* enable it, if version check doesn't work */
+            }
+        }
         return null;
     }
 

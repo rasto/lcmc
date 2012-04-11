@@ -1562,6 +1562,10 @@ public final class Tools {
         } else {
             version1a = version1;
         }
+        int index = version1a.indexOf("-");
+        if (index >= 0) {
+            version1a = version1a.substring(index);
+        }
 
         final Matcher m2 = p.matcher(version2);
         String version2a;

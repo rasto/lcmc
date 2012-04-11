@@ -2534,5 +2534,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},
+
+        {"HbOrderInfo.NotAvailableForThisVersion",
+          "Not available in this version"},
+
     };
 }
