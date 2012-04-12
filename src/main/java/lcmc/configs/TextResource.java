@@ -1825,7 +1825,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "loading..."},
 
         {"HostBrowser.CRM.StandByOn",
-         "Go Into Standby"},
+         "Standby / Switchover"},
 
         {"HostBrowser.CRM.StandByOff",
          "Go Online"},
