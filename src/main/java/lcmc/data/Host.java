@@ -1642,7 +1642,7 @@ public final class Host {
             }
             mInfoTimestampLock.lock();
             if (!infoTimestamp.containsKey(type)
-                || (timestamp != null && timestamp > infoTimestamp.get(type))) {
+                || (timestamp != null && timestamp >= infoTimestamp.get(type))) {
                 infoTimestamp.put(type, timestamp);
                 mInfoTimestampLock.unlock();
                 out = buffer.substring(s2 + 2, e);
