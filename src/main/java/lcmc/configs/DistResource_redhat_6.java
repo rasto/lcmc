@@ -101,8 +101,11 @@ public final class DistResource_redhat_6 extends java.util.ListResourceBundle {
         {"PmInst.install.text.2", "yum install" },
 
         {"PmInst.install.2",
-         "/usr/bin/yum -y install corosync pacemaker"
-         + "&& /sbin/chkconfig --add corosync"},
+         "/usr/bin/yum -y install corosync pacemaker"},
+
+        {"Corosync.addToRc",
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
 
         ///* Next Heartbeat/Pacemaker clusterlabs */
         //{"HbPmInst.install.text.3",
