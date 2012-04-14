@@ -816,16 +816,16 @@ public final class RoboTest {
         moveTo(ipX, ipY);
         rightClick(); /* popup */
         moveTo(ipX + 57, ipY + 28);
-        moveTo(ipX + 270, ipY + 28);
-        moveTo(ipX + 267, ipY + 52);
+        moveTo(ipX + 410, ipY + 28);
+        moveTo(ipX + 407, ipY + 52);
         leftClick(); /* choose ipaddr */
         removeResource(ipX, ipY, -15, false);
         /* again */
         moveTo(ipX, ipY);
         rightClick(); /* popup */
         moveTo(ipX + 57, ipY + 28);
-        moveTo(ipX + 270, ipY + 28);
-        moveTo(ipX + 267, ipY + 52);
+        moveTo(ipX + 410, ipY + 28);
+        moveTo(ipX + 407, ipY + 52);
         leftClick(); /* choose ipaddr */
 
         moveTo(1070, 357);
