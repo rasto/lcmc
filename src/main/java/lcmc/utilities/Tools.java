@@ -1564,7 +1564,7 @@ public final class Tools {
         }
         int index = version1a.indexOf("-");
         if (index >= 0) {
-            version1a = version1a.substring(index);
+            version1a = version1a.substring(0, index);
         }
 
         final Matcher m2 = p.matcher(version2);
