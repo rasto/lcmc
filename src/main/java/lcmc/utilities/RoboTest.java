@@ -1513,7 +1513,7 @@ public final class RoboTest {
         moveTo(700, 520);
         rightClick(); /* popup */
         sleep(3000);
-        moveTo(760, 596);
+        moveTo(760, 620);
         sleep(3000);
         leftClick();
         moveTo(1080, 81); /* not advanced */
@@ -1532,7 +1532,7 @@ public final class RoboTest {
         moveTo(700, 520);
         rightClick(); /* popup */
         sleep(3000);
-        moveTo(760, 626);
+        moveTo(760, 650);
         sleep(3000);
         leftClick();
         if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
