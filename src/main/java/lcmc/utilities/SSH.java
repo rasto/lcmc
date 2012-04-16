@@ -1169,63 +1169,6 @@ public final class SSH {
                                 if (lastDSAKey != null) {
                                     key = lastDSAKey;
                                 }
-                                /* try first passwordless authentication.  */
-                                if (lastRSAKey == null && dsaKey.exists()) {
-                                    try {
-                                        res = conn.authenticateWithPublicKey(
-                                                                      username,
-                                                                      dsaKey,
-                                                                      key);
-                                    } catch (Exception e) {
-                                        lastDSAKey = null;
-                                        Tools.debug(this,
-                                                    "dsa passwordless failed");
-                                    }
-                                    if (res) {
-                                        Tools.debug(
-                                           this,
-                                           "dsa passwordless auth successful");
-                                        lastDSAKey = key;
-                                        lastRSAKey = null;
-                                        lastPassword = null;
-                                        break;
-                                    }
-
-                                    conn.close();
-                                    conn.connect(new AdvancedVerifier(),
-                                                 connectTimeout,
-                                                 kexTimeout);
-                                }
-
-
-                                if (rsaKey.exists()) {
-                                    try {
-                                        res =
-                                           conn.authenticateWithPublicKey(
-                                                                      username,
-                                                                      rsaKey,
-                                                                      key);
-                                    } catch (Exception e) {
-                                        lastRSAKey = null;
-                                        Tools.debug(this,
-                                                    "rsa passwordless failed");
-                                    }
-                                    if (res) {
-                                        Tools.debug(
-                                           this,
-                                           "rsa passwordless auth successful");
-                                        lastRSAKey = key;
-                                        lastDSAKey = null;
-                                        lastPassword = null;
-                                        break;
-                                    }
-
-                                    conn.close();
-                                    conn.connect(new AdvancedVerifier(),
-                                                 connectTimeout,
-                                                 kexTimeout);
-                                }
-
                                 key = sshGui.enterSomethingDialog(
                                         Tools.getString(
                                                  "SSH.RSA.DSA.Authentication"),
