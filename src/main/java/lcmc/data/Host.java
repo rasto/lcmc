@@ -1772,6 +1772,11 @@ public final class Host {
                                  Tools.chomp(outputBuffer);
                                  if (hwUpdate != null) {
                                      parseHostInfo(hwUpdate);
+                                     for (final ResourceGraph g : graphs) {
+                                         if (g != null) {
+                                             g.repaint();
+                                         }
+                                     }
                                  }
                                  if (vmUpdate != null) {
                                      final VMSXML newVMSXML =
