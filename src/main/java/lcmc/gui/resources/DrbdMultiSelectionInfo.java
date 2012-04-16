@@ -107,7 +107,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public String enablePredicate() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (hi.getHost().isConnected()) {
-                            if (hi.getHost().isDrbdStatus()) {
+                            if (hi.getHost().isDrbdLoaded()) {
                                 return "already loaded";
                             }
                         } else {
