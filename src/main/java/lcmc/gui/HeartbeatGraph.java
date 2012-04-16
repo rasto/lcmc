@@ -1064,8 +1064,6 @@ public final class HeartbeatGraph extends ResourceGraph {
                 rightArrow = "\u21AE "; /* </> */
             } else if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
                 || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
-                leftArrow = "\u2194 "; /* <-> */
-                rightArrow = "\u2194 "; /* <-> */
             } else if (colSType == HbConnectionInfo.ColScoreType.IS_NULL) {
                 leftArrow = "\u21E0 "; /* < - - */
                 rightArrow = " \u21E2"; /* - - > */
@@ -1100,8 +1098,6 @@ public final class HeartbeatGraph extends ResourceGraph {
             if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
                 || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
                 colDesc = "repelled";
-                leftArrow = "\u2194 "; /* <-> */
-                rightArrow = "\u2194 "; /* <-> */
             } else {
                 colDesc = "colocated";
             }
