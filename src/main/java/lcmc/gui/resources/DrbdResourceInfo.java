@@ -771,6 +771,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                        final boolean fromDrbdInfo) {
         final DrbdInfo di = getDrbdInfo();
         boolean correct = true;
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        if (dxml != null && dxml.isDrbdDisabled()) {
+            correct = false;
+        }
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             if (!dvi.checkResourceFieldsCorrect(param,
                                                 dvi.getParametersFromXML(),

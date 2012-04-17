@@ -824,6 +824,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
+    //TODO: dead code?
     boolean checkResourceFieldsCorrect(final String param,
                                        final String[] params,
                                        final boolean fromDrbdInfo) {
@@ -846,6 +847,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
             return false;
         }
         getBrowser().putDrbdResHash();
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        if (dxml != null && dxml.isDrbdDisabled()) {
+            return false;
+        }
         return super.checkResourceFieldsCorrect(param, params);
     }
 

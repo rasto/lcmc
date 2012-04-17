@@ -1619,6 +1619,8 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
+                final DrbdXML dxml =
+                                 getBrowser().getClusterBrowser().getDrbdXML();
                 if (drbdVolumeInfo != null) {
                     return "it is already a drbd resouce";
                 } else if (!getHost().isConnected()) {
@@ -1631,6 +1633,8 @@ public final class BlockDevInfo extends EditableInfo {
                     return "is volume group";
                 } else if (!getBlockDevice().isAvailable()) {
                     return "not available";
+                } else if (dxml.isDrbdDisabled()) {
+                    return "disabled because of config";
                 }
                 return null;
             }
@@ -1656,6 +1660,8 @@ public final class BlockDevInfo extends EditableInfo {
 
                         @Override
                         public String enablePredicate() {
+                            final DrbdXML dxml =
+                                 getBrowser().getClusterBrowser().getDrbdXML();
                             if (!oHost.isConnected()) {
                                 return Host.NOT_CONNECTED_STRING;
                             } else if (!oHost.isDrbdLoaded()) {
@@ -2512,7 +2518,12 @@ public final class BlockDevInfo extends EditableInfo {
                                        final boolean fromDrbdInfo,
                                        final boolean fromDrbdResourceInfo,
                                        final boolean fromDrbdVolumeInfo) {
-        return super.checkResourceFieldsCorrect(param, params);
+        boolean correct = true;
+        final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+        if (dxml != null && dxml.isDrbdDisabled()) {
+            correct = false;
+        }
+        return super.checkResourceFieldsCorrect(param, params) && correct;
     }
 
     /** Returns whether this block device is a volume group in LVM. */

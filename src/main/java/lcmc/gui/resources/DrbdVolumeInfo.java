@@ -569,9 +569,12 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public String enablePredicate() {
+                final DrbdXML dxml = getBrowser().getDrbdXML();
                 if (!Tools.getConfigData().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
+                } else if (dxml.isDrbdDisabled()) {
+                    return "disabled because of config";
                 }
                 return null;
             }
@@ -1056,6 +1059,10 @@ public final class DrbdVolumeInfo extends EditableInfo
                                        final boolean fromDrbdInfo,
                                        final boolean fromDrbdResourceInfo) {
         boolean correct = true;
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        if (dxml != null && dxml.isDrbdDisabled()) {
+            correct = false;
+        }
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi != null
                 && !bdi.getBlockDevice().isNew()

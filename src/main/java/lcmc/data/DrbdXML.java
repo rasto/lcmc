@@ -143,6 +143,10 @@ public final class DrbdXML extends XML {
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
+    /** Whether there are unknown sections in the config. */
+    boolean unknownSections = false;
+    /** Whether there is proxy in the config. */
+    boolean proxyDetected = false;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol C, that is a default. */
@@ -889,6 +893,13 @@ public final class DrbdXML extends XML {
                     resourceHostPortMap.put(resName, hostPortMap);
                 }
                 hostPortMap.put(hostName, port);
+            } else if (option.getNodeName().equals("proxy")) {
+                if (!proxyDetected) {
+                    Tools.appWarning("unsuported feature: proxy");
+                    Tools.progressIndicatorFailed(hostName,
+                                                  "unsupported feature: proxy");
+                    proxyDetected = true;
+                }
             }
         }
     }
@@ -986,6 +997,16 @@ public final class DrbdXML extends XML {
 
                 parseConfigSectionNode(n, nameValueMap);
                 optionsMap.put(resName + "." + secName, nameValueMap);
+                if (!sectionParamsMap.containsKey(secName)
+                    && !sectionParamsMap.containsKey(secName + "-options")) {
+                    Tools.appWarning("DRBD: unknown section: " + secName);
+                    if (!unknownSections) {
+                        /* unknown section, so it's not removed. */
+                        Tools.progressIndicatorFailed(
+                                          "DRBD: unknown section: " + secName);
+                        unknownSections = true;
+                    }
+                }
             }
         }
     }
@@ -1289,5 +1310,14 @@ public final class DrbdXML extends XML {
         resourceDeviceMap.remove(res, volumeNr);
         deviceResourceMap.remove(dev);
         deviceVolumeMap.remove(dev);
+    }
+
+    /**
+     * Whether drbd is disabled. If there are unknown sections, that we don't
+     * want to overwrite.
+     */
+    public boolean isDrbdDisabled() {
+        return (unknownSections || proxyDetected)
+               && !Tools.getConfigData().isAdvancedMode();
     }
 }
