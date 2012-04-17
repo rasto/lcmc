@@ -189,17 +189,24 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final GuiComboBox acb = addressComboBoxHash.get(host);
                 final GuiComboBox pcb = portComboBox;
                 if (acb != null && pcb != null) {
-                    final NetInfo ni = (NetInfo) acb.getValue();
-                    if (ni == null) {
+                    final Object o = acb.getValue();
+                    if (o == null) {
                         throw new Exceptions.DrbdConfigException(
                                     "Address not defined in "
                                     + getCluster().getName()
                                     + " (" + getName() + ")");
                     }
+                    String ip = null;
+                    if (o instanceof String) {
+                        ip = (String) o;
+                    } else {
+                        final NetInfo ni = (NetInfo) o;
+                        ip = ni.getNetInterface().getIp();
+                    }
                     config.append("\n\t\taddress\t\t");
                     config.append(getDrbdNetInterfaceWithPort(
-                                            ni.getNetInterface().getIp(),
-                                            pcb.getStringValue()));
+                                                        ip,
+                                                        pcb.getStringValue()));
                     config.append(";");
 
                 }
