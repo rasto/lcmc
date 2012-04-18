@@ -200,7 +200,7 @@ public final class ProgressIndicatorPanel extends JComponent
         }
         failuresMap.add(text);
         start(text, null);
-        Tools.sleep(8000);
+        Tools.sleep(1000);
         stop(text);
     }
 
@@ -470,7 +470,7 @@ public final class ProgressIndicatorPanel extends JComponent
                     if (alpha < MAX_ALPHA_LEVEL) {
                         int delay = 1000;
                         if (failuresMap.contains(text)) {
-                            delay = 1000;
+                            delay = 10000;
                         }
                         alpha -=
                             (int) (MAX_ALPHA_LEVEL * (time - start) / delay);
