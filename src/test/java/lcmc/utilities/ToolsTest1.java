@@ -1053,6 +1053,26 @@ public final class ToolsTest1 extends TestCase {
         } catch (Exceptions.IllegalVersionException e) {
             assertFalse(true);
         }
+        try {
+            assertEquals(0, Tools.compareVersions("1.7.0_03", "1.7"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(-1, Tools.compareVersions("1.6.0_26", "1.7"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(1, Tools.compareVersions("1.7", "1.6.0_26"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
+        try {
+            assertEquals(0, Tools.compareVersions("1.6.0_26", "1.6.0"));
+        } catch (Exceptions.IllegalVersionException e) {
+            assertFalse(true);
+        }
     }
 
     @Test

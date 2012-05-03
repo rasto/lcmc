@@ -1563,6 +1563,9 @@ public final class Tools {
             version1a = version1;
         }
         int index = version1a.indexOf("-");
+        if (index < 0) {
+            index = version1a.indexOf("_");
+        }
         if (index >= 0) {
             version1a = version1a.substring(0, index);
         }
