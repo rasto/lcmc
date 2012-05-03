@@ -1760,7 +1760,7 @@ public final class RoboTest {
             sleep(5000);
         } else {
             removeEverything();
-            removePlaceHolder(phX, phY);
+            removePlaceHolder(phX, phY, false);
         }
         if (!aborted) {
             sleepNoFactor(20000);
@@ -1847,8 +1847,8 @@ public final class RoboTest {
 
             /* TEST test */
             if (i < count - 1) {
-                removePlaceHolder(ph1X, ph1Y);
-                removePlaceHolder(ph2X, ph2Y);
+                removePlaceHolder(ph1X, ph1Y, true);
+                removePlaceHolder(ph2X, ph2Y, true);
             }
         }
         moveTo(809, 144); /* ptest */
@@ -1859,8 +1859,8 @@ public final class RoboTest {
         stopEverything();
         checkTest("test4", 4);
         removeEverything();
-        //removePlaceHolder(ph1X, ph1Y);
-        //removePlaceHolder(ph2X, ph2Y);
+        removePlaceHolder(ph1X, ph1Y, false);
+        removePlaceHolder(ph2X, ph2Y, false);
         sleep(40000);
     }
 
@@ -2593,20 +2593,24 @@ public final class RoboTest {
     private static void removeGroup(final int x, final int y, final int corr) {
         moveTo(x + 20, y);
         rightClick();
-        sleep(120000);
+        sleep(30000);
         moveTo(x + 40 , y + 250 + corr);
         leftClick();
         confirmRemove();
     }
 
     /** Removes placeholder. */
-    private static void removePlaceHolder(final int x, final int y) {
+    private static void removePlaceHolder(final int x,
+                                          final int y,
+                                          boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
         sleep(1000);
         moveTo(x + 40 , y + 60);
         leftClick();
-        confirmRemove();
+        if (confirm) {
+            confirmRemove();
+        }
     }
 
     /** Confirms remove dialog. */
@@ -3033,8 +3037,17 @@ public final class RoboTest {
         final int origY = (int) origP.getY();
         final Point2D endP =
             Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+        int yCor = 0;
+        try {
+            if (Tools.compareVersions(
+                                System.getProperty("java.version"), "1.7") >= 0) {
+                yCor = -5;
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         final int endX = (int) endP.getX() + toX;
-        final int endY = (int) endP.getY() + toY;
+        final int endY = (int) endP.getY() + toY + yCor;
         if (MOVE_MOUSE_FAST) {
             robot.mouseMove(endX, endY);
             return;
