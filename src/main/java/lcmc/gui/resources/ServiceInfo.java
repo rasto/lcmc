@@ -3946,19 +3946,15 @@ public class ServiceInfo extends EditableInfo {
                 ///* so that it will not be removed */
                 cphi.setUpdated(false);
             }
-            if (CRM.setRscSet(dcHost,
-                              null,
-                              false,
-                              ordId,
-                              false,
-                              null,
-                              rscSetsOrdAttrs,
-                              attrs,
-                              testOnly)
-                && modifiedRscSet != null) {
-
-                modifiedRscSet.removeRscId(idToRemove);
-            }
+            CRM.setRscSet(dcHost,
+                          null,
+                          false,
+                          ordId,
+                          false,
+                          null,
+                          rscSetsOrdAttrs,
+                          attrs,
+                          testOnly);
         } else {
             final String rscFirstId = parent.getHeartbeatId(testOnly);
             final List<CRMXML.OrderData> allData =
@@ -4125,19 +4121,15 @@ public class ServiceInfo extends EditableInfo {
             if (!testOnly) {
                 cphi.setUpdated(false);
             }
-            if (CRM.setRscSet(dcHost,
-                              colId,
-                              false,
-                              null,
-                              false,
-                              rscSetsColAttrs,
-                              null,
-                              attrs,
-                              testOnly)
-                && modifiedRscSet != null) {
-
-                modifiedRscSet.removeRscId(idToRemove);
-            }
+            CRM.setRscSet(dcHost,
+                          colId,
+                          false,
+                          null,
+                          false,
+                          rscSetsColAttrs,
+                          null,
+                          attrs,
+                          testOnly);
         } else {
             final List<CRMXML.ColocationData> allData =
                                             clStatus.getColocationDatas(rscId);
@@ -5794,8 +5786,13 @@ public class ServiceInfo extends EditableInfo {
             @Override
             public void update() {
                 super.update();
-                removeAll();
-                addFilesMenuItems(this);
+                final MyMenu self = this;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        removeAll();
+                        addFilesMenuItems(self);
+                    }
+                });
             }
         };
         items.add(filesSubmenu);

@@ -3931,16 +3931,6 @@ public final class CRMXML extends XML {
             return true;
         }
 
-        /** Removes one id from rsc ids. */
-        public void removeRscId(final String id) {
-            mRscIdsWriteLock.lock();
-            try {
-                rscIds.remove(id);
-            } finally {
-                mRscIdsWriteLock.unlock();
-            }
-        }
-
         /** Adds one id to rsc ids. */
         public void addRscId(final String id) {
             mRscIdsWriteLock.lock();
