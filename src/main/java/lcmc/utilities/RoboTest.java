@@ -2989,8 +2989,17 @@ public final class RoboTest {
         final Point2D appP =
                      Tools.getGUIData().getMainFrameContentPane()
                                         .getLocationOnScreen();
+        int yCor = 0;
+        try {
+            if (Tools.compareVersions(
+                                System.getProperty("java.version"), "1.7") >= 0) {
+                yCor = -5;
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         final int appX = (int) appP.getX() + fromX;
-        final int appY = (int) appP.getY() + fromY;
+        final int appY = (int) appP.getY() + fromY + yCor;
         for (int i = 0; i < 7; i++) {
             boolean isColor = false;
             for (int y = -20; y < 20; y++) {

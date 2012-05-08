@@ -1995,6 +1995,7 @@ sub gui_test {
 	}
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
+	$status =~ s/\s+\(.*?\)(: standby)/$1/g;
 	my $testfile = "/tmp/lcmc-test/$testname/test$index.crm";
 	my $test = "";
 	my $notestfile;
