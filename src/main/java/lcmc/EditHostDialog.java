@@ -48,17 +48,22 @@ public final class EditHostDialog {
     /** Shows step by step dialogs that configure a host. */
     public void showDialogs() {
         DialogHost dialog = new SSH(null, host);
+        final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                if (!expanded) {
+                    Tools.getGUIData().expandTerminalSplitPane(1);
+                }
                 return;
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
             dialog = newdialog;
         }
-        Tools.getGUIData().expandTerminalSplitPane(1);
+        if (!expanded) {
+            Tools.getGUIData().expandTerminalSplitPane(1);
+        }
     }
 }

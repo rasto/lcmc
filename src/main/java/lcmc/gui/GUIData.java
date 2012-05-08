@@ -217,6 +217,11 @@ public final class GUIData  {
         }
     }
 
+    /** Returns whether the terminal panel is expanded. */
+    public boolean isTerminalPanelExpanded() {
+        return terminalSplitPane.getBottomComponent().getSize().getHeight() != 0;
+    }
+
     /** Expands the terminal split pane. */
     public void expandTerminalSplitPane(final int buttonNo) {
         if (terminalSplitPane == null) {
