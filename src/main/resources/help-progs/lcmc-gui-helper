@@ -48,6 +48,7 @@ our $DRBD_INFO_INTERVAL = 10;
 our $CLUSTER_INFO_INTERVAL = 10;
 our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
+our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
 
 
 my $option = shift || die;
@@ -1320,6 +1321,46 @@ sub get_lsb_resources {
 }
 
 sub get_stonith_devices {
+	my $type = shift || "";
+	my $existing_rscs = shift;
+	if (!-e $STONITH_ADMIN_PROG) {
+		get_stonith_devices_old($type, $existing_rscs);
+	}
+	my $quick = 0;
+	my $configured = 0;
+	my %configured_devs;
+	if ("quick" eq $type) {
+		$quick = 1;
+	} elsif ("configured" eq $type) {
+		$configured = 1;
+		for my $p (keys %$existing_rscs) {
+			for my $s (keys %{$$existing_rscs{$p}}) {
+				$configured_devs{$s}++
+			}
+		}
+
+	}
+
+	for my $name (`$STONITH_ADMIN_PROG -I`) {
+		chomp $name;
+		if ($quick) {
+			print "ra:$name\n";
+			next;
+		} 
+		if ($configured && !$configured_devs{$name}) {
+			next;
+		}
+		my $metadata = `$STONITH_ADMIN_PROG -M -a $name`;
+		$metadata =~ s/(<resource-agent.*?)\>/$1 class="stonith">/;
+		if (!$metadata) {
+			next;
+		}
+		print $metadata;
+	}
+}
+
+# squeeze, natty
+sub get_stonith_devices_old {
 	my $type = shift || "";
 	my $existing_rscs = shift;
 	my $quick = 0;
