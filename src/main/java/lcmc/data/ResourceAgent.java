@@ -579,4 +579,9 @@ public final class ResourceAgent {
     public final void setMetaDataLoaded(final boolean metaDataLoaded) {
         this.metaDataLoaded = metaDataLoaded;
     }
+
+    /** Whether the parameter exists. */
+    public boolean hasParameter(final String param) {
+        return parameters.contains(param);
+    }
 }

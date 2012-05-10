@@ -356,6 +356,19 @@ public final class CRMXML extends XML {
 
     private static final List<String> IGNORE_DEFAULTS_FOR =
                                                     new ArrayList<String>();
+
+    /** Stonith parameters that are not in meta-data. */
+    private static final String PCMK_HOST_CHECK_PARAM = "pcmk_host_check";
+    private static final String PCMK_HOST_LIST_PARAM = "pcmk_host_list";
+    private static final String PCMK_HOST_MAP_PARAM = "pcmk_host_map";
+
+    private static final String FENCING_ACTION_PARAM = "action";
+
+    /** TODO: If this is set PCMK_HOST_LIST must be set. */
+    private final static String PCMK_HOST_CHECK_STATIC = "static-list";
+    /** TODO: If this is set PCMK_HOST_LIST must not be set. */
+    private final static String PCMK_HOST_CHECK_DYNAMIC = "dynamic-list";
+
     static {
         /* target-role */
         M_A_POSSIBLE_CHOICES.put(
@@ -535,7 +548,6 @@ public final class CRMXML extends XML {
         RA_PARAM_SECTION.put("IPaddr2",
                              "cidr_netmask",
                              Tools.getString("CRMXML.OtherOptions"));
-
     }
 
     /** Prepares a new <code>CRMXML</code> object. */
@@ -1738,6 +1750,10 @@ public final class CRMXML extends XML {
                     final String type = getAttribute(contentParamNode, "type");
                     String defaultValue = getAttribute(contentParamNode,
                                                                     "default");
+                    if (defaultValue == null && ra.isStonith()
+                        && PARAM_TYPE_BOOLEAN.equals(type)) {
+                        defaultValue = PCMK_FALSE;
+                    }
                     if (ra.isIPaddr() && "nic".equals(param)) {
                         // workaround for default value in IPaddr and IPaddr2
                         defaultValue = "";
@@ -1756,9 +1772,13 @@ public final class CRMXML extends XML {
                     } else {
                         ra.setParamType(param, type);
                     }
+                    if (ra.isStonith() && PARAM_TYPE_BOOLEAN.equals(type)
+                        && defaultValue == null) {
+                    }
                     ra.setParamDefault(param, defaultValue);
                 }
-                if (ra.isStonith() && "hostlist".equals(param)) {
+                if (ra.isStonith()
+                    && ("hostlist".equals(param))) {
                     ra.setParamPossibleChoices(
                              param,
                              hostlistChoices.toArray(
@@ -1775,19 +1795,54 @@ public final class CRMXML extends XML {
             /* stonith-timeout */
             ra.addParameter(STONITH_TIMEOUT_INSTANCE_ATTR);
             ra.setParamShortDesc(STONITH_TIMEOUT_INSTANCE_ATTR,
-                                 "Stonith Timeout");
+                        Tools.getString("CRMXML.stonith-timeout.ShortDesc"));
+            ra.setParamLongDesc(STONITH_TIMEOUT_INSTANCE_ATTR,
+                        Tools.getString("CRMXML.stonith-timeout.LongDesc"));
             ra.setParamType(STONITH_TIMEOUT_INSTANCE_ATTR, PARAM_TYPE_TIME);
             ra.setParamDefault(STONITH_TIMEOUT_INSTANCE_ATTR, "");
             /* priority */
+            // TODO: priority or stonith-priority?
             ra.addParameter(STONITH_PRIORITY_INSTANCE_ATTR);
 
             ra.setParamShortDesc(STONITH_PRIORITY_INSTANCE_ATTR,
-                                 "Stonith Priority");
+                        Tools.getString("CRMXML.stonith-priority.ShortDesc"));
+            ra.setParamLongDesc(STONITH_PRIORITY_INSTANCE_ATTR,
+                        Tools.getString("CRMXML.stonith-priority.LongDesc"));
             ra.setParamPossibleChoices(STONITH_PRIORITY_INSTANCE_ATTR,
-                                       new String[]{"", "0", "5", "10"});
+                                       new String[]{"0", "5", "10"});
             ra.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
-            ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "");
+            ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "0");
+    
+            /* pcmk_host_check for stonithd */
+            ra.addParameter(PCMK_HOST_CHECK_PARAM);
+            ra.setParamPossibleChoices(PCMK_HOST_CHECK_PARAM,
+             new String[]{"", PCMK_HOST_CHECK_DYNAMIC, PCMK_HOST_CHECK_STATIC});
+            ra.setParamShortDesc(PCMK_HOST_CHECK_PARAM,
+                        Tools.getString("CRMXML.pcmk_host_check.ShortDesc"));
+            ra.setParamLongDesc(PCMK_HOST_CHECK_PARAM,
+                       Tools.getString("CRMXML.pcmk_host_check.LongDesc"));
+            ra.setParamDefault(PCMK_HOST_CHECK_PARAM, PCMK_HOST_CHECK_DYNAMIC);
+            ra.setParamType(PCMK_HOST_CHECK_PARAM, PARAM_TYPE_STRING);
 
+            /* pcmk_host_list for stonithd */
+            ra.addParameter(PCMK_HOST_LIST_PARAM);
+            ra.setParamShortDesc(PCMK_HOST_LIST_PARAM,
+                           Tools.getString("CRMXML.pcmk_host_list.ShortDesc"));
+            ra.setParamLongDesc(PCMK_HOST_LIST_PARAM,
+                           Tools.getString("CRMXML.pcmk_host_list.LongDesc"));
+            ra.setParamType(PCMK_HOST_LIST_PARAM, PARAM_TYPE_STRING);
+            ra.setParamPossibleChoices(
+                             PCMK_HOST_LIST_PARAM,
+                             hostlistChoices.toArray(
+                                          new String[hostlistChoices.size()]));
+
+            /* pcmk_host_map for stonithd */
+            ra.addParameter(PCMK_HOST_MAP_PARAM);
+            ra.setParamShortDesc(PCMK_HOST_MAP_PARAM,
+                            Tools.getString("CRMXML.pcmk_host_map.ShortDesc"));
+            ra.setParamLongDesc(PCMK_HOST_MAP_PARAM,
+                            Tools.getString("CRMXML.pcmk_host_map.LongDesc"));
+            ra.setParamType(PCMK_HOST_MAP_PARAM, PARAM_TYPE_STRING);
         }
         final Map<String, String> metaAttrParams = getMetaAttrParameters();
         for (final String metaAttr : metaAttrParams.keySet()) {
@@ -1820,6 +1875,24 @@ public final class CRMXML extends XML {
                 ra.addOperationDefault(name, "role", role);
             }
         }
+    }
+
+    /** Parses the actions node that is list of values for action param. */
+    private void parseStonithActions(final ResourceAgent ra,
+                                     final Node actionsNode) {
+        final NodeList actionNodes = actionsNode.getChildNodes();
+        final List<String> actions = new ArrayList<String>();
+        for (int i = 0; i < actionNodes.getLength(); i++) {
+            final Node actionNode = actionNodes.item(i);
+            if (actionNode.getNodeName().equals("action")) {
+                final String name = getAttribute(actionNode, "name");
+                actions.add(name);
+            }
+        }
+        ra.setParamPossibleChoices(
+                             FENCING_ACTION_PARAM,
+                             actions.toArray(
+                                          new String[actions.size()]));
     }
 
     /**
@@ -1888,7 +1961,12 @@ public final class CRMXML extends XML {
             /* <actions> */
             final Node actionsNode = getChildNode(raNode, "actions");
             if (actionsNode != null) {
-                parseActions(ra, actionsNode);
+                if (ra.isStonith()
+                    && ra.hasParameter(FENCING_ACTION_PARAM)) {
+                    parseStonithActions(ra, actionsNode);
+                } else {
+                    parseActions(ra, actionsNode);
+                }
             }
             ra.setProbablyMasterSlave(masterSlave);
         }

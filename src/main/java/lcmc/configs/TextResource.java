@@ -1950,6 +1950,46 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"CRMXML.OrderSectionParams",
          "Order Parameters"},
 
+        {"CRMXML.stonith-timeout.ShortDesc",
+         "Stonith Timeout"},
+
+        {"CRMXML.stonith-timeout.LongDesc",
+         "How long to wait for the STONITH action to complete."},
+
+        {"CRMXML.stonith-priority.ShortDesc",
+         "Stonith Priority"},
+
+        {"CRMXML.stonith-priority.LongDesc",
+         "The priority of the stonith resource. The lower the number, the<br>"
+         + "higher the priority."},
+
+        {"CRMXML.pcmk_host_check.ShortDesc",
+         "PCMK Host Check"},
+
+        {"CRMXML.pcmk_host_check.LongDesc",
+         "How to determin which machines are controlled by the device.<br>"
+         + "<br>"
+         + "Allowed values: dynamic-list (query the device), static-list (check<br>"
+         + "the pcmk_host_list attribute), none (assume every device can fence<br>"
+         + "every machine)"},
+
+        {"CRMXML.pcmk_host_list.ShortDesc",
+         "PCMK Host List"},
+
+        {"CRMXML.pcmk_host_list.LongDesc",
+         "A list of machines controlled by this device (Optional unless<br>"
+         + "pcmk_host_check=static-list)."},
+
+        {"CRMXML.pcmk_host_map.ShortDesc",
+         "PCMK Host Map"},
+
+        {"CRMXML.pcmk_host_map.LongDesc",
+         "A mapping of host names to ports numbers for devices that do not<br>"
+         + "support host names.<br>"
+         + "<br>"
+         + "Eg. node1:1;node2:2,3 would tell the cluster to use port 1 for<br>"
+         + "node1 and ports 2 and 3 for node2<br>"},
+
         {"GuiComboBox.Select",
          "Select..."},
 
