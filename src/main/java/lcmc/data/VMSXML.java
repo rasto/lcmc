@@ -156,6 +156,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_LOADER = "loader";
     /** VM field: autostart. */
     public static final String VM_PARAM_AUTOSTART = "autostart";
+    /** VM field: virsh options. */
+    public static final String VM_PARAM_VIRSH_OPTIONS = "virsh-options";
     /** VM field: type. */
     public static final String VM_PARAM_TYPE = "type";
     /** VM field: arch. */
@@ -844,7 +846,8 @@ public final class VMSXML extends XML {
     private void removeXML(final String domainName,
                            final Map<String, String> parametersMap,
                            final String path,
-                           final VirtualHardwareComparator vhc) {
+                           final VirtualHardwareComparator vhc,
+                           final String virshOptions) {
         final String configName = namesConfigsMap.get(domainName);
         if (configName == null) {
             return;
@@ -867,7 +870,7 @@ public final class VMSXML extends XML {
             Tools.appError("could not evaluate: ", e);
             return;
         }
-        saveAndDefine(domainNode, domainName);
+        saveAndDefine(domainNode, domainName, virshOptions);
     }
 
     /** Modify disk XML. */
@@ -886,11 +889,15 @@ public final class VMSXML extends XML {
 
     /** Save and define. */
     public void saveAndDefine(final Node domainNode,
-                              final String domainName) {
+                              final String domainName,
+                              final String virshOptions) {
         final String configName = namesConfigsMap.get(domainName);
         final String defineCommand =
-                            VIRSH.getDefineCommand(host, configName + ".new"
-                            + " && rm " + configName + ".new");
+                            VIRSH.getDefineCommand(
+                                                host,
+                                                configName + ".new" + " && rm "
+                                                + configName + ".new",
+                                                virshOptions);
         saveDomainXML(configName, domainNode, defineCommand);
         host.setVMInfoMD5(null);
     }
@@ -995,74 +1002,90 @@ public final class VMSXML extends XML {
 
     /** Remove disk XML. */
     public void removeDiskXML(final String domainName,
-                              final Map<String, String> parametersMap) {
+                              final Map<String, String> parametersMap,
+                              final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/disk",
-                  getDiskDataComparator());
+                  getDiskDataComparator(),
+                  virshOptions);
     }
 
     /** Remove interface XML. */
     public void removeInterfaceXML(final String domainName,
-                                   final Map<String, String> parametersMap) {
+                                   final Map<String, String> parametersMap,
+                                   final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/interface",
-                  getInterfaceDataComparator());
+                  getInterfaceDataComparator(),
+                  virshOptions);
     }
 
     /** Remove input device XML. */
     public void removeInputDevXML(final String domainName,
-                                  final Map<String, String> parametersMap) {
+                                  final Map<String, String> parametersMap,
+                                  final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/input",
-                  getInputDevDataComparator());
+                  getInputDevDataComparator(),
+                  virshOptions);
     }
 
     /** Remove graphics device XML. */
     public void removeGraphicsXML(final String domainName,
-                                  final Map<String, String> parametersMap) {
+                                  final Map<String, String> parametersMap,
+                                  final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/graphics",
-                  getGraphicsDataComparator());
+                  getGraphicsDataComparator(),
+                  virshOptions);
     }
 
     /** Remove sound device XML. */
     public void removeSoundXML(final String domainName,
-                               final Map<String, String> parametersMap) {
+                               final Map<String, String> parametersMap,
+                               final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/sound",
-                  getSoundDataComparator());
+                  getSoundDataComparator(),
+                  virshOptions);
     }
 
     /** Remove serial device XML. */
     public void removeSerialXML(final String domainName,
-                                final Map<String, String> parametersMap) {
+                                final Map<String, String> parametersMap,
+                                final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/serial",
-                  getSerialDataComparator());
+                  getSerialDataComparator(),
+                  virshOptions);
     }
 
     /** Remove parallel device XML. */
     public void removeParallelXML(final String domainName,
-                                  final Map<String, String> parametersMap) {
+                                  final Map<String, String> parametersMap,
+                                  final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/parallel",
-                  getParallelDataComparator());
+                  getParallelDataComparator(),
+                  virshOptions);
     }
 
     /** Remove parallel device XML. */
     public void removeVideoXML(final String domainName,
-                               final Map<String, String> parametersMap) {
+                               final Map<String, String> parametersMap,
+                               final String virshOptions) {
         removeXML(domainName,
                   parametersMap,
                   "devices/video",
-                  getVideoDataComparator());
+                  getVideoDataComparator(),
+                  virshOptions);
     }
 
     /** Updates data. */
@@ -1706,6 +1729,9 @@ public final class VMSXML extends XML {
         final Node infoNode = getChildNode(vmNode, "info");
         final String domainName = getAttribute(vmNode, VM_PARAM_NAME);
         final String autostart = getAttribute(vmNode, VM_PARAM_AUTOSTART);
+        final String virshOptions = getAttribute(vmNode,
+                                                 VM_PARAM_VIRSH_OPTIONS);
+        parameterValues.put(domainName, VM_PARAM_VIRSH_OPTIONS, virshOptions);
         if (autostart != null && "True".equals(autostart)) {
             parameterValues.put(domainName, VM_PARAM_AUTOSTART, host.getName());
         } else {

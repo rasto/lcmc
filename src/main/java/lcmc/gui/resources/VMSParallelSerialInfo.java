@@ -334,7 +334,9 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);
-                vmsxml.saveAndDefine(domainNode, domainName);
+                final String virshOptions =
+                                   getVMSVirtualDomainInfo().getVirshOptions();
+                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
             }
             getResource().setNew(false);
         }

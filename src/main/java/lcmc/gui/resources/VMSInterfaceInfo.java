@@ -356,7 +356,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                     getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
                 modifyXML(vmsxml, domainNode, domainName, parameters);
-                vmsxml.saveAndDefine(domainNode, domainName);
+                final String virshOptions =
+                                   getVMSVirtualDomainInfo().getVirshOptions();
+                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
             }
             getResource().setNew(false);
         }
@@ -540,6 +542,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         if (testOnly) {
             return;
         }
+        final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -548,7 +551,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
                 vmsxml.removeInterfaceXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
+                                    parameters,
+                                    virshOptions);
             }
         }
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {

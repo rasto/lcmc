@@ -1895,46 +1895,52 @@ sub get_vm_info {
 		$libvirt_version = $1;
 	}
 	my $out = "<version>$libvirt_version</version>\n";
-	for (`$VIRSH_COMMAND list --all 2>/dev/null|sed '1,2d'`) {
-		my ($name) = /^\s*\S+\s+(\S+)/;
-		next if !$name;
-		chomp;
-		my $info =
-		  `$VIRSH_COMMAND dominfo $name 2>/dev/null|grep -v 'CPU time'`
-		  || "";
-		next if !$info;
-		my $vncdisplay = `$VIRSH_COMMAND vncdisplay $name 2>/dev/null`
-				 || "";
-		my $config_in_etc;
-		#if (open CONFIG, $_) {
-		#	local $/;
-		#	$config_in_etc = <CONFIG>;
-		#	close CONFIG;
-		#}
-		my $config;
-		$config = `$VIRSH_COMMAND dumpxml $name 2>/dev/null` || "";
-		$out.= "<vm name=\"$name\"";
-		if ($autostart{$name}) {
-			$out.= ' autostart="True"';
-		} else {
-			$out.= ' autostart="False"';
+	for my $options ("", "-c 'xen:///'", "-c lxc:///") {
+		for (`$VIRSH_COMMAND $options list --all 2>/dev/null|sed '1,2d'`) {
+			my ($name) = /^\s*\S+\s+(\S+)/;
+			next if !$name;
+			chomp;
+			my $info =
+			  `$VIRSH_COMMAND $options dominfo $name 2>/dev/null|grep -v 'CPU time'`
+			  || "";
+			next if !$info;
+			my $vncdisplay =
+			   `$VIRSH_COMMAND $options vncdisplay $name 2>/dev/null` || "";
+			my $config_in_etc;
+			#if (open CONFIG, $_) {
+			#	local $/;
+			#	$config_in_etc = <CONFIG>;
+			#	close CONFIG;
+			#}
+			my $config;
+			$config =
+			      `$VIRSH_COMMAND $options dumpxml $name 2>/dev/null` || "";
+			$out.= "<vm name=\"$name\"";
+			if ($autostart{$name}) {
+				$out.= ' autostart="True"';
+			} else {
+				$out.= ' autostart="False"';
+			}
+			if ($options) {
+				$out.= ' virsh-options="'.$options.'"';
+			}
+			$out.= ">\n";
+			$out.= "<info>\n";
+			$out.= $info;
+			$out.= "</info>\n";
+			$out.= "<vncdisplay>$vncdisplay</vncdisplay>\n";
+			if ($config) {
+				$out.= "<config>\n";
+				$out.= $config;
+				$out.= "</config>\n";
+			}
+			if ($config_in_etc) {
+				$out.= "<config-in-etc>\n";
+				$out.= "<![CDATA[$config_in_etc]]>";
+				$out.= "</config-in-etc>\n";
+			}
+			$out.= "</vm>\n";
 		}
-		$out.= ">\n";
-		$out.= "<info>\n";
-		$out.= $info;
-		$out.= "</info>\n";
-		$out.= "<vncdisplay>$vncdisplay</vncdisplay>\n";
-		if ($config) {
-			$out.= "<config>\n";
-			$out.= $config;
-			$out.= "</config>\n";
-		}
-		if ($config_in_etc) {
-			$out.= "<config-in-etc>\n";
-			$out.= "<![CDATA[$config_in_etc]]>";
-			$out.= "</config-in-etc>\n";
-		}
-		$out.= "</vm>\n";
 	}
 	if ($networks) {
 		$out .= $networks;

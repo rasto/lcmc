@@ -39,8 +39,7 @@ public final class VIRSH {
     private static final Map<String, String> VIRSH_COMMANDS =
                                                  new HashMap<String, String>();
     static {
-        VIRSH_COMMANDS.put("autostart",
-                           "/usr/bin/virsh autostart @VALUE@ @DOMAIN@");
+        VIRSH_COMMANDS.put("autostart", Tools.getString("VIRSH.Autostart"));
     }
 
     /** Private constructor, cannot be instantiated. */
@@ -91,7 +90,8 @@ public final class VIRSH {
     /** Sets paramters with virsh command. */
     public static void setParameters(final Host[] hosts,
                                      final String domainName,
-                                     final Map<String, String> parameters) {
+                                     final Map<String, String> parameters,
+                                     final String options) {
         final Map<Host, String> hostCommands = new HashMap<Host, String>();
         for (final Host host : hosts) {
             final StringBuilder commands = new StringBuilder(100);
@@ -104,6 +104,9 @@ public final class VIRSH {
                     command = command.replaceAll(
                                               "@DOMAIN@",
                                               Matcher.quoteReplacement(domainName));
+                }
+                if (command.indexOf("@OPTIONS@") >= 0) {
+                    command = command.replaceAll("@OPTIONS@", options);
                 }
                 if (command.indexOf("@VALUE@") >= 0) {
                     String value = parameters.get(param);
@@ -127,54 +130,72 @@ public final class VIRSH {
     }
 
     /** Starts virtual domain. */
-    public static boolean start(final Host host, final String domain) {
+    public static boolean start(final Host host,
+                                final String domain,
+                                final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Start",
                                                    replaceHash);
         return execCommand(host, command, true);
     }
 
     /** Shuts down virtual domain. */
-    public static boolean shutdown(final Host host, final String domain) {
+    public static boolean shutdown(final Host host,
+                                   final String domain,
+                                   final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Shutdown",
                                                    replaceHash);
         return execCommand(host, command, true);
     }
 
     /** Reboots virtual domain. */
-    public static boolean reboot(final Host host, final String domain) {
+    public static boolean reboot(final Host host,
+                                 final String domain,
+                                 final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Reboot",
                                                    replaceHash);
         return execCommand(host, command, true);
     }
 
     /** Destroys virtual domain. */
-    public static boolean destroy(final Host host, final String domain) {
+    public static boolean destroy(final Host host,
+                                  final String domain,
+                                  final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Destroy",
                                                    replaceHash);
         return execCommand(host, command, true);
     }
 
     /** Suspends virtual domain. */
-    public static boolean suspend(final Host host, final String domain) {
+    public static boolean suspend(final Host host,
+                                  final String domain,
+                                  final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Suspend",
                                                    replaceHash);
         return execCommand(host, command, true);
     }
 
     /** Resumes virtual domain. */
-    public static boolean resume(final Host host, final String domain) {
+    public static boolean resume(final Host host,
+                                 final String domain,
+                                 final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Resume",
                                                    replaceHash);
         return execCommand(host, command, true);
@@ -184,9 +205,12 @@ public final class VIRSH {
      * Defines virtual domain. It rereads the config from XML, but does not
      * start the domain like "create" would.
      */
-    public static boolean define(final Host host, final String config) {
+    public static boolean define(final Host host,
+                                 final String config,
+                                 final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Define",
                                                    replaceHash);
         return execCommand(host, command, true);
@@ -194,18 +218,23 @@ public final class VIRSH {
 
     /** Returns command that defines virtual domain. */
     public static String getDefineCommand(final Host host,
-                                          final String config) {
+                                          final String config,
+                                          final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Define",
                                                    replaceHash);
         return command;
     }
 
     /** Undefines virtual domain. It removes the config. */
-    public static boolean undefine(final Host host, final String domain) {
+    public static boolean undefine(final Host host,
+                                   final String domain,
+                                   final String options) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
+        replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Undefine",
                                                    replaceHash);
         return execCommand(host, command, true);

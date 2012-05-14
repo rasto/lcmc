@@ -120,6 +120,7 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
         if (testOnly) {
             return;
         }
+        final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
@@ -129,7 +130,8 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
                                getParamSaved(SerialData.TYPE));
                 vmsxml.removeSerialXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
-                                    parameters);
+                                    parameters,
+                                    virshOptions);
             }
         }
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {

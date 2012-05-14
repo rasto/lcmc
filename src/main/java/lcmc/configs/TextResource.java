@@ -2176,6 +2176,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Os.Loader",
          "Loader"},
 
+        {"VMSVirtualDomainInfo.Short.VirshOptions",
+         "Virsh options"},
+
         {"VMSVirtualDomainInfo.Short.Autostart",
          "Autostart"},
 

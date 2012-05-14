@@ -404,29 +404,32 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"VMSXML.GetData",
          SUDO + "@GUI-HELPER@ get-vm-info"},
 
+        {"VIRSH.Autostart",
+         SUDO + "/usr/bin/virsh @OPTIONS@ autostart @VALUE@ @DOMAIN@ 2>/dev/null"},
+
         {"VIRSH.Start",
-         SUDO + "virsh start @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ start @DOMAIN@"},
 
         {"VIRSH.Shutdown",
-         SUDO + "virsh shutdown @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ shutdown @DOMAIN@"},
 
         {"VIRSH.Destroy",
-         SUDO + "virsh destroy @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ destroy @DOMAIN@"},
 
         {"VIRSH.Reboot",
-         SUDO + "virsh reboot @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ reboot @DOMAIN@"},
 
         {"VIRSH.Suspend",
-         SUDO + "virsh suspend @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ suspend @DOMAIN@"},
 
         {"VIRSH.Resume",
-         SUDO + "virsh resume @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ resume @DOMAIN@"},
 
         {"VIRSH.Define",
-         SUDO + "virsh define @CONFIG@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ define @CONFIG@"},
 
         {"VIRSH.Undefine",
-         SUDO + "virsh undefine @DOMAIN@"},
+         SUDO + "/usr/bin/virsh @OPTIONS@ undefine @DOMAIN@"},
 
         {"Host.getConnectionStatus",
          "true"},

@@ -202,10 +202,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private final String[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
+    /** Virsh options. */
+    private static final String[] VIRSH_OPTIONS = new String[]{
+                                                        "",
+                                                        "-c 'xen:///'",
+                                                        "-c 'lxc:///'"};
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                     VMSXML.VM_PARAM_NAME,
                                     VMSXML.VM_PARAM_DOMAIN_TYPE,
+                                    VMSXML.VM_PARAM_VIRSH_OPTIONS,
                                     VMSXML.VM_PARAM_EMULATOR,
                                     VMSXML.VM_PARAM_VCPU,
                                     VMSXML.VM_PARAM_CURRENTMEMORY,
@@ -400,6 +406,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
@@ -454,6 +461,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_AUTOSTART,
                    Tools.getString("VMSVirtualDomainInfo.Short.Autostart"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_VIRSH_OPTIONS,
+                   Tools.getString("VMSVirtualDomainInfo.Short.VirshOptions"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_TYPE,
                    Tools.getString("VMSVirtualDomainInfo.Short.Type"));
@@ -539,6 +549,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, "");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, "kvm");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
@@ -1989,7 +2000,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Starts the domain. */
     void start(final Host host) {
-        final boolean ret = VIRSH.start(host, getDomainName());
+        final boolean ret = VIRSH.start(host,
+                                        getDomainName(),
+                                        getVirshOptions());
         if (ret) {
             int i = 0;
             mTransitionWriteLock.lock();
@@ -2068,7 +2081,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Shuts down the domain. */
     void shutdown(final Host host) {
-        final boolean ret = VIRSH.shutdown(host, getDomainName());
+        final boolean ret = VIRSH.shutdown(host,
+                                           getDomainName(),
+                                           getVirshOptions());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -2076,7 +2091,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Destroys down the domain. */
     void destroy(final Host host) {
-        final boolean ret = VIRSH.destroy(host, getDomainName());
+        final boolean ret = VIRSH.destroy(host,
+                                          getDomainName(),
+                                          getVirshOptions());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -2084,7 +2101,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Reboots the domain. */
     void reboot(final Host host) {
-        final boolean ret = VIRSH.reboot(host, getDomainName());
+        final boolean ret = VIRSH.reboot(host,
+                                         getDomainName(),
+                                         getVirshOptions());
         if (ret) {
             startShuttingdownIndicator(host);
         }
@@ -2092,7 +2111,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Suspend down the domain. */
     void suspend(final Host host) {
-        final boolean ret = VIRSH.suspend(host, getDomainName());
+        final boolean ret = VIRSH.suspend(host,
+                                          getDomainName(),
+                                          getVirshOptions());
         if (ret) {
             int i = 0;
             mTransitionWriteLock.lock();
@@ -2133,7 +2154,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Resume down the domain. */
     void resume(final Host host) {
-        final boolean ret = VIRSH.resume(host, getDomainName());
+        final boolean ret = VIRSH.resume(host,
+                                         getDomainName(),
+                                         getVirshOptions());
         if (ret) {
             int i = 0;
             mTransitionWriteLock.lock();
@@ -3280,6 +3303,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     protected Object[] getParamPossibleChoices(final String param) {
         if (VMSXML.VM_PARAM_AUTOSTART.equals(param)) {
             return autostartPossibleValues;
+        } else if (VMSXML.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
+            return VIRSH_OPTIONS;
         } else if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
             final Set<String> models = new LinkedHashSet<String>();
             models.add("");
@@ -3394,7 +3419,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                      allHWP.get(hi));
                         hi.getResource().setNew(false);
                     }
-                    vmsxml.saveAndDefine(domainNode, getDomainName());
+                    vmsxml.saveAndDefine(domainNode,
+                                         getDomainName(),
+                                         getVirshOptions());
                 } else {
                     vmsxml = getBrowser().getVMSXML(host);
                     if (vmsxml == null) {
@@ -3445,12 +3472,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final VMSXML vmsxml = getBrowser().getVMSXML(host);
                 if (vmsxml != null
                     && vmsxml.getDomainNames().contains(getDomainName())) {
-                    VIRSH.undefine(host, getDomainName());
+                    VIRSH.undefine(host, getDomainName(), getVirshOptions());
                 }
             }
         }
         for (final Node dn : domainNodesToSave.keySet()) {
-            domainNodesToSave.get(dn).saveAndDefine(dn, getDomainName());
+            domainNodesToSave.get(dn).saveAndDefine(dn,
+                                                    getDomainName(),
+                                                    getVirshOptions());
         }
         if (!testOnly) {
             storeComboBoxValues(params);
@@ -3484,7 +3513,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         VIRSH.setParameters(definedOnHosts.toArray(
                                       new Host[definedOnHosts.size()]),
                             getDomainName(),
-                            parameters);
+                            parameters,
+                            getVirshOptions());
         getResource().setNew(false);
         for (final Host host : getBrowser().getClusterHosts()) {
             getBrowser().periodicalVMSUpdate(host);
@@ -4611,7 +4641,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
-                VIRSH.undefine(h, getDomainName());
+                VIRSH.undefine(h, getDomainName(), getVirshOptions());
             }
         }
         for (final Host h : getBrowser().getClusterHosts()) {
@@ -4864,5 +4894,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             uuid = UUID.randomUUID().toString();
         }
         return uuid;
+    }
+
+    /** Return virsh options like -c xen:/// */
+    public final String getVirshOptions() {
+        return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS);
     }
 }
