@@ -896,7 +896,7 @@ sub get_xen_lib_path {
 		}
 	}
 	for (`ls -d /usr/lib*/xen-* 2>/dev/null`) {
-		if (m!^/usr/lib(?:64)/xen-\d+[.\d]*$!) {
+		if (m!^/usr/lib(?:64)?/xen-\d+[.\d]*$!) {
 			return $_;
 		}
 	}
