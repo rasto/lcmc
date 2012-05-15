@@ -3989,7 +3989,7 @@ public final class RoboTest {
             leftClick();
             sleepNoFactor(5000);
 
-            moveTo(620, 432 + yMoreHosts); /* number of cpus */
+            moveTo(620, 452 + yMoreHosts); /* number of cpus */
             sleep(1000);
             leftClick();
             sleep(500);

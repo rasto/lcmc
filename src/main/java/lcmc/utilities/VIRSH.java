@@ -39,7 +39,7 @@ public final class VIRSH {
     private static final Map<String, String> VIRSH_COMMANDS =
                                                  new HashMap<String, String>();
     static {
-        VIRSH_COMMANDS.put("autostart", Tools.getString("VIRSH.Autostart"));
+        VIRSH_COMMANDS.put("autostart", "VIRSH.Autostart");
     }
 
     /** Private constructor, cannot be instantiated. */
@@ -93,20 +93,16 @@ public final class VIRSH {
                                      final Map<String, String> parameters,
                                      final String options) {
         final Map<Host, String> hostCommands = new HashMap<Host, String>();
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@DOMAIN@", domainName);
+        replaceHash.put("@OPTIONS@", options);
         for (final Host host : hosts) {
             final StringBuilder commands = new StringBuilder(100);
             for (final String param : parameters.keySet()) {
-                String command = VIRSH_COMMANDS.get(param);
+                String command = host.getDistCommand(VIRSH_COMMANDS.get(param),
+                                                     replaceHash);
                 if (command == null) {
                     continue;
-                }
-                if (command.indexOf("@DOMAIN@") >= 0) {
-                    command = command.replaceAll(
-                                              "@DOMAIN@",
-                                              Matcher.quoteReplacement(domainName));
-                }
-                if (command.indexOf("@OPTIONS@") >= 0) {
-                    command = command.replaceAll("@OPTIONS@", options);
                 }
                 if (command.indexOf("@VALUE@") >= 0) {
                     String value = parameters.get(param);

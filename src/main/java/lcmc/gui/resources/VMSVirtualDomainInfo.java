@@ -203,10 +203,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** Virsh options. */
+    private static final String VIRSH_OPTION_KVM = "";
+    private static final String VIRSH_OPTION_XEN = "-c 'xen:///'";
+    private static final String VIRSH_OPTION_LXC = "-c 'lxc:///'";
     private static final String[] VIRSH_OPTIONS = new String[]{
-                                                        "",
-                                                        "-c 'xen:///'",
-                                                        "-c 'lxc:///'"};
+                                                            VIRSH_OPTION_KVM,
+                                                            VIRSH_OPTION_XEN,
+                                                            VIRSH_OPTION_LXC};
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                     VMSXML.VM_PARAM_NAME,
@@ -3254,6 +3257,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, "wizard");
                 final GuiComboBox loCB =
                             paramComboBoxGet(VMSXML.VM_PARAM_LOADER, "wizard");
+                final GuiComboBox voCB =
+                     paramComboBoxGet(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
                 if (Tools.areEqual("xen", newValue)) {
                     if (emCB != null) {
                         emCB.setValue(xenLibPath + "/bin/qemu-dm");
@@ -3261,12 +3266,22 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (loCB != null) {
                         loCB.setValue(xenLibPath + "/boot/hvmloader");
                     }
+                    if (voCB != null) {
+                        voCB.setValue(VIRSH_OPTION_XEN);
+                    }
+                } else if (Tools.areEqual("lxc", newValue)) {
+                    if (voCB != null) {
+                        voCB.setValue(VIRSH_OPTION_LXC);
+                    }
                 } else {
                     if (emCB != null) {
                         emCB.setValue("/usr/bin/kvm");
                     }
                     if (loCB != null) {
                         loCB.setValue("");
+                    }
+                    if (voCB != null) {
+                        voCB.setValue(VIRSH_OPTION_KVM);
                     }
                 }
             }
