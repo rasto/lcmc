@@ -379,6 +379,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Default widths for columns. */
     private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS =
                                                new HashMap<Integer, Integer>();
+    /** Type HVM. */
+    private static final String TYPE_HVM = "hvm";
+    /** Type Linux. */
+    private static final String TYPE_LINUX = "linux";
+
     /** Width of the button field. */
     private static final int CONTROL_BUTTON_WIDTH = 80;
     static {
@@ -541,7 +546,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
         PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE, "hvm");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE, TYPE_HVM);
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH, "x86_64");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE, "pc");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, "True");
@@ -596,7 +601,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
                             new String[]{"", "/usr/bin/pygrub"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
-                            new String[]{"hvm", "linux"});
+                            new String[]{TYPE_HVM, TYPE_LINUX});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_ARCH,
                             new String[]{"", "x86_64", "i686"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
@@ -3259,6 +3264,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             paramComboBoxGet(VMSXML.VM_PARAM_LOADER, "wizard");
                 final GuiComboBox voCB =
                      paramComboBoxGet(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
+                final GuiComboBox typeCB =
+                             paramComboBoxGet(VMSXML.VM_PARAM_TYPE, "wizard");
                 if (Tools.areEqual("xen", newValue)) {
                     if (emCB != null) {
                         emCB.setValue(xenLibPath + "/bin/qemu-dm");
@@ -3268,6 +3275,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     if (voCB != null) {
                         voCB.setValue(VIRSH_OPTION_XEN);
+                    }
+                    if (typeCB != null) {
+                        typeCB.setValue(TYPE_LINUX);
                     }
                 } else if (Tools.areEqual("lxc", newValue)) {
                     if (voCB != null) {
@@ -3282,6 +3292,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     if (voCB != null) {
                         voCB.setValue(VIRSH_OPTION_KVM);
+                    }
+                    if (typeCB != null) {
+                        typeCB.setValue(TYPE_HVM);
                     }
                 }
             }
