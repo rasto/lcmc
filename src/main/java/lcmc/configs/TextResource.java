@@ -2191,6 +2191,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Type",
          "Type"},
 
+        {"VMSVirtualDomainInfo.Short.Init",
+         "Init"},
+
 
         {"VMSVirtualDomainInfo.Short.Acpi",
          "ACPI"},

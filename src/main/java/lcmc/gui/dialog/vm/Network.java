@@ -70,7 +70,12 @@ final class Network extends VMConfig {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            nextDialogObject = new Display(this, getVMSVirtualDomainInfo());
+            if (getVMSVirtualDomainInfo().needDisplay()) {
+                nextDialogObject = new Display(this, getVMSVirtualDomainInfo());
+            } else {
+                nextDialogObject = new Finish(this, getVMSVirtualDomainInfo());
+            }
+
         }
         return nextDialogObject;
     }

@@ -51,8 +51,8 @@ public final class Domain extends VMConfig {
     private JComponent inputPane = null;
     private GuiComboBox domainNameCB;
     /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {VMSXML.VM_PARAM_NAME,
-                                            VMSXML.VM_PARAM_DOMAIN_TYPE,
+    private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
+                                            VMSXML.VM_PARAM_NAME,
                                             VMSXML.VM_PARAM_VIRSH_OPTIONS,
                                             VMSXML.VM_PARAM_EMULATOR,
                                             VMSXML.VM_PARAM_VCPU,
@@ -60,6 +60,7 @@ public final class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_BOOT,
                                             VMSXML.VM_PARAM_LOADER,
                                             VMSXML.VM_PARAM_TYPE,
+                                            VMSXML.VM_PARAM_INIT,
                                             VMSXML.VM_PARAM_TYPE_ARCH,
                                             VMSXML.VM_PARAM_TYPE_MACHINE};
     /** Next dialog object. */

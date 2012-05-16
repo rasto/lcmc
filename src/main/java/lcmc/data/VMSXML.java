@@ -160,6 +160,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_VIRSH_OPTIONS = "virsh-options";
     /** VM field: type. */
     public static final String VM_PARAM_TYPE = "type";
+    /** VM field: init. */
+    public static final String VM_PARAM_INIT = "init";
     /** VM field: arch. */
     public static final String VM_PARAM_TYPE_ARCH = "arch";
     /** VM field: machine. */
@@ -536,7 +538,8 @@ public final class VMSXML extends XML {
     /** Creates XML for new domain. */
     public Node createDomainXML(final String uuid,
                                 final String domainName,
-                                final Map<String, String> parametersMap) {
+                                final Map<String, String> parametersMap,
+                                final boolean needConsole) {
         //<domain type='kvm'>
         //  <memory>524288</memory>
         //  <name>fff</name>
@@ -613,6 +616,12 @@ public final class VMSXML extends XML {
         typeNode.setAttribute("arch", parametersMap.get(VM_PARAM_TYPE_ARCH));
         typeNode.setAttribute("machine",
                               parametersMap.get(VM_PARAM_TYPE_MACHINE));
+        final String init = parametersMap.get(VM_PARAM_INIT);
+        if (init != null && !"".equals(init)) {
+            final Element initNode = (Element) osNode.appendChild(
+                                                      doc.createElement("init"));
+            initNode.appendChild(doc.createTextNode(init));
+        }
         final Element bootNode = (Element) osNode.appendChild(
                                                   doc.createElement("boot"));
         final Node loaderNode = (Element) osNode.appendChild(
@@ -651,9 +660,14 @@ public final class VMSXML extends XML {
         }
         /* devices / emulator */
         final String emulator = parametersMap.get(VM_PARAM_EMULATOR);
-        if (emulator != null) {
+        if (emulator != null || needConsole) {
             final Element devicesNode = (Element) root.appendChild(
                                               doc.createElement("devices"));
+            if (needConsole) {
+                final Element consoleNode = (Element) devicesNode.appendChild(
+                                                  doc.createElement("console"));
+                consoleNode.setAttribute("type", "pty");
+            }
             final Element emulatorNode = (Element) devicesNode.appendChild(
                                               doc.createElement("emulator"));
             emulatorNode.appendChild(doc.createTextNode(emulator));
@@ -682,6 +696,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_TYPE, "os/type");
         paths.put(VM_PARAM_TYPE_ARCH, "os/type");
         paths.put(VM_PARAM_TYPE_MACHINE, "os/type");
+        paths.put(VM_PARAM_INIT, "os/init");
         paths.put(VM_PARAM_LOADER, "os/loader");
         paths.put(VM_PARAM_CPU_MATCH, "cpu");
         paths.put(VM_PARAM_ACPI, "features");
@@ -1272,6 +1287,10 @@ public final class VMSXML extends XML {
                         parameterValues.put(name,
                                             VM_PARAM_TYPE_MACHINE,
                                             getAttribute(osOption, "machine"));
+                    } else if (VM_PARAM_INIT.equals(osOption.getNodeName())) {
+                        parameterValues.put(name,
+                                            VM_PARAM_INIT,
+                                            getText(osOption));
                     } else {
                         parameterValues.put(name,
                                             osOption.getNodeName(),

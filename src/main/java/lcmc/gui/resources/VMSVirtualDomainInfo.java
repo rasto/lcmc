@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.awt.Color;
@@ -206,14 +207,35 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final String VIRSH_OPTION_KVM = "";
     private static final String VIRSH_OPTION_XEN = "-c 'xen:///'";
     private static final String VIRSH_OPTION_LXC = "-c 'lxc:///'";
+    /** Domain types. */
+    private static final String DOMAIN_TYPE_KVM = "kvm";
+    private static final String DOMAIN_TYPE_XEN = "xen";
+    private static final String DOMAIN_TYPE_LXC = "lxc";
+    private static final String DOMAIN_TYPE_UML = "uml";
+    private static final String DOMAIN_TYPE_OPENVZ = "openvz";
+
+
+
     private static final String[] VIRSH_OPTIONS = new String[]{
                                                             VIRSH_OPTION_KVM,
                                                             VIRSH_OPTION_XEN,
                                                             VIRSH_OPTION_LXC};
+
+    /** Whether it needs "display" section. */
+    private static final Set<String> NEED_DISPLAY =
+         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            DOMAIN_TYPE_KVM,
+                                                            DOMAIN_TYPE_XEN)));
+    /** Whether it needs "console" section. */
+    private static final Set<String> NEED_CONSOLE =
+         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            DOMAIN_TYPE_LXC,
+                                                            DOMAIN_TYPE_OPENVZ,
+                                                            DOMAIN_TYPE_UML)));
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
-                                    VMSXML.VM_PARAM_NAME,
                                     VMSXML.VM_PARAM_DOMAIN_TYPE,
+                                    VMSXML.VM_PARAM_NAME,
                                     VMSXML.VM_PARAM_VIRSH_OPTIONS,
                                     VMSXML.VM_PARAM_EMULATOR,
                                     VMSXML.VM_PARAM_VCPU,
@@ -224,6 +246,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_LOADER,
                                     VMSXML.VM_PARAM_AUTOSTART,
                                     VMSXML.VM_PARAM_TYPE,
+                                    VMSXML.VM_PARAM_INIT,
                                     VMSXML.VM_PARAM_TYPE_ARCH,
                                     VMSXML.VM_PARAM_TYPE_MACHINE,
                                     VMSXML.VM_PARAM_ACPI,
@@ -383,6 +406,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final String TYPE_HVM = "hvm";
     /** Type Linux. */
     private static final String TYPE_LINUX = "linux";
+    /** Type exe. */
+    private static final String TYPE_EXE = "exe";
 
     /** Width of the button field. */
     private static final int CONTROL_BUTTON_WIDTH = 80;
@@ -418,6 +443,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH,     VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE,  VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_INIT,          VIRTUAL_SYSTEM_STRING);
 
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF,   VIRTUAL_SYSTEM_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_ON_REBOOT,     VIRTUAL_SYSTEM_OPTIONS);
@@ -475,6 +501,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_TYPE,
                    Tools.getString("VMSVirtualDomainInfo.Short.Type"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_INIT,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Init"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_TYPE_ARCH,
                    Tools.getString("VMSVirtualDomainInfo.Short.Arch"));
@@ -559,7 +588,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, "");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, "kvm");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, DOMAIN_TYPE_KVM);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
@@ -597,15 +626,20 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                          "/usr/lib/xen/boot/hvmloader",
                                          "/usr/lib/xen-4.0/boot/hvmloader"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
-                            new String[]{"kvm", "xen"});
+                            new String[]{DOMAIN_TYPE_KVM,
+                                         DOMAIN_TYPE_XEN,
+                                         DOMAIN_TYPE_LXC,
+                                         });
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
                             new String[]{"", "/usr/bin/pygrub"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
-                            new String[]{TYPE_HVM, TYPE_LINUX});
+                            new String[]{TYPE_HVM, TYPE_LINUX, TYPE_EXE});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_ARCH,
                             new String[]{"", "x86_64", "i686"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
                             new String[]{"", "pc", "pc-0.12"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_INIT,
+                            new String[]{"", "/init"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
                             new String[]{"destroy",
                                          "restart",
@@ -3266,7 +3300,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                      paramComboBoxGet(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
                 final GuiComboBox typeCB =
                              paramComboBoxGet(VMSXML.VM_PARAM_TYPE, "wizard");
-                if (Tools.areEqual("xen", newValue)) {
+                if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
                     if (emCB != null) {
                         emCB.setValue(xenLibPath + "/bin/qemu-dm");
                     }
@@ -3279,9 +3313,18 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (typeCB != null) {
                         typeCB.setValue(TYPE_LINUX);
                     }
-                } else if (Tools.areEqual("lxc", newValue)) {
+                } else if (Tools.areEqual(DOMAIN_TYPE_LXC, newValue)) {
+                    if (emCB != null) {
+                        emCB.setValue("/usr/lib/libvirt/libvirt_lxc");
+                    }
+                    if (loCB != null) {
+                        loCB.setValue("");
+                    }
                     if (voCB != null) {
                         voCB.setValue(VIRSH_OPTION_LXC);
+                    }
+                    if (typeCB != null) {
+                        typeCB.setValue(TYPE_EXE);
                     }
                 } else {
                     if (emCB != null) {
@@ -3430,7 +3473,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().vmStatusLock();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
-              definedOnHostComboBoxHash.get(host.getName()).getStringValue();
+                definedOnHostComboBoxHash.get(host.getName()).getStringValue();
+            final boolean needConsole = needConsole();
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 Node domainNode = null;
                 VMSXML vmsxml = null;
@@ -3439,7 +3483,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     getBrowser().vmsXMLPut(host, vmsxml);
                     domainNode = vmsxml.createDomainXML(getUUID(),
                                                         getDomainName(),
-                                                        parameters);
+                                                        parameters,
+                                                        needConsole);
                     for (final VMSHardwareInfo hi : allHWP.keySet()) {
                         hi.modifyXML(vmsxml,
                                      domainNode,
@@ -3479,7 +3524,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         /* new on this host */
                         domainNode = vmsxml.createDomainXML(getUUID(),
                                                             getDomainName(),
-                                                            parameters);
+                                                            parameters,
+                                                            needConsole);
                         if (domainNode != null) {
                             for (final VMSHardwareInfo hi : allHWP.keySet()) {
                                 hi.modifyXML(
@@ -4927,5 +4973,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Return virsh options like -c xen:/// */
     public final String getVirshOptions() {
         return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS);
+    }
+
+    /** Return whether domain type needs "display" section. */
+    public final boolean needDisplay() {
+        return NEED_DISPLAY.contains(paramComboBoxGet(
+                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+    }
+
+    /** Return whether domain type needs "console" section. */
+    public final boolean needConsole() {
+        return NEED_CONSOLE.contains(paramComboBoxGet(
+                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 }
