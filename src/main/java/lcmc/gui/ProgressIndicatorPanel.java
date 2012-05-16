@@ -195,6 +195,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure. */
     public void failure(final String text) {
+        Tools.appWarning(text);
         if (text == null) {
             return;
         }
@@ -206,6 +207,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure and shows it for n seconds. */
     public void failure(final String text, final int n) {
+        Tools.appWarning(text);
         if (text == null || n < 0) {
             return;
         }
