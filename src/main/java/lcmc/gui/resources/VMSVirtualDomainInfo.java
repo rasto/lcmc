@@ -226,6 +226,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                                                             DOMAIN_TYPE_KVM,
                                                             DOMAIN_TYPE_XEN)));
+    /** Whether it needs installation disk. */
+    private static final Set<String> NEED_INSTALLATION_DISK =
+         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            DOMAIN_TYPE_KVM,
+                                                            DOMAIN_TYPE_XEN)));
     /** Whether it needs "console" section. */
     private static final Set<String> NEED_CONSOLE =
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
@@ -4978,6 +4983,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Return whether domain type needs "display" section. */
     public final boolean needDisplay() {
         return NEED_DISPLAY.contains(paramComboBoxGet(
+                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+    }
+
+    /** Return whether domain type needs installation disk. */
+    public final boolean needInstallationDisk() {
+        return NEED_INSTALLATION_DISK.contains(paramComboBoxGet(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 

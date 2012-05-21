@@ -54,6 +54,7 @@ final class Storage extends VMConfig {
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
                                             DiskData.SOURCE_DEVICE,
+                                            DiskData.SOURCE_DIR,
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE};
     /** VMS disk info object. */

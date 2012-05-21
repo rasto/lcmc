@@ -76,8 +76,12 @@ public final class Domain extends VMConfig {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            nextDialogObject =
-                    new InstallationDisk(this, getVMSVirtualDomainInfo());
+            if (getVMSVirtualDomainInfo().needInstallationDisk()) {
+                nextDialogObject =
+                        new InstallationDisk(this, getVMSVirtualDomainInfo());
+            } else {
+                nextDialogObject = new Storage(this, getVMSVirtualDomainInfo());
+            }
         }
         return nextDialogObject;
     }
