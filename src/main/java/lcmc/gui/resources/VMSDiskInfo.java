@@ -159,12 +159,16 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
      * representation that appears in the menus. */
     private static final Map<String, String> TARGET_BUS_TYPES =
                                                  new HashMap<String, String>();
+    /** Disk types. */
+    private static final String FILE_TYPE = "file";
+    private static final String BLOCK_TYPE = "block";
+
     static {
         POSSIBLE_VALUES.put(DiskData.TYPE,
                             new StringInfo[]{
-                                 new StringInfo("Image file", "file", null),
+                                 new StringInfo("Image file", FILE_TYPE, null),
                                  new StringInfo("Disk/block device",
-                                                "block",
+                                                BLOCK_TYPE,
                                                 null)});
         POSSIBLE_VALUES.put(
                     DiskData.TARGET_BUS_TYPE,
@@ -269,7 +273,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override
     public String[] getRealParametersFromXML() {
-        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
+        if (BLOCK_TYPE.equals(getComboBoxValue(DiskData.TYPE))) {
             return BLOCK_PARAMETERS.clone();
         } else {
             return FILE_PARAMETERS.clone();
@@ -318,8 +322,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override
     protected boolean isRequired(final String param) {
         final String type = getComboBoxValue(DiskData.TYPE);
-        if ((DiskData.SOURCE_FILE.equals(param) && "file".equals(type))
-            || (DiskData.SOURCE_DEVICE.equals(param) && "block".equals(type))) {
+        if ((DiskData.SOURCE_FILE.equals(param) && FILE_TYPE.equals(type))
+            || (DiskData.SOURCE_DEVICE.equals(param)
+                && BLOCK_TYPE.equals(type))) {
             if ("ide/cdrom".equals(getComboBoxValue(DiskData.TARGET_BUS_TYPE))
                 || "fdc/floppy".equals(getComboBoxValue(
                                                  DiskData.TARGET_BUS_TYPE))) {
@@ -514,11 +519,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 public void run() {
                     for (final String p : sourceFileCB.keySet()) {
                         sourceFileCB.get(p).setVisible(
-                                                "file".equals(newValue));
+                                                FILE_TYPE.equals(newValue));
                     }
                     for (final String p : sourceDeviceCB.keySet()) {
                         sourceDeviceCB.get(p).setVisible(
-                                                "block".equals(newValue));
+                                                BLOCK_TYPE.equals(newValue));
                     }
                 }
             });
@@ -816,7 +821,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns the regexp of the parameter. */
     @Override
     protected String getParamRegexp(final String param) {
-        if ("file".equals(getComboBoxValue(DiskData.TYPE))
+        if (FILE_TYPE.equals(getComboBoxValue(DiskData.TYPE))
             && DiskData.SOURCE_FILE.equals(param)) {
             return ".*[^/]$";
         }
