@@ -3867,7 +3867,7 @@ public final class RoboTest {
             moveTo(159, 205); /* new domain */
             leftClick();
             dialogColorTest("new domain");
-            moveTo(450, 317); /* domain name */
+            moveTo(450, 365); /* domain name */
             leftClick();
             press(KeyEvent.VK_D);
             sleep(200);
@@ -4027,7 +4027,7 @@ public final class RoboTest {
             //leftClick();
             //sleep(1000);
 
-            moveTo(390, 492); /* readonly */
+            moveTo(390, 545); /* readonly */
             sleep(1000);
             leftClick();
             sleep(1000);
@@ -4036,7 +4036,7 @@ public final class RoboTest {
             leftClick();
             checkVMTest(vmTest, 3.1, name);
             sleep(1000);
-            moveTo(390, 597); /* readonly */
+            moveTo(390, 650); /* readonly */
             sleep(1000);
             leftClick();
 
