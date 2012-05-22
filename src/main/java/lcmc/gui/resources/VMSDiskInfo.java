@@ -58,14 +58,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Source block combo box, so that it can be disabled, depending on type.*/
     private final Map<String, GuiComboBox> sourceDeviceCB =
                                             new HashMap<String, GuiComboBox>();
-    /** Source dir combo box, so that it can be disabled, depending on type. */
-    private final Map<String, GuiComboBox> sourceDirCB =
-                                            new HashMap<String, GuiComboBox>();
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
     private final Map<String, GuiComboBox> targetDeviceCB =
-                                            new HashMap<String, GuiComboBox>();
-    private final Map<String, GuiComboBox> targetDirCB =
                                             new HashMap<String, GuiComboBox>();
     /** Driver name combo box. */
     private final Map<String, GuiComboBox> driverNameCB =
@@ -82,10 +77,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_BUS_TYPE,
                                                 DiskData.TARGET_DEVICE,
-                                                DiskData.TARGET_DIR,
                                                 DiskData.SOURCE_FILE,
                                                 DiskData.SOURCE_DEVICE,
-                                                DiskData.SOURCE_DIR,
                                                 DiskData.DRIVER_NAME,
                                                 DiskData.DRIVER_TYPE,
                                                 DiskData.READONLY,
@@ -103,15 +96,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     private static final String[] FILE_PARAMETERS = {DiskData.TYPE,
                                                      DiskData.TARGET_DEVICE,
                                                      DiskData.SOURCE_FILE,
-                                                     DiskData.TARGET_BUS_TYPE,
-                                                     DiskData.DRIVER_NAME,
-                                                     DiskData.DRIVER_TYPE,
-                                                     DiskData.READONLY,
-                                                     DiskData.SHAREABLE};
-    /** Mount parameters. */
-    private static final String[] MOUNT_PARAMETERS = {DiskData.TYPE,
-                                                     DiskData.TARGET_DIR,
-                                                     DiskData.SOURCE_DIR,
                                                      DiskData.TARGET_BUS_TYPE,
                                                      DiskData.DRIVER_NAME,
                                                      DiskData.DRIVER_TYPE,
@@ -137,8 +121,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                         GuiComboBox.Type.RADIOGROUP);
         FIELD_TYPES.put(DiskData.SOURCE_FILE,
                         GuiComboBox.Type.COMBOBOX);
-        FIELD_TYPES.put(DiskData.SOURCE_DIR,
-                        GuiComboBox.Type.COMBOBOX);
         FIELD_TYPES.put(DiskData.READONLY,
                         GuiComboBox.Type.CHECKBOX);
         FIELD_TYPES.put(DiskData.SHAREABLE,
@@ -152,9 +134,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     static {
         SHORTNAME_MAP.put(DiskData.TYPE, "Type");
         SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
-        SHORTNAME_MAP.put(DiskData.TARGET_DIR, "Target Dir");
         SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
-        SHORTNAME_MAP.put(DiskData.SOURCE_DIR, "Source Dir");
         SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
         SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
@@ -179,18 +159,13 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
      * representation that appears in the menus. */
     private static final Map<String, String> TARGET_BUS_TYPES =
                                                  new HashMap<String, String>();
-    /** Disk types. */
-    private static final String FILE_TYPE = "file";
-    private static final String BLOCK_TYPE = "block";
-    private static final String MOUNT_TYPE = "mount";
     static {
         POSSIBLE_VALUES.put(DiskData.TYPE,
                             new StringInfo[]{
-                                 new StringInfo("Image file", FILE_TYPE, null),
+                                 new StringInfo("Image file", "file", null),
                                  new StringInfo("Disk/block device",
-                                                BLOCK_TYPE,
-                                                null),
-                                 new StringInfo("Mount", MOUNT_TYPE, null)});
+                                                "block",
+                                                null)});
         POSSIBLE_VALUES.put(
                     DiskData.TARGET_BUS_TYPE,
                     new StringInfo[]{
@@ -205,8 +180,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                                "file",
                                                                "phy"});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
-        POSSIBLE_VALUES.put(DiskData.SOURCE_DIR,
-                            new String[]{null, "/opt/vm-1-root"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
             TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
@@ -214,7 +187,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
         DEFAULTS_MAP.put(DiskData.SHAREABLE, "False");
         PREFERRED_MAP.put(DiskData.DRIVER_NAME, "qemu");
-        PREFERRED_MAP.put(DiskData.TARGET_DIR, "/");
         TARGET_DEVICES_MAP.put("ide/disk",
                                new String[]{"hda", "hdb", "hdd"});
         TARGET_DEVICES_MAP.put("ide/cdrom",
@@ -297,10 +269,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override
     public String[] getRealParametersFromXML() {
-        if (BLOCK_TYPE.equals(getComboBoxValue(DiskData.TYPE))) {
+        if ("block".equals(getComboBoxValue(DiskData.TYPE))) {
             return BLOCK_PARAMETERS.clone();
-        } else if (MOUNT_TYPE.equals(getComboBoxValue(DiskData.TYPE))) {
-            return MOUNT_PARAMETERS.clone();
         } else {
             return FILE_PARAMETERS.clone();
         }
@@ -348,9 +318,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override
     protected boolean isRequired(final String param) {
         final String type = getComboBoxValue(DiskData.TYPE);
-        if ((DiskData.SOURCE_FILE.equals(param) && FILE_TYPE.equals(type))
-            || (DiskData.SOURCE_DEVICE.equals(param)
-                && BLOCK_TYPE.equals(type))) {
+        if ((DiskData.SOURCE_FILE.equals(param) && "file".equals(type))
+            || (DiskData.SOURCE_DEVICE.equals(param) && "block".equals(type))) {
             if ("ide/cdrom".equals(getComboBoxValue(DiskData.TARGET_BUS_TYPE))
                 || "fdc/floppy".equals(getComboBoxValue(
                                                  DiskData.TARGET_BUS_TYPE))) {
@@ -358,9 +327,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             } else {
                 return true;
             }
-        } else if (DiskData.SOURCE_DIR.equals(param)
-                   && MOUNT_TYPE.equals(type)) {
-            return true;
         }
         return IS_REQUIRED.contains(param);
     }
@@ -506,11 +472,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                              final String domainName,
                              final Map<String, String> params) {
         if (vmsxml != null) {
-            if (MOUNT_TYPE.equals(params.get(DiskData.TYPE))) {
-                vmsxml.modifyDiskMountXML(node, domainName, params);
-            } else {
-                vmsxml.modifyDiskXML(node, domainName, params);
-            }
+            vmsxml.modifyDiskXML(node, domainName, params);
         }
     }
 
@@ -550,28 +512,17 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    final boolean isFile = FILE_TYPE.equals(newValue);
-                    final boolean isBlock = BLOCK_TYPE.equals(newValue);
-                    final boolean isMount = MOUNT_TYPE.equals(newValue);
                     for (final String p : sourceFileCB.keySet()) {
-                        sourceFileCB.get(p).setVisible(isFile);
-                    }
-                    for (final String p : sourceDirCB.keySet()) {
-                        sourceDirCB.get(p).setVisible(isMount);
+                        sourceFileCB.get(p).setVisible(
+                                                "file".equals(newValue));
                     }
                     for (final String p : sourceDeviceCB.keySet()) {
-                        sourceDeviceCB.get(p).setVisible(isBlock);
-                    }
-                    for (final String p : targetDirCB.keySet()) {
-                        targetDirCB.get(p).setVisible(isMount);
-                    }
-                    for (final String p : targetDeviceCB.keySet()) {
-                        targetDeviceCB.get(p).setVisible(!isMount);
+                        sourceDeviceCB.get(p).setVisible(
+                                                "block".equals(newValue));
                     }
                 }
             });
             checkOneParam(DiskData.SOURCE_FILE);
-            checkOneParam(DiskData.SOURCE_DIR);
             checkOneParam(DiskData.SOURCE_DEVICE);
         } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
             final Set<String> devices = new LinkedHashSet<String>();
@@ -638,7 +589,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 }
             }
             checkOneParam(DiskData.SOURCE_FILE);
-            checkOneParam(DiskData.SOURCE_DIR);
             checkOneParam(DiskData.SOURCE_DEVICE);
         }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
@@ -765,24 +715,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 } else {
                     sourceDeviceCB.put(prefix, paramCB);
                 }
-            } else if (DiskData.SOURCE_DIR.equals(param)) {
-                if (prefix == null) {
-                    sourceDirCB.put("", paramCB);
-                } else {
-                    sourceDirCB.put(prefix, paramCB);
-                }
-                paramCB.setAlwaysEditable(true);
             } else if (DiskData.TARGET_DEVICE.equals(param)) {
                 if (prefix == null) {
                     targetDeviceCB.put("", paramCB);
                 } else {
                     targetDeviceCB.put(prefix, paramCB);
-                }
-            } else if (DiskData.TARGET_DIR.equals(param)) {
-                if (prefix == null) {
-                    targetDirCB.put("", paramCB);
-                } else {
-                    targetDirCB.put(prefix, paramCB);
                 }
             } else if (DiskData.DRIVER_NAME.equals(param)) {
                 if (prefix == null) {
@@ -879,7 +816,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns the regexp of the parameter. */
     @Override
     protected String getParamRegexp(final String param) {
-        if (FILE_TYPE.equals(getComboBoxValue(DiskData.TYPE))
+        if ("file".equals(getComboBoxValue(DiskData.TYPE))
             && DiskData.SOURCE_FILE.equals(param)) {
             return ".*[^/]$";
         }

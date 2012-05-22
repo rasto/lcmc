@@ -217,12 +217,6 @@ public final class VMSXML extends XML {
     public static final Map<String, String> DISK_ATTRIBUTE_MAP =
                                              new HashMap<String, String>();
     /** Map from paramater to its xml tag. */
-    public static final Map<String, String> DISK_MOUNT_TAG_MAP =
-                                             new HashMap<String, String>();
-    /** Map from paramater to its xml attribute. */
-    public static final Map<String, String> DISK_MOUNT_ATTRIBUTE_MAP =
-                                             new HashMap<String, String>();
-    /** Map from paramater to its xml tag. */
     public static final Map<String, String> INPUTDEV_TAG_MAP =
                                              new HashMap<String, String>();
     /** Map from paramater to its xml attribute. */
@@ -295,14 +289,6 @@ public final class VMSXML extends XML {
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
         DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
         DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
-
-        DISK_MOUNT_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
-        DISK_MOUNT_TAG_MAP.put(DiskData.TARGET_DIR, "target");
-        DISK_MOUNT_ATTRIBUTE_MAP.put(DiskData.TARGET_DIR, "dir");
-        DISK_MOUNT_TAG_MAP.put(DiskData.SOURCE_DIR, "source");
-        DISK_MOUNT_ATTRIBUTE_MAP.put(DiskData.SOURCE_DIR, "dir");
-        DISK_MOUNT_TAG_MAP.put(DiskData.READONLY, "readonly");
-        DISK_MOUNT_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
 
         INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.TYPE, "type");
         INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.BUS, "bus");
@@ -916,20 +902,6 @@ public final class VMSXML extends XML {
                   getDiskDataComparator());
     }
 
-    /** Modify mount disk XML. */
-    public void modifyDiskMountXML(final Node domainNode,
-                                   final String domainName,
-                                   final Map<String, String> parametersMap) {
-        modifyXML(domainNode,
-                  domainName,
-                  DISK_MOUNT_TAG_MAP,
-                  DISK_MOUNT_ATTRIBUTE_MAP,
-                  parametersMap,
-                  "devices/disk",
-                  "disk",
-                  getDiskDataComparator());
-    }
-
     /** Save and define. */
     public void saveAndDefine(final Node domainNode,
                               final String domainName,
@@ -1478,9 +1450,7 @@ public final class VMSXML extends XML {
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourceFile = null;
                         String sourceDev = null;
-                        String sourceDir = null;
                         String targetDev = null;
-                        String targetDir = null;
                         String targetBus = null;
                         String driverName = null;
                         String driverType = null;
@@ -1497,10 +1467,8 @@ public final class VMSXML extends XML {
                                     sourceFileDirs.add(dir);
                                 }
                                 sourceDev = getAttribute(optionNode, "dev");
-                                sourceDir = getAttribute(optionNode, "dir");
                             } else if ("target".equals(nodeName)) {
                                 targetDev = getAttribute(optionNode, "dev");
-                                targetDir = getAttribute(optionNode, "dir");
                                 targetBus = getAttribute(optionNode, "bus");
                             } else if ("driver".equals(nodeName)) {
                                 driverName = getAttribute(optionNode, "name");
@@ -1520,10 +1488,8 @@ public final class VMSXML extends XML {
                             final DiskData diskData =
                                          new DiskData(type,
                                                       targetDev,
-                                                      targetDir,
                                                       sourceFile,
                                                       sourceDev,
-                                                      sourceDir,
                                                       targetBus + "/" + device,
                                                       driverName,
                                                       driverType,
@@ -2215,14 +2181,10 @@ public final class VMSXML extends XML {
         private final String type;
         /** Target device: hda, hdb, hdc, sda... */
         private final String targetDev;
-        /** Target directory: / */
-        private final String targetDir;
         /** Source file. */
         private final String sourceFile;
         /** Source device: /dev/drbd0... */
         private final String sourceDev;
-        /** Source dir. */
-        private final String sourceDir;
         /** Target bus: ide... and type: disk..., delimited with, */
         private final String targetBusType;
         /** Driver name: qemu... */
@@ -2237,14 +2199,10 @@ public final class VMSXML extends XML {
         public static final String TYPE = "type";
         /** Target device string. */
         public static final String TARGET_DEVICE = "target_device";
-        /** Target dir string. */
-        public static final String TARGET_DIR = "target_dir";
         /** Saved target device string. */
         public static final String SAVED_TARGET_DEVICE = "saved_target_device";
         /** Source file. */
         public static final String SOURCE_FILE = "source_file";
-        /** Source dir. */
-        public static final String SOURCE_DIR = "source_dir";
         /** Source dev. */
         public static final String SOURCE_DEVICE = "source_dev";
         /** Target bus and type. */
@@ -2265,10 +2223,8 @@ public final class VMSXML extends XML {
         /** Creates new DiskData object. */
         public DiskData(final String type,
                         final String targetDev,
-                        final String targetDir,
                         final String sourceFile,
                         final String sourceDev,
-                        final String sourceDir,
                         final String targetBusType,
                         final String driverName,
                         final String driverType,
@@ -2279,14 +2235,10 @@ public final class VMSXML extends XML {
             setValue(TYPE, type);
             this.targetDev = targetDev;
             setValue(TARGET_DEVICE, targetDev);
-            this.targetDir = targetDir;
-            setValue(TARGET_DIR, targetDir);
             this.sourceFile = sourceFile;
             setValue(SOURCE_FILE, sourceFile);
             this.sourceDev = sourceDev;
             setValue(SOURCE_DEVICE, sourceDev);
-            this.sourceDir = sourceDir;
-            setValue(SOURCE_DIR, sourceDir);
             this.targetBusType = targetBusType;
             setValue(TARGET_BUS_TYPE, targetBusType);
             this.driverName = driverName;
@@ -2317,11 +2269,6 @@ public final class VMSXML extends XML {
             return targetDev;
         }
 
-        /** Returns target dir. */
-        public String getTargetDir() {
-            return targetDir;
-        }
-
         /** Returns source file. */
         public String getSourceFile() {
             return sourceFile;
@@ -2330,11 +2277,6 @@ public final class VMSXML extends XML {
         /** Returns source device. */
         public String getSourceDev() {
             return sourceDev;
-        }
-
-        /** Returns source dir. */
-        public String getSourceDir() {
-            return sourceDir;
         }
 
         /** Returns target bus. */
