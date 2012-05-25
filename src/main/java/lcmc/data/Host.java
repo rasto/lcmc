@@ -149,6 +149,9 @@ public final class Host {
     /** List of drbd block devices of this host. */
     private Map<String, BlockDevice> drbdBlockDevices =
                                       new LinkedHashMap<String, BlockDevice>();
+    /** Options for GUI drop down lists. */
+    private Map<String, List<String>> guiOptions =
+                                          new HashMap<String, List<String>>();
     /** Color of this host in graphs. */
     private Color defaultColor;
     /** Color of this host in graphs. */
@@ -293,6 +296,10 @@ public final class Host {
     private final int CLUSTER_EVENTS_TIMEOUT = 40000;
     private final int HW_INFO_TIMEOUT        = 40000;
 
+    /** Choices for gui drop down menus. */
+    public static final String VM_FILESYSTEM_SOURCE_DIR_LXC =
+                                                "vm.filesystem.source.dir.lxc";
+
     /** Root user name. */
     public static final String ROOT_USER = "root";
     /** Default SSH port. */
@@ -312,8 +319,8 @@ public final class Host {
 
     /** Prepares a new <code>Host</code> object. */
     public Host(final String ip) {
-        this();
-        this.ip = ip;
+    this();
+    this.ip = ip;
     }
 
     /** Returns borwser object for this host. */
@@ -913,6 +920,11 @@ public final class Host {
     /** Returns xen lib path. */
     public String getXenLibPath() {
         return xenLibPath;
+    }
+
+    /** Returns lxc lib path. */
+    public String getLxcLibPath() {
+        return getDistString("libvirt.lxc.libpath");
     }
 
     /** Gets distribution, e.g., debian. */
@@ -1982,6 +1994,9 @@ public final class Host {
         final Set<String> newCpuMapVendors = new TreeSet<String>();
         final Set<String> newMountPoints = new TreeSet<String>();
 
+        final Map<String, List<String>> newGuiOptions =
+                                          new HashMap<String, List<String>>();
+
         boolean netInfo = false;
         boolean diskInfo = false;
         boolean vgInfo = false;
@@ -1993,9 +2008,11 @@ public final class Host {
         boolean mountPointsInfo = false;
         boolean guiInfo = false;
         boolean installationInfo = false;
+        boolean guiOptionsInfo = false;
         boolean versionInfo = false;
 
         newMountPoints.add("/mnt/");
+        String guiOptionName = null;
 
         for (String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
@@ -2014,6 +2031,7 @@ public final class Host {
                 || "mount-points-info".equals(line)
                 || "gui-info".equals(line)
                 || "installation-info".equals(line)
+                || "gui-options-info".equals(line)
                 || "version-info".equals(line)) {
                 type = line;
                 continue;
@@ -2103,6 +2121,11 @@ public final class Host {
             } else if ("installation-info".equals(type)) {
                 parseInstallationInfo(line);
                 installationInfo = true;
+            } else if ("gui-options-info".equals(type)) {
+                guiOptionName = parseGuiOptionsInfo(line,
+                                                    guiOptionName,
+                                                    newGuiOptions);
+                guiOptionsInfo = true;
             } else if ("version-info".equals(type)) {
                 versionLines.add(line);
                 versionInfo = true;
@@ -2152,6 +2175,9 @@ public final class Host {
             setDistInfo(versionLines.toArray(new String[versionLines.size()]));
         }
 
+        if (guiOptionsInfo) {
+            guiOptions = newGuiOptions;
+        }
 
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
@@ -2181,6 +2207,24 @@ public final class Host {
                                                   new Double(x).doubleValue(),
                                                   new Double(y).doubleValue()));
         }
+    }
+    /** Parses the gui options info. */
+    public String parseGuiOptionsInfo(
+                                    final String line,
+                                    final String guiOptionName,
+                                    final Map<String, List<String>> goptions) {
+        if (line.length() > 2 && line.substring(0, 2).equals("o:")) {
+            final String name = line.substring(2);
+            goptions.put(name, new ArrayList<String>());
+            return name;
+        }
+        if (guiOptionName != null) {
+            final List<String> options = goptions.get(guiOptionName);
+            if (options != null) {
+                options.add(line);
+            }
+        }
+        return guiOptionName;
     }
 
     /** Parses the installation info. */
@@ -2940,6 +2984,11 @@ public final class Host {
     /** Return whether the user is root */
     public boolean isRoot() {
         return ROOT_USER.equals(username);
+    }
+
+    /** Return options for GUI elements. */
+    public List<String> getGuiOptions(final String name) {
+        return new ArrayList<String>(guiOptions.get(name));
     }
 }
 

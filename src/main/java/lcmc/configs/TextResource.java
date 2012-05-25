@@ -1105,6 +1105,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.vm.Storage.Description",
          "Enter a storage for this virtual machine."},
 
+        {"Dialog.vm.Filesystem.Title",
+         "Filesystem"},
+
+        {"Dialog.vm.Filesystem.Description",
+         "Enter a filesystem for this virtual machine."},
+
         {"Dialog.vm.Network.Title",
          "Network Interface Configuration"},
 
@@ -2266,6 +2272,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"VMSVirtualDomainInfo.AddNewDisk",
          "New Disk"},
+
+        {"VMSVirtualDomainInfo.AddNewFilesystem",
+         "New Filesystem"},
 
         {"VMSVirtualDomainInfo.AddNewInterface",
          "New Network Interface"},

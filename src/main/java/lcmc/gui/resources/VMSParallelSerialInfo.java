@@ -495,7 +495,9 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                             } else {
                                 directory = oldDir;
                             }
-                            startFileChooser(paramCB, directory);
+                            startFileChooser(paramCB,
+                                             directory,
+                                             FILECHOOSER_FILE_ONLY);
                         }
                     });
                     t.start();

@@ -458,6 +458,8 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"LVM.lvsnapshot",
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
 
+        {"libvirt.lxc.libpath", "/usr/lib/libvirt"},
+
         /* config files */
         {"ocf:heartbeat:apache.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
@@ -567,5 +569,6 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"ocf:heartbeat:Xen.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
               "xmfile")))},
+
     };
 }

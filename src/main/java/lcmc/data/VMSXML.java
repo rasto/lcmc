@@ -101,6 +101,9 @@ public final class VMSXML extends XML {
     /** Map from domain name and target device to the disk data. */
     private final Map<String, Map<String, DiskData>> disksMap =
                            new LinkedHashMap<String, Map<String, DiskData>>();
+    /** Map from domain name and target device to the fs data. */
+    private final Map<String, Map<String, FilesystemData>> filesystemsMap =
+                       new LinkedHashMap<String, Map<String, FilesystemData>>();
     /** Map from domain name and mac address to the interface data. */
     private final Map<String, Map<String, InterfaceData>> interfacesMap =
                        new LinkedHashMap<String, Map<String, InterfaceData>>();
@@ -217,6 +220,12 @@ public final class VMSXML extends XML {
     public static final Map<String, String> DISK_ATTRIBUTE_MAP =
                                              new HashMap<String, String>();
     /** Map from paramater to its xml tag. */
+    public static final Map<String, String> FILESYSTEM_TAG_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml attribute. */
+    public static final Map<String, String> FILESYSTEM_ATTRIBUTE_MAP =
+                                             new HashMap<String, String>();
+    /** Map from paramater to its xml tag. */
     public static final Map<String, String> INPUTDEV_TAG_MAP =
                                              new HashMap<String, String>();
     /** Map from paramater to its xml attribute. */
@@ -289,6 +298,12 @@ public final class VMSXML extends XML {
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
         DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
         DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
+
+        FILESYSTEM_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
+        FILESYSTEM_TAG_MAP.put(FilesystemData.SOURCE_DIR, "source");
+        FILESYSTEM_ATTRIBUTE_MAP.put(FilesystemData.SOURCE_DIR, "dir");
+        FILESYSTEM_TAG_MAP.put(FilesystemData.TARGET_DIR, "target");
+        FILESYSTEM_ATTRIBUTE_MAP.put(FilesystemData.TARGET_DIR, "dir");
 
         INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.TYPE, "type");
         INPUTDEV_ATTRIBUTE_MAP.put(InputDevData.BUS, "bus");
@@ -535,6 +550,17 @@ public final class VMSXML extends XML {
         }
     }
 
+    /** Return config name. */
+    private String getConfigName(final String type, final String domainName) {
+        if ("xen".equals(type)) {
+            return "/etc/xen/vm/" + domainName + ".xml";
+        } else if ("lxc".equals(type)) {
+            return "/etc/libvirt/lxc/" + domainName + ".xml";
+        } else {
+            return "/etc/libvirt/qemu/" + domainName + ".xml";
+        }
+    }
+
     /** Creates XML for new domain. */
     public Node createDomainXML(final String uuid,
                                 final String domainName,
@@ -550,10 +576,7 @@ public final class VMSXML extends XML {
 
         /* domain type: kvm/xen */
         final String type = parametersMap.get(VM_PARAM_DOMAIN_TYPE);
-        String configName = "/etc/libvirt/qemu/" + domainName + ".xml";
-        if ("xen".equals(type)) {
-            configName = "/etc/xen/vm/" + domainName + ".xml";
-        }
+        final String configName = getConfigName(type, domainName);
         namesConfigsMap.put(domainName, configName);
         /* build xml */
         final String encoding = "UTF-8";
@@ -902,6 +925,20 @@ public final class VMSXML extends XML {
                   getDiskDataComparator());
     }
 
+    /** Modify fs XML. */
+    public void modifyFilesystemXML(final Node domainNode,
+                              final String domainName,
+                              final Map<String, String> parametersMap) {
+        modifyXML(domainNode,
+                  domainName,
+                  FILESYSTEM_TAG_MAP,
+                  FILESYSTEM_ATTRIBUTE_MAP,
+                  parametersMap,
+                  "devices/filesystem",
+                  "filesystem",
+                  getFilesystemDataComparator());
+    }
+
     /** Save and define. */
     public void saveAndDefine(final Node domainNode,
                               final String domainName,
@@ -1023,6 +1060,17 @@ public final class VMSXML extends XML {
                   parametersMap,
                   "devices/disk",
                   getDiskDataComparator(),
+                  virshOptions);
+    }
+
+    /** Remove filesystem XML. */
+    public void removeFilesystemXML(final String domainName,
+                                    final Map<String, String> parametersMap,
+                                    final String virshOptions) {
+        removeXML(domainName,
+                  parametersMap,
+                  "devices/filesystem",
+                  getFilesystemDataComparator(),
                   virshOptions);
     }
 
@@ -1372,6 +1420,8 @@ public final class VMSXML extends XML {
             } else if ("devices".equals(option.getNodeName())) {
                 final Map<String, DiskData> devMap =
                                     new LinkedHashMap<String, DiskData>();
+                final Map<String, FilesystemData> fsMap =
+                                    new LinkedHashMap<String, FilesystemData>();
                 final Map<String, InterfaceData> macMap =
                                     new LinkedHashMap<String, InterfaceData>();
                 final Map<String, InputDevData> inputMap =
@@ -1496,6 +1546,30 @@ public final class VMSXML extends XML {
                                                       readonly,
                                                       shareable);
                             devMap.put(targetDev, diskData);
+                        }
+                    } else if ("filesystem".equals(deviceNode.getNodeName())) {
+                        final String type = getAttribute(deviceNode, "type");
+                        final NodeList opts = deviceNode.getChildNodes();
+                        String sourceDir = null;
+                        String targetDir = null;
+                        for (int k = 0; k < opts.getLength(); k++) {
+                            final Node optionNode = opts.item(k);
+                            final String nodeName = optionNode.getNodeName();
+                            if ("source".equals(nodeName)) {
+                                sourceDir = getAttribute(optionNode, "dir");
+                            } else if ("target".equals(nodeName)) {
+                                targetDir = getAttribute(optionNode, "dir");
+                            } else if (!"#text".equals(nodeName)) {
+                                Tools.appWarning("unknown fs option: "
+                                                 + nodeName);
+                            }
+                        }
+                        if (targetDir != null) {
+                            final FilesystemData filesystemData =
+                                                 new FilesystemData(type,
+                                                                    sourceDir,
+                                                                    targetDir);
+                            fsMap.put(targetDir, filesystemData);
                         }
                     } else if ("interface".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
@@ -1724,6 +1798,7 @@ public final class VMSXML extends XML {
                     }
                 }
                 disksMap.put(name, devMap);
+                filesystemsMap.put(name, fsMap);
                 interfacesMap.put(name, macMap);
                 inputDevsMap.put(name, inputMap);
                 graphicsDevsMap.put(name, graphicsMap);
@@ -1771,12 +1846,7 @@ public final class VMSXML extends XML {
         }
         final Node configNode = getChildNode(vmNode, "config");
         final String type = parseConfig(configNode, domainName);
-        String configName;
-        if ("xen".equals(type)) {
-            configName = "/etc/xen/vm/" + domainName + ".xml";
-        } else {
-            configName = "/etc/libvirt/qemu/" + domainName + ".xml";
-        }
+        final String configName = getConfigName(type, domainName);
         configsMap.put(configName, domainName);
         namesConfigsMap.put(domainName, configName);
     }
@@ -1860,6 +1930,11 @@ public final class VMSXML extends XML {
     /** Returns disk data. */
     public Map<String, DiskData> getDisks(final String name) {
         return disksMap.get(name);
+    }
+
+    /** Returns fs data. */
+    public Map<String, FilesystemData> getFilesystems(final String name) {
+        return filesystemsMap.get(name);
     }
 
     /** Returns interface data. */
@@ -2008,6 +2083,28 @@ public final class VMSXML extends XML {
                     for (int i = 0; i < nodes.getLength(); i++) {
                         final Node mn = getChildNode(nodes.item(i), "target");
                         if (targetDev.equals(getAttribute(mn, "dev"))) {
+                            el = (Element) nodes.item(i);
+                        }
+                    }
+                }
+                return el;
+            }
+        };
+    }
+
+    /** Returns function that gets the node that belongs to the paremeters. */
+    protected VirtualHardwareComparator getFilesystemDataComparator() {
+        return new VirtualHardwareComparator() {
+            @Override
+            public Element getElement(final NodeList nodes,
+                                      final Map<String, String> parameters) {
+                Element el = null;
+                final String targetDev = parameters.get(
+                                            FilesystemData.SAVED_TARGET_DIR);
+                if (targetDev != null) {
+                    for (int i = 0; i < nodes.getLength(); i++) {
+                        final Node mn = getChildNode(nodes.item(i), "target");
+                        if (targetDev.equals(getAttribute(mn, "dir"))) {
                             el = (Element) nodes.item(i);
                         }
                     }
@@ -2174,7 +2271,6 @@ public final class VMSXML extends XML {
         };
     }
 
-
     /** Class that holds data about virtual disks. */
     public static final class DiskData extends HardwareData {
         /** Type: file, block... */
@@ -2302,6 +2398,52 @@ public final class VMSXML extends XML {
         /** Returns whether the disk is read only. */
         boolean isShareable() {
             return shareable;
+        }
+    }
+
+    /** Class that holds data about virtual filesystems. */
+    public static final class FilesystemData extends HardwareData {
+        /** Type: mount */
+        private final String type;
+        /** Source dir. */
+        private final String sourceDir;
+        /** Target dir: / */
+        private final String targetDir;
+        /** Type. */
+        public static final String TYPE = "type";
+        /** Source dir string. */
+        public static final String SOURCE_DIR = "source_dir";
+        /** Target dir string. */
+        public static final String TARGET_DIR = "target_dir";
+        /** Saved target dir string. */
+        public static final String SAVED_TARGET_DIR = "saved_target_dir";
+
+        /** Creates new FilesysmteData object. */
+        public FilesystemData(final String type,
+                              final String sourceDir,
+                              final String targetDir) {
+            super();
+            this.type = type;
+            setValue(TYPE, type);
+            this.sourceDir = sourceDir;
+            setValue(SOURCE_DIR, sourceDir);
+            this.targetDir = targetDir;
+            setValue(TARGET_DIR, targetDir);
+        }
+
+        /** Returns type. */
+        public String getType() {
+            return type;
+        }
+
+        /** Returns source dir. */
+        public String getSourceDir() {
+            return sourceDir;
+        }
+
+        /** Returns target dir. */
+        public String getTargetDir() {
+            return targetDir;
         }
     }
 

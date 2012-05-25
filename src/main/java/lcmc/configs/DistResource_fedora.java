@@ -218,5 +218,8 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " fi && "
          + "make && make install DESTDIR=/ && "
          + "/bin/rm -rf /tmp/drbdinst"},
+
+        {"libvirt.lxc.libpath", "/usr/libexec"},
     };
+
 }

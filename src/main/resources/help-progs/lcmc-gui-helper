@@ -74,6 +74,8 @@ if ($option eq "all") {
 	print get_gui_info();
 	print "installation-info\n";
 	print get_installation_info();
+	print "gui-options-info\n";
+	print get_gui_options_info();
 	print "version-info\n";
 	print get_version_info();
 } elsif ($option eq "hw-info-daemon") {
@@ -769,6 +771,18 @@ sub get_installation_info {
 	$out .= "hn:$hn\n";
 	return $out;
 }
+
+#
+# get_gui_options_info
+#
+sub get_gui_options_info {
+	my $out = "o:vm.filesystem.source.dir.lxc\n";
+	$out .= "/usr/lib/lxc\n";
+	$out .= `ls -1d /var/lib/lxc/*/rootfs 2>/dev/null`;
+	return $out;
+}
+
+#
 # get_version_info()
 #
 sub get_version_info {

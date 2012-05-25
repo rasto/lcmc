@@ -1,10 +1,10 @@
 /*
- * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
- * written by Rasto Levrinc.
+ * This file is part of Linux Cluster Management Console (LCMC)
+ * by Rasto Levrinc.
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2012, Rasto Levrinc
  *
- * DRBD Management Console is free software; you can redistribute it and/or
+ * LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
  * any later version.
@@ -23,10 +23,11 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.GuiComboBox;
 import lcmc.data.VMSXML;
+import lcmc.gui.resources.VMSVirtualDomainInfo;
+import lcmc.gui.resources.VMSFilesystemInfo;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.data.VMSXML.FilesystemData;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -42,33 +43,24 @@ import java.awt.Dimension;
  *
  * @author Rasto Levrinc
  * @version $Id$
- *
  */
-public final class Domain extends VMConfig {
+final class Filesystem extends VMConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    private GuiComboBox domainNameCB;
     /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
-                                            VMSXML.VM_PARAM_NAME,
-                                            VMSXML.VM_PARAM_VIRSH_OPTIONS,
-                                            VMSXML.VM_PARAM_EMULATOR,
-                                            VMSXML.VM_PARAM_VCPU,
-                                            VMSXML.VM_PARAM_CURRENTMEMORY,
-                                            VMSXML.VM_PARAM_BOOT,
-                                            VMSXML.VM_PARAM_LOADER,
-                                            VMSXML.VM_PARAM_TYPE,
-                                            VMSXML.VM_PARAM_INIT,
-                                            VMSXML.VM_PARAM_TYPE_ARCH,
-                                            VMSXML.VM_PARAM_TYPE_MACHINE};
+    private static final String[] PARAMS = {FilesystemData.TYPE,
+                                            FilesystemData.SOURCE_DIR,
+                                            FilesystemData.TARGET_DIR};
+    /** VMS filesystem info object. */
+    private VMSFilesystemInfo vmsfi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Domain</code> object. */
-    public Domain(final WizardDialog previousDialog,
-                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Prepares a new <code>Filesystem</code> object. */
+    Filesystem(final WizardDialog previousDialog,
+               final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -76,13 +68,7 @@ public final class Domain extends VMConfig {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            if (getVMSVirtualDomainInfo().needFilesystem()) {
-                nextDialogObject =
-                        new Filesystem(this, getVMSVirtualDomainInfo());
-            } else {
-                nextDialogObject =
-                        new InstallationDisk(this, getVMSVirtualDomainInfo());
-            }
+            nextDialogObject = new Network(this, getVMSVirtualDomainInfo());
         }
         return nextDialogObject;
     }
@@ -93,7 +79,7 @@ public final class Domain extends VMConfig {
      */
     @Override
     protected String getDialogTitle() {
-        return Tools.getString("Dialog.vm.Domain.Title");
+        return Tools.getString("Dialog.vm.Filesystem.Title");
     }
 
     /**
@@ -102,7 +88,7 @@ public final class Domain extends VMConfig {
      */
     @Override
     protected String getDescription() {
-        return Tools.getString("Dialog.vm.Domain.Description");
+        return Tools.getString("Dialog.vm.Filesystem.Description");
     }
 
     /** Inits dialog. */
@@ -115,24 +101,14 @@ public final class Domain extends VMConfig {
     /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
-        super.initDialogAfterVisible();
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        final boolean ch = vdi.checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = vdi.checkResourceFieldsCorrect(null, PARAMS);
-        if (cor) {
-            enableComponents();
-        } else {
-            /* don't enable */
-            enableComponents(new JComponent[]{buttonClass(nextButton())});
-        }
+        enableComponents();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                makeDefaultButton(buttonClass(nextButton()));
-            }
-        });
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                domainNameCB.requestFocus();
+                final boolean enable = vmsfi.checkResourceFieldsCorrect(
+                                            null,
+                                            vmsfi.getRealParametersFromXML());
+                buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
@@ -140,9 +116,9 @@ public final class Domain extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        vdi.getInfoPanel();
-        vdi.waitForInfoPanel();
+        if (vmsfi != null) {
+            vmsfi.selectMyself();
+        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -152,19 +128,20 @@ public final class Domain extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-
-        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
-        vdi.savePreferredValues();
-        vdi.addWizardParams(
-                          optionsPanel,
-                          PARAMS,
-                          buttonClass(nextButton()),
-                          Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                          Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                          null);
-        domainNameCB = vdi.paramComboBoxGet(VMSXML.VM_PARAM_NAME, "wizard");
+        if (vmsfi == null) {
+            vmsfi = getVMSVirtualDomainInfo().addFilesystemPanel();
+        }
+        vmsfi.waitForInfoPanel();
+        vmsfi.savePreferredValues();
+        vmsfi.getResource().setValue(FilesystemData.TYPE, "mount");
+        vmsfi.addWizardParams(
+                      optionsPanel,
+                      PARAMS,
+                      buttonClass(nextButton()),
+                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                      null);
         panel.add(optionsPanel);
-
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));

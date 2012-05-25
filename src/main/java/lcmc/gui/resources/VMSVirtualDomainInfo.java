@@ -28,6 +28,7 @@ import lcmc.gui.GuiComboBox;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.DiskData;
+import lcmc.data.VMSXML.FilesystemData;
 import lcmc.data.VMSXML.InterfaceData;
 import lcmc.data.VMSXML.InputDevData;
 import lcmc.data.VMSXML.GraphicsData;
@@ -129,6 +130,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
      */
     private volatile Map<String, VMSDiskInfo> diskKeyToInfo =
                                            new HashMap<String, VMSDiskInfo>();
+
+    /** FS to info hash lock. */
+    private final Lock mFilesystemToInfoLock = new ReentrantLock();
+    /** Map from key to vms fs info object. */
+    private final Map<String, VMSFilesystemInfo> filesystemToInfo =
+                                      new HashMap<String, VMSFilesystemInfo>();
+    /** Map from target string in the table to vms fs info object.
+     */
+    private volatile Map<String, VMSFilesystemInfo> filesystemKeyToInfo =
+                                       new HashMap<String, VMSFilesystemInfo>();
+
     /** Interface to info hash lock. */
     private final Lock mInterfaceToInfoLock = new ReentrantLock();
     /** Map from key to vms interface info object. */
@@ -228,6 +240,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                             DOMAIN_TYPE_XEN)));
     /** Whether it needs "console" section. */
     private static final Set<String> NEED_CONSOLE =
+         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            DOMAIN_TYPE_LXC,
+                                                            DOMAIN_TYPE_OPENVZ,
+                                                            DOMAIN_TYPE_UML)));
+    /** Whether it needs "console" section. */
+    private static final Set<String> NEED_FILESYSTEM =
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                                                             DOMAIN_TYPE_LXC,
                                                             DOMAIN_TYPE_OPENVZ,
@@ -339,6 +357,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     static final String HEADER_TABLE = "header";
     /** Disk table. */
     static final String DISK_TABLE = "disks";
+    /** FS table. */
+    static final String FILESYSTEM_TABLE = "filesystems";
     /** Interface table. */
     static final String INTERFACES_TABLE = "interfaces";
     /** Input devices table. */
@@ -382,6 +402,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final Map<Integer, Integer> DISK_DEFAULT_WIDTHS =
                                                new HashMap<Integer, Integer>();
     /** Default widths for columns. */
+    private static final Map<Integer, Integer> FILESYSTEM_DEFAULT_WIDTHS =
+                                               new HashMap<Integer, Integer>();
+    /** Default widths for columns. */
     private static final Map<Integer, Integer> INTERFACES_DEFAULT_WIDTHS =
                                                new HashMap<Integer, Integer>();
     /** Default widths for columns. */
@@ -415,6 +438,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         /* remove button column */
         HEADER_DEFAULT_WIDTHS.put(4, CONTROL_BUTTON_WIDTH);
         DISK_DEFAULT_WIDTHS.put(2, CONTROL_BUTTON_WIDTH);
+        FILESYSTEM_DEFAULT_WIDTHS.put(2, CONTROL_BUTTON_WIDTH);
         INTERFACES_DEFAULT_WIDTHS.put(2, CONTROL_BUTTON_WIDTH);
         INPUTDEVS_DEFAULT_WIDTHS.put(1, CONTROL_BUTTON_WIDTH);
         GRAPHICS_DEFAULT_WIDTHS.put(1, CONTROL_BUTTON_WIDTH);
@@ -639,7 +663,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
                             new String[]{"", "pc", "pc-0.12"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_INIT,
-                            new String[]{"", "/init"});
+                            new String[]{"", "/bin/sh", "/init"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
                             new String[]{"destroy",
                                          "restart",
@@ -727,7 +751,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             return "new domain...";
         } else {
-            return getName();
+            final StringBuilder sb = new StringBuilder(getName());
+            final String dt = getParamSaved(VMSXML.VM_PARAM_DOMAIN_TYPE);
+            if (dt != null) {
+                sb.append(" (");
+                sb.append(dt);
+                sb.append(')');
+            }
+            return sb.toString();
         }
     }
 
@@ -827,6 +858,98 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         return nodeChanged;
     }
 
+    /** Updates FS nodes. Returns whether the node changed. */
+    private boolean updateFilesystemNodes() {
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return false;
+        }
+        final Map<String, FilesystemData> filesystems = getFilesystems();
+        final List<String> filesystemNames  = new ArrayList<String>();
+        if (filesystems != null) {
+            for (final String d : filesystems.keySet()) {
+                filesystemNames.add(d);
+            }
+        }
+        final List<DefaultMutableTreeNode> nodesToRemove =
+                                    new ArrayList<DefaultMutableTreeNode>();
+        final Enumeration e = thisNode.children();
+        boolean nodeChanged = false;
+        while (e.hasMoreElements()) {
+            final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) e.nextElement();
+            if (!(node.getUserObject() instanceof VMSFilesystemInfo)) {
+                continue;
+            }
+            final VMSFilesystemInfo vmsdi =
+                              (VMSFilesystemInfo) node.getUserObject();
+            if (vmsdi.getResource().isNew()) {
+                /* keep */
+            } else if (filesystemNames.contains(vmsdi.getName())) {
+                /* keeping */
+                filesystemNames.remove(vmsdi.getName());
+                mFilesystemToInfoLock.lock();
+                try {
+                    filesystemToInfo.put(vmsdi.getName(), vmsdi);
+                } finally {
+                    mFilesystemToInfoLock.unlock();
+                }
+                vmsdi.updateParameters(); /* update old */
+            } else {
+                /* remove not existing vms */
+                mFilesystemToInfoLock.lock();
+                try {
+                    filesystemToInfo.remove(vmsdi.getName());
+                } finally {
+                    mFilesystemToInfoLock.unlock();
+                }
+                vmsdi.setNode(null);
+                nodesToRemove.add(node);
+                nodeChanged = true;
+            }
+        }
+
+        /* remove nodes */
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            node.removeFromParent();
+        }
+
+        for (final String filesystem : filesystemNames) {
+            final Enumeration eee = thisNode.children();
+            int i = 0;
+            while (eee.hasMoreElements()) {
+                final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) eee.nextElement();
+                if (!(node.getUserObject() instanceof VMSFilesystemInfo)) {
+                    continue;
+                }
+                final VMSFilesystemInfo v = (VMSFilesystemInfo) node.getUserObject();
+                final String n = v.getName();
+                if (n != null && filesystem.compareTo(n) < 0) {
+                    break;
+                }
+                i++;
+            }
+            /* add new vm fs */
+            final VMSFilesystemInfo vmsdi =
+                        new VMSFilesystemInfo(filesystem, getBrowser(), this);
+            mFilesystemToInfoLock.lock();
+            try {
+                filesystemToInfo.put(filesystem, vmsdi);
+            } finally {
+                mFilesystemToInfoLock.unlock();
+            }
+            vmsdi.updateParameters();
+            final DefaultMutableTreeNode resource =
+                                        new DefaultMutableTreeNode(vmsdi);
+            getBrowser().setNode(resource);
+            thisNode.insert(resource, i);
+            nodeChanged = true;
+        }
+        return nodeChanged;
+    }
+
+
     /** Updates interface nodes. Returns whether the node changed. */
     private boolean updateInterfaceNodes() {
         final DefaultMutableTreeNode thisNode = getNode();
@@ -889,7 +1012,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
-                        if (node.getUserObject() instanceof VMSDiskInfo) {
+                        if (node.getUserObject() instanceof VMSDiskInfo
+                            || node.getUserObject() instanceof VMSFilesystemInfo) {
                             i++;
                         }
                         continue;
@@ -986,6 +1110,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 (DefaultMutableTreeNode) eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo) {
                         i++;
                     }
@@ -1110,6 +1235,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 (DefaultMutableTreeNode) eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo) {
                         i++;
@@ -1208,6 +1334,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 (DefaultMutableTreeNode) eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSSoundInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo) {
@@ -1303,6 +1430,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSSerialInfo)) {
                         if (node.getUserObject() instanceof VMSDiskInfo
+                            || node.getUserObject() instanceof VMSFilesystemInfo
                             || node.getUserObject() instanceof VMSInterfaceInfo
                             || node.getUserObject() instanceof VMSInputDevInfo
                             || node.getUserObject() instanceof VMSGraphicsInfo
@@ -1406,6 +1534,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSParallelInfo)) {
                         if (node.getUserObject() instanceof VMSDiskInfo
+                            || node.getUserObject() instanceof VMSFilesystemInfo
                             || node.getUserObject() instanceof VMSInterfaceInfo
                             || node.getUserObject() instanceof VMSInputDevInfo
                             || node.getUserObject() instanceof VMSGraphicsInfo
@@ -1511,6 +1640,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 (DefaultMutableTreeNode) eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSVideoInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo
@@ -1746,18 +1876,18 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 uuid = vmsxml.getValue(getDomainName(), VMSXML.VM_PARAM_UUID);
             }
         }
-        /* disks */
         Tools.invokeAndWait(new Runnable() {
             public void run() {
                 final boolean interfaceNodeChanged = updateInterfaceNodes();
                 final boolean diskNodeChanged = updateDiskNodes();
+                final boolean filesystemNodeChanged = updateFilesystemNodes();
                 final boolean inputDevNodeChanged = updateInputDevNodes();
                 final boolean graphicsNodeChanged = updateGraphicsNodes();
                 final boolean soundNodeChanged = updateSoundNodes();
                 final boolean serialNodeChanged = updateSerialNodes();
                 final boolean parallelNodeChanged = updateParallelNodes();
                 final boolean vidoNodeChanged = updateVideoNodes();
-                if (diskNodeChanged
+                if (filesystemNodeChanged
                     || interfaceNodeChanged
                     || inputDevNodeChanged
                     || graphicsNodeChanged
@@ -1771,6 +1901,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         });
         updateTable(HEADER_TABLE);
         updateTable(DISK_TABLE);
+        updateTable(FILESYSTEM_TABLE);
         updateTable(INTERFACES_TABLE);
         updateTable(INPUTDEVS_TABLE);
         updateTable(GRAPHICS_TABLE);
@@ -1981,6 +2112,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.add(optionsPanel);
 
         final MyButton newDiskBtn = VMSDiskInfo.getNewBtn(this);
+        final MyButton newFilesystemBtn = VMSFilesystemInfo.getNewBtn(this);
         final MyButton newInterfaceBtn = VMSInterfaceInfo.getNewBtn(this);
         final MyButton newInputBtn = VMSInputDevInfo.getNewBtn(this);
         final MyButton newGraphicsBtn = VMSGraphicsInfo.getNewBtn(this);
@@ -1992,6 +2124,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         mainPanel.add(getTablePanel("Disks",
                                     DISK_TABLE,
                                     newDiskBtn));
+        mainPanel.add(getTablePanel("Filesystems",
+                                    FILESYSTEM_TABLE,
+                                    newFilesystemBtn));
 
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(getTablePanel("Interfaces",
@@ -2269,6 +2404,39 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         return vmsdi;
     }
 
+    /** Adds new virtual fs. */
+    public VMSFilesystemInfo addFilesystemPanel() {
+        final VMSFilesystemInfo vmsdi =
+                             new VMSFilesystemInfo(null, getBrowser(), this);
+        vmsdi.getResource().setNew(true);
+        final DefaultMutableTreeNode resource =
+                                           new DefaultMutableTreeNode(vmsdi);
+        getBrowser().setNode(resource);
+        final DefaultMutableTreeNode thisNode = getNode();
+        if (thisNode == null) {
+            return vmsdi;
+        }
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                final Enumeration eee = thisNode.children();
+                int i = 0;
+                while (eee.hasMoreElements()) {
+                    final DefaultMutableTreeNode node =
+                                    (DefaultMutableTreeNode) eee.nextElement();
+                    if (node.getUserObject() instanceof VMSFilesystemInfo) {
+                        i++;
+                        continue;
+                    }
+                    break;
+                }
+                thisNode.insert(resource, i);
+            }
+        });
+        getBrowser().reload(thisNode, true);
+        vmsdi.selectMyself();
+        return vmsdi;
+    }
+
     /** Adds new virtual interface. */
     public VMSInterfaceInfo addInterfacePanel() {
         final VMSInterfaceInfo vmsii =
@@ -2289,6 +2457,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo) {
                         i++;
                         continue;
@@ -2324,6 +2493,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo) {
                         i++;
@@ -2359,6 +2529,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo) {
@@ -2395,6 +2566,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo
@@ -2431,6 +2603,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo
@@ -2469,6 +2642,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) eee.nextElement();
                     if (node.getUserObject() instanceof VMSDiskInfo
+                        || node.getUserObject() instanceof VMSFilesystemInfo
                         || node.getUserObject() instanceof VMSInterfaceInfo
                         || node.getUserObject() instanceof VMSInputDevInfo
                         || node.getUserObject() instanceof VMSGraphicsInfo
@@ -2542,6 +2716,22 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 };
                 newDiskMenuItem.setPos(pos);
                 add(newDiskMenuItem);
+
+                /* fs */
+                final MyMenuItem newFilesystemMenuItem = new MyMenuItem(
+                   Tools.getString("VMSVirtualDomainInfo.AddNewFilesystem"),
+                   BlockDevInfo.HARDDISK_ICON_LARGE,
+                   new AccessMode(ConfigData.AccessType.ADMIN, false),
+                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                    private static final long serialVersionUID = 1L;
+                    @Override
+                    public void action() {
+                        hidePopup();
+                        addFilesystemPanel();
+                    }
+                };
+                newFilesystemMenuItem.setPos(pos);
+                add(newFilesystemMenuItem);
 
                 /* interface */
                 final MyMenuItem newInterfaceMenuItem = new MyMenuItem(
@@ -3292,6 +3482,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         break;
                     }
                 }
+                String lxcLibPath = "/usr/lib/libvirt";
+                for (final Host host : getBrowser().getClusterHosts()) {
+                    final String llp = host.getLxcLibPath();
+                    if (llp != null) {
+                        lxcLibPath = llp;
+                        break;
+                    }
+                }
                 final GuiComboBox emCB =
                         paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, "wizard");
                 final GuiComboBox loCB =
@@ -3300,6 +3498,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                      paramComboBoxGet(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
                 final GuiComboBox typeCB =
                              paramComboBoxGet(VMSXML.VM_PARAM_TYPE, "wizard");
+                final GuiComboBox inCB =
+                             paramComboBoxGet(VMSXML.VM_PARAM_INIT, "wizard");
                 if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
                     if (emCB != null) {
                         emCB.setValue(xenLibPath + "/bin/qemu-dm");
@@ -3313,9 +3513,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (typeCB != null) {
                         typeCB.setValue(TYPE_LINUX);
                     }
+                    if (inCB != null) {
+                        inCB.setValue("");
+                    }
                 } else if (Tools.areEqual(DOMAIN_TYPE_LXC, newValue)) {
                     if (emCB != null) {
-                        emCB.setValue("/usr/lib/libvirt/libvirt_lxc");
+                        emCB.setValue(lxcLibPath + "/libvirt_lxc");
                     }
                     if (loCB != null) {
                         loCB.setValue("");
@@ -3325,6 +3528,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     if (typeCB != null) {
                         typeCB.setValue(TYPE_EXE);
+                    }
+                    if (inCB != null) {
+                        inCB.setValue("/bin/sh");
                     }
                 } else {
                     if (emCB != null) {
@@ -3338,6 +3544,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     if (typeCB != null) {
                         typeCB.setValue(TYPE_HVM);
+                    }
+                    if (inCB != null) {
+                        inCB.setValue("");
                     }
                 }
             }
@@ -3656,6 +3865,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return new String[]{"Name", "Defined on", "Status", "Memory", ""};
         } else if (DISK_TABLE.equals(tableName)) {
             return new String[]{"Virtual Device", "Source", ""};
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            return new String[]{"Virtual Device", "Source", ""};
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return new String[]{"Virtual Interface", "Source", ""};
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
@@ -3681,6 +3892,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return getMainTableData();
         } else if (DISK_TABLE.equals(tableName)) {
             return getDiskTableData();
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            return getFilesystemTableData();
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return getInterfaceTableData();
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
@@ -3836,6 +4049,85 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         mDiskToInfoLock.lock();
         diskKeyToInfo = dkti;
         mDiskToInfoLock.unlock();
+        return rows.toArray(new Object[rows.size()][]);
+    }
+
+    /** Returns all filesystems. */
+    protected Map<String, FilesystemData> getFilesystems() {
+        Map<String, FilesystemData> filesystems = null;
+        for (final Host host : getDefinedOnHosts()) {
+            final VMSXML vxml = getBrowser().getVMSXML(host);
+            if (vxml != null) {
+                filesystems = vxml.getFilesystems(getDomainName());
+                break;
+            }
+        }
+        return filesystems;
+    }
+
+    /** Get one row of the table. */
+    protected Object[] getFilesystemDataRow(
+                                 final String targetDev,
+                                 final Map<String, VMSFilesystemInfo> dkti,
+                                 final Map<String, FilesystemData> filesystems,
+                                 final boolean opaque) {
+        if (filesystems == null) {
+            return new Object[0];
+        }
+        final MyButton removeBtn = new MyButton(
+                                           "Remove",
+                                           ClusterBrowser.REMOVE_ICON_SMALL,
+                                           "Remove " + targetDev);
+        removeBtn.miniButton();
+        final FilesystemData filesystemData = filesystems.get(targetDev);
+        if (filesystemData == null) {
+            return new Object[]{targetDev,
+                                "unknown",
+                                removeBtn};
+        }
+        final StringBuilder target = new StringBuilder(10);
+        target.append(filesystemData.getTargetDir());
+        if (dkti != null) {
+            mFilesystemToInfoLock.lock();
+            final VMSFilesystemInfo vdi = filesystemToInfo.get(targetDev);
+            mFilesystemToInfoLock.unlock();
+            dkti.put(target.toString(), vdi);
+        }
+        final MyButton targetDevLabel = new MyButton(
+                                    target.toString(),
+                                    BlockDevInfo.HARDDISK_ICON_LARGE);
+        targetDevLabel.setOpaque(opaque);
+        final StringBuilder source = new StringBuilder(20);
+        String s = filesystemData.getSourceDir();
+        if (s == null) {
+            s = filesystemData.getSourceDir();
+        }
+        if (s != null) {
+            source.append(filesystemData.getType());
+            source.append(" : ");
+            source.append(s);
+        }
+        return new Object[]{targetDevLabel,
+                            source.toString(),
+                            removeBtn};
+    }
+
+    /** Returns data for the fs table. */
+    private Object[][] getFilesystemTableData() {
+        final List<Object[]> rows = new ArrayList<Object[]>();
+        final Map<String, FilesystemData> filesystems = getFilesystems();
+        final Map<String, VMSFilesystemInfo> dkti =
+                                      new HashMap<String, VMSFilesystemInfo>();
+        if (filesystems != null && !filesystems.isEmpty()) {
+            for (final String targetDev : filesystems.keySet()) {
+                final Object[] row =
+                     getFilesystemDataRow(targetDev, dkti, filesystems, false);
+                rows.add(row);
+            }
+        }
+        mFilesystemToInfoLock.lock();
+        filesystemKeyToInfo = dkti;
+        mFilesystemToInfoLock.unlock();
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4327,6 +4619,23 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 });
                 thread.start();
             }
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            mFilesystemToInfoLock.lock();
+            final VMSFilesystemInfo vfi = filesystemKeyToInfo.get(key);
+            mFilesystemToInfoLock.unlock();
+            if (vfi != null) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (FILESYSTEM_DEFAULT_WIDTHS.containsKey(column)) {
+                            vfi.removeMyself(false);
+                        } else {
+                            vfi.selectMyself();
+                        }
+                    }
+                });
+                thread.start();
+            }
         } else if (INTERFACES_TABLE.equals(tableName)) {
             mInterfaceToInfoLock.lock();
             final VMSInterfaceInfo vii = interfaceKeyToInfo.get(key);
@@ -4478,6 +4787,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mDiskToInfoLock.lock();
             final Info info = diskToInfo.get(key);
             mDiskToInfoLock.unlock();
+            return info;
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            mFilesystemToInfoLock.lock();
+            final Info info = filesystemToInfo.get(key);
+            mFilesystemToInfoLock.unlock();
             return info;
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return interfaceToInfo.get(key);
@@ -4731,6 +5045,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return HEADER_DEFAULT_WIDTHS;
         } else if (DISK_TABLE.equals(tableName)) {
             return DISK_DEFAULT_WIDTHS;
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            return FILESYSTEM_DEFAULT_WIDTHS;
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return INTERFACES_DEFAULT_WIDTHS;
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
@@ -4757,6 +5073,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return HEADER_DEFAULT_WIDTHS.containsKey(column);
         } else if (DISK_TABLE.equals(tableName)) {
             return DISK_DEFAULT_WIDTHS.containsKey(column);
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            return FILESYSTEM_DEFAULT_WIDTHS.containsKey(column);
         } else if (INTERFACES_TABLE.equals(tableName)) {
             return INTERFACES_DEFAULT_WIDTHS.containsKey(column);
         } else if (INPUTDEVS_TABLE.equals(tableName)) {
@@ -4788,6 +5106,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         } else if (DISK_TABLE.equals(tableName)) {
             if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
+                return "Remove " + key + ".";
+            }
+        } else if (FILESYSTEM_TABLE.equals(tableName)) {
+            if (FILESYSTEM_DEFAULT_WIDTHS.containsKey(column)) {
                 return "Remove " + key + ".";
             }
         } else if (INTERFACES_TABLE.equals(tableName)) {
@@ -4984,6 +5306,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Return whether domain type needs "console" section. */
     public final boolean needConsole() {
         return NEED_CONSOLE.contains(paramComboBoxGet(
+                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+    }
+
+    /** Return whether domain type needs filesystem instead of disk device. */
+    public final boolean needFilesystem() {
+        return NEED_FILESYSTEM.contains(paramComboBoxGet(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 }

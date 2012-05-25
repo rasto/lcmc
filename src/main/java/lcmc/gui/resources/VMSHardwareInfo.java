@@ -87,6 +87,11 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                                        "(.).{9}\\s+(\\d+)\\s+"
                                                        + "(\\d+)\\s+"
                                                        + "(\\d+) (.*)$");
+    /** Whether file chooser needs file or dir. */
+    protected static final boolean FILECHOOSER_DIR_ONLY = true;
+    protected static final boolean FILECHOOSER_FILE_ONLY =
+                                                        !FILECHOOSER_DIR_ONLY;
+
     /** Creates the VMSHardwareInfo object. */
     VMSHardwareInfo(final String name,
                     final Browser browser,
@@ -556,9 +561,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         };
     }
 
-    /** Starts file chooser. */
+    /**
+     * Starts file chooser.
+     * @param dir whether it needs dir or file
+     */
     protected void startFileChooser(final GuiComboBox paramCB,
-                                    final String directory) {
+                                    final String directory,
+                                    final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
             Tools.appError("Connection to host lost.");
@@ -584,6 +593,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             };
         fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
+        if (dirOnly) {
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        }
         fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
                           + host.getName());
 //        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));

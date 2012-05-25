@@ -659,7 +659,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                            final int width) {
         if (DiskData.SOURCE_FILE.equals(param)) {
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
-            final String regexp = "[^/]$";
+            final String regexp = ".*[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
             final GuiComboBox paramCB = new GuiComboBox(
@@ -680,7 +680,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 sourceFileCB.put(prefix, paramCB);
             }
             if (Tools.isWindows()) {
-                /* does not work on windows and I tries, ultimatly because
+                /* does not work on windows and I tried, ultimately because
                    FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
                    true and it is not possible to descent into a directory.
                    TODO: It may work in the future.
@@ -700,7 +700,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                             } else {
                                 file = oldFile;
                             }
-                            startFileChooser(paramCB, file);
+                            startFileChooser(paramCB,
+                                             file,
+                                             FILECHOOSER_FILE_ONLY);
                         }
                     });
                     t.start();
