@@ -751,14 +751,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             return "new domain...";
         } else {
-            final StringBuilder sb = new StringBuilder(getName());
-            final String dt = getParamSaved(VMSXML.VM_PARAM_DOMAIN_TYPE);
-            if (dt != null) {
-                sb.append(" (");
-                sb.append(dt);
-                sb.append(')');
-            }
-            return sb.toString();
+            return getName();
         }
     }
 
