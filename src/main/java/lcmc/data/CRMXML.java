@@ -548,6 +548,9 @@ public final class CRMXML extends XML {
         RA_PARAM_SECTION.put("IPaddr2",
                              "cidr_netmask",
                              Tools.getString("CRMXML.OtherOptions"));
+        RA_PARAM_SECTION.put("VirtualDomain",
+                             "hypervisor",
+                             Tools.getString("CRMXML.OtherOptions"));
     }
 
     /** Prepares a new <code>CRMXML</code> object. */
