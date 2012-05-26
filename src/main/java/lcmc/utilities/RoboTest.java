@@ -721,6 +721,20 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                         resetTerminalAreas();
+                    } else if ("5".equals(index)) {
+                        /* VMs */
+                        int i = 1;
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            info("test" + index + " no " + i);
+                            startVMTest5("vm-test" + index, 2);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
+                            i++;
+                        }
                     }
                 }
                 info(selected + " test " + index + " done");
@@ -3849,7 +3863,9 @@ public final class RoboTest {
     }
 
     /** VM Test 1. */
-    private static void startVMTest1(final String vmTest, final int count) {
+    private static void startVMTest(final String vmTest,
+                                    final String type,
+                                    final int count) {
         slowFactor = 0.2f;
         aborted = false;
         String name = "dmc";
@@ -3879,40 +3895,99 @@ public final class RoboTest {
                 press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
                 sleep(200);
             }
-            moveTo(730, 522);
+            /* type */
+            moveTo(450, 345); /* domain name */
             leftClick();
-            dialogColorTest("source file");
-            //press(KeyEvent.VK_ENTER);
-
-            moveTo(593, 392); /* source file */
-            sleep(2000);
-            leftClick();
-            sleep(2000);
-            press(KeyEvent.VK_T);
-            sleep(200);
-            press(KeyEvent.VK_E);
-            sleep(200);
-            press(KeyEvent.VK_S);
-            sleep(200);
-            press(KeyEvent.VK_T);
-            sleep(2000);
-            for (int i = 0; i < count2; i++) {
-                moveTo(600, 327); /* disk/block device */
-                leftClick();
+            sleep(1000);
+            if ("lxc".equals(type)) {
+                press(KeyEvent.VK_DOWN);
                 sleep(1000);
-                moveTo(430, 327); /* image */
-                leftClick();
+                press(KeyEvent.VK_DOWN);
                 sleep(1000);
+                press(KeyEvent.VK_DOWN);
+                sleep(1000);
+                press(KeyEvent.VK_ENTER);
+                sleep(3000);
             }
 
+            /* next */
             moveTo(730, 522);
             leftClick();
-            //press(KeyEvent.VK_ENTER);
-            sleep(5000);
-            dialogColorTest("disk image");
-            moveTo(730, 522);
-            leftClick();
-            //press(KeyEvent.VK_ENTER); /* storage */
+
+            if ("lxc".equals(type)) {
+                /* filesystem */
+                dialogColorTest("filesystem");
+                moveTo(593, 372);
+                sleep(2000);
+                leftClick();
+                sleep(2000);
+                press(KeyEvent.VK_DOWN);
+                sleep(200);
+                press(KeyEvent.VK_DOWN);
+                sleep(200);
+                press(KeyEvent.VK_ENTER);
+                sleep(200);
+                press(KeyEvent.VK_SLASH);
+                sleep(200);
+                press(KeyEvent.VK_D);
+                sleep(200);
+                press(KeyEvent.VK_M);
+                sleep(200);
+                press(KeyEvent.VK_C);
+                sleep(200);
+                for (int k = 0; k < j; k++) {
+                    press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
+                    sleep(200);
+                }
+                press(KeyEvent.VK_SLASH);
+                sleep(200);
+                press(KeyEvent.VK_R);
+                sleep(200);
+                press(KeyEvent.VK_O);
+                sleep(200);
+                press(KeyEvent.VK_O);
+                sleep(200);
+                press(KeyEvent.VK_T);
+                sleep(200);
+                press(KeyEvent.VK_F);
+                sleep(200);
+                press(KeyEvent.VK_S);
+                sleep(2000);
+                moveTo(730, 522);
+                leftClick();
+            } else {
+
+                /* source file */
+                dialogColorTest("source file");
+
+                moveTo(593, 392);
+                sleep(2000);
+                leftClick();
+                sleep(2000);
+                press(KeyEvent.VK_T);
+                sleep(200);
+                press(KeyEvent.VK_E);
+                sleep(200);
+                press(KeyEvent.VK_S);
+                sleep(200);
+                press(KeyEvent.VK_T);
+                sleep(2000);
+                for (int i = 0; i < count2; i++) {
+                    moveTo(600, 327); /* disk/block device */
+                    leftClick();
+                    sleep(1000);
+                    moveTo(430, 327); /* image */
+                    leftClick();
+                    sleep(1000);
+                }
+
+                moveTo(730, 522);
+                leftClick();
+                sleep(5000);
+                dialogColorTest("disk image");
+                moveTo(730, 522);
+                leftClick();
+            }
             sleep(5000);
             dialogColorTest("network");
             for (int i = 0; i < count2; i++) {
@@ -3927,19 +4002,20 @@ public final class RoboTest {
             leftClick();
             //press(KeyEvent.VK_ENTER); /* network */
             sleep(5000);
-            dialogColorTest("display");
-            for (int i = 0; i < count2; i++) {
-                moveTo(600, 327); /* sdl */
+            if (!"lxc".equals(type)) {
+                dialogColorTest("display");
+                for (int i = 0; i < count2; i++) {
+                    moveTo(600, 327); /* sdl */
+                    leftClick();
+                    sleep(1000);
+                    moveTo(430, 327); /* vnc */
+                    leftClick();
+                    sleep(1000);
+                }
+                moveTo(730, 522);
                 leftClick();
-                sleep(1000);
-                moveTo(430, 327); /* vnc */
-                leftClick();
-                sleep(1000);
+                sleep(5000);
             }
-            moveTo(730, 522);
-            leftClick();
-            //press(KeyEvent.VK_ENTER); /* display */
-            sleep(5000);
             dialogColorTest("create config");
 
             final int yMoreHosts = 30 * (cluster.getHosts().size() - 1);
@@ -4002,7 +4078,7 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
             checkVMTest(vmTest, 3, name);
-
+            
             /* disk readonly */
             moveTo(56, 201); /* popup */
             leftClick();
@@ -4013,50 +4089,30 @@ public final class RoboTest {
                 press(KeyEvent.VK_DOWN);
             }
 
-            //moveTo(100, 232 + j * 18); /* choose disk */
-            //sleep(1000);
-            //leftClick();
-            //moveTo(1100, 250);
-            //leftPress(); /* scroll bar */
-            //moveTo(1100, 362);
-            //leftRelease();
+            if (!"lxc".equals(type)) {
+                moveTo(390, 545); /* readonly */
+                sleep(1000);
+                leftClick();
+                sleep(1000);
+                moveTo(250, 142); /* apply */
+                sleep(1000);
+                leftClick();
+                checkVMTest(vmTest, 3.1, name);
+                sleep(1000);
+                moveTo(390, 650); /* readonly */
+                sleep(1000);
+                leftClick();
 
-            //sleep(1000);
-            //moveTo(400, 402 + yMoreHosts); /* choose disk */
-            //sleep(1000);
-            //leftClick();
-            //sleep(1000);
+                sleep(1000);
+                moveTo(950, 132); /* host overview */
+                sleep(1000);
+                leftClick();
+                sleep(1000);
 
-            moveTo(390, 545); /* readonly */
-            sleep(1000);
-            leftClick();
-            sleep(1000);
-            moveTo(250, 142); /* apply */
-            sleep(1000);
-            leftClick();
-            checkVMTest(vmTest, 3.1, name);
-            sleep(1000);
-            moveTo(390, 650); /* readonly */
-            sleep(1000);
-            leftClick();
-
-            sleep(1000);
-            moveTo(950, 132); /* host overview */
-            sleep(1000);
-            leftClick();
-            sleep(1000);
-
-            moveTo(250, 142); /* host apply */
-            leftClick();
-            checkVMTest(vmTest, 3.2, name);
-
-            /* remove interface */
-
-            // ...
-            //moveTo(1100, 362);
-            //leftPress(); /* scroll bar back */
-            //moveTo(1100, 152);
-            //leftRelease();
+                moveTo(250, 142); /* host apply */
+                leftClick();
+                checkVMTest(vmTest, 3.2, name);
+            }
 
             names.add(name);
             for (final String n : names) {
@@ -4083,6 +4139,12 @@ public final class RoboTest {
             leftClick();
             sleepNoFactor(5000);
         }
+    }
+
+    /** VM Test 1. */
+    private static void startVMTest1(final String vmTest,
+                                     final int count) {
+        startVMTest(vmTest, "kvm", count);
     }
 
     /** Cluster wizard locked until focus is lost. */
@@ -4120,6 +4182,12 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
         }
+    }
+
+    /** VM Test 1. */
+    private static void startVMTest5(final String vmTest,
+                                     final int count) {
+        startVMTest(vmTest, "lxc", count);
     }
 
     private static void saveAndExit() {

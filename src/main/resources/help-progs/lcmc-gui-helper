@@ -2140,13 +2140,21 @@ sub gui_vm_test {
 	my $testname = shift;
 	my $index = shift;
 	my $name = shift;
-	my $xml = `$VIRSH_COMMAND dumpxml $name 2>/dev/null`;
+	my $xml;
+	for ("", "-c 'lxc:///'", "-c 'xen:///'") {
+		$xml = `$VIRSH_COMMAND $_ dumpxml $name 2>/dev/null`;
+		if ($xml !~ /^\s*$/) {
+			last;
+		}
+	}
 	$xml =~ s/^(\s*<uuid>)[^<]+/$1UUID/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/^(\s*<emulator>)[^<]+/$1EMULATOR/gm;
 	$xml =~ s/$name/\@NAME@/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;
+	$xml =~ s/^\s+//;
+	$xml =~ s/\s+$//;
 
 	my $testfile = "/tmp/lcmc-test/$testname/domain.xml$index";
 	my $test = "";
@@ -2162,6 +2170,8 @@ sub gui_vm_test {
 		{
 			local $/;
 			$test = <TEST>;
+			$test =~ s/^\s+//;
+			$test =~ s/\s+$//;
 		}
 		close TEST;
 	}
