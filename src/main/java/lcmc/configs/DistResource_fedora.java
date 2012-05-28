@@ -220,6 +220,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"libvirt.lxc.libpath", "/usr/libexec"},
+        {"libvirt.xen.libpath", "/usr/lib/xen"},
     };
 
 }

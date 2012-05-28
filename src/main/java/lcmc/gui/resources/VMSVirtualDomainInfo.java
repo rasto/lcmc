@@ -646,9 +646,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                      "fd",
                                                      null)});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
-                            new String[]{"",
-                                         "/usr/lib/xen/boot/hvmloader",
-                                         "/usr/lib/xen-4.0/boot/hvmloader"});
+                            new String[]{});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
                             new String[]{DOMAIN_TYPE_KVM,
                                          DOMAIN_TYPE_XEN,
@@ -683,9 +681,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                          "coredump-restart"}); /* since 0.8.4*/
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
                             new String[]{"/usr/bin/kvm",
-                                         "/usr/lib/xen/bin/qemu-dm",
-                                         "/usr/lib/xen-4.0/bin/qemu-dm",
-                                         "/usr/lib64/xen/bin/qemu-dm",
                                          "/usr/bin/qemu"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPU_MATCH,
                             new String[]{"", "exact", "minimum", "strict"});

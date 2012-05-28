@@ -107,5 +107,6 @@ public final class DistResource_redhatenterpriseserver
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
         {"KVM.emulator",    "/usr/libexec/qemu-kvm"},
         {"libvirt.lxc.libpath", "/usr/libexec"},
+        {"libvirt.xen.libpath", "/usr/lib/xen"},
     };
 }

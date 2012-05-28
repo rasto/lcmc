@@ -159,5 +159,6 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"libvirt.lxc.libpath.x86_64", "/usr/lib64/libvirt"},
+        {"libvirt.xen.libpath", "/usr/lib/xen"},
     };
 }

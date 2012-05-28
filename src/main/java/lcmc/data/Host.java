@@ -251,8 +251,6 @@ public final class Host {
     private String drbdInstallMethod;
     /** Heartbeat lib path. */
     private String hbLibPath = null;
-    /** Xen lib path. */
-    private String xenLibPath = null;
     /** MD5 checksum of VM Info from server. */
     private String vmInfoMD5 = null;
     /** Index of this host in its cluster. */
@@ -917,14 +915,14 @@ public final class Host {
         return "/usr/lib/heartbeat";
     }
 
-    /** Returns xen lib path. */
-    public String getXenLibPath() {
-        return xenLibPath;
-    }
-
     /** Returns lxc lib path. */
     public String getLxcLibPath() {
         return getDistString("libvirt.lxc.libpath");
+    }
+
+    /** Returns xen lib path. */
+    public String getXenLibPath() {
+        return getDistString("libvirt.xen.libpath");
     }
 
     /** Gets distribution, e.g., debian. */
@@ -2361,12 +2359,6 @@ public final class Host {
                 hbLibPath = tokens[1].trim();
             } else {
                 hbLibPath = null;
-            }
-        } else if ("xen-lib-path".equals(tokens[0])) {
-            if (tokens.length == 2) {
-                xenLibPath = tokens[1].trim();
-            } else {
-                xenLibPath = null;
             }
         } else if ("hn".equals(tokens[0])) {
             if (tokens.length == 2) {

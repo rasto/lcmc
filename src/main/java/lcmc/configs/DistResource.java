@@ -459,6 +459,7 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
 
         {"libvirt.lxc.libpath", "/usr/lib/libvirt"},
+        {"libvirt.xen.libpath", "/usr/lib/xen-default"},
 
         /* config files */
         {"ocf:heartbeat:apache.params",

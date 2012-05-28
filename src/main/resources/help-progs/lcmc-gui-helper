@@ -903,20 +903,6 @@ sub get_crmd_lib_path {
 	}
 }
 
-sub get_xen_lib_path {
-	for ("/usr/lib/xen", "/usr/lib64/xen") {
-		if (-e $_) {
-			return $_;
-		}
-	}
-	for (`ls -d /usr/lib*/xen-* 2>/dev/null`) {
-		if (m!^/usr/lib(?:64)?/xen-\d+[.\d]*$!) {
-			return $_;
-		}
-	}
-	return "/usr/lib/xen";
-}
-
 sub get_message {
 	my $socket = shift;
 	my $msg = "";
@@ -1815,7 +1801,6 @@ sub get_cluster_versions {
 	$drbd_version = "" if !$drbd_version;
 	my $drbd_mod_version = `(/sbin/modinfo -F version drbd 2>/dev/null|grep . || /sbin/modinfo -F description drbd 2>/dev/null|sed 's/.* v//')` || "";
 	chomp $drbd_mod_version;
-	my $xen_libpath = get_xen_lib_path();
 	return "hb:$hb_version\n"
 	       ."pm:$pm_version\n"
 	       ."cs:$cs_version\n"
@@ -1839,7 +1824,6 @@ sub get_cluster_versions {
 	       ."drbd-mod:$drbd_mod_version\n"
 	       ."drbd-loaded:$drbd_loaded\n"
 	       ."hb-lib-path:$libpath\n"
-	       ."xen-lib-path:$xen_libpath\n"
 }
 
 # return -1 if ver1 is smaller than ver2 etc. 1.0.9.1 and 1.0.9 are considered
