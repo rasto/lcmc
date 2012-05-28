@@ -170,5 +170,6 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
         {"KVM.emulator",    "/usr/libexec/qemu-kvm"},
+        {"libvirt.lxc.libpath", "/usr/libexec"},
     };
 }

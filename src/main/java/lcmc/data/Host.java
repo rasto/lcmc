@@ -2988,6 +2988,10 @@ public final class Host {
 
     /** Return options for GUI elements. */
     public List<String> getGuiOptions(final String name) {
+        final List<String> opts = guiOptions.get(name);
+        if (opts == null) {
+            return new ArrayList<String>();
+        }
         return new ArrayList<String>(guiOptions.get(name));
     }
 }

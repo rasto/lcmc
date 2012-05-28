@@ -108,5 +108,6 @@ public final class DistResource_redhatenterpriseas
 
         {"Openais.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
+        {"libvirt.lxc.libpath", "/usr/libexec"},
     };
 }

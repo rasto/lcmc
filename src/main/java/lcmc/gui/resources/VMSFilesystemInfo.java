@@ -140,9 +140,11 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
         final List<Host> hosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
-        final List<String> sds =
-                 hosts.get(0).getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC);
-        sds.add(0, null);
+        final Set<String> sds = new LinkedHashSet<String>();
+        sds.add(null);
+        for (final Host h : hosts) {
+            sds.addAll(h.getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC));
+        }
         sourceDirs = sds.toArray(new String[sds.size()]);
     }
 
