@@ -3499,7 +3499,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         voCB.setValue(VIRSH_OPTION_XEN);
                     }
                     if (typeCB != null) {
-                        typeCB.setValue(TYPE_LINUX);
+                        typeCB.setValue(TYPE_HVM);
                     }
                     if (inCB != null) {
                         inCB.setValue("");
