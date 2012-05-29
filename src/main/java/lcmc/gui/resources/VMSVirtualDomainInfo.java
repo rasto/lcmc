@@ -3667,6 +3667,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final Map<VMSHardwareInfo, Map<String, String>> allHWP =
                                                       getAllHWParameters(true);
         final Map<Node, VMSXML> domainNodesToSave = new HashMap<Node, VMSXML>();
+        final String clusterName = getBrowser().getCluster().getName();
+        Tools.startProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusLock();
         for (final Host host : getBrowser().getClusterHosts()) {
             final String value =
@@ -3792,6 +3794,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         getBrowser().vmStatusUnlock();
         updateParameters();
+        Tools.stopProgressIndicator(clusterName, "VM view update");
     }
 
     /** Returns parameters of all devices. */
