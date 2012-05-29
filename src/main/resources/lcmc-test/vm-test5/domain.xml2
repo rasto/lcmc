@@ -20,7 +20,7 @@
   <devices>
     <emulator>EMULATOR</emulator>
     <filesystem type='mount' accessmode='passthrough'>
-      <source dir='/usr/lib/lxc/@NAME@/rootfs'/>
+      <source dir='/var/lib/lxc/@NAME@/rootfs'/>
       <target dir='/'/>
     </filesystem>
     <interface type='network'>
