@@ -180,8 +180,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                        new StringInfo("USB Disk",    "usb/disk",    null),
                        new StringInfo("Virtio Disk", "virtio/disk", null)});
         POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{null,
-                                                               "qemu",
                                                                "file",
+                                                               "qemu",
                                                                "phy"});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
@@ -190,7 +190,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         }
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
         DEFAULTS_MAP.put(DiskData.SHAREABLE, "False");
-        PREFERRED_MAP.put(DiskData.DRIVER_NAME, "qemu");
+        PREFERRED_MAP.put(DiskData.DRIVER_NAME, "file");
         TARGET_DEVICES_MAP.put("ide/disk",
                                new String[]{"hda", "hdb", "hdd"});
         TARGET_DEVICES_MAP.put("ide/cdrom",
