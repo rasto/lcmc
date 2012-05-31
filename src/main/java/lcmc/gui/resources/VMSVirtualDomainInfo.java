@@ -3668,9 +3668,19 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                       getAllHWParameters(true);
         final Map<Node, VMSXML> domainNodesToSave = new HashMap<Node, VMSXML>();
         final String clusterName = getBrowser().getCluster().getName();
-        Tools.startProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusLock();
+        Tools.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
+            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
+                                                               host.getName());
+            final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
+                                               WIZARD_PREFIX + host.getName());
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    wizardHostCB.setEnabled(false);
+                }
+            });
             final String value =
                 definedOnHostComboBoxHash.get(host.getName()).getStringValue();
             final boolean needConsole = needConsole();
@@ -3754,9 +3764,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                     getDomainName(),
                                                     getVirshOptions());
         }
-        if (!testOnly) {
-            storeComboBoxValues(params);
-        }
         for (final VMSHardwareInfo hi : allHWP.keySet()) {
             hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
@@ -3789,12 +3796,25 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             parameters,
                             getVirshOptions());
         getResource().setNew(false);
-        for (final Host host : getBrowser().getClusterHosts()) {
-            getBrowser().periodicalVMSUpdate(host);
+        if (!testOnly) {
+            storeComboBoxValues(params);
         }
-        getBrowser().vmStatusUnlock();
+        getBrowser().periodicalVMSUpdate(getBrowser().getClusterHosts());
         updateParameters();
         Tools.stopProgressIndicator(clusterName, "VM view update");
+        getBrowser().vmStatusUnlock();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                for (final Host host : getBrowser().getClusterHosts()) {
+                    final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
+                                                                       host.getName());
+                    final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
+                                                       WIZARD_PREFIX + host.getName());
+                    wizardHostCB.setEnabled(true);
+                }
+            }
+        });
     }
 
     /** Returns parameters of all devices. */
@@ -5023,9 +5043,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 VIRSH.undefine(h, getDomainName(), getVirshOptions());
             }
         }
-        for (final Host h : getBrowser().getClusterHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(getBrowser().getClusterHosts());
         removeNode();
     }
 

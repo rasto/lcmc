@@ -230,9 +230,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         }
         getResource().setNew(false);
         getBrowser().reload(getNode(), false);
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(
+                                getVMSVirtualDomainInfo().getDefinedOnHosts());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -373,9 +372,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
                                       virshOptions);
             }
         }
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(
+                                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

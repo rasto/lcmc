@@ -134,9 +134,8 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
                                     virshOptions);
             }
         }
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(
+                                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

@@ -455,9 +455,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         }
         getResource().setNew(false);
         getBrowser().reload(getNode(), false);
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(
+                                getVMSVirtualDomainInfo().getDefinedOnHosts());
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -766,9 +765,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                      virshOptions);
             }
         }
-        for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            getBrowser().periodicalVMSUpdate(h);
-        }
+        getBrowser().periodicalVMSUpdate(
+                                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

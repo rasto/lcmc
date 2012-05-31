@@ -837,6 +837,27 @@ public final class ClusterBrowser extends Browser {
         }
     }
 
+    /** Updates VMs info. */
+    @Deprecated
+    public void periodicalVMSUpdate(final Host[] hosts) {
+        periodicalVMSUpdate(Arrays.asList(hosts));
+    }
+
+    /** Updates VMs info. */
+    public void periodicalVMSUpdate(final List<Host> hosts) {
+        boolean updated = false;
+        for (final Host host : hosts) {
+            final VMSXML newVMSXML = new VMSXML(host);
+            if (newVMSXML.update()) {
+                vmsXMLPut(host, newVMSXML);
+                updated = true;
+            }
+        }
+        if (updated) {
+            updateVMS();
+        }
+    }
+
     /** Adds new vmsxml object to the hash. */
     public void vmsXMLPut(final Host host, final VMSXML newVMSXML) {
         mVMSWriteLock.lock();
