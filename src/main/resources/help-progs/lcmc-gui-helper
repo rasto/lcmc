@@ -289,13 +289,19 @@ sub get_net_info {
 	my $out = "";
 	for (`/sbin/ifconfig`) {
 		if (!$dev) {
-			($dev) = /^(\S+)/ or net_info_error("no dev");
+			($dev) = /^(.*?)(:?\s|:)/ or net_info_error("no dev");
 			next if $dev eq "lo";
 			($mac) = /\sHWaddr\s+(\S+)/;
 		} else {
 			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
 				$ip = $1;
 				$mask = $2;
+			} elsif (/^\s+inet\s+(\S+).*?\s+netmask\s+(\S+)/) {
+				# from fedora 17
+				$ip = $1;
+				$mask = $2;
+			} elsif (/^\s+ether\s+(\S+)/) {
+				$mac = $1;
 			}
 		}
 		if (/^$/) {
