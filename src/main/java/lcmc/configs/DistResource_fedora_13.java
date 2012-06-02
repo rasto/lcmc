@@ -127,5 +127,53 @@ public final class DistResource_fedora_13 extends java.util.ListResourceBundle {
          + " fi && "
          + "make && make install DESTDIR=/ && "
          + "/bin/rm -rf /tmp/drbdinst"},
+
+        {"Heartbeat.deleteFromRc",
+         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
+
+        {"Heartbeat.addToRc",
+         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
+
+        {"Corosync.addToRc",
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
+
+        {"Corosync.deleteFromRc",
+         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
+
+        {"Openais.addToRc",
+         DistResource.SUDO + "/sbin/chkconfig --level 2345 openais on "
+         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 openais off"},
+
+        {"Openais.deleteFromRc",
+         DistResource.SUDO + "/sbin/chkconfig --del openais"},
+
+        {"Heartbeat.startHeartbeat",
+         DistResource.SUDO + "/etc/init.d/heartbeat start"},
+
+        {"Heartbeat.stopHeartbeat",
+         DistResource.SUDO + "/etc/init.d/heartbeat stop"},
+
+        {"Corosync.startCorosync",
+         DistResource.SUDO + "/etc/init.d/corosync start"},
+
+        {"Corosync.startPcmk",
+         DistResource.SUDO + "/etc/init.d/pacemaker start"},
+
+        {"Corosync.stopCorosync",
+         DistResource.SUDO + "/etc/init.d/corosync stop"},
+
+        {"Corosync.stopCorosyncWithPcmk",
+         DistResource.SUDO + "/etc/init.d/pacemaker stop && "
+         + DistResource.SUDO + "/etc/init.d/corosync stop"},
+        {"Corosync.startCorosyncWithPcmk",
+         DistResource.SUDO + "/etc/init.d/corosync start;;;"
+         + DistResource.SUDO + "/etc/init.d/pacemaker start"},
+        {"Corosync.reloadCorosync",
+         "if ! " + DistResource.SUDO + "/etc/init.d/corosync status >/dev/null 2>&1; then "
+         + DistResource.SUDO + "/etc/init.d/corosync start; fi"},
+        {"Heartbeat.reloadHeartbeat",
+         "if ! " + DistResource.SUDO + "/etc/init.d/heartbeat status >/dev/null 2>&1; then "
+         + DistResource.SUDO + "/etc/init.d/heartbeat start; fi"},
     };
 }

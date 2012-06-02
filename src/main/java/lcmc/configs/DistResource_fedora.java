@@ -44,6 +44,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"version:Fedora release 13*", "13"},
         {"version:Fedora release 14*", "14"},
         {"version:Fedora release 15*", "15"},
+        {"version:Fedora release 16*", "16"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
@@ -167,25 +168,24 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + "/bin/rpm -q -i corosync|perl -lne"
          + " 'print \"cs:$1\" if /^Version\\s+:\\s+(\\S+)/'"},
 
-        {"Heartbeat.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
-
         {"Heartbeat.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --add heartbeat"},
+         DistResource.SUDO + "/bin/systemctl enable heartbeat.service"},
+
+        {"Heartbeat.deleteFromRc",
+         DistResource.SUDO + "/bin/systemctl disable heartbeat.service"},
 
         {"Corosync.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
-         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
+         DistResource.SUDO + "/bin/systemctl enable corosync.service"},
 
         {"Corosync.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del corosync"},
+         DistResource.SUDO + "/bin/systemctl disable corosync.service"},
 
         {"Openais.addToRc",
-         DistResource.SUDO + "/sbin/chkconfig --level 2345 openais on "
-         + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 openais off"},
+         DistResource.SUDO + "/bin/systemctl enable openais.service"},
 
         {"Openais.deleteFromRc",
-         DistResource.SUDO + "/sbin/chkconfig --del openais"},
+         DistResource.SUDO + "/bin/systemctl disable openais.service"},
+
         {"KVM.emulator",    "/usr/bin/qemu-kvm"},
 
         /* Drbd install method 2 */
@@ -221,6 +221,25 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
 
         {"libvirt.lxc.libpath", "/usr/libexec"},
         {"libvirt.xen.libpath", "/usr/lib/xen"},
+
+        {"Corosync.startCorosync",
+         DistResource.SUDO + "/sbin/service corosync start"},
+
+        {"Corosync.startPcmk",
+         DistResource.SUDO + "/sbin/service pacemaker start"},
+
+        {"Corosync.stopCorosync",
+         DistResource.SUDO + "/sbin/service corosync stop"},
+
+        {"Corosync.stopCorosyncWithPcmk",
+         DistResource.SUDO + "/sbin/service pacemaker stop && "
+         + DistResource.SUDO + "/sbin/service corosync stop"},
+        {"Corosync.startCorosyncWithPcmk",
+         DistResource.SUDO + "/sbin/service corosync start;;;"
+         + DistResource.SUDO + "/sbin/service pacemaker start"},
+        {"Corosync.reloadCorosync",
+         "if ! " + DistResource.SUDO + "/sbin/service corosync status >/dev/null 2>&1; then "
+         + DistResource.SUDO + "/sbin/service corosync start; fi"},
     };
 
 }

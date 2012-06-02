@@ -1633,7 +1633,11 @@ sub get_drbd_version {
 # Returns whether it is an init script.
 sub is_init {
 	my $script = shift;
-	return `if [ -e /etc/init.d/$script ]; then echo on; fi` || "";
+	if (-e "/usr/lib/systemd/system/$script.service"
+	    || -e "/etc/init.d/$script") {
+		return "on";
+	}
+	return "";
 }
 
 #
@@ -1642,7 +1646,8 @@ sub is_init {
 sub is_script_rc {
 	my $script = shift;
 	return 
-	  "(/usr/sbin/update-rc.d -n -f $script remove 2>&1|grep '/rc[0-9]\.d'"
+	  "(/bin/systemctl is-enabled $script.service|grep enabled"
+	 ." || /usr/sbin/update-rc.d -n -f $script remove 2>&1|grep '/rc[0-9]\.d'"
          ." || /sbin/chkconfig --list $script 2>/dev/null"
          ."|grep ':on') 2>/dev/null"
          ."|sed s/.*/on/|uniq";
@@ -1663,6 +1668,8 @@ if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
 	done; \
 	exit 3; \
 else \
+	service $script status 2>&1 >/dev/null; \
+	if [ "\$?" -eq "0" ]; then exit 0; fi; \
 	out=`/etc/init.d/$script status 2>&1`; \
 	ret=\$?; \
 	if [ -z "\$out" ]; then exit 111; else exit \$ret; fi; \

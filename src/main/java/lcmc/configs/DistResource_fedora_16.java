@@ -24,9 +24,9 @@ package lcmc.configs;
 import java.util.Arrays;
 
 /**
- * Here are commands for fedora 15.
+ * Here are commands for fedora 16.
  */
-public final class DistResource_fedora_15 extends java.util.ListResourceBundle {
+public final class DistResource_fedora_16 extends java.util.ListResourceBundle {
 
     /** Get contents. */
     @Override
@@ -36,15 +36,7 @@ public final class DistResource_fedora_15 extends java.util.ListResourceBundle {
 
     /** Contents. */
     private static Object[][] contents = {
-        {"Support", "fedora-15"},
-        /* Heartbeat/Pacemaker native */
-        {"HbPmInst.install.text.1",
-         "yum install: 1.1.x/3.0.x"},
-
-        {"HbPmInst.install.1",
-         "yum -y install pacemaker heartbeat "
-         + "&& if ( rpm -qa|grep drbd ); then"
-         + " yum -y install drbd-pacemaker; fi"},
+        {"Support", "fedora-16"},
 
         {"Heartbeat.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del heartbeat"},
