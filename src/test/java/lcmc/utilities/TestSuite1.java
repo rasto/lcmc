@@ -152,9 +152,10 @@ public final class TestSuite1 {
         clearStdout();
     }
     /** Adds test cluster to the GUI. */
-    private static void initTestCluster() {
+    public static void initTestCluster() {
         if (Tools.getGUIData() == null) {
             if (CONNECT_LINBIT) {
+                System.out.println("set up 2");
                 lcmc.LCMC.main(new String[]{});
             } else {
                 lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
@@ -282,8 +283,10 @@ public final class TestSuite1 {
         initTestCluster();
 
         final TestSuite suite = new TestSuite();
-        final int startPos = "build/classes".length() + 1;
-        for (final String c : getTest1Classes("build/classes")) {
+        for (final String classes : new String[]{"build/classes",
+                                                 "target/test-classes"}) {
+        final int startPos = classes.length() + 1;
+        for (final String c : getTest1Classes(classes)) {
             final String className =
               c.substring(startPos, c.length() - 6).replaceAll("[/\\\\]", ".");
             try {
@@ -293,8 +296,10 @@ public final class TestSuite1 {
                 error("unusable class: " + className);
             }
         }
+        }
         //final TestResult testResult = new TestResult();
         junit.textui.TestRunner.run(suite);
+        //System.exit(0);
     }
 
     /** Specify a condition to be passed to the waitForCondition function. */

@@ -24,6 +24,7 @@ import lcmc.data.Host;
 public final class ToolsTest1 extends TestCase {
     @Before
     protected void setUp() {
+        TestSuite1.initTestCluster();
         TestSuite1.initTest();
     }
 
@@ -723,6 +724,7 @@ public final class ToolsTest1 extends TestCase {
                 Tools.progressIndicatorFailed(host.getName(), "fail");
             }
         }
+        TestSuite1.clearStdout();
     }
 
     @Test

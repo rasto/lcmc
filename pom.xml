@@ -14,6 +14,7 @@
         <project.reporting.outputEncoding>
         UTF-8
         </project.reporting.outputEncoding>
+        <jmockit.version>0.999.15</jmockit.version>
     </properties>
 
     <dependencies>
@@ -46,6 +47,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
+            <scope>test</scope> 
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.jmockit</groupId>
+            <artifactId>jmockit-coverage</artifactId>
+            <version>${jmockit.version}</version>
+            <scope>test</scope> 
         </dependency>
     </dependencies>
 
@@ -129,13 +137,19 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <arguments>
+                        <argument>connect=true</argument>
+                        <argument>count=2</argument>
+                        <argument>password=rastislav</argument>
+                        <argument>quick=false</argument>
+                        <argument>interactive=false</argument>
+                    </arguments>
                     <outputDirectory>${basedir}/target/checks/surefire-reports</outputDirectory>
-                    <testFailureIgnore>true</testFailureIgnore>
                     <includes>
                         <include>**/*Test1.java</include>
                     </includes>
                     <excludes>
-                        <exclude>**/TestSuite*</exclude>
+                        <exclude>**/TestSuite*.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -224,6 +238,21 @@
                           <descriptorRef>jar-with-dependencies</descriptorRef>
                       </descriptorRefs>
                   </configuration>
+              </plugin>
+              <plugin>
+                  <artifactId>maven-surefire-plugin</artifactId><version>2.6</version>
+                  <configuration>
+                      <argLine>
+                         -Djmockit-coverage-outputDir=target/my-coverage-report
+                      </argLine>
+                  </configuration>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                  <argLine>-javaagent:${settings.localRepository}/com/googlecode/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar=coverage=:html:./target/coverage-report</argLine>
+                </configuration>
               </plugin>
           </plugins>
       </build>
