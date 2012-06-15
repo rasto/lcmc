@@ -2702,18 +2702,12 @@ public final class Tools {
 
     /** Wait for next swing threads to finish. It's used for synchronization */
     public static void waitForSwing() {
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    /* just wait */
-                }
-            });
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException x) {
-            Tools.printStackTrace();
-        }
+        invokeAndWait(new Runnable() {
+                          @Override
+                          public void run() {
+                              /* just wait */
+                          }
+                      });
     }
 
     /** Convenience invoke and wait function. */
