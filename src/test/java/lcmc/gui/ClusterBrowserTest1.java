@@ -73,8 +73,9 @@ public final class ClusterBrowserTest1 extends TestCase {
         final List<String> files = new ArrayList<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
+        final int repeat = TestSuite1.getFactor();
         for (final String dirName : new String[]{
-                    userHome + "/testdir/pacemaker/shell/regression",
+                    /* userHome + "/testdir/pacemaker/shell/regression", */
                     userHome + "/testdir/pacemaker/pengine/test10"}) {
             final File dir = new File(dirName);
             assertFalse(dir == null);
@@ -85,11 +86,12 @@ public final class ClusterBrowserTest1 extends TestCase {
                 final String file = f.getAbsolutePath();
                 if (file.length() > 3
                     && file.substring(file.length() - 4).equals(".xml")) {
-                    files.add(file);
+                    for (int i = 0; i < repeat; i++) {
+                        files.add(file);
+                    }
                 }
             }
         }
-        int i = 0;
         String emptyCib = null;
         final StringBuilder nodes = new StringBuilder("<nodes>\n");
         for (final Host host : TestSuite1.getHosts()) {
@@ -114,10 +116,11 @@ public final class ClusterBrowserTest1 extends TestCase {
             status.append("</node_state>\n");
         }
         status.append("</status>\n");
+        int i = 0;
 
         for (final String file : files) {
             i++;
-            if (i > 200) {
+            if (i > 19 * repeat + 1) {
                 break;
             }
             Tools.startProgressIndicator(i + ": " + file);
@@ -167,9 +170,6 @@ public final class ClusterBrowserTest1 extends TestCase {
                                         firstTime,
                                         testOnly);
                 Tools.waitForSwing();
-            }
-            if (i % 10 == 0) {
-                Tools.sleep(5000);
             }
             Tools.sleep(250);
         }

@@ -137,13 +137,14 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <arguments>
-                        <argument>connect=true</argument>
-                        <argument>count=2</argument>
-                        <argument>password=rastislav</argument>
-                        <argument>quick=false</argument>
-                        <argument>interactive=false</argument>
-                    </arguments>
+                    <systemPropertyVariables>
+                        <test.cluster>true</test.cluster>
+                        <test.connect>false</test.connect>
+                        <test.count>2</test.count>
+                        <test.password>rastislav</test.password>
+                        <test.quick>false</test.quick>
+                        <test.interactive>false</test.interactive>
+                    </systemPropertyVariables>
                     <outputDirectory>${basedir}/target/checks/surefire-reports</outputDirectory>
                     <includes>
                         <include>**/*Test1.java</include>
@@ -250,9 +251,11 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!--
                 <configuration>
                   <argLine>-javaagent:${settings.localRepository}/com/googlecode/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar=coverage=:html:./target/coverage-report</argLine>
                 </configuration>
+                -->
               </plugin>
           </plugins>
       </build>

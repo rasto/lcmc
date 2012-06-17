@@ -146,6 +146,7 @@ public final class TestSuite1 {
     }
 
     public static void initTest() {
+        initTestCluster();
         System.setOut(new PrintStream(out, true));
         System.setErr(new PrintStream(out, true));
         Tools.waitForSwing();
@@ -155,12 +156,14 @@ public final class TestSuite1 {
     public static void initTestCluster() {
         if (Tools.getGUIData() == null) {
             if (CONNECT_LINBIT) {
-                System.out.println("set up 2");
                 lcmc.LCMC.main(new String[]{});
             } else {
                 lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
             }
+        } else {
+            return;
         }
+
         Tools.setDebugLevel(-1);
         if (CLUSTER) {
             final String username = "root";
@@ -280,8 +283,6 @@ public final class TestSuite1 {
 
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
-        initTestCluster();
-
         final TestSuite suite = new TestSuite();
         for (final String classes : new String[]{"build/classes",
                                                  "target/test-classes"}) {
@@ -297,9 +298,8 @@ public final class TestSuite1 {
             }
         }
         }
-        //final TestResult testResult = new TestResult();
         junit.textui.TestRunner.run(suite);
-        //System.exit(0);
+        System.exit(0);
     }
 
     /** Specify a condition to be passed to the waitForCondition function. */
