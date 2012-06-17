@@ -1252,6 +1252,10 @@ public final class VMSXML extends XML {
                 bridgeSTP = getAttribute(optionNode, "stp");
                 bridgeDelay = getAttribute(optionNode, "delay");
                 bridgeForwardDelay = getAttribute(optionNode, "forwardDelay");
+            } else if ("mac".equals(nodeName)) {
+                /* skip */
+            } else if ("ip".equals(nodeName)) {
+                /* skip */
             } else if (!"#text".equals(nodeName)) {
                 Tools.appWarning("unknown network option: "
                                  + nodeName);
