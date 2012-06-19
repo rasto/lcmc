@@ -130,7 +130,7 @@ public final class CRM {
                 + "if [ -e /usr/sbin/ptest ];"
                 + " then export PROG=/usr/sbin/ptest; "
                 + "fi;"
-                + DistResource.SUDO + "$PROG -VVVV -S -x "
+                + DistResource.SUDO + "$PROG -VVVVV -S -x "
                 + LCMC_TEST_FILE
                 + " 2>&1;echo '"
                 + PTEST_END_DELIM

@@ -1079,7 +1079,7 @@ sub get_resource_status {
 	} elsif (!-e $prog) {
 		$errors .= "could not find $prog\n";
 	}
-	for my $line (`$prog -S -VVVV -L 2>&1`) {
+	for my $line (`$prog -S -VVVVV -L 2>&1`) {
 		my $what;
 		my $on;
 		my $res;
