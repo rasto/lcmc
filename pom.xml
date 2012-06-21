@@ -241,6 +241,30 @@
                   </configuration>
               </plugin>
               <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                  <execution>
+                    <phase>generate-sources</phase>
+                    <configuration>
+                      <tasks>
+                        <mkdir dir="${project.build.directory}/classes"/>
+                        <copy todir="${project.build.directory}/classes">
+                                <fileset dir="src/main/resources/"/>
+                        </copy>
+                        <tar tarfile="${project.build.directory}/classes/lcmc-test.tar"
+                             basedir="${project.build.directory}/classes/"
+                             includes="lcmc-test/**"/>
+
+                      </tasks>
+                    </configuration>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+              <plugin>
                   <artifactId>maven-surefire-plugin</artifactId><version>2.6</version>
                   <configuration>
                       <argLine>
