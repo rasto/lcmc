@@ -7,6 +7,8 @@ import org.junit.Before;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 
 import lcmc.utilities.TestSuite1;
@@ -70,7 +72,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         if (TestSuite1.QUICK) {
             return;
         }
-        final List<String> files = new ArrayList<String>();
+        final Set<String> files = new TreeSet<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
         final int repeat = TestSuite1.getFactor();
@@ -120,7 +122,7 @@ public final class ClusterBrowserTest1 extends TestCase {
 
         for (final String file : files) {
             i++;
-            if (i > 19 * repeat + 1) {
+            if (i > 58 * repeat + 1) {
                 break;
             }
             Tools.startProgressIndicator(i + ": " + file);
@@ -159,7 +161,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 Tools.waitForSwing();
                 cb.getHeartbeatGraph().repaint();
             }
-            Tools.sleep(1000);
+            Tools.sleep(100);
             Tools.stopProgressIndicator(i + ": " + file);
             for (final Host host : TestSuite1.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
@@ -173,5 +175,6 @@ public final class ClusterBrowserTest1 extends TestCase {
             }
             Tools.sleep(250);
         }
+        TestSuite1.clearStdout();
     }
 }
