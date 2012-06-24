@@ -208,7 +208,7 @@ public final class Host {
     /** Is "on" if pacemaker has an init script. */
     private boolean pcmkInit = false;
     /** Pacemaker service version. From version 1, use pacamker init script. */
-    private int pcmkServiceVersion = 0;
+    private int pcmkServiceVersion = -1;
     /** Is "on" if drbd module is loaded. */
     private boolean drbdLoaded = false;
     /** Corosync version. */
@@ -2345,7 +2345,7 @@ public final class Host {
                 try {
                     pcmkServiceVersion = Integer.parseInt(tokens[1].trim());
                 } catch (java.lang.NumberFormatException e) {
-                    pcmkServiceVersion = 0;
+                    pcmkServiceVersion = -1;
                 }
             }
         } else if ("drbd-loaded".equals(tokens[0])) {
@@ -2862,9 +2862,12 @@ public final class Host {
         this.commLayerStarting = commLayerStarting;
     }
 
-    /** Returns pcmkServiceVersion. */
-    public int getPcmkServiceVersion() {
-        return pcmkServiceVersion;
+    /** Returns whether pacemaker is started by corosync. */
+    public boolean isPcmkStartedByCorosync() {
+        if (pcmkServiceVersion == 0) {
+            return true;
+        }
+        return false;
     }
 
     /** Sets libvirt version. */

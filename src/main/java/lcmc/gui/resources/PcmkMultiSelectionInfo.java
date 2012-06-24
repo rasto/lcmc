@@ -263,7 +263,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         }
                         for (final HostInfo hi : selectedHostInfos) {
                             final Host host = hi.getHost();
-                            if (host.getPcmkServiceVersion() > 0
+                            if (!host.isPcmkStartedByCorosync()
                                 && host.isPcmkInit()
                                 && host.isPcmkRunning()) {
                                 Corosync.stopCorosyncWithPcmk(host);
@@ -542,7 +542,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
-                        if (h.getPcmkServiceVersion() > 0
+                        if (!h.isPcmkStartedByCorosync()
                             && !h.isPcmkRunning()
                             && (h.isCsRunning()
                                 || h.isAisRunning())

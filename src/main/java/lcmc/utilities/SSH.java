@@ -379,11 +379,7 @@ public final class SSH {
                    With pty, the sudo wouldn't work, because we don't want
                    to enter sudo password by every command.
                    (It would be exposed) */
-                if (command.indexOf("/etc/init.d/pacemaker start") < 0) {
-                    //TODO
-                    /* no pty workaround for pacemaker init script. */
-                    thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
-                }
+                thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
                 Tools.debug(this, "exec command: "
                                   + host.getName()
                                   + ": "

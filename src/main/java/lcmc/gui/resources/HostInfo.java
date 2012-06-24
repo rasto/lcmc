@@ -618,7 +618,7 @@ public final class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
                         final Host host = getHost();
                         host.setCommLayerStopping(true);
-                        if (host.getPcmkServiceVersion() > 0
+                        if (!host.isPcmkStartedByCorosync()
                             && host.isPcmkInit()
                             && host.isPcmkRunning()) {
                             Corosync.stopCorosyncWithPcmk(host);
@@ -844,7 +844,7 @@ public final class HostInfo extends Info {
                 @Override
                 public boolean visiblePredicate() {
                     final Host h = getHost();
-                    return h.getPcmkServiceVersion() > 0
+                    return !h.isPcmkStartedByCorosync()
                            && !h.isPcmkRunning()
                            && (h.isCsRunning()
                                || h.isAisRunning())

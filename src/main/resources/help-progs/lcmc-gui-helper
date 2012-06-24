@@ -1798,7 +1798,7 @@ sub get_cluster_versions {
 	chomp $cs_running;
 	chomp $pcmk_running;
 	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
-	my $pcmk_svc_ver = "0";
+	my $pcmk_svc_ver = "no";
 	if ($service) {
 		if ($service =~ /^service.ver=(\d*)/) {
 			$pcmk_svc_ver = $1;
