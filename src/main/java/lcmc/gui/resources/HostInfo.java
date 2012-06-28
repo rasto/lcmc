@@ -103,9 +103,12 @@ public final class HostInfo extends Info {
     /** Fenced/unclean subtext. */
     private static final Subtext FENCED_SUBTEXT =
                                     new Subtext("fencing...", null, Color.RED);
-    /** Stopped subtext. */
-    private static final Subtext STOPPED_SUBTEXT =
+    /** Corosync stopped subtext. */
+    private static final Subtext CORO_STOPPED_SUBTEXT =
                                       new Subtext("stopped", null, Color.RED);
+    /** Pacemaker stopped subtext. */
+    private static final Subtext PCMK_STOPPED_SUBTEXT =
+                                  new Subtext("pcmk stopped", null, Color.RED);
     /** Unknown subtext. */
     private static final Subtext UNKNOWN_SUBTEXT =
                                       new Subtext("wait...", null, Color.BLUE);
@@ -858,7 +861,8 @@ public final class HostInfo extends Info {
 
                 @Override
                 public void action() {
-                    Corosync.startPacemaker(getHost());
+                    host.setPcmkStarting(true);
+                    Corosync.startPacemaker(host);
                     getBrowser().getClusterBrowser().updateHWInfo(host);
                 }
             };
@@ -1042,6 +1046,8 @@ public final class HostInfo extends Info {
             return STOPPING_SUBTEXT;
         } else if (getHost().isCommLayerStarting()) {
             return STARTING_SUBTEXT;
+        } else if (getHost().isPcmkStarting()) {
+            return STARTING_SUBTEXT;
         }
         final ClusterStatus cs = getClusterStatus();
         if (cs != null && cs.isFencedNode(host.getName())) {
@@ -1057,10 +1063,12 @@ public final class HostInfo extends Info {
             if (running == null) {
                 return UNKNOWN_SUBTEXT;
             } else if (!running) {
-                return STOPPED_SUBTEXT;
+                return CORO_STOPPED_SUBTEXT;
             }
             if (cs != null && cs.isPendingNode(host.getName())) {
                 return PENDING_SUBTEXT;
+            } else if (!getHost().isPcmkRunning()) {
+                return PCMK_STOPPED_SUBTEXT;
             } else if (cs != null
                        && "no".equals(cs.isOnlineNode(host.getName()))) {
                 return OFFLINE_SUBTEXT;

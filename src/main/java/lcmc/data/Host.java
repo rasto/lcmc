@@ -179,6 +179,8 @@ public final class Host {
     private boolean commLayerStopping = false;
     /** Whether the comm layer is starting. */
     private boolean commLayerStarting = false;
+    /** Whether the pcmk is starting. */
+    private boolean pcmkStarting = false;
     /** Is "on" if corosync is in rc. */
     private boolean csIsRc = false;
     /** Is "on" if openais is in rc. */
@@ -2277,6 +2279,7 @@ public final class Host {
             if (tokens.length == 2) {
                 aisRunning = "on".equals(tokens[1].trim());
                 commLayerStarting = false;
+                pcmkStarting = false;
             } else {
                 aisRunning = false;
             }
@@ -2384,6 +2387,9 @@ public final class Host {
         if (commLayerStarting
             && (csRunning || aisRunning || heartbeatRunning)) {
             commLayerStarting = false;
+        }
+        if (pcmkStarting && pcmkRunning) {
+            pcmkStarting = false;
         }
         if (commLayerStopping
             && !csRunning
@@ -2860,6 +2866,16 @@ public final class Host {
     /** Sets whether the comm layer is starting. */
     public void setCommLayerStarting(final boolean commLayerStarting) {
         this.commLayerStarting = commLayerStarting;
+    }
+
+    /** Returns true if pcmk is starting. */
+    public boolean isPcmkStarting() {
+        return pcmkStarting;
+    }
+
+    /** Sets whether the pcmk is starting. */
+    public void setPcmkStarting(final boolean pcmkStarting) {
+        this.pcmkStarting = pcmkStarting;
     }
 
     /** Returns whether pacemaker is started by corosync. */
