@@ -84,6 +84,8 @@ public final class TestSuite1 {
         }
     }
     public static final List<Host> HOSTS = new ArrayList<Host>();
+    public static final String TEST_HOSTNAME =
+                                            System.getenv("LCMC_TEST_HOSTNAME");
 
     /** Private constructor. */
     private TestSuite1() {
@@ -171,7 +173,13 @@ public final class TestSuite1 {
             final Cluster cluster = new Cluster();
             cluster.setName("test");
             for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
-                final Host host = initHost("test" + i, username, useSudo);
+                String hostName;
+                if (TEST_HOSTNAME == null) {
+                    hostName = "test" + i;
+                } else {
+                    hostName = TEST_HOSTNAME + "-" + (char) ('a' - 1 + i);
+                }
+                final Host host = initHost(hostName, username, useSudo);
                 HOSTS.add(host);
                 host.setCluster(cluster);
                 cluster.addHost(host);
