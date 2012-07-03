@@ -86,6 +86,8 @@ public final class TestSuite1 {
     public static final List<Host> HOSTS = new ArrayList<Host>();
     public static final String TEST_HOSTNAME =
                                             System.getenv("LCMC_TEST_HOSTNAME");
+    public static final String TEST_USERNAME =
+                                            System.getenv("LCMC_TEST_USERNAME");
 
     /** Private constructor. */
     private TestSuite1() {
@@ -168,8 +170,15 @@ public final class TestSuite1 {
 
         Tools.setDebugLevel(-1);
         if (CLUSTER) {
-            final String username = "root";
-            final boolean useSudo = false;
+            String username;
+            boolean useSudo;
+            if (TEST_USERNAME == null) {
+                username = "root";
+                useSudo = false;
+            } else {
+                username = TEST_USERNAME;
+                useSudo = true;
+            }
             final Cluster cluster = new Cluster();
             cluster.setName("test");
             for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
