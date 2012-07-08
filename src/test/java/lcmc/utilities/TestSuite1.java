@@ -132,6 +132,7 @@ public final class TestSuite1 {
 
     /** Clears stdout. Call it, if something writes to stdout. */
     public static void clearStdout() {
+        realPrint(stdout.toString());
         stdout.delete(0, stdout.length());
     }
 
@@ -142,6 +143,10 @@ public final class TestSuite1 {
 
     public static void realPrintln(final String s) {
         realOut.println(s);
+    }
+
+    public static void realPrint(final String s) {
+        realOut.print(s);
     }
 
     /** Print error and exit. */
