@@ -146,6 +146,7 @@ public final class TestSuite1 {
 
     /** Print error and exit. */
     public static void error(final String s) {
+        System.out.println(s);
         System.exit(10);
     }
 
