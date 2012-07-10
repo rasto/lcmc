@@ -902,7 +902,8 @@ public final class CRMXML extends XML {
                 final String text =
                                 Tools.getString("CRMXML.GetRAMetaData.Done");
                 Tools.startProgressIndicator(hn, text);
-                ssi.setAllResources(CRM.LIVE);
+                ssi.setAllResources(ssi.getBrowser().getClusterStatus(),
+                                    CRM.LIVE);
                 ssi.getBrowser().getClusterViewPanel().reloadRightComponent();
                 Tools.stopProgressIndicator(hn, text);
                 Tools.debug(this, "RAs loaded", 0);

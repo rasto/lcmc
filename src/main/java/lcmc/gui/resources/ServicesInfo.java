@@ -305,11 +305,10 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     /** Sets heartbeat global parameters after they were obtained. */
-    public void setGlobalConfig() {
+    public void setGlobalConfig(final ClusterStatus clStatus) {
         final String[] params = getParametersFromXML();
         for (String param : params) {
-            final String value =
-                         getBrowser().getClusterStatus().getGlobalParam(param);
+            final String value = clStatus.getGlobalParam(param);
             final String oldValue = getParamSaved(param);
             if (value != null && !value.equals(oldValue)) {
                 getResource().setValue(param, value);
@@ -345,11 +344,11 @@ public final class ServicesInfo extends EditableInfo {
 
     /** Sets clone info object. */
     private CloneInfo setCreateCloneInfo(final String cloneId,
+                                         final ClusterStatus clStatus,
                                          final boolean testOnly) {
         CloneInfo newCi = null;
         newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (newCi == null) {
             final Point2D p = null;
             newCi =
@@ -382,11 +381,11 @@ public final class ServicesInfo extends EditableInfo {
     /** Sets group info object. */
     private GroupInfo setCreateGroupInfo(final String group,
                                          final CloneInfo newCi,
+                                         final ClusterStatus clStatus,
                                          final boolean testOnly) {
         GroupInfo newGi = null;
         newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
         final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (newGi == null) {
             final Point2D p = null;
             newGi =
@@ -426,10 +425,10 @@ public final class ServicesInfo extends EditableInfo {
                                final CloneInfo newCi,
                                final List<ServiceInfo> serviceIsPresent,
                                final List<ServiceInfo> groupServiceIsPresent,
+                               final ClusterStatus clStatus,
                                final boolean testOnly) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash =
                            new HashMap<ServiceInfo, Map<String, String>>();
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (newCi != null) {
             setParametersHash.put(
                             newCi,
@@ -458,13 +457,17 @@ public final class ServicesInfo extends EditableInfo {
                     continue;
                 }
                 /* clone group */
-                final GroupInfo gi = setCreateGroupInfo(hbId, newCi, testOnly);
+                final GroupInfo gi = setCreateGroupInfo(hbId,
+                                                        newCi,
+                                                        clStatus,
+                                                        testOnly);
                 setGroupResources(allGroupsAndClones,
                                   hbId,
                                   gi,
                                   null,
                                   serviceIsPresent,
                                   groupServiceIsPresent,
+                                  clStatus,
                                   testOnly);
                 newSi = (ServiceInfo) gi;
             } else {
@@ -586,8 +589,8 @@ public final class ServicesInfo extends EditableInfo {
      * This functions goes through all services, constrains etc. in
      * clusterStatus and updates the internal structures and graph.
      */
-    public void setAllResources(final boolean testOnly) {
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
+    public void setAllResources(final ClusterStatus clStatus,
+                                final boolean testOnly) {
         if (clStatus == null) {
             return;
         }
@@ -601,7 +604,7 @@ public final class ServicesInfo extends EditableInfo {
             GroupInfo newGi = null;
             if (clStatus.isClone(groupOrClone)) {
                 /* clone */
-                newCi = setCreateCloneInfo(groupOrClone, testOnly);
+                newCi = setCreateCloneInfo(groupOrClone, clStatus, testOnly);
                 serviceIsPresent.add(newCi);
             } else if (!"none".equals(groupOrClone)) {
                 /* group */
@@ -613,7 +616,10 @@ public final class ServicesInfo extends EditableInfo {
                     groupServiceIsPresent.add(gi);
                     continue;
                 }
-                newGi = setCreateGroupInfo(groupOrClone, newCi, testOnly);
+                newGi = setCreateGroupInfo(groupOrClone,
+                                           newCi,
+                                           clStatus,
+                                           testOnly);
                 serviceIsPresent.add(newGi);
             }
             setGroupResources(allGroupsAndClones,
@@ -622,6 +628,7 @@ public final class ServicesInfo extends EditableInfo {
                               newCi,
                               serviceIsPresent,
                               groupServiceIsPresent,
+                              clStatus,
                               testOnly);
         }
 

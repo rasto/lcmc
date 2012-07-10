@@ -1173,14 +1173,15 @@ public final class ClusterBrowser extends Browser {
                               final Host host,
                               final CountDownLatch firstTime,
                               final boolean testOnly) {
+        final ClusterStatus clStatus = clusterStatus;
         clStatusLock();
-        if (clStatusCanceled || clusterStatus == null) {
+        if (clStatusCanceled || clStatus == null) {
             clStatusUnlock();
             firstTime.countDown();
             return;
         }
         if (output == null || "".equals(output)) {
-            clusterStatus.setOnlineNode(host.getName(), "no");
+            clStatus.setOnlineNode(host.getName(), "no");
             setClStatus(host, false);
             firstTime.countDown();
         } else {
@@ -1209,32 +1210,32 @@ public final class ClusterBrowser extends Browser {
                                                  clusterStatusOutput.length());
                             if (CLUSTER_STATUS_ERROR.equals(status)) {
                                 final boolean oldStatus = host.isClStatus();
-                                clusterStatus.setOnlineNode(host.getName(),
+                                clStatus.setOnlineNode(host.getName(),
                                                             "no");
                                 setClStatus(host, false);
                                 if (oldStatus) {
                                    heartbeatGraph.repaint();
                                 }
                             } else {
-                                if (clusterStatus.parseStatus(status)) {
+                                if (clStatus.parseStatus(status)) {
                                     Tools.debug(this,
                                                 "update cluster status: "
                                                 + host.getName(), 1);
                                     final ServicesInfo ssi = servicesInfo;
                                     rscDefaultsInfo.setParameters(
-                                      clusterStatus.getRscDefaultsValuePairs());
-                                    ssi.setGlobalConfig();
-                                    ssi.setAllResources(testOnly);
+                                      clStatus.getRscDefaultsValuePairs());
+                                    ssi.setGlobalConfig(clStatus);
+                                    ssi.setAllResources(clStatus, testOnly);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/
-                                        ssi.setAllResources(testOnly);
+                                        ssi.setAllResources(clStatus, testOnly);
                                     }
                                     repaintTree();
                                     clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                                 }
                                 final String online =
-                                    clusterStatus.isOnlineNode(host.getName());
+                                    clStatus.isOnlineNode(host.getName());
                                 if ("yes".equals(online)) {
                                     setClStatus(host, true);
                                     setClStatus();

@@ -121,6 +121,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         int i = 0;
 
         for (final String file : files) {
+            System.out.println("file: " + file);
             i++;
             if (i > 58 * repeat + 1) {
                 break;
