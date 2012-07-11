@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 import lcmc.utilities.TestSuite1;
@@ -72,10 +73,10 @@ public final class ClusterBrowserTest1 extends TestCase {
         if (TestSuite1.QUICK) {
             return;
         }
-        final Set<String> files = new TreeSet<String>();
+        final List<String> files = new ArrayList<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
-        final int repeat = TestSuite1.getFactor();
+        final int repeat = TestSuite1.getFactor() * 2;
         for (final String dirName : new String[]{
                     /* userHome + "/testdir/pacemaker/shell/regression", */
                     userHome + "/testdir/pacemaker/pengine/test10"}) {
@@ -120,6 +121,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         status.append("</status>\n");
         int i = 0;
 
+        Collections.sort(files);
         for (final String file : files) {
             System.out.println("file: " + file);
             i++;
