@@ -76,7 +76,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         final List<String> files = new ArrayList<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
-        final int repeat = TestSuite1.getFactor() * 2;
+        final int repeat = TestSuite1.getFactor();
         for (final String dirName : new String[]{
                     /* userHome + "/testdir/pacemaker/shell/regression", */
                     userHome + "/testdir/pacemaker/pengine/test10"}) {
@@ -122,7 +122,9 @@ public final class ClusterBrowserTest1 extends TestCase {
         int i = 0;
 
         Collections.sort(files);
-        for (final String file : files) {
+        for (String file : files) {
+            //if (i > 1)
+            //    file = files.get(59);
             System.out.println("file: " + file);
             i++;
             if (i > 58 * repeat + 1) {

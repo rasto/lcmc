@@ -647,6 +647,10 @@ public final class ClusterBrowser extends Browser {
         return commonMountPoints.clone();
     }
 
+    public void newClusterStatus(final Host h, CRMXML cXML) {
+        clusterStatus = new ClusterStatus(h, cXML);
+    }
+
     /** Starts everything. */
     private void updateHeartbeatDrbdThread() {
         Tools.debug(this, "load cluster", 0);
