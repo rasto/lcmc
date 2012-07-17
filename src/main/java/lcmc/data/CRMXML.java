@@ -895,7 +895,6 @@ public final class CRMXML extends XML {
         initOCFMetaDataQuick();
         initOCFMetaDataConfigured();
         Tools.debug(this, "cluster loaded", 0);
-        final CRMXML thisCMRXML = this;
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 initOCFMetaDataAll();
@@ -903,7 +902,6 @@ public final class CRMXML extends XML {
                 final String text =
                                 Tools.getString("CRMXML.GetRAMetaData.Done");
                 Tools.startProgressIndicator(hn, text);
-                ssi.getBrowser().newClusterStatus(host, thisCMRXML);
                 ssi.setAllResources(ssi.getBrowser().getClusterStatus(),
                                     CRM.LIVE);
                 ssi.getBrowser().getClusterViewPanel().reloadRightComponent();
