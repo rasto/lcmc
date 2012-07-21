@@ -234,7 +234,8 @@ public class ViewPanel extends JPanel {
                     if (!mSetPanelLock.tryLock()) {
                         return;
                     }
-                    final JComponent p = browser.getInfoPanel(nodeInfo);
+                    final JComponent p =
+                            browser.getInfoPanel(nodeInfo, disabledDuringLoad);
                     if (!disabledDuringLoad) {
                         final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);
@@ -256,7 +257,8 @@ public class ViewPanel extends JPanel {
                     if (!mSetPanelLock.tryLock()) {
                         return;
                     }
-                    final JComponent p = browser.getInfoPanel(nodeInfo);
+                    final JComponent p =
+                            browser.getInfoPanel(nodeInfo, disabledDuringLoad);
                     lastSelectedInfo = nodeInfo;
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();

@@ -195,7 +195,8 @@ public class Browser {
      * graphical view, it returns a split pane with this view and the info
      * underneath.
      */
-    final JComponent getInfoPanel(final Object nodeInfo) {
+    final JComponent getInfoPanel(final Object nodeInfo,
+                                  final boolean disabledDuringLoad) {
         if (nodeInfo == null) {
             return null;
         }
@@ -212,10 +213,12 @@ public class Browser {
             iPanel.setMaximumSize(new Dimension(maxWidth,
                                                 (int) Short.MAX_VALUE));
             if (infoPanelSplitPane != null) {
-                final int loc = infoPanelSplitPane.getDividerLocation();
-                infoPanelSplitPane.setLeftComponent(gView);
-                infoPanelSplitPane.setRightComponent(iPanel);
-                infoPanelSplitPane.setDividerLocation(loc);
+                if (!disabledDuringLoad) {
+                    final int loc = infoPanelSplitPane.getDividerLocation();
+                    infoPanelSplitPane.setLeftComponent(gView);
+                    infoPanelSplitPane.setRightComponent(iPanel);
+                    infoPanelSplitPane.setDividerLocation(loc);
+                }
                 return infoPanelSplitPane;
             }
             final JSplitPane newSplitPane =
