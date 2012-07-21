@@ -123,13 +123,8 @@ public final class ClusterBrowserTest1 extends TestCase {
 
         Collections.sort(files);
         for (String file : files) {
-            //if (i > 1)
-            //    file = files.get(59);
-            System.out.println("file: " + file);
+            System.out.println(i + " file: " + file);
             i++;
-            if (i > 58 * repeat + 1) {
-                break;
-            }
             Tools.startProgressIndicator(i + ": " + file);
             String xml = Tools.loadFile(file, true);
             xml = xml.replaceAll("<nodes/>", nodes.toString())
@@ -158,12 +153,14 @@ public final class ClusterBrowserTest1 extends TestCase {
             final boolean testOnly = false;
             for (final Host host : TestSuite1.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
+                cb.getClusterViewPanel().setDisabledDuringLoad(true);
                 cb.processClusterOutput(cib,
                                         new StringBuffer(""),
                                         host,
                                         firstTime,
                                         testOnly);
                 Tools.waitForSwing();
+                cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getHeartbeatGraph().repaint();
             }
             Tools.sleep(100);
