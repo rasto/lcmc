@@ -735,6 +735,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     sourceDeviceCB.put(prefix, paramCB);
                 }
             } else if (DiskData.TARGET_DEVICE.equals(param)) {
+                paramCB.setAlwaysEditable(true);
                 if (prefix == null) {
                     targetDeviceCB.put("", paramCB);
                 } else {
