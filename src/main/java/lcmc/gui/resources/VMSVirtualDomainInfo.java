@@ -220,7 +220,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final String VIRSH_OPTION_XEN = "-c 'xen:///'";
     private static final String VIRSH_OPTION_LXC = "-c 'lxc:///'";
     /** Domain types. */
-    private static final String DOMAIN_TYPE_KVM = "kvm";
+    static final String DOMAIN_TYPE_KVM = "kvm";
     private static final String DOMAIN_TYPE_XEN = "xen";
     private static final String DOMAIN_TYPE_LXC = "lxc";
     private static final String DOMAIN_TYPE_UML = "uml";

@@ -163,6 +163,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     private static final String FILE_TYPE = "file";
     private static final String BLOCK_TYPE = "block";
 
+    /** Drivers. */
+    private static final String DRIVER_NAME_DEFUALT = null;
+    private static final String DRIVER_NAME_FILE = "file";
+    private static final String DRIVER_NAME_QEMU = "qemu";
+    private static final String DRIVER_NAME_PHY = "phy";
     static {
         POSSIBLE_VALUES.put(DiskData.TYPE,
                             new StringInfo[]{
@@ -179,10 +184,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                        new StringInfo("SCSI Disk",   "scsi/disk",   null),
                        new StringInfo("USB Disk",    "usb/disk",    null),
                        new StringInfo("Virtio Disk", "virtio/disk", null)});
-        POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{null,
-                                                               "file",
-                                                               "qemu",
-                                                               "phy"});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_NAME, new String[]{
+                                                          DRIVER_NAME_DEFUALT,
+                                                          DRIVER_NAME_FILE,
+                                                          DRIVER_NAME_QEMU,
+                                                          DRIVER_NAME_PHY});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
@@ -255,6 +261,13 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns preferred value for specified parameter. */
     @Override
     protected String getParamPreferred(final String param) {
+        final String domainType =
+                        getVMSVirtualDomainInfo().paramComboBoxGet(
+                            VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
+        if (DiskData.DRIVER_NAME.equals(param)
+            && VMSVirtualDomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
+            return DRIVER_NAME_QEMU;
+        }
         return PREFERRED_MAP.get(param);
     }
 
