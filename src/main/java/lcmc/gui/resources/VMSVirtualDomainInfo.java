@@ -1874,7 +1874,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final boolean soundNodeChanged = updateSoundNodes();
                 final boolean serialNodeChanged = updateSerialNodes();
                 final boolean parallelNodeChanged = updateParallelNodes();
-                final boolean vidoNodeChanged = updateVideoNodes();
+                final boolean videoNodeChanged = updateVideoNodes();
                 if (filesystemNodeChanged
                     || interfaceNodeChanged
                     || inputDevNodeChanged
@@ -1882,7 +1882,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     || soundNodeChanged
                     || serialNodeChanged
                     || parallelNodeChanged
-                    || vidoNodeChanged) {
+                    || videoNodeChanged) {
                     getBrowser().reload(thisNode, false);
                 }
             }
