@@ -1875,8 +1875,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final boolean serialNodeChanged = updateSerialNodes();
                 final boolean parallelNodeChanged = updateParallelNodes();
                 final boolean videoNodeChanged = updateVideoNodes();
-                if (filesystemNodeChanged
-                    || interfaceNodeChanged
+                if (interfaceNodeChanged
+                    || diskNodeChanged
+                    || filesystemNodeChanged
                     || inputDevNodeChanged
                     || graphicsNodeChanged
                     || soundNodeChanged
