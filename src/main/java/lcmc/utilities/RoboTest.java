@@ -3867,7 +3867,7 @@ public final class RoboTest {
     private static void startVMTest(final String vmTest,
                                     final String type,
                                     final int count) {
-        slowFactor = 0.2f;
+        slowFactor = 0.5f;
         aborted = false;
         String name = "dmc";
         final int count2 = 3;
@@ -4079,7 +4079,36 @@ public final class RoboTest {
             leftClick();
             sleep(1000);
             checkVMTest(vmTest, 3, name);
-            
+
+            if (j  == 0) {
+                /* add disk */
+                moveTo(80, 200);
+                rightClick();
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_RIGHT);
+                press(KeyEvent.VK_ENTER);
+
+                moveTo(550, 265);
+                leftClick(); /* block device */
+                moveTo(510, 390);
+                leftClick();
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_ENTER);
+                moveTo(240, 130);
+                leftClick(); /* apply */
+                checkVMTest(vmTest, 3.01, name);
+
+                /* remove disk */
+                moveTo(100, 225);
+                rightClick();
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_ENTER); /* remove */
+                confirmRemove();
+                checkVMTest(vmTest, 3.02, name);
+            }
+
             /* disk readonly */
             moveTo(56, 201); /* popup */
             leftClick();
@@ -4091,7 +4120,7 @@ public final class RoboTest {
             }
 
             if (!"lxc".equals(type)) {
-                moveTo(390, 545); /* readonly */
+                moveTo(390, 485); /* readonly */
                 sleep(1000);
                 leftClick();
                 sleep(1000);
@@ -4100,7 +4129,11 @@ public final class RoboTest {
                 leftClick();
                 checkVMTest(vmTest, 3.1, name);
                 sleep(1000);
-                moveTo(390, 650); /* readonly */
+		moveTo(1100, 250);
+		leftPress(); /* scroll bar */
+		moveTo(1100, 502);
+		leftRelease();
+                moveTo(390, 485); /* readonly */
                 sleep(1000);
                 leftClick();
 
