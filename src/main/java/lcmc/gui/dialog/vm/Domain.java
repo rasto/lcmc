@@ -119,7 +119,7 @@ public final class Domain extends VMConfig {
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
         final boolean ch = vdi.checkResourceFieldsChanged(null, PARAMS);
         final boolean cor = vdi.checkResourceFieldsCorrect(null, PARAMS);
-        if (cor) {
+        if (cor || nextDialogObject != null) {
             enableComponents();
         } else {
             /* don't enable */
