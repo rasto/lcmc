@@ -947,6 +947,7 @@ public final class Host {
         if (ssh.isConnected()) {
             ssh.forceDisconnect();
         }
+        setVMInfoMD5(null);
     }
 
     /**
