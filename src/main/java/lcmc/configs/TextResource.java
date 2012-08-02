@@ -356,9 +356,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          + "components are already installed. If not, you can press "
          + "one of the 'Install' buttons to install them. You can check "
          + "for DRBD upgrade as well if installed DRBD was detected.<br>"
-         + "You can also choose a <b>Pacemaker</b> installation method. "
-         + "The newest packages for many different distributions are in "
-         + "Clusterlabs repositories."},
+         + "You can also choose a <b>Pacemaker</b> installation method. "},
 
         {"Dialog.Host.CheckInstallation.Drbd.NotInstalled",
          "DRBD is not installed. Click 'Install' button to install a new "
