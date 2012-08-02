@@ -552,6 +552,7 @@ public final class RoboTest {
                         }
                     }
                 } else if ("Storage (DRBD, LVM)".equals(selected)) {
+                    Tools.getGUIData().expandTerminalSplitPane(1);
                     if ("0".equals(index)) {
                         /* all DRBD tests */
                         int i = 1;
@@ -662,7 +663,7 @@ public final class RoboTest {
                         }
                     }
                 } else if ("VMs (KVM, Xen)".equals(selected)) {
-                    if ("1".equals(index) || "x1".equals(index)) {
+                    if ("1".equals(index)) {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
@@ -676,13 +677,10 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("2".equals(index) || "x2".equals(index)) {
+                    } else if ("2".equals(index)) {
                         /* VMs */
                         int i = 1;
                         String testIndex = "1";
-                        if (index.charAt(0) == 'x') {
-                            testIndex = "x1";
-                        }
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -698,9 +696,6 @@ public final class RoboTest {
                         /* VMs */
                         int i = 1;
                         String testIndex = "1";
-                        if (index.charAt(0) == 'x') {
-                            testIndex = "x1";
-                        }
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -1027,21 +1022,27 @@ public final class RoboTest {
         addConstraint(gx, gy - 30, 1, true);
         checkTest(testName, 3.1); /* 3.1 */
 
-        /* move up, move down */
-        for (int i = 0; i < 2; i++) {
-            moveTo(137, 281);
-            rightClick();
-            sleep(1000);
-            moveTo(221, 430);
-            leftClick(); /* move res 3 up */
-            sleepNoFactor(2000);
-            checkTest(testName, 3.11); /* 3.11 */
-            moveTo(137, 265);
-            rightClick();
-            moveTo(236, 452);
-            leftClick(); /* move res 3 down */
-            sleepNoFactor(2000);
-            checkTest(testName, 3.12); /* 3.12 */
+        try {
+            if (pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
+                /* move up, move down */
+                for (int i = 0; i < 2; i++) {
+                    moveTo(137, 281);
+                    rightClick();
+                    sleep(1000);
+                    moveTo(221, 430);
+                    leftClick(); /* move res 3 up */
+                    sleepNoFactor(2000);
+                    checkTest(testName, 3.11); /* 3.11 */
+                    moveTo(137, 265);
+                    rightClick();
+                    moveTo(236, 452);
+                    leftClick(); /* move res 3 down */
+                    sleepNoFactor(2000);
+                    checkTest(testName, 3.12); /* 3.12 */
+                }
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
         }
 
         /* same as */
@@ -1488,6 +1489,8 @@ public final class RoboTest {
         press(KeyEvent.VK_DOWN);
         sleep(500);
         press(KeyEvent.VK_ENTER); /* start selected resources */
+        moveTo(700, 520); /* reset selection */
+        leftClick();
         checkTest(testName, 28.4);
 
         stopResource(ipX, ipY, 0);
@@ -2097,14 +2100,6 @@ public final class RoboTest {
         final int dummy1Y = 207;
         disableStonith();
         String testName = "testB";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
-        try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
-                testName = "testB-1.0";
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -2130,14 +2125,6 @@ public final class RoboTest {
         final int statefulY = 207;
         disableStonith();
         String testName = "testC";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
-        try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
-                testName = "testC-1.0";
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -2257,15 +2244,7 @@ public final class RoboTest {
         final int gy = 207;
         disableStonith();
         String testName = "testF";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         final String distro = cluster.getHostsArray()[0].getDist();
-        try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
-                testName = "testF-1.0";
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         checkTest(testName, 1);
         /* group with dummy resources */
         moveTo(gx, gy);
@@ -2888,14 +2867,6 @@ public final class RoboTest {
         aborted = false;
         disableStonith();
         String testName = "test3";
-        final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
-        try {
-            if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
-                testName = "test3-1.0";
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -3006,7 +2977,7 @@ public final class RoboTest {
         int yCor = 0;
         try {
             if (Tools.compareVersions(
-                                System.getProperty("java.version"), "1.7") >= 0) {
+                            System.getProperty("java.version"), "1.0.8") >= 0) {
                 yCor = -5;
             }
         } catch (Exceptions.IllegalVersionException e) {
@@ -3961,7 +3932,7 @@ public final class RoboTest {
                 /* source file */
                 dialogColorTest("source file");
 
-                moveTo(593, 392);
+                moveTo(593, 400);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -4024,6 +3995,7 @@ public final class RoboTest {
             sleep(4000);
             leftClick();
             checkVMTest(vmTest, 2, name);
+            sleep(8000);
 
             if (cluster.getHosts().size() > 1) {
                 for (int i = 0; i < 3; i ++) {
@@ -4094,7 +4066,16 @@ public final class RoboTest {
                 leftClick(); /* block device */
                 moveTo(510, 390);
                 leftClick();
-                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_SLASH);
+                press(KeyEvent.VK_D);
+                press(KeyEvent.VK_E);
+                press(KeyEvent.VK_V);
+
+                press(KeyEvent.VK_SLASH);
+                press(KeyEvent.VK_S);
+                press(KeyEvent.VK_D);
+                press(KeyEvent.VK_A);
+                press(KeyEvent.VK_1);
                 press(KeyEvent.VK_ENTER);
                 moveTo(240, 130);
                 leftClick(); /* apply */
@@ -4106,7 +4087,7 @@ public final class RoboTest {
                 press(KeyEvent.VK_DOWN);
                 press(KeyEvent.VK_ENTER); /* remove */
                 confirmRemove();
-                checkVMTest(vmTest, 3.02, name);
+                checkVMTest(vmTest, 3, name);
             }
 
             /* disk readonly */

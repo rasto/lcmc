@@ -1960,6 +1960,59 @@ sub get_vm_info {
 	return $ret;
 }
 
+sub gui_test_compare {
+	my $testfile_part = shift;
+	my $realconf = shift;
+	my $testfile;
+	my $test = "";
+	my $try = 1;
+	$realconf =~ s/^\s+//;
+	$realconf =~ s/\s+$//;
+	my $diff = "";
+	do {
+
+		if ($try > 1) {
+			$testfile = "$testfile_part-$try";
+		} else {
+			$testfile = $testfile_part;
+		}
+		my $notestfile;
+		if (!open TEST, $testfile) {
+			print "$!";
+			# .new can be used for new tests.
+			open TEST, ">$testfile.new" or print "$!";
+			print TEST $test;
+			close TEST;
+			$notestfile++;
+		} else {
+			{
+				local $/;
+				$test = <TEST>;
+				$test =~ s/^\s+//;
+				$test =~ s/\s+$//;
+			}
+			close TEST;
+		}
+		open TEST, ">$testfile.error" or print "$!";
+		print TEST $realconf;
+		close TEST;
+		open TEST, ">$testfile.error.file" or print "$!";
+		print TEST $test;
+		close TEST;
+		$diff .= `diff -u $testfile.error.file $testfile.error`."\n";
+		$try++;
+	} until ($realconf eq $test || ! -e "$testfile_part-$try");
+	if ($realconf eq $test) {
+		print "ok ";
+	} else {
+		print "error\n";
+		print "-------------\n";
+		print $diff;
+		exit 1;
+	}
+}
+
+
 sub gui_test {
 	my $testname = shift;
 	my $index = shift;
@@ -2052,82 +2105,14 @@ sub gui_test {
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
 	$status =~ s/\s+\(.*?\)(: standby)/$1/g;
-	my $testfile = "/tmp/lcmc-test/$testname/test$index.crm";
-	my $test = "";
-	my $notestfile;
-	if (!open TEST, $testfile) {
-		print "$!";
-		# .new can be used for new tests.
-		open TEST, ">$testfile.new" or print "$!";
-		print TEST $cib;
-		close TEST;
-		$notestfile++;
-	} else {
-		{
-			local $/;
-			$test = <TEST>;
-		}
-		close TEST;
+	$cib =~ s/\s*\n\s*attributes standby="off"\s*/\n/g;
+	$cib =~ s/^(node host)\s+$/$1/gm;
+      	if (pcmk_version_smaller_than("1.1.6")) {
+	      $status =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;
 	}
-	my $statustestfile = "/tmp/lcmc-test/$testname/status$index.crm";
-	my $statustest = "";
-	my $nostatusfile;
-	if (!open STTEST, $statustestfile) {
-		print "$!";
-		open STTEST, ">$statustestfile.new" or print "$!";
-		print STTEST $status;
-		close STTEST;
-		$nostatusfile++;
-	} else {
-		{
-			local $/;
-			$statustest = <STTEST>;
-		}
-		close STTEST;
-	}
-	if ($nostatusfile || $notestfile) {
-		exit 10;
-	}
-	for ($test, $statustest) {
-		s/\\$//mg;
-		s/^\s+//;
-		s/\s+$//;
-	}
-	if (pcmk_version_smaller_than("1.1.5")) {
-		$statustest =~ s/(Clone Set:.*?)\s+\[.*\]/$1/g;
-	}
-	for ($cib, $test) {
-		s/\s*\n\s*attributes standby="off"\s*/\n/g;
-	}
-	if ($hb_version eq "2.1.3" || $hb_version eq "2.1.4") {
-		print "na ";
-	} elsif ($cib eq $test) {
-		print "ok ";
-	} else {
-		open TEST, ">$testfile.error" or print "$!";
-		print TEST $cib;
-		close TEST;
-		my $diff = `diff -ub $testfile $testfile.error`;
-		print "error\n";
-		print "-------------\n";
-		print $diff;
-		exit 1;
-	}
-	for ($status, $statustest) {
-		s/\s+$//;
-	}
-	if ($status eq $statustest) {
-		print "ok";
-	} else {
-		open STTEST, ">$statustestfile.error" or print "$!";
-		print STTEST $status;
-		close STTEST;
-		my $diff = `diff -ub $statustestfile $statustestfile.error`;
-		print "error\n";
-		print "-------------\n";
-		print $diff;
-		exit 2;
-	}
+
+	gui_test_compare("/tmp/lcmc-test/$testname/test$index.crm", $cib);
+	gui_test_compare("/tmp/lcmc-test/$testname/status$index.crm", $status);
 }
 
 sub gui_vm_test {
@@ -2147,40 +2132,7 @@ sub gui_vm_test {
 	$xml =~ s/$name/\@NAME@/gm;
 	$xml =~ s/^(\s*<mac address=')[^']+/$1MAC/gm;
 	$xml =~ s/^(\s*<type arch=')[^']+('\s+machine=')[^']+/$1ARCH$2MACHINE/gm;
-	$xml =~ s/^\s+//;
-	$xml =~ s/\s+$//;
-
-	my $testfile = "/tmp/lcmc-test/$testname/domain.xml$index";
-	my $test = "";
-	my $notestfile;
-	if (!open TEST, $testfile) {
-		print "$!";
-		# .new can be used for new tests.
-		open TEST, ">$testfile.new" or print "$!";
-		print TEST $test;
-		close TEST;
-		$notestfile++;
-	} else {
-		{
-			local $/;
-			$test = <TEST>;
-			$test =~ s/^\s+//;
-			$test =~ s/\s+$//;
-		}
-		close TEST;
-	}
-	if ($xml eq $test) {
-		print "ok ";
-	} else {
-		open TEST, ">$testfile.error" or print "$!";
-		print TEST $xml;
-		close TEST;
-		my $diff = `diff -u $testfile $testfile.error`;
-		print "error\n";
-		print "-------------\n";
-		print $diff;
-		exit 1;
-	}
+	gui_test_compare("/tmp/lcmc-test/$testname/domain.xml$index", $xml);
 }
 
 sub gui_drbd_test {
@@ -2244,67 +2196,8 @@ sub gui_drbd_test {
 	$conf =~ s/^(\s+address\s+)[^:]+/$1IP/mg;
 	my $libdir = get_hb_lib_path();
 	$conf =~ s/$libdir/LIBDIR/g;
-
-	my $testfile = "/tmp/lcmc-test/$testname/drbd.conf$index";
-	my $test = "";
-	my $notestfile;
-	if (!open TEST, $testfile) {
-		print "$!";
-		# .new can be used for new tests.
-		open TEST, ">$testfile.new" or print "$!";
-		print TEST $conf;
-		close TEST;
-		$notestfile++;
-	} else {
-		{
-			local $/;
-			$test = <TEST>;
-		}
-		close TEST;
-	}
-	my $statustestfile = "/tmp/lcmc-test/$testname/proc$index";
-	my $statustest = "";
-	my $nostatusfile;
-	if (!open STTEST, $statustestfile) {
-		print "$!";
-		open STTEST, ">$statustestfile.new" or print "$!";
-		print STTEST $proc;
-		close STTEST;
-		$nostatusfile++;
-	} else {
-		{
-			local $/;
-			$statustest = <STTEST>;
-		}
-		close STTEST;
-	}
-	if ($nostatusfile || $notestfile) {
-		exit 10;
-	}
-	if ($conf eq $test) {
-		print "ok ";
-	} else {
-		open TEST, ">$testfile.error" or print "$!";
-		print TEST $conf;
-		close TEST;
-		my $diff = `diff -u $testfile $testfile.error`;
-		print "error\n";
-		print "-------------\n";
-		print $diff;
-		exit 1;
-	}
-	if ($proc eq $statustest) {
-		print "ok";
-	} else {
-		open STTEST, ">$statustestfile.error" or print "$!";
-		print STTEST $proc;
-		close STTEST;
-		my $diff = `diff -u $statustestfile $statustestfile.error`;
-		print "error\n";
-		print "-------------\n";
-		print $diff;
-		exit 2;
-	}
+	gui_test_compare("/tmp/lcmc-test/$testname/drbd.conf$index", $conf);
+	gui_test_compare("/tmp/lcmc-test/$testname/proc$index", $proc);
 }
 
 sub get_proc_drbd {
