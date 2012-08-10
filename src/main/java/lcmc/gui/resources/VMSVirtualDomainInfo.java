@@ -3674,12 +3674,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host host : getBrowser().getClusterHosts()) {
             final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
                                                                host.getName());
-            final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
-                                               WIZARD_PREFIX + host.getName());
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    wizardHostCB.setEnabled(false);
+                    final GuiComboBox wizardHostCB =
+                                          definedOnHostComboBoxHash.get(
+                                               WIZARD_PREFIX + host.getName());
+                    if (wizardHostCB != null) {
+                        wizardHostCB.setEnabled(false);
+                    }
                 }
             });
             final String value =
@@ -3809,10 +3812,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             public void run() {
                 for (final Host host : getBrowser().getClusterHosts()) {
                     final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
-                                                                       host.getName());
-                    final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
-                                                       WIZARD_PREFIX + host.getName());
-                    wizardHostCB.setEnabled(true);
+                                                               host.getName());
+                    final GuiComboBox wizardHostCB =
+                                            definedOnHostComboBoxHash.get(
+                                               WIZARD_PREFIX + host.getName());
+                    if (wizardHostCB != null) {
+                        wizardHostCB.setEnabled(true);
+                    }
                 }
             }
         });
