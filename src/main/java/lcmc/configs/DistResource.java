@@ -377,7 +377,9 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "/sbin/modprobe drbd"},
 
         {"HostBrowser.getCrmMon",
-         SUDO + "/usr/sbin/crm_mon -1Arfn"},
+         SUDO + "/usr/sbin/crm_mon -1Arfn 2>/dev/null"
+         + " || " + SUDO + "/usr/sbin/crm_mon -1rfn 2>/dev/null"
+         + " || " + SUDO + "/usr/sbin/crm_mon -1rn"},
         {"HostBrowser.getCrmConfigureShow",
          SUDO + "PAGER=cat /usr/sbin/crm configure show"},
 
