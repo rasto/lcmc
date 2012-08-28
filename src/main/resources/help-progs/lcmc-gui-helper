@@ -283,7 +283,7 @@ sub get_net_info {
 	my $mask = "";
 	my $bridges = get_bridges();
 	my $out = "";
-	for (`/sbin/ifconfig`) {
+	for (`ifconfig`) {
 		if (!$dev) {
 			($dev) = /^(.*?)(:?\s|:)/ or net_info_error("no dev");
 			next if $dev eq "lo";
