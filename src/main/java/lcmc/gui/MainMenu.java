@@ -94,8 +94,8 @@ public final class MainMenu extends JPanel implements ActionListener {
 
         final JMenuItem cmi = addMenuItem(Tools.getString("MainMenu.Cluster"),
                                           menuNew,
-                                          KeyEvent.VK_C,
-                                          KeyEvent.VK_C,
+                                          0,
+                                          0,
                                           newClusterActionListener(),
                                           ClusterBrowser.CLUSTER_ICON_SMALL);
 
@@ -176,6 +176,22 @@ public final class MainMenu extends JPanel implements ActionListener {
                         null);
         }
         submenu.add(menuLookAndFeel);
+        menuBar.add(submenu);
+
+        /* Edit */
+        submenu = addMenu(Tools.getString("MainMenu.Edit"), KeyEvent.VK_E);
+        addMenuItem(Tools.getString("MainMenu.Copy"),
+                    submenu,
+                    KeyEvent.VK_O,
+                    KeyEvent.VK_C,
+                    copyActionListener(),
+                    null);
+        addMenuItem(Tools.getString("MainMenu.Paste"),
+                    submenu,
+                    KeyEvent.VK_P,
+                    KeyEvent.VK_V,
+                    pasteActionListener(),
+                    null);
         menuBar.add(submenu);
 
         /* help */
@@ -422,6 +438,39 @@ public final class MainMenu extends JPanel implements ActionListener {
         };
     }
 
+    /** Copy action listener. */
+    private ActionListener copyActionListener() {
+        return new ActionListener() {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
+                 System.out.println(":copy");
+                 final Thread t = new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         Tools.getGUIData().copy();
+                     }
+                 });
+                 t.start();
+             }
+        };
+    }
+
+    /** Paste action listener. */
+    private ActionListener pasteActionListener() {
+        return new ActionListener() {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
+                 final Thread t = new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         Tools.getGUIData().paste();
+                     }
+                 });
+                 t.start();
+             }
+        };
+    }
+
     /** About action listener. */
     private ActionListener aboutActionListener() {
         return new ActionListener() {
@@ -474,7 +523,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         if (accelerator != 0) {
             item.setAccelerator(KeyStroke.getKeyStroke(
                                     accelerator,
-                                    ActionEvent.ALT_MASK));
+                                    ActionEvent.CTRL_MASK));
         }
         if (al == null) {
             item.addActionListener(this);

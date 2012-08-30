@@ -1998,5 +1998,4 @@ public final class HeartbeatGraph extends ResourceGraph {
                                                         getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
-
 }

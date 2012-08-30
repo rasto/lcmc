@@ -76,6 +76,15 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"MainMenu.Help",
          "Help"},
 
+        {"MainMenu.Edit",
+         "Edit"},
+
+        {"MainMenu.Copy",
+         "Copy"},
+
+        {"MainMenu.Paste",
+         "Paste"},
+
         {"MainMenu.About",
          "About"},
 

@@ -23,6 +23,7 @@
 package lcmc.gui;
 
 import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.Info;
 import lcmc.data.Cluster;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -111,6 +112,8 @@ public final class GUIData  {
      */
     private final List<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
+    /** Selected components for copy/paste. */
+    private List<Info> selectedComponents = null;
 
     /** Sets main frame of this application. */
     public void setMainFrame(final Container mainFrame) {
@@ -533,5 +536,44 @@ public final class GUIData  {
             }
         }
         return bdis;
+    }
+
+    private ResourceGraph getSelectedGraph() {
+        final ClustersPanel csp = clustersPanel;
+        if (csp == null) {
+            return null;
+        }
+        final ClusterTab selected = csp.getClusterTab();
+        if (selected == null) {
+            return null;
+        }
+        //TODO: or drbd
+        final Cluster c = selected.getCluster();
+        if (c == null) {
+            return null;
+        }
+        return c.getBrowser().getHeartbeatGraph();
+    }
+
+    /** Copy / paste function. */
+    public void copy() {
+        System.out.println("copy");
+        final ResourceGraph g = getSelectedGraph();
+        if (g == null) {
+            return;
+        }
+        selectedComponents = g.getSelectedComponents();
+    }
+
+    /** Copy / paste function. */
+    public void paste() {
+        System.out.println("paste");
+        final List<Info> scs = selectedComponents;
+        if (scs == null) {
+            return;
+        }
+        for (final Info sc : scs) {
+            System.out.println("paste: " + sc);
+        }
     }
 }
