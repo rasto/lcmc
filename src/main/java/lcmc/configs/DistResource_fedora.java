@@ -107,7 +107,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + "/usr/bin/yum -y install autoconf automake libtool glib2-devel"
          + " libxml2-devel bzip2-devel libtool-ltdl-devel e2fsprogs-devel"
          + " net-snmp-devel subversion libxslt-devel libuuid-devel wget git"
-         + " mercurial nss-devel"
+         + " mercurial nss-devel libaio-devel libqb-devel"
          + " && /bin/mkdir -p /tmp/pminst "
          /* cluster glue */
          + " && cd /tmp/pminst/"
@@ -128,7 +128,24 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " && ./autogen.sh && ./configure"
          + " --sysconfdir=/etc --localstatedir=/var"
          + " && make && make install"
-         /* corosync */
+         ///* corosync 2.0 */
+         //+ " && cd /tmp/pminst"
+         //+ " && git clone https://github.com/corosync/corosync.git"
+         //+ " && cd corosync"
+         //+ " && ./autogen.sh"
+         //+ " && ./configure --prefix=/usr"
+         //+ " && make"
+         //+ " && make install"
+
+         //+ " && cp init/corosync /etc/init.d/corosync"
+         //+ " && chmod a+x /etc/init.d/corosync"
+         //+ " && (groupadd ais;"
+         //+ " useradd -g ais --shell /bin/false ais;"
+         //+ " groupadd haclient;"
+         //+ " useradd -g haclient --shell /bin/false hacluster;"
+         //+ " true)"
+
+         /* corosync 1.4 */
          + " && cd /tmp/pminst"
          + " && export CORO_VERSION=1.4.2"
          + " && /usr/bin/wget"
@@ -153,6 +170,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + " && cd /tmp/pminst"
          + " && git clone https://github.com/ClusterLabs/pacemaker"
          + " && cd /tmp/pminst/pacemaker"
+         + " && git checkout Pacemaker-1.1.7"
          + " && ./autogen.sh"
          + " && ./configure --with-acl=yes --with-lcrso-dir=$LCRSODIR"
          + " --with-ais --sysconfdir=/etc --localstatedir=/var"
