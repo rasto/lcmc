@@ -1,16 +1,16 @@
 /*
- * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
+ * This file is part of Linux Cluster Management Console
  * written by Rasto Levrinc.
  *
  * Copyright (C) 2011, Rastislav Levrinc
  * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
  *
- * DRBD Management Console is free software; you can redistribute it and/or
+ * LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * DRBD Management Console is distributed in the hope that it will be useful,
+ * LCMC is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -515,11 +515,11 @@ public final class LCMC extends JPanel {
             autoArgs = cmd.getOptionValue(AUTO_OP);
             if (cmd.hasOption(HELP_OP)) {
                 final HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("java -jar DMC.jar [OPTIONS]", options);
+                formatter.printHelp("java -jar LCMC.jar [OPTIONS]", options);
                 System.exit(0);
             }
             if (cmd.hasOption(VERSION_OP)) {
-                System.out.println("MANAGEMENT CONSOLE "
+                System.out.println("LINUX CLUSTER MANAGEMENT CONSOLE "
                                    + Tools.getRelease()
                                    + " by Rasto Levrinc");
                 System.exit(0);
