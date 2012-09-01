@@ -729,6 +729,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 || DiskData.TARGET_BUS_TYPE.equals(param)) {
                 paramCB.setAlwaysEditable(false);
             } else if (DiskData.SOURCE_DEVICE.equals(param)) {
+                paramCB.setAlwaysEditable(true);
                 if (prefix == null) {
                     sourceDeviceCB.put("", paramCB);
                 } else {
