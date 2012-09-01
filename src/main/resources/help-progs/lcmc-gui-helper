@@ -47,6 +47,8 @@ our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
 our $VIRSH_COMMAND = "/usr/bin/virsh -r";
 
+our $PROC_DRBD = "/proc/drbd";
+
 
 my $option = shift || die;
 
@@ -823,7 +825,7 @@ sub get_drbd_events {
 }
 
 sub do_drbd_events {
-	if (! -e "/proc/drbd") {
+	if (! -e $PROC_DRBD) {
 	       print "--nm--\n";
 	       return;
 	}
@@ -1781,8 +1783,7 @@ sub get_cluster_versions {
 	my $pcmk_running_cmd = is_running($pcmk_script, $pcmk_prog);
 	my $pcmk_running =
 		system("$pcmk_running_cmd >/dev/null 2>&1") >> 8 || "on";
-	my $drbd_loaded =
-		system("/sbin/lsmod |grep -q '\\<drbd\\>'") >> 8 || "on";
+	my $drbd_loaded = (! -e $PROC_DRBD) || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf >/dev/null 2>&1") >> 8 || "on";
 	my $cs_ais_conf;
 	if ($cs_version) {
