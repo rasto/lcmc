@@ -2186,6 +2186,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Os.Boot",
          "Boot Device"},
 
+        {"VMSVirtualDomainInfo.Short.Os.Boot.2",
+         "2nd Boot Device"},
+
         {"VMSVirtualDomainInfo.Short.Os.Loader",
          "Loader"},
 

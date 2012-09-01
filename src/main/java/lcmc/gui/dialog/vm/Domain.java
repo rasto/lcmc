@@ -58,6 +58,7 @@ public final class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_VCPU,
                                             VMSXML.VM_PARAM_CURRENTMEMORY,
                                             VMSXML.VM_PARAM_BOOT,
+                                            VMSXML.VM_PARAM_BOOT_2,
                                             VMSXML.VM_PARAM_LOADER,
                                             VMSXML.VM_PARAM_TYPE,
                                             VMSXML.VM_PARAM_INIT,

@@ -153,8 +153,14 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_CURRENTMEMORY = "currentMemory";
     /** VM field: memory. */
     public static final String VM_PARAM_MEMORY = "memory";
+    /** VM node: os-boot. */
+    public static final String OS_BOOT_NODE = "boot";
+    /** VM node: os-boot dev attribute. */
+    public static final String OS_BOOT_NODE_DEV = "dev";
     /** VM field: os-boot. */
     public static final String VM_PARAM_BOOT = "boot";
+    /** VM field: os-boot 2. */
+    public static final String VM_PARAM_BOOT_2 = "boot2";
     /** VM field: loader. */
     public static final String VM_PARAM_LOADER = "loader";
     /** VM field: autostart. */
@@ -648,12 +654,21 @@ public final class VMSXML extends XML {
             initNode.appendChild(doc.createTextNode(init));
         }
         final Element bootNode = (Element) osNode.appendChild(
-                                                  doc.createElement("boot"));
+                                              doc.createElement(OS_BOOT_NODE));
+        bootNode.setAttribute(OS_BOOT_NODE_DEV,
+                              parametersMap.get(VM_PARAM_BOOT));
+        final String bootDev2 = parametersMap.get(VM_PARAM_BOOT_2);
+        if (bootDev2 != null && !"".equals(bootDev2)) {
+            final Element bootNode2 = (Element) osNode.appendChild(
+                                              doc.createElement(OS_BOOT_NODE));
+            bootNode2.setAttribute(OS_BOOT_NODE_DEV,
+                                   parametersMap.get(VM_PARAM_BOOT_2));
+        }
+
         final Node loaderNode = (Element) osNode.appendChild(
                                                   doc.createElement("loader"));
         loaderNode.appendChild(doc.createTextNode(
                                           parametersMap.get(VM_PARAM_LOADER)));
-        bootNode.setAttribute("dev", parametersMap.get(VM_PARAM_BOOT));
 
         /* features */
         addFeatures(doc, root, parametersMap);
@@ -718,6 +733,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_VCPU, "vcpu");
         paths.put(VM_PARAM_BOOTLOADER, "bootloader");
         paths.put(VM_PARAM_BOOT, "os/boot");
+        paths.put(VM_PARAM_BOOT_2, "os/boot");
         paths.put(VM_PARAM_TYPE, "os/type");
         paths.put(VM_PARAM_TYPE_ARCH, "os/type");
         paths.put(VM_PARAM_TYPE_MACHINE, "os/type");
@@ -732,6 +748,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
         paths.put(VM_PARAM_ON_CRASH, "on_crash");
         paths.put(VM_PARAM_EMULATOR, "devices/emulator");
+        final Document doc = domainNode.getOwnerDocument();
         try {
             for (final String param : parametersMap.keySet()) {
                 final String path = paths.get(param);
@@ -742,7 +759,16 @@ public final class VMSXML extends XML {
                                                    path,
                                                    domainNode,
                                                    XPathConstants.NODESET);
-                final Element node = (Element) nodes.item(0);
+                Element node = (Element) nodes.item(0);
+                if (VM_PARAM_BOOT_2.equals(param)) {
+                    if (nodes.getLength() > 1) {
+                        node = (Element) nodes.item(1);
+                    } else {
+                        final Node prevNode = (Element) nodes.item(0);
+                        node = (Element) prevNode.getParentNode().appendChild(
+                                              doc.createElement(OS_BOOT_NODE));
+                    }
+                }
                 if (node == null) {
                     continue;
                 }
@@ -759,7 +785,13 @@ public final class VMSXML extends XML {
                     || VM_PARAM_HAP.equals(param)) {
                     domainNode.removeChild(node);
                 } else if (VM_PARAM_BOOT.equals(param)) {
-                    node.setAttribute("dev", value);
+                    node.setAttribute(OS_BOOT_NODE_DEV, value);
+                } else if (VM_PARAM_BOOT_2.equals(param)) {
+                    if (value == null || "".equals(value)) {
+                        node.getParentNode().removeChild(node);
+                    } else {
+                        node.setAttribute(OS_BOOT_NODE_DEV, value);
+                    }
                 } else if (VM_PARAM_TYPE_ARCH.equals(param)) {
                     node.setAttribute("arch", value);
                 } else if (VM_PARAM_TYPE_MACHINE.equals(param)) {
@@ -776,19 +808,14 @@ public final class VMSXML extends XML {
                 } else {
                     final Node n = getChildNode(node, "#text");
                     if (n == null) {
-                        node.appendChild(
-                            node.getOwnerDocument().createTextNode(value));
+                        node.appendChild(doc.createTextNode(value));
                     } else {
                         n.setNodeValue(value);
                     }
                 }
             }
-            addCPUMatchNode(domainNode.getOwnerDocument(),
-                            domainNode,
-                            parametersMap);
-            addFeatures(domainNode.getOwnerDocument(),
-                        domainNode,
-                        parametersMap);
+            addCPUMatchNode(doc, domainNode, parametersMap);
+            addFeatures(doc, domainNode, parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return null;
@@ -1326,12 +1353,22 @@ public final class VMSXML extends XML {
                                     Tools.convertKilobytes(getText(option)));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
+                int bootOption = 0;
                 for (int j = 0; j < osOptions.getLength(); j++) {
                     final Node osOption = osOptions.item(j);
-                    if (VM_PARAM_BOOT.equals(osOption.getNodeName())) {
-                        parameterValues.put(name,
-                                            VM_PARAM_BOOT,
-                                            getAttribute(osOption, "dev"));
+                    if (OS_BOOT_NODE.equals(osOption.getNodeName())) {
+                        if (bootOption == 0) {
+                            parameterValues.put(
+                                    name,
+                                    VM_PARAM_BOOT,
+                                    getAttribute(osOption, OS_BOOT_NODE_DEV));
+                        } else {
+                            parameterValues.put(
+                                    name,
+                                    VM_PARAM_BOOT_2,
+                                    getAttribute(osOption, OS_BOOT_NODE_DEV));
+                        }
+                        bootOption++;
                     } else if (VM_PARAM_LOADER.equals(osOption.getNodeName())) {
                         parameterValues.put(name,
                                             VM_PARAM_LOADER,

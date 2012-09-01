@@ -261,6 +261,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_MEMORY,
                                     VMSXML.VM_PARAM_BOOTLOADER,
                                     VMSXML.VM_PARAM_BOOT,
+                                    VMSXML.VM_PARAM_BOOT_2,
                                     VMSXML.VM_PARAM_LOADER,
                                     VMSXML.VM_PARAM_AUTOSTART,
                                     VMSXML.VM_PARAM_TYPE,
@@ -461,6 +462,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_MEMORY,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOTLOADER,    VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_BOOT,          VIRTUAL_SYSTEM_STRING);
+        SECTION_MAP.put(VMSXML.VM_PARAM_BOOT_2,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_LOADER,        VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_AUTOSTART,     VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, VIRTUAL_SYSTEM_STRING);
@@ -513,6 +515,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_BOOT,
                    Tools.getString("VMSVirtualDomainInfo.Short.Os.Boot"));
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_BOOT_2,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Os.Boot.2"));
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_LOADER,
                    Tools.getString("VMSVirtualDomainInfo.Short.Os.Loader"));
@@ -612,6 +617,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, "");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, DOMAIN_TYPE_KVM);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
@@ -633,6 +639,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         // TODO: no virsh command for os-boot
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT,
                            new StringInfo[]{
+                                      new StringInfo("Hard Disk",
+                                                     "hd",
+                                                     null),
+                                      new StringInfo("Network (PXE)",
+                                                     "network",
+                                                     null),
+                                      new StringInfo("CD-ROM",
+                                                     "cdrom",
+                                                     null),
+                                      new StringInfo("Floppy",
+                                                     "fd",
+                                                     null)});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT_2,
+                           new StringInfo[]{
+                                      null,
                                       new StringInfo("Hard Disk",
                                                      "hd",
                                                      null),
@@ -5008,7 +5029,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                            final int width) {
         final GuiComboBox paramCB =
                                  super.getParamComboBox(param, prefix, width);
-        if (VMSXML.VM_PARAM_BOOT.equals(param)) {
+        if (VMSXML.VM_PARAM_BOOT.equals(param)
+            || VMSXML.VM_PARAM_BOOT_2.equals(param)) {
             paramCB.setAlwaysEditable(false);
         }
         return paramCB;
