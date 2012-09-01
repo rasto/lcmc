@@ -207,6 +207,8 @@ public final class VMSXML extends XML {
     public static final String NET_PARAM_UUID = "uuid";
     /** Network field: autostart. */
     public static final String NET_PARAM_AUTOSTART = "autostart";
+    /** Auto generated disk address. . */
+    public static final String HW_ADDRESS = "address";
     /** Map from paramater to its xml tag. */
     public static final Map<String, String> INTERFACE_TAG_MAP =
                                              new HashMap<String, String>();
@@ -874,6 +876,11 @@ public final class VMSXML extends XML {
                     }
                 }
             }
+            final Element hwAddressNode = (Element) getChildNode(hwNode,
+                                                                 HW_ADDRESS);
+            if (hwAddressNode != null) {
+                hwNode.removeChild(hwAddressNode);
+            }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return;
@@ -1531,7 +1538,7 @@ public final class VMSXML extends XML {
                                 readonly = true;
                             } else if ("shareable".equals(nodeName)) {
                                 shareable = true;
-                            } else if ("address".equals(nodeName)) {
+                            } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown disk option: "
@@ -1601,7 +1608,7 @@ public final class VMSXML extends XML {
                                 modelType = getAttribute(optionNode, "type");
                             } else if ("script".equals(nodeName)) {
                                 scriptPath = getAttribute(optionNode, "path");
-                            } else if ("address".equals(nodeName)) {
+                            } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown interface option: "
@@ -1625,7 +1632,7 @@ public final class VMSXML extends XML {
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
-                            if ("address".equals(nodeName)) {
+                            if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown sound option: "
@@ -1676,7 +1683,7 @@ public final class VMSXML extends XML {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
                                 targetPort = getAttribute(optionNode, "port");
-                            } else if ("address".equals(nodeName)) {
+                            } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown serial option: "
@@ -1740,7 +1747,7 @@ public final class VMSXML extends XML {
                                 protocolType = getAttribute(optionNode, "type");
                             } else if ("target".equals(nodeName)) {
                                 targetPort = getAttribute(optionNode, "port");
-                            } else if ("address".equals(nodeName)) {
+                            } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown parallel option: "
@@ -1777,7 +1784,7 @@ public final class VMSXML extends XML {
                                 modelType = getAttribute(optionNode, "type");
                                 modelVRAM = getAttribute(optionNode, "vram");
                                 modelHeads = getAttribute(optionNode, "heads");
-                            } else if ("address".equals(nodeName)) {
+                            } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
                                 Tools.appWarning("unknown video option: "
