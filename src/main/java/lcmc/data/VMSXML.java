@@ -760,17 +760,16 @@ public final class VMSXML extends XML {
                                                    domainNode,
                                                    XPathConstants.NODESET);
                 Element node = (Element) nodes.item(0);
+                if (node == null) {
+                    continue;
+                }
                 if (VM_PARAM_BOOT_2.equals(param)) {
                     if (nodes.getLength() > 1) {
                         node = (Element) nodes.item(1);
                     } else {
-                        final Node prevNode = (Element) nodes.item(0);
-                        node = (Element) prevNode.getParentNode().appendChild(
+                        node = (Element) node.getParentNode().appendChild(
                                               doc.createElement(OS_BOOT_NODE));
                     }
-                }
-                if (node == null) {
-                    continue;
                 }
                 String value = parametersMap.get(param);
                 if (VM_PARAM_MEMORY.equals(param)
