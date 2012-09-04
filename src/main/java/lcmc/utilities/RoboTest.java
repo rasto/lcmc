@@ -3463,6 +3463,7 @@ public final class RoboTest {
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
+        Tools.getGUIData().expandTerminalSplitPane(1);
 
         moveTo(970, 432 + correctionY); /* wfc timeout */
         leftClick();
@@ -3475,13 +3476,13 @@ public final class RoboTest {
             correctionYPlus = 20;
         }
 
-        moveTo(940, 615 + correctionY + correctionYPlus); /* max buffers */
+        moveTo(940, 610 + correctionY + correctionYPlus); /* max buffers */
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(1000);
-        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit*/
+        moveTo(1000, 610 + correctionY + correctionYPlus); /* max buffers unit*/
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3489,11 +3490,20 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 500);
+        moveTo(1100, 500);
         leftRelease();
-        moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+        try {
+            if (Tools.compareVersions(cluster.getHostsArray()[0].getDrbdVersion(),
+                                      "8.3.7") <= 0) {
+                moveTo(950, 620 + correctionY + correctionYPlus); /* after */
+            } else {
+                moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3501,9 +3511,9 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER);
         sleep(1000);
 
-        moveTo(1090, 502);
+        moveTo(1100, 502);
         leftPress(); /* scroll bar */
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftRelease();
 
         moveTo(814, 141);
@@ -3576,7 +3586,7 @@ public final class RoboTest {
         press(KeyEvent.VK_5);
         sleep(2000);
 
-        moveTo(950, 615 + correctionY + correctionYPlus); /* max buffers */
+        moveTo(950, 613 + correctionY + correctionYPlus); /* max buffers */
         leftClick();
         sleep(1000);
         leftClick();
@@ -3591,7 +3601,7 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_8);
         sleep(500);
-        moveTo(1000, 615 + correctionY + correctionYPlus); /* max buffers unit*/
+        moveTo(1000, 613 + correctionY + correctionYPlus); /* max buffers unit*/
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -3599,11 +3609,20 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftPress(); /* scroll bar */
-        moveTo(1090, 500);
+        moveTo(1100, 500);
         leftRelease();
-        moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+        try {
+            if (Tools.compareVersions(cluster.getHostsArray()[0].getDrbdVersion(),
+                                      "8.3.7") <= 0) {
+                moveTo(950, 620 + correctionY + correctionYPlus); /* after */
+            } else {
+                moveTo(950, 525 + correctionY + correctionYPlus); /* after */
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -3611,9 +3630,9 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER);
         sleep(1000);
 
-        moveTo(1090, 502);
+        moveTo(1100, 502);
         leftPress(); /* scroll bar */
-        moveTo(1090, 250);
+        moveTo(1100, 250);
         leftRelease();
 
         moveTo(814, 141);
@@ -3838,7 +3857,7 @@ public final class RoboTest {
     private static void startVMTest(final String vmTest,
                                     final String type,
                                     final int count) {
-        slowFactor = 0.5f;
+        slowFactor = 1f;
         aborted = false;
         String name = "dmc";
         final int count2 = 3;
@@ -4052,7 +4071,7 @@ public final class RoboTest {
             sleep(1000);
             checkVMTest(vmTest, 3, name);
 
-            if (j  == 0) {
+            if (j  == 0 && !"lxc".equals(type)) {
                 /* add disk */
                 moveTo(80, 200);
                 rightClick();
@@ -4090,17 +4109,17 @@ public final class RoboTest {
                 checkVMTest(vmTest, 3, name);
             }
 
-            /* disk readonly */
-            moveTo(56, 201); /* popup */
-            leftClick();
-            sleep(1000);
-            press(KeyEvent.VK_DOWN);
-            for (int down = 0; down < j; down++) {
-                sleep(200);
-                press(KeyEvent.VK_DOWN);
-            }
-
             if (!"lxc".equals(type)) {
+                /* disk readonly */
+                moveTo(56, 201); /* popup */
+                leftClick();
+                sleep(1000);
+                press(KeyEvent.VK_DOWN);
+                for (int down = 0; down < j; down++) {
+                    sleep(200);
+                    press(KeyEvent.VK_DOWN);
+                }
+
                 moveTo(390, 485); /* readonly */
                 sleep(1000);
                 leftClick();
@@ -4110,11 +4129,12 @@ public final class RoboTest {
                 leftClick();
                 checkVMTest(vmTest, 3.1, name);
                 sleep(1000);
-		moveTo(1100, 250);
-		leftPress(); /* scroll bar */
-		moveTo(1100, 502);
-		leftRelease();
-                moveTo(390, 485); /* readonly */
+		//moveTo(1100, 250);
+		//leftPress(); /* scroll bar */
+		//moveTo(1100, 502);
+		//leftRelease();
+                Tools.getGUIData().expandTerminalSplitPane(1);
+                moveTo(390, 588); /* readonly */
                 sleep(1000);
                 leftClick();
 

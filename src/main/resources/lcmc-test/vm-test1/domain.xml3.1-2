@@ -26,7 +26,7 @@
       <readonly/>
     </disk>
     <disk type='file' device='cdrom'>
-      <driver name='file' type='raw'/>
+      <driver name='qemu' type='raw'/>
       <source file='/var/lib/libvirt/images/test'/>
       <target dev='hdc' bus='ide'/>
       <readonly/>
