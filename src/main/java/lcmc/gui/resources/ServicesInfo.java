@@ -1945,4 +1945,39 @@ public final class ServicesInfo extends EditableInfo {
         }
         //TODO: should remove new resources and constraints
     }
+
+    public void pasteServices(final List<Info> oldInfos) {
+        for (final Info oldI : oldInfos) {
+            if (oldI instanceof ServiceInfo) {
+                final ServiceInfo oldSI = (ServiceInfo) oldI;
+                System.out.println("paste: " + oldSI);
+                final ServiceInfo newSI =
+                    addServicePanel(oldSI.getResourceAgent(),
+                                    null, /* pos */
+                                    true,
+                                    null,
+                                    null,
+                                    CRM.LIVE);
+                newSI.getInfoPanel();
+                newSI.waitForInfoPanel();
+                for (final String param : oldSI.getParametersFromXML()) {
+                    if (ServiceInfo.GUI_ID.equals(param)
+                        || ServiceInfo.PCMK_ID.equals(param)) {
+                        continue;
+                    }
+                    final GuiComboBox newCB =
+                                          newSI.paramComboBoxGet(param, null);
+                    final GuiComboBox oldCB =
+                                          oldSI.paramComboBoxGet(param, null);
+                    if (newCB != null) {
+                        if (oldCB == null) {
+                            newCB.setValue(oldSI.getParamSaved(param));
+                        } else {
+                            newCB.setValue(oldCB.getStringValue());
+                        }
+                    }
+                }
+            }
+        }
+    } 
 }

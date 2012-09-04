@@ -24,10 +24,13 @@ package lcmc.gui;
 
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.Info;
+import lcmc.gui.resources.ServiceInfo;
+import lcmc.gui.resources.ServicesInfo;
 import lcmc.data.Cluster;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
+import lcmc.utilities.CRM;
 import lcmc.utilities.AllHostsUpdatable;
 
 import javax.swing.JFrame;
@@ -538,6 +541,23 @@ public final class GUIData  {
         return bdis;
     }
 
+    private ServicesInfo getSelectedServicesInfo() {
+        final ClustersPanel csp = clustersPanel;
+        if (csp == null) {
+            return null;
+        }
+        final ClusterTab selected = csp.getClusterTab();
+        if (selected == null) {
+            return null;
+        }
+        //TODO: or drbd
+        final Cluster c = selected.getCluster();
+        if (c == null) {
+            return null;
+        }
+        return c.getBrowser().getServicesInfo();
+    }
+
     private ResourceGraph getSelectedGraph() {
         final ClustersPanel csp = clustersPanel;
         if (csp == null) {
@@ -572,8 +592,10 @@ public final class GUIData  {
         if (scs == null) {
             return;
         }
-        for (final Info sc : scs) {
-            System.out.println("paste: " + sc);
+        final ServicesInfo ssi = getSelectedServicesInfo();
+        if (ssi == null) {
+            return;
         }
+        ssi.pasteServices(scs);
     }
 }
