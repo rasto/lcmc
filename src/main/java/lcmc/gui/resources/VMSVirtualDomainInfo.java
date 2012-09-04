@@ -1748,13 +1748,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final String hostName = h.getName();
-            final MyButton hostBtn = hostButtons.get(h.getName());
-            final MyButton wizardHostBtn =
-                                  hostButtons.get(WIZARD_PREFIX + h.getName());
-            final GuiComboBox hostCB =
-                                    definedOnHostComboBoxHash.get(h.getName());
-            final GuiComboBox wizardHostCB =
-                       definedOnHostComboBoxHash.get(WIZARD_PREFIX + hostName);
+            //final MyButton hostBtn = hostButtons.get(h.getName());
+            //final MyButton wizardHostBtn =
+            //                      hostButtons.get(WIZARD_PREFIX + h.getName());
+            //final GuiComboBox hostCB =
+            //                        definedOnHostComboBoxHash.get(h.getName());
+            //final GuiComboBox wizardHostCB =
+            //           definedOnHostComboBoxHash.get(WIZARD_PREFIX + hostName);
 
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
@@ -1848,10 +1848,20 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         + "</html>";
             }
             mTransitionReadLock.unlock();
-            for (final Host h : getBrowser().getClusterHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                final GuiComboBox hcb =
-                                    definedOnHostComboBoxHash.get(h.getName());
+        }
+        for (final Host h : getBrowser().getClusterHosts()) {
+            final VMSXML vmsxml = getBrowser().getVMSXML(h);
+            final GuiComboBox hcb =
+                                definedOnHostComboBoxHash.get(h.getName());
+            if (hcb != null) {
+                String value;
+                if ((vmsxml != null
+                        && vmsxml.getDomainNames().contains(getDomainName()))) {
+                    value = DEFINED_ON_HOST_TRUE;
+                } else {
+                    value = DEFINED_ON_HOST_FALSE;
+                }
+                hcb.setValue(value);
             }
         }
         for (final String param : getParametersFromXML()) {
