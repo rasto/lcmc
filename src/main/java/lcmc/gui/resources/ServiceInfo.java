@@ -6560,4 +6560,13 @@ public class ServiceInfo extends EditableInfo {
     protected final void setPingComboBox(final GuiComboBox pingComboBox) {
         this.pingComboBox = pingComboBox;
     }
+
+    /** Return operation combo box. */
+    public final GuiComboBox getOperationsComboBox(final String op,
+                                                final String param) {
+        mOperationsComboBoxHashReadLock.lock();
+        final GuiComboBox cb = operationsComboBoxHash.get(op, param);
+        mOperationsComboBoxHashReadLock.unlock();
+        return cb;
+    }
 }

@@ -1950,7 +1950,6 @@ public final class ServicesInfo extends EditableInfo {
         for (final Info oldI : oldInfos) {
             if (oldI instanceof ServiceInfo) {
                 final ServiceInfo oldSI = (ServiceInfo) oldI;
-                System.out.println("paste: " + oldSI);
                 final ServiceInfo newSI =
                     addServicePanel(oldSI.getResourceAgent(),
                                     null, /* pos */
@@ -1958,8 +1957,8 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     null,
                                     CRM.LIVE);
-                newSI.getInfoPanel();
                 newSI.waitForInfoPanel();
+                /* parameters */
                 for (final String param : oldSI.getParametersFromXML()) {
                     if (ServiceInfo.GUI_ID.equals(param)
                         || ServiceInfo.PCMK_ID.equals(param)) {
@@ -1974,6 +1973,19 @@ public final class ServicesInfo extends EditableInfo {
                             newCB.setValue(oldSI.getParamSaved(param));
                         } else {
                             newCB.setValue(oldCB.getStringValue());
+                        }
+                    }
+                }
+                /* operations */
+                for (final String op : oldSI.getResourceAgent().getOperationNames()) {
+                    for (final String param
+                                  : getBrowser().getCRMOperationParams(op)) {
+                        final GuiComboBox oldCB =
+                                        oldSI.getOperationsComboBox(op, param);
+                        final GuiComboBox newCB =
+                                        newSI.getOperationsComboBox(op, param);
+                        if (oldCB != null && newCB != null) {
+                            newCB.setValue( oldCB.getStringValue());
                         }
                     }
                 }
