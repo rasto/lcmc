@@ -443,7 +443,6 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 System.out.println(":copy");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {

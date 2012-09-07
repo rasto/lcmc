@@ -1946,6 +1946,22 @@ public final class ServicesInfo extends EditableInfo {
         //TODO: should remove new resources and constraints
     }
 
+    /**
+     * Copy/paste field from one field to another.
+     */
+    private void copyPasteField(final GuiComboBox oldCB,
+                                final GuiComboBox newCB) {
+        if (newCB == null || oldCB == null) {
+            return;
+        }
+        final String oldValue = oldCB.getStringValue();
+        if ("".equals(oldValue)) {
+            newCB.setValue(null);
+        } else {
+            newCB.setValue(oldValue);
+        }
+    }
+
     public void pasteServices(final List<Info> oldInfos) {
         for (final Info oldI : oldInfos) {
             if (oldI instanceof ServiceInfo) {
@@ -1958,37 +1974,35 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     CRM.LIVE);
                 newSI.waitForInfoPanel();
+
                 /* parameters */
                 for (final String param : oldSI.getParametersFromXML()) {
                     if (ServiceInfo.GUI_ID.equals(param)
                         || ServiceInfo.PCMK_ID.equals(param)) {
                         continue;
                     }
-                    final GuiComboBox newCB =
-                                          newSI.paramComboBoxGet(param, null);
-                    final GuiComboBox oldCB =
-                                          oldSI.paramComboBoxGet(param, null);
-                    if (newCB != null) {
-                        if (oldCB == null) {
-                            newCB.setValue(oldSI.getParamSaved(param));
-                        } else {
-                            newCB.setValue(oldCB.getStringValue());
-                        }
-                    }
+                    copyPasteField(oldSI.paramComboBoxGet(param, null),
+                                   newSI.paramComboBoxGet(param, null));
                 }
+
                 /* operations */
                 for (final String op : oldSI.getResourceAgent().getOperationNames()) {
                     for (final String param
                                   : getBrowser().getCRMOperationParams(op)) {
-                        final GuiComboBox oldCB =
-                                        oldSI.getOperationsComboBox(op, param);
-                        final GuiComboBox newCB =
-                                        newSI.getOperationsComboBox(op, param);
-                        if (oldCB != null && newCB != null) {
-                            newCB.setValue( oldCB.getStringValue());
-                        }
+                        copyPasteField(oldSI.getOperationsComboBox(op, param),
+                                       newSI.getOperationsComboBox(op, param));
                     }
                 }
+
+                /* locations */
+                for (final Host host : getBrowser().getClusterHosts()) {
+                    final HostInfo hi = host.getBrowser().getHostInfo();
+                    copyPasteField(oldSI.getScoreComboBoxHash().get(hi),
+                                   newSI.getScoreComboBoxHash().get(hi));
+                }
+                /* ping */
+                copyPasteField(oldSI.getPingComboBox(),
+                               newSI.getPingComboBox());
             }
         }
     } 

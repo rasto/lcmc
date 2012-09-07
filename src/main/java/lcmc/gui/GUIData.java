@@ -577,7 +577,6 @@ public final class GUIData  {
 
     /** Copy / paste function. */
     public void copy() {
-        System.out.println("copy");
         final ResourceGraph g = getSelectedGraph();
         if (g == null) {
             return;
@@ -587,7 +586,6 @@ public final class GUIData  {
 
     /** Copy / paste function. */
     public void paste() {
-        System.out.println("paste");
         final List<Info> scs = selectedComponents;
         if (scs == null) {
             return;

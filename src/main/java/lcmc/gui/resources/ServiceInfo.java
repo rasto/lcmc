@@ -6552,7 +6552,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns ping combo box. */
-    protected final GuiComboBox getPingComboBox() {
+    public final GuiComboBox getPingComboBox() {
         return pingComboBox;
     }
 
