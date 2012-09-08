@@ -1973,9 +1973,9 @@ public final class ServicesInfo extends EditableInfo {
                 oldI = oldCi.getContainedService();
             }
             if (oldI instanceof ServiceInfo) {
-                final ServiceInfo oldSI = (ServiceInfo) oldI;
-                final ServiceInfo newSI =
-                    addServicePanel(oldSI.getResourceAgent(),
+                final ServiceInfo oldSi = (ServiceInfo) oldI;
+                final ServiceInfo newSi =
+                    addServicePanel(oldSi.getResourceAgent(),
                                     null, /* pos */
                                     true,
                                     null,
@@ -1983,26 +1983,26 @@ public final class ServicesInfo extends EditableInfo {
                                     CRM.LIVE);
                     if (oldCi != null) {
                         if (oldCi.getService().isMaster()) {
-                            newSI.changeType(
+                            newSi.changeType(
                                         ServiceInfo.MASTER_SLAVE_TYPE_STRING);
                         } else {
-                            newSI.changeType(ServiceInfo.CLONE_TYPE_STRING);
+                            newSi.changeType(ServiceInfo.CLONE_TYPE_STRING);
                         }
                     }
-                newSI.waitForInfoPanel();
+                newSi.waitForInfoPanel();
 
                 /* parameters */
-                for (final String param : oldSI.getParametersFromXML()) {
+                for (final String param : oldSi.getParametersFromXML()) {
                     if (ServiceInfo.GUI_ID.equals(param)
                         || ServiceInfo.PCMK_ID.equals(param)) {
                         continue;
                     }
-                    copyPasteField(oldSI.paramComboBoxGet(param, null),
-                                   newSI.paramComboBoxGet(param, null));
+                    copyPasteField(oldSi.paramComboBoxGet(param, null),
+                                   newSi.paramComboBoxGet(param, null));
                 }
 
                 /* clone parameters */
-                final CloneInfo newCi = newSI.getCloneInfo();
+                final CloneInfo newCi = newSi.getCloneInfo();
                 if (newCi != null) {
                     for (final String param : oldCi.getParametersFromXML()) {
                         if (ServiceInfo.GUI_ID.equals(param)
@@ -2015,23 +2015,23 @@ public final class ServicesInfo extends EditableInfo {
                 }
 
                 /* operations */
-                for (final String op : oldSI.getResourceAgent().getOperationNames()) {
+                for (final String op : oldSi.getResourceAgent().getOperationNames()) {
                     for (final String param
                                   : getBrowser().getCRMOperationParams(op)) {
-                        copyPasteField(oldSI.getOperationsComboBox(op, param),
-                                       newSI.getOperationsComboBox(op, param));
+                        copyPasteField(oldSi.getOperationsComboBox(op, param),
+                                       newSi.getOperationsComboBox(op, param));
                     }
                 }
 
                 /* locations */
                 for (final Host host : getBrowser().getClusterHosts()) {
                     final HostInfo hi = host.getBrowser().getHostInfo();
-                    copyPasteField(oldSI.getScoreComboBoxHash().get(hi),
-                                   newSI.getScoreComboBoxHash().get(hi));
+                    copyPasteField(oldSi.getScoreComboBoxHash().get(hi),
+                                   newSi.getScoreComboBoxHash().get(hi));
                 }
                 /* ping */
-                copyPasteField(oldSI.getPingComboBox(),
-                               newSI.getPingComboBox());
+                copyPasteField(oldSi.getPingComboBox(),
+                               newSi.getPingComboBox());
             }
         }
     } 
