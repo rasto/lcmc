@@ -35,6 +35,7 @@ import lcmc.data.PtestData;
 import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import java.util.Arrays;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;
@@ -80,6 +81,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class ServicesInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+    /** No clone parameter. */
+    public static final CloneInfo NO_CLONE = null;
 
     /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
@@ -1963,7 +1966,12 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     public void pasteServices(final List<Info> oldInfos) {
-        for (final Info oldI : oldInfos) {
+        for (Info oldI : oldInfos) {
+            CloneInfo oldCi = null;
+            if (oldI instanceof CloneInfo) {
+                oldCi = (CloneInfo) oldI;
+                oldI = oldCi.getContainedService();
+            }
             if (oldI instanceof ServiceInfo) {
                 final ServiceInfo oldSI = (ServiceInfo) oldI;
                 final ServiceInfo newSI =
@@ -1973,6 +1981,14 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     null,
                                     CRM.LIVE);
+                    if (oldCi != null) {
+                        if (oldCi.getService().isMaster()) {
+                            newSI.changeType(
+                                        ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                        } else {
+                            newSI.changeType(ServiceInfo.CLONE_TYPE_STRING);
+                        }
+                    }
                 newSI.waitForInfoPanel();
 
                 /* parameters */
@@ -1983,6 +1999,19 @@ public final class ServicesInfo extends EditableInfo {
                     }
                     copyPasteField(oldSI.paramComboBoxGet(param, null),
                                    newSI.paramComboBoxGet(param, null));
+                }
+
+                /* clone parameters */
+                final CloneInfo newCi = newSI.getCloneInfo();
+                if (newCi != null) {
+                    for (final String param : oldCi.getParametersFromXML()) {
+                        if (ServiceInfo.GUI_ID.equals(param)
+                            || ServiceInfo.PCMK_ID.equals(param)) {
+                            continue;
+                        }
+                        copyPasteField(oldCi.paramComboBoxGet(param, null),
+                                       newCi.paramComboBoxGet(param, null));
+                    }
                 }
 
                 /* operations */
