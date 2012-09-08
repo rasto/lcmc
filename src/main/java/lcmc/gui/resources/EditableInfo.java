@@ -970,17 +970,12 @@ public abstract class EditableInfo extends Info {
                     if (check) {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    cb.setBackground(
-                                                Tools.extractUnit(
-                                                   getParamDefault(otherParam)),
-                                                Tools.extractUnit(
-                                                   getParamSaved(otherParam)),
-                                                isRequired(otherParam));
-                                }
-                            });
+                            cb.setBackground(
+                                        Tools.extractUnit(
+                                           getParamDefault(otherParam)),
+                                        Tools.extractUnit(
+                                           getParamSaved(otherParam)),
+                                        isRequired(otherParam));
                             if (wizardCb != null) {
                                 wizardCb.setBackground(
                                     Tools.extractUnit(
@@ -990,21 +985,16 @@ public abstract class EditableInfo extends Info {
                                     isRequired(otherParam));
                             }
                         } else {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    cb.setBackground(
-                                             getParamDefault(otherParam),
-                                             getParamSaved(otherParam),
-                                             isRequired(otherParam));
-                                    if (wizardCb != null) {
-                                        wizardCb.setBackground(
-                                                    getParamDefault(otherParam),
-                                                    getParamSaved(otherParam),
-                                                    isRequired(otherParam));
-                                    }
-                                }
-                            });
+                            cb.setBackground(
+                                     getParamDefault(otherParam),
+                                     getParamSaved(otherParam),
+                                     isRequired(otherParam));
+                            if (wizardCb != null) {
+                                wizardCb.setBackground(
+                                            getParamDefault(otherParam),
+                                            getParamSaved(otherParam),
+                                            isRequired(otherParam));
+                            }
                         }
                     } else {
                         cb.wrongValue();

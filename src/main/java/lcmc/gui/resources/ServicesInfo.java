@@ -2000,6 +2000,7 @@ public final class ServicesInfo extends EditableInfo {
     public void pasteServices(final List<Info> oldInfos) {
         final String cn = getBrowser().getCluster().getName();
         Tools.startProgressIndicator(cn, "paste");
+        getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
         for (Info oldI : oldInfos) {
             CloneInfo oldCi = null;
             if (oldI instanceof CloneInfo) {
@@ -2025,6 +2026,7 @@ public final class ServicesInfo extends EditableInfo {
                 //}
                 if (!(newSi instanceof GroupInfo)
                     && !(newSi instanceof CloneInfo)) {
+                    newSi.getInfoPanel();
                     newSi.waitForInfoPanel();
                 }
                 copyPasteFields(oldSi, newSi);
@@ -2075,5 +2077,6 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         Tools.stopProgressIndicator(cn, "paste");
+        getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
     }
 }

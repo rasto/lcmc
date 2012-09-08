@@ -205,7 +205,7 @@ public class ViewPanel extends JPanel {
         return disabledDuringLoad;
     }
     /** Sets if expanding of paths should be disabled during the initial load.*/
-    final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
+    public final void setDisabledDuringLoad(final boolean disabledDuringLoad) {
         this.disabledDuringLoad = disabledDuringLoad;
     }
 

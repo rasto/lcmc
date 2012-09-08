@@ -1057,29 +1057,24 @@ public final class GuiComboBox extends JPanel {
 
     /** Sets component enabled or disabled. */
     private void setComponentsEnabled(final boolean enabled) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                component.setEnabled(enabled);
-                mComponentsReadLock.lock();
-                for (final JComponent c : componentsHash.values()) {
-                    c.setEnabled(enabled);
-                }
-                mComponentsReadLock.unlock();
-                switch(type) {
-                    case TEXTFIELDWITHUNIT:
-                        textFieldPart.setEnabled(enabled);
-                        unitComboBox.setEnabled(enabled && unitEnabled);
-                        break;
-                    default:
-                        /* nothing */
-                }
-                if (fieldButton != null) {
-                    componentPart.setEnabled(enabled);
-                    fieldButton.setEnabled(enabled && tfButtonEnabled);
-                }
-            }
-        });
+        component.setEnabled(enabled);
+        mComponentsReadLock.lock();
+        for (final JComponent c : componentsHash.values()) {
+            c.setEnabled(enabled);
+        }
+        mComponentsReadLock.unlock();
+        switch(type) {
+            case TEXTFIELDWITHUNIT:
+                textFieldPart.setEnabled(enabled);
+                unitComboBox.setEnabled(enabled && unitEnabled);
+                break;
+            default:
+                /* nothing */
+        }
+        if (fieldButton != null) {
+            componentPart.setEnabled(enabled);
+            fieldButton.setEnabled(enabled && tfButtonEnabled);
+        }
     }
 
 
