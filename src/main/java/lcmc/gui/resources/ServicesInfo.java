@@ -1965,7 +1965,41 @@ public final class ServicesInfo extends EditableInfo {
         }
     }
 
+    private void copyPasteFields(final ServiceInfo oldSi,
+                                 final ServiceInfo newSi) {
+        /* parameters */
+        for (final String param : oldSi.getParametersFromXML()) {
+            if (ServiceInfo.GUI_ID.equals(param)
+                || ServiceInfo.PCMK_ID.equals(param)) {
+                continue;
+            }
+            copyPasteField(oldSi.paramComboBoxGet(param, null),
+                           newSi.paramComboBoxGet(param, null));
+        }
+
+        /* operations */
+        for (final String op : oldSi.getResourceAgent().getOperationNames()) {
+            for (final String param
+                          : getBrowser().getCRMOperationParams(op)) {
+                copyPasteField(oldSi.getOperationsComboBox(op, param),
+                               newSi.getOperationsComboBox(op, param));
+            }
+        }
+
+        /* locations */
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final HostInfo hi = host.getBrowser().getHostInfo();
+            copyPasteField(oldSi.getScoreComboBoxHash().get(hi),
+                           newSi.getScoreComboBoxHash().get(hi));
+        }
+        /* ping */
+        copyPasteField(oldSi.getPingComboBox(),
+                       newSi.getPingComboBox());
+    }
+
     public void pasteServices(final List<Info> oldInfos) {
+        final String cn = getBrowser().getCluster().getName();
+        Tools.startProgressIndicator(cn, "paste");
         for (Info oldI : oldInfos) {
             CloneInfo oldCi = null;
             if (oldI instanceof CloneInfo) {
@@ -1981,25 +2015,19 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     null,
                                     CRM.LIVE);
-                    if (oldCi != null) {
-                        if (oldCi.getService().isMaster()) {
-                            newSi.changeType(
-                                        ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                        } else {
-                            newSi.changeType(ServiceInfo.CLONE_TYPE_STRING);
-                        }
-                    }
-                newSi.waitForInfoPanel();
-
-                /* parameters */
-                for (final String param : oldSi.getParametersFromXML()) {
-                    if (ServiceInfo.GUI_ID.equals(param)
-                        || ServiceInfo.PCMK_ID.equals(param)) {
-                        continue;
-                    }
-                    copyPasteField(oldSi.paramComboBoxGet(param, null),
-                                   newSi.paramComboBoxGet(param, null));
+                //if (oldCi != null) {
+                //    if (oldCi.getService().isMaster()) {
+                //        newSi.changeType(
+                //                    ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                //    } else {
+                //        newSi.changeType(ServiceInfo.CLONE_TYPE_STRING);
+                //    }
+                //}
+                if (!(newSi instanceof GroupInfo)
+                    && !(newSi instanceof CloneInfo)) {
+                    newSi.waitForInfoPanel();
                 }
+                copyPasteFields(oldSi, newSi);
 
                 /* clone parameters */
                 final CloneInfo newCi = newSi.getCloneInfo();
@@ -2013,26 +2041,39 @@ public final class ServicesInfo extends EditableInfo {
                                        newCi.paramComboBoxGet(param, null));
                     }
                 }
+                if (oldI instanceof GroupInfo) {
+                    final GroupInfo oldGi = (GroupInfo) oldI;
+                    final GroupInfo newGi = (GroupInfo) newSi;
 
-                /* operations */
-                for (final String op : oldSi.getResourceAgent().getOperationNames()) {
-                    for (final String param
-                                  : getBrowser().getCRMOperationParams(op)) {
-                        copyPasteField(oldSi.getOperationsComboBox(op, param),
-                                       newSi.getOperationsComboBox(op, param));
+                    final Enumeration e = oldGi.getNode().children();
+                    while (e.hasMoreElements()) {
+                        final DefaultMutableTreeNode n =
+                                      (DefaultMutableTreeNode) e.nextElement();
+                        final ServiceInfo oldChild =
+                                            (ServiceInfo) n.getUserObject();
+                        final ServiceInfo newChild =
+                                              newGi.addGroupServicePanel(
+                                                    oldChild.getResourceAgent(),
+                                                    false);
+                        newChild.getInfoPanel();
+                        newChild.waitForInfoPanel();
+                        oldChild.getInfoPanel();
+                        oldChild.waitForInfoPanel();
+                        
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                copyPasteFields(oldChild, newChild);
+                            }
+                        });
                     }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            getBrowser().reload(newGi.getNode(), false);
+                        }
+                    });
                 }
-
-                /* locations */
-                for (final Host host : getBrowser().getClusterHosts()) {
-                    final HostInfo hi = host.getBrowser().getHostInfo();
-                    copyPasteField(oldSi.getScoreComboBoxHash().get(hi),
-                                   newSi.getScoreComboBoxHash().get(hi));
-                }
-                /* ping */
-                copyPasteField(oldSi.getPingComboBox(),
-                               newSi.getPingComboBox());
             }
         }
-    } 
+        Tools.stopProgressIndicator(cn, "paste");
+    }
 }

@@ -60,6 +60,7 @@ import java.awt.FlowLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info
@@ -1063,6 +1064,10 @@ public abstract class EditableInfo extends Info {
     /** Waits till the info panel is done for the first time. */
     public final void waitForInfoPanel() {
         try {
+            boolean ret = infoPanelLatch.await(20, TimeUnit.SECONDS);
+            if (!ret) {
+                Tools.printStackTrace("latch timeout detected");
+            }
             infoPanelLatch.await();
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();

@@ -594,6 +594,11 @@ public final class GUIData  {
         if (ssi == null) {
             return;
         }
-        ssi.pasteServices(scs);
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                ssi.pasteServices(scs);
+            }
+        });
+        t.start();
     }
 }

@@ -2017,17 +2017,17 @@ public abstract class ResourceGraph {
 
     /** Get selected components for copy/paste. */
     public List<Info> getSelectedComponents() {
+        final String cn = getClusterBrowser().getCluster().getName();
+        Tools.startProgressIndicator(cn, "copy");
         final List<Info> selected = new ArrayList<Info>();
         final PickedState<Vertex> ps =
                 getVisualizationViewer().getRenderContext()
                                                     .getPickedVertexState();
         for (final Vertex v : ps.getPicked()) {
             final Info i = getInfo(v);
-            final String cn = getClusterBrowser().getCluster().getName();
-            Tools.startProgressIndicator(cn, "copy: " + i);
-            Tools.stopProgressIndicator(cn, "copy: " + i);
             selected.add(i);
         }
+        Tools.stopProgressIndicator(cn, "copy");
         return selected;
     }
 }

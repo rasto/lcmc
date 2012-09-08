@@ -422,7 +422,7 @@ public final class GroupInfo extends ServiceInfo {
     }
 
     /** Adds service to this group and creates new service info object. */
-    void addGroupServicePanel(final ResourceAgent newRA,
+    ServiceInfo addGroupServicePanel(final ResourceAgent newRA,
                               final boolean reloadNode) {
         ServiceInfo newServiceInfo;
 
@@ -439,11 +439,12 @@ public final class GroupInfo extends ServiceInfo {
             newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
         } else if (newRA.isGroup()) {
             Tools.appError("No groups in group allowed");
-            return;
+            return null;
         } else {
             newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
         }
         addGroupServicePanel(newServiceInfo, reloadNode);
+        return newServiceInfo;
     }
 
     /**
