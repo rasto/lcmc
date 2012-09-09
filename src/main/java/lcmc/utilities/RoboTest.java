@@ -2016,7 +2016,22 @@ public final class RoboTest {
             stopResource(dummy1X, dummy1Y, 0);
             checkTest("test7", 3);
             sleep(5000);
+            /* copy/paste */
+            moveTo(dummy1X + 10 , dummy1Y + 10);
+            leftClick();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            press(KeyEvent.VK_C);
+            press(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            moveTo(dummy1X + 10 , dummy1Y + 90);
+            leftClick();
+            moveTo(809, 144); /* ptest */
+            sleep(4000);
+            leftClick(); /* apply */
+            checkTest("test7", 4);
+
             removeResource(dummy1X, dummy1Y, -15, true);
+            removeResource(dummy1X, dummy1Y + 90, -15, true);
         }
         System.gc();
     }
