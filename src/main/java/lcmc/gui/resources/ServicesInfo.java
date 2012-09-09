@@ -1971,7 +1971,9 @@ public final class ServicesInfo extends EditableInfo {
         for (final String param : oldSi.getParametersFromXML()) {
             if (ServiceInfo.GUI_ID.equals(param)
                 || ServiceInfo.PCMK_ID.equals(param)) {
-                continue;
+                if (getBrowser().isCRMId(oldSi.getService().getHeartbeatId())) {
+                    continue;
+                }
             }
             copyPasteField(oldSi.paramComboBoxGet(param, null),
                            newSi.paramComboBoxGet(param, null));
@@ -1998,9 +2000,15 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     public void pasteServices(final List<Info> oldInfos) {
+        if (oldInfos.size() == 0) {
+            return;
+        }
         final String cn = getBrowser().getCluster().getName();
         Tools.startProgressIndicator(cn, "paste");
+        final ClusterBrowser otherBrowser =
+                                (ClusterBrowser) oldInfos.get(0).getBrowser();
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
+        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(true);
         for (Info oldI : oldInfos) {
             CloneInfo oldCi = null;
             if (oldI instanceof CloneInfo) {
@@ -2013,7 +2021,7 @@ public final class ServicesInfo extends EditableInfo {
                     addServicePanel(oldSi.getResourceAgent(),
                                     null, /* pos */
                                     true,
-                                    null,
+                                    null, /* crm id */
                                     null,
                                     CRM.LIVE);
                 //if (oldCi != null) {
@@ -2024,23 +2032,36 @@ public final class ServicesInfo extends EditableInfo {
                 //        newSi.changeType(ServiceInfo.CLONE_TYPE_STRING);
                 //    }
                 //}
-                if (!(newSi instanceof GroupInfo)
-                    && !(newSi instanceof CloneInfo)) {
+                if (!(newSi instanceof CloneInfo)) {
+                    oldSi.getInfoPanel();
                     newSi.getInfoPanel();
+                    oldSi.waitForInfoPanel();
                     newSi.waitForInfoPanel();
                 }
-                copyPasteFields(oldSi, newSi);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        copyPasteFields(oldSi, newSi);
+                    }
+                });
 
                 /* clone parameters */
                 final CloneInfo newCi = newSi.getCloneInfo();
                 if (newCi != null) {
-                    for (final String param : oldCi.getParametersFromXML()) {
+                    final CloneInfo oldCi0 = oldCi;
+                    for (final String param : oldCi0.getParametersFromXML()) {
                         if (ServiceInfo.GUI_ID.equals(param)
                             || ServiceInfo.PCMK_ID.equals(param)) {
-                            continue;
+                            if (getBrowser().isCRMId(
+                                    oldCi0.getService().getHeartbeatId())) {
+                                continue;
+                            }
                         }
-                        copyPasteField(oldCi.paramComboBoxGet(param, null),
-                                       newCi.paramComboBoxGet(param, null));
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                copyPasteField(oldCi0.paramComboBoxGet(param, null),
+                                               newCi.paramComboBoxGet(param, null));
+                            }
+                        });
                     }
                 }
                 if (oldI instanceof GroupInfo) {
@@ -2077,6 +2098,7 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         Tools.stopProgressIndicator(cn, "paste");
+        otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
     }
 }

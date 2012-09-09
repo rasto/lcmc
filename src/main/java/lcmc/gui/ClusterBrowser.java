@@ -1850,6 +1850,14 @@ public final class ClusterBrowser extends Browser {
         return si;
     }
 
+    /** Returns if the crm id is already taken. */
+    public boolean isCRMId(final String crmId) {
+        mHeartbeatIdToServiceLock();
+        final boolean ret = heartbeatIdToServiceInfo.containsKey(crmId);
+        mHeartbeatIdToServiceUnlock();
+        return ret;
+    }
+
     /** Locks heartbeatIdToServiceInfo hash. */
     public void mHeartbeatIdToServiceLock() {
         mHeartbeatIdToService.lock();

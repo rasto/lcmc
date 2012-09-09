@@ -87,7 +87,9 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         final StringBuilder s = new StringBuilder(80);
         s.append(Tools.getString("PcmkMultiSelectionInfo.Selection"));
         for (final Info si : selectedInfos) {
-            s.append(si.toString());
+            if (si != null) {
+                s.append(si.toString());
+            }
             s.append("<br />");
         }
         return s.toString();
