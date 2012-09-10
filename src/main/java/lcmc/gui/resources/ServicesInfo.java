@@ -2021,22 +2021,28 @@ public final class ServicesInfo extends EditableInfo {
                     addServicePanel(oldSi.getResourceAgent(),
                                     null, /* pos */
                                     true,
-                                    null, /* crm id */
+                                    null, /* clone id */
                                     null,
                                     CRM.LIVE);
-                //if (oldCi != null) {
-                //    if (oldCi.getService().isMaster()) {
-                //        newSi.changeType(
-                //                    ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                //    } else {
-                //        newSi.changeType(ServiceInfo.CLONE_TYPE_STRING);
-                //    }
-                //}
                 if (!(newSi instanceof CloneInfo)) {
                     oldSi.getInfoPanel();
                     newSi.getInfoPanel();
                     oldSi.waitForInfoPanel();
                     newSi.waitForInfoPanel();
+                }
+                if (oldCi != null) {
+                    final CloneInfo oci = oldCi;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (oci.getService().isMaster()) {
+                                newSi.getTypeRadioGroup().setValue(
+                                         ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                            } else {
+                                newSi.getTypeRadioGroup().setValue(
+                                                ServiceInfo.CLONE_TYPE_STRING);
+                            }
+                        }
+                    });
                 }
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {

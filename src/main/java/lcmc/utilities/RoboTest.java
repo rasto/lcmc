@@ -2102,7 +2102,23 @@ public final class RoboTest {
             stopResource(gx, gy, 0);
             sleep(6000);
             checkTest("testA", 3);
+
+            /* copy/paste */
+            moveTo(gx + 10 , gy + 10);
+            leftClick();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            press(KeyEvent.VK_C);
+            press(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            moveTo(gx + 10 , gy + 90);
+            leftClick();
+            moveTo(809, 144); /* ptest */
+            sleep(4000);
+            leftClick(); /* apply */
+            checkTest("testA", 4);
+
             removeResource(gx, gy, 0, true);
+            removeResource(gx, gy + 90, 0, true);
             resetTerminalAreas();
         }
         System.gc();
@@ -2128,6 +2144,21 @@ public final class RoboTest {
             stopResource(dummy1X, dummy1Y, 0);
             checkTest(testName, 3);
             sleep(5000);
+            /* copy/paste */
+            moveTo(dummy1X + 10 , dummy1Y + 10);
+            leftClick();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            press(KeyEvent.VK_C);
+            press(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            moveTo(dummy1X + 10 , dummy1Y + 90);
+            leftClick();
+            moveTo(809, 144); /* ptest */
+            sleep(4000);
+            leftClick(); /* apply */
+            checkTest("testB", 4);
+
+            removeResource(dummy1X, dummy1Y + 90, -15, true);
             removeResource(dummy1X, dummy1Y, -15, true);
             resetTerminalAreas();
         }
@@ -2177,7 +2208,23 @@ public final class RoboTest {
             stopResource(statefulX, statefulY, -20);
             checkTest(testName, 2);
             sleep(5000);
+            /* copy/paste */
+            stopResource(statefulX, statefulY, -20);
+            leftClick();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            press(KeyEvent.VK_C);
+            press(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            moveTo(245, statefulY + 90);
+            leftClick();
+            moveTo(809, 144); /* ptest */
+            sleep(4000);
+            leftClick(); /* apply */
+            checkTest(testName, 4);
+
+
             removeResource(statefulX, statefulY, -20, true);
+            removeResource(245, statefulY + 90, -20, true);
             resetTerminalAreas();
         }
     }
