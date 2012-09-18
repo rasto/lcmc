@@ -2010,11 +2010,12 @@ public final class ServicesInfo extends EditableInfo {
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
         otherBrowser.getClusterViewPanel().setDisabledDuringLoad(true);
         for (Info oldI : oldInfos) {
-            CloneInfo oldCi = null;
+            CloneInfo oci = null;
             if (oldI instanceof CloneInfo) {
-                oldCi = (CloneInfo) oldI;
-                oldI = oldCi.getContainedService();
+                oci = (CloneInfo) oldI;
+                oldI = oci.getContainedService();
             }
+            final CloneInfo oldCi = oci;
             if (oldI instanceof ServiceInfo) {
                 final ServiceInfo oldSi = (ServiceInfo) oldI;
                 final ServiceInfo newSi =
@@ -2024,28 +2025,30 @@ public final class ServicesInfo extends EditableInfo {
                                     null, /* clone id */
                                     null,
                                     CRM.LIVE);
-                if (!(newSi instanceof CloneInfo)) {
-                    oldSi.getInfoPanel();
-                    newSi.getInfoPanel();
-                    oldSi.waitForInfoPanel();
-                    newSi.waitForInfoPanel();
-                }
-                if (oldCi != null) {
-                    final CloneInfo oci = oldCi;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (oci.getService().isMaster()) {
-                                newSi.getTypeRadioGroup().setValue(
-                                         ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                            } else {
-                                newSi.getTypeRadioGroup().setValue(
-                                                ServiceInfo.CLONE_TYPE_STRING);
-                            }
-                        }
-                    });
-                }
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        if (!(newSi instanceof CloneInfo)) {
+                            oldSi.getInfoPanel();
+                            newSi.getInfoPanel();
+                            oldSi.waitForInfoPanel();
+                            newSi.waitForInfoPanel();
+                        }
+                        if (oldCi != null) {
+                            final CloneInfo oci = oldCi;
+                            final String v =
+                                    newSi.getTypeRadioGroup().getStringValue();
+                            if (oci.getService().isMaster()) {
+                                if (!ServiceInfo.MASTER_SLAVE_TYPE_STRING.equals(v)) {
+                                    newSi.getTypeRadioGroup().setValue(
+                                         ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                                }
+                            } else {
+                                if (!ServiceInfo.CLONE_TYPE_STRING.equals(v)) {
+                                    newSi.getTypeRadioGroup().setValue(
+                                                ServiceInfo.CLONE_TYPE_STRING);
+                                }
+                            }
+                        }
                         copyPasteFields(oldSi, newSi);
                     }
                 });
@@ -2080,14 +2083,14 @@ public final class ServicesInfo extends EditableInfo {
                                       (DefaultMutableTreeNode) e.nextElement();
                         final ServiceInfo oldChild =
                                             (ServiceInfo) n.getUserObject();
+                        oldChild.getInfoPanel();
+                        oldChild.waitForInfoPanel();
                         final ServiceInfo newChild =
                                               newGi.addGroupServicePanel(
                                                     oldChild.getResourceAgent(),
                                                     false);
                         newChild.getInfoPanel();
                         newChild.waitForInfoPanel();
-                        oldChild.getInfoPanel();
-                        oldChild.waitForInfoPanel();
                         
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
