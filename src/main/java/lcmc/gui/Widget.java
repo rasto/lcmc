@@ -180,6 +180,9 @@ public final class Widget extends JPanel {
     private final String regexp;
     /** Reason why it is disabled. */
     private String disabledReason = null;
+    /** List of widget listeners. */
+    private List<WidgetListener> widgetListeners =
+                                              new ArrayList<WidgetListener>();
 
     /** Prepares a new <code>Widget</code> object. */
     public Widget(final String selectedValue,
@@ -1082,6 +1085,9 @@ public final class Widget extends JPanel {
     /** Sets item/value in the component and waits till it is set. */
     public void setValueAndWait(final Object item) {
         mValueWriteLock.lock();
+        for (final WidgetListener wl : widgetListeners) {
+            wl.setEnabled(false);
+        }
         JComponent comp;
         if (fieldButton == null) {
             comp = component;
@@ -1176,6 +1182,9 @@ public final class Widget extends JPanel {
                 break;
             default:
                 Tools.appError("impossible type");
+        }
+        for (final WidgetListener wl : widgetListeners) {
+            wl.setEnabled(true);
         }
         mValueWriteLock.unlock();
     }
@@ -1349,15 +1358,17 @@ public final class Widget extends JPanel {
         return new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
-                if (isCheckBox() || e.getStateChange() == ItemEvent.SELECTED) {
-                    final Object value = e.getItem();
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            wl.check(value);
-                        }
-                    });
-                    t.start();
+                if (wl.isEnabled()) {
+                    if (isCheckBox() || e.getStateChange() == ItemEvent.SELECTED) {
+                        final Object value = e.getItem();
+                        final Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                wl.check(value);
+                            }
+                        });
+                        t.start();
+                    }
                 }
             }
         };
@@ -1365,6 +1376,7 @@ public final class Widget extends JPanel {
 
     /** Adds item listener to the component. */
     public void addListeners(final WidgetListener wl) {
+        widgetListeners.add(wl);
         JComponent comp;
         if (fieldButton == null) {
             comp = component;
@@ -1779,6 +1791,7 @@ public final class Widget extends JPanel {
         } else {
             comp = componentPart;
         }
+        widgetListeners.clear();
         switch(type) {
             case TEXTFIELD:
                 final AbstractDocument d = (AbstractDocument) getDocument();
