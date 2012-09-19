@@ -34,7 +34,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.resources.BlockDevice;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.Browser;
 
 import java.util.Set;
@@ -76,11 +76,11 @@ public final class LVResize extends LV {
     /** Resize button. */
     private final MyButton resizeButton = new MyButton("Resize");
     /** Size combo box. */
-    private GuiComboBox sizeCB;
+    private Widget sizeWi;
     /** Old size combo box. */
-    private GuiComboBox oldSizeCB;
+    private Widget oldSizeWi;
     /** Max size combo box. */
-    private GuiComboBox maxSizeCB;
+    private Widget maxSizeWi;
     /** Map from host to the checkboxes for these hosts. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Create new LVResize object. */
@@ -120,7 +120,7 @@ public final class LVResize extends LV {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (checkDRBD()) {
-            makeDefaultAndRequestFocusLater(sizeCB);
+            makeDefaultAndRequestFocusLater(sizeWi);
         }
     }
 
@@ -132,34 +132,34 @@ public final class LVResize extends LV {
             if (!dvi.isConnected(false)) {
                 printErrorAndRetry(
                               "Not resizing. DRBD resource is not connected.");
-                sizeCB.setEnabled(false);
+                sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             } else if (dvi.isSyncing()) {
                 printErrorAndRetry(
                                 "Not resizing. DRBD resource is syncing.");
-                sizeCB.setEnabled(false);
+                sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             } else if (!oBDI.getBlockDevice().isAttached()) {
                 printErrorAndRetry(
                         "Not resizing. DRBD resource is not attached on "
                         + oBDI.getHost() + ".");
-                sizeCB.setEnabled(false);
+                sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             } else if (!blockDevInfo.getBlockDevice().isAttached()) {
                 printErrorAndRetry(
                         "Not resizing. DRBD resource is not attached on "
                         + blockDevInfo.getHost() + ".");
-                sizeCB.setEnabled(false);
+                sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             } else if (!oBDI.getBlockDevice().isPrimary()
                        && !blockDevInfo.getBlockDevice().isPrimary()) {
                 printErrorAndRetry(
                    "Not resizing. Must be primary at least on one node.");
-                sizeCB.setEnabled(false);
+                sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             }
@@ -184,18 +184,18 @@ public final class LVResize extends LV {
             boolean e = enable;
             if (enable) {
                 final long oldSize = Tools.convertToKilobytes(
-                                               oldSizeCB.getStringValue());
+                                               oldSizeWi.getStringValue());
                 final long size = Tools.convertToKilobytes(
-                                                  sizeCB.getStringValue());
+                                                  sizeWi.getStringValue());
                 final String maxBlockSize = getMaxBlockSize();
                 final long maxSize = Long.parseLong(maxBlockSize);
-                maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
+                maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
 
                 if (oldSize >= size || size > maxSize) {
                     e = false;
-                    sizeCB.wrongValue();
+                    sizeWi.wrongValue();
                 } else {
-                    sizeCB.setBackground("", "", true);
+                    sizeWi.setBackground("", "", true);
                 }
             }
             resizeButton.setEnabled(e);
@@ -207,11 +207,11 @@ public final class LVResize extends LV {
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
         final String maxBlockSize = getMaxBlockSize();
-        oldSizeCB.setValue(Tools.convertKilobytes(oldBlockSize));
-        sizeCB.setValue(Tools.convertKilobytes(Long.toString(
+        oldSizeWi.setValue(Tools.convertKilobytes(oldBlockSize));
+        sizeWi.setValue(Tools.convertKilobytes(Long.toString(
                                     (Long.parseLong(oldBlockSize)
                                      + Long.parseLong(maxBlockSize)) / 2)));
-        maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
+        maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
     }
 
     /** Returns the input pane. */
@@ -226,18 +226,18 @@ public final class LVResize extends LV {
 
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
-        oldSizeCB = new GuiComboBox(Tools.convertKilobytes(oldBlockSize),
-                                    null,
-                                    getUnits(),
-                                    GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                    null, /* regexp */
-                                    250,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.OP,
-                                                  false)); /* only adv. */
-        oldSizeCB.setEnabled(false);
+        oldSizeWi = new Widget(Tools.convertKilobytes(oldBlockSize),
+                               null,
+                               getUnits(),
+                               Widget.Type.TEXTFIELDWITHUNIT,
+                               null, /* regexp */
+                               250,
+                               null, /* abbrv */
+                               new AccessMode(ConfigData.AccessType.OP,
+                                             false)); /* only adv. */
+        oldSizeWi.setEnabled(false);
         inputPane.add(oldSizeLabel);
-        inputPane.add(oldSizeCB);
+        inputPane.add(oldSizeWi);
         inputPane.add(new JLabel());
 
         final String maxBlockSize = getMaxBlockSize();
@@ -247,17 +247,17 @@ public final class LVResize extends LV {
                                       + Long.parseLong(maxBlockSize)) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeCB = new GuiComboBox(Tools.convertKilobytes(newBlockSize),
-                                 null,
-                                 getUnits(), /* units */
-                                 GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                 null, /* regexp */
-                                 250,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.OP,
-                                                  false)); /* only adv. */
+        sizeWi = new Widget(Tools.convertKilobytes(newBlockSize),
+                            null,
+                            getUnits(), /* units */
+                            Widget.Type.TEXTFIELDWITHUNIT,
+                            null, /* regexp */
+                            250,
+                            null, /* abbrv */
+                            new AccessMode(ConfigData.AccessType.OP,
+                                             false)); /* only adv. */
         inputPane.add(sizeLabel);
-        inputPane.add(sizeCB);
+        inputPane.add(sizeWi);
         resizeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -270,7 +270,7 @@ public final class LVResize extends LV {
                             disableComponents();
                             getProgressBar().start(RESIZE_TIMEOUT
                                                    * hostCheckBoxes.size());
-                            final boolean ret = resize(sizeCB.getStringValue());
+                            final boolean ret = resize(sizeWi.getStringValue());
                             final Host host = blockDevInfo.getHost();
                             host.getBrowser().getClusterBrowser().updateHWInfo(
                                                                           host);
@@ -292,20 +292,20 @@ public final class LVResize extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeCB = new GuiComboBox(Tools.convertKilobytes(maxBlockSize),
-                                    null,
-                                    getUnits(),
-                                    GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                    null, /* regexp */
-                                    250,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.OP,
-                                                   false)); /* only adv. */
-        maxSizeCB.setEnabled(false);
+        maxSizeWi = new Widget(Tools.convertKilobytes(maxBlockSize),
+                               null,
+                               getUnits(),
+                               Widget.Type.TEXTFIELDWITHUNIT,
+                               null, /* regexp */
+                               250,
+                               null, /* abbrv */
+                               new AccessMode(ConfigData.AccessType.OP,
+                                              false)); /* only adv. */
+        maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
-        inputPane.add(maxSizeCB);
+        inputPane.add(maxSizeWi);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new WidgetListener() {
+        sizeWi.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
                                     checkButtons();

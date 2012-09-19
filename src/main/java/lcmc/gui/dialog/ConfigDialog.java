@@ -22,7 +22,7 @@
 package lcmc.gui.dialog;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
@@ -341,7 +341,7 @@ public abstract class ConfigDialog {
      * This method is called during every insert, update and remove events of
      * field that was added with addCheckField(). It does nothing by default.
      */
-    protected void checkFields(final GuiComboBox field) {
+    protected void checkFields(final Widget field) {
         /* Does nothing by default. */
     }
 
@@ -349,7 +349,7 @@ public abstract class ConfigDialog {
      * Add listener to the field. The checkFields(field) will be called on every
      * insert, update and remove event.
      */
-    protected final void addCheckField(final GuiComboBox field) {
+    protected final void addCheckField(final Widget field) {
         field.getDocument().addDocumentListener(
                 new DocumentListener() {
                     @Override

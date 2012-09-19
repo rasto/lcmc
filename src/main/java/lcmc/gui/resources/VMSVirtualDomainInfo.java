@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.DiskData;
@@ -315,8 +315,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final Map<String, String> PREFERRED_MAP =
                                                  new HashMap<String, String>();
     /** Types of some of the field. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Possible values for some fields. */
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                           new HashMap<String, Object[]>();
@@ -452,8 +452,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
     static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
     /** This is a map from host to the check box. */
-    private final Map<String, GuiComboBox> definedOnHostComboBoxHash =
-                                          new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> definedOnHostComboBoxHash =
+                                          new HashMap<String, Widget>();
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
@@ -595,13 +595,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                    Tools.getString("VMSVirtualDomainInfo.Short.Emulator"));
 
         FIELD_TYPES.put(VMSXML.VM_PARAM_CURRENTMEMORY,
-                        GuiComboBox.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY,
-                        GuiComboBox.Type.TEXTFIELDWITHUNIT);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_APIC, GuiComboBox.Type.CHECKBOX);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_ACPI, GuiComboBox.Type.CHECKBOX);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, GuiComboBox.Type.CHECKBOX);
-        FIELD_TYPES.put(VMSXML.VM_PARAM_HAP, GuiComboBox.Type.CHECKBOX);
+                        Widget.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_MEMORY, Widget.Type.TEXTFIELDWITHUNIT);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_APIC, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_ACPI, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, Widget.Type.CHECKBOX);
+        FIELD_TYPES.put(VMSXML.VM_PARAM_HAP, Widget.Type.CHECKBOX);
 
         PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
@@ -1749,14 +1748,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final String hostName = h.getName();
-            //final MyButton hostBtn = hostButtons.get(h.getName());
-            //final MyButton wizardHostBtn =
-            //                      hostButtons.get(WIZARD_PREFIX + h.getName());
-            //final GuiComboBox hostCB =
-            //                        definedOnHostComboBoxHash.get(h.getName());
-            //final GuiComboBox wizardHostCB =
-            //           definedOnHostComboBoxHash.get(WIZARD_PREFIX + hostName);
-
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
                 if (vmsxml.isRunning(getDomainName())) {
@@ -1852,9 +1843,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            final GuiComboBox hcb =
-                                definedOnHostComboBoxHash.get(h.getName());
-            if (hcb != null) {
+            final Widget hwi = definedOnHostComboBoxHash.get(h.getName());
+            if (hwi != null) {
                 String value;
                 if ((vmsxml != null
                         && vmsxml.getDomainNames().contains(getDomainName()))) {
@@ -1862,13 +1852,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 } else {
                     value = DEFINED_ON_HOST_FALSE;
                 }
-                hcb.setValue(value);
+                hwi.setValue(value);
             }
         }
         for (final String param : getParametersFromXML()) {
             final String oldValue = getParamSaved(param);
             String value = null;
-            final GuiComboBox cb = paramComboBoxGet(param, null);
+            final Widget wi = getWidget(param, null);
             for (final Host h : getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null && value == null) {
@@ -1884,9 +1874,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
-                if (cb != null) {
+                if (wi != null) {
                     /* only if it is not changed by user. */
-                    cb.setValue(value);
+                    wi.setValue(value);
                 }
             }
         }
@@ -1974,11 +1964,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 defaultValue = DEFINED_ON_HOST_FALSE;
             }
             final MyButton hostBtn = getHostButton(host, prefix);
-            final GuiComboBox cb = new GuiComboBox(
+            final Widget wi = new Widget(
                                         defaultValue,
                                         null, /* items */
                                         null,
-                                        GuiComboBox.Type.CHECKBOX,
+                                        Widget.Type.CHECKBOX,
                                         null,
                                         ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                                         null, /* abbrv */
@@ -1986,40 +1976,40 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                           ConfigData.AccessType.ADMIN,
                                           false),
                                         hostBtn);
-            GuiComboBox rpcb = null;
+            Widget rpwi = null;
             if (prefix == null) {
-                definedOnHostComboBoxHash.put(host.getName(), cb);
+                definedOnHostComboBoxHash.put(host.getName(), wi);
             } else {
                 definedOnHostComboBoxHash.put(prefix + ":" + host.getName(),
-                                              cb);
-                rpcb = definedOnHostComboBoxHash.get(host.getName());
+                                              wi);
+                rpwi = definedOnHostComboBoxHash.get(host.getName());
             }
-            final GuiComboBox realParamCb = rpcb;
+            final Widget realParamWi = rpwi;
             if (!host.isConnected()) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        cb.setEnabled(false);
+                        wi.setEnabled(false);
                     }
                 });
             }
-            cb.addListeners(
+            wi.addListeners(
                         new WidgetListener() {
                             @Override
                             public void check(final Object value) {
-                                checkParameterFields(cb,
-                                                     realParamCb,
+                                checkParameterFields(wi,
+                                                     realParamWi,
                                                      ServiceInfo.CACHED_FIELD,
                                                      getParametersFromXML(),
                                                      thisApplyButton);
                             }
                         });
-            cb.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
+            wi.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             final JLabel label = new JLabel(host.getName());
-            cb.setLabel(label, null);
+            wi.setLabel(label, null);
             addField(hostPanel,
                      label,
-                     cb,
+                     wi,
                      ClusterBrowser.SERVICE_LABEL_WIDTH,
                      ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                      0);
@@ -3484,12 +3474,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final long mem = Tools.convertToKilobytes(
                              getComboBoxValue(VMSXML.VM_PARAM_MEMORY));
             if (mem < curMem) {
-                paramComboBoxGet(VMSXML.VM_PARAM_MEMORY, null).setValue(
-                                                                     newValue);
+                getWidget(VMSXML.VM_PARAM_MEMORY, null).setValue(newValue);
             }
         } else if (VMSXML.VM_PARAM_DOMAIN_TYPE.equals(param)) {
-            final GuiComboBox cb = paramComboBoxGet(param,
-                                                      null);
+            final Widget wi = getWidget(param, null);
             if (getResource().isNew()
                 && !Tools.areEqual(prevType, newValue)) {
                 String xenLibPath = "/usr/lib/xen";
@@ -3508,67 +3496,64 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         break;
                     }
                 }
-                final GuiComboBox emCB =
-                        paramComboBoxGet(VMSXML.VM_PARAM_EMULATOR, "wizard");
-                final GuiComboBox loCB =
-                            paramComboBoxGet(VMSXML.VM_PARAM_LOADER, "wizard");
-                final GuiComboBox voCB =
-                     paramComboBoxGet(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
-                final GuiComboBox typeCB =
-                             paramComboBoxGet(VMSXML.VM_PARAM_TYPE, "wizard");
-                final GuiComboBox inCB =
-                             paramComboBoxGet(VMSXML.VM_PARAM_INIT, "wizard");
+                final Widget emWi =
+                                getWidget(VMSXML.VM_PARAM_EMULATOR, "wizard");
+                final Widget loWi = getWidget(VMSXML.VM_PARAM_LOADER, "wizard");
+                final Widget voWi =
+                            getWidget(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
+                final Widget typeWi = getWidget(VMSXML.VM_PARAM_TYPE, "wizard");
+                final Widget inWi = getWidget(VMSXML.VM_PARAM_INIT, "wizard");
                 if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
-                    if (emCB != null) {
-                        emCB.setValue(xenLibPath + "/bin/qemu-dm");
+                    if (emWi != null) {
+                        emWi.setValue(xenLibPath + "/bin/qemu-dm");
                     }
-                    if (loCB != null) {
-                        loCB.setValue(xenLibPath + "/boot/hvmloader");
+                    if (loWi != null) {
+                        loWi.setValue(xenLibPath + "/boot/hvmloader");
                     }
-                    if (voCB != null) {
-                        voCB.setValue(VIRSH_OPTION_XEN);
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_XEN);
                     }
-                    if (typeCB != null) {
-                        typeCB.setValue(TYPE_HVM);
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_HVM);
                     }
-                    if (inCB != null) {
-                        inCB.setValue("");
+                    if (inWi != null) {
+                        inWi.setValue("");
                     }
                 } else if (Tools.areEqual(DOMAIN_TYPE_LXC, newValue)) {
-                    if (emCB != null) {
-                        emCB.setValue(lxcLibPath + "/libvirt_lxc");
+                    if (emWi != null) {
+                        emWi.setValue(lxcLibPath + "/libvirt_lxc");
                     }
-                    if (loCB != null) {
-                        loCB.setValue("");
+                    if (loWi != null) {
+                        loWi.setValue("");
                     }
-                    if (voCB != null) {
-                        voCB.setValue(VIRSH_OPTION_LXC);
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_LXC);
                     }
-                    if (typeCB != null) {
-                        typeCB.setValue(TYPE_EXE);
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_EXE);
                     }
-                    if (inCB != null) {
-                        inCB.setValue("/bin/sh");
+                    if (inWi != null) {
+                        inWi.setValue("/bin/sh");
                     }
                 } else {
-                    if (emCB != null) {
-                        emCB.setValue("/usr/bin/kvm");
+                    if (emWi != null) {
+                        emWi.setValue("/usr/bin/kvm");
                     }
-                    if (loCB != null) {
-                        loCB.setValue("");
+                    if (loWi != null) {
+                        loWi.setValue("");
                     }
-                    if (voCB != null) {
-                        voCB.setValue(VIRSH_OPTION_KVM);
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_KVM);
                     }
-                    if (typeCB != null) {
-                        typeCB.setValue(TYPE_HVM);
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_HVM);
                     }
-                    if (inCB != null) {
-                        inCB.setValue("");
+                    if (inWi != null) {
+                        inWi.setValue("");
                     }
                 }
             }
-            prevType = cb.getStringValue();
+            prevType = wi.getStringValue();
         } else if (VMSXML.VM_PARAM_CPU_MATCH.equals(param)) {
             final boolean match = !"".equals(newValue);
             SwingUtilities.invokeLater(new Runnable() {
@@ -3582,7 +3567,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
                                     VMSXML.VM_PARAM_CPUMATCH_FEATURES}) {
-                        paramComboBoxGet(p, null).setVisible(match);
+                        getWidget(p, null).setVisible(match);
                     }
                 }
             });
@@ -3665,7 +3650,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -3701,16 +3686,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         getBrowser().vmStatusLock();
         Tools.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
-            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
-                                                               host.getName());
+            final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    final GuiComboBox wizardHostCB =
+                    final Widget wizardHostWi =
                                           definedOnHostComboBoxHash.get(
                                                WIZARD_PREFIX + host.getName());
-                    if (wizardHostCB != null) {
-                        wizardHostCB.setEnabled(false);
+                    if (wizardHostWi != null) {
+                        wizardHostWi.setEnabled(false);
                     }
                 }
             });
@@ -3840,13 +3824,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             @Override
             public void run() {
                 for (final Host host : getBrowser().getClusterHosts()) {
-                    final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
+                    final Widget hostWi = definedOnHostComboBoxHash.get(
                                                                host.getName());
-                    final GuiComboBox wizardHostCB =
-                                            definedOnHostComboBoxHash.get(
+                    final Widget wizardHostWi = definedOnHostComboBoxHash.get(
                                                WIZARD_PREFIX + host.getName());
-                    if (wizardHostCB != null) {
-                        wizardHostCB.setEnabled(true);
+                    if (wizardHostWi != null) {
+                        wizardHostWi.setEnabled(true);
                     }
                 }
             }
@@ -4988,11 +4971,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
                 continue;
             }
-            final GuiComboBox hostCB = definedOnHostComboBoxHash.get(
-                                                               host.getName());
-            final GuiComboBox wizardHostCB = definedOnHostComboBoxHash.get(
+            final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
+            final Widget wizardHostWi = definedOnHostComboBoxHash.get(
                                                WIZARD_PREFIX + host.getName());
-            final String value = hostCB.getStringValue();
+            final String value = hostWi.getStringValue();
             String savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if (vmsxml != null
@@ -5001,9 +4983,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else {
                 savedValue = DEFINED_ON_HOST_FALSE;
             }
-            hostCB.setBackground(value, savedValue, false);
-            if (wizardHostCB != null) {
-                wizardHostCB.setBackground(value, savedValue, false);
+            hostWi.setBackground(value, savedValue, false);
+            if (wizardHostWi != null) {
+                wizardHostWi.setBackground(value, savedValue, false);
             }
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 cor = true; /* at least one */
@@ -5032,16 +5014,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns combo box for parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        final GuiComboBox paramCB =
-                                 super.getParamComboBox(param, prefix, width);
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        final Widget paramWi = super.createWidget(param, prefix, width);
         if (VMSXML.VM_PARAM_BOOT.equals(param)
             || VMSXML.VM_PARAM_BOOT_2.equals(param)) {
-            paramCB.setAlwaysEditable(false);
+            paramWi.setAlwaysEditable(false);
         }
-        return paramCB;
+        return paramWi;
     }
 
     /** Removes this domain. */
@@ -5192,15 +5173,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Sets button next to host to the start button. */
     private void setButtonToStart(final Host host,
-                                  final GuiComboBox hostCB,
+                                  final Widget hostWi,
                                   final MyButton hostBtn,
                                   final boolean stopped) {
-        if (hostCB != null) {
+        if (hostWi != null) {
             final boolean enable = host.isConnected();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostCB.setTFButtonEnabled(enable && stopped);
+                    hostWi.setTFButtonEnabled(enable && stopped);
                     hostBtn.setText("Start");
                     hostBtn.setIcon(HostBrowser.HOST_ON_ICON);
                     hostBtn.setToolTipText("Start on " + host.getName());
@@ -5211,14 +5192,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Sets button next to host to the view button. */
     private void setButtonToView(final Host host,
-                                 final GuiComboBox hostCB,
+                                 final Widget hostWi,
                                  final MyButton hostBtn) {
-        if (hostCB != null) {
+        if (hostWi != null) {
             final boolean enable = host.isConnected();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostCB.setTFButtonEnabled(enable);
+                    hostWi.setTFButtonEnabled(enable);
                     hostBtn.setText("View");
                     hostBtn.setIcon(VNC_ICON);
                     hostBtn.setToolTipText("Graphical console on "
@@ -5230,13 +5211,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Sets button next to host to the not defined button. */
     private void setButtonToNotDefined(final Host host,
-                                       final GuiComboBox hostCB,
+                                       final Widget hostWi,
                                        final MyButton hostBtn) {
-        if (hostCB != null) {
+        if (hostWi != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostCB.setTFButtonEnabled(false);
+                    hostWi.setTFButtonEnabled(false);
                     hostBtn.setIcon(null);
                     hostBtn.setToolTipText("not defined on " + host.getName());
                 }
@@ -5251,22 +5232,21 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final MyButton hostBtn = hostButtons.get(h.getName());
             final MyButton wizardHostBtn =
                                  hostButtons.get(WIZARD_PREFIX + h.getName());
-            final GuiComboBox hostCB =
-                                    definedOnHostComboBoxHash.get(h.getName());
-            final GuiComboBox wizardHostCB =
+            final Widget hostWi = definedOnHostComboBoxHash.get(h.getName());
+            final Widget wizardHostWi =
                     definedOnHostComboBoxHash.get(WIZARD_PREFIX + h.getName());
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
                 if (vmsxml.isRunning(getDomainName())) {
-                    setButtonToView(h, hostCB, hostBtn);
-                    setButtonToView(h, wizardHostCB, wizardHostBtn);
+                    setButtonToView(h, hostWi, hostBtn);
+                    setButtonToView(h, wizardHostWi, wizardHostBtn);
                 } else {
-                    setButtonToStart(h, hostCB, hostBtn, !running);
-                    setButtonToStart(h, wizardHostCB, wizardHostBtn, !running);
+                    setButtonToStart(h, hostWi, hostBtn, !running);
+                    setButtonToStart(h, wizardHostWi, wizardHostBtn, !running);
                 }
             } else {
-                setButtonToNotDefined(h, hostCB, hostBtn);
-                setButtonToNotDefined(h, wizardHostCB, wizardHostBtn);
+                setButtonToNotDefined(h, hostWi, hostBtn);
+                setButtonToNotDefined(h, wizardHostWi, wizardHostBtn);
             }
         }
     }
@@ -5279,8 +5259,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         for (final Host h : getBrowser().getClusterHosts()) {
-            final GuiComboBox hostCB =
-                                    definedOnHostComboBoxHash.get(h.getName());
+            final Widget hostWi = definedOnHostComboBoxHash.get(h.getName());
             String savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (getResource().isNew()
@@ -5290,7 +5269,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             } else {
                 savedValue = DEFINED_ON_HOST_FALSE;
             }
-            hostCB.setValue(savedValue);
+            hostWi.setValue(savedValue);
         }
         final Enumeration eee = thisNode.children();
         while (eee.hasMoreElements()) {
@@ -5345,19 +5324,19 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Return whether domain type needs "display" section. */
     public final boolean needDisplay() {
-        return NEED_DISPLAY.contains(paramComboBoxGet(
+        return NEED_DISPLAY.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs "console" section. */
     public final boolean needConsole() {
-        return NEED_CONSOLE.contains(paramComboBoxGet(
+        return NEED_CONSOLE.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs filesystem instead of disk device. */
     public final boolean needFilesystem() {
-        return NEED_FILESYSTEM.contains(paramComboBoxGet(
+        return NEED_FILESYSTEM.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 }

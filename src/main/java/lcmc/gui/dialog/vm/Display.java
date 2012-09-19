@@ -145,7 +145,6 @@ final class Display extends VMConfig {
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-        //vmsgi.paramComboBoxGet(GraphicsData.TYPE, "wizard").setValue("vnc");
 
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);

@@ -2003,10 +2003,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          + "Eg. node1:1;node2:2,3 would tell the cluster to use port 1 for<br>"
          + "node1 and ports 2 and 3 for node2<br>"},
 
-        {"GuiComboBox.Select",
+        {"Widget.Select",
          "Select..."},
 
-        {"GuiComboBox.NothingSelected",
+        {"Widget.NothingSelected",
          "<<nothing selected>>"},
 
         {"HeartbeatGraph.ColOrd",

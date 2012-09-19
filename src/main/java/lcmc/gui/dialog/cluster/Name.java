@@ -26,7 +26,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.BorderLayout;
@@ -48,7 +48,7 @@ public final class Name extends DialogCluster {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Name field. */
-    private GuiComboBox nameField;
+    private Widget nameField;
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
 
@@ -71,7 +71,7 @@ public final class Name extends DialogCluster {
 
     /** Checks the field if it is correct and renames the tab. */
     @Override
-    protected void checkFields(final GuiComboBox field) {
+    protected void checkFields(final Widget field) {
         final boolean isValid =
                             (nameField.getStringValue().trim().length() > 0);
         SwingUtilities.invokeLater(new Runnable() {
@@ -152,15 +152,15 @@ public final class Name extends DialogCluster {
         }
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
-        nameField = new GuiComboBox(getCluster().getName(),
-                                    null, /* items */
-                                    null, /* units */
-                                    null, /* type */
-                                    regexp,
-                                    NAME_FIELD_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.RO,
-                                                   false)); /* only adv. mode */
+        nameField = new Widget(getCluster().getName(),
+                               null, /* items */
+                               null, /* units */
+                               null, /* type */
+                               regexp,
+                               NAME_FIELD_WIDTH,
+                               null, /* abbrv */
+                               new AccessMode(ConfigData.AccessType.RO,
+                                              false)); /* only adv. mode */
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField);
         pane.add(nameField);

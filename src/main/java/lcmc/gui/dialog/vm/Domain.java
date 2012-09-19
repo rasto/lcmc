@@ -25,7 +25,7 @@ package lcmc.gui.dialog.vm;
 import lcmc.utilities.Tools;
 import lcmc.gui.resources.VMSVirtualDomainInfo;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 
 import javax.swing.JPanel;
@@ -49,7 +49,7 @@ public final class Domain extends VMConfig {
     private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    private GuiComboBox domainNameCB;
+    private Widget domainNameWi;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
                                             VMSXML.VM_PARAM_NAME,
@@ -133,7 +133,7 @@ public final class Domain extends VMConfig {
         });
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                domainNameCB.requestFocus();
+                domainNameWi.requestFocus();
             }
         });
     }
@@ -163,7 +163,7 @@ public final class Domain extends VMConfig {
                           Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                           null);
-        domainNameCB = vdi.paramComboBoxGet(VMSXML.VM_PARAM_NAME, "wizard");
+        domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME, "wizard");
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);

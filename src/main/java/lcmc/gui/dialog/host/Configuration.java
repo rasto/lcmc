@@ -27,7 +27,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JLabel;
@@ -54,11 +54,9 @@ final class Configuration extends DialogHost {
     /** Maximum hops. */
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
     /** Hostname fields. */
-    private GuiComboBox[] hostnameField =
-                            new GuiComboBox[MAX_HOPS];
+    private Widget[] hostnameField = new Widget[MAX_HOPS];
     /** Ip fields. */
-    private GuiComboBox[] ipCombo =
-                            new GuiComboBox[MAX_HOPS];
+    private Widget[] ipCombo = new Widget[MAX_HOPS];
     /** Hostnames. */
     private String[] hostnames = new String[MAX_HOPS];
     /** Whether the hostname was ok. */
@@ -107,7 +105,7 @@ final class Configuration extends DialogHost {
      * Checks the fields and if they are correct the buttons will be enabled.
      */
     @Override
-    protected void checkFields(final GuiComboBox field) {
+    protected void checkFields(final Widget field) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -355,16 +353,16 @@ final class Configuration extends DialogHost {
             hostnames = hostname.split(",");
         }
         for (int i = 0; i < hops; i++) {
-            hostnameField[i] = new GuiComboBox(hostnames[i],
-                                               null, /* items */
-                                               null, /* units */
-                                               null, /* type*/
-                                               null, /* regexp*/
-                                               COMBO_BOX_WIDTH,
-                                               null, /* abbrv */
-                                               new AccessMode(
-                                                    ConfigData.AccessType.RO,
-                                                    false)); /* only adv mode */
+            hostnameField[i] = new Widget(hostnames[i],
+                                          null, /* items */
+                                          null, /* units */
+                                          null, /* type*/
+                                          null, /* regexp*/
+                                          COMBO_BOX_WIDTH,
+                                          null, /* abbrv */
+                                          new AccessMode(
+                                               ConfigData.AccessType.RO,
+                                               false)); /* only adv mode */
 
             inputPane.add(hostnameField[i]);
         }
@@ -377,16 +375,16 @@ final class Configuration extends DialogHost {
             if (getHost().getIp(i) == null) {
                 getHost().setIps(i, null);
             }
-            ipCombo[i] = new GuiComboBox(getHost().getIp(i),
-                                         getHost().getIps(i),
-                                         null, /* units */
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null, /* regexp */
-                                         COMBO_BOX_WIDTH,
-                                         null, /* abbrv */
-                                         new AccessMode(
-                                                     ConfigData.AccessType.RO,
-                                                     false)); /* only adv. */
+            ipCombo[i] = new Widget(getHost().getIp(i),
+                                    getHost().getIps(i),
+                                    null, /* units */
+                                    Widget.Type.COMBOBOX,
+                                    null, /* regexp */
+                                    COMBO_BOX_WIDTH,
+                                    null, /* abbrv */
+                                    new AccessMode(
+                                                ConfigData.AccessType.RO,
+                                                false)); /* only adv. */
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

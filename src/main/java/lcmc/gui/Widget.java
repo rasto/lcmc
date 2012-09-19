@@ -88,13 +88,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- * TODO: rename it to GuiWidget or something
  *
  * @author Rasto Levrinc
  * @version $Id$
  *
  */
-public final class GuiComboBox extends JPanel {
+public final class Widget extends JPanel {
     /** Widget type. */
     public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
                        RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
@@ -128,16 +127,16 @@ public final class GuiComboBox extends JPanel {
     private String checkBoxFalse = Tools.getString("Boolean.False");
     /** Background of the field if the value is wrong. */
     private static final Color ERROR_VALUE_BACKGROUND =
-                            Tools.getDefaultColor("GuiComboBox.ErrorValue");
+                            Tools.getDefaultColor("Widget.ErrorValue");
     /** Background of the field if the value has changed. */
     private static final Color CHANGED_VALUE_COLOR =
-                            Tools.getDefaultColor("GuiComboBox.ChangedValue");
+                            Tools.getDefaultColor("Widget.ChangedValue");
     /** Background of the field if the value is default. */
     private static final Color DEFAULT_VALUE_COLOR =
-                            Tools.getDefaultColor("GuiComboBox.DefaultValue");
+                            Tools.getDefaultColor("Widget.DefaultValue");
     /** Background of the field if the value is saved. */
     private static final Color SAVED_VALUE_COLOR =
-                            Tools.getDefaultColor("GuiComboBox.SavedValue");
+                            Tools.getDefaultColor("Widget.SavedValue");
     /** No scrollbar ever. */
     private static final int SCROLLBAR_MAX_ROWS = 10;
     /** Widget default height. */
@@ -156,7 +155,7 @@ public final class GuiComboBox extends JPanel {
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
     /** Nothing selected string, that returns null, if selected. */
     public static final String NOTHING_SELECTED =
-                                Tools.getString("GuiComboBox.NothingSelected");
+                                Tools.getString("Widget.NothingSelected");
     /** Label of this component. */
     private JLabel label = null;
     /** Whether the component should be enabled. */
@@ -182,15 +181,15 @@ public final class GuiComboBox extends JPanel {
     /** Reason why it is disabled. */
     private String disabledReason = null;
 
-    /** Prepares a new <code>GuiComboBox</code> object. */
-    public GuiComboBox(final String selectedValue,
-                       final Object[] items,
-                       final Unit[] units,
-                       final Type type,
-                       final String regexp,
-                       final int width,
-                       final Map<String, String> abbreviations,
-                       final AccessMode enableAccessMode) {
+    /** Prepares a new <code>Widget</code> object. */
+    public Widget(final String selectedValue,
+                  final Object[] items,
+                  final Unit[] units,
+                  final Type type,
+                  final String regexp,
+                  final int width,
+                  final Map<String, String> abbreviations,
+                  final AccessMode enableAccessMode) {
         this(selectedValue,
              items,
              units,
@@ -202,16 +201,16 @@ public final class GuiComboBox extends JPanel {
              null); /* without button */
     }
 
-    /** Prepares a new <code>GuiComboBox</code> object. */
-    public GuiComboBox(final String selectedValue,
-                       final Object[] items,
-                       final Unit[] units,
-                       final Type type,
-                       final String regexp,
-                       final int width,
-                       final Map<String, String> abbreviations,
-                       final AccessMode enableAccessMode,
-                       final MyButton fieldButton) {
+    /** Prepares a new <code>Widget</code> object. */
+    public Widget(final String selectedValue,
+                  final Object[] items,
+                  final Unit[] units,
+                  final Type type,
+                  final String regexp,
+                  final int width,
+                  final Map<String, String> abbreviations,
+                  final AccessMode enableAccessMode,
+                  final MyButton fieldButton) {
         super();
         this.units = units;
         this.enableAccessMode = enableAccessMode;
@@ -491,7 +490,7 @@ public final class GuiComboBox extends JPanel {
         for (int i = 0; i < items.length; i++) {
             Object item;
             if (items[i] == null) {
-                item = GuiComboBox.NOTHING_SELECTED;
+                item = Widget.NOTHING_SELECTED;
             } else {
                 item = items[i];
             }
@@ -516,7 +515,7 @@ public final class GuiComboBox extends JPanel {
                 boolean selectedChanged = false;
                 if (selectedValue == null
                     && (selectedItem != null
-                         && selectedItem != GuiComboBox.NOTHING_SELECTED)) {
+                         && selectedItem != Widget.NOTHING_SELECTED)) {
                     selectedChanged = true;
                 } else if (selectedValue != null
                            && !selectedValue.equals(selectedItem)) {
@@ -561,7 +560,7 @@ public final class GuiComboBox extends JPanel {
         if (items != null) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == null) {
-                    items[i] = GuiComboBox.NOTHING_SELECTED;
+                    items[i] = Widget.NOTHING_SELECTED;
                 }
                 if (items[i] instanceof Info
                     && ((Info) items[i]).getStringValue() != null

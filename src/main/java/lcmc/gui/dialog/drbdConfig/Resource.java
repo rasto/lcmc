@@ -111,7 +111,7 @@ public final class Resource extends DrbdConfig {
                 }
                 final String value = dri.getComboBoxValue(commonP);
                 drbdInfo.getResource().setValue(commonP, value);
-                drbdInfo.paramComboBoxGet(commonP, null).setValue(value);
+                drbdInfo.getWidget(commonP, null).setValue(value);
             }
         }
         Tools.waitForSwing();
@@ -205,7 +205,7 @@ public final class Resource extends DrbdConfig {
                     if ((defaultValue == null && "".equals(commonValue))
                         || (defaultValue != null
                             && defaultValue.equals(commonValue))) {
-                        drbdInfo.paramComboBoxGet(commonP, null).setValue(
+                        drbdInfo.getWidget(commonP, null).setValue(
                                             commonPreferredValue.get(commonP));
                         dri.getResource().setValue(
                                             commonP,

@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.ParallelSerialData;
 import lcmc.data.Host;
@@ -114,8 +114,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                           ParallelSerialData.TARGET_PORT}));
     }
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
@@ -132,7 +132,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(ParallelSerialData.PROTOCOL_TYPE, "Protocol");
         SHORTNAME_MAP.put(ParallelSerialData.TARGET_PORT, "Target Port");
         FIELD_TYPES.put(ParallelSerialData.PROTOCOL_TYPE,
-                        GuiComboBox.Type.RADIOGROUP);
+                        Widget.Type.RADIOGROUP);
     }
 
     /** Whether the parameter is enabled only in advanced mode. */
@@ -303,7 +303,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected final GuiComboBox.Type getFieldType(final String param) {
+    protected final Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -426,7 +426,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 @Override
                 public void run() {
                     for (final String param : PARAMETERS) {
-                        paramComboBoxGet(param, null).setVisible(
+                        getWidget(param, null).setVisible(
                              PARAMETERS_MAP.get(newValue).contains(param));
                     }
                 }
@@ -448,19 +448,19 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns combo box for parameter. */
     @Override
-    protected final GuiComboBox getParamComboBox(final String param,
-                                                 final String prefix,
-                                                 final int width) {
+    protected final Widget createWidget(final String param,
+                                        final String prefix,
+                                        final int width) {
         if (ParallelSerialData.SOURCE_PATH.equals(param)) {
             final String sourceFile =
                                 getParamSaved(ParallelSerialData.SOURCE_PATH);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
-            final GuiComboBox paramCB = new GuiComboBox(
+            final Widget paramWi = new Widget(
                                   sourceFile,
                                   null,
                                   null, /* units */
-                                  GuiComboBox.Type.TEXTFIELD,
+                                  Widget.Type.TEXTFIELD,
                                   regexp,
                                   width,
                                   null, /* abbrv */
@@ -473,7 +473,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                    true and it is not possible to descent into a directory.
                    TODO: It may work in the future.
                 */
-                paramCB.setTFButtonEnabled(false);
+                paramWi.setTFButtonEnabled(false);
             }
             fileChooserBtn.addActionListener(new ActionListener() {
                 @Override
@@ -481,7 +481,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            final String oldDir = paramCB.getStringValue();
+                            final String oldDir = paramWi.getStringValue();
                             String directory;
                             if (oldDir == null || "".equals(oldDir)) {
                                 final String type = getComboBoxValue(
@@ -494,7 +494,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                             } else {
                                 directory = oldDir;
                             }
-                            startFileChooser(paramCB,
+                            startFileChooser(paramWi,
                                              directory,
                                              FILECHOOSER_FILE_ONLY);
                         }
@@ -502,16 +502,15 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                     t.start();
                 }
             });
-            paramComboBoxAdd(param, prefix, paramCB);
-            return paramCB;
+            widgetAdd(param, prefix, paramWi);
+            return paramWi;
         } else {
-            final GuiComboBox paramCB =
-                                 super.getParamComboBox(param, prefix, width);
+            final Widget paramWi = super.createWidget(param, prefix, width);
             if (ParallelSerialData.TYPE.equals(param)
                 || ParallelSerialData.SOURCE_MODE.equals(param)) {
-                paramCB.setAlwaysEditable(false);
+                paramWi.setAlwaysEditable(false);
             }
-            return paramCB;
+            return paramWi;
         }
     }
 

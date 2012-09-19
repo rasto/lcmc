@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.HeartbeatGraph;
 import lcmc.gui.dialog.ClusterLogs;
 import lcmc.data.Host;
@@ -315,9 +315,9 @@ public final class ServicesInfo extends EditableInfo {
             final String oldValue = getParamSaved(param);
             if (value != null && !value.equals(oldValue)) {
                 getResource().setValue(param, value);
-                final GuiComboBox cb = paramComboBoxGet(param, null);
-                if (cb != null) {
-                    cb.setValue(value);
+                final Widget wi = getWidget(param, null);
+                if (wi != null) {
+                    wi.setValue(value);
                 }
             }
         }
@@ -942,7 +942,7 @@ public final class ServicesInfo extends EditableInfo {
                                      final int leftWidth,
                                      final int rightWidth) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        rdi.paramComboBoxClear();
+        rdi.widgetClear();
         final String[] params = rdi.getParametersFromXML();
         rdi.addParams(optionsPanel,
                       params,
@@ -1952,16 +1952,15 @@ public final class ServicesInfo extends EditableInfo {
     /**
      * Copy/paste field from one field to another.
      */
-    private void copyPasteField(final GuiComboBox oldCB,
-                                final GuiComboBox newCB) {
-        if (newCB == null || oldCB == null) {
+    private void copyPasteField(final Widget oldWi, final Widget newWi) {
+        if (newWi == null || oldWi == null) {
             return;
         }
-        final String oldValue = oldCB.getStringValue();
+        final String oldValue = oldWi.getStringValue();
         if ("".equals(oldValue)) {
-            newCB.setValue(null);
+            newWi.setValue(null);
         } else {
-            newCB.setValue(oldValue);
+            newWi.setValue(oldValue);
         }
     }
 
@@ -1975,8 +1974,8 @@ public final class ServicesInfo extends EditableInfo {
                     continue;
                 }
             }
-            copyPasteField(oldSi.paramComboBoxGet(param, null),
-                           newSi.paramComboBoxGet(param, null));
+            copyPasteField(oldSi.getWidget(param, null),
+                           newSi.getWidget(param, null));
         }
 
         /* operations */
@@ -2067,8 +2066,8 @@ public final class ServicesInfo extends EditableInfo {
                         }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                copyPasteField(oldCi0.paramComboBoxGet(param, null),
-                                               newCi.paramComboBoxGet(param, null));
+                                copyPasteField(oldCi0.getWidget(param, null),
+                                               newCi.getWidget(param, null));
                             }
                         });
                     }

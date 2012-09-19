@@ -23,7 +23,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.resources.Resource;
 import lcmc.data.AccessMode;
 import lcmc.utilities.ButtonCallback;
@@ -102,8 +102,8 @@ public class Info implements Comparable {
     private JEditorPane resourceInfoArea;
 
     /** Map from parameter to its user-editable widget. */
-    private final Map<String, GuiComboBox> paramComboBoxHash =
-              Collections.synchronizedMap(new HashMap<String, GuiComboBox>());
+    private final Map<String, Widget> widgetHash =
+              Collections.synchronizedMap(new HashMap<String, Widget>());
     /** popup menu for this object. */
     private JPopupMenu popup;
     /** Popup object lock. */
@@ -179,60 +179,59 @@ public class Info implements Comparable {
     }
 
     /** Adds the widget for parameter. */
-    protected final void paramComboBoxAdd(final String param,
-                                          final String prefix,
-                                          final GuiComboBox paramCb) {
+    protected final void widgetAdd(final String param,
+                                   final String prefix,
+                                   final Widget paramWi) {
         if (prefix == null) {
-            paramComboBoxHash.put(param, paramCb);
+            widgetHash.put(param, paramWi);
         } else {
-            paramComboBoxHash.put(prefix + ":" + param, paramCb);
+            widgetHash.put(prefix + ":" + param, paramWi);
         }
     }
 
     /** Returns the widget for the parameter. */
-    public final GuiComboBox paramComboBoxGet(final String param,
-                                                        final String prefix) {
+    public final Widget getWidget(final String param, final String prefix) {
         if (prefix == null) {
-            return paramComboBoxHash.get(param);
+            return widgetHash.get(param);
         } else {
-            return paramComboBoxHash.get(prefix + ":" + param);
+            return widgetHash.get(prefix + ":" + param);
         }
     }
 
-    /** Returns true if the paramComboBox contains the parameter. */
-    protected final boolean paramComboBoxContains(final String param,
-                                                  final String prefix) {
+    /** Returns true if the widget hash contains the parameter. */
+    protected final boolean widgetContains(final String param,
+                                           final String prefix) {
         if (prefix == null) {
-            return paramComboBoxHash.containsKey(param);
+            return widgetHash.containsKey(param);
         } else {
-            return paramComboBoxHash.containsKey(prefix + ":" + param);
+            return widgetHash.containsKey(prefix + ":" + param);
         }
     }
 
-    /** Removes the parameter from the paramComboBox hash. */
-    protected final GuiComboBox paramComboBoxRemove(final String param,
-                                                    final String prefix) {
+    /** Removes the parameter from the widget hash. */
+    protected final Widget widgetRemove(final String param,
+                                               final String prefix) {
         if (prefix == null) {
-            if (paramComboBoxHash.containsKey(param)) {
-                paramComboBoxHash.get(param).cleanup();
-                return paramComboBoxHash.remove(param);
+            if (widgetHash.containsKey(param)) {
+                widgetHash.get(param).cleanup();
+                return widgetHash.remove(param);
             }
             return null;
         } else {
-            if (paramComboBoxHash.containsKey(prefix + ":" + param)) {
-                paramComboBoxHash.get(prefix + ":" + param).cleanup();
-                return paramComboBoxHash.remove(prefix + ":" + param);
+            if (widgetHash.containsKey(prefix + ":" + param)) {
+                widgetHash.get(prefix + ":" + param).cleanup();
+                return widgetHash.remove(prefix + ":" + param);
             }
             return null;
         }
     }
 
-    /** Clears the whole paramComboBox hash. */
-    protected final void paramComboBoxClear() {
-        for (final String param : paramComboBoxHash.keySet()) {
-            paramComboBoxHash.get(param).cleanup();
+    /** Clears the whole widget hash. */
+    protected final void widgetClear() {
+        for (final String param : widgetHash.keySet()) {
+            widgetHash.get(param).cleanup();
         }
-        paramComboBoxHash.clear();
+        widgetHash.clear();
     }
 
     /** Sets the terminal panel, if necessary. */

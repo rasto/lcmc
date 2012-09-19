@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.ParallelData;
 import lcmc.data.Host;
@@ -74,7 +74,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -88,9 +88,9 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }

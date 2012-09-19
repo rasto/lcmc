@@ -20,7 +20,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.FilesystemData;
 import lcmc.data.Host;
@@ -51,24 +51,24 @@ import org.w3c.dom.Node;
  */
 public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
-    private final Map<String, GuiComboBox> sourceFileCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> sourceFileWi =
+                                            new HashMap<String, Widget>();
     /** Source block combo box, so that it can be disabled, depending on type.*/
-    private final Map<String, GuiComboBox> sourceDeviceCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> sourceDeviceWi =
+                                            new HashMap<String, Widget>();
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
-    private final Map<String, GuiComboBox> targetDeviceCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> targetDeviceWi =
+                                            new HashMap<String, Widget>();
     /** Driver name combo box. */
-    private final Map<String, GuiComboBox> driverNameCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> driverNameWi =
+                                            new HashMap<String, Widget>();
     /** Driver type combo box. */
-    private final Map<String, GuiComboBox> driverTypeCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> driverTypeWi =
+                                            new HashMap<String, Widget>();
     /** Readonly combo box. */
-    private final Map<String, GuiComboBox> readonlyCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> readonlyWi =
+                                            new HashMap<String, Widget>();
     /** Choices for source directories */
     private final String[] sourceDirs;
     /** Previous target bus value. */
@@ -87,18 +87,15 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                                 FilesystemData.SOURCE_DIR,
                                                 FilesystemData.TARGET_DIR}));
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Target devices depending on the target type. */
     private static final Map<String, String[]> TARGET_DEVICES_MAP =
                                            new HashMap<String, String[]>();
     static {
-        FIELD_TYPES.put(FilesystemData.TYPE,
-                        GuiComboBox.Type.RADIOGROUP);
-        FIELD_TYPES.put(FilesystemData.SOURCE_DIR,
-                        GuiComboBox.Type.COMBOBOX);
-        FIELD_TYPES.put(FilesystemData.TARGET_DIR,
-                        GuiComboBox.Type.COMBOBOX);
+        FIELD_TYPES.put(FilesystemData.TYPE, Widget.Type.RADIOGROUP);
+        FIELD_TYPES.put(FilesystemData.SOURCE_DIR, Widget.Type.COMBOBOX);
+        FIELD_TYPES.put(FilesystemData.TARGET_DIR, Widget.Type.COMBOBOX);
     }
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
@@ -264,7 +261,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -417,7 +414,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -431,9 +428,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }
@@ -512,15 +509,15 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns combo box for parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             final String sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
             final String regexp = ".*[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
-            final GuiComboBox paramCB = new GuiComboBox(
+            final Widget paramWi = new Widget(
                                   sourceDir,
                                   getParamPossibleChoices(param),
                                   null, /* units */
@@ -531,9 +528,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                   new AccessMode(getAccessType(param),
                                                  false), /* only adv. mode */
                                   fileChooserBtn);
-            paramCB.setAlwaysEditable(true);
+            paramWi.setAlwaysEditable(true);
             if (Tools.isWindows()) {
-                paramCB.setTFButtonEnabled(false);
+                paramWi.setTFButtonEnabled(false);
             }
             fileChooserBtn.addActionListener(new ActionListener() {
                 @Override
@@ -542,13 +539,13 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                         @Override
                         public void run() {
                             String file;
-                            final String oldFile = paramCB.getStringValue();
+                            final String oldFile = paramWi.getStringValue();
                             if (oldFile == null || "".equals(oldFile)) {
                                 file = LXC_SOURCE_DIR;
                             } else {
                                 file = oldFile;
                             }
-                            startFileChooser(paramCB,
+                            startFileChooser(paramWi,
                                              file,
                                              FILECHOOSER_DIR_ONLY);
                         }
@@ -556,16 +553,16 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                     t.start();
                 }
             });
-            paramComboBoxAdd(param, prefix, paramCB);
-            return paramCB;
+            widgetAdd(param, prefix, paramWi);
+            return paramWi;
         } else {
-            final GuiComboBox paramCB = super.getParamComboBox(param, prefix, width);
+            final Widget paramWi = super.createWidget(param, prefix, width);
 
             if (FilesystemData.SOURCE_DIR.equals(param)
                 || FilesystemData.TARGET_DIR.equals(param)) {
-                paramCB.setAlwaysEditable(true);
+                paramWi.setAlwaysEditable(true);
             }
-            return paramCB;
+            return paramWi;
         }
     }
 }

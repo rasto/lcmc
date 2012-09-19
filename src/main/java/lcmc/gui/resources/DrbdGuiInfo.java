@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 import lcmc.Exceptions;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.Cluster;
 import lcmc.data.DrbdXML;
 import lcmc.data.ConfigData;
@@ -212,10 +212,10 @@ abstract class DrbdGuiInfo extends EditableInfo {
      * Returns the widget that is used to edit this parameter.
      */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        GuiComboBox paramCb;
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        Widget paramWi;
         final Object[] possibleChoices = getParamPossibleChoices(param);
         getResource().setPossibleChoices(param, possibleChoices);
         if (hasUnitPrefix(param)) {
@@ -236,7 +236,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
             if (index > -1) {
                 unitPart = unit.substring(index);
             }
-            GuiComboBox.Type type = null;
+            Widget.Type type = null;
             Unit[] units = null;
             if ("".equals(unit)) {
                 units = new Unit[]{
@@ -283,26 +283,26 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 };
             }
 
-            paramCb = new GuiComboBox(selectedValue,
-                                      getPossibleChoices(param),
-                                      units,
-                                      GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                      null, /* regexp */
-                                      width,
-                                      null, /* abbrv */
-                                      new AccessMode(
-                                           getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)));
+            paramWi = new Widget(selectedValue,
+                                 getPossibleChoices(param),
+                                 units,
+                                 Widget.Type.TEXTFIELDWITHUNIT,
+                                 null, /* regexp */
+                                 width,
+                                 null, /* abbrv */
+                                 new AccessMode(
+                                      getAccessType(param),
+                                      isEnabledOnlyInAdvancedMode(param)));
 
-            paramComboBoxAdd(param, prefix, paramCb);
+            widgetAdd(param, prefix, paramWi);
         } else {
-            paramCb = super.getParamComboBox(param, prefix, width);
+            paramWi = super.createWidget(param, prefix, width);
             if (possibleChoices != null
                 && !getBrowser().getDrbdXML().isStringType(param)) {
-                paramCb.setEditable(false);
+                paramWi.setEditable(false);
             }
         }
-        return paramCb;
+        return paramWi;
     }
 
     /**

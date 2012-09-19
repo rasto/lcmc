@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.VideoData;
 import lcmc.data.Host;
@@ -58,8 +58,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                                                 VideoData.MODEL_HEADS}));
 
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
@@ -215,7 +215,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -341,7 +341,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -355,9 +355,9 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }

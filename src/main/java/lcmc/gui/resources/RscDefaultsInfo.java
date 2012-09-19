@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 
 import lcmc.data.resources.Resource;
 import lcmc.data.CRMXML;
@@ -79,7 +79,7 @@ public final class RscDefaultsInfo extends EditableInfo {
                     value = "";
                 }
                 final String oldValue = getParamSaved(param);
-                final GuiComboBox cb = paramComboBoxGet(param, null);
+                final Widget wi = getWidget(param, null);
                 final boolean haveChanged =
                    !Tools.areEqual(value, oldValue)
                    || !Tools.areEqual(defaultValue,
@@ -87,8 +87,8 @@ public final class RscDefaultsInfo extends EditableInfo {
                 if (haveChanged) {
                     getResource().setValue(param, value);
                     getResource().setDefaultValue(param, defaultValue);
-                    if (cb != null) {
-                        cb.setValue(value);
+                    if (wi != null) {
+                        wi.setValue(value);
                     }
                 }
             }

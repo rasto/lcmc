@@ -31,7 +31,7 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 
@@ -57,7 +57,7 @@ public final class Start extends WizardDialog {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** DRBD resource pulldown menu. */
-    private GuiComboBox drbdResourceCB;
+    private Widget drbdResourceWi;
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
     /** DRBD info object. */
@@ -84,7 +84,7 @@ public final class Start extends WizardDialog {
     @Override
     public WizardDialog nextDialog() {
         boolean newResource = false;
-        final Info i = (Info) drbdResourceCB.getValue();
+        final Info i = (Info) drbdResourceWi.getValue();
         if (i.getStringValue() == null) {
             final List<BlockDevInfo> bdis =
                     new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
@@ -165,19 +165,19 @@ public final class Start extends WizardDialog {
         for (final DrbdResourceInfo dri : drbdInfo.getDrbdResources()) {
             choices.add(dri);
         }
-        drbdResourceCB = new GuiComboBox(null,
-                                         choices.toArray(
-                                                    new Info[choices.size()]),
-                                         null, /* units */
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null, /* regexp */
-                                         COMBOBOX_WIDTH,
-                                         null, /* abbrv */
-                                         new AccessMode(
-                                                  ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+        drbdResourceWi = new Widget(null,
+                                    choices.toArray(
+                                               new Info[choices.size()]),
+                                    null, /* units */
+                                    Widget.Type.COMBOBOX,
+                                    null, /* regexp */
+                                    COMBOBOX_WIDTH,
+                                    null, /* abbrv */
+                                    new AccessMode(
+                                             ConfigData.AccessType.RO,
+                                             false)); /* only adv. mode */
         inputPane.add(drbdResourceLabel);
-        inputPane.add(drbdResourceCB);
+        inputPane.add(drbdResourceWi);
         SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad

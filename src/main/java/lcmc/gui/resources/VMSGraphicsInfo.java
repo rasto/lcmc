@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.GraphicsData;
 import lcmc.data.Host;
@@ -50,23 +50,17 @@ import org.w3c.dom.Node;
  */
 public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> portCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> portWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> listenCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> listenWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> passwdCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> passwdWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> keymapCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> keymapWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> displayCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> displayWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
-    private final Map<String, GuiComboBox> xauthCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
 
     /** Parameters. AUTOPORT is generated */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
@@ -89,8 +83,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                                                     GraphicsData.XAUTH};
 
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
@@ -112,8 +106,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                                new HashMap<String, Object[]>();
     static {
-        FIELD_TYPES.put(GraphicsData.TYPE, GuiComboBox.Type.RADIOGROUP);
-        FIELD_TYPES.put(GraphicsData.PASSWD, GuiComboBox.Type.PASSWDFIELD);
+        FIELD_TYPES.put(GraphicsData.TYPE, Widget.Type.RADIOGROUP);
+        FIELD_TYPES.put(GraphicsData.PASSWD, Widget.Type.PASSWDFIELD);
         SHORTNAME_MAP.put(GraphicsData.TYPE, "Type");
         SHORTNAME_MAP.put(GraphicsData.PORT, "Port");
         SHORTNAME_MAP.put(GraphicsData.LISTEN, "Listen");
@@ -318,7 +312,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -466,23 +460,23 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    for (final String p : listenCB.keySet()) {
-                        listenCB.get(p).setVisible(vnc);
+                    for (final String p : listenWi.keySet()) {
+                        listenWi.get(p).setVisible(vnc);
                     }
-                    for (final String p : passwdCB.keySet()) {
-                        passwdCB.get(p).setVisible(vnc);
+                    for (final String p : passwdWi.keySet()) {
+                        passwdWi.get(p).setVisible(vnc);
                     }
-                    for (final String p : keymapCB.keySet()) {
-                        keymapCB.get(p).setVisible(vnc);
+                    for (final String p : keymapWi.keySet()) {
+                        keymapWi.get(p).setVisible(vnc);
                     }
-                    for (final String p : portCB.keySet()) {
-                        portCB.get(p).setVisible(vnc);
+                    for (final String p : portWi.keySet()) {
+                        portWi.get(p).setVisible(vnc);
                     }
-                    for (final String p : displayCB.keySet()) {
-                        displayCB.get(p).setVisible(sdl);
+                    for (final String p : displayWi.keySet()) {
+                        displayWi.get(p).setVisible(sdl);
                     }
-                    for (final String p : xauthCB.keySet()) {
-                        xauthCB.get(p).setVisible(sdl);
+                    for (final String p : xauthWi.keySet()) {
+                        xauthWi.get(p).setVisible(sdl);
                     }
                 }
             });
@@ -503,7 +497,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -517,9 +511,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }
@@ -600,49 +594,48 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns combo box for parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        final GuiComboBox paramCB =
-                                 super.getParamComboBox(param, prefix, width);
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        final Widget paramWi = super.createWidget(param, prefix, width);
         if (GraphicsData.PORT.equals(param)) {
             if (prefix == null) {
-                portCB.put("", paramCB);
+                portWi.put("", paramWi);
             } else {
-                portCB.put(prefix, paramCB);
+                portWi.put(prefix, paramWi);
             }
         } else if (GraphicsData.LISTEN.equals(param)) {
             if (prefix == null) {
-                listenCB.put("", paramCB);
+                listenWi.put("", paramWi);
             } else {
-                listenCB.put(prefix, paramCB);
+                listenWi.put(prefix, paramWi);
             }
         } else if (GraphicsData.PASSWD.equals(param)) {
             if (prefix == null) {
-                passwdCB.put("", paramCB);
+                passwdWi.put("", paramWi);
             } else {
-                passwdCB.put(prefix, paramCB);
+                passwdWi.put(prefix, paramWi);
             }
         } else if (GraphicsData.KEYMAP.equals(param)) {
             if (prefix == null) {
-                keymapCB.put("", paramCB);
+                keymapWi.put("", paramWi);
             } else {
-                keymapCB.put(prefix, paramCB);
+                keymapWi.put(prefix, paramWi);
             }
         } else if (GraphicsData.DISPLAY.equals(param)) {
             if (prefix == null) {
-                displayCB.put("", paramCB);
+                displayWi.put("", paramWi);
             } else {
-                displayCB.put(prefix, paramCB);
+                displayWi.put(prefix, paramWi);
             }
         } else if (GraphicsData.XAUTH.equals(param)) {
             if (prefix == null) {
-                xauthCB.put("", paramCB);
+                xauthWi.put("", paramWi);
             } else {
-                xauthCB.put(prefix, paramCB);
+                xauthWi.put(prefix, paramWi);
             }
         }
-        return paramCB;
+        return paramWi;
     }
 
     /** Modify device xml. */

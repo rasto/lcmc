@@ -29,7 +29,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.event.ItemEvent;
@@ -58,9 +58,9 @@ public class DrbdAvailFiles extends DialogHost {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd versions. */
-    private GuiComboBox drbdVersionCombo = null;
+    private Widget drbdVersionCombo = null;
     /** Combo box with drbd builds. (kernel, arch) */
-    private GuiComboBox drbdBuildCombo = null;
+    private Widget drbdBuildCombo = null;
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
@@ -272,29 +272,29 @@ public class DrbdAvailFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* drbd version combo box */
-        drbdVersionCombo = new GuiComboBox(null, /* selected value */
-                                           null, /* items */
-                                           null, /* units */
-                                           GuiComboBox.Type.COMBOBOX,
-                                           null, /* regexp */
-                                           0,    /* width */
-                                           null, /* abbrv */
-                                           new AccessMode(
-                                                  ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+        drbdVersionCombo = new Widget(null, /* selected value */
+                                      null, /* items */
+                                      null, /* units */
+                                      Widget.Type.COMBOBOX,
+                                      null, /* regexp */
+                                      0,    /* width */
+                                      null, /* abbrv */
+                                      new AccessMode(
+                                             ConfigData.AccessType.RO,
+                                             false)); /* only adv. mode */
         pane.add(drbdVersionCombo);
 
         /* build combo box */
-        drbdBuildCombo = new GuiComboBox(null, /* selected value */
-                                         null, /* items */
-                                         null, /* units */
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null, /* regexp */
-                                         0,    /* width */
-                                         null, /* abbrv */
-                                         new AccessMode(
-                                                  ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+        drbdBuildCombo = new Widget(null, /* selected value */
+                                    null, /* items */
+                                    null, /* units */
+                                    Widget.Type.COMBOBOX,
+                                    null, /* regexp */
+                                    0,    /* width */
+                                    null, /* abbrv */
+                                    new AccessMode(
+                                             ConfigData.AccessType.RO,
+                                             false)); /* only adv. mode */
 
         pane.add(drbdBuildCombo);
 

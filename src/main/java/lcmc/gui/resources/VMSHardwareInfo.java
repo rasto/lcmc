@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.Host;
 import lcmc.data.resources.Resource;
@@ -565,7 +565,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * Starts file chooser.
      * @param dir whether it needs dir or file
      */
-    protected void startFileChooser(final GuiComboBox paramCB,
+    protected void startFileChooser(final Widget paramWi,
                                     final String directory,
                                     final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
@@ -608,7 +608,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (ret == JFileChooser.APPROVE_OPTION
             && fc.getSelectedFile() != null) {
             final String name = fc.getSelectedFile().getAbsolutePath();
-            paramCB.setValue(name);
+            paramWi.setValue(name);
         }
     }
 

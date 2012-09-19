@@ -22,7 +22,7 @@
 package lcmc.data;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.ServiceInfo;
 import java.util.List;
@@ -105,8 +105,8 @@ public final class ResourceAgent {
     private final Map<String, String> sectionMap =
                                                 new HashMap<String, String>();
     /** Map to field types for some parameters. */
-    private final Map<String, GuiComboBox.Type> fieldType =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private final Map<String, Widget.Type> fieldType =
+                                       new HashMap<String, Widget.Type>();
     /** Whether this resource agent is ping or pingd. */
     private final boolean pingService;
     /** Whether to ignore defaults, show them, but don't assume they are
@@ -180,7 +180,7 @@ public final class ResourceAgent {
         paramRequired.add(name);
         paramShortDesc.put(name, shortName);
         paramLongDesc.put(name, longName);
-        fieldType.put(name, GuiComboBox.Type.LABELFIELD);
+        fieldType.put(name, Widget.Type.LABELFIELD);
     }
 
     /** Returns the hb service name. */
@@ -546,7 +546,7 @@ public final class ResourceAgent {
     }
 
     /** Returns field type of the param. */
-    public GuiComboBox.Type getFieldType(final String param) {
+    public Widget.Type getFieldType(final String param) {
         return fieldType.get(param);
     }
 

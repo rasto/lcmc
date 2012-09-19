@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.InterfaceData;
 import lcmc.data.Host;
@@ -50,12 +50,12 @@ import org.w3c.dom.Node;
 public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
-    private final Map<String, GuiComboBox> sourceNetworkCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> sourceNetworkWi =
+                                            new HashMap<String, Widget>();
     /** Source bridge combo box, so that it can be disabled, depending on
      * type. */
-    private final Map<String, GuiComboBox> sourceBridgeCB =
-                                            new HashMap<String, GuiComboBox>();
+    private final Map<String, Widget> sourceBridgeWi =
+                                            new HashMap<String, Widget>();
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
@@ -81,14 +81,13 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE};
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        FIELD_TYPES.put(InterfaceData.TYPE,
-                        GuiComboBox.Type.RADIOGROUP);
+        FIELD_TYPES.put(InterfaceData.TYPE, Widget.Type.RADIOGROUP);
         SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
         SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
         SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
@@ -287,7 +286,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -424,12 +423,12 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     protected boolean checkParam(final String param, final String newValue) {
         if (InterfaceData.TYPE.equals(param)) {
-            for (final String p : sourceNetworkCB.keySet()) {
-                sourceNetworkCB.get(p).setVisible(
+            for (final String p : sourceNetworkWi.keySet()) {
+                sourceNetworkWi.get(p).setVisible(
                                                "network".equals(newValue));
             }
-            for (final String p : sourceBridgeCB.keySet()) {
-                sourceBridgeCB.get(p).setVisible(
+            for (final String p : sourceBridgeWi.keySet()) {
+                sourceBridgeWi.get(p).setVisible(
                                                 "bridge".equals(newValue));
             }
             checkOneParam(InterfaceData.SOURCE_NETWORK);
@@ -442,30 +441,28 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
     /** Returns combo box for parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        final GuiComboBox paramCB = super.getParamComboBox(param,
-                                                           prefix,
-                                                           width);
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        final Widget paramWi = super.createWidget(param, prefix, width);
         if (InterfaceData.TYPE.equals(param)) {
-            paramCB.setAlwaysEditable(false);
+            paramWi.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_NETWORK.equals(param)) {
             if (prefix == null) {
-                sourceNetworkCB.put("", paramCB);
+                sourceNetworkWi.put("", paramWi);
             } else {
-                sourceNetworkCB.put(prefix, paramCB);
+                sourceNetworkWi.put(prefix, paramWi);
             }
-            paramCB.setAlwaysEditable(false);
+            paramWi.setAlwaysEditable(false);
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
             if (prefix == null) {
-                sourceBridgeCB.put("", paramCB);
+                sourceBridgeWi.put("", paramWi);
             } else {
-                sourceBridgeCB.put(prefix, paramCB);
+                sourceBridgeWi.put(prefix, paramWi);
             }
-            paramCB.setAlwaysEditable(false);
+            paramWi.setAlwaysEditable(false);
         }
-        return paramCB;
+        return paramWi;
     }
 
     /** Updates parameters. */
@@ -479,7 +476,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -493,9 +490,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }

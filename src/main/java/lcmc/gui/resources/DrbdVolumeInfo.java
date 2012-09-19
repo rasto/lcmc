@@ -932,7 +932,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             hg.addOrder(null, di, giFi);
         }
         di.waitForInfoPanel();
-        di.paramComboBoxGet("1", null).setValueAndWait(
+        di.getWidget("1", null).setValueAndWait(
                                             getDrbdResourceInfo().getName());
         di.apply(dcHost, testOnly);
     }
@@ -967,7 +967,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();
-        ldi.paramComboBoxGet("drbd_resource", null).setValueAndWait(
+        ldi.getWidget("drbd_resource", null).setValueAndWait(
                                             getDrbdResourceInfo().getName());
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();

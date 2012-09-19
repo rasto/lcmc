@@ -30,7 +30,7 @@ import lcmc.utilities.ComboInfo;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.event.ItemEvent;
@@ -57,7 +57,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd tarballs. */
-    private GuiComboBox drbdTarballCombo = null;
+    private Widget drbdTarballCombo = null;
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
@@ -199,16 +199,16 @@ final class DrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
-        drbdTarballCombo = new GuiComboBox(null, /* selected value */
-                                           null, /* items */
-                                           null, /* units */
-                                           GuiComboBox.Type.COMBOBOX,
-                                           null, /* regexp */
-                                           0,    /* width */
-                                           null, /* abbrv */
-                                           new AccessMode(
-                                                    ConfigData.AccessType.RO,
-                                                    false)); /* only adv mode*/
+        drbdTarballCombo = new Widget(null, /* selected value */
+                                      null, /* items */
+                                      null, /* units */
+                                      Widget.Type.COMBOBOX,
+                                      null, /* regexp */
+                                      0,    /* width */
+                                      null, /* abbrv */
+                                      new AccessMode(
+                                               ConfigData.AccessType.RO,
+                                               false)); /* only adv mode*/
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);

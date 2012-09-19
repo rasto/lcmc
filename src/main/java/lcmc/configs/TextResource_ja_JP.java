@@ -1787,10 +1787,10 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"CRMXML.OrderSectionParams",
          "順序制約(order)パラメータ"},
 
-        {"GuiComboBox.Select",
+        {"Widget.Select",
          "選択..."},
 
-        {"GuiComboBox.NothingSelected",
+        {"Widget.NothingSelected",
          "<<選択なし>>"},
 
         {"HeartbeatGraph.ColOrd",

@@ -46,7 +46,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.LVM;
 import lcmc.utilities.ButtonCallback;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.Cluster;
@@ -470,32 +470,30 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns combobox for this parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        GuiComboBox paramCb;
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        Widget paramWi;
         if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            final GuiComboBox gcb =
-                                super.getParamComboBox(param, prefix, width);
-            paramCb = gcb;
+            final Widget gwi = super.createWidget(param, prefix, width);
+            paramWi = gwi;
             //SwingUtilities.invokeLater(new Runnable() {
             //    @Override
             //    public void run() {
-            //        gcb.setAlwaysEditable(true);
+            //        gwi.setAlwaysEditable(true);
             //    }
             //});
         } else {
-            final GuiComboBox gcb =
-                                 super.getParamComboBox(param, prefix, width);
-            paramCb = gcb;
+            final Widget gwi = super.createWidget(param, prefix, width);
+            paramWi = gwi;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    gcb.setEditable(false);
+                    gwi.setEditable(false);
                 }
             });
         }
-        return paramCb;
+        return paramWi;
     }
 
     /** Returns true if a paramter is correct. */
@@ -511,12 +509,9 @@ public final class BlockDevInfo extends EditableInfo {
             if (infoPanel != null) {
                 if (!getHost().isServerStatusLatch()) {
                     final boolean internal = "internal".equals(value);
-                    final GuiComboBox ind = paramComboBoxGet(
-                                                           DRBD_MD_INDEX_PARAM,
-                                                           null);
-                    final GuiComboBox indW = paramComboBoxGet(
-                                                           DRBD_MD_INDEX_PARAM,
-                                                           "wizard");
+                    final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
+                    final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
+                                                  "wizard");
                     if (internal) {
                         ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         if (indW != null) {
@@ -962,7 +957,7 @@ public final class BlockDevInfo extends EditableInfo {
             getBlockDevice().setNew(false);
             storeComboBoxValues(params);
 
-            final Object o = paramComboBoxGet(DRBD_MD_PARAM, null).getValue();
+            final Object o = getWidget(DRBD_MD_PARAM, null).getValue();
             if (Tools.isStringInfoClass(o)) {
                 getBlockDevice().setMetaDisk(null); /* internal */
             } else {
@@ -1788,10 +1783,10 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser cb = getBrowser().getClusterBrowser();
-        if (cb != null) {
+        final ClusterBrowser wi = getBrowser().getClusterBrowser();
+        if (wi != null) {
             final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
-                            cb.new DRBDMenuItemCallback(attachMenu, getHost()) {
+                            wi.new DRBDMenuItemCallback(attachMenu, getHost()) {
                 @Override
                 public void action(final Host host) {
                     if (isDiskless(false)) {
@@ -1858,9 +1853,9 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                 }
             };
-        if (cb != null) {
+        if (wi != null) {
             final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-                               cb.new DRBDMenuItemCallback(connectMenu,
+                               wi.new DRBDMenuItemCallback(connectMenu,
                                                            getHost()) {
                 @Override
                 public void action(final Host host) {
@@ -2453,11 +2448,11 @@ public final class BlockDevInfo extends EditableInfo {
                 value = "";
             }
             final String oldValue = getParamSaved(param);
-            final GuiComboBox cb = paramComboBoxGet(param, null);
+            final Widget wi = getWidget(param, null);
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
-                if (cb != null) {
-                    cb.setValue(value);
+                if (wi != null) {
+                    wi.setValue(value);
                 }
             }
         }

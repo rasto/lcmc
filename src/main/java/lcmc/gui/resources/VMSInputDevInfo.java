@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.InputDevData;
 import lcmc.data.Host;
@@ -50,13 +50,13 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     private static final String[] PARAMETERS = {InputDevData.TYPE,
                                                 InputDevData.BUS};
     /** Field type. */
-    private static final Map<String, GuiComboBox.Type> FIELD_TYPES =
-                                       new HashMap<String, GuiComboBox.Type>();
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        FIELD_TYPES.put(InputDevData.TYPE, GuiComboBox.Type.RADIOGROUP);
+        FIELD_TYPES.put(InputDevData.TYPE, Widget.Type.RADIOGROUP);
         SHORTNAME_MAP.put(InputDevData.TYPE, "Type");
         SHORTNAME_MAP.put(InputDevData.BUS, "Bus");
     }
@@ -196,7 +196,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns type of the field. */
     @Override
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return FIELD_TYPES.get(param);
     }
 
@@ -325,7 +325,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
                 for (final String param : getParametersFromXML()) {
                     final String oldValue = getParamSaved(param);
                     String value = getParamSaved(param);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
+                    final Widget wi = getWidget(param, null);
                     for (final Host h
                              : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -339,9 +339,9 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
                     }
                     if (!Tools.areEqual(value, oldValue)) {
                         getResource().setValue(param, value);
-                        if (cb != null) {
+                        if (wi != null) {
                             /* only if it is not changed by user. */
-                            cb.setValue(value);
+                            wi.setValue(value);
                         }
                     }
                 }

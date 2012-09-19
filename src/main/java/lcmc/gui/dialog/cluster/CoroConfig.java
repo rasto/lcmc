@@ -37,7 +37,7 @@ import lcmc.data.AisCastAddress;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.Exceptions.IllegalVersionException;
@@ -92,13 +92,13 @@ final class CoroConfig extends DialogCluster {
     private final MyButton makeConfigButton = new MyButton(
                 Tools.getString("Dialog.Cluster.CoroConfig.CreateAisConfig"));
     /** Connection type pulldown menu: mcast ... */
-    private GuiComboBox typeCB;
+    private Widget typeW;
     /** Interface pulldown menu. */
-    private GuiComboBox ifaceCB;
+    private Widget ifaceW;
     /** Address field. */
-    private GuiComboBox addrCB;
+    private Widget addrW;
     /** Port field. */
-    private GuiComboBox portCB;
+    private Widget portW;
     /** Add address button. */
     private MyButton addButton;
     /** Array with corosync.conf or openais.conf configs from all hosts. */
@@ -717,16 +717,16 @@ final class CoroConfig extends DialogCluster {
      * button' accordingly.
      */
     private void checkInterface() {
-        final String type  = typeCB.getStringValue();
+        final String type  = typeW.getStringValue();
         String address     = "";
         String bindnetaddr = "";
         String port        = "";
 
         if (MCAST_TYPE.equals(type)) {
-            final NetInterface iface = (NetInterface) ifaceCB.getValue();
+            final NetInterface iface = (NetInterface) ifaceW.getValue();
             bindnetaddr = iface.getBindnetaddr();
-            address = addrCB.getStringValue();
-            port = portCB.getStringValue();
+            address = addrW.getStringValue();
+            port = portW.getStringValue();
         }
 
         for (final AisCastAddress c : aisCastAddresses) {
@@ -881,10 +881,10 @@ final class CoroConfig extends DialogCluster {
         String addr        = "";
         String port        = "";
         if (MCAST_TYPE.equals(type)) {
-            final NetInterface iface  = (NetInterface) ifaceCB.getValue();
+            final NetInterface iface  = (NetInterface) ifaceW.getValue();
             bindnetaddr = iface.getBindnetaddr();
-            addr = addrCB.getStringValue();
-            port = portCB.getStringValue();
+            addr = addrW.getStringValue();
+            port = portW.getStringValue();
         }
         aisCastAddresses.add(
             new AisCastAddress(type,
@@ -903,7 +903,7 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final String[] types = {MCAST_TYPE};
 
-        typeCB = new GuiComboBox(MCAST_TYPE,
+        typeW = new Widget(MCAST_TYPE,
                                  types,
                                  null, /* units */
                                  null, /* type */
@@ -912,10 +912,10 @@ final class CoroConfig extends DialogCluster {
                                  null, /* abbrv */
                                  new AccessMode(ConfigData.AccessType.RO,
                                                 false)); /* only adv. mode */
-        typeCB.setEnabled(false);
+        typeW.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceCB = new GuiComboBox(null, /* selected value */
+        ifaceW = new Widget(null, /* selected value */
                                   ni,
                                   null, /* units */
                                   null, /* type */
@@ -930,7 +930,7 @@ final class CoroConfig extends DialogCluster {
          * that it must match also during the thing is written.
          */
         final String regexp = "^[\\d.]+$";
-        addrCB = new GuiComboBox(
+        addrW = new Widget(
               Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress"),
               null, /* items */
               null, /* units */
@@ -941,14 +941,14 @@ final class CoroConfig extends DialogCluster {
               new AccessMode(ConfigData.AccessType.RO,
                              false)); /* only adv. mode */
 
-        typeCB.addListeners(new WidgetListener() {
+        typeW.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
                                     checkInterface();
                                 }
                             });
 
-        ifaceCB.addListeners(new WidgetListener() {
+        ifaceW.addListeners(new WidgetListener() {
                                  @Override
                                  public void check(final Object value) {
                                      checkInterface();
@@ -956,7 +956,7 @@ final class CoroConfig extends DialogCluster {
                              });
 
         final String portRegexp = "^\\d+$";
-        portCB = new GuiComboBox(
+        portW = new Widget(
                 Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort"),
                 null, /* items */
                 null, /* units */
@@ -966,14 +966,14 @@ final class CoroConfig extends DialogCluster {
                 null, /* abbrv */
                 new AccessMode(ConfigData.AccessType.RO,
                                false)); /* only adv. mode */
-        portCB.addListeners(new WidgetListener() {
+        portW.addListeners(new WidgetListener() {
                                  @Override
                                  public void check(final Object value) {
                                      checkInterface();
                                  }
                              });
 
-        addrCB.addListeners(new WidgetListener() {
+        addrW.addListeners(new WidgetListener() {
                                  @Override
                                  public void check(final Object value) {
                                      checkInterface();
@@ -988,7 +988,7 @@ final class CoroConfig extends DialogCluster {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    final String type = typeCB.getStringValue();
+                    final String type = typeW.getStringValue();
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1061,10 +1061,10 @@ final class CoroConfig extends DialogCluster {
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
-        mcast.add(typeCB);
-        mcast.add(ifaceCB);
-        mcast.add(addrCB);
-        mcast.add(portCB);
+        mcast.add(typeW);
+        mcast.add(ifaceW);
+        mcast.add(addrW);
+        mcast.add(portW);
         mcast.add(addButton);
         mcast.setPreferredSize(mcast.getMinimumSize());
         mcast.setAlignmentX(Component.LEFT_ALIGNMENT);

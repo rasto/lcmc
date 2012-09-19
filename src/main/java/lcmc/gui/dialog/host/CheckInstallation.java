@@ -30,7 +30,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -81,11 +81,11 @@ final class CheckInstallation extends DialogHost {
     private final MyButton hbPmButton = new MyButton(
             Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallButton"));
     /** Corosync/Openais/Pacemaker installation method. */
-    private GuiComboBox pmInstMethodCB;
+    private Widget pmInstMethodWi;
     /** Heartbeat/pacemaker installation method. */
-    private GuiComboBox hbPmInstMethodCB;
+    private Widget hbPmInstMethodWi;
     /** DRBD installation method. */
-    private GuiComboBox drbdInstMethodCB;
+    private Widget drbdInstMethodWi;
 
     /** Checking icon. */
     private static final ImageIcon CHECKING_ICON =
@@ -151,11 +151,11 @@ final class CheckInstallation extends DialogHost {
                 drbdButton.setBackgroundColor(
                                  Tools.getDefaultColor("ConfigDialog.Button"));
                 drbdButton.setEnabled(false);
-                drbdInstMethodCB.setEnabled(false);
+                drbdInstMethodWi.setEnabled(false);
                 pmButton.setEnabled(false);
-                pmInstMethodCB.setEnabled(false);
+                pmInstMethodWi.setEnabled(false);
                 hbPmButton.setEnabled(false);
-                hbPmInstMethodCB.setEnabled(false);
+                hbPmInstMethodWi.setEnabled(false);
             }
         });
         drbdButton.addActionListener(
@@ -166,7 +166,7 @@ final class CheckInstallation extends DialogHost {
                         getHost().setDrbdWillBeUpgraded(true);
                     }
                     final InstallMethods im =
-                                  (InstallMethods) drbdInstMethodCB.getValue();
+                                  (InstallMethods) drbdInstMethodWi.getValue();
                     getHost().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
@@ -212,7 +212,7 @@ final class CheckInstallation extends DialogHost {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new HeartbeatInst(thisClass, getHost());
                     final InstallMethods im =
-                                   (InstallMethods) hbPmInstMethodCB.getValue();
+                                   (InstallMethods) hbPmInstMethodWi.getValue();
                     getHost().setHbPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -232,7 +232,7 @@ final class CheckInstallation extends DialogHost {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new PacemakerInst(thisClass, getHost());
                     final InstallMethods im =
-                                (InstallMethods) pmInstMethodCB.getValue();
+                                (InstallMethods) pmInstMethodWi.getValue();
                     getHost().setPmInstallMethod(im.getIndex());
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -276,11 +276,11 @@ final class CheckInstallation extends DialogHost {
                     drbdIcon.setIcon(NOT_INSTALLED_ICON);
                     final String toolTip =
                                    getDrbdInstToolTip("1");
-                    drbdInstMethodCB.setToolTipText(toolTip);
+                    drbdInstMethodWi.setToolTipText(toolTip);
                     drbdButton.setToolTipText(toolTip);
                     if (drbdInstallMethodsAvailable) {
                         drbdButton.setEnabled(true);
-                        drbdInstMethodCB.setEnabled(true);
+                        drbdInstMethodWi.setEnabled(true);
                     }
                 }
             });
@@ -296,7 +296,7 @@ final class CheckInstallation extends DialogHost {
                           "Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
                         if (drbdInstallMethodsAvailable) {
                             drbdButton.setEnabled(true);
-                            drbdInstMethodCB.setEnabled(true);
+                            drbdInstMethodWi.setEnabled(true);
                         }
                     } else {
                         drbdButton.setText(Tools.getString(
@@ -305,7 +305,7 @@ final class CheckInstallation extends DialogHost {
                         if (false && drbdInstallMethodsAvailable) {
                             // TODO: disabled
                             drbdButton.setEnabled(true);
-                            drbdInstMethodCB.setEnabled(true);
+                            drbdInstMethodWi.setEnabled(true);
                         }
                         drbdIcon.setIcon(INSTALLED_ICON);
                     }
@@ -352,21 +352,21 @@ final class CheckInstallation extends DialogHost {
             && (getHost().getPacemakerVersion() == null
                 || (corosyncVersion == null && aisVersion == null))) {
             final InstallMethods hbim =
-                                  (InstallMethods) hbPmInstMethodCB.getValue();
+                                  (InstallMethods) hbPmInstMethodWi.getValue();
             if (hbim != null) {
                 hbPmButton.setEnabled(true);
-                hbPmInstMethodCB.setEnabled(true);
+                hbPmInstMethodWi.setEnabled(true);
                 final String toolTip = getHbPmInstToolTip(hbim.getIndex());
-                hbPmInstMethodCB.setToolTipText(toolTip);
+                hbPmInstMethodWi.setToolTipText(toolTip);
                 hbPmButton.setToolTipText(toolTip);
             }
             final InstallMethods pmim =
-                                    (InstallMethods) pmInstMethodCB.getValue();
+                                    (InstallMethods) pmInstMethodWi.getValue();
             if (pmim != null) {
                 pmButton.setEnabled(true);
-                pmInstMethodCB.setEnabled(true);
+                pmInstMethodWi.setEnabled(true);
                 final String aisToolTip = getPmInstToolTip(pmim.getIndex());
-                pmInstMethodCB.setToolTipText(aisToolTip);
+                pmInstMethodWi.setToolTipText(aisToolTip);
                 pmButton.setToolTipText(aisToolTip);
             }
         }
@@ -645,12 +645,12 @@ final class CheckInstallation extends DialogHost {
             pmMethods.add(pmInstallMethod);
             i++;
         }
-        pmInstMethodCB = new GuiComboBox(
+        pmInstMethodWi = new Widget(
                    pmDefaultValue,
                    (Object[]) pmMethods.toArray(
                                       new InstallMethods[pmMethods.size()]),
                    null, /* units */
-                   GuiComboBox.Type.COMBOBOX,
+                   Widget.Type.COMBOBOX,
                    null, /* regexp */
                    0,    /* width */
                    null, /* abbrv */
@@ -660,23 +660,23 @@ final class CheckInstallation extends DialogHost {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    pmInstMethodCB.setSelectedIndex(
+                    pmInstMethodWi.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
                                                                 "pminst")));
                 }
             });
         }
-        pmInstMethodCB.addListeners(new WidgetListener() {
+        pmInstMethodWi.addListeners(new WidgetListener() {
             @Override
             public void check(final Object value) {
                 InstallMethods method =
-                                    (InstallMethods) pmInstMethodCB.getValue();
+                                    (InstallMethods) pmInstMethodWi.getValue();
                 final String toolTip = getPmInstToolTip(method.getIndex());
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        pmInstMethodCB.setToolTipText(toolTip);
+                        pmInstMethodWi.setToolTipText(toolTip);
                         pmButton.setToolTipText(toolTip);
                     }
                 });
@@ -717,12 +717,12 @@ final class CheckInstallation extends DialogHost {
             }
             i++;
         }
-        hbPmInstMethodCB = new GuiComboBox(
+        hbPmInstMethodWi = new Widget(
                    hbPmDefaultValue,
                    (Object[]) hbPmMethods.toArray(
                                         new InstallMethods[hbPmMethods.size()]),
                    null, /* units */
-                   GuiComboBox.Type.COMBOBOX,
+                   Widget.Type.COMBOBOX,
                    null, /* regexp */
                    0,    /* width */
                    null, /* abbrv */
@@ -732,25 +732,25 @@ final class CheckInstallation extends DialogHost {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hbPmInstMethodCB.setSelectedIndex(
+                    hbPmInstMethodWi.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
                                                                 "hbinst")));
                 }
             });
         }
-        hbPmInstMethodCB.addListeners(
+        hbPmInstMethodWi.addListeners(
                     new WidgetListener() {
                         @Override
                         public void check(final Object value) {
                             InstallMethods method =
-                                 (InstallMethods) hbPmInstMethodCB.getValue();
+                                 (InstallMethods) hbPmInstMethodWi.getValue();
                             final String toolTip =
                                      getHbPmInstToolTip(method.getIndex());
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    hbPmInstMethodCB.setToolTipText(toolTip);
+                                    hbPmInstMethodWi.setToolTipText(toolTip);
                                     hbPmButton.setToolTipText(toolTip);
                                 }
                             });
@@ -797,52 +797,52 @@ final class CheckInstallation extends DialogHost {
         }
         if (i > 1) {
             drbdInstallMethodsAvailable = true;
-            drbdInstMethodCB = new GuiComboBox(
+            drbdInstMethodWi = new Widget(
                        drbdDefaultValue,
                        (Object[]) drbdMethods.toArray(
                                         new InstallMethods[drbdMethods.size()]),
                        null, /* units */
-                       GuiComboBox.Type.COMBOBOX,
+                       Widget.Type.COMBOBOX,
                        null, /* regexp */
                        0,    /* width */
                        null, /* abbrv */
                        new AccessMode(ConfigData.AccessType.RO,
                                       false)); /* only adv. mode */
-            drbdInstMethodCB.addListeners(
+            drbdInstMethodWi.addListeners(
                         new WidgetListener() {
                             @Override
                             public void check(final Object value) {
                                 InstallMethods method =
-                                   (InstallMethods) drbdInstMethodCB.getValue();
+                                   (InstallMethods) drbdInstMethodWi.getValue();
                                 final String toolTip =
                                      getDrbdInstToolTip(method.getIndex());
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                       drbdInstMethodCB.setToolTipText(toolTip);
+                                       drbdInstMethodWi.setToolTipText(toolTip);
                                        drbdButton.setToolTipText(toolTip);
                                     }
                                 });
                             }
                         });
         } else {
-            drbdInstMethodCB = new GuiComboBox("",
-                                               null, /* items */
-                                               null, /* units */
-                                               GuiComboBox.Type.COMBOBOX,
-                                               null, /* regexp */
-                                               0,    /* width */
-                                               null, /* abbrv */
-                                               new AccessMode(
-                                                      ConfigData.AccessType.RO,
-                                                      false)); /* only adv. */
-            drbdInstMethodCB.setEnabled(false);
+            drbdInstMethodWi = new Widget("",
+                                          null, /* items */
+                                          null, /* units */
+                                          Widget.Type.COMBOBOX,
+                                          null, /* regexp */
+                                          0,    /* width */
+                                          null, /* abbrv */
+                                          new AccessMode(
+                                                 ConfigData.AccessType.RO,
+                                                 false)); /* only adv. */
+            drbdInstMethodWi.setEnabled(false);
         }
         if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    drbdInstMethodCB.setSelectedIndex(
+                    drbdInstMethodWi.setSelectedIndex(
                         Integer.parseInt(
                             Tools.getConfigData().getAutoOptionHost(
                                                                 "drbdinst")));
@@ -863,17 +863,17 @@ final class CheckInstallation extends DialogHost {
         pane.add(hbPmJLabel);
         pane.add(hbPmLabel);
         pane.add(hbPmIcon);
-        pane.add(hbPmInstMethodCB);
+        pane.add(hbPmInstMethodWi);
         pane.add(hbPmButton);
         pane.add(pmJLabel);
         pane.add(pmLabel);
         pane.add(pmIcon);
-        pane.add(pmInstMethodCB);
+        pane.add(pmInstMethodWi);
         pane.add(pmButton);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdIcon);
-        pane.add(drbdInstMethodCB);
+        pane.add(drbdInstMethodWi);
         pane.add(drbdButton);
 
         SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols

@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.AddHostDialog;
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.TerminalPanel;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
@@ -140,8 +140,8 @@ public final class AllHostsInfo extends Info {
                 final Set<Cluster> clusters =
                      Tools.getConfigData().getClusters().getClusterSet();
                 for (final Cluster cluster : clusters) {
-                    final JCheckBox cb = allCheckboxes.get(cluster);
-                    if (cb.isSelected()) {
+                    final JCheckBox wi = allCheckboxes.get(cluster);
+                    if (wi.isSelected()) {
                         selectedClusters.add(cluster);
                         clusterNames.add(cluster.getName());
                         if (cluster.getClusterTab() != null) {
@@ -363,13 +363,13 @@ public final class AllHostsInfo extends Info {
         final JPanel left = new JPanel();
         left.setBackground(Browser.PANEL_BACKGROUND);
         clusterBackgrounds.put(cluster, startPanel);
-        final JCheckBox markCB = new JCheckBox();
-        markCB.setBackground(Browser.PANEL_BACKGROUND);
-        allCheckboxes.put(cluster, markCB);
-        left.add(markCB);
+        final JCheckBox markWi = new JCheckBox();
+        markWi.setBackground(Browser.PANEL_BACKGROUND);
+        allCheckboxes.put(cluster, markWi);
+        left.add(markWi);
         left.add(label);
         startPanel.add(left, BorderLayout.LINE_START);
-        final MyButton loadClusterBtn = loadClusterButton(cluster, markCB);
+        final MyButton loadClusterBtn = loadClusterButton(cluster, markWi);
         startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
         c.fill = GridBagConstraints.HORIZONTAL;
         mainPanel.add(startPanel, c);
@@ -381,7 +381,7 @@ public final class AllHostsInfo extends Info {
     }
 
     private MyButton loadClusterButton(final Cluster cluster,
-                                       final JCheckBox markCB) {
+                                       final JCheckBox markWi) {
         /* Load cluster button */
         final MyButton loadClusterBtn = new MyButton(
            Tools.getString("EmptyBrowser.LoadClusterButton"));
@@ -411,7 +411,7 @@ public final class AllHostsInfo extends Info {
                                 public void run() {
                                     clusterBackgrounds.get(cluster)
                                                    .setBackground(Color.GREEN);
-                                    markCB.setSelected(false);
+                                    markWi.setSelected(false);
                                 }
                             });
                         }
@@ -429,13 +429,11 @@ public final class AllHostsInfo extends Info {
         final JPanel label = new JPanel();
         label.setBackground(Browser.PANEL_BACKGROUND);
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
-        final JTextField clusterTF =
-                                new GuiComboBox.MTextField(CLUSTER_NAME_PH);
+        final JTextField clusterTF = new Widget.MTextField(CLUSTER_NAME_PH);
         label.add(clusterTF);
         final List<JTextField> hostsTF = new ArrayList<JTextField>();
         for (int i = 1; i < 3; i++) {
-            final JTextField nl =
-                            new GuiComboBox.MTextField("node" + i + "...", 15);
+            final JTextField nl = new Widget.MTextField("node" + i + "...", 15);
             nl.setToolTipText("<html><b>enter the node name or ip</b><br>node"
                               + i + "<br>or ...<br>"
                               + System.getProperty("user.name")
@@ -609,21 +607,17 @@ public final class AllHostsInfo extends Info {
 
     /** Adds checkbox listener for this cluster's checkbox. */
     public void addCheckboxListener(final Cluster cluster) {
-        final JCheckBox cb = allCheckboxes.get(cluster);
-        cb.addItemListener(new ItemListener() {
+        final JCheckBox wi = allCheckboxes.get(cluster);
+        wi.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         final Set<Cluster> clusters =
-                                Tools.getConfigData()
-                                .getClusters()
-                                .getClusterSet();
+                           Tools.getConfigData().getClusters().getClusterSet();
 
-                        allCheckboxesListener(
-                                        clusters,
-                                        cb);
+                        allCheckboxesListener(clusters, wi);
                     }
                 });
                 thread.start();
@@ -643,8 +637,8 @@ public final class AllHostsInfo extends Info {
         final List<Cluster> selectedClusters = new ArrayList<Cluster>();
         for (final Cluster cluster : clusters) {
             if (cluster.getClusterTab() == null) {
-                final JCheckBox cb = allCheckboxes.get(cluster);
-                if (cb.isSelected()) {
+                final JCheckBox wi = allCheckboxes.get(cluster);
+                if (wi.isSelected()) {
                     selectedClusters.add(cluster);
                     setConnected(cluster);
                 } else if (cluster.getClusterTab() == null) {
@@ -684,8 +678,8 @@ public final class AllHostsInfo extends Info {
         final List<Cluster> selectedClusters = new ArrayList<Cluster>();
         for (final Cluster cluster : clusters) {
             if (cluster.getClusterTab() != null) {
-                final JCheckBox cb = allCheckboxes.get(cluster);
-                if (cb.isSelected()) {
+                final JCheckBox wi = allCheckboxes.get(cluster);
+                if (wi.isSelected()) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -703,7 +697,7 @@ public final class AllHostsInfo extends Info {
 
     /** Listener for checkboxes that is called from thread. */
     private void allCheckboxesListener(final Set<Cluster> clusters,
-                                       final JCheckBox cb) {
+                                       final JCheckBox wi) {
         int rc = 0;
         int nrc = 0;
         int ac = 0;
@@ -721,7 +715,7 @@ public final class AllHostsInfo extends Info {
         final int runningCount = rc;
         final int notRunningCount = nrc;
         final int allCount = ac;
-        if (cb.isSelected()) {
+        if (wi.isSelected()) {
             /* disable all start cluster buttons */
             SwingUtilities.invokeLater(new Runnable() {
                 @Override

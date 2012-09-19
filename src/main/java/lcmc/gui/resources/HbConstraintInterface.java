@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.data.Host;
 import lcmc.data.resources.Service;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -46,7 +46,7 @@ public interface HbConstraintInterface {
                    final String[] params,
                    final int leftWidth,
                    final int rightWidth,
-                   final Map<String, GuiComboBox> sameAsFields);
+                   final Map<String, Widget> sameAsFields);
     /**
      * Check which fields are correct and return true if all are.
      */

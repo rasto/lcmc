@@ -25,7 +25,7 @@ import lcmc.Exceptions;
 import lcmc.AddDrbdConfigDialog;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.Host;
 import lcmc.data.DrbdXML;
 import lcmc.data.resources.Resource;
@@ -109,11 +109,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 }
             }
             final String oldValue = getParamSaved(param);
-            final GuiComboBox cb = paramComboBoxGet(param, null);
+            final Widget wi = getWidget(param, null);
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
-                if (cb != null) {
-                    cb.setValue(value);
+                if (wi != null) {
+                    wi.setValue(value);
                 }
             }
         }
@@ -129,14 +129,14 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * disabled.
      */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        final GuiComboBox cb = super.getParamComboBox(param, prefix, width);
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        final Widget wi = super.createWidget(param, prefix, width);
         if ("usage-count".equals(param)) {
-            cb.setEnabled(false);
+            wi.setEnabled(false);
         }
-        return cb;
+        return wi;
     }
 
     /** Creates drbd config. */
@@ -638,8 +638,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     adrd.showDialogs();
                     /* remove wizard parameters from hashes. */
                     for (final String p : bd1.getParametersFromXML()) {
-                        bd1.paramComboBoxRemove(p, "wizard");
-                        bd2.paramComboBoxRemove(p, "wizard");
+                        bd1.widgetRemove(p, "wizard");
+                        bd2.widgetRemove(p, "wizard");
                     }
                     if (adrd.isCanceled()) {
                         final DrbdVolumeInfo dvi = bd1.getDrbdVolumeInfo();

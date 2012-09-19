@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -99,7 +99,7 @@ public abstract class EditableInfo extends Info {
      * boolean. */
     protected abstract boolean isCheckBox(String param);
     /** Returns type of the field. */
-    protected GuiComboBox.Type getFieldType(final String param) {
+    protected Widget.Type getFieldType(final String param) {
         return null;
     }
     /** Returns the name of the type. */
@@ -253,7 +253,7 @@ public abstract class EditableInfo extends Info {
                                  final MyButton wizardApplyButton,
                                  final int leftWidth,
                                  final int rightWidth,
-                                 final Map<String, GuiComboBox> sameAsFields) {
+                                 final Map<String, Widget> sameAsFields) {
         addParams(optionsPanel,
                   "wizard",
                   params,
@@ -305,7 +305,7 @@ public abstract class EditableInfo extends Info {
                                 final String[] params,
                                 final int leftWidth,
                                 final int rightWidth,
-                                final Map<String, GuiComboBox> sameAsFields) {
+                                final Map<String, Widget> sameAsFields) {
         addParams(optionsPanel,
                   null,
                   params,
@@ -322,7 +322,7 @@ public abstract class EditableInfo extends Info {
                            final MyButton thisApplyButton,
                            final int leftWidth,
                            final int rightWidth,
-                           final Map<String, GuiComboBox> sameAsFields) {
+                           final Map<String, Widget> sameAsFields) {
         if (params == null) {
             return;
         }
@@ -333,9 +333,7 @@ public abstract class EditableInfo extends Info {
                                             new MultiKeyMap<String, Integer>();
 
         for (final String param : params) {
-            final GuiComboBox paramCb = getParamComboBox(param,
-                                                         prefix,
-                                                         rightWidth);
+            final Widget paramWi = createWidget(param, prefix, rightWidth);
             /* sub panel */
             final String section = getSection(param);
             JPanel panel;
@@ -385,67 +383,66 @@ public abstract class EditableInfo extends Info {
             /* label */
             final JLabel label = new JLabel(getParamShortDesc(param));
             final String longDesc = getParamLongDesc(param);
-            paramCb.setLabel(label, longDesc);
+            paramWi.setLabel(label, longDesc);
 
             /* tool tip */
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    paramCb.setToolTipText(getToolTipText(param));
+                    paramWi.setToolTipText(getToolTipText(param));
                     label.setToolTipText(longDesc);
                 }
             });
             int height = 0;
-            if (paramCb.getType() == GuiComboBox.Type.LABELFIELD) {
+            if (paramWi.getType() == Widget.Type.LABELFIELD) {
                 height = Tools.getDefaultSize("Browser.LabelFieldHeight");
             }
-            addField(panel, label, paramCb, leftWidth, rightWidth, height);
+            addField(panel, label, paramWi, leftWidth, rightWidth, height);
         }
         for (final String param : params) {
-            final GuiComboBox paramCb = paramComboBoxGet(param, prefix);
-            GuiComboBox rpcb = null;
+            final Widget paramWi = getWidget(param, prefix);
+            Widget rpwi = null;
             if ("wizard".equals(prefix)) {
-                rpcb = paramComboBoxGet(param, null);
-                if (rpcb == null) {
+                rpwi = getWidget(param, null);
+                if (rpwi == null) {
                     Tools.appError("unkown param: " + param
                                    + ". Man pages not installed?");
                     continue;
                 }
                 int height = 0;
-                if (rpcb.getType() == GuiComboBox.Type.LABELFIELD) {
+                if (rpwi.getType() == Widget.Type.LABELFIELD) {
                     height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
-                final GuiComboBox rpcb0 = rpcb;
+                final Widget rpwi0 = rpwi;
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (paramCb.getValue() == null
-                            || paramCb.getValue()
-                               == GuiComboBox.NOTHING_SELECTED) {
-                            rpcb0.setValueAndWait(null);
+                        if (paramWi.getValue() == null
+                            || paramWi.getValue() == Widget.NOTHING_SELECTED) {
+                            rpwi0.setValueAndWait(null);
                         } else {
-                            final Object value = paramCb.getStringValue();
-                            rpcb0.setValueAndWait(value);
+                            final Object value = paramWi.getStringValue();
+                            rpwi0.setValueAndWait(value);
                         }
                     }
                 });
             }
         }
         for (final String param : params) {
-            final GuiComboBox paramCb = paramComboBoxGet(param, prefix);
-            GuiComboBox rpcb = null;
+            final Widget paramWi = getWidget(param, prefix);
+            Widget rpwi = null;
             if ("wizard".equals(prefix)) {
-                rpcb = paramComboBoxGet(param, null);
+                rpwi = getWidget(param, null);
             }
-            final GuiComboBox realParamCb = rpcb;
+            final Widget realParamWi = rpwi;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    paramCb.addListeners(new WidgetListener() {
+                    paramWi.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
-                                    checkParameterFields(paramCb,
-                                                         realParamCb,
+                                    checkParameterFields(paramWi,
+                                                         realParamWi,
                                                          param,
                                                          params,
                                                          thisApplyButton);
@@ -485,7 +482,7 @@ public abstract class EditableInfo extends Info {
                 sectionMap.put(section, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
-                    final GuiComboBox sameAsCombo = sameAsFields.get(section);
+                    final Widget sameAsCombo = sameAsFields.get(section);
                     if (sameAsCombo != null) {
                         final JPanel saPanel = new JPanel(new SpringLayout());
                         saPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
@@ -556,8 +553,8 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Checks ands sets paramter fields. */
-    public void checkParameterFields(final GuiComboBox paramCb,
-                                     final GuiComboBox realParamCb,
+    public void checkParameterFields(final Widget paramWi,
+                                     final Widget realParamWi,
                                      final String param,
                                      final String[] params,
                                      final MyButton thisApplyButton) {
@@ -568,12 +565,12 @@ public abstract class EditableInfo extends Info {
                 //SwingUtilities.invokeLater(new Runnable() {
                 //    @Override
                 //    public void run() {
-                //        paramCb.setEditable();
+                //        paramWi.setEditable();
                 //    }
                 //});
                 boolean c;
                 boolean ch = false;
-                if (realParamCb == null) {
+                if (realParamWi == null) {
                     Tools.waitForSwing();
                     ch = checkResourceFieldsChanged(param, params);
                     c = checkResourceFieldsCorrect(param, params);
@@ -581,13 +578,12 @@ public abstract class EditableInfo extends Info {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (paramCb.getValue() == null
-                                || paramCb.getValue()
-                                   == GuiComboBox.NOTHING_SELECTED) {
-                                realParamCb.setValueAndWait(null);
+                            if (paramWi.getValue() == null
+                                || paramWi.getValue() == Widget.NOTHING_SELECTED) {
+                                realParamWi.setValueAndWait(null);
                             } else {
-                                final Object value = paramCb.getStringValue();
-                                realParamCb.setValueAndWait(value);
+                                final Object value = paramWi.getStringValue();
+                                realParamWi.setValueAndWait(value);
                             }
                         }
                     });
@@ -611,10 +607,10 @@ public abstract class EditableInfo extends Info {
                         if (revertButton != null) {
                             revertButton.setEnabled(changed);
                         }
-                        paramCb.setToolTipText(
+                        paramWi.setToolTipText(
                                 getToolTipText(param));
-                        if (realParamCb != null) {
-                            realParamCb.setToolTipText(getToolTipText(param));
+                        if (realParamWi != null) {
+                            realParamWi.setToolTipText(getToolTipText(param));
                         }
                     }
                 });
@@ -625,14 +621,14 @@ public abstract class EditableInfo extends Info {
 
     /** Get stored value in the combo box. */
     public final String getComboBoxValue(final String param) {
-        final GuiComboBox cb = paramComboBoxGet(param, null);
-        if (cb == null) {
+        final Widget wi = getWidget(param, null);
+        if (wi == null) {
             return null;
         }
-        final Object o = cb.getValue();
+        final Object o = wi.getValue();
         String value;
         if (Tools.isStringClass(o)) {
-            value = cb.getStringValue();
+            value = wi.getStringValue();
         } else if (o instanceof Object[]) {
             value = ((Object[]) o)[0].toString();
             if (((Object[]) o)[1] instanceof Unit) {
@@ -649,17 +645,17 @@ public abstract class EditableInfo extends Info {
         for (String param : params) {
             final String value = getComboBoxValue(param);
             getResource().setValue(param, value);
-            final GuiComboBox cb = paramComboBoxGet(param, null);
-            if (cb != null) {
-               cb.setToolTipText(getToolTipText(param));
+            final Widget wi = getWidget(param, null);
+            if (wi != null) {
+               wi.setToolTipText(getToolTipText(param));
             }
         }
     }
 
     /** Returns combo box for one parameter. */
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
         getResource().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
         String initValue = getPreviouslySelected(param, prefix);
@@ -690,20 +686,20 @@ public abstract class EditableInfo extends Info {
             abbreviations.put("d", CRMXML.DISABLED_STRING);
             abbreviations.put("D", CRMXML.DISABLED_STRING);
         }
-        GuiComboBox.Type type = getFieldType(param);
+        Widget.Type type = getFieldType(param);
         Unit[] units = null;
-        if (type == GuiComboBox.Type.TEXTFIELDWITHUNIT) {
+        if (type == Widget.Type.TEXTFIELDWITHUNIT) {
             units = getUnits();
         }
         if (isCheckBox(param)) {
-            type = GuiComboBox.Type.CHECKBOX;
+            type = Widget.Type.CHECKBOX;
         } else if (isTimeType(param)) {
-            type = GuiComboBox.Type.TEXTFIELDWITHUNIT;
+            type = Widget.Type.TEXTFIELDWITHUNIT;
             units = getTimeUnits();
         } else if (isLabel(param)) {
-            type = GuiComboBox.Type.LABELFIELD;
+            type = Widget.Type.LABELFIELD;
         }
-        final GuiComboBox paramCb = new GuiComboBox(
+        final Widget paramWi = new Widget(
                                       initValue,
                                       getPossibleChoices(param),
                                       units,
@@ -714,9 +710,9 @@ public abstract class EditableInfo extends Info {
                                       new AccessMode(
                                         getAccessType(param),
                                         isEnabledOnlyInAdvancedMode(param)));
-        paramComboBoxAdd(param, prefix, paramCb);
-        paramCb.setEditable(true);
-        return paramCb;
+        widgetAdd(param, prefix, paramWi);
+        paramWi.setEditable(true);
+        return paramWi;
     }
 
     /**
@@ -732,9 +728,9 @@ public abstract class EditableInfo extends Info {
                                         final String newValue) {
         String regexp = getParamRegexp(param);
         if (regexp == null) {
-            final GuiComboBox cb = paramComboBoxGet(param, null);
-            if (cb != null) {
-                regexp = cb.getRegexp();
+            final Widget wi = getWidget(param, null);
+            if (wi != null) {
+                regexp = wi.getRegexp();
             }
         }
         if (regexp != null) {
@@ -824,9 +820,9 @@ public abstract class EditableInfo extends Info {
     protected final String getToolTipText(final String param) {
         final String defaultValue = getParamDefault(param);
         final StringBuilder ret = new StringBuilder(120);
-        final GuiComboBox cb = paramComboBoxGet(param, null);
-        if (cb != null) {
-            final Object value = cb.getStringValue();
+        final Widget wi = getWidget(param, null);
+        if (wi != null) {
+            final Object value = wi.getStringValue();
             ret.append("<b>");
             ret.append(value);
             ret.append("</b>");
@@ -894,14 +890,14 @@ public abstract class EditableInfo extends Info {
         boolean correctValue = true;
         if (params != null) {
             for (final String otherParam : params) {
-                final GuiComboBox cb = paramComboBoxGet(otherParam, null);
-                if (cb == null) {
+                final Widget wi = getWidget(otherParam, null);
+                if (wi == null) {
                     continue;
                 }
                 String newValue;
-                final Object o = cb.getValue();
+                final Object o = wi.getValue();
                 if (Tools.isStringClass(o)) {
-                    newValue = cb.getStringValue();
+                    newValue = wi.getStringValue();
                 } else if (o instanceof Object[]) {
                     final Object o0 = ((Object[]) o)[0];
                     final Object o1 = ((Object[]) o)[1];
@@ -916,15 +912,14 @@ public abstract class EditableInfo extends Info {
 
                 if (param == null || otherParam.equals(param)
                     || !paramCorrectValueMap.containsKey(param)) {
-                    final GuiComboBox wizardCb =
-                                    paramComboBoxGet(otherParam, "wizard");
+                    final Widget wizardWi = getWidget(otherParam, "wizard");
                     final String enable = isEnabled(otherParam);
-                    if (wizardCb != null) {
-                        wizardCb.setDisabledReason(enable);
-                        wizardCb.setEnabled(enable == null);
-                        final Object wo = wizardCb.getValue();
+                    if (wizardWi != null) {
+                        wizardWi.setDisabledReason(enable);
+                        wizardWi.setEnabled(enable == null);
+                        final Object wo = wizardWi.getValue();
                         if (Tools.isStringClass(wo)) {
-                            newValue = wizardCb.getStringValue();
+                            newValue = wizardWi.getStringValue();
                         } else if (wo instanceof Object[]) {
                             newValue =
                                    ((Object[]) wo)[0].toString()
@@ -933,21 +928,21 @@ public abstract class EditableInfo extends Info {
                             newValue = ((Info) wo).getStringValue();
                         }
                     }
-                    cb.setDisabledReason(enable);
-                    cb.setEnabled(enable == null);
+                    wi.setDisabledReason(enable);
+                    wi.setEnabled(enable == null);
                     final boolean check = checkParam(otherParam, newValue)
                                           && checkRegexp(otherParam, newValue);
                     if (check) {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {
-                            cb.setBackground(
+                            wi.setBackground(
                                         Tools.extractUnit(
                                            getParamDefault(otherParam)),
                                         Tools.extractUnit(
                                            getParamSaved(otherParam)),
                                         isRequired(otherParam));
-                            if (wizardCb != null) {
-                                wizardCb.setBackground(
+                            if (wizardWi != null) {
+                                wizardWi.setBackground(
                                     Tools.extractUnit(
                                               getParamDefault(otherParam)),
                                     Tools.extractUnit(
@@ -955,21 +950,21 @@ public abstract class EditableInfo extends Info {
                                     isRequired(otherParam));
                             }
                         } else {
-                            cb.setBackground(
+                            wi.setBackground(
                                      getParamDefault(otherParam),
                                      getParamSaved(otherParam),
                                      isRequired(otherParam));
-                            if (wizardCb != null) {
-                                wizardCb.setBackground(
+                            if (wizardWi != null) {
+                                wizardWi.setBackground(
                                             getParamDefault(otherParam),
                                             getParamSaved(otherParam),
                                             isRequired(otherParam));
                             }
                         }
                     } else {
-                        cb.wrongValue();
-                        if (wizardCb != null) {
-                            wizardCb.wrongValue();
+                        wi.wrongValue();
+                        if (wizardWi != null) {
+                            wizardWi.wrongValue();
                         }
                         correctValue = false;
                     }
@@ -993,11 +988,11 @@ public abstract class EditableInfo extends Info {
         boolean changedValue = false;
         if (params != null) {
             for (String otherParam : params) {
-                final GuiComboBox cb = paramComboBoxGet(otherParam, null);
-                if (cb == null) {
+                final Widget wi = getWidget(otherParam, null);
+                if (wi == null) {
                     continue;
                 }
-                final Object newValue = cb.getValue();
+                final Object newValue = wi.getValue();
 
                 /* check if value has changed */
                 Object oldValue = getParamSaved(otherParam);
@@ -1010,15 +1005,15 @@ public abstract class EditableInfo extends Info {
                 if (!Tools.areEqual(newValue, oldValue)) {
                     changedValue = true;
                 }
-                cb.processAccessMode();
+                wi.processAccessMode();
             }
         }
         return changedValue;
     }
 
     /** Return JLabel object for the combobox. */
-    protected final JLabel getLabel(final GuiComboBox cb) {
-        return cb.getLabel();
+    protected final JLabel getLabel(final Widget wi) {
+        return wi.getLabel();
     }
 
     /** Waits till the info panel is done for the first time. */
@@ -1088,12 +1083,12 @@ public abstract class EditableInfo extends Info {
             if (v == null) {
                 v = getParamDefault(param);
             }
-            final GuiComboBox cb = paramComboBoxGet(param, null);
-            if (cb != null && !Tools.areEqual(cb.getStringValue(), v)) {
-                cb.setValue(v);
-                final GuiComboBox wizardCb = paramComboBoxGet(param, "wizard");
-                if (wizardCb != null) {
-                    wizardCb.setValue(v);
+            final Widget wi = getWidget(param, null);
+            if (wi != null && !Tools.areEqual(wi.getStringValue(), v)) {
+                wi.setValue(v);
+                final Widget wizardWi = getWidget(param, "wizard");
+                if (wizardWi != null) {
+                    wizardWi.setValue(v);
                 }
             }
         }
@@ -1149,9 +1144,9 @@ public abstract class EditableInfo extends Info {
      *  primitive changes to and from clone. */
     protected final String getPreviouslySelected(final String param,
                                                  final String prefix) {
-        final GuiComboBox prevParamCb = paramComboBoxGet(param, prefix);
-        if (prevParamCb != null) {
-            return prevParamCb.getStringValue();
+        final Widget prevParamWi = getWidget(param, prefix);
+        if (prevParamWi != null) {
+            return prevParamWi.getStringValue();
         }
         return null;
     }

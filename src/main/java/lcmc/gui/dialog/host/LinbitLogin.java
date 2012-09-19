@@ -25,7 +25,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -48,9 +48,9 @@ public class LinbitLogin extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Field with user name. */
-    private GuiComboBox downloadUserField;
+    private Widget downloadUserField;
     /** Field with password. */
-    private GuiComboBox downloadPasswordField;
+    private Widget downloadPasswordField;
     /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
     /** Width of the check boxes. */
@@ -96,7 +96,7 @@ public class LinbitLogin extends DialogHost {
 
     /** Check all fields if they are correct. */
     @Override
-    protected final void checkFields(final GuiComboBox field) {
+    protected final void checkFields(final Widget field) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -166,16 +166,15 @@ public class LinbitLogin extends DialogHost {
         final JLabel userLabel = new JLabel(
                       Tools.getString("Dialog.Host.LinbitLogin.EnterUser"));
         inputPane.add(userLabel);
-        downloadUserField = new GuiComboBox(
-                                        Tools.getConfigData().getDownloadUser(),
-                                        null, /* items */
-                                        null, /* units */
-                                        null, /* type */
-                                        "^[,\\w.-]+$",
-                                        CHECKBOX_WIDTH,
-                                        null, /* abbrv */
-                                        new AccessMode(ConfigData.AccessType.RO,
-                                                       false)); /* only adv. */
+        downloadUserField = new Widget(Tools.getConfigData().getDownloadUser(),
+                                       null, /* items */
+                                       null, /* units */
+                                       null, /* type */
+                                       "^[,\\w.-]+$",
+                                       CHECKBOX_WIDTH,
+                                       null, /* abbrv */
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      false)); /* only adv. */
 
         addCheckField(downloadUserField);
         userLabel.setLabelFor(downloadUserField);
@@ -186,11 +185,11 @@ public class LinbitLogin extends DialogHost {
                   Tools.getString("Dialog.Host.LinbitLogin.EnterPassword"));
 
         inputPane.add(passwordLabel);
-        downloadPasswordField = new GuiComboBox(
+        downloadPasswordField = new Widget(
                                   Tools.getConfigData().getDownloadPassword(),
                                   null, /* items */
                                   null, /* units */
-                                  GuiComboBox.Type.PASSWDFIELD,
+                                  Widget.Type.PASSWDFIELD,
                                   null, /* type */
                                   CHECKBOX_WIDTH,
                                   null, /* abbrv */

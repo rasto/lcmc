@@ -28,7 +28,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.DRBD;
@@ -61,7 +61,7 @@ final class CreateMD extends DrbdConfig {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Metadata pulldown choices. */
-    private GuiComboBox metadataCB;
+    private Widget metadataWi;
     /** Make Meta-Data button. */
     private final MyButton makeMDButton = new MyButton();
     /** Width of the combo boxes. */
@@ -289,16 +289,16 @@ final class CreateMD extends DrbdConfig {
             makeMDButton.setText(
                  Tools.getString("Dialog.DrbdConfig.CreateMD.CreateMDButton"));
             final String metadataDefault = createNewMetadata;
-            metadataCB = new GuiComboBox(metadataDefault,
-                                         choices,
-                                         null, /* units */
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null, /* regexp */
-                                         COMBOBOX_WIDTH,
-                                         null, /* abbrv */
-                                         new AccessMode(
-                                                  ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+            metadataWi = new Widget(metadataDefault,
+                                    choices,
+                                    null, /* units */
+                                    Widget.Type.COMBOBOX,
+                                    null, /* regexp */
+                                    COMBOBOX_WIDTH,
+                                    null, /* abbrv */
+                                    new AccessMode(
+                                             ConfigData.AccessType.RO,
+                                             false)); /* only adv. mode */
         } else {
             final String[] choices = {useExistingMetadata,
                                       createNewMetadata,
@@ -311,25 +311,25 @@ final class CreateMD extends DrbdConfig {
                 metadataDefault = createNewMetadata;
                 makeMDButton.setEnabled(true);
             }
-            metadataCB = new GuiComboBox(metadataDefault,
-                                         choices,
-                                         null, /* units */
-                                         GuiComboBox.Type.COMBOBOX,
-                                         null, /* regexp */
-                                         COMBOBOX_WIDTH,
-                                         null, /* abbrv */
-                                         new AccessMode(
-                                                  ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+            metadataWi = new Widget(metadataDefault,
+                                    choices,
+                                    null, /* units */
+                                    Widget.Type.COMBOBOX,
+                                    null, /* regexp */
+                                    COMBOBOX_WIDTH,
+                                    null, /* abbrv */
+                                    new AccessMode(
+                                             ConfigData.AccessType.RO,
+                                             false)); /* only adv. mode */
         }
 
         inputPane.add(metadataLabel);
-        inputPane.add(metadataCB);
-        metadataCB.addListeners(
+        inputPane.add(metadataWi);
+        metadataWi.addListeners(
             new WidgetListener() {
                 @Override
                 public void check(final Object value) {
-                    if (metadataCB.getStringValue().equals(
+                    if (metadataWi.getStringValue().equals(
                                                 useExistingMetadata)) {
                         makeMDButton.setEnabled(false);
                         buttonClass(nextButton()).setEnabled(true);
@@ -347,7 +347,7 @@ final class CreateMD extends DrbdConfig {
                     @Override
                     public void run() {
                         getProgressBar().start(10000);
-                        if (metadataCB.getStringValue().equals(
+                        if (metadataWi.getStringValue().equals(
                                               createNewMetadataDestroyData)) {
                             createMetadata(true);
                         } else {

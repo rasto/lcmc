@@ -94,8 +94,6 @@ public final class AppDefaults extends java.util.ListResourceBundle {
 
         {"ClusterBrowser.DrbdResLabelWidth",     150},
         {"ClusterBrowser.DrbdResFieldWidth",     150},
-        //{"GuiComboBox.width",                    200},
-        //{"GuiComboBox.height",                   30},
         {"HostBrowser.DrbdDevLabelWidth",        150},
         {"HostBrowser.DrbdDevFieldWidth",        150},
 
@@ -202,10 +200,10 @@ public final class AppDefaults extends java.util.ListResourceBundle {
         {"Host.ErrorColor",                       Color.RED },
         {"Host.NoStatusColor",                    Color.LIGHT_GRAY },
 
-        {"GuiComboBox.DefaultValue",              new Color(50, 50, 50) },
-        {"GuiComboBox.SavedValue",                new Color(0, 120, 0) },
-        {"GuiComboBox.ChangedValue",              new Color(128, 0, 128) },
-        {"GuiComboBox.ErrorValue",                new Color(255, 100, 100) },
+        {"Widget.DefaultValue",                   new Color(50, 50, 50) },
+        {"Widget.SavedValue",                     new Color(0, 120, 0) },
+        {"Widget.ChangedValue",                   new Color(128, 0, 128) },
+        {"Widget.ErrorValue",                     new Color(255, 100, 100) },
 
         {"ClusterBrowser.Background",             new Color(255, 255, 255) },
         {"ClusterBrowser.Test.Tooltip.Background", new Color(255, 255, 0, 160)},

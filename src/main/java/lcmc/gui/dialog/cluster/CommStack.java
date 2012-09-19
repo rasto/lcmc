@@ -29,7 +29,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 
@@ -54,7 +54,7 @@ final class CommStack extends DialogCluster {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
-    private GuiComboBox chooseStackCombo;
+    private Widget chooseStackCombo;
 
     /** Prepares a new <code>CommStack</code> object. */
     CommStack(final WizardDialog previousDialog, final Cluster cluster) {
@@ -236,18 +236,18 @@ final class CommStack extends DialogCluster {
         if (defaultValue == null) {
             defaultValue = ConfigData.COROSYNC_NAME;
         }
-        chooseStackCombo = new GuiComboBox(defaultValue,
-                                           new String[]{
-                                                    ConfigData.HEARTBEAT_NAME,
-                                                    ConfigData.COROSYNC_NAME},
-                                           null, /* units */
-                                           GuiComboBox.Type.RADIOGROUP,
-                                           null, /* regexp */
-                                           500,
-                                           null, /* abbrv */
-                                           new AccessMode(
-                                                  ConfigData.AccessType.ADMIN,
-                                                  false)); /* only adv. mode */
+        chooseStackCombo = new Widget(defaultValue,
+                                      new String[]{
+                                               ConfigData.HEARTBEAT_NAME,
+                                               ConfigData.COROSYNC_NAME},
+                                      null, /* units */
+                                      Widget.Type.RADIOGROUP,
+                                      null, /* regexp */
+                                      500,
+                                      null, /* abbrv */
+                                      new AccessMode(
+                                             ConfigData.AccessType.ADMIN,
+                                             false)); /* only adv. mode */
         chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);

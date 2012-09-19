@@ -28,7 +28,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.Cluster;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
@@ -63,7 +63,7 @@ public final class VGCreate extends LV {
     /** Selected block device, can be null. */
     private final BlockDevInfo selectedBlockDevInfo;
     private final MyButton createButton = new MyButton("Create VG");
-    private GuiComboBox vgNameCB;
+    private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
     /** Description create VG. */
@@ -103,7 +103,7 @@ public final class VGCreate extends LV {
     /** Inits the dialog after it becomes visible. */
     protected void initDialogAfterVisible() {
         enableComponents();
-        makeDefaultAndRequestFocusLater(vgNameCB);
+        makeDefaultAndRequestFocusLater(vgNameWi);
         makeDefaultButton(createButton);
     }
 
@@ -131,7 +131,7 @@ public final class VGCreate extends LV {
             boolean e = enable;
             if (enable) {
                 boolean vgNameCorrect = true;
-                if ("".equals(vgNameCB.getStringValue())) {
+                if ("".equals(vgNameWi.getStringValue())) {
                     vgNameCorrect = false;
                 } else if (hostCheckBoxes != null) {
                     for (final Host h : hostCheckBoxes.keySet()) {
@@ -139,7 +139,7 @@ public final class VGCreate extends LV {
                             final Set<String> vgs =
                                 h.getVolumeGroupNames();
                             if (vgs != null && vgs.contains(
-                                            vgNameCB.getStringValue())) {
+                                            vgNameWi.getStringValue())) {
                                 vgNameCorrect = false;
                                 break;
                             }
@@ -147,10 +147,10 @@ public final class VGCreate extends LV {
                     }
                 }
                 if (vgNameCorrect) {
-                    vgNameCB.setBackground("", "", true);
+                    vgNameWi.setBackground("", "", true);
                 } else {
                     e = false;
-                    vgNameCB.wrongValue();
+                    vgNameWi.wrongValue();
                 }
             }
             createButton.setEnabled(e);
@@ -219,17 +219,17 @@ public final class VGCreate extends LV {
             }
             i++;
         }
-        vgNameCB = new GuiComboBox(defaultName,
-                                   null,
-                                   null, /* units */
-                                   GuiComboBox.Type.TEXTFIELD,
-                                   null, /* regexp */
-                                   250,
-                                   null, /* abbrv */
-                                   new AccessMode(ConfigData.AccessType.OP,
-                                                  false)); /* only adv. */
+        vgNameWi = new Widget(defaultName,
+                              null,
+                              null, /* units */
+                              Widget.Type.TEXTFIELD,
+                              null, /* regexp */
+                              250,
+                              null, /* abbrv */
+                              new AccessMode(ConfigData.AccessType.OP,
+                                             false)); /* only adv. */
         inputPane.add(new JLabel("VG Name"));
-        inputPane.add(vgNameCB);
+        inputPane.add(vgNameWi);
 
         createButton.addActionListener(new CreateActionListener());
         inputPane.add(createButton);
@@ -363,7 +363,7 @@ public final class VGCreate extends LV {
                         }
                     }
                     final boolean ret =
-                        vgCreate(h, vgNameCB.getStringValue(), pvNames);
+                        vgCreate(h, vgNameWi.getStringValue(), pvNames);
                     if (!ret) {
                         oneFailed = true;
                     }

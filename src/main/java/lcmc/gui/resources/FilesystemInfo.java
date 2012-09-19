@@ -28,7 +28,7 @@ import lcmc.configs.DistResource;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.Browser;
 
 import java.util.Map;
@@ -46,9 +46,9 @@ final class FilesystemInfo extends ServiceInfo {
     /** drbddisk service object. */
     private DrbddiskInfo drbddiskInfo = null;
     /** Block device combo box. */
-    private GuiComboBox blockDeviceParamCb = null;
+    private Widget blockDeviceParamWi = null;
     /** Filesystem type combo box. */
-    private GuiComboBox fstypeParamCb = null;
+    private Widget fstypeParamWi = null;
     /** Whether old style drbddisk is preferred. */
     private boolean drbddiskIsPreferred = false;
     /** Name of the device parameter in the file system. */
@@ -115,8 +115,8 @@ final class FilesystemInfo extends ServiceInfo {
         if (!ret) {
             return false;
         }
-        final GuiComboBox cb = paramComboBoxGet(FS_RES_PARAM_DEV, null);
-        if (cb == null || cb.getValue() == null) {
+        final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
+        if (wi == null || wi.getValue() == null) {
             return false;
         }
         return true;
@@ -183,12 +183,12 @@ final class FilesystemInfo extends ServiceInfo {
     }
 
     /** Adds combo box listener for the parameter. */
-    private void addParamComboListeners(final GuiComboBox paramCb) {
-        paramCb.addListeners(
+    private void addParamComboListeners(final Widget paramWi) {
+        paramWi.addListeners(
                     new WidgetListener() {
                         @Override
                         public void check(final Object value) {
-                            if (fstypeParamCb != null) {
+                            if (fstypeParamWi != null) {
                                 if (!(value instanceof Info)) {
                                     return;
                                 }
@@ -210,7 +210,7 @@ final class FilesystemInfo extends ServiceInfo {
                                 }
                                 if (createdFs != null
                                     && !"".equals(createdFs)) {
-                                    fstypeParamCb.setValue(createdFs);
+                                    fstypeParamWi.setValue(createdFs);
                                 }
                             }
                         }
@@ -219,10 +219,10 @@ final class FilesystemInfo extends ServiceInfo {
 
     /** Returns editable element for the parameter. */
     @Override
-    protected GuiComboBox getParamComboBox(final String param,
-                                           final String prefix,
-                                           final int width) {
-        GuiComboBox paramCb;
+    protected Widget createWidget(final String param,
+                                  final String prefix,
+                                  final int width) {
+        Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
             String selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
@@ -244,20 +244,20 @@ final class FilesystemInfo extends ServiceInfo {
             final Info[] commonBlockDevInfos =
                                         getCommonBlockDevInfos(defaultValue,
                                                                getName());
-            paramCb = new GuiComboBox(selectedValue,
-                                      commonBlockDevInfos,
-                                      null, /* units */
-                                      null, /* type */
-                                      null, /* regexp */
-                                      width,
-                                      null, /* abbrv */
-                                      new AccessMode(
+            paramWi = new Widget(selectedValue,
+                                 commonBlockDevInfos,
+                                 null, /* units */
+                                 null, /* type */
+                                 null, /* regexp */
+                                 width,
+                                 null, /* abbrv */
+                                 new AccessMode(
                                            getAccessType(param),
                                            isEnabledOnlyInAdvancedMode(param)));
-            paramCb.setAlwaysEditable(true);
-            blockDeviceParamCb = paramCb;
-            addParamComboListeners(paramCb);
-            paramComboBoxAdd(param, prefix, paramCb);
+            paramWi.setAlwaysEditable(true);
+            blockDeviceParamWi = paramWi;
+            addParamComboListeners(paramWi);
+            widgetAdd(param, prefix, paramWi);
         } else if ("fstype".equals(param)) {
             final String defaultValue =
                         Tools.getString("ClusterBrowser.SelectFilesystem");
@@ -268,7 +268,7 @@ final class FilesystemInfo extends ServiceInfo {
             if (selectedValue == null || "".equals(selectedValue)) {
                 selectedValue = defaultValue;
             }
-            paramCb = new GuiComboBox(
+            paramWi = new Widget(
                               selectedValue,
                               getBrowser().getCommonFileSystems(defaultValue),
                               null, /* units */
@@ -279,10 +279,10 @@ final class FilesystemInfo extends ServiceInfo {
                               new AccessMode(
                                        getAccessType(param),
                                        isEnabledOnlyInAdvancedMode(param)));
-            fstypeParamCb = paramCb;
+            fstypeParamWi = paramWi;
 
-            paramComboBoxAdd(param, prefix, paramCb);
-            paramCb.setEditable(false);
+            widgetAdd(param, prefix, paramWi);
+            paramWi.setEditable(false);
         } else if ("directory".equals(param)) {
             final String[] cmp = getBrowser().getCommonMountPoints();
             Object[] items = new Object[cmp.length + 1];
@@ -306,22 +306,22 @@ final class FilesystemInfo extends ServiceInfo {
                 selectedValue = defaultValue;
             }
             final String regexp = "^.+$";
-            paramCb = new GuiComboBox(selectedValue,
-                                      items,
-                                      null, /* units */
-                                      null, /* type */
-                                      regexp,
-                                      width,
-                                      null, /* abbrv */
-                                      new AccessMode(
+            paramWi = new Widget(selectedValue,
+                                 items,
+                                 null, /* units */
+                                 null, /* type */
+                                 regexp,
+                                 width,
+                                 null, /* abbrv */
+                                 new AccessMode(
                                          getAccessType(param),
                                          isEnabledOnlyInAdvancedMode(param)));
-            paramComboBoxAdd(param, prefix, paramCb);
-            paramCb.setAlwaysEditable(true);
+            widgetAdd(param, prefix, paramWi);
+            paramWi.setAlwaysEditable(true);
         } else {
-            paramCb = super.getParamComboBox(param, prefix, width);
+            paramWi = super.createWidget(param, prefix, width);
         }
-        return paramCb;
+        return paramWi;
     }
 
     /** Returns string representation of the filesystem service. */
@@ -451,8 +451,8 @@ final class FilesystemInfo extends ServiceInfo {
     /** Returns how much of the filesystem is used. */
     @Override
     public int getUsed() {
-        if (blockDeviceParamCb != null) {
-            final Object value = blockDeviceParamCb.getValue();
+        if (blockDeviceParamWi != null) {
+            final Object value = blockDeviceParamWi.getValue();
             if (Tools.isStringClass(value)) {
                 // TODO:
                 return -1;
@@ -496,9 +496,9 @@ final class FilesystemInfo extends ServiceInfo {
         }
         final Info[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
                                                                   getName());
-        if (blockDeviceParamCb != null) {
-            final String value = blockDeviceParamCb.getStringValue();
-            blockDeviceParamCb.reloadComboBox(value,
+        if (blockDeviceParamWi != null) {
+            final String value = blockDeviceParamWi.getStringValue();
+            blockDeviceParamWi.reloadComboBox(value,
                                               commonBlockDevInfos);
         }
     }

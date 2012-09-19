@@ -29,7 +29,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.utilities.MyButton;
@@ -56,7 +56,7 @@ public final class SplitBrain extends DrbdConfig {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Combo box with host that has more recent data. */
-    private GuiComboBox hostCB;
+    private Widget hostWi;
     /** Resolve split brain button. */
     private final MyButton resolveButton = new MyButton(
                     Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
@@ -73,7 +73,7 @@ public final class SplitBrain extends DrbdConfig {
     protected void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
         final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo().getHost();
-        final String h = hostCB.getStringValue();
+        final String h = hostWi.getStringValue();
 
         final Runnable runnable = new Runnable() {
             @Override
@@ -162,17 +162,17 @@ public final class SplitBrain extends DrbdConfig {
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
-        hostCB = new GuiComboBox(null, /* selected value */
-                                 hosts.toArray(new Host[hosts.size()]),
-                                 null, /* units */
-                                 GuiComboBox.Type.COMBOBOX,
-                                 null, /* regexp */
-                                 COMBOBOX_WIDTH,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.RO,
-                                                false)); /* only adv. mode */
+        hostWi = new Widget(null, /* selected value */
+                            hosts.toArray(new Host[hosts.size()]),
+                            null, /* units */
+                            Widget.Type.COMBOBOX,
+                            null, /* regexp */
+                            COMBOBOX_WIDTH,
+                            null, /* abbrv */
+                            new AccessMode(ConfigData.AccessType.RO,
+                                           false)); /* only adv. mode */
         inputPane.add(hostLabel);
-        inputPane.add(hostCB);
+        inputPane.add(hostWi);
         resolveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

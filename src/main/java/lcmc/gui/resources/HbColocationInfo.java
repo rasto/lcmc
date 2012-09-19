@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.Host;
 import lcmc.data.resources.Service;
 import lcmc.data.ClusterStatus;
@@ -136,9 +136,9 @@ final class HbColocationInfo extends EditableInfo
                 if ((value == null && value != oldValue)
                     || (value != null && !value.equals(oldValue))) {
                     getResource().setValue(param, value);
-                    final GuiComboBox cb = paramComboBoxGet(param, null);
-                    if (cb != null) {
-                        cb.setValue(value);
+                    final Widget wi = getWidget(param, null);
+                    if (wi != null) {
+                        wi.setValue(value);
                     }
                 }
             }

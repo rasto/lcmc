@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 import lcmc.data.CRMXML;
@@ -221,7 +221,7 @@ public final class GroupInfo extends ServiceInfo {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText(null);
-                    final GuiComboBox idField = paramComboBoxGet(GUI_ID, null);
+                    final Widget idField = getWidget(GUI_ID, null);
                     idField.setEnabled(false);
                 }
             });

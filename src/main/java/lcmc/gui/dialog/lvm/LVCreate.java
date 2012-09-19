@@ -23,7 +23,7 @@
 package lcmc.gui.dialog.lvm;
 
 import lcmc.gui.Browser;
-import lcmc.gui.GuiComboBox;
+import lcmc.gui.Widget;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.MyButton;
@@ -60,11 +60,11 @@ public final class LVCreate extends LV {
     /** Create button. */
     private final MyButton createButton = new MyButton("Create");
     /** Name of the logical volume. */
-    private GuiComboBox lvNameCB;
+    private Widget lvNameWi;
     /** New size of the logical volume. */
-    private GuiComboBox sizeCB;
+    private Widget sizeWi;
     /** Maximum size of the logical volume. */
-    private GuiComboBox maxSizeCB;
+    private Widget maxSizeWi;
     /** Volume group. */
     private final String volumeGroup;
     /** Checkboxes with all hosts in the cluster. */
@@ -116,7 +116,7 @@ public final class LVCreate extends LV {
     /** Inits the dialog after it becomes visible. */
     protected void initDialogAfterVisible() {
         enableComponents();
-        makeDefaultAndRequestFocusLater(sizeCB);
+        makeDefaultAndRequestFocusLater(sizeWi);
         makeDefaultButton(createButton);
     }
 
@@ -138,17 +138,17 @@ public final class LVCreate extends LV {
             if (enable) {
                 final String maxBlockSize = getMaxBlockSize();
                 final long maxSize = Long.parseLong(maxBlockSize);
-                maxSizeCB.setValue(Tools.convertKilobytes(maxBlockSize));
+                maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
                 final long size = Tools.convertToKilobytes(
-                                                  sizeCB.getStringValue());
+                                                  sizeWi.getStringValue());
                 if (size > maxSize || size <= 0) {
                     e = false;
-                    sizeCB.wrongValue();
+                    sizeWi.wrongValue();
                 } else {
-                    sizeCB.setBackground("", "", true);
+                    sizeWi.setBackground("", "", true);
                 }
                 boolean lvNameCorrect = true;
-                if ("".equals(lvNameCB.getStringValue())) {
+                if ("".equals(lvNameWi.getStringValue())) {
                     lvNameCorrect = false;
                 } else if (hostCheckBoxes != null) {
                     for (final Host h : hostCheckBoxes.keySet()) {
@@ -158,7 +158,7 @@ public final class LVCreate extends LV {
                                                               volumeGroup);
                             if (lvs != null
                                 && lvs.contains(
-                                        lvNameCB.getStringValue())) {
+                                        lvNameWi.getStringValue())) {
                                 lvNameCorrect = false;
                                 break;
                             }
@@ -166,10 +166,10 @@ public final class LVCreate extends LV {
                     }
                 }
                 if (lvNameCorrect) {
-                    lvNameCB.setBackground("", "", true);
+                    lvNameWi.setBackground("", "", true);
                 } else {
                     e = false;
-                    lvNameCB.wrongValue();
+                    lvNameWi.wrongValue();
                 }
             }
             createButton.setEnabled(e);
@@ -200,19 +200,19 @@ public final class LVCreate extends LV {
             }
             i++;
         }
-        lvNameCB = new GuiComboBox(defaultName,
-                                   null,
-                                   null, /* units */
-                                   GuiComboBox.Type.TEXTFIELD,
-                                   null, /* regexp */
-                                   250,
-                                   null, /* abbrv */
-                                   new AccessMode(ConfigData.AccessType.OP,
-                                                  false)); /* only adv. */
+        lvNameWi = new Widget(defaultName,
+                              null,
+                              null, /* units */
+                              Widget.Type.TEXTFIELD,
+                              null, /* regexp */
+                              250,
+                              null, /* abbrv */
+                              new AccessMode(ConfigData.AccessType.OP,
+                                             false)); /* only adv. */
         inputPane.add(new JLabel("LV Name"));
-        inputPane.add(lvNameCB);
+        inputPane.add(lvNameWi);
         inputPane.add(new JLabel());
-        lvNameCB.addListeners(new WidgetListener() {
+        lvNameWi.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
                                     checkButtons();
@@ -225,17 +225,17 @@ public final class LVCreate extends LV {
                                       Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeCB = new GuiComboBox(Tools.convertKilobytes(newBlockSize),
-                                 null,
-                                 getUnits(), /* units */
-                                 GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                 null, /* regexp */
-                                 250,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.OP,
-                                                  false)); /* only adv. */
+        sizeWi = new Widget(Tools.convertKilobytes(newBlockSize),
+                            null,
+                            getUnits(), /* units */
+                            Widget.Type.TEXTFIELDWITHUNIT,
+                            null, /* regexp */
+                            250,
+                            null, /* abbrv */
+                            new AccessMode(ConfigData.AccessType.OP,
+                                             false)); /* only adv. */
         inputPane.add(sizeLabel);
-        inputPane.add(sizeCB);
+        inputPane.add(sizeWi);
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -251,8 +251,8 @@ public final class LVCreate extends LV {
                             if (hostCheckBoxes.get(h).isSelected()) {
                                 final boolean ret = lvCreate(
                                                       h,
-                                                      lvNameCB.getStringValue(),
-                                                      sizeCB.getStringValue());
+                                                      lvNameWi.getStringValue(),
+                                                      sizeWi.getStringValue());
                                 if (!ret) {
                                     oneFailed = true;
                                 }
@@ -263,7 +263,7 @@ public final class LVCreate extends LV {
                         }
                         final String maxBlockSize = getMaxBlockSize();
                         final long maxSize = Long.parseLong(maxBlockSize);
-                        maxSizeCB.setValue(Tools.convertKilobytes(
+                        maxSizeWi.setValue(Tools.convertKilobytes(
                                                                 maxBlockSize));
                         enableComponents();
                         if (oneFailed) {
@@ -280,20 +280,20 @@ public final class LVCreate extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeCB = new GuiComboBox(Tools.convertKilobytes(maxBlockSize),
-                                    null,
-                                    getUnits(),
-                                    GuiComboBox.Type.TEXTFIELDWITHUNIT,
-                                    null, /* regexp */
-                                    250,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.OP,
-                                                   false)); /* only adv. */
-        maxSizeCB.setEnabled(false);
+        maxSizeWi = new Widget(Tools.convertKilobytes(maxBlockSize),
+                               null,
+                               getUnits(),
+                               Widget.Type.TEXTFIELDWITHUNIT,
+                               null, /* regexp */
+                               250,
+                               null, /* abbrv */
+                               new AccessMode(ConfigData.AccessType.OP,
+                                              false)); /* only adv. */
+        maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
-        inputPane.add(maxSizeCB);
+        inputPane.add(maxSizeWi);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new WidgetListener() {
+        sizeWi.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
                                     checkButtons();
