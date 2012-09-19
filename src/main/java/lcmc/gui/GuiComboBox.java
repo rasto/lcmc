@@ -296,20 +296,6 @@ public final class GuiComboBox extends JPanel {
                                                          0, 0,
                                                          0, 0);
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    newComp = new JPanel();
-            //    newComp.setLayout(new SpringLayout());
-
-            //    /* text field */
-            //    textFieldPart = (JTextField) getTextField(selectedValue,
-            //                                              regexp,
-            //                                              abbreviations);
-            //    newComp.add(textFieldPart);
-            //    /** add button */
-            //    SpringUtilities.makeCompactGrid(newComp, 1, 2,
-            //                                               0, 0,
-            //                                               0, 0);
-            //    break;
             case RADIOGROUP:
                 newComp = getRadioGroup(selectedValue, items);
                 break;
@@ -442,7 +428,6 @@ public final class GuiComboBox extends JPanel {
         editor.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(final FocusEvent e) {
-                //Object o = (GuiComboBox) e.getSource()).getValue();
                 Object o = getValue();
                 if (o != null && !Tools.isStringClass(o)
                     && ((Info) o).getStringValue() == null) {
@@ -713,9 +698,6 @@ public final class GuiComboBox extends JPanel {
         if (type == Type.TEXTFIELDWITHUNIT) {
             textFieldPart.setToolTipText("<html>" + text + "</html>");
             unitComboBox.setToolTipText("<html>" + text + "</html>");
-        //} else if (type == Type.TEXTFIELDWITHBUTTON) {
-        //    textFieldPart.setToolTipText("<html>" + text + "</html>");
-        //    fieldButton.setToolTipText("<html>" + text + "</html>");
         } else {
             component.setToolTipText("<html>" + text + "</html>");
         }
@@ -958,9 +940,6 @@ public final class GuiComboBox extends JPanel {
                 }
                 value = new Object[]{text, unit};
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    value = textFieldPart.getText();
-            //    break;
             default:
                 /* error */
         }
@@ -1036,9 +1015,6 @@ public final class GuiComboBox extends JPanel {
                     default:
                         break;
                 }
-                //if (fieldButton != null) {
-                //    fieldButton.setVisible(visible);
-                //}
                 repaint();
             }
         });
@@ -1126,10 +1102,6 @@ public final class GuiComboBox extends JPanel {
             case COMBOBOX:
                 final JComboBox cb = (JComboBox) comp;
                 cb.setSelectedItem(item);
-                //if (cb.isEditable()) {
-                //    final JTextComponent tc =
-                //        (JTextComponent) cb.getEditor().getEditorComponent();
-                //    tc.setText((String) item);
                 if (Tools.isStringClass(item)) {
                     Object selectedObject = null;
                     for (int i = 0; i < cb.getItemCount(); i++) {
@@ -1203,11 +1175,6 @@ public final class GuiComboBox extends JPanel {
 
                 unitComboBox.setSelectedItem(selectedUnitInfo);
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    if (item != null) {
-            //        textFieldPart.setText((String) item);
-            //    }
-            //    break;
             default:
                 Tools.appError("impossible type");
         }
@@ -1252,8 +1219,6 @@ public final class GuiComboBox extends JPanel {
 
             case TEXTFIELDWITHUNIT:
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    break;
             default:
                 Tools.appError("impossible type");
         }
@@ -1400,7 +1365,6 @@ public final class GuiComboBox extends JPanel {
     }
 
     /** Adds item listener to the component. */
-    //public void addListeners(final ItemListener il, final DocumentListener dl) {
     public void addListeners(final WidgetListener wl) {
         JComponent comp;
         if (fieldButton == null) {
@@ -1436,11 +1400,6 @@ public final class GuiComboBox extends JPanel {
                 addDocumentListener(textFieldPart.getDocument(), wl);
                 unitComboBox.addItemListener(getItemListener(wl));
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    if (dl != null) {
-            //        textFieldPart.getDocument().addDocumentListener(dl);
-            //    }
-            //    break;
             default:
                 /* error */
         }
@@ -1546,9 +1505,6 @@ public final class GuiComboBox extends JPanel {
             case TEXTFIELDWITHUNIT:
                 textFieldPart.setBackground(Color.WHITE);
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    textFieldPart.setBackground(Color.WHITE);
-            //    break;
             default:
                 /* error */
         }
@@ -1673,9 +1629,6 @@ public final class GuiComboBox extends JPanel {
             case TEXTFIELDWITHUNIT:
                 textFieldPart.requestFocus();
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    textFieldPart.requestFocus();
-            //    break;
             default:
                 break;
         }
@@ -1705,9 +1658,6 @@ public final class GuiComboBox extends JPanel {
             case TEXTFIELDWITHUNIT:
                 textFieldPart.selectAll();
                 break;
-            //case TEXTFIELDWITHBUTTON:
-            //    textFieldPart.selectAll();
-            //    break;
             default:
                 break;
         }
@@ -1773,9 +1723,6 @@ public final class GuiComboBox extends JPanel {
                     case TEXTFIELDWITHUNIT:
                         textFieldPart.setBackground(bg);
                         break;
-                    //case TEXTFIELDWITHBUTTON:
-                    //    textFieldPart.setBackground(bg);
-                    //    break;
                     default:
                         /* error */
                 }
