@@ -29,6 +29,7 @@ import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.LVM;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.AccessMode;
@@ -211,7 +212,12 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel("LV Name"));
         inputPane.add(lvNameCB);
         inputPane.add(new JLabel());
-        lvNameCB.addListeners(null, new SizeDocumentListener());
+        lvNameCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkButtons();
+                                }
+                            });
 
         final String maxBlockSize = getMaxBlockSize();
         /* size */
@@ -287,8 +293,12 @@ public final class LVCreate extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new ItemChangeListener(false),
-                            new SizeDocumentListener());
+        sizeCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkButtons();
+                                }
+                            });
 
         SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
                                                    1, 1,  /* initX, initY */
@@ -300,7 +310,13 @@ public final class LVCreate extends LV {
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         for (final Host h : hostCheckBoxes.keySet()) {
-            hostCheckBoxes.get(h).addItemListener(new ItemChangeListener(true));
+            hostCheckBoxes.get(h).addItemListener(
+                        new ItemListener() {
+                            @Override
+                            public void itemStateChanged(final ItemEvent e) {
+                                checkButtons();
+                            }
+                        });
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
@@ -327,47 +343,6 @@ public final class LVCreate extends LV {
                                               0, 0); /* xPad, yPad */
         checkButtons();
         return pane;
-    }
-
-    /** Size combo box item listener. */
-    private class ItemChangeListener implements ItemListener {
-        /** Whether to check buttons on both select and deselect. */
-        private final boolean onDeselect;
-        /** Create ItemChangeListener object. */
-        public ItemChangeListener(final boolean onDeselect) {
-            super();
-            this.onDeselect = onDeselect;
-        }
-        @Override
-        public void itemStateChanged(final ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED
-                || onDeselect) {
-                checkButtons();
-            }
-        }
-    }
-
-    /** Size combo box action listener. */
-    private class SizeDocumentListener implements DocumentListener {
-        /** Check. */
-        private void check() {
-            checkButtons();
-        }
-
-        @Override
-        public void insertUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void removeUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void changedUpdate(final DocumentEvent e) {
-            check();
-        }
     }
 
     /** Create LV. */

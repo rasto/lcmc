@@ -28,6 +28,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ComboInfo;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.dialog.WizardDialog;
@@ -221,17 +222,14 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Adds listeners to all combo boxes. */
     private void addListeners() {
         /* tarball combo box */
-        final ItemListener buildItemListener = new ItemListener() {
+        drbdTarballCombo.addListeners(new WidgetListener() {
             @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final ComboInfo item =
-                                       (ComboInfo) drbdTarballCombo.getValue();
+            public void check(final Object value) {
+                final ComboInfo item = (ComboInfo) drbdTarballCombo.getValue();
                     allDone(item);
-                }
             }
-        };
-        drbdTarballCombo.addListeners(buildItemListener, null);
+        });
+
     }
 
     /** Returns input pane with available drbd files. */

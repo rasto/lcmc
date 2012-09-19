@@ -45,6 +45,7 @@ import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.MyList;
 import lcmc.utilities.MyListModel;
+import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.pacemaker.ServiceLogs;
 import lcmc.gui.dialog.EditConfig;
@@ -2153,13 +2154,9 @@ public class ServiceInfo extends EditableInfo {
             sameAsOperationsCB.setValue(OPERATIONS_DEFAULT_VALUES_TEXT);
         }
         sameAsOperationsCB.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
+                        new WidgetListener() {
                             @Override
-                            public void run() {
+                            public void check(final Object value) {
                                 final Info info = sameAsOperationsCBValue();
                                 setOperationsSameAs(info);
                                 final String[] params = getParametersFromXML();
@@ -2173,14 +2170,8 @@ public class ServiceInfo extends EditableInfo {
                                         }
                                     }
                                 });
-                            }
-                        });
-                        thread.start();
-                    }
                 }
-            },
-            null
-        );
+            });
         optionsPanel.add(sectionPanel);
     }
 
@@ -2548,101 +2539,26 @@ public class ServiceInfo extends EditableInfo {
         for (Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final GuiComboBox cb = scoreComboBoxHash.get(hi);
-            cb.addListeners(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (cb.isCheckBox()
-                            || e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
+            cb.addListeners(new WidgetListener() {
                                 @Override
-                                public void run() {
+                                public void check(final Object value) {
                                     setApplyButtons(CACHED_FIELD, params);
                                     SwingUtilities.invokeLater(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            cb.setEditable();
-                                        }
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                cb.setEditable();
+                                            }
                                     });
                                 }
                             });
-                            thread.start();
-                        }
-                    }
-                },
-
-                new DocumentListener() {
-                    private void check() {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setApplyButtons(CACHED_FIELD, params);
-                            }
-                        });
-                        thread.start();
-                    }
-
-                    @Override
-                    public void insertUpdate(final DocumentEvent e) {
-                        check();
-                    }
-
-                    @Override
-                    public void removeUpdate(final DocumentEvent e) {
-                        check();
-                    }
-
-                    @Override
-                    public void changedUpdate(final DocumentEvent e) {
-                        check();
-                    }
-                }
-            );
         }
-        pingComboBox.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (pingComboBox.isCheckBox()
-                        || e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setApplyButtons(CACHED_FIELD, params);
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            },
-
-            new DocumentListener() {
-                private void check() {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setApplyButtons(CACHED_FIELD, params);
-                        }
-                    });
-                    thread.start();
-                }
-
-                @Override
-                public void insertUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void removeUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void changedUpdate(final DocumentEvent e) {
-                    check();
-                }
-            });
+        pingComboBox.addListeners(new WidgetListener() {
+                                      @Override
+                                      public void check(final Object value) {
+                                          setApplyButtons(CACHED_FIELD, params);
+                                      }
+                                  });
     }
 
     /** Adds listeners for operation and parameter. */
@@ -2655,50 +2571,12 @@ public class ServiceInfo extends EditableInfo {
         final GuiComboBox cb = operationsComboBoxHash.get(op, param);
         mOperationsComboBoxHashReadLock.unlock();
         final String[] params = getParametersFromXML();
-        cb.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (cb.isCheckBox()
-                        || e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
+        cb.addListeners(new WidgetListener() {
                             @Override
-                            public void run() {
+                            public void check(final Object value) {
                                 setApplyButtons(CACHED_FIELD, params);
                             }
                         });
-                        thread.start();
-                    }
-                }
-            },
-
-            new DocumentListener() {
-                private void check() {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setApplyButtons(CACHED_FIELD, params);
-                        }
-                    });
-                    thread.start();
-                }
-
-                @Override
-                public void insertUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void removeUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void changedUpdate(final DocumentEvent e) {
-                    check();
-                }
-            }
-        );
     }
 
     /**
@@ -2725,14 +2603,9 @@ public class ServiceInfo extends EditableInfo {
         final Map<String, GuiComboBox> sameAsFields =
                                             new HashMap<String, GuiComboBox>();
         sameAsFields.put("Meta Attributes", sameAsMetaAttrsCB);
-        sameAsMetaAttrsCB.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
+        sameAsMetaAttrsCB.addListeners(new WidgetListener() {
                             @Override
-                            public void run() {
+                            public void check(final Object value) {
                                 Info i = null;
                                 final Object o =
                                       sameAsMetaAttrsCB.getValue();
@@ -2755,12 +2628,6 @@ public class ServiceInfo extends EditableInfo {
                                 });
                             }
                         });
-                        thread.start();
-                    }
-                }
-            },
-            null
-        );
         return sameAsFields;
     }
 
@@ -2944,22 +2811,12 @@ public class ServiceInfo extends EditableInfo {
             if (!getService().isNew()) {
                 typeRadioGroup.setEnabled(false);
             }
-            typeRadioGroup.addListeners(new ItemListener() {
+            typeRadioGroup.addListeners(new WidgetListener() {
                 @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                final String value =
-                                    ((JRadioButton) e.getItem()).getText();
-                                changeType(value);
-                            }
-                        }
-                    });
-                    thread.start();
+                public void check(final Object value) {
+                    changeType(((JRadioButton) value).getText());
                 }
-            }, null);
+            });
             final JPanel tp = new JPanel();
             tp.setBackground(ClusterBrowser.PANEL_BACKGROUND);
             tp.setLayout(new BoxLayout(tp, BoxLayout.Y_AXIS));

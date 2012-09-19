@@ -26,6 +26,7 @@ import lcmc.gui.resources.BlockDevInfo;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
@@ -186,7 +187,12 @@ public final class LVSnapshot extends LV {
         inputPane.add(new JLabel("LV Name"));
         inputPane.add(lvNameCB);
         inputPane.add(new JLabel());
-        lvNameCB.addListeners(null, new SizeDocumentListener());
+        lvNameCB.addListeners(new WidgetListener() {
+                                  @Override
+                                  public void check(final Object value) {
+                                      checkButtons();
+                                  }
+                              });
 
         final String maxBlockSize = getMaxBlockSize();
         /* size */
@@ -251,8 +257,12 @@ public final class LVSnapshot extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new SizeItemListener(),
-                            new SizeDocumentListener());
+        sizeCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkButtons();
+                                }
+                            });
 
         SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
                                                    1, 1,  /* initX, initY */
@@ -266,38 +276,6 @@ public final class LVSnapshot extends LV {
                                               0, 0); /* xPad, yPad */
         checkButtons();
         return pane;
-    }
-
-    /** Size combo box item listener. */
-    private class SizeItemListener implements ItemListener {
-        @Override
-        public void itemStateChanged(final ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                checkButtons();
-            }
-        }
-    }
-
-    /** Size combo box action listener. */
-    private class SizeDocumentListener implements DocumentListener {
-        private void check() {
-            checkButtons();
-        }
-
-        @Override
-        public void insertUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void removeUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void changedUpdate(final DocumentEvent e) {
-            check();
-        }
     }
 
     /** LV Snapshot. */

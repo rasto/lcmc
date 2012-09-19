@@ -28,6 +28,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.ConfigData;
@@ -1094,140 +1095,85 @@ final class HbConfig extends DialogCluster {
                                  new AccessMode(ConfigData.AccessType.RO,
                                                 false)); /* only adv. mode */
 
-        final ItemListener typeL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        typeCB.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     final String type = typeCB.getStringValue();
                     if (type != null) {
-                        Thread thread = new Thread(new Runnable() {
+                        if (MCAST_TYPE.equals(type)
+                            || BCAST_TYPE.equals(type)) {
+                            ifaceCB.setVisible(true);
+                        } else {
+                            ifaceCB.setVisible(false);
+                        }
+
+                        if (MCAST_TYPE.equals(type)) {
+                            addrCB.setVisible(true);
+                        } else {
+                            addrCB.setVisible(false);
+                        }
+                        if (SERIAL_TYPE.equals(type)) {
+                            serialCB.setVisible(true);
+                        } else {
+                            serialCB.setVisible(false);
+                        }
+                        if (UCAST_TYPE.equals(type)) {
+                            ucastLink1CB.setVisible(true);
+                            ucastLink2CB.setVisible(true);
+                        } else {
+                            ucastLink1CB.setVisible(false);
+                            ucastLink2CB.setVisible(false);
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                if (MCAST_TYPE.equals(type)
-                                    || BCAST_TYPE.equals(type)) {
-                                    ifaceCB.setVisible(true);
-                                } else {
-                                    ifaceCB.setVisible(false);
-                                }
-
-                                if (MCAST_TYPE.equals(type)) {
-                                    addrCB.setVisible(true);
-                                } else {
-                                    addrCB.setVisible(false);
-                                }
-                                if (SERIAL_TYPE.equals(type)) {
-                                    serialCB.setVisible(true);
-                                } else {
-                                    serialCB.setVisible(false);
-                                }
-                                if (UCAST_TYPE.equals(type)) {
-                                    ucastLink1CB.setVisible(true);
-                                    ucastLink2CB.setVisible(true);
-                                } else {
-                                    ucastLink1CB.setVisible(false);
-                                    ucastLink2CB.setVisible(false);
-                                }
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mcast.setMaximumSize(
-                                                    mcast.getPreferredSize());
-                                    }
-                                });
-                                checkInterface();
+                                mcast.setMaximumSize(
+                                            mcast.getPreferredSize());
                             }
                         });
-                        thread.start();
+                        checkInterface();
                     }
                 }
-            }
-        };
+            });
 
-        typeCB.addListeners(typeL, null);
+        ifaceCB.addListeners(new WidgetListener() {
+                                  @Override
+                                  public void check(final Object value) {
+                                      checkInterface();
+                                  }
+                              });
 
-        final ItemListener ifaceL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkInterface();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        };
-
-        ifaceCB.addListeners(ifaceL, null);
-
-        final ItemListener serialL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkInterface();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        };
         serialCB.setVisible(false);
 
-        serialCB.addListeners(serialL, null);
+        serialCB.addListeners(new WidgetListener() {
+                                  @Override
+                                  public void check(final Object value) {
+                                      checkInterface();
+                                  }
+                              });
 
-        final ItemListener ucastLinkL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkInterface();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        };
         ucastLink1CB.setVisible(false);
         ucastLink2CB.setVisible(false);
 
-        ucastLink1CB.addListeners(ucastLinkL, null);
-        ucastLink2CB.addListeners(ucastLinkL, null);
-
-        final DocumentListener addrL = new DocumentListener() {
-                        private void check() {
-                            Thread thread = new Thread(new Runnable() {
+        ucastLink1CB.addListeners(new WidgetListener() {
+                                      @Override
+                                      public void check(final Object value) {
+                                          checkInterface();
+                                      }
+                                  });
+        ucastLink2CB.addListeners(new WidgetListener() {
+                                      @Override
+                                      public void check(final Object value) {
+                                          checkInterface();
+                                      }
+                                  });
+        addrCB.addListeners(new WidgetListener() {
                                 @Override
-                                public void run() {
+                                public void check(final Object value) {
                                     checkInterface();
                                 }
                             });
-                            thread.start();
-                        }
-
-                        @Override
-                        public void insertUpdate(final DocumentEvent e) {
-                            check();
-                        }
-
-                        @Override
-                        public void removeUpdate(final DocumentEvent e) {
-                            check();
-                        }
-
-                        @Override
-                        public void changedUpdate(final DocumentEvent e) {
-                            check();
-                        }
-                    };
-
-        addrCB.addListeners(null, addrL);
 
         addButton = new MyButton(
                       Tools.getString("Dialog.Cluster.HbConfig.AddIntButton"));
@@ -1341,7 +1287,7 @@ final class HbConfig extends DialogCluster {
                                                false));
             optionsCB.put(option, cb);
             cb.setAlwaysEditable(true);
-            cb.addListeners(null, getDocumentListener());
+            cb.addListeners(getOptionListener());
         }
 
         /* dopd */
@@ -1398,48 +1344,28 @@ final class HbConfig extends DialogCluster {
         return true;
     }
 
-    /** Returns document listener for textfields. */
-    private DocumentListener getDocumentListener() {
-        return new DocumentListener() {
-            private void check() {
+    /** Returns widget listener for textfields. */
+    private WidgetListener getOptionListener() {
+        return new WidgetListener() {
+            @Override
+            public void check(final Object value) {
                 if (fieldCheckLatch.getCount() > 0) {
                     return;
                 }
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final String option : OPTIONS) {
-                            final GuiComboBox cb = optionsCB.get(option);
-                            if (cb != null) {
-                                if (checkRegexp(cb.getRegexp(),
-                                                cb.getStringValue())) {
-                                    cb.setBackground(null, null, true);
-                                } else {
-                                    cb.wrongValue();
-                                }
-                            }
+                for (final String option : OPTIONS) {
+                    final GuiComboBox cb = optionsCB.get(option);
+                    if (cb != null) {
+                        if (checkRegexp(cb.getRegexp(),
+                                        cb.getStringValue())) {
+                            cb.setBackground(null, null, true);
+                        } else {
+                            cb.wrongValue();
                         }
-                        Tools.getGUIData().setAccessible(
-                                                makeConfigButton,
-                                                ConfigData.AccessType.ADMIN);
                     }
-                });
-                t.start();
-            }
-
-            @Override
-            public void insertUpdate(final DocumentEvent e) {
-                check();
-            }
-
-            @Override
-            public void removeUpdate(final DocumentEvent e) {
-                check();
-            }
-
-            @Override
-            public void changedUpdate(final DocumentEvent e) {
-                check();
+                }
+                Tools.getGUIData().setAccessible(
+                                        makeConfigButton,
+                                        ConfigData.AccessType.ADMIN);
             }
         };
     }

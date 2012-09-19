@@ -28,6 +28,7 @@ import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.SSH.ExecCommandThread;
@@ -452,25 +453,24 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private void addListeners() {
         /* listeners, that disallow to select anything. */
         /* distribution combo box */
-        final ItemListener distItemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        drbdDistCombo.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     String v = getHost().getDistVersion();
                     if (drbdDistItems == null || !drbdDistItems.contains(v)) {
                         v = NO_MATCH_STRING;
                     }
                     drbdDistCombo.setValue(v);
                 }
-            }
-        };
-        drbdDistCombo.addListeners(distItemListener, null);
+            });
+
 
         /* kernel version combo box */
-        final ItemListener kernelItemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        drbdKernelDirCombo.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     String v = getHost().getKernelVersion();
                     if (drbdKernelDirItems == null
                         || !drbdKernelDirItems.contains(v)) {
@@ -478,28 +478,19 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                     }
                     drbdKernelDirCombo.setValue(v);
                 }
-            }
-        };
-        drbdKernelDirCombo.addListeners(kernelItemListener, null);
+            });
 
         /* arch combo box */
-        final ItemListener archItemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        drbdArchCombo.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     enableComponentsLater(
                                 new JComponent[]{buttonClass(nextButton())});
                     getHost().setArch(drbdArchCombo.getStringValue());
-                    //String v = getHost().getArch();
-                    //if (drbdArchItems == null || !drbdArchItems.contains(v)) {
-                    //    v = NO_MATCH_STRING;
-                    //}
-                    //drbdArchCombo.setValue(v);
                     availVersionsForDist();
                 }
-            }
-        };
-        drbdArchCombo.addListeners(archItemListener, null);
+            });
     }
 
     /** Returns the input pane with check boxes and other info. */

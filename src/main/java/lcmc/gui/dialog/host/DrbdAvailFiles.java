@@ -27,6 +27,7 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.dialog.WizardDialog;
@@ -306,11 +307,10 @@ public class DrbdAvailFiles extends DialogHost {
     /** Adds listeners to all combo boxes. */
     private void addListeners() {
         /* drbd version combo box */
-        final ItemListener versionItemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    //drbdBuildCombo.setEnabled(false);
+        drbdVersionCombo.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     enableComponentsLater(
                             new JComponent[]{buttonClass(nextButton())});
                     disableComponents(new JComponent[]{drbdBuildCombo});
@@ -324,22 +324,18 @@ public class DrbdAvailFiles extends DialogHost {
                             }
                         });
                 }
-            }
-        };
-        drbdVersionCombo.addListeners(versionItemListener, null);
+            });
 
         /* build combo box */
-        final ItemListener buildItemListener = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
+        drbdBuildCombo.addListeners(
+            new WidgetListener() {
+                @Override
+                public void check(final Object value) {
                     final String item = drbdBuildCombo.getStringValue();
                     getHost().setDrbdBuildToInstall(item);
                     availFiles();
                 }
-            }
-        };
-        drbdBuildCombo.addListeners(buildItemListener, null);
+            });
     }
 
     /** Returns input pane with available drbd files. */

@@ -27,6 +27,7 @@ import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -440,48 +441,17 @@ public abstract class EditableInfo extends Info {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    paramCb.addListeners(new ItemListener() {
-                        @Override
-                        public void itemStateChanged(final ItemEvent e) {
-                            if (paramCb.isCheckBox()
-                                || e.getStateChange() == ItemEvent.SELECTED) {
-                                checkParameterFields(paramCb,
-                                                     realParamCb,
-                                                     param,
-                                                     params,
-                                                     thisApplyButton);
-                            }
-                        }
-                    },
+                    paramCb.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkParameterFields(paramCb,
+                                                         realParamCb,
+                                                         param,
+                                                         params,
+                                                         thisApplyButton);
+                                }
+                            });
 
-                    new DocumentListener() {
-                        @Override
-                        public void insertUpdate(final DocumentEvent e) {
-                            checkParameterFields(paramCb,
-                                                 realParamCb,
-                                                 param,
-                                                 params,
-                                                 thisApplyButton);
-                        }
-
-                        @Override
-                        public void removeUpdate(final DocumentEvent e) {
-                            checkParameterFields(paramCb,
-                                                 realParamCb,
-                                                 param,
-                                                 params,
-                                                 thisApplyButton);
-                        }
-
-                        @Override
-                        public void changedUpdate(final DocumentEvent e) {
-                            checkParameterFields(paramCb,
-                                                 realParamCb,
-                                                 param,
-                                                 params,
-                                                 thisApplyButton);
-                        }
-                    });
                 }
             });
         }

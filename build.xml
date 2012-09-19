@@ -162,6 +162,7 @@
 		   <pathelement location="${buildlib.dir}/vecmath.jar"/>
 		   <pathelement location="/usr/share/java/xml-commons-apis.jar"/>
 		   <pathelement location="/usr/share/java/xerces-j2.jar"/>
+		   <pathelement location="${buildlib.dir}/junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
 		  <compilerarg value="-Xmaxerrs"/> 

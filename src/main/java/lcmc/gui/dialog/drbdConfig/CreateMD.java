@@ -32,6 +32,7 @@ import lcmc.gui.GuiComboBox;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.DRBD;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 
@@ -325,22 +326,19 @@ final class CreateMD extends DrbdConfig {
         inputPane.add(metadataLabel);
         inputPane.add(metadataCB);
         metadataCB.addListeners(
-            new  ItemListener() {
+            new WidgetListener() {
                 @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        if (metadataCB.getStringValue().equals(
-                                                    useExistingMetadata)) {
-                            makeMDButton.setEnabled(false);
-                            buttonClass(nextButton()).setEnabled(true);
-                        } else {
-                            buttonClass(nextButton()).setEnabled(false);
-                            makeMDButton.setEnabled(true);
-                        }
+                public void check(final Object value) {
+                    if (metadataCB.getStringValue().equals(
+                                                useExistingMetadata)) {
+                        makeMDButton.setEnabled(false);
+                        buttonClass(nextButton()).setEnabled(true);
+                    } else {
+                        buttonClass(nextButton()).setEnabled(false);
+                        makeMDButton.setEnabled(true);
                     }
                 }
-            },
-            null);
+            });
 
         makeMDButton.addActionListener(new ActionListener() {
             @Override

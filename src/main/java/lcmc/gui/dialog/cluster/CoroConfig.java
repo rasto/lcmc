@@ -29,6 +29,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.Cluster;
@@ -940,57 +941,19 @@ final class CoroConfig extends DialogCluster {
               new AccessMode(ConfigData.AccessType.RO,
                              false)); /* only adv. mode */
 
-        final ItemListener typeL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final String type = typeCB.getStringValue();
-                    if (type != null) {
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkInterface();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            }
-        };
+        typeCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkInterface();
+                                }
+                            });
 
-        typeCB.addListeners(typeL, null);
-
-        final ItemListener ifaceL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkInterface();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        };
-
-        ifaceCB.addListeners(ifaceL, null);
-
-        final ItemListener portL = new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkInterface();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        };
+        ifaceCB.addListeners(new WidgetListener() {
+                                 @Override
+                                 public void check(final Object value) {
+                                     checkInterface();
+                                 }
+                             });
 
         final String portRegexp = "^\\d+$";
         portCB = new GuiComboBox(
@@ -1003,36 +966,19 @@ final class CoroConfig extends DialogCluster {
                 null, /* abbrv */
                 new AccessMode(ConfigData.AccessType.RO,
                                false)); /* only adv. mode */
-        portCB.addListeners(portL, null);
+        portCB.addListeners(new WidgetListener() {
+                                 @Override
+                                 public void check(final Object value) {
+                                     checkInterface();
+                                 }
+                             });
 
-        final DocumentListener addrL = new DocumentListener() {
-            private void check() {
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkInterface();
-                    }
-                });
-                thread.start();
-            }
-
-            @Override
-            public void insertUpdate(final DocumentEvent e) {
-                check();
-            }
-
-            @Override
-            public void removeUpdate(final DocumentEvent e) {
-                check();
-            }
-
-            @Override
-            public void changedUpdate(final DocumentEvent e) {
-                check();
-            }
-        };
-
-        addrCB.addListeners(null, addrL);
+        addrCB.addListeners(new WidgetListener() {
+                                 @Override
+                                 public void check(final Object value) {
+                                     checkInterface();
+                                 }
+                             });
 
         addButton = new MyButton(
                      Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));

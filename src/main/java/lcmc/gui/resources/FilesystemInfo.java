@@ -27,6 +27,7 @@ import lcmc.data.AccessMode;
 import lcmc.configs.DistResource;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
+import lcmc.utilities.WidgetListener;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.Browser;
 
@@ -184,18 +185,14 @@ final class FilesystemInfo extends ServiceInfo {
     /** Adds combo box listener for the parameter. */
     private void addParamComboListeners(final GuiComboBox paramCb) {
         paramCb.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED
-                        && fstypeParamCb != null) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!(e.getItem() instanceof Info)) {
+                    new WidgetListener() {
+                        @Override
+                        public void check(final Object value) {
+                            if (fstypeParamCb != null) {
+                                if (!(value instanceof Info)) {
                                     return;
                                 }
-                                final Info item = (Info) e.getItem();
+                                final Info item = (Info) value;
                                 if (item.getStringValue() == null
                                     || "".equals(item.getStringValue())) {
                                     return;
@@ -216,12 +213,8 @@ final class FilesystemInfo extends ServiceInfo {
                                     fstypeParamCb.setValue(createdFs);
                                 }
                             }
-                        });
-                        thread.start();
-                    }
-                }
-            },
-            null);
+                        }
+                    });
     }
 
     /** Returns editable element for the parameter. */

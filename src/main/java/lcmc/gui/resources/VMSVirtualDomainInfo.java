@@ -47,6 +47,7 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.VIRSH;
 import lcmc.utilities.Unit;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.WidgetListener;
 import lcmc.Exceptions;
 
 import javax.swing.JComponent;
@@ -2003,19 +2004,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 });
             }
             cb.addListeners(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (cb.isCheckBox()
-                            || e.getStateChange() == ItemEvent.SELECTED) {
-                            checkParameterFields(cb,
-                                                 realParamCb,
-                                                 ServiceInfo.CACHED_FIELD,
-                                                 getParametersFromXML(),
-                                                 thisApplyButton);
-                        }
-                    }
-                }, null);
+                        new WidgetListener() {
+                            @Override
+                            public void check(final Object value) {
+                                checkParameterFields(cb,
+                                                     realParamCb,
+                                                     ServiceInfo.CACHED_FIELD,
+                                                     getParametersFromXML(),
+                                                     thisApplyButton);
+                            }
+                        });
             cb.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             final JLabel label = new JLabel(host.getName());
             cb.setLabel(label, null);

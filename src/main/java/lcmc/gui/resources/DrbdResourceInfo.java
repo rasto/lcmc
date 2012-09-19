@@ -39,6 +39,7 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenu;
+import lcmc.utilities.WidgetListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -1134,60 +1135,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
             final GuiComboBox comboBox = cb;
             final GuiComboBox realComboBox = rcb;
-            comboBox.addListeners(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(final ItemEvent e) {
-                        if (e.getStateChange() == ItemEvent.SELECTED) {
-                            final Thread thread = new Thread(new Runnable() {
+            comboBox.addListeners(new WidgetListener() {
                                 @Override
-                                public void run() {
-                                    if (e.getStateChange()
-                                        == ItemEvent.SELECTED) {
-                                        checkParameterFields(comboBox,
-                                                             realComboBox,
-                                                             null,
-                                                             null,
-                                                             thisApplyButton);
-                                    }
+                                public void check(final Object value) {
+                                    checkParameterFields(comboBox,
+                                                         realComboBox,
+                                                         null,
+                                                         null,
+                                                         thisApplyButton);
                                 }
                             });
-                            thread.start();
-                        }
-                    }
-                },
-
-                new DocumentListener() {
-                    private void check() {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkParameterFields(comboBox,
-                                                     realComboBox,
-                                                     null,
-                                                     null,
-                                                     thisApplyButton);
-                            }
-                        });
-                        thread.start();
-                    }
-
-                    @Override
-                    public void insertUpdate(final DocumentEvent e) {
-                        check();
-                    }
-
-                    @Override
-                    public void removeUpdate(final DocumentEvent e) {
-                        check();
-                    }
-
-                    @Override
-                    public void changedUpdate(final DocumentEvent e) {
-                        check();
-                    }
-                }
-            );
         }
         GuiComboBox pcb;
         GuiComboBox prcb;
@@ -1200,58 +1157,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         final GuiComboBox comboBox = pcb;
         final GuiComboBox realComboBox = prcb;
-        pcb.addListeners(
-            new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (e.getStateChange() == ItemEvent.SELECTED) {
+        pcb.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
                                     checkParameterFields(comboBox,
                                                          realComboBox,
                                                          null,
                                                          null,
                                                          thisApplyButton);
                                 }
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            },
-
-            new DocumentListener() {
-                private void check() {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkParameterFields(comboBox,
-                                                 realComboBox,
-                                                 null,
-                                                 null,
-                                                 thisApplyButton);
-                        }
-                    });
-                    thread.start();
-                }
-
-                @Override
-                public void insertUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void removeUpdate(final DocumentEvent e) {
-                    check();
-                }
-
-                @Override
-                public void changedUpdate(final DocumentEvent e) {
-                    check();
-                }
-            });
+                            });
     }
 
     /** Stores values in the combo boxes in the component c. */

@@ -28,6 +28,7 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.LVM;
+import lcmc.utilities.WidgetListener;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
@@ -304,8 +305,12 @@ public final class LVResize extends LV {
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeCB);
         inputPane.add(new JLabel());
-        sizeCB.addListeners(new ItemChangeListener(false),
-                            new SizeDocumentListener());
+        sizeCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkButtons();
+                                }
+                            });
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 3,  /* rows, cols */
                                                    1, 1,  /* initX, initY */
@@ -322,7 +327,12 @@ public final class LVResize extends LV {
         for (final Host h : hostCheckBoxes.keySet()) {
             final Set<String> allLVS = h.getAllLogicalVolumes();
             hostCheckBoxes.get(h).addItemListener(
-                                            new ItemChangeListener(true));
+                        new ItemListener() {
+                            @Override
+                            public void itemStateChanged(final ItemEvent e) {
+                                checkButtons();
+                            }
+                        });
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
@@ -352,47 +362,6 @@ public final class LVResize extends LV {
                                               0, 0); /* xPad, yPad */
         checkButtons();
         return pane;
-    }
-
-    /** Size combo box item listener. */
-    private class ItemChangeListener implements ItemListener {
-        /** Whether to check buttons on both select and deselect. */
-        private final boolean onDeselect;
-        /** Create ItemChangeListener object. */
-        public ItemChangeListener(final boolean onDeselect) {
-            super();
-            this.onDeselect = onDeselect;
-        }
-        @Override
-        public void itemStateChanged(final ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED
-                || onDeselect) {
-                checkButtons();
-            }
-        }
-    }
-
-    /** Size combo box action listener. */
-    private class SizeDocumentListener implements DocumentListener {
-        /** Check buttons. */
-        private void check() {
-            checkButtons();
-        }
-
-        @Override
-        public void insertUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void removeUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void changedUpdate(final DocumentEvent e) {
-            check();
-        }
     }
 
     /** LVM Resize and DRBD Resize. */

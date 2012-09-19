@@ -34,6 +34,7 @@ import lcmc.gui.resources.StringInfo;
 import lcmc.gui.GuiComboBox;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.WidgetListener;
 
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -308,22 +309,12 @@ final class CreateFS extends DrbdConfig {
                                  null, /* abbrv */
                                  new AccessMode(ConfigData.AccessType.RO,
                                                 false)); /* only adv. mode */
-        hostCB.addListeners(
-            new  ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkButtons();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            },
-            null);
+        hostCB.addListeners(new WidgetListener() {
+                                @Override
+                                public void check(final Object value) {
+                                    checkButtons();
+                                }
+                            });
         inputPane.add(hostLabel);
         inputPane.add(hostCB);
         inputPane.add(new JLabel(""));
@@ -350,14 +341,9 @@ final class CreateFS extends DrbdConfig {
                                                       false)); /* only adv. */
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemCB);
-        filesystemCB.addListeners(
-            new  ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        final Thread thread = new Thread(new Runnable() {
+        filesystemCB.addListeners(new WidgetListener() {
                             @Override
-                            public void run() {
+                            public void check(final Object value) {
                                 if (NO_HOST_STRING.equals(
                                                 hostCB.getStringValue())
                                     && !NO_FILESYSTEM_STRING.equals(
@@ -368,11 +354,6 @@ final class CreateFS extends DrbdConfig {
                                 }
                             }
                         });
-                        thread.start();
-                    }
-                }
-            },
-            null);
 
         makeFsButton.addActionListener(new ActionListener() {
             @Override

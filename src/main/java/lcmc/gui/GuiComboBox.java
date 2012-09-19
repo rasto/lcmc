@@ -28,6 +28,7 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -50,6 +51,8 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.BadLocationException;
 
 import java.awt.BorderLayout;
 
@@ -63,6 +66,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.PopupMenuEvent;
 import java.awt.Component;
@@ -1332,8 +1337,71 @@ public final class GuiComboBox extends JPanel {
         }
     }
 
+    private void addDocumentListener(final Document doc,
+                                     final WidgetListener wl) {
+        doc.addDocumentListener(
+                new DocumentListener() {
+                    private void check(final DocumentEvent e) {
+                        if (wl.isEnabled()) {
+                            try {
+                                final String text =
+                                     ((Document) e.getDocument()).getText(
+                                                               0,
+                                                               doc.getLength());
+
+                                final Thread t = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        wl.check(text);
+                                    }
+                                });
+                                t.start();
+                            } catch (BadLocationException ble) {
+                                Tools.appWarning("document listener error");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void insertUpdate(final DocumentEvent e) {
+                        check(e);
+                    }
+
+                    @Override
+                    public void removeUpdate(final DocumentEvent e) {
+                        check(e);
+                    }
+
+                    @Override
+                    public void changedUpdate(final DocumentEvent e) {
+                        check(e);
+                    }
+                }
+            );
+
+    }
+
+    private ItemListener getItemListener(final WidgetListener wl) {
+        return new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                if (isCheckBox() || e.getStateChange() == ItemEvent.SELECTED) {
+                    final Object value = e.getItem();
+                    final Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            wl.check(value);
+                        }
+                    });
+                    t.start();
+                }
+            }
+        };
+    }
+
     /** Adds item listener to the component. */
-    public void addListeners(final ItemListener il, final DocumentListener dl) {
+    //public void addListeners(final ItemListener il, final DocumentListener dl) {
+    public void addListeners(final WidgetListener wl) {
         JComponent comp;
         if (fieldButton == null) {
             comp = component;
@@ -1344,44 +1412,29 @@ public final class GuiComboBox extends JPanel {
             case LABELFIELD:
                 break;
             case TEXTFIELD:
-                if (dl != null) {
-                    getDocument().addDocumentListener(dl);
-                }
+                addDocumentListener(getDocument(), wl);
                 break;
             case PASSWDFIELD:
-                if (dl != null) {
-                    getDocument().addDocumentListener(dl);
-                }
+                addDocumentListener(getDocument(), wl);
                 break;
             case COMBOBOX:
-                if (il != null) {
-                    ((JComboBox) comp).addItemListener(il);
-                }
-                if (dl != null) {
-                    getDocument().addDocumentListener(dl);
-                }
+                addDocumentListener(getDocument(), wl);
+                ((JComboBox) comp).addItemListener(getItemListener(wl));
                 break;
             case RADIOGROUP:
-                if (il != null) {
-                    mComponentsReadLock.lock();
-                    for (final JComponent c : componentsHash.values()) {
-                        ((JRadioButton) c).addItemListener(il);
-                    }
-                    mComponentsReadLock.unlock();
+                mComponentsReadLock.lock();
+                final ItemListener il = getItemListener(wl);
+                for (final JComponent c : componentsHash.values()) {
+                    ((JRadioButton) c).addItemListener(il);
                 }
+                mComponentsReadLock.unlock();
                 break;
             case CHECKBOX:
-                if (il != null) {
-                    ((JCheckBox) comp).addItemListener(il);
-                }
+                ((JCheckBox) comp).addItemListener(getItemListener(wl));
                 break;
             case TEXTFIELDWITHUNIT:
-                if (dl != null) {
-                    textFieldPart.getDocument().addDocumentListener(dl);
-                }
-                if (il != null) {
-                    unitComboBox.addItemListener(il);
-                }
+                addDocumentListener(textFieldPart.getDocument(), wl);
+                unitComboBox.addItemListener(getItemListener(wl));
                 break;
             //case TEXTFIELDWITHBUTTON:
             //    if (dl != null) {
