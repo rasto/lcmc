@@ -2086,13 +2086,13 @@ public final class RoboTest {
             /* create dummy */
             moveTo(gx + 46, gy + 11);
             rightClick(); /* group popup */
-            sleep(2000 + i * 500);
+            sleep(2000);
             moveTo(gx + 80, gy + 20);
             moveTo(gx + 84, gy + 22);
             moveTo(gx + 580, gy + 22);
             sleep(1000);
             typeDummy();
-            sleep(i * 300);
+            sleep(300);
             setTimeouts(true);
             moveTo(809, 144); /* ptest */
             sleep(6000);
@@ -2328,13 +2328,13 @@ public final class RoboTest {
             /* create dummy */
             moveTo(gxM + 46, gyM + 11);
             rightClick(); /* group popup */
-            sleep(2000 + i * 500);
+            sleep(2000);
             moveTo(gxM + 80, gyM + 20);
             moveTo(gxM + 84, gyM + 22);
             moveTo(gxM + 580, gyM + 22);
             sleep(1000);
             typeDummy();
-            sleep(i * 300);
+            sleep(300);
             setTimeouts(true);
             if (type == 1) {
                 moveTo(809, 144); /* ptest */

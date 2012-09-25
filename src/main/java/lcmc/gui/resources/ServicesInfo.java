@@ -1957,11 +1957,15 @@ public final class ServicesInfo extends EditableInfo {
             return;
         }
         final String oldValue = oldWi.getStringValue();
-        if ("".equals(oldValue)) {
-            newWi.setValue(null);
-        } else {
-            newWi.setValue(oldValue);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                if ("".equals(oldValue)) {
+                    newWi.setValueNoListeners(null);
+                } else {
+                    newWi.setValueNoListeners(oldValue);
+                }
+            }
+        });
     }
 
     private void copyPasteFields(final ServiceInfo oldSi,
@@ -1979,6 +1983,9 @@ public final class ServicesInfo extends EditableInfo {
         }
 
         /* operations */
+        copyPasteField(oldSi.getSameAsOperationsWi(),
+                       newSi.getSameAsOperationsWi());
+
         for (final String op : oldSi.getResourceAgent().getOperationNames()) {
             for (final String param
                           : getBrowser().getCRMOperationParams(op)) {
@@ -2090,7 +2097,7 @@ public final class ServicesInfo extends EditableInfo {
                                                     false);
                         newChild.getInfoPanel();
                         newChild.waitForInfoPanel();
-                        
+                        Tools.waitForSwing();
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 copyPasteFields(oldChild, newChild);

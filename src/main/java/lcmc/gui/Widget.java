@@ -1,10 +1,9 @@
 /*
- * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
- * written by Rasto Levrinc.
+ * This file is part of LCMC
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2012, Rastislav Levrinc.
  *
- * DRBD Management Console is free software; you can redistribute it and/or
+ * LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
  * any later version.
@@ -1084,10 +1083,15 @@ public final class Widget extends JPanel {
 
     /** Sets item/value in the component and waits till it is set. */
     public void setValueAndWait(final Object item) {
-        mValueWriteLock.lock();
-        for (final WidgetListener wl : widgetListeners) {
-            wl.setEnabled(false);
+        if (Tools.areEqual(item, getValue())) {
+            return;
         }
+        setValueAndWait0(item);
+    }
+
+    /** Sets item/value in the component and waits till it is set. */
+    private void setValueAndWait0(final Object item) {
+        mValueWriteLock.lock();
         JComponent comp;
         if (fieldButton == null) {
             comp = component;
@@ -1183,18 +1187,32 @@ public final class Widget extends JPanel {
             default:
                 Tools.appError("impossible type");
         }
+        mValueWriteLock.unlock();
+    }
+
+    /** Sets item/value in the component, disable listeners. */
+    public void setValueNoListeners(final Object item) {
+        if (Tools.areEqual(item, getValue())) {
+            return;
+        }
+        for (final WidgetListener wl : widgetListeners) {
+            wl.setEnabled(false);
+        }
+        setValueAndWait0(item);
         for (final WidgetListener wl : widgetListeners) {
             wl.setEnabled(true);
         }
-        mValueWriteLock.unlock();
     }
 
     /** Sets item/value in the component. */
     public void setValue(final Object item) {
+        if (Tools.areEqual(item, getValue())) {
+            return;
+        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                setValueAndWait(item);
+                setValueAndWait0(item);
             }
         });
     }

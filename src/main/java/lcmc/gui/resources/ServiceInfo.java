@@ -564,21 +564,11 @@ public class ServiceInfo extends EditableInfo {
                 if (savedMetaAttrInfoRef == null
                     && defaultValues != allMetaAttrsAreDefaultValues) {
                     if (allMetaAttrsAreDefaultValues) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValue(
+                        sameAsMetaAttrsWi.setValueNoListeners(
                                                META_ATTRS_DEFAULT_VALUES_TEXT);
-                            }
-                        });
                     } else {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValue(
-                                                 Widget.NOTHING_SELECTED);
-                            }
-                        });
+                        sameAsMetaAttrsWi.setValueNoListeners(
+                                                     Widget.NOTHING_SELECTED);
                     }
                 }
             }
@@ -1373,7 +1363,7 @@ public class ServiceInfo extends EditableInfo {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                sameAsOperationsWi.setValue(
+                                sameAsOperationsWi.setValueNoListeners(
                                        OPERATIONS_DEFAULT_VALUES_TEXT);
                             }
                         });
@@ -1381,7 +1371,7 @@ public class ServiceInfo extends EditableInfo {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                sameAsOperationsWi.setValue(
+                                sameAsOperationsWi.setValueNoListeners(
                                          Widget.NOTHING_SELECTED);
                             }
                         });
@@ -1990,14 +1980,9 @@ public class ServiceInfo extends EditableInfo {
                     final String newValue = defaultValue;
                     if (!Tools.areEqual(oldValue,
                                         Tools.extractUnit(newValue))) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (wi != null) {
-                                    wi.setValue(newValue);
-                                }
-                            }
-                        });
+                        if (wi != null) {
+                            wi.setValueNoListeners(newValue);
+                        }
                     }
                 }
             }
@@ -6413,5 +6398,10 @@ public class ServiceInfo extends EditableInfo {
         final Widget wi = operationsComboBoxHash.get(op, param);
         mOperationsComboBoxHashReadLock.unlock();
         return wi;
+    }
+
+    /** Return same as operations combo box. */
+    public final Widget getSameAsOperationsWi() {
+        return sameAsOperationsWi;
     }
 }
