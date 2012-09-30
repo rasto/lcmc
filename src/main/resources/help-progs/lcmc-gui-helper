@@ -42,6 +42,7 @@ our $DEBUG = 0;
 our $HW_INFO_INTERVAL = 10;
 our $DRBD_INFO_INTERVAL = 10;
 our $CLUSTER_INFO_INTERVAL = 10;
+our $CIBMON_RESTART = 60;
 our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
@@ -945,7 +946,9 @@ sub get_cluster_events {
 sub do_cluster_events {
 	my $info = get_cluster_info();
 	my $command =
-		"PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat cibmon -udV -m10 2>&1";
+		" ( sleep $CIBMON_RESTART; kill -9 \$\$; ) 2>/dev/null &"
+		." PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat"
+		." exec cibmon -udV -m10 2>&1";
 	if ($info) {
 		print "---start---\n";
 		print $info;
