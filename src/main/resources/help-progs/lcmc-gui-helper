@@ -947,7 +947,8 @@ sub do_cluster_events {
 	my $info = get_cluster_info();
 	my $command =
 		" ( sleep $CIBMON_RESTART; kill -9 \$\$; ) 2>/dev/null &"
-		." PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat"
+		."
+		PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
 		." exec cibmon -udV -m10 2>&1";
 	if ($info) {
 		print "---start---\n";
