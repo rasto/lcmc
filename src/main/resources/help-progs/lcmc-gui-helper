@@ -930,11 +930,11 @@ sub get_cluster_events {
 	my $pid = $$;
 	die "can't fork: $!" unless defined($kidpid = fork());
 	if ($kidpid) {
-		while (1) {
-			do_cluster_events();
-			sleep $CLUSTER_INFO_INTERVAL;
-		}
+		# parent
+		do_cluster_events();
+		kill 1, $kidpid;
 	} else {
+		# kid
 		while (1) {
 			print "---reset---\n"; # reset timeout
 			sleep $CLUSTER_INFO_INTERVAL;
@@ -959,8 +959,8 @@ sub do_cluster_events {
 			while (<EVENTS>) {
 				# pcmk 1.1.8, it's an error, but
 				# still indicates an event
-				if (/Signon to CIB failed/) {
-					close EVENTS;
+				if (/signon to CIB failed/i) {
+					print "ERROR: signon to CIB failed";
 					return;
 				} elsif (/error:/ || /cib_diff/) {
 					my $info = get_cluster_info();
@@ -973,9 +973,8 @@ sub do_cluster_events {
 				}
 			}
 		}
-		return "";
 	} else {
-		return "ERROR: cib connection error";
+		print "ERROR: cib connection error";
 	}
 }
 
