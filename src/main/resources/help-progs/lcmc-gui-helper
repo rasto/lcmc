@@ -42,7 +42,6 @@ our $DEBUG = 0;
 our $HW_INFO_INTERVAL = 10;
 our $DRBD_INFO_INTERVAL = 10;
 our $CLUSTER_INFO_INTERVAL = 10;
-our $CIBMON_RESTART = 60;
 our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
@@ -946,10 +945,8 @@ sub get_cluster_events {
 sub do_cluster_events {
 	my $info = get_cluster_info();
 	my $command =
-		" ( sleep $CIBMON_RESTART; kill -9 \$\$; ) 2>/dev/null &"
-		."
-		PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
-		." exec cibmon -udV -m10 2>&1";
+		" PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
+		." exec cibmon -udV -m1 2>&1";
 	if ($info) {
 		print "---start---\n";
 		print $info;
@@ -962,7 +959,10 @@ sub do_cluster_events {
 			while (<EVENTS>) {
 				# pcmk 1.1.8, it's an error, but
 				# still indicates an event
-				if (/error:/ || /cib_diff/) {
+				if (/Signon to CIB failed/) {
+					close EVENTS;
+					return;
+				} elsif (/error:/ || /cib_diff/) {
 					my $info = get_cluster_info();
 					if ($info ne $prev_info) {
 						print "---start---\n";
