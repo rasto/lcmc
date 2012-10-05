@@ -797,40 +797,65 @@ final class CoroConfig extends DialogCluster {
             config.append(plugins(fake));
         }
         config.append("logging {\n");
+        if (corosync2) {
+            config.append(tab);
+            config.append("fileline: off\n");
+            config.append(tab);
+            config.append("to_logfile: yes\n");
+            config.append(tab);
+            config.append("logfile: /var/log/cluster/corosync.log\n");
+
+        }
         config.append(tab);
-        config.append("to_stderr: yes\n");
+        config.append("to_stderr: no\n");
         config.append(tab);
         config.append("debug: off\n");
         config.append(tab);
         config.append("timestamp: on\n");
         config.append(tab);
-        config.append("to_file: no\n");
-        config.append(tab);
         config.append("to_syslog: yes\n");
-        config.append(tab);
-        config.append("syslog_facility: daemon\n}\n\ntotem {\n");
+        if (corosync2) {
+            config.append(tab);
+            config.append("logger_subsys {\n");
+            config.append(tab);
+            config.append(tab);
+            config.append("subsys: QUORUM\n");
+            config.append(tab);
+            config.append(tab);
+            config.append("debug: off\n");
+            config.append(tab);
+            config.append("}\n");
+        } else {
+            config.append(tab);
+            config.append("to_file: no\n");
+            config.append(tab);
+            config.append("syslog_facility: daemon\n");
+        }
+        config.append("}\n\ntotem {\n");
         config.append(tab);
         config.append("version: 2\n");
         config.append(tab);
         config.append("token: 3000\n");
         config.append(tab);
-        config.append("token_retransmits_before_loss_const: 10\n");
-        config.append(tab);
-        config.append("join: 60\n");
-        config.append(tab);
-        config.append("consensus: 4000\n");
-        config.append(tab);
-        config.append("vsftype: none\n");
-        config.append(tab);
-        config.append("max_messages: 20\n");
-        config.append(tab);
-        config.append("clear_node_high_bit: yes\n");
-        config.append(tab);
         config.append("secauth: on\n");
-        config.append(tab);
-        config.append("threads: 0\n");
-        config.append(tab);
-        config.append("# nodeid: 1234\n");
+        if (!corosync2) {
+            config.append(tab);
+            config.append("token_retransmits_before_loss_const: 10\n");
+            config.append(tab);
+            config.append("join: 60\n");
+            config.append(tab);
+            config.append("consensus: 4000\n");
+            config.append(tab);
+            config.append("vsftype: none\n");
+            config.append(tab);
+            config.append("max_messages: 20\n");
+            config.append(tab);
+            config.append("clear_node_high_bit: yes\n");
+            config.append(tab);
+            config.append("threads: 0\n");
+            config.append(tab);
+            config.append("# nodeid: 1234\n");
+        }
         config.append(tab);
         config.append("rrp_mode: active\n");
         return config;
