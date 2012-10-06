@@ -120,7 +120,6 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                new HashMap<String, Object[]>();
     static {
         DEFAULTS_MAP.put(InterfaceData.MAC_ADDRESS, "generate");
-        PREFERRED_MAP.put(InterfaceData.MODEL_TYPE, "virtio");
         PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, "default");
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
                             new String[]{null,
