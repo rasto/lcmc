@@ -9,13 +9,13 @@ import lcmc.utilities.TestSuite1;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 
-public final class GuiComboBoxTest1 extends TestCase {
-    private GuiComboBox comboBox;
+public final class WidgetTest1 extends TestCase {
+    private Widget widget;
     @Before
     protected void setUp() {
         TestSuite1.initTest();
         for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
-            comboBox = new GuiComboBox(
+            widget = new Widget(
                           null,
                           new String[]{"a", "b", "c"},
                           null, /* units */
@@ -35,79 +35,79 @@ public final class GuiComboBoxTest1 extends TestCase {
     /* ---- tests ----- */
     @Test
     public void testIsCheckBox() {
-        assertFalse(comboBox.isCheckBox());
+        assertFalse(widget.isCheckBox());
     }
 
     @Test
     public void testReloadComboBox() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.reloadComboBox(null, new Object[]{"a", "b"});
-            comboBox.reloadComboBox(null, new Object[]{"a", "b", "c"});
-            comboBox.reloadComboBox("as", new Object[]{"a", "b", "c"});
-            comboBox.reloadComboBox(null, new Object[]{"a", "b", "c"});
-            comboBox.reloadComboBox(null, new Object[]{"a"});
+            widget.reloadComboBox(null, new Object[]{"a", "b"});
+            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
+            widget.reloadComboBox("as", new Object[]{"a", "b", "c"});
+            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
+            widget.reloadComboBox(null, new Object[]{"a"});
         }
     }
 
     @Test
     public void testSetEnabled() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.setEnabled(null, false);
-            comboBox.setEnabled(null, true);
-            comboBox.setEnabled("a", false);
-            comboBox.setEnabled("a", true);
+            widget.setEnabled(null, false);
+            widget.setEnabled(null, true);
+            widget.setEnabled("a", false);
+            widget.setEnabled("a", true);
         }
     }
 
     @Test
     public void testSetVisible() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.setEnabled(null, false);
-            comboBox.setEnabled(null, true);
-            comboBox.setEnabled("a", false);
-            comboBox.setEnabled("a", true);
+            widget.setEnabled(null, false);
+            widget.setEnabled(null, true);
+            widget.setEnabled("a", false);
+            widget.setEnabled("a", true);
         }
     }
 
     @Test
     public void testSetToolTipText() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.setToolTipText(null);
-            comboBox.setToolTipText("");
-            comboBox.setToolTipText("x");
+            widget.setToolTipText(null);
+            widget.setToolTipText("");
+            widget.setToolTipText("x");
         }
     }
 
     @Test
     public void testSetLabelToolTipText() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.setLabelToolTipText(null);
-            comboBox.setLabelToolTipText("x");
+            widget.setLabelToolTipText(null);
+            widget.setLabelToolTipText("x");
         }
     }
 
     @Test
     public void testSetEditable() {
-        comboBox.setEditable(false);
-        comboBox.setEditable(true);
-        comboBox.setEditable();
+        widget.setEditable(false);
+        widget.setEditable(true);
+        widget.setEditable();
     }
 
     @Test
     public void testGetStringValue() {
-        assertEquals("a", comboBox.getStringValue());
+        assertEquals("a", widget.getStringValue());
     }
 
     @Test
     public void testGetValue() {
-        assertEquals("a", comboBox.getValue());
+        assertEquals("a", widget.getValue());
     }
 
     @Test
     public void testClear() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            comboBox.clear();
-            comboBox.reloadComboBox(null, new Object[]{"a", "b", "c"});
+            widget.clear();
+            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
         }
     }
 }
