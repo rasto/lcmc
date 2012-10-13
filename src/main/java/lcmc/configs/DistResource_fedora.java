@@ -45,6 +45,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"version:Fedora release 14*", "14"},
         {"version:Fedora release 15*", "15"},
         {"version:Fedora release 16*", "16"},
+        {"version:Fedora release 17*", "17"},
 
         /* directory capturing regexp on the website from the kernel version */
         {"kerneldir", "(\\d+\\.\\d+\\.\\d+-\\d+.*?fc\\d+).*"},
