@@ -48,7 +48,7 @@ public class Service extends Resource {
     private boolean modifying = false;
     /** Whether the service is orphaned. */
     private boolean orphaned = false;
-    /** Heartbeat class:  heartbeat, ocf, lsb. */
+    /** Heartbeat class:  heartbeat, ocf, service (upstart, systemd). */
     private String resourceClass = null;
     /** Whether this service master when it is clone. */
     private boolean master = false;
@@ -258,7 +258,7 @@ public class Service extends Resource {
 
     /**
      * Sets heartbeat resource class heartbeat (old style), ocf, lsb (from
-     * init.d).
+     * init.d), service (upstart, systemd).
      */
     public final void setResourceClass(final String resourceClass) {
         this.resourceClass = resourceClass;

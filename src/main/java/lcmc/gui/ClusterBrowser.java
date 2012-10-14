@@ -229,6 +229,7 @@ public final class ClusterBrowser extends Browser {
         HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
         HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
                           "Heartbeat 1 RAs (deprecated)");
+        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS, "Service Scripts");
         HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
         HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
     }
@@ -248,6 +249,7 @@ public final class ClusterBrowser extends Browser {
     /** String array with all hb classes. */
     public static final String[] HB_CLASSES = {ResourceAgent.OCF_CLASS,
                                                ResourceAgent.HEARTBEAT_CLASS,
+                                               ResourceAgent.SERVICE_CLASS,
                                                ResourceAgent.LSB_CLASS,
                                                ResourceAgent.STONITH_CLASS};
 

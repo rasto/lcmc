@@ -1452,6 +1452,11 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
+                    final List<ResourceAgent> services = getAddServiceList(cl);
+                    if (services.size() == 0) {
+                        /* no services, don't show */
+                        continue;
+                    }
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
                                        new AccessMode(
@@ -1460,7 +1465,7 @@ public final class ServicesInfo extends EditableInfo {
                                        new AccessMode(ConfigData.AccessType.OP,
                                                       false));
                     MyListModel dlm = new MyListModel();
-                    for (final ResourceAgent ra : getAddServiceList(cl)) {
+                    for (final ResourceAgent ra : services) {
                         final MyMenuItem mmi =
                                 new MyMenuItem(ra.getMenuName(),
                                                null,

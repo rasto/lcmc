@@ -990,6 +990,7 @@ public final class CRMXML extends XML {
                         ra.setIgnoreDefaults(true);
                     }
                     if (ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)
+                        || ResourceAgent.SERVICE_CLASS.equals(resourceClass)
                         || ResourceAgent.LSB_CLASS.equals(resourceClass)) {
                         ra.setMetaDataLoaded(true);
                         setLSBResourceAgent(serviceName, resourceClass, ra);
@@ -1935,7 +1936,8 @@ public final class CRMXML extends XML {
         if (ra.isMetaDataLoaded()) {
             return;
         }
-        if (ResourceAgent.LSB_CLASS.equals(resourceClass)
+        if (ResourceAgent.SERVICE_CLASS.equals(resourceClass)
+            || ResourceAgent.LSB_CLASS.equals(resourceClass)
             || ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
             setLSBResourceAgent(serviceName, resourceClass, ra);
         } else {
@@ -1982,7 +1984,10 @@ public final class CRMXML extends XML {
                                      final String raClass,
                                      final ResourceAgent ra) {
         ra.setVersion("0.0");
-        if (ResourceAgent.LSB_CLASS.equals(raClass)) {
+        if (ResourceAgent.SERVICE_CLASS.equals(raClass)) {
+            ra.setLongDesc("System Resource.");
+            ra.setShortDesc(serviceName);
+        } else if (ResourceAgent.LSB_CLASS.equals(raClass)) {
             ra.setLongDesc("LSB resource.");
             ra.setShortDesc("/etc/init.d/" + serviceName);
         } else if (ResourceAgent.HEARTBEAT_CLASS.equals(raClass)) {
@@ -2119,7 +2124,8 @@ public final class CRMXML extends XML {
         if (ra == null) {
             final ResourceAgent notInstalledRA =
                             new ResourceAgent(serviceName, provider, raClass);
-            if (ResourceAgent.LSB_CLASS.equals(raClass)
+            if (ResourceAgent.SERVICE_CLASS.equals(raClass)
+                || ResourceAgent.LSB_CLASS.equals(raClass)
                 || ResourceAgent.HEARTBEAT_CLASS.equals(raClass)) {
                 setLSBResourceAgent(serviceName, raClass, notInstalledRA);
             } else {

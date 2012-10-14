@@ -38,7 +38,7 @@ import org.apache.commons.collections15.map.MultiKeyMap;
 /**
  * This class describes a resource agent with its name and class.
  * This is important in otder to distinguish services that have the same name
- * int the heartbeat, ocf or lsb classes.
+ * int the heartbeat, ocf, service or lsb classes.
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -114,6 +114,8 @@ public final class ResourceAgent {
     private boolean ignoreDefaults = false;
     /** Whether meta-data has been loaded. */
     private boolean metaDataLoaded = false;
+    /** Name of service resource (upstart, systemd). */
+    public static final String SERVICE_CLASS = "service";
     /** Name of lsb style resource (/etc/init.d/*). */
     public static final String LSB_CLASS = "lsb";
     /** Name of heartbeat style resource (heartbeat 1). */

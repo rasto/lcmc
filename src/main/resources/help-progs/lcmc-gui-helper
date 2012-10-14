@@ -46,6 +46,7 @@ our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
 our $VIRSH_COMMAND = "/usr/bin/virsh -r";
+our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents service";
 
 our $PROC_DRBD = "/proc/drbd";
 
@@ -110,6 +111,8 @@ if ($option eq "all") {
 	get_resource_agents(@ARGV);
 } elsif ($option eq "get-old-style-resources") {
 	get_old_style_resources(@ARGV);
+} elsif ($option eq "get-service-resources") {
+	get_service_resources(@ARGV);
 } elsif ($option eq "get-lsb-resources") {
 	get_lsb_resources(@ARGV);
 } elsif ($option eq "get-stonith-devices") {
@@ -1178,6 +1181,10 @@ sub get_resource_agents {
 	if ("quick" eq $type) {
 		print "class:heartbeat\n";
 		get_old_style_resources($type);
+		print "class:service\n";
+		get_service_resources($type);
+		# lsb is subset of service, but this is needed for
+		# services already configured as lsb in pcmk config.
 		print "class:lsb\n";
 		get_lsb_resources($type);
 	}
@@ -1235,12 +1242,17 @@ sub get_old_style_resources {
 	}
 }
 
+sub get_service_resources {
+	my $type = shift || "";
+	for (`$PCMK_SERVICE_AGENTS 2>/dev/null`) {
+		next if /@/; # skip some weird stuff
+		print "ra:$_";
+	}
+}
+
 sub get_lsb_resources {
 	my $type = shift || "";
-	my $quick = 0;
-	if ("quick" eq $type) {
-		$quick = 1;
-	}
+	# old style init scripts (lsb)
 	my $dir = "/etc/init.d/";
 	for (`find $dir -perm -u=x -xtype f -printf "%f\n"`) {
 		print "ra:$_";

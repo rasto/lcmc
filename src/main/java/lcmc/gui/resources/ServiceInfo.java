@@ -516,6 +516,7 @@ public class ServiceInfo extends EditableInfo {
         }
         final String cl = getService().getResourceClass();
         if (cl != null && (cl.equals(ResourceAgent.HEARTBEAT_CLASS)
+                           || cl.equals(ResourceAgent.SERVICE_CLASS)
                            || cl.equals(ResourceAgent.LSB_CLASS))) {
             /* in old style resources don't show all the textfields */
             boolean visible = false;
@@ -3090,6 +3091,7 @@ public class ServiceInfo extends EditableInfo {
         pacemakerResAttrs.put("id", heartbeatId);
         pacemakerResAttrs.put("class", raClass);
         if (!ResourceAgent.HEARTBEAT_CLASS.equals(raClass)
+            && !raClass.equals(ResourceAgent.SERVICE_CLASS)
             && !raClass.equals(ResourceAgent.LSB_CLASS)
             && !raClass.equals(ResourceAgent.STONITH_CLASS)) {
             pacemakerResAttrs.put("provider", provider);
@@ -5075,6 +5077,11 @@ public class ServiceInfo extends EditableInfo {
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
+                    final List<ResourceAgent> services = getAddServiceList(cl);
+                    if (services.size() == 0) {
+                        /* no services, don't show */
+                        continue;
+                    }
                     final JCheckBox colocationWi = new JCheckBox("Colo", true);
                     final JCheckBox orderWi = new JCheckBox("Order", true);
                     colocationWi.setBackground(
@@ -5093,7 +5100,7 @@ public class ServiceInfo extends EditableInfo {
                             new AccessMode(ConfigData.AccessType.ADMIN, false),
                             new AccessMode(ConfigData.AccessType.OP, false));
                     final MyListModel dlm = new MyListModel();
-                    for (final ResourceAgent ra : getAddServiceList(cl)) {
+                    for (final ResourceAgent ra : services) {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {
                                 @Override

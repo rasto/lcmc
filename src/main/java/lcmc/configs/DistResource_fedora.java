@@ -83,7 +83,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
          + "echo 'provider:heartbeat';"
          + "echo 'master:';"
          + "@GUI-HELPER@ get-old-style-resources;"
-         + "@GUI-HELPER@ get-lsb-resources"},
+         + "@GUI-HELPER@ get-service-resources"},
 
         /* Corosync/Pacemaker native */
         {"PmInst.install.text.1",
