@@ -46,9 +46,11 @@ our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
 our $VIRSH_COMMAND = "/usr/bin/virsh -r";
-our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents service";
+our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
 
 our $PROC_DRBD = "/proc/drbd";
+our @SERVICE_CLASSES = ("service", "systemd", "upstart");
+our $LSB_CLASS = "lsb";
 
 
 my $option = shift || die;
@@ -111,8 +113,6 @@ if ($option eq "all") {
 	get_resource_agents(@ARGV);
 } elsif ($option eq "get-old-style-resources") {
 	get_old_style_resources(@ARGV);
-} elsif ($option eq "get-service-resources") {
-	get_service_resources(@ARGV);
 } elsif ($option eq "get-lsb-resources") {
 	get_lsb_resources(@ARGV);
 } elsif ($option eq "get-stonith-devices") {
@@ -1181,8 +1181,9 @@ sub get_resource_agents {
 	if ("quick" eq $type) {
 		print "class:heartbeat\n";
 		get_old_style_resources($type);
-		print "class:service\n";
-		get_service_resources($type);
+		for my $service (@SERVICE_CLASSES) {
+			get_service_resources($service);
+		}
 		# lsb is subset of service, but this is needed for
 		# services already configured as lsb in pcmk config.
 		print "class:lsb\n";
@@ -1242,9 +1243,12 @@ sub get_old_style_resources {
 	}
 }
 
+# service, upstart, systemd.
+# would work for lsb, but it's not backwards compatible
 sub get_service_resources {
-	my $type = shift || "";
-	for (`$PCMK_SERVICE_AGENTS 2>/dev/null`) {
+	my $service = shift;
+	print "class:$service\n";
+	for (`$PCMK_SERVICE_AGENTS $service 2>/dev/null`) {
 		next if /@/; # skip some weird stuff
 		print "ra:$_";
 	}

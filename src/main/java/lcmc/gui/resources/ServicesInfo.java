@@ -1457,13 +1457,23 @@ public final class ServicesInfo extends EditableInfo {
                         /* no services, don't show */
                         continue;
                     }
+                    boolean mode = !AccessMode.ADVANCED;
+                    if (ResourceAgent.UPSTART_CLASS.equals(cl)
+                        || ResourceAgent.SYSTEMD_CLASS.equals(cl)) {
+                        mode = AccessMode.ADVANCED;
+                    }
+                    if (ResourceAgent.LSB_CLASS.equals(cl)
+                        && !getAddServiceList(
+                                    ResourceAgent.SERVICE_CLASS).isEmpty()) {
+                        mode = AccessMode.ADVANCED;
+                    }
                     final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
+                            new MyMenu(ClusterBrowser.getClassMenu(cl),
                                        new AccessMode(
                                                    ConfigData.AccessType.ADMIN,
-                                                   false),
+                                                   mode),
                                        new AccessMode(ConfigData.AccessType.OP,
-                                                      false));
+                                                      mode));
                     MyListModel dlm = new MyListModel();
                     for (final ResourceAgent ra : services) {
                         final MyMenuItem mmi =
@@ -1505,7 +1515,7 @@ public final class ServicesInfo extends EditableInfo {
                         dlm.addElement(mmi);
                     }
                     final boolean ret = Tools.getScrollingMenu(
-                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        ClusterBrowser.getClassMenu(cl),
                                         null, /* options */
                                         classItem,
                                         dlm,

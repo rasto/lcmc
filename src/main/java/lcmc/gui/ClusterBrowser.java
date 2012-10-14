@@ -229,7 +229,6 @@ public final class ClusterBrowser extends Browser {
         HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
         HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
                           "Heartbeat 1 RAs (deprecated)");
-        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS, "Service Scripts");
         HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
         HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
     }
@@ -247,11 +246,15 @@ public final class ClusterBrowser extends Browser {
     /** Name of the boolean type in drbd. */
     public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
     /** String array with all hb classes. */
-    public static final String[] HB_CLASSES = {ResourceAgent.OCF_CLASS,
-                                               ResourceAgent.HEARTBEAT_CLASS,
-                                               ResourceAgent.SERVICE_CLASS,
-                                               ResourceAgent.LSB_CLASS,
-                                               ResourceAgent.STONITH_CLASS};
+    public static final List<String> HB_CLASSES = new ArrayList<String>();
+    static {
+        HB_CLASSES.add(ResourceAgent.OCF_CLASS);
+        HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
+        for (final String c : ResourceAgent.SERVICE_CLASSES) {
+            HB_CLASSES.add(c);
+        }
+        HB_CLASSES.add(ResourceAgent.STONITH_CLASS);
+    }
 
     /** Hb start operation. */
     private static final String HB_OP_START = "start";
@@ -2627,6 +2630,15 @@ public final class ClusterBrowser extends Browser {
     /** clStatusLock global unlock. */
     public void clStatusUnlock() {
         mClStatusLock.unlock();
+    }
+
+    /** Return name of the classes in the menu. */ 
+    public static String getClassMenu(final String cl) {
+        final String name = ClusterBrowser.HB_CLASS_MENU.get(cl);
+        if (name == null) {
+            return Tools.ucfirst(cl) + " scripts";
+        }
+        return name;
     }
 
 }

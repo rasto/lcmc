@@ -516,8 +516,7 @@ public class ServiceInfo extends EditableInfo {
         }
         final String cl = getService().getResourceClass();
         if (cl != null && (cl.equals(ResourceAgent.HEARTBEAT_CLASS)
-                           || cl.equals(ResourceAgent.SERVICE_CLASS)
-                           || cl.equals(ResourceAgent.LSB_CLASS))) {
+                           || ResourceAgent.SERVICE_CLASSES.contains(cl))) {
             /* in old style resources don't show all the textfields */
             boolean visible = false;
             Widget wi = null;
@@ -3091,8 +3090,7 @@ public class ServiceInfo extends EditableInfo {
         pacemakerResAttrs.put("id", heartbeatId);
         pacemakerResAttrs.put("class", raClass);
         if (!ResourceAgent.HEARTBEAT_CLASS.equals(raClass)
-            && !raClass.equals(ResourceAgent.SERVICE_CLASS)
-            && !raClass.equals(ResourceAgent.LSB_CLASS)
+            && !ResourceAgent.SERVICE_CLASSES.contains(raClass)
             && !raClass.equals(ResourceAgent.STONITH_CLASS)) {
             pacemakerResAttrs.put("provider", provider);
         }
@@ -5095,10 +5093,20 @@ public class ServiceInfo extends EditableInfo {
                     colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                     colOrdPanel.add(colocationWi);
                     colOrdPanel.add(orderWi);
+                    boolean mode = !AccessMode.ADVANCED;
+                    if (ResourceAgent.UPSTART_CLASS.equals(cl)
+                        || ResourceAgent.SYSTEMD_CLASS.equals(cl)) {
+                        mode = AccessMode.ADVANCED;
+                    }
+                    if (ResourceAgent.LSB_CLASS.equals(cl)
+                        && !getAddServiceList(
+                                    ResourceAgent.SERVICE_CLASS).isEmpty()) {
+                        mode = AccessMode.ADVANCED;
+                    }
                     final MyMenu classItem = new MyMenu(
-                            ClusterBrowser.HB_CLASS_MENU.get(cl),
-                            new AccessMode(ConfigData.AccessType.ADMIN, false),
-                            new AccessMode(ConfigData.AccessType.OP, false));
+                            ClusterBrowser.getClassMenu(cl),
+                            new AccessMode(ConfigData.AccessType.ADMIN, mode),
+                            new AccessMode(ConfigData.AccessType.OP, mode));
                     final MyListModel dlm = new MyListModel();
                     for (final ResourceAgent ra : services) {
                         try {
@@ -5125,7 +5133,7 @@ public class ServiceInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 final boolean ret = Tools.getScrollingMenu(
-                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                        ClusterBrowser.getClassMenu(cl),
                                         colOrdPanel,
                                         classItem,
                                         dlm,

@@ -35,6 +35,8 @@ public final class AccessMode {
     private final ConfigData.AccessType accessType;
     /** Whether it is advanced mode or not. */
     private final boolean advancedMode;
+    /** Advanced mode. */
+    public static final boolean ADVANCED = true;
 
     /** Prepares a new <code>AccessMode</code> object. */
     public AccessMode(final ConfigData.AccessType accessType,
@@ -50,6 +52,6 @@ public final class AccessMode {
 
     /** Returns advanced mode. */
     public boolean isAdvancedMode() {
-        return advancedMode;
+        return advancedMode == ADVANCED;
     }
 }
