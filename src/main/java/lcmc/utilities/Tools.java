@@ -121,7 +121,6 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
-import java.awt.Font;
 import javax.swing.plaf.FontUIResource;
 
 /**

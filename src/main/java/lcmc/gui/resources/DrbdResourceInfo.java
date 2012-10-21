@@ -46,8 +46,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -66,8 +64,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;

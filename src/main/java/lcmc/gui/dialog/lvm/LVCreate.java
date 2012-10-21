@@ -37,8 +37,6 @@ import lcmc.data.ConfigData;
 
 import java.util.Map;
 import java.util.Set;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemListener;

@@ -35,7 +35,6 @@ import lcmc.data.PtestData;
 import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
-import java.util.Arrays;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;

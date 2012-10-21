@@ -39,10 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 /**

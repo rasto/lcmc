@@ -51,15 +51,11 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
 

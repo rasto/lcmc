@@ -45,8 +45,6 @@ import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;

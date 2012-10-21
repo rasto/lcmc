@@ -63,8 +63,6 @@ import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
 import javax.swing.SwingUtilities;
 
 import javax.swing.JComponent;

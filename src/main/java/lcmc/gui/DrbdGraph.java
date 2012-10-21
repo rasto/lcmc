@@ -23,7 +23,6 @@
 package lcmc.gui;
 
 import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
 import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.resources.BlockDevice;
@@ -54,7 +53,6 @@ import java.util.ArrayList;
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class creates graph and provides methods to add new block device

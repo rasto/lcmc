@@ -33,9 +33,6 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
 import java.util.List;
 import java.util.ArrayList;
 

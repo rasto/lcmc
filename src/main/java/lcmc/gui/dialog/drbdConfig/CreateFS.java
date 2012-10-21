@@ -42,8 +42,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 

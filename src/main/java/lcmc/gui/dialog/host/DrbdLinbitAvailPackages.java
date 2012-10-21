@@ -39,8 +39,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.List;

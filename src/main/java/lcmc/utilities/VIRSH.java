@@ -25,7 +25,6 @@ import lcmc.data.Host;
 import lcmc.configs.DistResource;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.regex.Matcher;
 
 /**
  * This class provides virsh commands.

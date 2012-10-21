@@ -32,8 +32,6 @@ import lcmc.gui.Widget;
 import lcmc.gui.Browser;
 
 import java.util.Map;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
