@@ -478,57 +478,61 @@ public final class VMSXML extends XML {
                                  final Node root,
                                  final Map<String, String> parametersMap) {
         final String cpuMatch = parametersMap.get(VM_PARAM_CPU_MATCH);
-        if (!"".equals(cpuMatch)) {
-            final Element cpuMatchNode = (Element) root.appendChild(
+        final Element cpuMatchNode = (Element) root.appendChild(
                                                doc.createElement("cpu"));
+        if (!"".equals(cpuMatch)) {
             cpuMatchNode.setAttribute("match", cpuMatch);
-            final String model = parametersMap.get(VM_PARAM_CPUMATCH_MODEL);
-            if (!"".equals(model)) {
-                final Node modelNode = (Element) cpuMatchNode.appendChild(
-                                                  doc.createElement("model"));
-                modelNode.appendChild(doc.createTextNode(model));
+        }
+        final String model = parametersMap.get(VM_PARAM_CPUMATCH_MODEL);
+        if (!"".equals(model)) {
+            final Node modelNode = (Element) cpuMatchNode.appendChild(
+                                              doc.createElement("model"));
+            modelNode.appendChild(doc.createTextNode(model));
+        }
+        final String vendor = parametersMap.get(VM_PARAM_CPUMATCH_VENDOR);
+        if (!"".equals(vendor)) {
+            final Node vendorNode = (Element) cpuMatchNode.appendChild(
+                                              doc.createElement("vendor"));
+            vendorNode.appendChild(doc.createTextNode(vendor));
+        }
+        final String sockets = parametersMap.get(
+                                       VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
+        final String cores = parametersMap.get(
+                                       VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
+        final String threads = parametersMap.get(
+                                       VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
+        final boolean isSockets = !"".equals(sockets);
+        final boolean isCores =   !"".equals(cores);
+        final boolean isThreads = !"".equals(threads);
+        if (isSockets || isCores || isThreads) {
+            final Element topologyNode = (Element) cpuMatchNode.appendChild(
+                                          doc.createElement("topology"));
+            if (isSockets) {
+                topologyNode.setAttribute("sockets", sockets);
             }
-            final String vendor = parametersMap.get(VM_PARAM_CPUMATCH_VENDOR);
-            if (!"".equals(vendor)) {
-                final Node vendorNode = (Element) cpuMatchNode.appendChild(
-                                                  doc.createElement("vendor"));
-                vendorNode.appendChild(doc.createTextNode(vendor));
+            if (isCores) {
+                topologyNode.setAttribute("cores", cores);
             }
-            final String sockets = parametersMap.get(
-                                           VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
-            final String cores = parametersMap.get(
-                                           VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
-            final String threads = parametersMap.get(
-                                           VM_PARAM_CPUMATCH_TOPOLOGY_THREADS);
-            final boolean isSockets = !"".equals(sockets);
-            final boolean isCores =   !"".equals(cores);
-            final boolean isThreads = !"".equals(threads);
-            if (isSockets || isCores || isThreads) {
-                final Element topologyNode = (Element) cpuMatchNode.appendChild(
-                                              doc.createElement("topology"));
-                if (isSockets) {
-                    topologyNode.setAttribute("sockets", sockets);
-                }
-                if (isCores) {
-                    topologyNode.setAttribute("cores", cores);
-                }
-                if (isThreads) {
-                    topologyNode.setAttribute("threads", threads);
-                }
+            if (isThreads) {
+                topologyNode.setAttribute("threads", threads);
             }
-            final String policy = parametersMap.get(
-                                           VM_PARAM_CPUMATCH_FEATURE_POLICY);
-            final String features = parametersMap.get(
-                                           VM_PARAM_CPUMATCH_FEATURES);
-            if (!"".equals(policy) && !"".equals(features)) {
-                for (final String feature : features.split("\\s+")) {
-                    final Element featureNode =
-                                      (Element) cpuMatchNode.appendChild(
-                                                 doc.createElement("feature"));
-                    featureNode.setAttribute("policy", policy);
-                    featureNode.setAttribute("name", feature);
-                }
+        }
+        final String policy = parametersMap.get(
+                                       VM_PARAM_CPUMATCH_FEATURE_POLICY);
+        final String features = parametersMap.get(
+                                       VM_PARAM_CPUMATCH_FEATURES);
+        if (!"".equals(policy) && !"".equals(features)) {
+            for (final String feature : features.split("\\s+")) {
+                final Element featureNode =
+                                  (Element) cpuMatchNode.appendChild(
+                                             doc.createElement("feature"));
+                featureNode.setAttribute("policy", policy);
+                featureNode.setAttribute("name", feature);
             }
+        }
+        if (!cpuMatchNode.hasChildNodes()) {
+            root.removeChild(cpuMatchNode);
+
         }
     }
 

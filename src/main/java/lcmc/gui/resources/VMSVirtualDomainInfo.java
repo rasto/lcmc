@@ -706,7 +706,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
                             new String[]{"", "1", "2"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                            new String[]{"", "1", "2"});
+                            new String[]{"", "1", "2", "4", "8"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
                             new String[]{"", "1", "2"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
@@ -3552,23 +3552,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 }
             }
             prevType = wi.getStringValue();
-        } else if (VMSXML.VM_PARAM_CPU_MATCH.equals(param)) {
-            final boolean match = !"".equals(newValue);
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    for (final String p : new String[]{
-                                    VMSXML.VM_PARAM_CPUMATCH_MODEL,
-                                    VMSXML.VM_PARAM_CPUMATCH_VENDOR,
-                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                                    VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                                    VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                                    VMSXML.VM_PARAM_CPUMATCH_FEATURES}) {
-                        getWidget(p, null).setVisible(match);
-                    }
-                }
-            });
         }
         return true;
     }

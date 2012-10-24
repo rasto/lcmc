@@ -4316,6 +4316,7 @@ public final class RoboTest {
             /* next */
             moveTo("Next");
             leftClick();
+            sleep(2000);
 
             if ("lxc".equals(type)) {
                 /* filesystem */

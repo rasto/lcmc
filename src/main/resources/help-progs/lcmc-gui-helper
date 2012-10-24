@@ -45,7 +45,9 @@ our $CLUSTER_INFO_INTERVAL = 10;
 our $OCF_DIR = "/usr/lib/ocf";
 our $OCF_RESOURCE_DIR = $OCF_DIR."/resource.d";
 our $STONITH_ADMIN_PROG = "/usr/sbin/stonith_admin";
-our $VIRSH_COMMAND = "/usr/bin/virsh -r";
+our $VIRSH_COMMAND = "virsh -r";
+# --secure-info and -r don't work together
+our $VIRSH_COMMAND_NO_RO = "virsh";
 our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
 
 our $PROC_DRBD = "/proc/drbd";
@@ -1866,7 +1868,7 @@ sub get_vm_info {
 			#}
 			my $config;
 			$config =
-			      `$VIRSH_COMMAND $options dumpxml --security-info $name 2>/dev/null` || "";
+			      `$VIRSH_COMMAND_NO_RO $options dumpxml --security-info $name 2>/dev/null` || "";
 			$out.= "<vm name=\"$name\"";
 			if ($autostart{$name}) {
 				$out.= ' autostart="True"';
@@ -2069,7 +2071,7 @@ sub gui_vm_test {
 	my $name = shift;
 	my $xml;
 	for ("", "-c 'lxc:///'", "-c 'xen:///'") {
-		$xml = `$VIRSH_COMMAND $_ dumpxml --security-info $name 2>/dev/null`;
+		$xml = `$VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null`;
 		if ($xml !~ /^\s*$/) {
 			last;
 		}
