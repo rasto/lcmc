@@ -129,6 +129,25 @@ public class Browser {
     }
 
     /** Reloads the node. */
+    public final void reloadAndWait(final DefaultMutableTreeNode node,
+                                    final boolean select) {
+        final JTree t = tree;
+        DefaultMutableTreeNode oldN = null;
+        if (t != null) {
+            oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
+        }
+        final DefaultMutableTreeNode oldNode = oldN;
+        if (node != null) {
+            treeModel.reload(node);
+        }
+        if (!select && t != null && oldNode != null) {
+            /* if don't want to select, we reselect the old path. */
+            //t.setSelectionPath(path);
+            treeModel.reload(oldNode);
+        }
+    }
+
+    /** Reloads the node. */
     public final void reload(final DefaultMutableTreeNode node,
                              final boolean select) {
         final JTree t = tree;

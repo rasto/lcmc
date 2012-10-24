@@ -438,7 +438,11 @@ public class Info implements Comparable {
     public void selectMyself() {
         // this fires an event in ViewPanel.
         if (node != null) {
-            getBrowser().reload(node, true);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getBrowser().reload(node, true);
+                }
+            });
             getBrowser().nodeChanged(node);
         }
     }
@@ -1143,16 +1147,21 @@ public class Info implements Comparable {
 
     /** Remove node in tree menu. Call it from swing thread. */
     final void removeNode() {
-        final DefaultMutableTreeNode n = node;
-        node = null;
-        if (n == null) {
-            return;
-        }
-        final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
-        if (p != null) {
-            p.remove(n);
-            getBrowser().reload(p, true);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final DefaultMutableTreeNode n = node;
+                node = null;
+                if (n == null) {
+                    return;
+                }
+                final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
+                if (p != null) {
+                    p.remove(n);
+                    getBrowser().reloadAndWait(p, true);
+                }
+            }
+        });
     }
 
     /** Returns the main text that appears in the graph. */
