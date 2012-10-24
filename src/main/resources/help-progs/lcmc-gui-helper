@@ -1866,7 +1866,7 @@ sub get_vm_info {
 			#}
 			my $config;
 			$config =
-			      `$VIRSH_COMMAND $options dumpxml $name 2>/dev/null` || "";
+			      `$VIRSH_COMMAND $options dumpxml --security-info $name 2>/dev/null` || "";
 			$out.= "<vm name=\"$name\"";
 			if ($autostart{$name}) {
 				$out.= ' autostart="True"';
@@ -2069,7 +2069,7 @@ sub gui_vm_test {
 	my $name = shift;
 	my $xml;
 	for ("", "-c 'lxc:///'", "-c 'xen:///'") {
-		$xml = `$VIRSH_COMMAND $_ dumpxml $name 2>/dev/null`;
+		$xml = `$VIRSH_COMMAND $_ dumpxml --security-info $name 2>/dev/null`;
 		if ($xml !~ /^\s*$/) {
 			last;
 		}
