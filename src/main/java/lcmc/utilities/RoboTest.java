@@ -26,6 +26,8 @@ import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.Widget;
+import lcmc.gui.DrbdGraph;
+import lcmc.gui.resources.Info;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -671,6 +673,44 @@ public final class RoboTest {
                                 Tools.getConfigData().setBigDRBDConf(
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
+                        }
+                    } else if ("5".equals(index)) {
+                        /* pv create */
+                        final int blockDevY = getBlockDevY();
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        startDRBDTest5(blockDevY);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
+                        resetTerminalAreas();
+                    } else if ("6".equals(index)) {
+                        /* pv create */
+                        final int blockDevY = getBlockDevY();
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        startDRBDTest6(blockDevY);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
+                        resetTerminalAreas();
+                    } else if ("7".equals(index)) {
+                        int i = 1;
+                        final int blockDevY = getBlockDevY();
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            info("test" + index + " no " + i);
+                            startDRBDTest5(blockDevY);
+                            if (aborted) {
+                                break;
+                            }
+                            startDRBDTest6(blockDevY);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
+                            i++;
                         }
                     }
                 } else if ("VMs (KVM, Xen)".equals(selected)) {
@@ -3203,10 +3243,13 @@ public final class RoboTest {
         }
         Component c = null;
         int i = 0;
-        while (c == null && i < 60) {
+        while (c == null && i < 60 && !aborted) {
             c = findInside(getFocusedWindow(), clazz, number);
-            Tools.sleep(1000);
+            sleepNoFactor(1000);
             i++;
+        }
+        if (aborted) {
+            return;
         }
         if (c == null) {
             Tools.printStackTrace("can't find: " + clazz);
@@ -3219,6 +3262,9 @@ public final class RoboTest {
     }
 
     private static void moveToMenu(final String text) {
+        if (aborted) {
+            return;
+        }
         final JTree tree = (JTree) findInside(Tools.getGUIData().getMainFrame(),
                                               JTree.class,
                                               0);
@@ -3239,6 +3285,27 @@ public final class RoboTest {
         Tools.info("can't find " + text + " the tree");
     }
 
+    private static void moveToGraph(final String text) {
+        if (aborted) {
+            return;
+        }
+        final DrbdGraph graph = cluster.getBrowser().getDrbdGraph();
+        for (final Info i : graph.infoToVertexKeySet()) {
+            final String item = graph.getMainText(graph.getVertex(i), false);
+            if (item.startsWith(text) || item.endsWith(text)) {
+                final Point2D loc = graph.getLocation(i);
+                moveToAbs((int) (graph.getVisualizationViewer()
+                                      .getLocationOnScreen().getX()
+                                 + loc.getX()),
+                          (int) (graph.getVisualizationViewer()
+                                      .getLocationOnScreen().getY()
+                                 + loc.getY()));
+                return;
+            }
+        }
+        Tools.info("can't find " + text + " in the graph");
+    }
+
     private static void moveTo(final String text, final Class<?> clazz) {
         moveTo(text, 1, clazz);
     }
@@ -3251,10 +3318,13 @@ public final class RoboTest {
         }
         Component c = null;
         int i = 0;
-        while (c == null && i < 60) {
+        while (c == null && i < 60 && !aborted) {
             c = (Component) findComponent(text, number);
-            Tools.sleep(1000);
+            sleepNoFactor(1000);
             i++;
+        }
+        if (aborted) {
+            return;
         }
         if (c == null) {
             Tools.printStackTrace("can't find: " + text);
@@ -3476,6 +3546,98 @@ public final class RoboTest {
         }
     }
 
+    private static void createPV(final int blockDevY) {
+        moveTo(334, blockDevY);
+        rightClick();
+        sleep(1000);
+        moveTo("Create PV");
+        leftClick();
+        sleep(2000);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+        moveTo("Create PV"); /* button */
+        leftClick();
+    }
+
+    private static void pvRemove(final int blockDevY) {
+        moveTo(334, blockDevY);
+        rightClick();
+        sleep(3000);
+        moveTo("Remove PV");
+        leftClick();
+        sleep(2000);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+        moveTo("Remove PV"); /* button */
+        leftClick();
+    }
+
+    private static void createVG(final int blockDevY) {
+        moveTo(334, blockDevY);
+        rightClick();
+        sleep(1000);
+        moveTo("Create VG");
+        leftClick();
+        sleep(2000);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+        moveTo("Create VG"); /* button */
+        leftClick();
+    }
+
+    private static void createLV() {
+        rightClick();
+        sleep(1000);
+        moveTo("Create LV in VG");
+        leftClick();
+        sleep(2000);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+        moveTo("Create"); /* button */
+        leftClick();
+        moveTo("Close");
+        leftClick();
+    }
+
+    private static void resizeLV() {
+        rightClick();
+        sleep(1000);
+        moveTo("Resize LV");
+        leftClick();
+        sleep(2000);
+        press(KeyEvent.VK_2);
+        press(KeyEvent.VK_5);
+        press(KeyEvent.VK_2);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+
+        moveTo("Resize");
+        leftClick();
+        moveTo("Close");
+        leftClick();
+    }
+
+    private static void vgRemove() {
+        rightClick();
+        sleep(1000);
+        moveTo("Remove VG");
+        leftClick();
+        sleep(2000);
+        moveTo(cluster.getHostsArray()[1].getName());
+        leftClick();
+        moveTo("Remove VG"); /* button */
+        leftClick();
+    }
+
+    private static void lvRemove() {
+        rightClick();
+        sleep(1000);
+        moveTo("Remove LV");
+        leftClick();
+        sleep(2000);
+        moveTo("Remove"); /* button */
+        leftClick();
+    }
 
     /** DRBD Test 1. */
     private static void startDRBDTest1(final int blockDevY) {
@@ -4064,6 +4226,41 @@ public final class RoboTest {
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 4);
+    }
+
+    /** Create LV */
+    private static void startDRBDTest5(final int blockDevY) {
+        /* Two bds. */
+        slowFactor = 0.2f;
+        aborted = false;
+        for (int i = 0; i < 2; i++) {
+            createPV(blockDevY);
+            createVG(blockDevY);
+            sleepNoFactor(60000);
+            moveToGraph("VG vg0" + i);
+            createLV();
+            moveToGraph("vg0" + i + "/lvol0");
+            resizeLV();
+        }
+    }
+    /** Remove LV */
+    private static void startDRBDTest6(final int blockDevY) {
+        /* Two bds. */
+        slowFactor = 0.2f;
+        aborted = false;
+        int offset = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                moveToGraph("vg0" + i + "/lvol0");
+                lvRemove();
+                sleepNoFactor(10000);
+            }
+            moveToGraph("VG vg0" + i);
+            vgRemove();
+            sleepNoFactor(60000);
+            pvRemove(blockDevY + offset);
+            offset += 40;
+        }
     }
 
     /** VM Test 1. */

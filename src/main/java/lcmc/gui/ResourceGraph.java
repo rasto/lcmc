@@ -510,7 +510,7 @@ public abstract class ResourceGraph {
     }
 
     /** Returns the visualization viewer. */
-    protected final VisualizationViewer<Vertex, Edge> getVisualizationViewer() {
+    public final VisualizationViewer<Vertex, Edge> getVisualizationViewer() {
         return vv;
     }
 
@@ -520,7 +520,7 @@ public abstract class ResourceGraph {
     }
 
     /** Returns the vertex that represents the specified resource. */
-    protected Vertex getVertex(final Info i) {
+    public Vertex getVertex(final Info i) {
         return infoToVertexMap.get(i);
     }
 
@@ -536,7 +536,7 @@ public abstract class ResourceGraph {
     }
 
     /** Returns all resources. */
-    protected final Set<Info> infoToVertexKeySet() {
+    public final Set<Info> infoToVertexKeySet() {
         return infoToVertexMap.keySet();
     }
 
@@ -2029,5 +2029,9 @@ public abstract class ResourceGraph {
         }
         Tools.stopProgressIndicator(cn, "copy");
         return selected;
+    }
+
+    public final Point2D getLocation(final Info i) {
+        return layout.transform(getVertex(i));
     }
 }

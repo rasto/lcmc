@@ -1899,7 +1899,7 @@ public final class HeartbeatGraph extends ResourceGraph {
      * Returns the vertex that represents the specified resource or its group.
      */
     @Override
-    protected Vertex getVertex(final Info i) {
+    public Vertex getVertex(final Info i) {
         if (i == null) {
             return null;
         }

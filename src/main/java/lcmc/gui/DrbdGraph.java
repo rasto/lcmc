@@ -511,7 +511,7 @@ public final class DrbdGraph extends ResourceGraph {
      * characters, it is shortened.
      */
     @Override
-    protected String getMainText(final Vertex v, final boolean testOnly) {
+    public String getMainText(final Vertex v, final boolean testOnly) {
         if (isVertexBlockDevice(v)) {
             String l;
             if (isVertexDrbd(v)) {
