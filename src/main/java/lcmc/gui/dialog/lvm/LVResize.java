@@ -364,17 +364,15 @@ public final class LVResize extends LV {
 
     /** LVM Resize and DRBD Resize. */
     private boolean resize(final String size) {
-        final boolean ret = LVM.resize(
-                                   blockDevInfo.getHost(),
-                                   blockDevInfo.getBlockDevice().getName(),
-                                   size,
-                                   false);
+        final boolean ret = LVM.resize(blockDevInfo.getHost(),
+                                       blockDevInfo.getBlockDevice().getName(),
+                                       size,
+                                       false);
         if (ret) {
             answerPaneSetText("Lodical volume was successfully resized on "
                               + blockDevInfo.getHost() + ".");
             /* resize lvm volume on the other node. */
-            final String lv =
-                    blockDevInfo.getBlockDevice().getLogicalVolume();
+            final String lvm = blockDevInfo.getBlockDevice().getName();
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             boolean resizingFailed = false;
             for (final Host h : hostCheckBoxes.keySet()) {
@@ -383,7 +381,7 @@ public final class LVResize extends LV {
                     continue;
                 }
                 for (final BlockDevice b : h.getBlockDevices()) {
-                    if (lv.equals(b.getLogicalVolume())
+                    if (lvm.equals(b.getName())
                         || (oBDI != null && oBDI.getBlockDevice() == b)) {
                         /* drbd or selected other host */
                         final boolean oRet = LVM.resize(h,
@@ -443,8 +441,8 @@ public final class LVResize extends LV {
                              blockDevInfo.getBlockDevice().getBlockSize());
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             long max = free + taken;
-            final String lv =
-                        blockDevInfo.getBlockDevice().getLogicalVolume();
+            final String lvm =
+                        blockDevInfo.getBlockDevice().getName();
             if (hostCheckBoxes != null) {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     if (blockDevInfo.getHost() == h) {
@@ -452,7 +450,7 @@ public final class LVResize extends LV {
                     }
                     if (hostCheckBoxes.get(h).isSelected()) {
                         for (final BlockDevice b : h.getBlockDevices()) {
-                            if (lv.equals(b.getLogicalVolume())
+                            if (lvm.equals(b.getName())
                                 || (oBDI != null
                                     && oBDI.getBlockDevice() == b)) {
                                 final long oFree =
