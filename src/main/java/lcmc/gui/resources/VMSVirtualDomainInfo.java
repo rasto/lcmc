@@ -256,7 +256,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                                                             DOMAIN_TYPE_LXC,
                                                             DOMAIN_TYPE_OPENVZ,
-                                                            DOMAIN_TYPE_UML)));
+                                                            DOMAIN_TYPE_VBOX)));
     /** All parameters. */
     private static final String[] VM_PARAMETERS = new String[]{
                                     VMSXML.VM_PARAM_DOMAIN_TYPE,
@@ -439,6 +439,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final String TYPE_LINUX = "linux";
     /** Type exe. */
     private static final String TYPE_EXE = "exe";
+    /** Type UML. */
+    private static final String TYPE_UML = "uml";
 
     /** Width of the button field. */
     private static final int CONTROL_BUTTON_WIDTH = 80;
@@ -3543,6 +3545,54 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                     if (inWi != null) {
                         inWi.setValue("/bin/sh");
+                    }
+                } else if (Tools.areEqual(DOMAIN_TYPE_VBOX, newValue)) {
+                    if (emWi != null) {
+                        emWi.setValue(xenLibPath + "");
+                    }
+                    if (loWi != null) {
+                        loWi.setValue(xenLibPath + "");
+                    }
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_VBOX);
+                    }
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_HVM);
+                    }
+                    if (inWi != null) {
+                        inWi.setValue("");
+                    }
+                } else if (Tools.areEqual(DOMAIN_TYPE_OPENVZ, newValue)) {
+                    if (emWi != null) {
+                        emWi.setValue("");
+                    }
+                    if (loWi != null) {
+                        loWi.setValue("");
+                    }
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_OPENVZ);
+                    }
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_EXE);
+                    }
+                    if (inWi != null) {
+                        inWi.setValue("/sbin/init");
+                    }
+                } else if (Tools.areEqual(DOMAIN_TYPE_UML, newValue)) {
+                    if (emWi != null) {
+                        emWi.setValue("");
+                    }
+                    if (loWi != null) {
+                        loWi.setValue("");
+                    }
+                    if (voWi != null) {
+                        voWi.setValue(VIRSH_OPTION_UML);
+                    }
+                    if (typeWi != null) {
+                        typeWi.setValue(TYPE_UML);
+                    }
+                    if (inWi != null) {
+                        inWi.setValue("");
                     }
                 } else {
                     if (emWi != null) {
