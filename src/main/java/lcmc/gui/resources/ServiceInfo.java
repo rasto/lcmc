@@ -4722,21 +4722,29 @@ public class ServiceInfo extends EditableInfo {
                 colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colOrdPanel.add(colocationWi);
                 colOrdPanel.add(orderWi);
-                final boolean ret = Tools.getScrollingMenu(name,
-                                                           colOrdPanel,
-                                                           this,
-                                                           dlm,
-                                                           list,
-                                                           thisClass,
-                                                           popups,
-                                                           callbackHash);
-                if (!ret) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                final MyMenu thisM = this;
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
-                            setEnabled(false);
+                            final boolean ret =
+                                        Tools.getScrollingMenu(name,
+                                                               colOrdPanel,
+                                                               thisM,
+                                                               dlm,
+                                                               list,
+                                                               thisClass,
+                                                               popups,
+                                                               callbackHash);
+                            if (!ret) {
+                                setEnabled(false);
+                            }
                         }
                     });
+                } catch (final InterruptedException ix) {
+                    Thread.currentThread().interrupt();
+                } catch (final InvocationTargetException x) {
+                    Tools.printStackTrace();
                 }
                 super.update();
             }
