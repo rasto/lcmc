@@ -142,15 +142,15 @@ public final class MainMenu extends JPanel implements ActionListener {
                     saveAsActionListener(),
                     null);
 
-
         submenu.addSeparator();
-        addMenuItem(Tools.getString("MainMenu.Exit"),
-                    submenu,
-                    KeyEvent.VK_X,
-                    KeyEvent.VK_X,
-                    exitActionListener(),
-                    null);
-
+        if (!Tools.getGUIData().isApplet()) {
+            addMenuItem(Tools.getString("MainMenu.Exit"),
+                        submenu,
+                        KeyEvent.VK_X,
+                        KeyEvent.VK_X,
+                        exitActionListener(),
+                        null);
+        }
         menuBar.add(submenu);
 
         /* settings */

@@ -599,4 +599,12 @@ public final class GUIData  {
         });
         t.start();
     }
+
+    /**
+     * Return whether it is run as an applet.
+     */
+    public boolean isApplet() {
+        return mainFrame instanceof JApplet;
+    }
+
 }
