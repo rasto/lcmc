@@ -54,8 +54,9 @@ final class VirtualDomainInfo extends ServiceInfo {
     private static final String[] HYPERVISORS = new String[]{"qemu:///system",
                                                              "xen:///",
                                                              "lxc:///",
-                                                             "openvz:///",
-                                                             "vbox:///"};
+                                                             "vbox:///",
+                                                             "openvz:///system",
+                                                             "uml:///system"};
 
     /** Creates the VirtualDomainInfo object. */
     VirtualDomainInfo(final String name,

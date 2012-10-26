@@ -215,28 +215,36 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** Virsh options. */
-    private static final String VIRSH_OPTION_KVM = "";
-    private static final String VIRSH_OPTION_XEN = "-c 'xen:///'";
-    private static final String VIRSH_OPTION_LXC = "-c 'lxc:///'";
+    private static final String VIRSH_OPTION_KVM    = "";
+    private static final String VIRSH_OPTION_XEN    = "-c 'xen:///'";
+    private static final String VIRSH_OPTION_LXC    = "-c 'lxc:///'";
+    private static final String VIRSH_OPTION_VBOX   = "-c 'vbox:///session'";
+    private static final String VIRSH_OPTION_OPENVZ = "-c 'openvz:///system'";
+    private static final String VIRSH_OPTION_UML    = "-c 'uml:///system'";
     /** Domain types. */
     static final String DOMAIN_TYPE_KVM = "kvm";
-    private static final String DOMAIN_TYPE_XEN = "xen";
-    private static final String DOMAIN_TYPE_LXC = "lxc";
-    private static final String DOMAIN_TYPE_UML = "uml";
+    private static final String DOMAIN_TYPE_XEN    = "xen";
+    private static final String DOMAIN_TYPE_LXC    = "lxc";
+    private static final String DOMAIN_TYPE_VBOX   = "vbox";
     private static final String DOMAIN_TYPE_OPENVZ = "openvz";
+    private static final String DOMAIN_TYPE_UML    = "uml";
 
 
 
     private static final String[] VIRSH_OPTIONS = new String[]{
                                                             VIRSH_OPTION_KVM,
                                                             VIRSH_OPTION_XEN,
-                                                            VIRSH_OPTION_LXC};
+                                                            VIRSH_OPTION_LXC,
+                                                            VIRSH_OPTION_VBOX,
+                                                            VIRSH_OPTION_OPENVZ,
+                                                            VIRSH_OPTION_UML};
 
     /** Whether it needs "display" section. */
     private static final Set<String> NEED_DISPLAY =
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                                                             DOMAIN_TYPE_KVM,
-                                                            DOMAIN_TYPE_XEN)));
+                                                            DOMAIN_TYPE_XEN,
+                                                            DOMAIN_TYPE_VBOX)));
     /** Whether it needs "console" section. */
     private static final Set<String> NEED_CONSOLE =
          Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
@@ -670,6 +678,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{DOMAIN_TYPE_KVM,
                                          DOMAIN_TYPE_XEN,
                                          DOMAIN_TYPE_LXC,
+                                         DOMAIN_TYPE_OPENVZ,
+                                         DOMAIN_TYPE_VBOX,
+                                         DOMAIN_TYPE_UML,
                                          });
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
                             new String[]{"", "/usr/bin/pygrub"});

@@ -53,7 +53,14 @@ our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
 our $PROC_DRBD = "/proc/drbd";
 our @SERVICE_CLASSES = ("service", "systemd", "upstart");
 our $LSB_CLASS = "lsb";
-
+# "" = kvm
+our @VM_OPTIONS = ("",
+		   "-c 'xen:///'",
+		   "-c lxc:///",
+		   "-c openvz:///system",
+		   "-c vbox:///session",
+		   "-c uml:///system");
+our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
 my $option = shift || die;
 
@@ -1849,8 +1856,23 @@ sub get_vm_info {
 		$libvirt_version = $1;
 	}
 	my $out = "<version>$libvirt_version</version>\n";
-	for my $options ("", "-c 'xen:///'", "-c lxc:///") {
-		for (`$VIRSH_COMMAND $options list --all 2>/dev/null|sed '1,2d'`) {
+	OPTIONS: for my $options (@VM_OPTIONS) {
+		if ($DISABLE_VM_OPTIONS{$options}) {
+			next;
+		}
+		my $header = 1;
+		for (`$VIRSH_COMMAND $options list --all 2>&1`) {
+			if ($header) {
+				if (/^-{5}/) {
+					$header = 0;
+				} elsif (/^error:/) {
+					# disable the ones that give an
+					# error
+					$DISABLE_VM_OPTIONS{$options}++;
+					next OPTIONS;
+				}
+				next;
+			}
 			my ($name) = /^\s*\S+\s+(\S+)/;
 			next if !$name;
 			chomp;
@@ -2070,7 +2092,7 @@ sub gui_vm_test {
 	my $index = shift;
 	my $name = shift;
 	my $xml;
-	for ("", "-c 'lxc:///'", "-c 'xen:///'") {
+	for (@VM_OPTIONS) {
 		$xml = `$VIRSH_COMMAND_NO_RO $_ dumpxml --security-info $name 2>/dev/null`;
 		if ($xml !~ /^\s*$/) {
 			last;
