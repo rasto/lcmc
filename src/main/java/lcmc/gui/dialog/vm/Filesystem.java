@@ -51,6 +51,7 @@ final class Filesystem extends VMConfig {
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {FilesystemData.TYPE,
                                             FilesystemData.SOURCE_DIR,
+                                            FilesystemData.SOURCE_NAME,
                                             FilesystemData.TARGET_DIR};
     /** VMS filesystem info object. */
     private VMSFilesystemInfo vmsfi = null;

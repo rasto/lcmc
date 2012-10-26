@@ -49,23 +49,10 @@ import org.w3c.dom.Node;
  */
 public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
-    private final Map<String, Widget> sourceFileWi =
+    private final Map<String, Widget> sourceDirWi =
                                             new HashMap<String, Widget>();
     /** Source block combo box, so that it can be disabled, depending on type.*/
-    private final Map<String, Widget> sourceDeviceWi =
-                                            new HashMap<String, Widget>();
-    /** Target device combo box, that needs to be reloaded if target type has
-     * changed. */
-    private final Map<String, Widget> targetDeviceWi =
-                                            new HashMap<String, Widget>();
-    /** Driver name combo box. */
-    private final Map<String, Widget> driverNameWi =
-                                            new HashMap<String, Widget>();
-    /** Driver type combo box. */
-    private final Map<String, Widget> driverTypeWi =
-                                            new HashMap<String, Widget>();
-    /** Readonly combo box. */
-    private final Map<String, Widget> readonlyWi =
+    private final Map<String, Widget> sourceNameWi =
                                             new HashMap<String, Widget>();
     /** Choices for source directories */
     private final String[] sourceDirs;
@@ -74,6 +61,17 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
                                                 FilesystemData.SOURCE_DIR,
+                                                FilesystemData.SOURCE_NAME,
+                                                FilesystemData.TARGET_DIR};
+    /** Mount parameters. */
+    private static final String[] MOUNT_PARAMETERS =
+                                               {FilesystemData.TYPE,
+                                                FilesystemData.SOURCE_DIR,
+                                                FilesystemData.TARGET_DIR};
+    /** Template parameters. */
+    private static final String[] TEMPLATE_PARAMETERS =
+                                               {FilesystemData.TYPE,
+                                                FilesystemData.SOURCE_NAME,
                                                 FilesystemData.TARGET_DIR};
     /** Whether the parameter is enabled only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
@@ -82,7 +80,6 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 FilesystemData.TYPE,
-                                                FilesystemData.SOURCE_DIR,
                                                 FilesystemData.TARGET_DIR}));
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
@@ -93,6 +90,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     static {
         FIELD_TYPES.put(FilesystemData.TYPE, Widget.Type.RADIOGROUP);
         FIELD_TYPES.put(FilesystemData.SOURCE_DIR, Widget.Type.COMBOBOX);
+        FIELD_TYPES.put(FilesystemData.SOURCE_NAME, Widget.Type.TEXTFIELD);
         FIELD_TYPES.put(FilesystemData.TARGET_DIR, Widget.Type.COMBOBOX);
     }
     /** Short name. */
@@ -101,6 +99,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     static {
         SHORTNAME_MAP.put(FilesystemData.TYPE, "Type");
         SHORTNAME_MAP.put(FilesystemData.SOURCE_DIR, "Source Dir");
+        SHORTNAME_MAP.put(FilesystemData.SOURCE_NAME, "Source Name");
         SHORTNAME_MAP.put(FilesystemData.TARGET_DIR, "Target Dir");
     }
 
@@ -115,14 +114,17 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                               new HashMap<String, Object[]>();
     /** Filesystem types. */
     private static final String MOUNT_TYPE = "mount";
+    /** Filesystem types. */
+    private static final String TEMPLATE_TYPE = "template";
 
     /** LXC source dir */
     private static final String LXC_SOURCE_DIR = "/var/lib/lxc";
 
     static {
         POSSIBLE_VALUES.put(FilesystemData.TYPE,
-                            new StringInfo[]{
-                                 new StringInfo("Mount", MOUNT_TYPE, null)});
+                        new StringInfo[]{
+                             new StringInfo("Mount", MOUNT_TYPE, null),
+                             new StringInfo("Template", TEMPLATE_TYPE, null)});
         POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new String[]{"/"});
         PREFERRED_MAP.put(FilesystemData.TYPE, "mount");
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, "/");
@@ -224,6 +226,13 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
+        final String type = getComboBoxValue(FilesystemData.TYPE);
+        if ((FilesystemData.SOURCE_DIR.equals(param)
+              && MOUNT_TYPE.equals(type))
+             || (FilesystemData.SOURCE_NAME.equals(param)
+                 && TEMPLATE_TYPE.equals(type))) {
+            return true;
+        }
         return IS_REQUIRED.contains(param);
     }
 
@@ -384,6 +393,21 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final String newValue) {
+        if (FilesystemData.TYPE.equals(param)) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (final String p : sourceDirWi.keySet()) {
+                        sourceDirWi.get(p).setVisible(
+                                                MOUNT_TYPE.equals(newValue));
+                    }
+                    for (final String p : sourceNameWi.keySet()) {
+                        sourceNameWi.get(p).setVisible(
+                                               TEMPLATE_TYPE.equals(newValue));
+                    }
+                }
+            });
+        }
         if (isRequired(param) && (newValue == null || "".equals(newValue))) {
             return false;
         }
@@ -468,7 +492,14 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         if (name == null) {
             return "new FS...";
         }
-        final String saved = getParamSaved(FilesystemData.SOURCE_DIR);
+        String saved;
+        final String type = getComboBoxValue(FilesystemData.TYPE);
+
+        if (MOUNT_TYPE.equals(type)) {
+            saved = getParamSaved(FilesystemData.SOURCE_DIR);
+        } else {
+            saved = getParamSaved(FilesystemData.SOURCE_NAME);
+        }
         if (saved == null) {
             s.append("new...");
         } else {
@@ -512,7 +543,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                   final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             final String sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
-            final String regexp = ".*[^/]$";
+            final String regexp = ".*[^/]?$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
             final Widget paramWi = new Widget(
@@ -527,6 +558,11 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                                  false), /* only adv. mode */
                                   fileChooserBtn);
             paramWi.setAlwaysEditable(true);
+            if (prefix == null) {
+                sourceDirWi.put("", paramWi);
+            } else {
+                sourceDirWi.put(prefix, paramWi);
+            }
             if (Tools.isWindows()) {
                 paramWi.setTFButtonEnabled(false);
             }
@@ -551,6 +587,26 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                     t.start();
                 }
             });
+            widgetAdd(param, prefix, paramWi);
+            return paramWi;
+        } else if (FilesystemData.SOURCE_NAME.equals(param)) {
+            final String sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
+            final Widget paramWi = new Widget(
+                                  sourceName,
+                                  getParamPossibleChoices(param),
+                                  null, /* units */
+                                  getFieldType(param),
+                                  null, /* regexp */
+                                  width,
+                                  null, /* abbrv */
+                                  new AccessMode(getAccessType(param),
+                                                 false)); /* only adv. mode */
+            paramWi.setAlwaysEditable(true);
+            if (prefix == null) {
+                sourceNameWi.put("", paramWi);
+            } else {
+                sourceNameWi.put(prefix, paramWi);
+            }
             widgetAdd(param, prefix, paramWi);
             return paramWi;
         } else {

@@ -310,6 +310,8 @@ public final class VMSXML extends XML {
         FILESYSTEM_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
         FILESYSTEM_TAG_MAP.put(FilesystemData.SOURCE_DIR, "source");
         FILESYSTEM_ATTRIBUTE_MAP.put(FilesystemData.SOURCE_DIR, "dir");
+        FILESYSTEM_TAG_MAP.put(FilesystemData.SOURCE_NAME, "source");
+        FILESYSTEM_ATTRIBUTE_MAP.put(FilesystemData.SOURCE_NAME, "name");
         FILESYSTEM_TAG_MAP.put(FilesystemData.TARGET_DIR, "target");
         FILESYSTEM_ATTRIBUTE_MAP.put(FilesystemData.TARGET_DIR, "dir");
 
@@ -1602,12 +1604,14 @@ public final class VMSXML extends XML {
                         final String type = getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
                         String sourceDir = null;
+                        String sourceName = null;
                         String targetDir = null;
                         for (int k = 0; k < opts.getLength(); k++) {
                             final Node optionNode = opts.item(k);
                             final String nodeName = optionNode.getNodeName();
                             if ("source".equals(nodeName)) {
                                 sourceDir = getAttribute(optionNode, "dir");
+                                sourceName = getAttribute(optionNode, "name");
                             } else if ("target".equals(nodeName)) {
                                 targetDir = getAttribute(optionNode, "dir");
                             } else if (!"#text".equals(nodeName)) {
@@ -1619,6 +1623,7 @@ public final class VMSXML extends XML {
                             final FilesystemData filesystemData =
                                                  new FilesystemData(type,
                                                                     sourceDir,
+                                                                    sourceName,
                                                                     targetDir);
                             fsMap.put(targetDir, filesystemData);
                         }
@@ -2458,12 +2463,16 @@ public final class VMSXML extends XML {
         private final String type;
         /** Source dir. */
         private final String sourceDir;
+        /** Source name. */
+        private final String sourceName;
         /** Target dir: / */
         private final String targetDir;
         /** Type. */
         public static final String TYPE = "type";
         /** Source dir string. */
         public static final String SOURCE_DIR = "source_dir";
+        /** Source name string. */
+        public static final String SOURCE_NAME = "source_name";
         /** Target dir string. */
         public static final String TARGET_DIR = "target_dir";
         /** Saved target dir string. */
@@ -2472,12 +2481,15 @@ public final class VMSXML extends XML {
         /** Creates new FilesysmteData object. */
         public FilesystemData(final String type,
                               final String sourceDir,
+                              final String sourceName,
                               final String targetDir) {
             super();
             this.type = type;
             setValue(TYPE, type);
             this.sourceDir = sourceDir;
             setValue(SOURCE_DIR, sourceDir);
+            this.sourceName = sourceName;
+            setValue(SOURCE_NAME, sourceName);
             this.targetDir = targetDir;
             setValue(TARGET_DIR, targetDir);
         }
@@ -2490,6 +2502,11 @@ public final class VMSXML extends XML {
         /** Returns source dir. */
         public String getSourceDir() {
             return sourceDir;
+        }
+
+        /** Returns source name. */
+        public String getSourceName() {
+            return sourceName;
         }
 
         /** Returns target dir. */
