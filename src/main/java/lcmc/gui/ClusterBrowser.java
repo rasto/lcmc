@@ -2425,6 +2425,19 @@ public final class ClusterBrowser extends Browser {
     }
 
     /**
+     * Return volume info object from the drbd block device name.
+     * /dev/drbd/by-res/r0
+     * /dev/drbd/by-res/r0/0
+     * /dev/drbd0
+     */
+    public void DrbdVolumeInfo getDrbdVolumeFromDev(final String dev) {
+        mDrbdDevHashLock.lock();
+        final DrbdVolumeInfo dvi = drbdDevHash.get(dev);
+        mDrbdDevHashLock.unlock();
+        return dvi;
+    }
+
+    /**
      * Returns a hash from resource name to drbd resource info hash.
      * Get locks the hash and put unlocks it
      */

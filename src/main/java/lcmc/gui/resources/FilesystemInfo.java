@@ -227,8 +227,7 @@ final class FilesystemInfo extends ServiceInfo {
                 selectedValue = getParamSaved(param);
             }
             final DrbdVolumeInfo selectedInfo =
-                          getBrowser().getDrbdDevHash().get(selectedValue);
-            getBrowser().putDrbdDevHash();
+                            getBrowser().getDrbdVolumeFromDev(selectedValue);
             if (selectedInfo != null) {
                 selectedValue = selectedInfo.toString();
             }
@@ -356,10 +355,8 @@ final class FilesystemInfo extends ServiceInfo {
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
-        final DrbdVolumeInfo oldDvi =
-                    getBrowser().getDrbdDevHash().get(
+        final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV));
-        getBrowser().putDrbdDevHash();
         super.removeMyselfNoConfirm(dcHost, testOnly);
         if (oldDvi != null && !testOnly) {
             final Thread t = new Thread(new Runnable() {
@@ -382,18 +379,14 @@ final class FilesystemInfo extends ServiceInfo {
             // TODO: disabled for now
             return;
         }
-        final DrbdVolumeInfo oldDvi =
-                    getBrowser().getDrbdDevHash().get(
+        final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV));
-        getBrowser().putDrbdDevHash();
         if (oldDvi != null) {
             // TODO: disabled because it does not work well at the moment.
             return;
         }
-        final DrbdVolumeInfo newDvi =
-                    getBrowser().getDrbdDevHash().get(
-                                        getComboBoxValue(FS_RES_PARAM_DEV));
-        getBrowser().putDrbdDevHash();
+        final DrbdVolumeInfo newDvi = getBrowser().getDrbdVolumeFromDev(
+                                          getComboBoxValue(FS_RES_PARAM_DEV));
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
@@ -476,9 +469,8 @@ final class FilesystemInfo extends ServiceInfo {
     public void reloadComboBoxes() {
         super.reloadComboBoxes();
         final DrbdVolumeInfo selectedInfo =
-                          getBrowser().getDrbdDevHash().get(
+                                getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV));
-        getBrowser().putDrbdDevHash();
         String selectedValue = null;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
