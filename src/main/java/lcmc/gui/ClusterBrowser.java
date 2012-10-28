@@ -345,6 +345,9 @@ public final class ClusterBrowser extends Browser {
                                                              HB_PAR_INTERVAL));
     private static final String RESET_STRING = "---reset---\r\n";
     private static int RESET_STRING_LEN = RESET_STRING.length();
+    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4 */
+    private final static Pattern BY_RES_PATTERN =
+                    Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
     /** Prepares a new <code>CusterBrowser</code> object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
@@ -2430,11 +2433,23 @@ public final class ClusterBrowser extends Browser {
      * /dev/drbd/by-res/r0/0
      * /dev/drbd0
      */
-    public void DrbdVolumeInfo getDrbdVolumeFromDev(final String dev) {
-        mDrbdDevHashLock.lock();
-        final DrbdVolumeInfo dvi = drbdDevHash.get(dev);
-        mDrbdDevHashLock.unlock();
-        return dvi;
+    public DrbdVolumeInfo getDrbdVolumeFromDev(final String dev) {
+        final Matcher m = BY_RES_PATTERN.matcher(dev);
+        if (m.matches()) {
+            final String res = m.group(1);
+            String vol;
+            if (m.groupCount() > 2) {
+                vol = m.group(2);
+            } else {
+                vol = "0";
+            }
+            final DrbdResourceInfo dri = getDrbdResHash().get(res);
+            putDrbdResHash();
+            if (dri != null) {
+                return dri.getDrbdVolumeInfo(vol);
+            }
+        }
+        return null;
     }
 
     /**

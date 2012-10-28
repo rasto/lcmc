@@ -133,6 +133,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                     put(DRBD_VOL_PARAM_NUMBER,
                         new String[]{"0", "1", "2", "3", "4", "5"});
                 }});
+    private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
     /** Prepares a new <code>DrbdVolumeInfo</code> object. */
     DrbdVolumeInfo(final String name,
@@ -1331,7 +1332,14 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     @Override
     public String getStringValue() {
-        return getDevice();
+        if (getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
+            return BY_RES_DEV_DIR
+                   + getDrbdResourceInfo().getName()
+                   + "/"
+                   + getName();
+        } else {
+            return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
+        }
     }
 
     /** Sets stored parameters. */
