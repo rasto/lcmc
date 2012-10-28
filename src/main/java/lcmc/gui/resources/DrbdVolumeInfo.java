@@ -778,6 +778,18 @@ public final class DrbdVolumeInfo extends EditableInfo
         return device;
     }
 
+    /** Return DRBD device in /dev/drbd/by-res...form. */
+    public String getDeviceByRes() {
+        if (getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
+            return BY_RES_DEV_DIR
+                   + getDrbdResourceInfo().getName()
+                   + "/"
+                   + getName();
+        } else {
+            return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
+        }
+    }
+
     /** Returns the last created filesystem. */
     @Override
     public String getCreatedFs() {
@@ -1332,14 +1344,7 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     @Override
     public String getStringValue() {
-        if (getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
-            return BY_RES_DEV_DIR
-                   + getDrbdResourceInfo().getName()
-                   + "/"
-                   + getName();
-        } else {
-            return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
-        }
+        return getDeviceByRes();
     }
 
     /** Sets stored parameters. */

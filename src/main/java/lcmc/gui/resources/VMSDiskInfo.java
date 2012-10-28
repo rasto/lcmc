@@ -308,7 +308,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     for (final BlockDevInfo bdi
                             : h.getBrowser().getBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()) {
-                            bds.add(bdi.getDrbdVolumeInfo().getDevice());
+                            bds.add(bdi.getDrbdVolumeInfo().getDeviceByRes());
                         } else {
                             bds.add(bdi.getName());
                         }
