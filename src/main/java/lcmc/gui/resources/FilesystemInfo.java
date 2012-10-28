@@ -330,13 +330,12 @@ final class FilesystemInfo extends ServiceInfo {
         }
 
         final StringBuilder s = new StringBuilder(getName());
-        final DrbdResourceInfo dri = getBrowser().getDrbdResHash().get(
+        final DrbdVolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(
                                              getParamSaved(FS_RES_PARAM_DEV));
-        getBrowser().putDrbdResHash();
-        if (dri == null) {
+        if (dvi == null) {
             id = getParamSaved(FS_RES_PARAM_DEV);
         } else {
-            id = dri.getName();
+            id = dvi.getDrbdResourceInfo().getName();
             s.delete(0, s.length());
             s.append("Filesystem / Drbd");
         }
