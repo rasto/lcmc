@@ -81,42 +81,20 @@ final class Devices extends DialogHost {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    getProgressBar().start(6000);
-                    final ExecCommandThread t = getHost().execCommand(
-                             "installGuiHelper",
-                             (ProgressBar) null, //getProgressBar(),
-                             new ExecCallback() {
-                                 @Override
-                                 public void done(final String ans) {
-                                     getAllInfo();
-                                 }
-                                 @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
-                                     /* in case of error, the next command will
-                                        find out, so it's not checked here. Gui
-                                        Helper can be installed anyway. */
-                                     getAllInfo();
-                                 }
-                             },
-                             null,  /* ConvertCmdCallback */
-                             false, /* outputVisible */
-                             SSH.DEFAULT_COMMAND_TIMEOUT);
-                    setCommandThread(t);
-                }
-            });
-        thread.start();
+        final Thread t = new Thread(new Runnable() {
+            public void run() {
+                getHost().getSSH().installGuiHelper();
+                getAllInfo();
+            }
+        });
+        t.start();
     }
 
     /** Returns info for input pane. */
     protected void getAllInfo() {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
-                         (ProgressBar) null, //getProgressBar(),
+                         getProgressBar(),
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
