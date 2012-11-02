@@ -2434,6 +2434,9 @@ public final class ClusterBrowser extends Browser {
      * /dev/drbd0
      */
     public DrbdVolumeInfo getDrbdVolumeFromDev(final String dev) {
+        if (dev == null) {
+            return null;
+        }
         final Matcher m = BY_RES_PATTERN.matcher(dev);
         if (m.matches()) {
             final String res = m.group(1);
