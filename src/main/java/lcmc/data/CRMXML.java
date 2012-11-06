@@ -710,7 +710,9 @@ public final class CRMXML extends XML {
                     electionTimeout,
                     shutdownEscalation,
                     "crmd-integration-timeout",
-                    "crmd-finalization-timeout"
+                    "crmd-finalization-timeout",
+                    "expected-quorum-votes",
+                    "maintenance-mode",
                 };
                 globalParams.add("dc-version");
                 paramGlobalShortDescMap.put("dc-version", "DC Version");
