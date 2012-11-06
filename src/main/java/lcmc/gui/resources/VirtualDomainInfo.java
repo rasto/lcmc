@@ -57,6 +57,7 @@ final class VirtualDomainInfo extends ServiceInfo {
                                                              "vbox:///",
                                                              "openvz:///system",
                                                              "uml:///system"};
+    private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
 
     /** Creates the VirtualDomainInfo object. */
     VirtualDomainInfo(final String name,
@@ -322,5 +323,14 @@ final class VirtualDomainInfo extends ServiceInfo {
     @Override
     void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
+    }
+
+    /** Returns whether this parameter is advanced. */
+    @Override
+    protected boolean isAdvanced(final String param) {
+        if (PARAM_ALLOW_MIGRATE.equals(param)) {
+            return false;
+        }
+        return super.isAdvanced(param);
     }
 }
