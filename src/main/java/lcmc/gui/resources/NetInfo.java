@@ -62,7 +62,7 @@ public final class NetInfo extends Info {
             public void run() {
                 final SSH.SSHOutput ret =
                               Tools.execCommand(getBrowser().getHost(),
-                                                "/sbin/ifconfig "
+                                                "/sbin/ip a l "
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
