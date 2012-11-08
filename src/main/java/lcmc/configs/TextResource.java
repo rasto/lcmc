@@ -1834,6 +1834,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostInfo.crmShellShowButton",
          "<html>crm shell<br>(config)</html>"},
 
+        {"HostInfo.crmVerifyBtn",
+         "<html>crm<br>verify</html>"},
+
+        {"HostInfo.coroMembersBtn",
+         "<html>cluster<br>members</html>"},
+
         {"HostInfo.crmShellLoading",
          "loading..."},
 

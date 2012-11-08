@@ -127,8 +127,8 @@ public final class HostInfo extends Info {
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
-    /** whether crm mon is showing. */
-    private volatile boolean crmMon = false;
+    /** whether crm info is showing. */
+    private volatile boolean crmInfo = false;
     /** whether crm show is in progress. */
     private volatile boolean crmShowInProgress = true;
     /** Prepares a new <code>HostInfo</code> object. */
@@ -196,6 +196,15 @@ public final class HostInfo extends Info {
         final MyButton crmMonButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
         crmMonButton.miniButton();
+        final MyButton crmVerifyBtn =
+                        new MyButton(Tools.getString("HostInfo.crmVerifyBtn"));
+        crmVerifyBtn.miniButton();
+        final MyButton coroMembersBtn =
+                      new MyButton(Tools.getString("HostInfo.coroMembersBtn"));
+        coroMembersBtn.miniButton();
+        final Host h = getHost();
+        coroMembersBtn.setEnabled(h.isCorosync());
+
         final MyButton crmConfigureShowButton =
                   new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
         crmConfigureShowButton.miniButton();
@@ -209,6 +218,8 @@ public final class HostInfo extends Info {
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
                             crmMonButton.setEnabled(true);
+                            crmVerifyBtn.setEnabled(true);
+                            coroMembersBtn.setEnabled(true);
                             crmShowInProgress = false;
                         }
                     });
@@ -216,7 +227,7 @@ public final class HostInfo extends Info {
 
                 @Override
                 public void doneError(final String ans, final int exitCode) {
-                    ta.setText("error");
+                    ta.setText(ans);
                     Tools.sshError(host, "", ans, "", exitCode);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -233,7 +244,7 @@ public final class HostInfo extends Info {
                                 ta,
                                 new AccessMode(ConfigData.AccessType.GOD,
                                                false));
-                crmMon = true;
+                crmInfo = true;
                 crmMonButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 host.execCommand("HostBrowser.getCrmMon",
@@ -244,6 +255,45 @@ public final class HostInfo extends Info {
             }
         });
         host.registerEnableOnConnect(crmMonButton);
+
+        crmVerifyBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                registerComponentEditAccessMode(
+                                ta,
+                                new AccessMode(ConfigData.AccessType.GOD,
+                                               false));
+                crmInfo = true;
+                crmVerifyBtn.setEnabled(false);
+                crmConfigureCommitButton.setEnabled(false);
+                host.execCommand("HostBrowser.getCrmVerify",
+                                 execCallback,
+                                 null,  /* ConvertCmdCallback */
+                                 false,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+            }
+        });
+        host.registerEnableOnConnect(crmVerifyBtn);
+
+        coroMembersBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                registerComponentEditAccessMode(
+                                ta,
+                                new AccessMode(ConfigData.AccessType.GOD,
+                                               false));
+                crmInfo = true;
+                coroMembersBtn.setEnabled(false);
+                crmConfigureCommitButton.setEnabled(false);
+                host.execCommand("HostBrowser.getCoroMembers",
+                                 execCallback,
+                                 null,  /* ConvertCmdCallback */
+                                 false,  /* outputVisible */
+                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+            }
+        });
+        host.registerEnableOnConnect(coroMembersBtn);
+
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -253,7 +303,7 @@ public final class HostInfo extends Info {
                                                    false));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
-                crmMon = false;
+                crmInfo = false;
                 crmConfigureShowButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 host.execCommand("HostBrowser.getCrmConfigureShow",
@@ -268,7 +318,7 @@ public final class HostInfo extends Info {
         final Document taDocument = ta.getDocument();
         taDocument.addDocumentListener(new DocumentListener() {
             private void update() {
-                if (!crmShowInProgress && !crmMon) {
+                if (!crmShowInProgress && !crmInfo) {
                     crmConfigureCommitButton.setEnabled(true);
                 }
             }
@@ -368,9 +418,9 @@ public final class HostInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 50));
-        buttonPanel.setPreferredSize(new Dimension(0, 50));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
+        buttonPanel.setMinimumSize(new Dimension(0, 75));
+        buttonPanel.setPreferredSize(new Dimension(0, 75));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 75));
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -381,7 +431,11 @@ public final class HostInfo extends Info {
         p.add(crmMonButton);
         p.add(crmConfigureShowButton);
         p.add(crmConfigureCommitButton);
-        SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
+
+        p.add(coroMembersBtn);
+        p.add(crmVerifyBtn);
+        p.add(new JLabel(""));
+        SpringUtilities.makeCompactGrid(p, 2, 3,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(
