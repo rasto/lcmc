@@ -202,8 +202,7 @@ public final class HostInfo extends Info {
         final MyButton coroMembersBtn =
                       new MyButton(Tools.getString("HostInfo.coroMembersBtn"));
         coroMembersBtn.miniButton();
-        final Host h = getHost();
-        coroMembersBtn.setEnabled(h.isCorosync());
+        coroMembersBtn.setEnabled(host.isCorosync());
 
         final MyButton crmConfigureShowButton =
                   new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
@@ -219,7 +218,7 @@ public final class HostInfo extends Info {
                             crmConfigureShowButton.setEnabled(true);
                             crmMonButton.setEnabled(true);
                             crmVerifyBtn.setEnabled(true);
-                            coroMembersBtn.setEnabled(true);
+                            coroMembersBtn.setEnabled(host.isCorosync());
                             crmShowInProgress = false;
                         }
                     });
