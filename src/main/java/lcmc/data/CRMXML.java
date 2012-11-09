@@ -2510,6 +2510,8 @@ public final class CRMXML extends XML {
         private final List<String> masterOnNodes;
         /** On which nodes the resource is slave if it is m/s resource. */
         private final List<String> slaveOnNodes;
+        /** Allocation scores. */
+        private final Map<String, String> allocationScores;
         /** Is managed by CRM. */
         private final boolean managed;
 
@@ -2519,10 +2521,12 @@ public final class CRMXML extends XML {
         ResStatus(final List<String> runningOnNodes,
                   final List<String> masterOnNodes,
                   final List<String> slaveOnNodes,
+                  final Map<String, String> allocationScores,
                   final boolean managed) {
             this.runningOnNodes = runningOnNodes;
             this.masterOnNodes = masterOnNodes;
             this.slaveOnNodes = slaveOnNodes;
+            this.allocationScores = allocationScores;
             this.managed = managed;
         }
 
@@ -2545,6 +2549,27 @@ public final class CRMXML extends XML {
         boolean isManaged() {
             return managed;
         }
+
+        /** Returns allocation scores. */
+        Map<String, String> getAllocationScores() {
+            return allocationScores;
+        }
+    }
+
+    /** Parse allocation scores. */
+    private Map<String, String> parseAllocationScores(final String res,
+                                                      final NodeList scores) {
+        final Map<String, String> allocationScores =
+                                           new LinkedHashMap<String, String>();
+        for (int i = 0; i < scores.getLength(); i++) {
+            final Node scoreNode = scores.item(i);
+            if (scoreNode.getNodeName().equals("score")) {
+                final String host = getAttribute(scoreNode, "host");
+                final String score = getAttribute(scoreNode, "score");
+                allocationScores.put(host, score);
+            }
+        }
+        return allocationScores;
     }
 
     /** Returns a hash with resource information. (running_on) */
@@ -2576,6 +2601,8 @@ public final class CRMXML extends XML {
                 if ("managed".equals(isManaged)) {
                     managed = true;
                 }
+                Map<String, String> allocationScores =
+                                                new HashMap<String, String>();
                 for (int j = 0; j < statusList.getLength(); j++) {
                     final Node setNode = statusList.item(j);
                     if (TARGET_ROLE_STARTED.equalsIgnoreCase(
@@ -2599,11 +2626,15 @@ public final class CRMXML extends XML {
                             slaveOnList = new ArrayList<String>();
                         }
                         slaveOnList.add(node);
+                    } else if ("scores".equals(setNode.getNodeName())) {
+                        allocationScores =
+                            parseAllocationScores(id, setNode.getChildNodes());
                     }
                 }
                 resStatusMap.put(id, new ResStatus(runningOnList,
                                                    masterOnList,
                                                    slaveOnList,
+                                                   allocationScores,
                                                    managed));
             }
         }

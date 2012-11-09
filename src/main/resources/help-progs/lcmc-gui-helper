@@ -955,9 +955,9 @@ sub get_cluster_events {
 }
 
 sub do_cluster_events {
-	my $info = get_cluster_info();
 	my $libpath = get_hb_lib_path();
 	my $hb_version = `$libpath/heartbeat -V 2>/dev/null` || "";
+	my $info = get_cluster_info($hb_version);
 	my $command =
 		"PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker"
 		." exec cibmon -udV -m1 2>&1";
@@ -982,7 +982,8 @@ sub do_cluster_events {
 					print "ERROR: signon to CIB failed";
 					return;
 				} elsif (/error:/ || /cib_diff/) {
-					my $info = get_cluster_info();
+					my $info =
+					get_cluster_info($hb_version);
 					if ($info ne $prev_info) {
 						print "---start---\n";
 						print $info;
@@ -1002,21 +1003,30 @@ sub do_cluster_events {
 # if a resource is running, not running and/or unmanaged
 # unmanaged etc.
 sub get_resource_status {
+	my $hb_version = shift;
 	my %role;
 	my %running;
 	my %unmanaged;
 	my %resources;
 	my @fenced_nodes;
-	my $prog = "/usr/sbin/crm_simulate";
+	my $prog = "crm_simulate -s -S -VVVVV -L 2>&1";
 	my $errors = ""; # TODO: error handling
 	my $ptest_prog = "/usr/sbin/ptest";
 	if (-e $ptest_prog) {
-		$prog = $ptest_prog; # default, because crm_simulate
-				     # crashes sometimes
+		if ($hb_version
+		    && (compare_versions($hb_version, "2.1.4") <= 0)) {
+			$prog = "$ptest_prog -S -VVVVV -L 2>&1";
+		} else {
+			$prog = "$ptest_prog -s -S -VVVVV -L 2>&1";
+		}
+		# default, because crm_simulate
+		# crashes sometimes
+		# older ptest versions don't have -s option
 	} elsif (!-e $prog) {
 		$errors .= "could not find $prog\n";
 	}
-	for my $line (`$prog -S -VVVVV -L 2>&1`) {
+	my %allocation_scores;
+	for my $line (`$prog`) {
 		my $what;
 		my $on;
 		my $res;
@@ -1087,6 +1097,11 @@ sub get_resource_status {
 				($what, $on) = split /\s+/, $state;
 			}
 			$unmanaged{$res}++;
+		} elsif ($line =~ /native_color:\s+(\S+)\s+allocation score on ([^:]+):\s+(\S+)/) {
+			my $r = $1;
+			my $host = $2;
+			my $score = $3;
+			$allocation_scores{$r}{$host} = $score;
 		}
 		if ($res) {
 			$resources{$res}++;
@@ -1118,7 +1133,15 @@ sub get_resource_status {
 			." managed=\"$managed\">\n";
 		for my $on (sort keys %{$role{$res}}) {
 			my $tag = $role{$res}{$on};
-			$info.="   <$tag>$on</$tag>\n";
+			$info.="    <$tag>$on</$tag>\n";
+		}
+		if ($allocation_scores{$res}) {
+			$info .= "    <scores>\n";
+			for my $host (keys %{$allocation_scores{$res}}) {
+				my $score = $allocation_scores{$res}{$host};
+				$info .= "      <score host=\"$host\" score=\"$score\"/>\n";
+			}
+			$info .= "    </scores>\n";
 		}
 		$info.= "  </resource>\n";
 	}
@@ -1130,7 +1153,8 @@ sub get_resource_status {
 }
 
 sub get_cluster_info {
-	my ($info, $fenced_nodes) = get_resource_status();
+	my $hb_version = shift;
+	my ($info, $fenced_nodes) = get_resource_status($hb_version);
 	# TODO: use cib.xml if cibadmin can't connect
 	my $cibinfo = `/usr/sbin/cibadmin -Ql || cat /var/lib/pacemaker/cib/cib.xml /var/lib/heartbeat/crm/cib.xml 2>/dev/null`;
 	if ($cibinfo) {

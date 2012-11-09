@@ -6049,6 +6049,16 @@ public class ServiceInfo extends EditableInfo {
         if (!isManaged(testOnly)) {
             sb.append(" (unmanaged)");
         }
+        final Map<String, String> scores =
+                    getBrowser().getClusterStatus().getAllocationScores(
+                                                      getHeartbeatId(testOnly),
+                                                      testOnly);
+        for (final String h : scores.keySet()) {
+            sb.append("<br>allocation score on ");
+            sb.append(h);
+            sb.append(": ");
+            sb.append(scores.get(h));
+        }
         return sb.toString();
     }
 

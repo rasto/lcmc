@@ -507,6 +507,19 @@ public final class ClusterStatus {
         return resStatus.getMasterOnNodes();
     }
 
+    public Map<String, String> getAllocationScores(final String crmId,
+                                                   final boolean testOnly) {
+        if (resStateMap == null) {
+            return Collections.<String, String>emptyMap();
+        }
+        final ResStatus resStatus = resStateMap.get(crmId);
+        if (resStatus == null) {
+            return Collections.<String, String>emptyMap();
+        }
+        return resStatus.getAllocationScores();
+    }
+
+
     /**
      * Returns String whether the node is online.
      * "yes", "no" or null if it is unknown.
