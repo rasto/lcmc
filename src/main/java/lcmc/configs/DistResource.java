@@ -382,13 +382,13 @@ public final class DistResource extends java.util.ListResourceBundle {
          + " || " + SUDO + "/usr/sbin/crm_mon -1rn"},
 
         {"HostBrowser.getCrmVerify",
-         SUDO + "/usr/sbin/crm_verify -VL 2>&1 && echo \"ok\"|grep -v -e -V;:"},
+         SUDO + "/usr/sbin/crm_verify -VL 2>&1 && echo \" Config OK.\"|grep -v -e -V;:"},
 
         {"HostBrowser.getCoroMembers",
          SUDO + "/usr/sbin/corosync-cmapctl|grep members|cut -d ' ' -f 4-"
          + "|awk '{printf(\"%s \", $0); if (NR%3==0) printf(\"\\n\")}'"
-         + ";echo;corosync-cfgtool -s 2>/dev/null"
-         + ";echo;corosync-quorumtool -l 2>/dev/null"},
+         + ";echo;" + SUDO + "/usr/sbin/corosync-cfgtool -s 2>/dev/null"
+         + ";echo;" + SUDO + "/usr/sbin/corosync-quorumtool -l 2>/dev/null"},
 
         {"HostBrowser.getCrmConfigureShow",
          SUDO + "PAGER=cat /usr/sbin/crm configure show"},

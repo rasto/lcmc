@@ -268,7 +268,7 @@ public final class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCrmVerify",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 false,  /* outputVisible */
+                                 true,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
@@ -287,7 +287,7 @@ public final class HostInfo extends Info {
                 host.execCommand("HostBrowser.getCoroMembers",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
-                                 false,  /* outputVisible */
+                                 true,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
