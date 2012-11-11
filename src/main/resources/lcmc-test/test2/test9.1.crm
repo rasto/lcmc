@@ -28,8 +28,8 @@ primitive res_Dummy_4 ocf:heartbeat:Dummy
 	op monitor interval="121" timeout="154" start-delay="0" 
 	op migrate_to interval="0" timeout="123" 
 	op migrate_from interval="0" timeout="122"
-colocation c1 inf: _rsc_set_ ( res_Dummy_1 )
-order o1 inf: _rsc_set_ ( res_Dummy_3 ) ( res_Dummy_1 )
+colocation c1 inf: ( res_Dummy_1 )
+order o1 inf: ( res_Dummy_3 ) ( res_Dummy_1 )
 property $id="cib-bootstrap-options" 
 	stonith-enabled="false" 
 	no-quorum-policy="ignore"

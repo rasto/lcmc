@@ -2068,6 +2068,8 @@ sub gui_test {
 				$i++;
 			}
 		}
+		# older crm shell had _rsc_set_
+		$cib =~ s/_rsc_set_ //g;
 		$cib =~ s/(start-delay="\d+") (timeout="\d+")/$2 $1/g;
 		$cib =~ s/(node)\s+\$id=".*?"/$1/g;
 		# sort node lines

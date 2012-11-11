@@ -62,6 +62,8 @@ public final class RoboTest {
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Don't move the mosue pointer smothly. */
     private static final boolean MOVE_MOUSE_FAST = false;
+    /** Confirm remove variable. */
+    private static final boolean CONFIRM_REMOVE = true;
     /** Previous position of the mouse. */
     private static volatile Point2D prevP = null;
     /** Whether the test was aborted. */
@@ -82,10 +84,8 @@ public final class RoboTest {
         if (MouseInfo.getPointerInfo() == null) {
             return false;
         }
-        final Point2D loc =
-            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
-        Point2D p = MouseInfo.getPointerInfo().getLocation();
-        double x = p.getX() - loc.getX();
+        Point2D p = getAppPosition();
+        double x = p.getX();
         if (x > 1536 || x < -100) {
             int i = 0;
             while (x > 1536 || x < -100) {
@@ -94,8 +94,8 @@ public final class RoboTest {
                 }
                 Tools.sleep(500);
                 if (MouseInfo.getPointerInfo() != null) {
-                    p = MouseInfo.getPointerInfo().getLocation();
-                    x = p.getX() - loc.getX();
+                    p = getAppPosition();
+                    x = p.getX();
                 }
                 i++;
             }
@@ -229,19 +229,16 @@ public final class RoboTest {
                     return;
                 }
 
-                final Point2D locP =
-                    Tools.getGUIData().getMainFrameContentPane()
-                                                    .getLocationOnScreen();
                 robot = rbt;
                 final int xOffset = getOffset();
-                final Point2D origP = MouseInfo.getPointerInfo().getLocation();
-                final int origX = (int) (origP.getX() - locP.getX());
-                final int origY = (int) (origP.getY() - locP.getY());
+                final Point2D pos = getAppPosition();
+                final int origX = (int) pos.getX();
+                final int origY = (int) pos.getY();
                 info("move mouse to the end position");
                 sleepNoFactor(5000);
-                final Point2D endP = MouseInfo.getPointerInfo().getLocation();
-                final int endX = (int) (endP.getX() - locP.getX());
-                final int endY = (int) (endP.getY() - locP.getY());
+                final Point2D endP = getAppPosition();
+                final int endX = (int) endP.getX();
+                final int endY = (int) endP.getY();
                 int destX = origX;
                 int destY = origY;
                 info("test started");
@@ -881,7 +878,7 @@ public final class RoboTest {
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
         leftClick();
-        removeResource(ipX, ipY, false);
+        removeResource(ipX, ipY, !CONFIRM_REMOVE);
         /* again */
         moveTo(ipX, ipY);
         rightClick(); /* popup */
@@ -965,7 +962,7 @@ public final class RoboTest {
         leftClick(); /* choose group */
         sleep(3000);
         /* remove it */
-        removeResource(gx, gy, false);
+        removeResource(gx, gy, !CONFIRM_REMOVE);
 
         moveTo(gx, gy);
         rightClick(); /* popup */
@@ -984,7 +981,7 @@ public final class RoboTest {
         sleep(1000);
 
         /* remove it */
-        removeResource(gx, gy, false);
+        removeResource(gx, gy, !CONFIRM_REMOVE);
 
         /* group with dummy resources, once again */
         moveTo(gx, gy);
@@ -1008,7 +1005,7 @@ public final class RoboTest {
 
         moveTo("Remove Service");
         leftClick(); /* menu remove service */
-        removeResource(gx, gy, false);
+        removeResource(gx, gy, !CONFIRM_REMOVE);
 
         /* group with dummy resources, once again */
         moveTo(gx, gy);
@@ -1026,7 +1023,7 @@ public final class RoboTest {
         typeDummy();
         sleep(1000);
 
-        removeResource(gx, gy, false);
+        removeResource(gx, gy, !CONFIRM_REMOVE);
 
         /* once again */
         moveTo(gx, gy);
@@ -1538,14 +1535,9 @@ public final class RoboTest {
         leftRelease();
         moveTo(ipX, ipY);
         rightClick();
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_ENTER); /* stop selected resources */
+        sleep(1000);
+        moveTo("Stop Selected Services");
+        leftClick();
         checkTest(testName, 28.3);
 
         moveTo(700, 450);
@@ -1554,31 +1546,28 @@ public final class RoboTest {
         leftRelease();
         moveTo(ipX, ipY);
         rightClick();
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_ENTER); /* start selected resources */
-        moveTo(700, 520); /* reset selection */
+        sleep(1000);
+        moveTo("Start Selected Services");
         leftClick();
         checkTest(testName, 28.4);
+        sleep(10000);
+        moveTo(700, 520); /* reset selection */
+        leftClick();
 
         stopResource(ipX, ipY);
         sleep(5000);
         moveTo(gx, gy);
         leftClick();
-        stopGroup(1020, 132); /* actions menu stop */
+        moveTo("Menu");
+        stopGroup();
         sleep(5000);
-        stopGroup(statefulX, statefulY);
-        stopEverything(); /* to be sure */
+        moveTo(statefulX, statefulY);
+        stopGroup();
         sleep(5000);
         checkTest(testName, 29);
 
         if (true) {
-            removeResource(ipX, ipY, true);
+            removeResource(ipX, ipY, CONFIRM_REMOVE);
             sleep(5000);
             removeGroup(gx, gy - 20);
             sleep(5000);
@@ -1625,9 +1614,7 @@ public final class RoboTest {
         moveTo("Remove All Services");
         sleep(3000);
         leftClick();
-        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
-            info("remove everything color: failed");
-        }
+        dialogColorTest("remove everything");
         confirmRemove();
         sleep(3000);
         leftClick();
@@ -1667,7 +1654,6 @@ public final class RoboTest {
         }
         final String quorum = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("no-quorum-policy");
-        System.out.println("quorum: " + quorum);
         if (!"ignore".equals(quorum)) {
             moveTo("No Quorum Policy", JComboBox.class);
             leftClick();
@@ -1686,7 +1672,7 @@ public final class RoboTest {
 
     /** TEST 2. */
     private static void startTest2() {
-        slowFactor = 0.3f;
+        slowFactor = 0.6f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 207;
@@ -1833,7 +1819,7 @@ public final class RoboTest {
         stopResource(dummy1X, dummy1Y);
         sleep(5000);
         checkTest("test2", 11.92);
-        removeResource(dummy1X, dummy1Y, true);
+        removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
         sleep(5000);
         checkTest("test2", 12);
         stopResource(dummy2X, dummy2Y);
@@ -1857,13 +1843,13 @@ public final class RoboTest {
             sleep(5000);
 
             /* remove rest of the dummies */
-            removeResource(dummy2X, dummy2Y, true);
+            removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
             sleep(5000);
             checkTest("test2", 14);
-            removeResource(dummy3X, dummy3Y, true);
+            removeResource(dummy3X, dummy3Y, CONFIRM_REMOVE);
             sleep(5000);
             checkTest("test2", 15);
-            removeResource(dummy4X, dummy4Y, true);
+            removeResource(dummy4X, dummy4Y, CONFIRM_REMOVE);
             sleep(5000);
         } else {
             removeEverything();
@@ -1876,7 +1862,7 @@ public final class RoboTest {
 
     /** TEST 4. */
     private static void startTest4() {
-        slowFactor = 0.5f;
+        slowFactor = 0.6f;
         aborted = false;
         final int dummy1X = 235;
         final int dummy1Y = 207;
@@ -1973,8 +1959,6 @@ public final class RoboTest {
         stopEverything();
         checkTest("test4", 4);
         removeEverything();
-        removePlaceHolder(ph1X, ph1Y, false);
-        removePlaceHolder(ph2X, ph2Y, false);
         sleep(40000);
     }
 
@@ -2049,7 +2033,9 @@ public final class RoboTest {
         }
         stopEverything();
         checkTest("test5", 3.1);
-        removeEverything();
+        removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
+        removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
+        removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
         sleep(5000);
         checkTest("test5", 1);
     }
@@ -2131,8 +2117,8 @@ public final class RoboTest {
             leftClick();
             checkTest("test7", 4);
 
-            removeResource(dummy1X, dummy1Y, true);
-            removeResource(dummy1X, dummy1Y + 90, true);
+            removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
+            removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
         }
         System.gc();
     }
@@ -2218,8 +2204,8 @@ public final class RoboTest {
             leftClick();
             checkTest("testA", 4);
 
-            removeResource(gx, gy, true);
-            removeResource(gx, gy + 90, true);
+            removeResource(gx, gy, CONFIRM_REMOVE);
+            removeResource(gx, gy + 90, CONFIRM_REMOVE);
             resetTerminalAreas();
         }
         System.gc();
@@ -2259,8 +2245,8 @@ public final class RoboTest {
             leftClick();
             checkTest("testB", 4);
 
-            removeResource(dummy1X, dummy1Y + 90, true);
-            removeResource(dummy1X, dummy1Y, true);
+            removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
+            removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
             resetTerminalAreas();
         }
         System.gc();
@@ -2325,8 +2311,8 @@ public final class RoboTest {
             checkTest(testName, 4);
 
 
-            removeResource(statefulX, statefulY, true);
-            removeResource(245, statefulY + 90, true);
+            removeResource(statefulX, statefulY, CONFIRM_REMOVE);
+            removeResource(245, statefulY + 90, CONFIRM_REMOVE);
             resetTerminalAreas();
         }
     }
@@ -2342,7 +2328,7 @@ public final class RoboTest {
                 info("testD 1 I: " + i);
             }
             chooseDummy(dummy1X, dummy1Y, false, false);
-            removeResource(dummy1X, dummy1Y, false);
+            removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
         }
         chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
@@ -2374,7 +2360,7 @@ public final class RoboTest {
                 leftClick();
             }
         }
-        removeResource(dummy1X, dummy1Y, false);
+        removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
     }
 
     /** Host wizard deadlock. */
@@ -2450,8 +2436,7 @@ public final class RoboTest {
         }
         checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo(1000, 429);
-        sleep(1000);
+        moveTo("Resource Stickiness", JComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);
@@ -2467,7 +2452,7 @@ public final class RoboTest {
         stopResource(gx, gy);
         sleep(6000);
         checkTest(testName, 4);
-        removeResource(gx, gy, true);
+        removeResource(gx, gy, CONFIRM_REMOVE);
         resetTerminalAreas();
         System.gc();
     }
@@ -2720,7 +2705,7 @@ public final class RoboTest {
         sleep(1000);
         moveTo("Remove Service");
         leftClick();
-        if (confirm) {
+        if (confirm == CONFIRM_REMOVE) {
             confirmRemove();
         }
     }
@@ -2752,9 +2737,7 @@ public final class RoboTest {
     /** Confirms remove dialog. */
     private static void confirmRemove() {
         sleep(1000);
-        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
-            info("confirm remove color: error");
-        }
+        dialogColorTest("confirm remove");
         press(KeyEvent.VK_TAB);
         sleep(500);
         press(KeyEvent.VK_TAB);
@@ -2774,12 +2757,11 @@ public final class RoboTest {
     }
 
     /** Stops group. */
-    private static void stopGroup(final int x, final int y) {
-        moveTo(x + 50, y + 5);
-        sleep(1000);
+    private static void stopGroup() {
         rightClick(); /* popup */
+        sleep(3000);
         moveTo("Stop");
-        sleep(30000); /* ptest */
+        sleep(10000); /* ptest */
         leftClick(); /* stop */
     }
 
@@ -3102,17 +3084,8 @@ public final class RoboTest {
         final Point2D appP =
                      Tools.getGUIData().getMainFrameContentPane()
                                         .getLocationOnScreen();
-        int yCor = 0;
-        try {
-            if (Tools.compareVersions(
-                            System.getProperty("java.version"), "1.0.8") >= 0) {
-                yCor = -5;
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         final int appX = (int) appP.getX() + fromX;
-        final int appY = (int) appP.getY() + fromY + yCor;
+        final int appY = (int) appP.getY() + fromY;
         for (int i = 0; i < 7; i++) {
             boolean isColor = false;
             for (int y = -20; y < 20; y++) {
@@ -3131,6 +3104,9 @@ public final class RoboTest {
                                                   appY + y))) {
                         isColor = true;
                     }
+                }
+                if (aborted) {
+                    return false;
                 }
             }
             if (!expected && !isColor) {
@@ -3158,17 +3134,8 @@ public final class RoboTest {
         final int origY = (int) origP.getY();
         final Point2D endP =
             Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
-        int yCor = 0;
-        try {
-            if (Tools.compareVersions(
-                                System.getProperty("java.version"), "1.7") >= 0) {
-                yCor = -5;
-            }
-        } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
-        }
         final int endX = (int) endP.getX() + toX;
-        final int endY = (int) endP.getY() + toY + yCor;
+        final int endY = (int) endP.getY() + toY;
         moveToAbs(endX, endY);
     }
 
@@ -3412,14 +3379,8 @@ public final class RoboTest {
                 Point2D prevP = new Point2D.Double(0, 0);
                 Point2D prevPrevP = new Point2D.Double(0, 0);
                 while (true) {
-                    final Point2D loc =
-                                Tools.getGUIData().getMainFrameContentPane()
-                                                        .getLocationOnScreen();
-                    final Point2D pos =
-                                      MouseInfo.getPointerInfo().getLocation();
-                    final Point2D newPos = new Point2D.Double(
-                                                      pos.getX() - loc.getX(),
-                                                      pos.getY() - loc.getY());
+                    final Point2D newPos = getAppPosition();
+
                     sleepNoFactor(2000);
                     if (newPos.equals(prevP) && !prevPrevP.equals(prevP)) {
                         info("moveTo("
@@ -3441,12 +3402,10 @@ public final class RoboTest {
 
     /** Return vertical position of the blockdevices. */
     private static int getBlockDevY() {
-        info("move to position, start in 10 seconds");
-        sleepNoFactor(10000);
-        final Point2D loc = Tools.getGUIData().getMainFrameContentPane()
-                                                .getLocationOnScreen();
-        final Point2D pos = MouseInfo.getPointerInfo().getLocation();
-        final int y = (int) (pos.getY() - loc.getY());
+        info("move to position, start in 3 seconds");
+        sleepNoFactor(3000);
+        final Point2D pos = getAppPosition();
+        final int y = (int) pos.getY();
         if (y > 532) {
             return 267;
         }
@@ -3454,13 +3413,33 @@ public final class RoboTest {
     }
 
     private static boolean dialogColorTest(final String text) {
-        return true;
-        //if (!isColor(125, 370, AppDefaults.BACKGROUND, true)) {
-        //    info(text + ": color test: error");
-        //    return false;
-        //} else {
-        //    return true;
-        //}
+        if (aborted) {
+            return false;
+        }
+        sleepNoFactor(2000);
+        final Component dialog = getFocusedWindow();
+        for (int i = 0; i < 60; i++) {
+            if (dialog instanceof JDialog || aborted) {
+                break;
+            }
+            sleepNoFactor(1000);
+        }
+        if (!(dialog instanceof JDialog) || aborted) {
+            info(text + ": color test: no dialog");
+            return false;
+        }
+        moveToAbs((int) dialog.getLocationOnScreen().getX() + 5,
+                  (int) dialog.getLocationOnScreen().getY() + 40);
+        final Point2D p = getAppPosition();
+        if (!isColor((int) p.getX(),
+                     (int) p.getY(),
+                     AppDefaults.BACKGROUND,
+                     true)) {
+            info(text + ": color test: error");
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private static void addDrbdResource(final int blockDevY) {
@@ -3522,7 +3501,7 @@ public final class RoboTest {
 
     private static void addMetaData() {
         drbdNext();
-        sleep(10000);
+        sleep(30000);
         dialogColorTest("addMetaData");
     }
 
@@ -3532,13 +3511,15 @@ public final class RoboTest {
     }
 
     private static void removeDrbdVolume(final boolean really) {
+        if (aborted) {
+            return;
+        }
         moveTo(480, 202); /* rsc popup */
         rightClick(); /* remove */
         moveTo("Remove DRBD Volume"); /* remove */
         leftClick();
-        if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
-            info("remove drbd volume color: error");
-        }
+        Tools.sleep(10000);
+        dialogColorTest("removeDrbdVolume");
         if (really) {
             confirmRemove();
         } else {
@@ -3604,7 +3585,7 @@ public final class RoboTest {
         sleep(1000);
         moveTo("Resize LV");
         leftClick();
-        sleep(2000);
+        sleep(5000);
         press(KeyEvent.VK_2);
         press(KeyEvent.VK_5);
         press(KeyEvent.VK_2);
@@ -3649,6 +3630,7 @@ public final class RoboTest {
         chooseDrbdResource();
         addDrbdVolume();
         addBlockDevice();
+        sleep(1000);
         addBlockDevice();
         sleep(20000);
         addMetaData();
@@ -4231,7 +4213,7 @@ public final class RoboTest {
     /** Create LV */
     private static void startDRBDTest5(final int blockDevY) {
         /* Two bds. */
-        slowFactor = 0.2f;
+        slowFactor = 0.6f;
         aborted = false;
         for (int i = 0; i < 2; i++) {
             createPV(blockDevY);
@@ -4246,7 +4228,7 @@ public final class RoboTest {
     /** Remove LV */
     private static void startDRBDTest6(final int blockDevY) {
         /* Two bds. */
-        slowFactor = 0.2f;
+        slowFactor = 0.6f;
         aborted = false;
         int offset = 0;
         for (int i = 0; i < 2; i++) {
@@ -4424,7 +4406,7 @@ public final class RoboTest {
             }
             dialogColorTest("create config");
 
-            final int yMoreHosts = 30 * (cluster.getHosts().size() - 1);
+            sleep(4000);
             moveTo("Create Config");
             sleep(4000);
             leftClick();
@@ -4573,9 +4555,7 @@ public final class RoboTest {
             moveTo("Remove Domain");
             leftClick();
             sleepNoFactor(2000);
-            if (!isColor(365, 360, AppDefaults.BACKGROUND, true)) {
-                info("remove VM color: error");
-            }
+            dialogColorTest("remove VM");
             confirmRemove();
             leftClick();
             sleepNoFactor(5000);
@@ -4600,7 +4580,12 @@ public final class RoboTest {
             sleep(500);
             leftClick();
             sleep(1000);
-            if (!isColor(480, 322, new Color(255, 100, 100), true)) {
+            moveTo("Domain name", Widget.MTextField.class);
+            final Point2D p = getAppPosition();
+            if (!isColor((int) p.getX(),
+                         (int) p.getY(),
+                         new Color(255, 100, 100),
+                         true)) {
                 info(vmTest + " 1: error");
                 break;
             }
@@ -4608,7 +4593,10 @@ public final class RoboTest {
             for (int error = 0; error < 5; error++) {
                 sleep(100);
                 press(KeyEvent.VK_X);
-                if (!isColor(480, 322, new Color(255, 100, 100), false)) {
+                if (!isColor((int) p.getX(),
+                             (int) p.getY(),
+                             new Color(255, 100, 100),
+                             false)) {
                     sleepNoFactor(1000);
                     ok = true;
                     break;
@@ -4748,5 +4736,29 @@ public final class RoboTest {
         return findComponent(text,
                              (Container) getFocusedWindow(),
                              new Integer[]{number});
+    }
+
+    private static Point2D getAppPosition() {
+        final Point2D loc =
+             Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+        final Point2D pos = MouseInfo.getPointerInfo().getLocation();
+        final Point2D newPos = new Point2D.Double(pos.getX() - loc.getX(),
+                                                  pos.getY() - loc.getY());
+        return newPos;
+    }
+
+    private static void waitForMe() {
+        info("waiting...");
+        final Point2D iPos = MouseInfo.getPointerInfo().getLocation();
+        while (true) {
+            final Point2D pos = MouseInfo.getPointerInfo().getLocation();
+            if (Math.abs(iPos.getX() - pos.getX()) > 10
+                || Math.abs(iPos.getY() - pos.getY()) > 10) {
+                break;
+            }
+            Tools.sleep(100);
+        }
+        prevP = getAppPosition();
+        info("continue...");
     }
 }
