@@ -882,11 +882,12 @@ import java.net.*;
     if (rec != null)
       rec.dispose();
 
-    //if (inAnApplet) {
-    //  showMessage("Disconnected");
-    //} else {
-    //  System.exit(0);
-    //}
+    if (inAnApplet) {
+      showMessage("Disconnected");
+    } else {
+      vncFrame.dispose(); /* for LCMC */
+      //System.exit(0);
+    }
   }
 
   //
@@ -897,13 +898,14 @@ import java.net.*;
   synchronized public void fatalError(String str) {
     System.out.println(str);
 
-    //if (inAnApplet) {
-    //  // vncContainer null, applet not inited,
-    //  // can not present the error to the user.
-    //  Thread.currentThread().stop();
-    //} else {
-    //  System.exit(1);
-    //}
+    if (inAnApplet) {
+      // vncContainer null, applet not inited,
+      // can not present the error to the user.
+      Thread.currentThread().stop();
+    } else {
+      vncFrame.dispose(); /* for LCMC */
+      //System.exit(0);
+    }
   }
 
   synchronized public void fatalError(String str, Exception e) {
@@ -921,11 +923,11 @@ import java.net.*;
     if (rfb != null)
       rfb.close();
 
-    //if (inAnApplet) {
-    //  showMessage(str);
-    //} else {
-    //  System.exit(1);
-    //}
+    if (inAnApplet) {
+      showMessage(str);
+    } else {
+      vncFrame.dispose(); /* for LCMC */
+    }
   }
 
   //
@@ -1012,9 +1014,10 @@ import java.net.*;
 
     vncContainer.hide();
 
-    //if (!inAnApplet) {
-    //  System.exit(0);
-    //}
+    if (!inAnApplet) {
+      vncFrame.dispose(); /* for LCMC */
+      //System.exit(0);
+    }
   }
 
   //
