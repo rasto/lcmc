@@ -385,7 +385,9 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "/usr/sbin/crm_verify -VL 2>&1 && echo \" Config OK.\"|grep -v -e -V;:"},
 
         {"HostBrowser.getCoroMembers",
-         SUDO + "/usr/sbin/corosync-cmapctl|grep members|cut -d ' ' -f 4-"
+         "( " + SUDO + "/usr/sbin/corosync-cmapctl "
+         + " || " + SUDO + "/usr/sbin/corosync-objctl ) 2>/dev/null"
+         + "|grep members|sed 's/.*= *//'"
          + "|awk '{printf(\"%s \", $0); if (NR%3==0) printf(\"\\n\")}'"
          + ";echo;" + SUDO + "/usr/sbin/corosync-cfgtool -s 2>/dev/null"
          + ";echo;" + SUDO + "/usr/sbin/corosync-quorumtool -l 2>/dev/null"},
