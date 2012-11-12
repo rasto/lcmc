@@ -414,14 +414,9 @@ public final class Widget extends JPanel {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
         cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedValueInfo != null) {
-                    cb.setSelectedItem(selectedValueInfo);
-                }
-            }
-        });
+        if (selectedValueInfo != null) {
+            cb.setSelectedItem(selectedValueInfo);
+        }
         /* workround, so that default button works */
         editor.addKeyListener(new ActivateDefaultButtonListener(cb));
 
