@@ -861,13 +861,10 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.About.Description",
          "<b> by "
          + "rasto.levrinc@gmail.com.</b><br>"
-         + "(C)opyright 2011 by Rasto Levrinc.<br>"
-         + "(C)opyright 2007 - 2011 by Rasto Levrinc, LINBIT HA-Solution GmbH.<br>"
+         + "(C)opyright 2011 - 2012 by Rasto Levrinc.<br>"
          + "Please visit the website:<br><br>"
          + "http://lcmc.sourceforge.net<br>"
-         + "http://github.com/rasto/lcmc<br>"
-         + "Old mailing list: http://lists.linbit.com/listinfo/drbd-mc<br>" },
-
+         + "http://github.com/rasto/lcmc<br>" },
 
         {"Dialog.About.Licences",
 "Linux Cluster Management Console is free software; you can redistribute it and/or\n"
@@ -896,6 +893,7 @@ public final class TextResource extends java.util.ListResourceBundle {
 + "* tightvnc, released under the terms of the GPL License\n"
 + "* ultravnc, released under the terms of the GPL License\n"
 + "* realvnc, released under the terms of the GPL License\n"
++ "* DRBD MC, released under the terms of the GPL License\n"
          },
 
         {"Dialog.EditConfig.Title",
