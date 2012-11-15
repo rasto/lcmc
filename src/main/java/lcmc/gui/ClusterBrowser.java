@@ -231,6 +231,10 @@ public final class ClusterBrowser extends Browser {
                           "Heartbeat 1 RAs (deprecated)");
         HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
         HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
+        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS,
+                          "Upstart/Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.SYSTEMD_CLASS, "Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.UPSTART_CLASS, "Upstart Scripts");
     }
     /** Width of the label in the info panel. */
     public static final int SERVICE_LABEL_WIDTH =
