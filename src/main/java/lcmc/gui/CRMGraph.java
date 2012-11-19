@@ -1025,7 +1025,7 @@ public final class CRMGraph extends ResourceGraph {
     @Override
     protected String getLabelForEdgeStringer(final Edge e) {
         if (isTestEdge(e)) {
-            return "ptest...";
+            return Tools.getString("CRMGraph.Simulate");
         }
         final boolean edgeIsOrder = edgeIsOrderList.contains(e);
         final boolean edgeIsColocation =
@@ -1733,7 +1733,7 @@ public final class CRMGraph extends ResourceGraph {
     @Override
     protected String getIconText(final Vertex v, final boolean testOnly) {
         if (isTestOnlyAnimation()) {
-            return "ptest...";
+            return Tools.getString("CRMGraph.Simulate");
         }
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getIconTextForGraph(testOnly);
