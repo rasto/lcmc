@@ -53,6 +53,6 @@ public class HbCategoryInfo extends CategoryInfo {
     /** Returns heartbeat graph. */
     @Override
     public final JPanel getGraphicalView() {
-        return getBrowser().getHeartbeatGraph().getGraphPanel();
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 }

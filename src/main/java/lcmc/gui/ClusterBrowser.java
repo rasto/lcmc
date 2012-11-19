@@ -160,7 +160,7 @@ public final class ClusterBrowser extends Browser {
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo =
                                           new HashMap<String, ServiceInfo>();
     /** Heartbeat graph. */
-    private final HeartbeatGraph heartbeatGraph;
+    private final CRMGraph crmGraph;
     /** Drbd graph. */
     private final DrbdGraph drbdGraph;
     /** object that holds current heartbeat status. */
@@ -244,7 +244,7 @@ public final class ClusterBrowser extends Browser {
                     Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
     /** Color for stopped services. */
     public static final Color FILL_PAINT_STOPPED =
-                      Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped");
+                      Tools.getDefaultColor("CRMGraph.FillPaintStopped");
     /** Identation. */
     public static final String IDENT_4 = "    ";
     /** Name of the boolean type in drbd. */
@@ -356,7 +356,7 @@ public final class ClusterBrowser extends Browser {
     public ClusterBrowser(final Cluster cluster) {
         super();
         this.cluster = cluster;
-        heartbeatGraph = new HeartbeatGraph(this);
+        crmGraph = new CRMGraph(this);
         drbdGraph = new DrbdGraph(this);
         setTreeTop();
 
@@ -471,8 +471,8 @@ public final class ClusterBrowser extends Browser {
         if (positions.isEmpty()) {
             return;
         }
-        if (heartbeatGraph != null) {
-            heartbeatGraph.getPositions(positions);
+        if (crmGraph != null) {
+            crmGraph.getPositions(positions);
         }
         if (positions.isEmpty()) {
             return;
@@ -485,8 +485,8 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns heartbeat graph for this cluster. */
-    public HeartbeatGraph getHeartbeatGraph() {
-        return heartbeatGraph;
+    public CRMGraph getCRMGraph() {
+        return crmGraph;
     }
 
     /** Returns drbd graph for this cluster. */
@@ -635,7 +635,7 @@ public final class ClusterBrowser extends Browser {
             resource = hostBrowser.getTreeTop();
             setNode(resource);
             addNode(clusterHostsNode, resource);
-            heartbeatGraph.addHost(hostBrowser.getHostInfo());
+            crmGraph.addHost(hostBrowser.getHostInfo());
         }
 
         reload(clusterHostsNode, false);
@@ -648,7 +648,7 @@ public final class ClusterBrowser extends Browser {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                heartbeatGraph.scale();
+                crmGraph.scale();
             }
         });
         updateHeartbeatDrbdThread();
@@ -802,8 +802,7 @@ public final class ClusterBrowser extends Browser {
 
             host.setIsLoading();
             host.startHWInfoDaemon(infosToUpdate,
-                                   new ResourceGraph[]{drbdGraph,
-                                                       heartbeatGraph});
+                                   new ResourceGraph[]{drbdGraph, crmGraph});
             if (serverStatusCanceled) {
                 break;
             }
@@ -831,8 +830,7 @@ public final class ClusterBrowser extends Browser {
         }
         host.serverStatusLatchDone();
         clusterHostsInfo.updateTable(CategoryInfo.MAIN_TABLE);
-        for (final ResourceGraph g : new ResourceGraph[]{drbdGraph,
-                                                         heartbeatGraph}) {
+        for (final ResourceGraph g : new ResourceGraph[]{drbdGraph, crmGraph}) {
             if (g != null) {
                 g.repaint();
                 g.updatePopupMenus();
@@ -1226,7 +1224,7 @@ public final class ClusterBrowser extends Browser {
                                                             "no");
                                 setClStatus(host, false);
                                 if (oldStatus) {
-                                   heartbeatGraph.repaint();
+                                   crmGraph.repaint();
                                 }
                             } else {
                                 if (clStatus.parseStatus(status)) {
@@ -1287,7 +1285,7 @@ public final class ClusterBrowser extends Browser {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                           heartbeatGraph.scale();
+                           crmGraph.scale();
                        }
                     });
                 }
@@ -1334,7 +1332,7 @@ public final class ClusterBrowser extends Browser {
                          clStatusUnlock();
                          if (exitCode == 255) {
                              /* looks like connection was lost */
-                             //heartbeatGraph.repaint();
+                             //crmGraph.repaint();
                              //host.getSSH().forceReconnect();
                              //host.setConnected();
                          }
@@ -1934,8 +1932,7 @@ public final class ClusterBrowser extends Browser {
                     sigi = gi;
                     // TODO: it does not work here
                 }
-                if (p == null
-                    || !getHeartbeatGraph().existsInThePath(sigi, p)) {
+                if (p == null || !getCRMGraph().existsInThePath(sigi, p)) {
                     existingServiceList.add(si);
                 }
             }
@@ -2191,7 +2188,7 @@ public final class ClusterBrowser extends Browser {
         public final void mouseOut() {
             if (isEnabled()) {
                 mouseStillOver = false;
-                heartbeatGraph.stopTestAnimation((JComponent) component);
+                crmGraph.stopTestAnimation((JComponent) component);
                 component.setToolTipText(null);
             }
         }
@@ -2211,8 +2208,8 @@ public final class ClusterBrowser extends Browser {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                heartbeatGraph.startTestAnimation((JComponent) component,
-                                                  startTestLatch);
+                crmGraph.startTestAnimation((JComponent) component,
+                                            startTestLatch);
                 ptestLockAcquire();
                 clusterStatus.setPtestData(null);
                 Host h;
@@ -2599,8 +2596,7 @@ public final class ClusterBrowser extends Browser {
             }
         }
 
-        for (final HbConnectionInfo hbci
-                                    : heartbeatGraph.getAllHbConnections()) {
+        for (final HbConnectionInfo hbci : crmGraph.getAllHbConnections()) {
             hbci.checkResourceFieldsChanged(null, hbci.getParametersFromXML());
             hbci.updateAdvancedPanels();
         }
@@ -2642,7 +2638,7 @@ public final class ClusterBrowser extends Browser {
     public void updateHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, heartbeatGraph});
+                       new ResourceGraph[]{drbdGraph, crmGraph});
         Tools.invokeAndWait(new Runnable() {
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());

@@ -40,7 +40,7 @@ import lcmc.data.DrbdXML;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.Exceptions;
 import lcmc.AddDrbdSplitBrainDialog;
-import lcmc.gui.HeartbeatGraph;
+import lcmc.gui.CRMGraph;
 import lcmc.data.DRBDtestData;
 import lcmc.utilities.ButtonCallback;
 
@@ -924,7 +924,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                             final Host dcHost,
                             final boolean testOnly) {
         final Point2D p = null;
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph crmg = getBrowser().getCRMGraph();
         final DrbddiskInfo di =
             (DrbddiskInfo) getBrowser().getServicesInfo().addServicePanel(
                                     getBrowser().getCRMXML().getHbDrbddisk(),
@@ -938,11 +938,11 @@ public final class DrbdVolumeInfo extends EditableInfo
         fi.setDrbddiskInfo(di);
         final GroupInfo giFi = fi.getGroupInfo();
         if (giFi == null) {
-            hg.addColocation(null, fi, di);
-            hg.addOrder(null, di, fi);
+            crmg.addColocation(null, fi, di);
+            crmg.addOrder(null, di, fi);
         } else {
-            hg.addColocation(null, giFi, di);
-            hg.addOrder(null, di, giFi);
+            crmg.addColocation(null, giFi, di);
+            crmg.addOrder(null, di, giFi);
         }
         di.waitForInfoPanel();
         di.getWidget("1", null).setValueAndWait(
@@ -955,7 +955,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                        final Host dcHost,
                        final boolean testOnly) {
         final Point2D p = null;
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph crmg = getBrowser().getCRMGraph();
         final LinbitDrbdInfo ldi =
          (LinbitDrbdInfo) getBrowser().getServicesInfo().addServicePanel(
                                      getBrowser().getCRMXML().getHbLinbitDrbd(),
@@ -972,11 +972,11 @@ public final class DrbdVolumeInfo extends EditableInfo
         final CloneInfo ci = ldi.getCloneInfo();
         final GroupInfo giFi = fi.getGroupInfo();
         if (giFi == null) {
-            hg.addColocation(null, fi, ci);
-            hg.addOrder(null, ci, fi);
+            crmg.addColocation(null, fi, ci);
+            crmg.addOrder(null, ci, fi);
         } else {
-            hg.addColocation(null, giFi, ci);
-            hg.addOrder(null, ci, giFi);
+            crmg.addColocation(null, giFi, ci);
+            crmg.addOrder(null, ci, giFi);
         }
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();

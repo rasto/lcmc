@@ -198,7 +198,7 @@ public final class GroupInfo extends ServiceInfo {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
         }
-        getBrowser().getHeartbeatGraph().repaint();
+        getBrowser().getCRMGraph().repaint();
     }
 
     /** Applies the changes to the group parameters. */
@@ -257,7 +257,7 @@ public final class GroupInfo extends ServiceInfo {
         final String heartbeatId = getHeartbeatId(testOnly);
         if (getService().isNew()) {
             final Set<ServiceInfo> parents =
-                             getBrowser().getHeartbeatGraph().getParents(this);
+                                    getBrowser().getCRMGraph().getParents(this);
             final List<Map<String, String>> colAttrsList =
                                        new ArrayList<Map<String, String>>();
             final List<Map<String, String>> ordAttrsList =
@@ -300,7 +300,7 @@ public final class GroupInfo extends ServiceInfo {
             if (!testOnly) {
                 setApplyButtons(null, params);
             }
-            getBrowser().getHeartbeatGraph().repaint();
+            getBrowser().getCRMGraph().repaint();
             return;
         } else {
             final Map<String, String> groupMetaArgs =
@@ -385,7 +385,7 @@ public final class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             setApplyButtons(null, params);
         }
-        getBrowser().getHeartbeatGraph().repaint();
+        getBrowser().getCRMGraph().repaint();
     }
 
     /** Returns the list of services that can be added to the group. */
@@ -848,7 +848,7 @@ public final class GroupInfo extends ServiceInfo {
         if (getService().isNew()) {
             if (!testOnly) {
                 getService().setNew(false);
-                getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getBrowser().getCRMGraph().killRemovedVertices();
                 getService().doneRemoving();
             }
         } else {
@@ -1032,7 +1032,7 @@ public final class GroupInfo extends ServiceInfo {
                     migrated = " / migrated";
                 }
                 final HbConnectionInfo[] hbcis =
-                  getBrowser().getHeartbeatGraph().getHbConnections(si);
+                              getBrowser().getCRMGraph().getHbConnections(si);
                 String constraintLeft = "";
                 String constraint = "";
                 if (hbcis != null) {

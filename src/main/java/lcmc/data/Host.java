@@ -1505,7 +1505,7 @@ public final class Host {
             }
             final ClusterBrowser cb = getBrowser().getClusterBrowser();
             if (cb != null) {
-                cb.getHeartbeatGraph().repaint();
+                cb.getCRMGraph().repaint();
                 cb.getDrbdGraph().repaint();
             }
         }

@@ -176,7 +176,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                             new HashMap<ServiceInfo, ServiceInfo>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             final Set<ServiceInfo> cphiParents =
-                            getBrowser().getHeartbeatGraph().getParents(cphi);
+                                    getBrowser().getCRMGraph().getParents(cphi);
             boolean startComparing = false;
             for (final ConstraintPHInfo withCphi : allCphis) {
                 if (cphi == withCphi) {
@@ -187,7 +187,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                     continue;
                 }
                 final Set<ServiceInfo> withCphiChildren =
-                         getBrowser().getHeartbeatGraph().getChildren(withCphi);
+                             getBrowser().getCRMGraph().getChildren(withCphi);
                 if (Tools.serviceInfoListEquals(cphiParents,
                                                 withCphiChildren)) {
                     parentToChild.put(cphi, withCphi);
@@ -202,13 +202,13 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 //cphi.apply(dcHost, testOnly);
                 final List<CRMXML.RscSet> sets =
                  cphi.addConstraintWithPlaceholder(
-                  getBrowser().getHeartbeatGraph().getChildrenAndParents(cphi),
-                  getBrowser().getHeartbeatGraph().getParents(cphi),
-                  true, /* colocation */
-                  true, /* order */
-                  dcHost,
-                  false,
-                  testOnly);
+                        getBrowser().getCRMGraph().getChildrenAndParents(cphi),
+                        getBrowser().getCRMGraph().getParents(cphi),
+                        true, /* colocation */
+                        true, /* order */
+                        dcHost,
+                        false,
+                        testOnly);
                 rscSetsCol.add(sets.get(0)); /* col1 */
                 rscSetsOrd.add(0, sets.get(3)); /* ord2 */
                 ConstraintPHInfo parent = cphi;
@@ -222,15 +222,14 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                             //child.apply(dcHost, testOnly);
                             childSets =
                              child.addConstraintWithPlaceholder(
-                              getBrowser().getHeartbeatGraph()
-                                          .getChildrenAndParents(child),
-                              getBrowser().getHeartbeatGraph()
-                                          .getParents(child),
-                              true, /* colocation */
-                              true, /* order */
-                              dcHost,
-                              false,
-                              testOnly);
+                                  getBrowser().getCRMGraph()
+                                              .getChildrenAndParents(child),
+                                  getBrowser().getCRMGraph().getParents(child),
+                                  true, /* colocation */
+                                  true, /* order */
+                                  dcHost,
+                                  false,
+                                  testOnly);
                             rscSetsCol.add(childSets.get(0)); /* col1 */
                             rscSetsOrd.add(0, childSets.get(3)); /* ord2 */
                             //if (!testOnly) {
@@ -293,7 +292,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         try {
             for (final ConstraintPHInfo cphi : constraintPHInfos) {
                 if (cphi.getService().isNew()
-                    && !getBrowser().getHeartbeatGraph().getChildrenAndParents(
+                    && !getBrowser().getCRMGraph().getChildrenAndParents(
                                                              cphi).isEmpty()) {
                     oneIsNew = true;
                 }

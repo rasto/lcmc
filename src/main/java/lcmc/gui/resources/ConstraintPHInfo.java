@@ -395,7 +395,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             public void action() {
                 hidePopup();
                 removeMyself(false);
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
@@ -423,17 +423,17 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 setUpdated(true);
                 getService().setRemoved(true);
                 final HbConnectionInfo[] hbcis =
-                       getBrowser().getHeartbeatGraph().getHbConnections(this);
+                       getBrowser().getCRMGraph().getHbConnections(this);
                 for (final HbConnectionInfo hbci : hbcis) {
-                    getBrowser().getHeartbeatGraph().removeConnection(hbci,
-                                                                      dcHost,
-                                                                      testOnly);
+                    getBrowser().getCRMGraph().removeConnection(hbci,
+                                                                dcHost,
+                                                                testOnly);
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        getBrowser().getHeartbeatGraph().killRemovedVertices();
+                        getBrowser().getCRMGraph().killRemovedVertices();
                         getService().doneRemoving();
                     }
                 });
@@ -483,9 +483,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
     @Override
     public void setUpdated(final boolean updated) {
         if (updated && !isUpdated()) {
-            getBrowser().getHeartbeatGraph().startAnimation(this);
+            getBrowser().getCRMGraph().startAnimation(this);
         } else if (!updated) {
-            getBrowser().getHeartbeatGraph().stopAnimation(this);
+            getBrowser().getCRMGraph().stopAnimation(this);
         }
         super.setUpdated(updated);
     }

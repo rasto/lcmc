@@ -175,11 +175,11 @@ public class ServiceInfo extends EditableInfo {
                  Tools.getDefault("ServiceInfo.UnmanageByCRMIcon"));
     /** Unmanage service icon. */
     private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
-                      Tools.getDefault("HeartbeatGraph.ServiceUnmanagedIcon"));
+                            Tools.getDefault("CRMGraph.ServiceUnmanagedIcon"));
     /** Icon that indicates a running service. */
     public static final ImageIcon SERVICE_RUNNING_ICON_SMALL =
                                      Tools.createImageIcon(Tools.getDefault(
-                                    "ServiceInfo.ServiceRunningIconSmall"));
+                                       "ServiceInfo.ServiceRunningIconSmall"));
     /** Icon that indicates a running that failed. */
     private static final ImageIcon SERVICE_RUNNING_FAILED_ICON_SMALL =
                             Tools.createImageIcon(Tools.getDefault(
@@ -203,27 +203,27 @@ public class ServiceInfo extends EditableInfo {
     /** Running service icon. */
     static final ImageIcon SERVICE_RUNNING_ICON =
                 Tools.createImageIcon(
-                        Tools.getDefault("HeartbeatGraph.ServiceRunningIcon"));
+                        Tools.getDefault("CRMGraph.ServiceRunningIcon"));
     /** Not running service icon. */
     private static final ImageIcon SERVICE_STOPPED_ICON =
             Tools.createImageIcon(
-                        Tools.getDefault("HeartbeatGraph.ServiceStoppedIcon"));
+                        Tools.getDefault("CRMGraph.ServiceStoppedIcon"));
     /** Start service icon. */
     static final ImageIcon START_ICON = SERVICE_RUNNING_ICON;
     /** Stop service icon. */
     static final ImageIcon STOP_ICON  = SERVICE_STOPPED_ICON;
     /** Migrate icon. */
     protected static final ImageIcon MIGRATE_ICON = Tools.createImageIcon(
-                            Tools.getDefault("HeartbeatGraph.MigrateIcon"));
+                                      Tools.getDefault("CRMGraph.MigrateIcon"));
     /** Unmigrate icon. */
     static final ImageIcon UNMIGRATE_ICON = Tools.createImageIcon(
-                            Tools.getDefault("HeartbeatGraph.UnmigrateIcon"));
+                                   Tools.getDefault("CRMGraph.UnmigrateIcon"));
     /** Group up icon. */
     static final ImageIcon GROUP_UP_ICON = Tools.createImageIcon(
-                                Tools.getDefault("HeartbeatGraph.GroupUp"));
+                                         Tools.getDefault("CRMGraph.GroupUp"));
     /** Group down icon. */
     static final ImageIcon GROUP_DOWN_ICON = Tools.createImageIcon(
-                                Tools.getDefault("HeartbeatGraph.GroupDown"));
+                                       Tools.getDefault("CRMGraph.GroupDown"));
     /** Orphaned subtext. */
     private static final Subtext ORPHANED_SUBTEXT = new Subtext("(LRM)",
                                                                 null,
@@ -2429,7 +2429,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void run() {
                     if (oldCI == null) {
-                        getBrowser().getHeartbeatGraph()
+                        getBrowser().getCRMGraph()
                                     .exchangeObjectInTheVertex(ci, thisClass);
                         ci.setPingComboBox(pingComboBox);
                         for (final HostInfo hi : scoreComboBoxHash.keySet()) {
@@ -2444,7 +2444,7 @@ public class ServiceInfo extends EditableInfo {
                         }
                     } else {
                         oldCI.removeNode();
-                        getBrowser().getHeartbeatGraph()
+                        getBrowser().getCRMGraph()
                                     .exchangeObjectInTheVertex(ci, oldCI);
                         cleanup();
                         oldCI.cleanup();
@@ -2491,7 +2491,7 @@ public class ServiceInfo extends EditableInfo {
                     ci.cleanup();
                     setNode(node);
                     getBrowser().getServicesNode().add(node);
-                    getBrowser().getHeartbeatGraph().exchangeObjectInTheVertex(
+                    getBrowser().getCRMGraph().exchangeObjectInTheVertex(
                                                                      thisClass,
                                                                      ci);
                     getBrowser().mHeartbeatIdToServiceLock();
@@ -2620,9 +2620,9 @@ public class ServiceInfo extends EditableInfo {
         }
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
-            getBrowser().getHeartbeatGraph().pickInfo(this);
+            getBrowser().getCRMGraph().pickInfo(this);
         } else {
-            getBrowser().getHeartbeatGraph().pickInfo(ci);
+            getBrowser().getCRMGraph().pickInfo(ci);
         }
         if (infoPanel != null) {
             return infoPanel;
@@ -2652,7 +2652,7 @@ public class ServiceInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getHeartbeatGraph().stopTestAnimation(
+                getBrowser().getCRMGraph().stopTestAnimation(
                                                              getApplyButton());
                 getApplyButton().setToolTipText(null);
             }
@@ -2673,7 +2673,7 @@ public class ServiceInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getHeartbeatGraph().startTestAnimation(
+                getBrowser().getCRMGraph().startTestAnimation(
                                                                getApplyButton(),
                                                                startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
@@ -3524,7 +3524,7 @@ public class ServiceInfo extends EditableInfo {
                     infoForDependency = clInfo;
                 }
                 final Set<ServiceInfo> parents =
-                          getBrowser().getHeartbeatGraph().getParents(
+                          getBrowser().getCRMGraph().getParents(
                                                             infoForDependency);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
@@ -3552,7 +3552,7 @@ public class ServiceInfo extends EditableInfo {
                                            new LinkedHashMap<String, String>();
                         final Map<String, String> ordAttrs =
                                            new LinkedHashMap<String, String>();
-                        if (getBrowser().getHeartbeatGraph().isColocation(
+                        if (getBrowser().getCRMGraph().isColocation(
                                                         parentInfo,
                                                         infoForDependency)) {
                             colAttrs.put(CRMXML.SCORE_STRING,
@@ -3564,7 +3564,7 @@ public class ServiceInfo extends EditableInfo {
                         } else {
                             colAttrsList.add(null);
                         }
-                        if (getBrowser().getHeartbeatGraph().isOrder(
+                        if (getBrowser().getCRMGraph().isOrder(
                                                          parentInfo,
                                                          infoForDependency)) {
                             ordAttrs.put(CRMXML.SCORE_STRING,
@@ -3685,7 +3685,7 @@ public class ServiceInfo extends EditableInfo {
                     getBrowser().reload(ci.getNode(), false);
                     getBrowser().reload(node, false);
                 }
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         }
     }
@@ -4041,7 +4041,7 @@ public class ServiceInfo extends EditableInfo {
     /** Returns panel with graph. */
     @Override
     public JPanel getGraphicalView() {
-        return getBrowser().getHeartbeatGraph().getGraphPanel();
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 
     /** Adds service panel to the position 'pos'. */
@@ -4107,12 +4107,12 @@ public class ServiceInfo extends EditableInfo {
         if (ra != null) {
             serviceInfo.getService().setResourceClass(ra.getResourceClass());
         }
-        if (getBrowser().getHeartbeatGraph().addResource(serviceInfo,
-                                                         this,
-                                                         pos,
-                                                         colocation,
-                                                         order,
-                                                         testOnly)) {
+        if (getBrowser().getCRMGraph().addResource(serviceInfo,
+                                                   this,
+                                                   pos,
+                                                   colocation,
+                                                   order,
+                                                   testOnly)) {
             Tools.waitForSwing();
             /* edge added */
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
@@ -4127,8 +4127,7 @@ public class ServiceInfo extends EditableInfo {
                     withService = this;
                     withFrom.add(this);
                 }
-                withFrom.addAll(
-                            getBrowser().getHeartbeatGraph().getParents(cphi));
+                withFrom.addAll(getBrowser().getCRMGraph().getParents(cphi));
                 final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
@@ -4200,12 +4199,12 @@ public class ServiceInfo extends EditableInfo {
                 serviceInfo.changeType(CLONE_TYPE_STRING);
             }
         }
-        getBrowser().getHeartbeatGraph().reloadServiceMenus();
+        getBrowser().getCRMGraph().reloadServiceMenus();
         if (reloadNode) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    getBrowser().getHeartbeatGraph().scale();
+                    getBrowser().getCRMGraph().scale();
                 }
             });
         }
@@ -4400,7 +4399,7 @@ public class ServiceInfo extends EditableInfo {
         if (getService().isNew() && gi == null) {
             if (!testOnly) {
                 getService().setNew(false);
-                getBrowser().getHeartbeatGraph().killRemovedVertices();
+                getBrowser().getCRMGraph().killRemovedVertices();
             }
         } else {
             final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -4781,7 +4780,7 @@ public class ServiceInfo extends EditableInfo {
                                                     false,
                                                     testOnly);
                 fsi.setDrbddiskIsPreferred(false);
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         if (getBrowser().atLeastOneDrbddisk()
@@ -4818,7 +4817,7 @@ public class ServiceInfo extends EditableInfo {
                                                     false,
                                                     testOnly);
                 fsi.setDrbddiskIsPreferred(true);
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         if (getBrowser().isOneLinbitDrbd()
@@ -4851,7 +4850,7 @@ public class ServiceInfo extends EditableInfo {
                                 true,
                                 false,
                                 testOnly);
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         ipMenuItem.setPos(pos);
@@ -4880,7 +4879,7 @@ public class ServiceInfo extends EditableInfo {
                                     true,
                                     false,
                                     testOnly);
-                    getBrowser().getHeartbeatGraph().repaint();
+                    getBrowser().getCRMGraph().repaint();
                 }
         };
         fsMenuItem.setPos(pos);
@@ -4926,7 +4925,7 @@ public class ServiceInfo extends EditableInfo {
                                 true,
                                 false,
                                 testOnly);
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         mmi.setPos(pos);
@@ -5205,7 +5204,7 @@ public class ServiceInfo extends EditableInfo {
                                     true,
                                     false,
                                     testOnly);
-                    getBrowser().getHeartbeatGraph().repaint();
+                    getBrowser().getCRMGraph().repaint();
                 }
             };
         items.add((UpdatableItem) addGroupMenuItem);
@@ -5561,7 +5560,7 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         removeMyself(false);
                     }
-                    getBrowser().getHeartbeatGraph().repaint();
+                    getBrowser().getCRMGraph().repaint();
                 }
             };
             final ServiceInfo thisClass = this;
@@ -6081,9 +6080,9 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         if (updated && !isUpdated()) {
-            getBrowser().getHeartbeatGraph().startAnimation(this);
+            getBrowser().getCRMGraph().startAnimation(this);
         } else if (!updated) {
-            getBrowser().getHeartbeatGraph().stopAnimation(this);
+            getBrowser().getCRMGraph().stopAnimation(this);
         }
         super.setUpdated(updated);
     }
@@ -6348,16 +6347,13 @@ public class ServiceInfo extends EditableInfo {
     void removeConstraints(final Host dcHost, final boolean testOnly) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final HbConnectionInfo[] hbcis =
-                     getBrowser().getHeartbeatGraph().getHbConnections(this);
+                     getBrowser().getCRMGraph().getHbConnections(this);
         for (final HbConnectionInfo hbci : hbcis) {
             if (hbci != null) {
-                getBrowser().getHeartbeatGraph().removeOrder(hbci,
-                                                             dcHost,
-                                                             testOnly);
-                getBrowser().getHeartbeatGraph().removeColocation(
-                                                              hbci,
-                                                              dcHost,
-                                                              testOnly);
+                getBrowser().getCRMGraph().removeOrder(hbci, dcHost, testOnly);
+                getBrowser().getCRMGraph().removeColocation(hbci,
+                                                            dcHost,
+                                                            testOnly);
             }
         }
 

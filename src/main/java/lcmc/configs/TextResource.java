@@ -2013,26 +2013,29 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Widget.NothingSelected",
          "<<nothing selected>>"},
 
-        {"HeartbeatGraph.ColOrd",
+        {"CRMGraph.ColOrd",
          "col / ord"},
 
-        {"HeartbeatGraph.Colocation",
+        {"CRMGraph.Colocation",
          "colocated"},
 
-        {"HeartbeatGraph.NoColOrd",
+        {"CRMGraph.NoColOrd",
          "repelled / ord"},
 
-        {"HeartbeatGraph.NoColocation",
+        {"CRMGraph.NoColocation",
          "repelled"},
 
-        {"HeartbeatGraph.Order",
+        {"CRMGraph.Order",
          "ordered"},
 
-        {"HeartbeatGraph.Removing",
+        {"CRMGraph.Removing",
          " removing... "},
 
-        {"HeartbeatGraph.Unconfigured",
+        {"CRMGraph.Unconfigured",
          "unconfigured"},
+
+        {"CRMGraph.Simulate",
+         "simulate..."},
 
         /* Score */
         {"Score.InfinityString",

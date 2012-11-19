@@ -25,7 +25,7 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.Widget;
-import lcmc.gui.HeartbeatGraph;
+import lcmc.gui.CRMGraph;
 import lcmc.gui.dialog.ClusterLogs;
 import lcmc.data.Host;
 import lcmc.data.ResourceAgent;
@@ -350,7 +350,7 @@ public final class ServicesInfo extends EditableInfo {
                                          final boolean testOnly) {
         CloneInfo newCi = null;
         newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         if (newCi == null) {
             final Point2D p = null;
             newCi =
@@ -387,7 +387,7 @@ public final class ServicesInfo extends EditableInfo {
                                          final boolean testOnly) {
         GroupInfo newGi = null;
         newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         if (newGi == null) {
             final Point2D p = null;
             newGi =
@@ -440,7 +440,7 @@ public final class ServicesInfo extends EditableInfo {
                             newGi,
                             clStatus.getParamValuePairs(grpOrCloneId));
         }
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         boolean newService = false;
         int pos = 0;
         final List<String> gs = clStatus.getGroupResources(grpOrCloneId,
@@ -597,7 +597,7 @@ public final class ServicesInfo extends EditableInfo {
             return;
         }
         final Set<String> allGroupsAndClones = clStatus.getAllGroups();
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         final List<ServiceInfo> groupServiceIsPresent =
                                                   new ArrayList<ServiceInfo>();
         final List<ServiceInfo> serviceIsPresent = new ArrayList<ServiceInfo>();
@@ -959,7 +959,7 @@ public final class ServicesInfo extends EditableInfo {
         if (getBrowser().clStatusFailed()) {
             return super.getInfoPanel();
         }
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         if (infoPanel != null) {
             hg.pickBackground();
             return infoPanel;
@@ -1119,7 +1119,7 @@ public final class ServicesInfo extends EditableInfo {
     /** Returns heartbeat graph. */
     @Override
     public JPanel getGraphicalView() {
-        return getBrowser().getHeartbeatGraph().getGraphPanel();
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 
     /**
@@ -1188,7 +1188,7 @@ public final class ServicesInfo extends EditableInfo {
                          final boolean testOnly) {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
-        final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+        final CRMGraph hg = getBrowser().getCRMGraph();
         if (!hg.addResource(newServiceInfo,
                             null,
                             pos,
@@ -1269,7 +1269,7 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     null,
                                     testOnly);
-                    getBrowser().getHeartbeatGraph().repaint();
+                    getBrowser().getCRMGraph().repaint();
                 }
             };
         items.add((UpdatableItem) addGroupMenuItem);
@@ -1357,7 +1357,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 null,
                                                                 testOnly);
                             fsi.setDrbddiskIsPreferred(false);
-                            getBrowser().getHeartbeatGraph().repaint();
+                            getBrowser().getCRMGraph().repaint();
                         }
                     };
                     if (getBrowser().atLeastOneDrbddisk()
@@ -1396,7 +1396,7 @@ public final class ServicesInfo extends EditableInfo {
                                             null,
                                             null,
                                             testOnly);
-                            getBrowser().getHeartbeatGraph().repaint();
+                            getBrowser().getCRMGraph().repaint();
                         }
                     };
                     ipMenuItem.setPos(pos);
@@ -1434,7 +1434,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 null,
                                                                 testOnly);
                             fsi.setDrbddiskIsPreferred(true);
-                            getBrowser().getHeartbeatGraph().repaint();
+                            getBrowser().getCRMGraph().repaint();
                         }
                     };
                     if (getBrowser().isOneLinbitDrbd()
@@ -1507,7 +1507,7 @@ public final class ServicesInfo extends EditableInfo {
                                                 null,
                                                 null,
                                                 testOnly);
-                                getBrowser().getHeartbeatGraph().repaint();
+                                getBrowser().getCRMGraph().repaint();
                             }
                         };
                         mmi.setPos(pos);
@@ -1561,7 +1561,7 @@ public final class ServicesInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+                    final CRMGraph hg = getBrowser().getCRMGraph();
                     final ConstraintPHInfo cphi =
                          new ConstraintPHInfo(getBrowser(),
                                               null,
@@ -1618,7 +1618,7 @@ public final class ServicesInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final HeartbeatGraph hg = getBrowser().getHeartbeatGraph();
+                    final CRMGraph hg = getBrowser().getCRMGraph();
                     final ConstraintPHInfo cphi =
                          new ConstraintPHInfo(getBrowser(),
                                               null,
@@ -1677,7 +1677,7 @@ public final class ServicesInfo extends EditableInfo {
                         si.stopResource(dcHost, false);
                     }
                 }
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         final ClusterBrowser.ClMenuItemCallback stopAllItemCallback =
@@ -1742,7 +1742,7 @@ public final class ServicesInfo extends EditableInfo {
                         si.unmigrateResource(dcHost, false);
                     }
                 }
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         final ClusterBrowser.ClMenuItemCallback unmigrateAllItemCallback =
@@ -1827,7 +1827,7 @@ public final class ServicesInfo extends EditableInfo {
                                     }
                                 }
                             }
-                            getBrowser().getHeartbeatGraph().repaint();
+                            getBrowser().getCRMGraph().repaint();
                         }
                     };
                     t.start();

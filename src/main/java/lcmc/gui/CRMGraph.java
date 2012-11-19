@@ -1,10 +1,10 @@
 /*
- * This file is part of DRBD Management Console by LINBIT HA-Solutions GmbH
+ * This file is part of Linux Cluster Management Console
  * written by Rasto Levrinc.
  *
- * Copyright (C) 2009, LINBIT HA-Solutions GmbH.
+ * Copyright (C) 2012, Rastislav Levrinc
  *
- * DRBD Management Console is free software; you can redistribute it and/or
+ * LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
  * any later version.
@@ -77,7 +77,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id$
  *
  */
-public final class HeartbeatGraph extends ResourceGraph {
+public final class CRMGraph extends ResourceGraph {
     /** List with edges that are order constraints. */
     private final Set<Edge> edgeIsOrderList = new HashSet<Edge>();
     /** List with edges that should be kept as order constraints. */
@@ -142,41 +142,41 @@ public final class HeartbeatGraph extends ResourceGraph {
     private static final int VERTEX_HEIGHT = 50;
     /** Host standby icon. */
     private static final ImageIcon HOST_STANDBY_ICON =
-     Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
+     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
     /** Icon that indicates a running service. */
     private static final ImageIcon SERVICE_RUNNING_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
-                                       "HeartbeatGraph.ServiceRunningIcon"));
+                                               "CRMGraph.ServiceRunningIcon"));
     /** Icon that indicates a running that failed. */
     private static final ImageIcon SERVICE_RUNNING_FAILED_ICON =
                                 Tools.createImageIcon(Tools.getDefault(
-                                   "HeartbeatGraph.ServiceRunningFailedIcon"));
+                                         "CRMGraph.ServiceRunningFailedIcon"));
     /** Icon that indicates a started service (but not running). */
     private static final ImageIcon SERVICE_STARTED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
-                                       "HeartbeatGraph.ServiceStartedIcon"));
+                                               "CRMGraph.ServiceStartedIcon"));
     /** Icon that indicates a stopping service (but not stopped). */
     private static final ImageIcon SERVICE_STOPPING_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
-                                       "HeartbeatGraph.ServiceStoppingIcon"));
+                                              "CRMGraph.ServiceStoppingIcon"));
     /** Icon that indicates a not running service. */
     private static final ImageIcon SERVICE_STOPPED_ICON =
                                 Tools.createImageIcon(Tools.getDefault(
-                                        "HeartbeatGraph.ServiceStoppedIcon"));
+                                               "CRMGraph.ServiceStoppedIcon"));
     /** Icon that indicates a not running service that failed. */
     private static final ImageIcon SERVICE_STOPPED_FAILED_ICON =
                                 Tools.createImageIcon(Tools.getDefault(
-                                   "HeartbeatGraph.ServiceStoppedFailedIcon"));
+                                         "CRMGraph.ServiceStoppedFailedIcon"));
     /** Icon that indicates an unmanaged service. */
     private static final ImageIcon SERVICE_UNMANAGED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
-                                       "HeartbeatGraph.ServiceUnmanagedIcon"));
+                                             "CRMGraph.ServiceUnmanagedIcon"));
     /** Icon that indicates a migrated service. */
     private static final ImageIcon SERVICE_MIGRATED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
-                                       "HeartbeatGraph.ServiceMigratedIcon"));
-    /** Prepares a new <code>HeartbeatGraph</code> object. */
-    HeartbeatGraph(final ClusterBrowser clusterBrowser) {
+                                              "CRMGraph.ServiceMigratedIcon"));
+    /** Prepares a new <code>CRMGraph</code> object. */
+    CRMGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
     }
 
@@ -697,14 +697,14 @@ public final class HeartbeatGraph extends ResourceGraph {
             final Set<Vertex> vipl = getVertexIsPresentList();
             putVertexIsPresentList();
             if (si.getService().isRemoved()) {
-                str = Tools.getString("HeartbeatGraph.Removing");
+                str = Tools.getString("CRMGraph.Removing");
             } else if (vipl.contains(v)) {
                 str = si.getMainTextForGraph();
             } else {
                 if (si.getService().isNew()) {
                     str = si.getMainTextForGraph();
                 } else {
-                    str = Tools.getString("HeartbeatGraph.Unconfigured");
+                    str = Tools.getString("CRMGraph.Unconfigured");
                 }
             }
         }
@@ -985,12 +985,10 @@ public final class HeartbeatGraph extends ResourceGraph {
             return vertexToHostMap.get(v).getHost().getPmColors()[0];
         } else if (vertexToConstraintPHMap.containsKey(v)) {
             if (vertexToConstraintPHMap.get(v).getService().isNew()) {
-                return Tools.getDefaultColor(
-                                       "HeartbeatGraph.FillPaintUnconfigured");
+                return Tools.getDefaultColor("CRMGraph.FillPaintUnconfigured");
             } else {
                 // TODO fillpaint.placeholder
-                return Tools.getDefaultColor(
-                                        "HeartbeatGraph.FillPaintPlaceHolder");
+                return Tools.getDefaultColor("CRMGraph.FillPaintPlaceHolder");
             }
         }
         final ServiceInfo si = (ServiceInfo) getInfo(v);
@@ -1000,15 +998,15 @@ public final class HeartbeatGraph extends ResourceGraph {
         final Set<Vertex> vipl = getVertexIsPresentList();
         putVertexIsPresentList();
         if (getClusterBrowser().allHostsDown()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
+            return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (si.getService().isOrphaned()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
+            return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (si.isFailed(tOnly)) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintFailed");
+            return Tools.getDefaultColor("CRMGraph.FillPaintFailed");
         } else if (!si.isRunning(tOnly)) {
             return ClusterBrowser.FILL_PAINT_STOPPED;
         } else if (getClusterBrowser().clStatusFailed()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintUnknown");
+            return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (vipl.contains(v) || tOnly) {
             final List<Color> colors = si.getHostColors(tOnly);
             if (colors.size() >= 1) {
@@ -1017,10 +1015,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                 return Color.WHITE; /* more colors */
             }
         } else if (!si.getService().isNew()) {
-            return Tools.getDefaultColor("HeartbeatGraph.FillPaintRemoved");
+            return Tools.getDefaultColor("CRMGraph.FillPaintRemoved");
         } else {
-            return Tools.getDefaultColor(
-                                      "HeartbeatGraph.FillPaintUnconfigured");
+            return Tools.getDefaultColor("CRMGraph.FillPaintUnconfigured");
         }
     }
 
@@ -1102,9 +1099,9 @@ public final class HeartbeatGraph extends ResourceGraph {
                 colDesc = "colocated";
             }
         } else if (s1.getService().isNew() || s2.getService().isNew()) {
-            desc = Tools.getString("HeartbeatGraph.Unconfigured");
+            desc = Tools.getString("CRMGraph.Unconfigured");
         } else {
-            desc = Tools.getString("HeartbeatGraph.Removing");
+            desc = Tools.getString("CRMGraph.Removing");
         }
         if (desc != null) {
             return desc;

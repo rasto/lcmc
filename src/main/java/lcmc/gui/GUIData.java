@@ -570,7 +570,7 @@ public final class GUIData  {
         if (c == null) {
             return null;
         }
-        return c.getBrowser().getHeartbeatGraph();
+        return c.getBrowser().getCRMGraph();
     }
 
     /** Copy / paste function. */

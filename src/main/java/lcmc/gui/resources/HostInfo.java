@@ -47,7 +47,7 @@ import lcmc.utilities.Corosync;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Heartbeat;
 import lcmc.utilities.ButtonCallback;
-import lcmc.gui.HeartbeatGraph;
+import lcmc.gui.CRMGraph;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -81,19 +81,19 @@ public final class HostInfo extends Info {
     private final Host host;
     /** Host standby icon. */
     static final ImageIcon HOST_STANDBY_ICON =
-     Tools.createImageIcon(Tools.getDefault("HeartbeatGraph.HostStandbyIcon"));
+     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
     /** Host standby off icon. */
     static final ImageIcon HOST_STANDBY_OFF_ICON =
              Tools.createImageIcon(
-                        Tools.getDefault("HeartbeatGraph.HostStandbyOffIcon"));
+                        Tools.getDefault("CRMGraph.HostStandbyOffIcon"));
     /** Stop comm layer icon. */
     static final ImageIcon HOST_STOP_COMM_LAYER_ICON =
              Tools.createImageIcon(
-                     Tools.getDefault("HeartbeatGraph.HostStopCommLayerIcon"));
+                     Tools.getDefault("CRMGraph.HostStopCommLayerIcon"));
     /** Start comm layer icon. */
     static final ImageIcon HOST_START_COMM_LAYER_ICON =
              Tools.createImageIcon(
-                    Tools.getDefault("HeartbeatGraph.HostStartCommLayerIcon"));
+                    Tools.getDefault("CRMGraph.HostStartCommLayerIcon"));
     /** Offline subtext. */
     private static final Subtext OFFLINE_SUBTEXT =
                                       new Subtext("offline", null, Color.BLUE);
@@ -312,8 +312,7 @@ public final class HostInfo extends Info {
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
-        final HeartbeatGraph hg =
-                        getBrowser().getClusterBrowser().getHeartbeatGraph();
+        final CRMGraph crmg = getBrowser().getClusterBrowser().getCRMGraph();
         final Document taDocument = ta.getDocument();
         taDocument.addDocumentListener(new DocumentListener() {
             private void update() {
@@ -355,7 +354,7 @@ public final class HostInfo extends Info {
                     return;
                 }
                 mouseStillOver = false;
-                hg.stopTestAnimation(crmConfigureCommitButton);
+                crmg.stopTestAnimation(crmConfigureCommitButton);
                 crmConfigureCommitButton.setToolTipText(null);
             }
 
@@ -376,7 +375,7 @@ public final class HostInfo extends Info {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                hg.startTestAnimation(crmConfigureCommitButton, startTestLatch);
+                crmg.startTestAnimation(crmConfigureCommitButton, startTestLatch);
                 final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
                 getBrowser().getClusterBrowser().ptestLockAcquire();

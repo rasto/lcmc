@@ -251,8 +251,7 @@ public final class Cluster {
     public List<Color> getHostColors(final List<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
         if (nodes == null || nodes.isEmpty()) {
-            colors.add(
-                    Tools.getDefaultColor("HeartbeatGraph.FillPaintStopped"));
+            colors.add(Tools.getDefaultColor("CRMGraph.FillPaintStopped"));
             return colors;
         }
         for (final String node : nodes) {

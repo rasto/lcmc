@@ -261,7 +261,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     /** Returns panel with graph. */
     @Override
     public JPanel getGraphicalView() {
-        return getBrowser().getHeartbeatGraph().getGraphPanel();
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 
     /** Check the fields. */

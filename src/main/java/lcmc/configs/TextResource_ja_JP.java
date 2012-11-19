@@ -1793,25 +1793,25 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"Widget.NothingSelected",
          "<<選択なし>>"},
 
-        {"HeartbeatGraph.ColOrd",
+        {"CRMGraph.ColOrd",
          "同居 / 順序"},
 
-        {"HeartbeatGraph.Colocation",
+        {"CRMGraph.Colocation",
          "同居指定"},
 
-        {"HeartbeatGraph.NoColOrd",
+        {"CRMGraph.NoColOrd",
          "反発 / 順序"},
 
-        {"HeartbeatGraph.NoColocation",
+        {"CRMGraph.NoColocation",
          "反発"},
 
-        {"HeartbeatGraph.Order",
+        {"CRMGraph.Order",
          "順序指定"},
 
-        {"HeartbeatGraph.Removing",
+        {"CRMGraph.Removing",
          " 削除しています... "},
 
-        {"HeartbeatGraph.Unconfigured",
+        {"CRMGraph.Unconfigured",
          "未設定"},
 
         /* Score */

@@ -1218,7 +1218,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         si.removeMyselfNoConfirm(dcHost, CRM.LIVE);
                     }
                 }
-                getBrowser().getHeartbeatGraph().repaint();
+                getBrowser().getCRMGraph().repaint();
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
@@ -1280,7 +1280,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
     /** @see EditableInfo#getGraphicalView() */
     @Override
     public JPanel getGraphicalView() {
-        return getBrowser().getHeartbeatGraph().getGraphPanel();
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 
     /** @see EditableInfo#isEnabledOnlyInAdvancedMode() */
@@ -1428,8 +1428,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getHeartbeatGraph().stopTestAnimation(
-                                                             getApplyButton());
+                getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
                 getApplyButton().setToolTipText(null);
             }
 
@@ -1449,9 +1448,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getHeartbeatGraph().startTestAnimation(
-                                                               getApplyButton(),
-                                                               startTestLatch);
+                getBrowser().getCRMGraph().startTestAnimation(getApplyButton(),
+                                                              startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 final ClusterStatus cs = getBrowser().getClusterStatus();
