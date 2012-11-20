@@ -159,7 +159,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                         testOnly);
                 Tools.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
-                cb.getHeartbeatGraph().repaint();
+                cb.getCRMGraph().repaint();
             }
             Tools.sleep(100);
             Tools.stopProgressIndicator(i + ": " + file);
