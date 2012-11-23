@@ -230,12 +230,21 @@ public final class PtestData {
                     if (clone) {
                         slaveNodes.add(node);
                     }
-                }
-                if ("start".equals(action)) {
+                } else if ("start".equals(action)) {
                     nodes.remove(node); /* start failed */
                     if (clone) {
                         slaveNodes.remove(node);
                         masterNodes.remove(node);
+                    }
+                } else if ("promote".equals(action)) {
+                    if (clone) {
+                        masterNodes.remove(node); /* promote failed */
+                        slaveNodes.add(node);
+                    }
+                } else if ("demote".equals(action)) {
+                    if (clone) {
+                        slaveNodes.remove(node); /* demote failed */
+                        masterNodes.add(node);
                     }
                 }
                 runningOnNodes.put(res, nodes);
