@@ -1085,6 +1085,12 @@ sub get_resource_status {
 				$res = $1;
 			}
 		} elsif ($line =~
+			 /Move\s+(\S+)\s+\((\S+)\s+(\S+)/) {
+			# Promote from something, still that something
+			$res = $1;
+			$what = $2;
+			$on = $3;
+		} elsif ($line =~
 			 /native_print:\s+(\S+).*:\s+(.*)\s+\(unmanaged\)$/) {
 		  	# unmanaged
 			$res = $1;
