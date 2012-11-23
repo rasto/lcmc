@@ -257,6 +257,11 @@ public final class PtestData {
             }
             final String[] prefixes = new String[]{"LogActions: ",
                                                    "ERROR: print_elem: "};
+            if (line.indexOf("_post_notify_") >= 0
+                || line.indexOf("_pre_notify_") >= 0
+                || line.indexOf("_monitor_") >= 0) {
+                continue;
+            }
             for (final String prefix : prefixes) {
                 final int index = line.indexOf(prefix);
                 if (index >= 0) {
