@@ -47,7 +47,7 @@ public final class PtestData {
                           + "\\s+\\(([^)]*)\\).*");
     /** Pattern for pending actions. */
     private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
-                           ".*ERROR: print_elem:\\s+\\[Action.*?: Pending "
+                           "(?i).*ERROR: print_elem:\\s+\\[Action.*?: Pending "
                            + "\\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
            //".*native_color:\\s+Resource\\s+(\\S+)\\s+cannot run anywhere.*");
     /** Pattern that gets cloned resource id. */
