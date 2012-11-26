@@ -61,7 +61,7 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
     /** Combo box with operating modes. */
-    private final JComboBox operatingModesCB;
+    private final JComboBox<String> operatingModesCB;
     /** Advanced mode button. */
     private final JCheckBox advancedModeCB;
 
@@ -141,7 +141,7 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
                           Tools.getString("ClusterViewPanel.OperatingMode"));
         opModePanel.setBorder(vmBorder);
         final String[] modes = Tools.getConfigData().getOperatingModes();
-        final JComboBox opModeCB = new JComboBox(modes);
+        final JComboBox<String> opModeCB = new JComboBox<String>(modes);
 
         final ConfigData.AccessType accessType =
                                         Tools.getConfigData().getAccessType();

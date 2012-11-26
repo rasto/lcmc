@@ -1227,10 +1227,11 @@ public class ServiceInfo extends EditableInfo {
     /** Returns list of all host names in this cluster. */
     List<String> getHostNames() {
         final List<String> hostNames = new ArrayList<String>();
-        final Enumeration e = getBrowser().getClusterHostsNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e =
+                                 getBrowser().getClusterHostsNode().children();
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                              (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode n = e.nextElement();
             final String hostName = ((HostInfo) n.getUserObject()).getName();
             hostNames.add(hostName);
         }
@@ -1242,17 +1243,17 @@ public class ServiceInfo extends EditableInfo {
      * Converts enumeration to the info array, get objects from
      * hash if they exist.
      */
-    protected Info[] enumToInfoArray(final Info defaultValue,
-                                     final String serviceName,
-                                     final Enumeration e) {
+    protected Info[] enumToInfoArray(
+                                 final Info defaultValue,
+                                 final String serviceName,
+                                 final Enumeration<DefaultMutableTreeNode> e) {
         final List<Info> list = new ArrayList<Info>();
         if (defaultValue != null) {
             list.add(defaultValue);
         }
 
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                             (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode n = e.nextElement();
             final Info i = (Info) n.getUserObject();
             final String name = i.getName();
             final ServiceInfo si = getBrowser().getServiceInfoFromId(
@@ -1446,22 +1447,24 @@ public class ServiceInfo extends EditableInfo {
         final List<Info> list = new ArrayList<Info>();
 
         /* drbd resources */
-        final Enumeration drbdResources = getBrowser().getDrbdNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> drbdResources =
+                                         getBrowser().getDrbdNode().children();
 
         if (defaultValue != null) {
             list.add(defaultValue);
         }
         while (drbdResources.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                      (DefaultMutableTreeNode) drbdResources.nextElement();
+            final DefaultMutableTreeNode n = drbdResources.nextElement();
             final DrbdResourceInfo drbdRes =
                                         (DrbdResourceInfo) n.getUserObject();
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
             if (drbdResNode != null) {
-                final Enumeration drbdVolumes = drbdResNode.children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> drbdVolumes =
+                                                        drbdResNode.children();
                 while (drbdVolumes.hasMoreElements()) {
-                    final DefaultMutableTreeNode vn =
-                           (DefaultMutableTreeNode) drbdVolumes.nextElement();
+                    final DefaultMutableTreeNode vn = drbdVolumes.nextElement();
                     final CommonDeviceInterface drbdVol =
                                    (CommonDeviceInterface) vn.getUserObject();
                     list.add((Info) drbdVol);
@@ -1470,13 +1473,13 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* block devices that are the same on all hosts */
-        final Enumeration wids =
-                        getBrowser().getCommonBlockDevicesNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> wids =
+                           getBrowser().getCommonBlockDevicesNode().children();
         while (wids.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                               (DefaultMutableTreeNode) wids.nextElement();
+            final DefaultMutableTreeNode n = wids.nextElement();
             final CommonDeviceInterface wid =
-                                (CommonDeviceInterface) n.getUserObject();
+                                     (CommonDeviceInterface) n.getUserObject();
             list.add((Info) wid);
         }
 
@@ -4244,11 +4247,11 @@ public class ServiceInfo extends EditableInfo {
         }
         final int index = giNode.getIndex(node);
         if (index > 0) {
-            final Enumeration e = giNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                     (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
@@ -4274,11 +4277,11 @@ public class ServiceInfo extends EditableInfo {
         }
         final int index = giNode.getIndex(node);
         if (index < giNode.getChildCount() - 1) {
-            final Enumeration e = giNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                     (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
@@ -4421,10 +4424,12 @@ public class ServiceInfo extends EditableInfo {
                         final String group = gi.getHeartbeatId(testOnly);
                         final DefaultMutableTreeNode giNode = gi.getNode();
                         if (giNode != null) {
-                            final Enumeration e = giNode.children();
+                            @SuppressWarnings("unchecked")
+                            final Enumeration<DefaultMutableTreeNode> e =
+                                                             giNode.children();
                             while (e.hasMoreElements()) {
                                 final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                                                               e.nextElement();
                                 final ServiceInfo child =
                                                (ServiceInfo) n.getUserObject();
                                 child.getService().setModified(true);
@@ -4541,9 +4546,9 @@ public class ServiceInfo extends EditableInfo {
     /** Adds existing service menu item for every member of a group. */
     protected void addExistingGroupServiceMenuItems(
                         final ServiceInfo asi,
-                        final MyListModel dlm,
+                        final MyListModel<MyMenuItem> dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList list,
+                        final MyList<MyMenuItem> list,
                         final JCheckBox colocationWi,
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
@@ -4555,9 +4560,9 @@ public class ServiceInfo extends EditableInfo {
     protected void addExistingServiceMenuItem(
                         final String name,
                         final ServiceInfo asi,
-                        final MyListModel dlm,
+                        final MyListModel<MyMenuItem> dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList list,
+                        final MyList<MyMenuItem> list,
                         final JCheckBox colocationWi,
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
@@ -4682,10 +4687,10 @@ public class ServiceInfo extends EditableInfo {
                     }
                 });
 
-                final MyListModel dlm = new MyListModel();
+                final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                 final Map<MyMenuItem, ButtonCallback> callbackHash =
                                  new HashMap<MyMenuItem, ButtonCallback>();
-                final MyList list = new MyList(dlm, getBackground());
+                final MyList<MyMenuItem> list = new MyList<MyMenuItem>(dlm, getBackground());
 
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final ServiceInfo asi
@@ -4888,7 +4893,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds resource agent RA menu item. It is called in swing thread. */
     private void addResourceAgentMenu(final ResourceAgent ra,
-                                      final MyListModel dlm,
+                                      final MyListModel<MyMenuItem> dlm,
                                       final Point2D pos,
                                       final List<JDialog> popups,
                                       final JCheckBox colocationWi,
@@ -5110,7 +5115,7 @@ public class ServiceInfo extends EditableInfo {
                             ClusterBrowser.getClassMenu(cl),
                             new AccessMode(ConfigData.AccessType.ADMIN, mode),
                             new AccessMode(ConfigData.AccessType.OP, mode));
-                    final MyListModel dlm = new MyListModel();
+                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {
@@ -5140,7 +5145,7 @@ public class ServiceInfo extends EditableInfo {
                                         colOrdPanel,
                                         classItem,
                                         dlm,
-                                        new MyList(dlm, getBackground()),
+                                        new MyList<MyMenuItem>(dlm, getBackground()),
                                         thisClass,
                                         popups,
                                         null);

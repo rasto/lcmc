@@ -865,19 +865,19 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
 
-        final Enumeration e = getNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n =
-                      (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode n = e.nextElement();
             final ServiceInfo g = (ServiceInfo) n.getUserObject();
             if (g.getResourceAgent().isGroup()
                 || g.getResourceAgent().isClone()) {
-                final Enumeration ge = g.getNode().children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> ge =
+                                                        g.getNode().children();
                 while (ge.hasMoreElements()) {
-                    final DefaultMutableTreeNode gn =
-                             (DefaultMutableTreeNode) ge.nextElement();
-                    final ServiceInfo s =
-                                     (ServiceInfo) gn.getUserObject();
+                    final DefaultMutableTreeNode gn = ge.nextElement();
+                    final ServiceInfo s = (ServiceInfo) gn.getUserObject();
                     if (!groupServiceIsPresent.contains(s)
                         && !s.getService().isNew()) {
                         /* remove the group service from the menu
@@ -1473,7 +1473,7 @@ public final class ServicesInfo extends EditableInfo {
                                                    mode),
                                        new AccessMode(ConfigData.AccessType.OP,
                                                       mode));
-                    MyListModel dlm = new MyListModel();
+                    MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
                         final MyMenuItem mmi =
                                 new MyMenuItem(ra.getMenuName(),
@@ -1518,7 +1518,7 @@ public final class ServicesInfo extends EditableInfo {
                                         null, /* options */
                                         classItem,
                                         dlm,
-                                        new MyList(dlm, getBackground()),
+                                        new MyList<MyMenuItem>(dlm, getBackground()),
                                         thisClass,
                                         popups,
                                         null);
@@ -2097,10 +2097,11 @@ public final class ServicesInfo extends EditableInfo {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    final Enumeration e = oldGi.getNode().children();
+                    @SuppressWarnings("unchecked")
+                    final Enumeration<DefaultMutableTreeNode> e =
+                                                    oldGi.getNode().children();
                     while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                        final DefaultMutableTreeNode n = e.nextElement();
                         final ServiceInfo oldChild =
                                             (ServiceInfo) n.getUserObject();
                         oldChild.getInfoPanel();

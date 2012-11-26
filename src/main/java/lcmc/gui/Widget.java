@@ -287,10 +287,7 @@ public final class Widget extends JPanel {
                 newComp.add(textFieldPart);
 
                 /* unit combo box */
-                unitComboBox = (JComboBox) getComboBox(unit,
-                                                       units,
-                                                       regexp,
-                                                       abbreviations);
+                unitComboBox = getComboBox(unit, units, regexp, abbreviations);
 
                 newComp.add(unitComboBox);
                 SpringUtilities.makeCompactGrid(newComp, 1, 2,
@@ -397,10 +394,10 @@ public final class Widget extends JPanel {
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private JComponent getComboBox(final String selectedValue,
-                                   final Object[] items,
-                                   final String regexp,
-                                   final Map<String, String> abbreviations) {
+    private JComboBox getComboBox(final String selectedValue,
+                                  final Object[] items,
+                                  final String regexp,
+                                  final Map<String, String> abbreviations) {
         final List<Object> comboList = new ArrayList<Object>();
 
         final Object selectedValueInfo = addItems(comboList,
@@ -1331,9 +1328,7 @@ public final class Widget extends JPanel {
                         if (wl.isEnabled()) {
                             try {
                                 final String text =
-                                     ((Document) e.getDocument()).getText(
-                                                               0,
-                                                               doc.getLength());
+                                   e.getDocument().getText(0, doc.getLength());
 
                                 final Thread t = new Thread(new Runnable() {
                                     @Override

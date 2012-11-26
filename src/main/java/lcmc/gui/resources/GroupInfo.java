@@ -288,11 +288,11 @@ public final class GroupInfo extends ServiceInfo {
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);
-            final Enumeration e = getNode().children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = getNode().children();
             final List<String> newOrder = new ArrayList<String>();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                     (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
@@ -634,7 +634,7 @@ public final class GroupInfo extends ServiceInfo {
                                                   false),
                                    new AccessMode(ConfigData.AccessType.OP,
                                                   false));
-                    MyListModel dlm = new MyListModel();
+                    MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi =
                             new MyMenuItem(
@@ -668,14 +668,14 @@ public final class GroupInfo extends ServiceInfo {
                         dlm.addElement(mmi);
                     }
                     final boolean ret = Tools.getScrollingMenu(
-                                        ClusterBrowser.HB_CLASS_MENU.get(cl),
-                                        null, /* options */
-                                        classItem,
-                                        dlm,
-                                        new MyList(dlm, getBackground()),
-                                        thisGroupInfo,
-                                        popups,
-                                        null);
+                                ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                null, /* options */
+                                classItem,
+                                dlm,
+                                new MyList<MyMenuItem>(dlm, getBackground()),
+                                thisGroupInfo,
+                                popups,
+                                null);
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
@@ -789,11 +789,11 @@ public final class GroupInfo extends ServiceInfo {
 
         final StringBuilder services = new StringBuilder();
 
-        final Enumeration e = getNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
         try {
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 services.append(child.toString());
                 if (e.hasMoreElements()) {
@@ -831,11 +831,11 @@ public final class GroupInfo extends ServiceInfo {
                                       final boolean testOnly) {
         final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (!testOnly) {
-            final Enumeration e = getNode().children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = getNode().children();
             try {
                 while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                    final DefaultMutableTreeNode n = e.nextElement();
                     final ServiceInfo child = (ServiceInfo) n.getUserObject();
                     child.getService().setRemoved(true);
                     children.add(child);
@@ -912,11 +912,11 @@ public final class GroupInfo extends ServiceInfo {
         }
         sb.append("</b>");
 
-        final Enumeration e = getNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
         try {
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
                 sb.append("\n&nbsp;&nbsp;&nbsp;");
                 sb.append(child.getToolTipText(testOnly));
@@ -1255,7 +1255,8 @@ public final class GroupInfo extends ServiceInfo {
         if (gn == null) {
             return false;
         }
-        final Enumeration se = gn.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> se = gn.children();
         if (!se.hasMoreElements()) {
             return false;
         }
@@ -1264,11 +1265,11 @@ public final class GroupInfo extends ServiceInfo {
                                                            fromServicesInfo,
                                                            fromCloneInfo,
                                                            true);
-        final Enumeration e = gn.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = gn.children();
         try {
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
                 if (gsi.checkResourceFieldsChanged(
                                                null,
@@ -1314,14 +1315,14 @@ public final class GroupInfo extends ServiceInfo {
                                                        true);
         final DefaultMutableTreeNode gn = getNode();
         if (gn != null) {
-            final Enumeration e = gn.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = gn.children();
             if (!e.hasMoreElements()) {
                 return false;
             }
             try {
                 while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                    final DefaultMutableTreeNode n = e.nextElement();
                     final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
                     if (!gsi.checkResourceFieldsCorrect(
                                                     null,
@@ -1362,9 +1363,9 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     protected void addExistingGroupServiceMenuItems(
                         final ServiceInfo asi,
-                        final MyListModel dlm,
+                        final MyListModel<MyMenuItem> dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList list,
+                        final MyList<MyMenuItem> list,
                         final JCheckBox colocationCB,
                         final JCheckBox orderCB,
                         final List<JDialog> popups,
@@ -1405,11 +1406,11 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     public void revert() {
         super.revert();
-        final Enumeration e = getNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
         try {
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
                 if (gsi != null && gsi.checkResourceFieldsChanged(
                                                   null,

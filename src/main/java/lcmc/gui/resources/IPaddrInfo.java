@@ -103,6 +103,7 @@ final class IPaddrInfo extends ServiceInfo {
             } else {
                 defaultValue = new StringInfo(ip, ip, getBrowser());
             }
+            @SuppressWarnings("unchecked")
             final Info[] networks = enumToInfoArray(
                                     defaultValue,
                                     getName(),

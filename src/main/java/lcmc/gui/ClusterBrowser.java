@@ -848,7 +848,6 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates VMs info. */
-    @Deprecated
     public void periodicalVMSUpdate(final Host[] hosts) {
         periodicalVMSUpdate(Arrays.asList(hosts));
     }
@@ -1375,12 +1374,13 @@ public final class ClusterBrowser extends Browser {
         if (commonBlockDevicesNode != null) {
             DefaultMutableTreeNode resource;
             final List<String> bd = cluster.getCommonBlockDevices();
-            final Enumeration e = commonBlockDevicesNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e =
+                                             commonBlockDevicesNode.children();
             final List<DefaultMutableTreeNode> nodesToRemove =
-                                        new ArrayList<DefaultMutableTreeNode>();
+                                       new ArrayList<DefaultMutableTreeNode>();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode node = e.nextElement();
                 final Info cbdi = (Info) node.getUserObject();
                 if (bd.contains(cbdi.getName())) {
                     /* keeping */
@@ -1465,10 +1465,10 @@ public final class ClusterBrowser extends Browser {
 
         mVMSUpdateLock.lock();
         if (vmsNode != null) {
-            final Enumeration ee = vmsNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> ee = vmsNode.children();
             while (ee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) ee.nextElement();
+                final DefaultMutableTreeNode node = ee.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 if (domainNames.contains(vmsvdi.toString())) {
@@ -1501,11 +1501,11 @@ public final class ClusterBrowser extends Browser {
             return;
         }
         for (final String domainName : domainNames) {
-            final Enumeration e = vmsNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
             int i = 0;
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                     (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode node = e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 final String name = vmsvdi.getName();
@@ -2508,10 +2508,10 @@ public final class ClusterBrowser extends Browser {
      */
     public VMSVirtualDomainInfo findVMSVirtualDomainInfo(final String name) {
         if (vmsNode != null && name != null) {
-            final Enumeration e = vmsNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode node = e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 if (name.equals(vmsvdi.getName())) {
@@ -2572,20 +2572,20 @@ public final class ClusterBrowser extends Browser {
         }
 
         if (vmsNode != null) {
-            final Enumeration e = vmsNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode node = e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
                 vmsvdi.checkResourceFieldsChanged(
                                                 null,
                                                 vmsvdi.getParametersFromXML());
                 vmsvdi.updateAdvancedPanels();
-                final Enumeration ce = node.children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> ce = node.children();
                 while (ce.hasMoreElements()) {
-                    final DefaultMutableTreeNode cnode =
-                                     (DefaultMutableTreeNode) ce.nextElement();
+                    final DefaultMutableTreeNode cnode = ce.nextElement();
                     final VMSHardwareInfo vmshi =
                                   (VMSHardwareInfo) cnode.getUserObject();
                     vmshi.checkResourceFieldsChanged(

@@ -802,11 +802,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSDiskInfo)) {
                 continue;
             }
@@ -844,11 +844,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         for (final String disk : diskNames) {
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSDiskInfo)) {
                     continue;
                 }
@@ -893,11 +893,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSFilesystemInfo)) {
                 continue;
             }
@@ -935,11 +935,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         for (final String filesystem : filesystemNames) {
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSFilesystemInfo)) {
                     continue;
                 }
@@ -985,12 +985,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         VMSInterfaceInfo emptySlot = null; /* for generated mac address. */
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
                 continue;
             }
@@ -1026,11 +1026,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String interf : interfaceNames) {
             VMSInterfaceInfo vmsii;
             if (emptySlot == null) {
-                final Enumeration eee = thisNode.children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> eee =
+                                                           thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) eee.nextElement();
+                    final DefaultMutableTreeNode node = eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSInterfaceInfo)) {
                         if (node.getUserObject() instanceof VMSDiskInfo
                             || node.getUserObject() instanceof VMSFilesystemInfo) {
@@ -1085,11 +1086,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
                 continue;
             }
@@ -1123,11 +1124,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String inputDev : inputDevNames) {
             VMSInputDevInfo vmsid;
             final InputDevData data = inputDevs.get(inputDev);
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSInputDevInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
                         || node.getUserObject() instanceof VMSFilesystemInfo
@@ -1204,11 +1205,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
                 continue;
             }
@@ -1248,11 +1249,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String graphicDisplay : graphicsNames) {
             VMSGraphicsInfo vmsgi;
             final GraphicsData data = graphicDisplays.get(graphicDisplay);
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSGraphicsInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
                         || node.getUserObject() instanceof VMSFilesystemInfo
@@ -1303,11 +1304,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSSoundInfo)) {
                 continue;
             }
@@ -1347,11 +1348,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String sound : soundNames) {
             VMSSoundInfo vmssi;
             final SoundData data = sounds.get(sound);
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSSoundInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
                         || node.getUserObject() instanceof VMSFilesystemInfo
@@ -1402,12 +1403,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         VMSSerialInfo emptySlot = null; /* for generated target port. */
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSSerialInfo)) {
                 continue;
             }
@@ -1443,11 +1444,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             VMSSerialInfo vmssi;
             final SerialData data = serials.get(serial);
             if (emptySlot == null) {
-                final Enumeration eee = thisNode.children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> eee =
+                                                           thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) eee.nextElement();
+                    final DefaultMutableTreeNode node = eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSSerialInfo)) {
                         if (node.getUserObject() instanceof VMSDiskInfo
                             || node.getUserObject() instanceof VMSFilesystemInfo
@@ -1505,12 +1507,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         VMSParallelInfo emptySlot = null; /* for generated target port. */
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSParallelInfo)) {
                 continue;
             }
@@ -1547,11 +1549,12 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             VMSParallelInfo vmspi;
             final ParallelData data = parallels.get(parallel);
             if (emptySlot == null) {
-                final Enumeration eee = thisNode.children();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> eee =
+                                                           thisNode.children();
                 int i = 0;
                 while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node =
-                                    (DefaultMutableTreeNode) eee.nextElement();
+                    final DefaultMutableTreeNode node = eee.nextElement();
                     if (!(node.getUserObject() instanceof VMSParallelInfo)) {
                         if (node.getUserObject() instanceof VMSDiskInfo
                             || node.getUserObject() instanceof VMSFilesystemInfo
@@ -1610,11 +1613,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         final List<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             if (!(node.getUserObject() instanceof VMSVideoInfo)) {
                 continue;
             }
@@ -1653,11 +1656,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String video : videoNames) {
             VMSVideoInfo vmspi;
             final VideoData data = videos.get(video);
-            final Enumeration eee = thisNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
             while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) eee.nextElement();
+                final DefaultMutableTreeNode node = eee.nextElement();
                 if (!(node.getUserObject() instanceof VMSVideoInfo)) {
                     if (node.getUserObject() instanceof VMSDiskInfo
                         || node.getUserObject() instanceof VMSFilesystemInfo
@@ -3887,10 +3890,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         if (thisNode == null) {
             return allParamaters;
         }
-        final Enumeration e = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode node = e.nextElement();
             final VMSHardwareInfo hi = (VMSHardwareInfo) node.getUserObject();
             allParamaters.put(hi, hi.getHWParameters(allParams));
         }
@@ -4982,10 +4985,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 changed = true;
             }
         }
-        final Enumeration eee = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
         while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode) eee.nextElement();
+            final DefaultMutableTreeNode node = eee.nextElement();
             final VMSHardwareInfo vmshi =
                             (VMSHardwareInfo) node.getUserObject();
             if (vmshi.checkResourceFieldsChanged(
@@ -5038,10 +5041,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 definedOnHostComboBoxHash.get(key).wrongValue();
             }
         }
-        final Enumeration eee = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
         while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode) eee.nextElement();
+            final DefaultMutableTreeNode node = eee.nextElement();
             final VMSHardwareInfo vmshi =
                             (VMSHardwareInfo) node.getUserObject();
             if (!vmshi.checkResourceFieldsCorrect(
@@ -5313,10 +5316,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
             hostWi.setValue(savedValue);
         }
-        final Enumeration eee = thisNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
         while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode) eee.nextElement();
+            final DefaultMutableTreeNode node = eee.nextElement();
             final VMSHardwareInfo vmshi =
                             (VMSHardwareInfo) node.getUserObject();
             if (vmshi.checkResourceFieldsChanged(

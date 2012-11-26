@@ -448,8 +448,8 @@ public abstract class ResourceGraph {
 
         /* picking and popups */
         /* overwriting loadPlugins method only to set scaler */
-        final DefaultModalGraphMouse graphMouse =
-            new DefaultModalGraphMouse() {
+        final DefaultModalGraphMouse<Vertex, Edge> graphMouse =
+            new DefaultModalGraphMouse<Vertex, Edge>() {
                 protected void loadPlugins() {
                     super.loadPlugins();
                     ((ScalingGraphMousePlugin) scalingPlugin).setScaler(

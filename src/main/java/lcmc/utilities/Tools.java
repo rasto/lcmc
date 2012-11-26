@@ -1688,8 +1688,8 @@ public final class Tools {
                         final String name,
                         final JPanel optionsPanel,
                         final MyMenu menu,
-                        final MyListModel dlm,
-                        final MyList list,
+                        final MyListModel<MyMenuItem> dlm,
+                        final MyList<MyMenuItem> list,
                         final Info infoObject,
                         final List<JDialog> popups,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
@@ -1769,8 +1769,7 @@ public final class Tools {
                                 menu.setSelected(false);
                             }
                         });
-                        final MyMenuItem item =
-                                          (MyMenuItem) dlm.getElementAt(index);
+                        final MyMenuItem item = dlm.getElementAt(index);
                         item.action();
                     }
                 });
@@ -1807,7 +1806,7 @@ public final class Tools {
                         if (callbackHash != null) {
                             if (lastIndex >= 0) {
                                 final MyMenuItem lastItem =
-                                      (MyMenuItem) dlm.getElementAt(lastIndex);
+                                                   dlm.getElementAt(lastIndex);
                                 final ButtonCallback bc =
                                                     callbackHash.get(lastItem);
                                 if (bc != null) {
@@ -1815,8 +1814,7 @@ public final class Tools {
                                 }
                             }
                             if (index >= 0) {
-                                final MyMenuItem item =
-                                          (MyMenuItem) dlm.getElementAt(index);
+                                final MyMenuItem item = dlm.getElementAt(index);
                                 final ButtonCallback bc =
                                                         callbackHash.get(item);
                                 if (bc != null) {
@@ -1845,8 +1843,7 @@ public final class Tools {
                     }
                     infoObject.hidePopup();
                 } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                    final MyMenuItem item =
-                                       (MyMenuItem) list.getSelectedValue();
+                    final MyMenuItem item = list.getSelectedValue();
                     //SwingUtilities.invokeLater(new Runnable() {
                     //    @Override
                     //    public void run() {
@@ -1894,8 +1891,7 @@ public final class Tools {
                     }
                     infoObject.hidePopup();
                 } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                    final MyMenuItem item =
-                                   (MyMenuItem) list.getModel().getElementAt(0);
+                    final MyMenuItem item = list.getModel().getElementAt(0);
                     if (item != null) {
                         item.action();
                     }
@@ -2848,7 +2844,7 @@ public final class Tools {
         if (scale > 10000) {
             scale = 10000;
         }
-        for (final Enumeration e = UIManager.getDefaults().keys();
+        for (final Enumeration<Object> e = UIManager.getDefaults().keys();
              e.hasMoreElements();) {
             final Object key = e.nextElement();
             final Object value = UIManager.get(key);

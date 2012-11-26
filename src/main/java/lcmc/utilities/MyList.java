@@ -41,7 +41,7 @@ import java.awt.Rectangle;
 /**
  * A Jlist with updatable tooltips.
  */
-public final class MyList extends JList implements ComponentWithTest {
+public final class MyList<E> extends JList<E> implements ComponentWithTest {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Tools tip object. */
@@ -55,7 +55,7 @@ public final class MyList extends JList implements ComponentWithTest {
     private Color toolTipBackground = null;
 
     /** Prepares a new <code>MyList</code> object. */
-    public MyList(final ListModel dataModel, final Color bg) {
+    public MyList(final ListModel<E> dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
         Robot r = null;

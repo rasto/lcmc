@@ -286,10 +286,11 @@ public final class HostBrowser extends Browser {
         final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
         mBlockDevInfosReadLock.lock();
         try {
-            final Enumeration e = blockDevicesNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e =
+                                                   blockDevicesNode.children();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode bdNode =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode bdNode = e.nextElement();
                 final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
                 blockDevInfos.add(bdi);
             }
@@ -355,10 +356,11 @@ public final class HostBrowser extends Browser {
                                           new HashMap<NetInterface, NetInfo>();
         mNetInfosReadLock.lock();
         try {
-            final Enumeration e = netInterfacesNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e =
+                                                  netInterfacesNode.children();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode niNode =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode niNode = e.nextElement();
                 final NetInfo nii = (NetInfo) niNode.getUserObject();
                 netInterfaces.put(nii.getNetInterface(), nii);
             }
@@ -373,10 +375,11 @@ public final class HostBrowser extends Browser {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
         mFileSystemsReadLock.lock();
         try {
-            final Enumeration e = fileSystemsNode.children();
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e =
+                                                    fileSystemsNode.children();
             while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode fsiNode =
-                                      (DefaultMutableTreeNode) e.nextElement();
+                final DefaultMutableTreeNode fsiNode = e.nextElement();
                 final FSInfo fsi = (FSInfo) fsiNode.getUserObject();
                 filesystems.put(fsi.getName(), fsi);
             }
@@ -388,11 +391,12 @@ public final class HostBrowser extends Browser {
 
     /** @return list of network interfaces. */
     List<NetInfo> getNetInfos() {
-        final Enumeration e = netInterfacesNode.children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e =
+                                                  netInterfacesNode.children();
         final List<NetInfo> netInfos = new ArrayList<NetInfo>();
         while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode niNode =
-                                (DefaultMutableTreeNode) e.nextElement();
+            final DefaultMutableTreeNode niNode = e.nextElement();
             final NetInfo ni = (NetInfo) niNode.getUserObject();
             netInfos.add(ni);
         }

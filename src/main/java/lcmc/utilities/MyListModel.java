@@ -34,12 +34,12 @@ import java.util.Locale;
 /**
  * A ListModel with filtered items.
  */
-public final class MyListModel extends AbstractListModel {
+public final class MyListModel<E> extends AbstractListModel<E> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    private final List<MyMenuItem> items = new ArrayList<MyMenuItem>();
-    private final List<MyMenuItem> filteredItems = new ArrayList<MyMenuItem>();
+    private final List<E> items = new ArrayList<E>();
+    private final List<E> filteredItems = new ArrayList<E>();
     private static final String START_TEXT = "type to search...";
     private final FilterField filterField = new FilterField(START_TEXT);
     /** Prepares a new <code>MyListModel</code> object. */
@@ -56,7 +56,7 @@ public final class MyListModel extends AbstractListModel {
         return filterField;
     }
 
-    public Object getElementAt(final int index) {
+    public E getElementAt(final int index) {
         if (index < filteredItems.size()) {
             return filteredItems.get(index);
         } else {
@@ -68,8 +68,8 @@ public final class MyListModel extends AbstractListModel {
         return filteredItems.size();
     }
 
-    public void addElement(final Object o) {
-        items.add((MyMenuItem) o);
+    public void addElement(final E o) {
+        items.add(o);
         refilter();
     }
 

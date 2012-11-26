@@ -83,7 +83,7 @@ import java.util.concurrent.locks.Lock;
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
-public class Info implements Comparable {
+public class Info implements Comparable<Info> {
     /** Menu node of this object. */
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
@@ -787,7 +787,7 @@ public class Info implements Comparable {
 
     /** Compares ignoring case. */
     @Override
-    public int compareTo(final Object o) {
+    public int compareTo(final Info o) {
         return toString().compareToIgnoreCase(o.toString());
     }
 

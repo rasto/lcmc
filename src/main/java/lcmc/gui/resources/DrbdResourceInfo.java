@@ -1046,11 +1046,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final List<Object> list = new ArrayList<Object>();
 
         list.add(null);
-        final Enumeration e = hostBrowser.getNetInterfacesNode().children();
+        @SuppressWarnings("unchecked")
+        final Enumeration<DefaultMutableTreeNode> e =
+                                hostBrowser.getNetInterfacesNode().children();
 
         while (e.hasMoreElements()) {
-            final Info i =
-              (Info) ((DefaultMutableTreeNode) e.nextElement()).getUserObject();
+            final Info i = (Info) e.nextElement().getUserObject();
             list.add(i);
         }
         return list.toArray(new Object[list.size()]);

@@ -629,6 +629,7 @@ public final class BlockDevInfo extends EditableInfo {
                                    getBrowser());
             final String defaultMetaDiskString = internalMetaDisk.toString();
             getBrowser().lockBlockDevInfosRead();
+            @SuppressWarnings("unchecked")
             final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(
                                 internalMetaDisk,
                                 getName(),
@@ -695,9 +696,9 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns block devices that are available for drbd meta-disk. */
     protected Info[] getAvailableBlockDevicesForMetaDisk(
-                                           final Info defaultValue,
-                                           final String serviceName,
-                                           final Enumeration e) {
+                               final Info defaultValue,
+                               final String serviceName,
+                               final Enumeration<DefaultMutableTreeNode> e) {
         final List<Info> list = new ArrayList<Info>();
         final String savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
 
@@ -707,8 +708,7 @@ public final class BlockDevInfo extends EditableInfo {
 
         while (e.hasMoreElements()) {
             final BlockDevInfo bdi =
-              (BlockDevInfo) ((DefaultMutableTreeNode) e.nextElement())
-                                                            .getUserObject();
+                                (BlockDevInfo) e.nextElement().getUserObject();
             final BlockDevice bd = bdi.getBlockDevice();
             if (bd.toString().equals(savedMetaDisk)
                 || (!bd.isDrbd() && !bd.isUsedByCRM() && !bd.isMounted())) {
@@ -2359,7 +2359,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Compares ignoring case and using drbd device names if available. */
     @Override
-    public int compareTo(final Object o) {
+    public int compareTo(final Info o) {
         String name;
         String oName;
         int volume = 0;
