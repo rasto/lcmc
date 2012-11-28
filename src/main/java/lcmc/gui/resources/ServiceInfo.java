@@ -1486,16 +1486,6 @@ public class ServiceInfo extends EditableInfo {
         return list.toArray(new Info[list.size()]);
     }
 
-    /** Selects the node in the menu and reloads everything underneath. */
-    @Override
-    public void selectMyself() {
-        super.selectMyself();
-        final DefaultMutableTreeNode node = getNode();
-        if (node != null) {
-            getBrowser().nodeChanged(node);
-        }
-    }
-
     /**
      * Adds clone fields to the option pane.
      */
@@ -2446,7 +2436,7 @@ public class ServiceInfo extends EditableInfo {
                                     getName() + "_" + prevWi.getStringValue());
                         }
                     } else {
-                        oldCI.removeNode();
+                        oldCI.removeNodeAndWait();
                         getBrowser().getCRMGraph()
                                     .exchangeObjectInTheVertex(ci, oldCI);
                         cleanup();
@@ -2488,8 +2478,8 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final DefaultMutableTreeNode node = getNode();
                     final DefaultMutableTreeNode ciNode = ci.getNode();
-                    removeNode();
-                    ci.removeNode();
+                    removeNodeAndWait();
+                    ci.removeNodeAndWait();
                     cleanup();
                     ci.cleanup();
                     setNode(node);
@@ -3678,18 +3668,18 @@ public class ServiceInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     setApplyButtons(null, params);
+                    final DefaultMutableTreeNode node = getNode();
+                    if (node != null) {
+                        if (clInfo == null) {
+                            getBrowser().reload(node, false);
+                        } else {
+                            getBrowser().reload(clInfo.getNode(), false);
+                            getBrowser().reload(node, false);
+                        }
+                        getBrowser().getCRMGraph().repaint();
+                    }
                 }
             });
-            final DefaultMutableTreeNode node = getNode();
-            if (node != null) {
-                if (ci == null) {
-                    getBrowser().reload(node, false);
-                } else {
-                    getBrowser().reload(ci.getNode(), false);
-                    getBrowser().reload(node, false);
-                }
-                getBrowser().getCRMGraph().repaint();
-            }
         }
     }
 
@@ -4184,15 +4174,20 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            final DefaultMutableTreeNode newServiceNode =
-                                    new DefaultMutableTreeNode(serviceInfo);
-            serviceInfo.setNode(newServiceNode);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    final DefaultMutableTreeNode newServiceNode =
+                                       new DefaultMutableTreeNode(serviceInfo);
+                    serviceInfo.setNode(newServiceNode);
 
-            getBrowser().getServicesNode().add(newServiceNode);
-            if (reloadNode) {
-                getBrowser().reload(getBrowser().getServicesNode(), false);
-                getBrowser().reload(newServiceNode, false);
-            }
+                    getBrowser().getServicesNode().add(newServiceNode);
+                    if (reloadNode) {
+                        getBrowser().reloadAndWait(
+                                        getBrowser().getServicesNode(), false);
+                        getBrowser().reloadAndWait(newServiceNode, false);
+                    }
+                }
+            });
             getBrowser().reloadAllComboBoxes(serviceInfo);
         }
         if (reloadNode && ra != null && serviceInfo.getResource().isNew()) {
@@ -4509,11 +4504,16 @@ public class ServiceInfo extends EditableInfo {
                                                 getService().getHeartbeatId());
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
-        removeNode();
         final CloneInfo ci = cloneInfo;
-        if (ci != null) {
-            ci.removeNode();
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                removeNodeAndWait();
+                if (ci != null) {
+                    ci.removeNodeAndWait();
+                }
+            }
+        });
         super.removeMyself(false);
     }
 

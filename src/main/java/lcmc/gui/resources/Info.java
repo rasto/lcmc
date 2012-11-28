@@ -440,7 +440,7 @@ public class Info implements Comparable<Info> {
         if (node != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getBrowser().reload(node, true);
+                    getBrowser().reloadAndWait(node, true);
                 }
             });
             getBrowser().nodeChanged(node);
@@ -1146,20 +1146,24 @@ public class Info implements Comparable<Info> {
     }
 
     /** Remove node in tree menu. Call it from swing thread. */
+    final void removeNodeAndWait() {
+        final DefaultMutableTreeNode n = node;
+        node = null;
+        if (n == null) {
+            return;
+        }
+        final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
+        if (p != null) {
+            p.remove(n);
+            getBrowser().reloadAndWait(p, true);
+        }
+    }
+
     final void removeNode() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final DefaultMutableTreeNode n = node;
-                node = null;
-                if (n == null) {
-                    return;
-                }
-                final DefaultMutableTreeNode p = (DefaultMutableTreeNode) n.getParent();
-                if (p != null) {
-                    p.remove(n);
-                    getBrowser().reloadAndWait(p, true);
-                }
+                removeNodeAndWait();
             }
         });
     }

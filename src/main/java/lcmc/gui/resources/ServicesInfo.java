@@ -566,7 +566,7 @@ public final class ServicesInfo extends EditableInfo {
                             if (i > p) {
                                 parent.remove(n);
                                 parent.insert(n, p);
-                                getBrowser().reload(parent, false);
+                                getBrowser().reloadAndWait(parent, false);
                             }
                         }
                     }
@@ -582,7 +582,12 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         if (newService) {
-            getBrowser().reload(getBrowser().getServicesNode(), false);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    getBrowser().reloadAndWait(
+                                        getBrowser().getServicesNode(), false);
+                }
+            });
         }
         hg.repaint();
     }

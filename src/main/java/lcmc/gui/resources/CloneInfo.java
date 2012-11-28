@@ -90,10 +90,10 @@ final class CloneInfo extends ServiceInfo {
                 newServiceInfo.setNode(newServiceNode);
                 final DefaultMutableTreeNode node = getNode();
                 if (node != null) {
-                    getBrowser().reload(node, false);
+                    getBrowser().reloadAndWait(node, false);
                     node.add(newServiceNode);
                 }
-                getBrowser().reload(newServiceNode, true);
+                getBrowser().reloadAndWait(newServiceNode, true);
             }
         });
     }
@@ -111,7 +111,7 @@ final class CloneInfo extends ServiceInfo {
         setNode(node);
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
-        getBrowser().reload(node, true);
+        getBrowser().reloadAndWait(node, true);
     }
 
     /** Returns info panel. */
