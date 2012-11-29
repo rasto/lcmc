@@ -303,6 +303,8 @@ public final class VMSXML extends XML {
         DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_NAME, "name");
         DISK_TAG_MAP.put(DiskData.DRIVER_TYPE, "driver");
         DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_TYPE, "type");
+        DISK_TAG_MAP.put(DiskData.DRIVER_CACHE, "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_CACHE, "cache");
         DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
         DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
         DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
@@ -1557,6 +1559,7 @@ public final class VMSXML extends XML {
                         String targetBus = null;
                         String driverName = null;
                         String driverType = null;
+                        String driverCache = null;
                         boolean readonly = false;
                         boolean shareable = false;
                         for (int k = 0; k < opts.getLength(); k++) {
@@ -1576,6 +1579,7 @@ public final class VMSXML extends XML {
                             } else if ("driver".equals(nodeName)) {
                                 driverName = getAttribute(optionNode, "name");
                                 driverType = getAttribute(optionNode, "type");
+                                driverCache = getAttribute(optionNode, "cache");
                             } else if ("readonly".equals(nodeName)) {
                                 readonly = true;
                             } else if ("shareable".equals(nodeName)) {
@@ -1596,6 +1600,7 @@ public final class VMSXML extends XML {
                                                       targetBus + "/" + device,
                                                       driverName,
                                                       driverType,
+                                                      driverCache,
                                                       readonly,
                                                       shareable);
                             devMap.put(targetDev, diskData);
@@ -2343,6 +2348,8 @@ public final class VMSXML extends XML {
         private final String driverName;
         /** Driver type: raw... */
         private final String driverType;
+        /** Driver cache: none... */
+        private final String driverCache;
         /** Whether the disk is read only. */
         private final boolean readonly;
         /** Whether the disk is shareable. */
@@ -2367,6 +2374,8 @@ public final class VMSXML extends XML {
         public static final String DRIVER_NAME = "driver_name";
         /** Driver type. */
         public static final String DRIVER_TYPE = "driver_type";
+        /** Driver cache. */
+        public static final String DRIVER_CACHE = "driver_cache";
         /** Readonly. */
         public static final String READONLY = "readonly";
         /** Shareable. */
@@ -2380,6 +2389,7 @@ public final class VMSXML extends XML {
                         final String targetBusType,
                         final String driverName,
                         final String driverType,
+                        final String driverCache,
                         final boolean readonly,
                         final boolean shareable) {
             super();
@@ -2397,6 +2407,8 @@ public final class VMSXML extends XML {
             setValue(DRIVER_NAME, driverName);
             this.driverType = driverType;
             setValue(DRIVER_TYPE, driverType);
+            this.driverCache = driverCache;
+            setValue(DRIVER_CACHE, driverCache);
             this.readonly = readonly;
             if (readonly) {
                 setValue(READONLY, "True");
@@ -2444,6 +2456,11 @@ public final class VMSXML extends XML {
         /** Returns driver type. */
         String getDriverType() {
             return driverType;
+        }
+
+        /** Returns driver cache. */
+        String getDriverCache() {
+            return driverCache;
         }
 
         /** Returns whether the disk is read only. */
