@@ -68,6 +68,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Driver type combo box. */
     private final Map<String, Widget> driverTypeWi =
                                             new HashMap<String, Widget>();
+    /** Driver cache combo box. */
+    private final Map<String, Widget> driverCacheWi =
+                                            new HashMap<String, Widget>();
     /** Readonly combo box. */
     private final Map<String, Widget> readonlyWi =
                                             new HashMap<String, Widget>();
@@ -81,6 +84,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                 DiskData.SOURCE_DEVICE,
                                                 DiskData.DRIVER_NAME,
                                                 DiskData.DRIVER_TYPE,
+                                                DiskData.DRIVER_CACHE,
                                                 DiskData.READONLY,
                                                 DiskData.SHAREABLE};
     /** Block parameters. */
@@ -90,6 +94,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                       DiskData.SOURCE_DEVICE,
                                                       DiskData.DRIVER_NAME,
                                                       DiskData.DRIVER_TYPE,
+                                                      DiskData.DRIVER_CACHE,
                                                       DiskData.READONLY,
                                                       DiskData.SHAREABLE};
     /** File parameters. */
@@ -99,6 +104,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                      DiskData.TARGET_BUS_TYPE,
                                                      DiskData.DRIVER_NAME,
                                                      DiskData.DRIVER_TYPE,
+                                                     DiskData.DRIVER_CACHE,
                                                      DiskData.READONLY,
                                                      DiskData.SHAREABLE};
     /** Whether the parameter is enabled only in advanced mode. */
@@ -106,7 +112,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{
                                                 DiskData.TARGET_DEVICE,
                                                 DiskData.DRIVER_NAME,
-                                                DiskData.DRIVER_TYPE}));
+                                                DiskData.DRIVER_TYPE,
+                                                DiskData.DRIVER_CACHE}));
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{DiskData.TYPE}));
@@ -134,6 +141,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
         SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
         SHORTNAME_MAP.put(DiskData.DRIVER_TYPE, "Driver Type");
+        SHORTNAME_MAP.put(DiskData.DRIVER_CACHE, "Driver Cache");
         SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
         SHORTNAME_MAP.put(DiskData.SHAREABLE, "Shareable");
     }
@@ -185,6 +193,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                           DRIVER_NAME_QEMU,
                                                           DRIVER_NAME_PHY});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_CACHE, new String[]{null, "default", "none", "writethrough", "writeback", "directsync", "unsafe"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
             TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
@@ -591,6 +600,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     for (final String p : driverTypeWi.keySet()) {
                         driverTypeWi.get(p).setValue("raw");
                     }
+                    for (final String p : driverCacheWi.keySet()) {
+                        driverCacheWi.get(p).setValue("none");
+                    }
                 } else {
                     for (final String p : readonlyWi.keySet()) {
                         readonlyWi.get(p).setValue("False");
@@ -747,6 +759,12 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     driverTypeWi.put("", paramWi);
                 } else {
                     driverTypeWi.put(prefix, paramWi);
+                }
+            } else if (DiskData.DRIVER_CACHE.equals(param)) {
+                if (prefix == null) {
+                    driverCacheWi.put("", paramWi);
+                } else {
+                    driverCacheWi.put(prefix, paramWi);
                 }
             } else if (DiskData.READONLY.equals(param)) {
                 if (prefix == null) {

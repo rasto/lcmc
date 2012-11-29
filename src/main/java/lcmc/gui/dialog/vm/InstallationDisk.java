@@ -55,6 +55,7 @@ final class InstallationDisk extends VMConfig {
                                             DiskData.SOURCE_DEVICE,
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
+                                            DiskData.DRIVER_CACHE,
                                             DiskData.READONLY};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
@@ -141,6 +142,7 @@ final class InstallationDisk extends VMConfig {
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE CDROM");
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hdc");
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
+        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, "default");
         vmsdi.getResource().setValue(DiskData.READONLY, "True");
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
                                      VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
