@@ -34,6 +34,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
+import java.util.UUID;
 
 /**
  * This class provides cib commands. There are commands that use cibadmin and
@@ -56,7 +57,9 @@ public final class CRM {
     /** Delimiter that delimits the ptest and test cib part. */
     public static final String PTEST_END_DELIM = "--- PTEST END ---";
     /** Location of lcmc-test.xml file. */
-    public static final String LCMC_TEST_FILE = "/tmp/lcmc-test.xml";
+    public static final String LCMC_TEST_FILE = "/tmp/lcmc-test-"
+                                                + UUID.randomUUID()
+                                                + ".xml";
     /** Test only boolean variable. */
     public static final boolean TESTONLY = true;
     /** Live boolean variable. */
