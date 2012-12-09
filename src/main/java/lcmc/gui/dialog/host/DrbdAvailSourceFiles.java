@@ -30,7 +30,8 @@ import lcmc.utilities.ComboInfo;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.util.List;
@@ -196,16 +197,16 @@ final class DrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
-        drbdTarballCombo = new Widget(null, /* selected value */
-                                      null, /* items */
-                                      null, /* units */
+        drbdTarballCombo = WidgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
-                                      null, /* regexp */
+                                      Widget.NO_DEFAULT,
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
                                       0,    /* width */
-                                      null, /* abbrv */
-                                      new AccessMode(
-                                               ConfigData.AccessType.RO,
-                                               false)); /* only adv mode*/
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
 
         //drbdTarballCombo.setEnabled(false);
         pane.add(drbdTarballCombo);

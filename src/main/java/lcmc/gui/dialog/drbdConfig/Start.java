@@ -31,7 +31,8 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 
@@ -165,17 +166,16 @@ public final class Start extends WizardDialog {
         for (final DrbdResourceInfo dri : drbdInfo.getDrbdResources()) {
             choices.add(dri);
         }
-        drbdResourceWi = new Widget(null,
-                                    choices.toArray(
-                                               new Info[choices.size()]),
-                                    null, /* units */
+        drbdResourceWi = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
-                                    null, /* regexp */
+                                    Widget.NO_DEFAULT,
+                                    choices.toArray(new Info[choices.size()]),
+                                    Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(
-                                             ConfigData.AccessType.RO,
-                                             false)); /* only adv. mode */
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   !AccessMode.ADVANCED),
+                                    Widget.NO_BUTTON);
         inputPane.add(drbdResourceLabel);
         inputPane.add(drbdResourceWi);
         SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols

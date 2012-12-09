@@ -20,7 +20,8 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.FilesystemData;
 import lcmc.data.Host;
@@ -546,17 +547,16 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             final String regexp = ".*[^/]?$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
-            final Widget paramWi = new Widget(
-                                  sourceDir,
-                                  getParamPossibleChoices(param),
-                                  null, /* units */
-                                  getFieldType(param),
-                                  regexp,
-                                  width,
-                                  null, /* abbrv */
-                                  new AccessMode(getAccessType(param),
-                                                 false), /* only adv. mode */
-                                  fileChooserBtn);
+            final Widget paramWi = WidgetFactory.createInstance(
+                                     getFieldType(param),
+                                     sourceDir,
+                                     getParamPossibleChoices(param),
+                                     regexp,
+                                     width,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(getAccessType(param),
+                                                    false), /* only adv. mode */
+                                     fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {
                 sourceDirWi.put("", paramWi);
@@ -591,16 +591,16 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             return paramWi;
         } else if (FilesystemData.SOURCE_NAME.equals(param)) {
             final String sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
-            final Widget paramWi = new Widget(
-                                  sourceName,
-                                  getParamPossibleChoices(param),
-                                  null, /* units */
-                                  getFieldType(param),
-                                  null, /* regexp */
-                                  width,
-                                  null, /* abbrv */
-                                  new AccessMode(getAccessType(param),
-                                                 false)); /* only adv. mode */
+            final Widget paramWi = WidgetFactory.createInstance(
+                                    getFieldType(param),
+                                    sourceName,
+                                    getParamPossibleChoices(param),
+                                    Widget.NO_REGEXP,
+                                    width,
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(getAccessType(param),
+                                                   false), /* only adv. mode */
+                                    Widget.NO_BUTTON);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {
                 sourceNameWi.put("", paramWi);

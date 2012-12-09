@@ -22,7 +22,8 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.DiskData;
 import lcmc.data.Host;
@@ -681,17 +682,16 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             final String regexp = ".*[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
-            final Widget paramWi = new Widget(
-                                  sourceFile,
-                                  getParamPossibleChoices(param),
-                                  null, /* units */
-                                  getFieldType(param),
-                                  regexp,
-                                  width,
-                                  null, /* abbrv */
-                                  new AccessMode(getAccessType(param),
-                                                 false), /* only adv. mode */
-                                  fileChooserBtn);
+            final Widget paramWi = WidgetFactory.createInstance(
+                                     getFieldType(param),
+                                     sourceFile,
+                                     getParamPossibleChoices(param),
+                                     regexp,
+                                     width,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(getAccessType(param),
+                                                    false), /* only adv. mode */
+                                     fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {
                 sourceFileWi.put("", paramWi);

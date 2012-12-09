@@ -46,7 +46,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.LVM;
 import lcmc.utilities.ButtonCallback;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.Cluster;

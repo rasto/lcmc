@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.AddHostDialog;
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.gui.TerminalPanel;
 import lcmc.data.Cluster;
 import lcmc.data.Host;

@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.GraphicsData;
 import lcmc.data.Host;

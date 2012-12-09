@@ -25,7 +25,7 @@ package lcmc.gui.dialog.vm;
 import lcmc.utilities.Tools;
 import lcmc.gui.resources.VMSVirtualDomainInfo;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 
 import javax.swing.JPanel;

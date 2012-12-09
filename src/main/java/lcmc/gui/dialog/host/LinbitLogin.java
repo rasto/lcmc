@@ -25,7 +25,8 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -166,15 +167,16 @@ public class LinbitLogin extends DialogHost {
         final JLabel userLabel = new JLabel(
                       Tools.getString("Dialog.Host.LinbitLogin.EnterUser"));
         inputPane.add(userLabel);
-        downloadUserField = new Widget(Tools.getConfigData().getDownloadUser(),
-                                       null, /* items */
-                                       null, /* units */
-                                       null, /* type */
+        downloadUserField = WidgetFactory.createInstance(
+                                       Widget.GUESS_TYPE,
+                                       Tools.getConfigData().getDownloadUser(),
+                                       Widget.NO_ITEMS,
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
-                                       null, /* abbrv */
+                                       Widget.NO_ABBRV,
                                        new AccessMode(ConfigData.AccessType.RO,
-                                                      false)); /* only adv. */
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
 
         addCheckField(downloadUserField);
         userLabel.setLabelFor(downloadUserField);
@@ -185,16 +187,16 @@ public class LinbitLogin extends DialogHost {
                   Tools.getString("Dialog.Host.LinbitLogin.EnterPassword"));
 
         inputPane.add(passwordLabel);
-        downloadPasswordField = new Widget(
-                                  Tools.getConfigData().getDownloadPassword(),
-                                  null, /* items */
-                                  null, /* units */
+        downloadPasswordField = WidgetFactory.createInstance(
                                   Widget.Type.PASSWDFIELD,
-                                  null, /* type */
+                                  Tools.getConfigData().getDownloadPassword(),
+                                  Widget.NO_ITEMS,
+                                  Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,
-                                  null, /* abbrv */
+                                  Widget.NO_ABBRV,
                                   new AccessMode(ConfigData.AccessType.RO,
-                                                 false)); /* only adv. mode */
+                                                 !AccessMode.ADVANCED),
+                                  Widget.NO_BUTTON);
 
         addCheckField(downloadPasswordField);
         passwordLabel.setLabelFor(downloadPasswordField);

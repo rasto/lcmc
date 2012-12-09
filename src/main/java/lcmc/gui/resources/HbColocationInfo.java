@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.Host;
 import lcmc.data.resources.Service;
 import lcmc.data.ClusterStatus;

@@ -25,7 +25,7 @@ import lcmc.Exceptions;
 import lcmc.AddDrbdConfigDialog;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.Host;
 import lcmc.data.DrbdXML;
 import lcmc.data.resources.Resource;

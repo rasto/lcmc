@@ -25,7 +25,8 @@ import lcmc.Exceptions;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.resources.DrbdResource;
 import lcmc.data.Host;
@@ -287,16 +288,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             } else {
                 resName = getResource().getName();
             }
-            paramWi = new Widget(resName,
-                                 null, /* items */
-                                 null, /* units */
-                                 null, /* type */
-                                 "^\\S+$", /* regexp */
-                                 width,
-                                 null, /* abbrv */
-                                 new AccessMode(
-                                      getAccessType(param),
-                                      isEnabledOnlyInAdvancedMode(param)));
+            paramWi = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      resName,
+                                      Widget.NO_ITEMS,
+                                      "^\\S+$",
+                                      width,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)),
+                                      Widget.NO_BUTTON);
             paramWi.setEnabled(!getDrbdResource().isCommited());
             widgetAdd(param, prefix, paramWi);
         } else if (DRBD_RES_PARAM_AFTER.equals(param)
@@ -325,18 +327,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
             getBrowser().putDrbdResHash();
-            paramWi = new Widget(defaultItem,
-                                 l.toArray(new Info[l.size()]),
-                                 null, /* units */
-                                 null, /* type */
-                                 null, /* regexp */
-                                 width,
-                                 null, /* abbrv */
-                                 new AccessMode(
-                                      getAccessType(param),
-                                      isEnabledOnlyInAdvancedMode(param)));
-            resyncAfterParamWi = paramWi;
-
+            resyncAfterParamWi = WidgetFactory.createInstance(
+                                      Widget.Type.COMBOBOX,
+                                      defaultItem,
+                                      l.toArray(new Info[l.size()]),
+                                      Widget.NO_REGEXP,
+                                      width,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(
+                                           getAccessType(param),
+                                           isEnabledOnlyInAdvancedMode(param)),
+                                      Widget.NO_BUTTON);
+            paramWi = resyncAfterParamWi;
             widgetAdd(param, prefix, paramWi);
         } else {
             paramWi = super.createWidget(param, prefix, width);
@@ -930,15 +932,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
              getParamPanel(Tools.getString("DrbdResourceInfo.HostAddresses"));
         panel.setLayout(new SpringLayout());
         for (final Host host : getHosts()) {
-            final Widget wi =
-                new Widget(null,
+            final Widget wi = WidgetFactory.createInstance(
+                           Widget.Type.COMBOBOX,
+                           Widget.NO_DEFAULT,
                            getNetInterfaces(host.getBrowser()),
-                           null, /* units */
-                           null, /* type */
-                           null, /* regexp */
+                           Widget.NO_REGEXP,
                            rightWidth,
-                           null, /* abbreviations */
-                           new AccessMode(ConfigData.AccessType.ADMIN, false));
+                           Widget.NO_ABBRV,
+                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           Widget.NO_BUTTON);
             wi.setEditable(true);
             final String haSaved = savedHostAddresses.get(host);
             wi.setValue(haSaved);
@@ -1000,15 +1002,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             index++;
         }
         final String defaultPort = drbdVIPorts.get(0);
-        final Widget pwi = new Widget(
-                   defaultPort,
-                   drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
-                   null, /* units */
-                   null, /* type */
-                   "^\\d*$",
-                   leftWidth,
-                   null, /* abbrv */
-                   new AccessMode(ConfigData.AccessType.ADMIN, false));
+        final Widget pwi = WidgetFactory.createInstance(
+                          Widget.Type.COMBOBOX,
+                          defaultPort,
+                          drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
+                          "^\\d*$",
+                          leftWidth,
+                          Widget.NO_ABBRV,
+                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          Widget.NO_BUTTON);
         pwi.setAlwaysEditable(true);
         final JLabel label = new JLabel(
                         Tools.getString("DrbdResourceInfo.NetInterfacePort"));

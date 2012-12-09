@@ -23,7 +23,7 @@ package lcmc.gui.resources;
 
 import lcmc.data.Host;
 import lcmc.data.resources.Service;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;

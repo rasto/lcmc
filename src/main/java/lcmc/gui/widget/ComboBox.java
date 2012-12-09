@@ -1,0 +1,478 @@
+/*
+ * This file is part of LCMC
+ *
+ * Copyright (C) 2012, Rastislav Levrinc.
+ *
+ * LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * DRBD Management Console is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with drbd; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+package lcmc.gui.widget;
+
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.PatternDocument;
+import lcmc.data.AccessMode;
+import lcmc.gui.resources.Info;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.WidgetListener;
+
+import javax.swing.JComponent;
+import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Document;
+import javax.swing.text.AbstractDocument;
+import javax.swing.event.DocumentListener;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ComboBoxEditor;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ItemListener;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
+
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.PopupMenuEvent;
+
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+/**
+ * An implementation of a field where user can enter new value. The
+ * field can be Textfield or combo box, depending if there are values
+ * too choose from.
+ *
+ * @author Rasto Levrinc
+ * @version $Id$
+ *
+ */
+//TODO: public final class ComboBox<E> extends Widget {
+public final class ComboBox extends Widget {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 1L;
+    /** Scrollbar max rows. */
+    private static final int SCROLLBAR_MAX_ROWS = 10;
+
+    /** Prepares a new <code>ComboBox</code> object. */
+    public ComboBox(final String selectedValue,
+                    final Object[] items,
+                    final String regexp,
+                    final int width,
+                    final Map<String, String> abbreviations,
+                    final AccessMode enableAccessMode,
+                    final MyButton fieldButton) {
+        super(regexp,
+              enableAccessMode,
+              fieldButton);
+        addComponent(getComboBox(selectedValue,
+                                 items,
+                                 regexp,
+                                 abbreviations),
+                     width);
+    }
+
+    /** Returns combo box with items in the combo and selectedValue on top. */
+    private JComboBox getComboBox(final String selectedValue,
+                                  final Object[] items,
+                                  final String regexp,
+                                  final Map<String, String> abbreviations) {
+        final List<Object> comboList = new ArrayList<Object>();
+
+        final Object selectedValueInfo = addItems(comboList,
+                                                  selectedValue,
+                                                  items);
+        final JComboBox cb = new JComboBox(comboList.toArray(
+                                            new Object[comboList.size()]));
+        final JTextComponent editor =
+                        (JTextComponent) cb.getEditor().getEditorComponent();
+        if (regexp != null) {
+            editor.setDocument(new PatternDocument(regexp, abbreviations));
+        }
+        cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
+        if (selectedValueInfo != null) {
+            cb.setSelectedItem(selectedValueInfo);
+        }
+        /* workround, so that default button works */
+        editor.addKeyListener(new ActivateDefaultButtonListener(cb));
+
+        /* removing select... keyword */
+        editor.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(final FocusEvent e) {
+                Object o = getValue();
+                if (o != null && !Tools.isStringClass(o)
+                    && ((Info) o).getStringValue() == null) {
+                    o = null;
+                }
+                if (o == null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            editor.setText("");
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void focusLost(final FocusEvent e) {
+                /* do nothing */
+            }
+        });
+        cb.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuCanceled(final PopupMenuEvent pe) {
+                /* do nothing */
+            }
+            @Override
+            public void popupMenuWillBecomeInvisible(final PopupMenuEvent pe) {
+                /* do nothing */
+            }
+            @Override
+            public void popupMenuWillBecomeVisible(final PopupMenuEvent pe) {
+                /* workaround to have items with bigger widths than jcombobox */
+                final JComboBox thisCB = (JComboBox) pe.getSource();
+                final Object c = thisCB.getUI().getAccessibleChild(thisCB, 0);
+                if (!(c instanceof JPopupMenu)) {
+                    return;
+                }
+                final JScrollPane scrollPane =
+                            (JScrollPane) ((JPopupMenu) c).getComponent(0);
+                final Dimension size = scrollPane.getPreferredSize();
+                final JComponent view =
+                               (JComponent) scrollPane.getViewport().getView();
+                final int newSize = view.getPreferredSize().width;
+                if (newSize > size.width) {
+                    size.width = newSize;
+                    scrollPane.setPreferredSize(size);
+                    scrollPane.setMaximumSize(size);
+                }
+            }
+        });
+        return cb;
+    }
+
+    /** Returns true if combo box has changed. */
+    private boolean comboBoxChanged(final Object[] items) {
+        final JComboBox cb = (JComboBox) getComponent();
+        if (items.length != cb.getItemCount()) {
+            return true;
+        }
+
+        for (int i = 0; i < items.length; i++) {
+            Object item;
+            if (items[i] == null) {
+                item = Widget.NOTHING_SELECTED;
+            } else {
+                item = items[i];
+            }
+            if (!Tools.areEqual(item, cb.getItemAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Reloads combo box with items and selects supplied value. */
+    @Override
+    public void reloadComboBox(final String selectedValue,
+                               final Object[] items) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final JComboBox cb = (JComboBox) getComponent();
+                final Object selectedItem = cb.getSelectedItem();
+                boolean selectedChanged = false;
+                if (selectedValue == null
+                    && (selectedItem != null
+                         && selectedItem != Widget.NOTHING_SELECTED)) {
+                    selectedChanged = true;
+                } else if (selectedValue != null
+                           && !selectedValue.equals(selectedItem)) {
+                    selectedChanged = true;
+                }
+                final boolean itemsChanged = comboBoxChanged(items);
+                if (!selectedChanged && !itemsChanged) {
+                    return;
+                }
+
+                cb.setPreferredSize(null);
+                /* removing dupicates */
+
+                final List<Object> comboList = new ArrayList<Object>();
+                final Object selectedValueInfo = addItems(comboList,
+                                                          selectedValue,
+                                                          items);
+
+                if (itemsChanged) {
+                    final HashSet<String> itemCache = new HashSet<String>();
+                    cb.setSelectedIndex(-1);
+                    cb.removeAllItems();
+                    for (final Object item : comboList) {
+                        if (!itemCache.contains(item.toString())) {
+                            cb.addItem(item);
+                            itemCache.add(item.toString());
+                        }
+                    }
+                }
+                if (selectedValueInfo != null) {
+                    cb.setSelectedItem(selectedValueInfo);
+                }
+            }
+        });
+    }
+
+    /** Add items to the combo box. */
+    protected static Object addItems(final List<Object> comboList,
+                                     final String selectedValue,
+                                     final Object[] items) {
+        Object selectedValueInfo = null;
+        if (items != null) {
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] == null) {
+                    items[i] = Widget.NOTHING_SELECTED;
+                }
+                if (items[i] instanceof Info
+                    && ((Info) items[i]).getStringValue() != null
+                    && ((Info) items[i]).getStringValue().equals(
+                                                             selectedValue)) {
+                    selectedValueInfo = items[i];
+                } else if (items[i] instanceof Unit
+                    && ((Unit) items[i]).equals(selectedValue)) {
+                    selectedValueInfo = items[i];
+                } else if (items[i].toString().equals(selectedValue)
+                    || items[i].equals(selectedValue)) {
+                    selectedValueInfo = items[i];
+                }
+                comboList.add(items[i]);
+            }
+            if (selectedValueInfo == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedValueInfo = selectedValue;
+            }
+        }
+        return selectedValueInfo;
+    }
+
+    /** Set combo box editable. */
+    @Override
+    public void setEditable(final boolean editable) {
+        super.setEditable(editable);
+        final JComponent comp = getComponent();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Object o = getValue();
+                if (o != null
+                    && !Tools.isStringClass(o)
+                    && ((Info) o).getStringValue() == null) {
+                    o = null;
+                }
+                if (isAlwaysEditable()) {
+                    ((JComboBox) comp).setEditable(true);
+                    final JTextComponent editor = getTextComponent();
+                    if (o == null) {
+                        editor.selectAll();
+                    }
+                } else {
+                    if (o == null) {
+                        ((JComboBox) comp).setEditable(false);
+                    } else {
+                        ((JComboBox) comp).setEditable(editable);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Returns string value. If object value is null, returns empty string (not
+     * null).
+     */
+    @Override
+    public String getStringValue() {
+        final Object o = getValue();
+        if (o == null) {
+            return "";
+        }
+        return o.toString();
+    }
+
+    /** Return value, that user have chosen in the field or typed in. */
+    @Override
+    protected Object getValueInternal() {
+        final JComboBox cb = (JComboBox) getComponent();
+        Object value;
+        if (cb.isEditable()) {
+            final JTextComponent editor =
+                        (JTextComponent) cb.getEditor().getEditorComponent();
+            String text = editor.getText();
+            if (text == null) {
+                text = "";
+            }
+            value = cb.getSelectedItem();
+            if (value == null || !text.equals(value.toString())) {
+                value = text;
+            }
+
+            if ("".equals(value)) {
+                return "";
+            }
+        } else {
+            value = cb.getSelectedItem();
+        }
+        if (NOTHING_SELECTED.equals(value)) {
+            return null;
+        }
+        return value;
+    }
+
+    /** Clears the combo box. */
+    @Override
+    public void clear() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ((JComboBox) getComponent()).removeAllItems();
+            }
+        });
+    }
+
+    /** Returns whether component is editable or not. */
+    @Override
+    boolean isEditable() {
+        return ((JComboBox) getComponent()).isEditable();
+    }
+
+    /** Set item/value in the component and waits till it is set. */
+    @Override
+    protected void setValueAndWait0(final Object item) {
+        final JComboBox cb = (JComboBox) getComponent();
+        cb.setSelectedItem(item);
+        if (Tools.isStringClass(item)) {
+            Object selectedObject = null;
+            for (int i = 0; i < cb.getItemCount(); i++) {
+                final Object it = cb.getItemAt(i);
+                if (it == item
+                    || it.toString().equals(item)
+                    || it.equals(item)
+                    || ((it instanceof Info)
+                        && Tools.areEqual(((Info) it).getStringValue(), item))
+                    || (NOTHING_SELECTED.equals(it) && item == null)) {
+                    selectedObject = it;
+                    cb.setSelectedItem(it);
+                    break;
+                }
+            }
+            if (selectedObject == null) {
+                cb.addItem(item);
+                cb.setSelectedItem(item);
+            }
+        }
+    }
+
+    /** Set selected index. */
+    @Override
+    public void setSelectedIndex(final int index) {
+        final JComboBox cb = (JComboBox) getComponent();
+        cb.setSelectedIndex(index);
+    }
+
+    /** Returns document object of the component. */
+    @Override
+    public Document getDocument() {
+        final JTextComponent tc = getTextComponent();
+        return tc.getDocument();
+    }
+
+    /** Selects part after first '*' in the ip. */
+    @Override
+    public void selectSubnet() {
+        final JTextComponent tc = getTextComponent();
+        final String ip = tc.getText();
+        int p = ip.length() - 2;
+        while (p >= 0
+               && Tools.isIp(ip)
+               && ".0".equals(ip.substring(p, p + 2))) {
+            p -= 2;
+        }
+        final int pos = p + 3;
+        if (pos >= 0 && pos < ip.length()) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    tc.select(pos, ip.length());
+                }
+            });
+        }
+    }
+
+    /** Add item listener to the component. */
+    @Override
+    public void addListeners(final WidgetListener wl) {
+        getWidgetListeners().add(wl);
+        addDocumentListener(getDocument(), wl);
+        ((JComboBox) getComponent()).addItemListener(getItemListener(wl));
+    }
+
+    @Override
+    protected void setComponentBackground(final Color backgroundColor,
+                                          final Color compColor) {
+        setBackground(Color.WHITE);
+    }
+
+    /** Set background color. */
+    @Override
+    public void setBackgroundColor(final Color bg) {
+        final JComponent comp = getComponent();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setBackground(bg);
+            }
+        });
+    }
+
+    /** Returns item at the specified index. */
+    @Override
+    Object getItemAt(final int i) {
+        return ((JComboBox) getComponent()).getItemAt(i);
+    }
+
+    /** Cleanup whatever would cause a leak. */
+    @Override
+    public void cleanup() {
+        getWidgetListeners().clear();
+        final JComboBox thisCB = ((JComboBox) getComponent());
+        final AbstractDocument dc = (AbstractDocument) getDocument();
+        for (final DocumentListener dl : dc.getDocumentListeners()) {
+            dc.removeDocumentListener(dl);
+        }
+        for (final ItemListener il : thisCB.getItemListeners()) {
+            thisCB.removeItemListener(il);
+        }
+    }
+
+    /** Returns the text component of the combo box. */
+    private JTextComponent getTextComponent() {
+        final JComponent comp = getComponent();
+        final ComboBoxEditor editor = ((JComboBox) comp).getEditor();
+        return (JTextComponent) editor.getEditorComponent();
+    }
+}

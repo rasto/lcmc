@@ -29,7 +29,8 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.utilities.MyButton;
@@ -162,15 +163,16 @@ public final class SplitBrain extends DrbdConfig {
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
-        hostWi = new Widget(null, /* selected value */
-                            hosts.toArray(new Host[hosts.size()]),
-                            null, /* units */
-                            Widget.Type.COMBOBOX,
-                            null, /* regexp */
-                            COMBOBOX_WIDTH,
-                            null, /* abbrv */
-                            new AccessMode(ConfigData.AccessType.RO,
-                                           false)); /* only adv. mode */
+        hostWi = WidgetFactory.createInstance(
+                                    Widget.Type.COMBOBOX,
+                                    Widget.NO_DEFAULT,
+                                    hosts.toArray(new Host[hosts.size()]),
+                                    Widget.NO_REGEXP,
+                                    COMBOBOX_WIDTH,
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   !AccessMode.ADVANCED),
+                                    Widget.NO_BUTTON);
         inputPane.add(hostLabel);
         inputPane.add(hostWi);
         resolveButton.addActionListener(new ActionListener() {

@@ -23,7 +23,7 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.data.resources.Resource;
 import lcmc.data.AccessMode;
 import lcmc.utilities.ButtonCallback;

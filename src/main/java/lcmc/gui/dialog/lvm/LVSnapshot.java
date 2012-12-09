@@ -30,7 +30,9 @@ import lcmc.utilities.WidgetListener;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.Browser;
 
 import java.util.Set;
@@ -171,15 +173,16 @@ public final class LVSnapshot extends LV {
             }
             i++;
         }
-        lvNameWi = new Widget(defaultName,
-                              null,
-                              null, /* units */
-                              Widget.Type.TEXTFIELD,
-                              null, /* regexp */
-                              250,
-                              null, /* abbrv */
-                              new AccessMode(ConfigData.AccessType.OP,
-                                             false)); /* only adv. */
+        lvNameWi = WidgetFactory.createInstance(
+                                      Widget.Type.TEXTFIELD,
+                                      defaultName,
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
+                                      250,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.OP,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
         inputPane.add(lvNameWi);
         inputPane.add(new JLabel());
@@ -196,15 +199,14 @@ public final class LVSnapshot extends LV {
                                       Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new Widget(Tools.convertKilobytes(newBlockSize),
-                            null,
-                            getUnits(), /* units */
-                            Widget.Type.TEXTFIELDWITHUNIT,
-                            null, /* regexp */
-                            250,
-                            null, /* abbrv */
-                            new AccessMode(ConfigData.AccessType.OP,
-                                             false)); /* only adv. */
+        sizeWi = new TextfieldWithUnit(Tools.convertKilobytes(newBlockSize),
+                                       getUnits(),
+                                       Widget.NO_REGEXP,
+                                       250,
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.OP,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi);
         snapshotButton.addActionListener(new ActionListener() {
@@ -240,15 +242,15 @@ public final class LVSnapshot extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWi = new Widget(Tools.convertKilobytes(maxBlockSize),
-                               null,
-                               getUnits(),
-                               Widget.Type.TEXTFIELDWITHUNIT,
-                               null, /* regexp */
-                               250,
-                               null, /* abbrv */
-                               new AccessMode(ConfigData.AccessType.OP,
-                                              false)); /* only adv. */
+        maxSizeWi = new TextfieldWithUnit(
+                                    Tools.convertKilobytes(maxBlockSize),
+                                    getUnits(),
+                                    Widget.NO_REGEXP,
+                                    250,
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(ConfigData.AccessType.OP,
+                                                   !AccessMode.ADVANCED),
+                                    Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeWi);

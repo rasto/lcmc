@@ -30,7 +30,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -643,17 +644,17 @@ final class CheckInstallation extends DialogHost {
             pmMethods.add(pmInstallMethod);
             i++;
         }
-        pmInstMethodWi = new Widget(
-                   pmDefaultValue,
-                   (Object[]) pmMethods.toArray(
-                                      new InstallMethods[pmMethods.size()]),
-                   null, /* units */
-                   Widget.Type.COMBOBOX,
-                   null, /* regexp */
-                   0,    /* width */
-                   null, /* abbrv */
-                   new AccessMode(ConfigData.AccessType.RO,
-                                  false)); /* only adv. mode */
+        pmInstMethodWi = WidgetFactory.createInstance(
+                       Widget.Type.COMBOBOX,
+                       pmDefaultValue,
+                       (Object[]) pmMethods.toArray(
+                                          new InstallMethods[pmMethods.size()]),
+                       Widget.NO_REGEXP,
+                       0,    /* width */
+                       Widget.NO_ABBRV,
+                       new AccessMode(ConfigData.AccessType.RO,
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
         if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -715,17 +716,17 @@ final class CheckInstallation extends DialogHost {
             }
             i++;
         }
-        hbPmInstMethodWi = new Widget(
+        hbPmInstMethodWi = WidgetFactory.createInstance(
+                   Widget.Type.COMBOBOX,
                    hbPmDefaultValue,
                    (Object[]) hbPmMethods.toArray(
                                         new InstallMethods[hbPmMethods.size()]),
-                   null, /* units */
-                   Widget.Type.COMBOBOX,
-                   null, /* regexp */
+                   Widget.NO_REGEXP,
                    0,    /* width */
-                   null, /* abbrv */
+                   Widget.NO_ABBRV,
                    new AccessMode(ConfigData.AccessType.RO,
-                                  false)); /* only adv. mode */
+                                  !AccessMode.ADVANCED),
+                   Widget.NO_BUTTON);
         if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -795,17 +796,17 @@ final class CheckInstallation extends DialogHost {
         }
         if (i > 1) {
             drbdInstallMethodsAvailable = true;
-            drbdInstMethodWi = new Widget(
+            drbdInstMethodWi = WidgetFactory.createInstance(
+                       Widget.Type.COMBOBOX,
                        drbdDefaultValue,
                        (Object[]) drbdMethods.toArray(
                                         new InstallMethods[drbdMethods.size()]),
-                       null, /* units */
-                       Widget.Type.COMBOBOX,
-                       null, /* regexp */
+                       Widget.NO_REGEXP,
                        0,    /* width */
-                       null, /* abbrv */
+                       Widget.NO_ABBRV,
                        new AccessMode(ConfigData.AccessType.RO,
-                                      false)); /* only adv. mode */
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
             drbdInstMethodWi.addListeners(
                         new WidgetListener() {
                             @Override
@@ -824,16 +825,16 @@ final class CheckInstallation extends DialogHost {
                             }
                         });
         } else {
-            drbdInstMethodWi = new Widget("",
-                                          null, /* items */
-                                          null, /* units */
-                                          Widget.Type.COMBOBOX,
-                                          null, /* regexp */
-                                          0,    /* width */
-                                          null, /* abbrv */
-                                          new AccessMode(
-                                                 ConfigData.AccessType.RO,
-                                                 false)); /* only adv. */
+            drbdInstMethodWi = WidgetFactory.createInstance(
+                                      Widget.Type.COMBOBOX,
+                                      "",
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
+                                      0,    /* width */
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
             drbdInstMethodWi.setEnabled(false);
         }
         if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {

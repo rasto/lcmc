@@ -23,7 +23,7 @@ package lcmc.utilities;
 public abstract class WidgetListener {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Whether it is enabled or not */
+    /** Whether it is enabled or not. */
     private boolean enabled = true;
 
     public boolean isEnabled() {

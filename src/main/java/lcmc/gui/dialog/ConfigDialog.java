@@ -22,7 +22,7 @@
 package lcmc.gui.dialog;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;

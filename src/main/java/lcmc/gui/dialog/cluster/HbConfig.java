@@ -37,7 +37,8 @@ import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.UcastLink;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.Exceptions;
@@ -1008,26 +1009,28 @@ final class HbConfig extends DialogCluster {
                                 UCAST_TYPE,
                                 SERIAL_TYPE};
 
-        typeW = new Widget(MCAST_TYPE,
-                           types,
-                           null, /* units */
-                           null, /* type */
-                           null, /* regexp */
-                           TYPE_COMBOBOX_WIDTH,
-                           null, /* abbrv */
-                           new AccessMode(ConfigData.AccessType.RO,
-                                          false)); /* only adv. mode */
+        typeW = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      MCAST_TYPE,
+                                      types,
+                                      Widget.NO_REGEXP,
+                                      TYPE_COMBOBOX_WIDTH,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceW = new Widget(null, /* selected value */
-                             ni,
-                             null, /* units */
-                             null, /* type */
-                             null, /* regexp */
-                             INTF_COMBOBOX_WIDTH,
-                             null, /* abbrv */
-                             new AccessMode(ConfigData.AccessType.RO,
-                                            false)); /* only adv. mode */
+        ifaceW = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      Widget.NO_DEFAULT,
+                                      ni,
+                                      Widget.NO_REGEXP,
+                                      INTF_COMBOBOX_WIDTH,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
 
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
@@ -1040,24 +1043,26 @@ final class HbConfig extends DialogCluster {
         final UcastLink[] ucastLinks =
                                 ulList.toArray(new UcastLink[ulList.size()]);
 
-        ucastLink1W = new Widget(null, /* selected value */
-                                 ucastLinks,
-                                 null, /* units */
-                                 null, /* type */
-                                 null, /* regexp */
-                                 LINK_COMBOBOX_WIDTH,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.RO,
-                                                false)); /* only adv. */
-        ucastLink2W = new Widget(null, /* selected value */
-                                 ucastLinks,
-                                 null, /* units */
-                                 null, /* type */
-                                 null, /* regexp */
-                                 LINK_COMBOBOX_WIDTH,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.RO,
-                                                false)); /* only adv. */
+        ucastLink1W = WidgetFactory.createInstance(
+                                     Widget.GUESS_TYPE,
+                                     Widget.NO_DEFAULT,
+                                     ucastLinks,
+                                     Widget.NO_REGEXP,
+                                     LINK_COMBOBOX_WIDTH,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    !AccessMode.ADVANCED),
+                                     Widget.NO_BUTTON);
+        ucastLink2W = WidgetFactory.createInstance(
+                                     Widget.GUESS_TYPE,
+                                     Widget.NO_DEFAULT,
+                                     ucastLinks,
+                                     Widget.NO_REGEXP,
+                                     LINK_COMBOBOX_WIDTH,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    !AccessMode.ADVANCED),
+                                     Widget.NO_BUTTON);
 
         /* serial links */
         final String[] serialDevs = {"/dev/ttyS0",
@@ -1065,15 +1070,16 @@ final class HbConfig extends DialogCluster {
                                      "/dev/ttyS2",
                                      "/dev/ttyS3"};
 
-        serialW = new Widget(null, /* selected value */
-                             serialDevs,
-                             null, /* units */
-                             null, /* type */
-                             null, /* regexp */
-                             LINK_COMBOBOX_WIDTH,
-                             null, /* abbrv */
-                             new AccessMode(ConfigData.AccessType.RO,
-                                            false)); /* only adv. mode */
+        serialW = WidgetFactory.createInstance(
+                                     Widget.GUESS_TYPE,
+                                     Widget.NO_DEFAULT,
+                                     serialDevs,
+                                     Widget.NO_REGEXP,
+                                     LINK_COMBOBOX_WIDTH,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    !AccessMode.ADVANCED),
+                                     Widget.NO_BUTTON);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
@@ -1083,15 +1089,16 @@ final class HbConfig extends DialogCluster {
         final String regexp = "^\\d{1,3}(\\.\\d{0,3}(\\d\\.\\d{0,3}"
                               + "(\\d\\.\\d{0,3})( \\d{0,3}(\\d \\d{0,3}"
                               + "(\\d \\d{0,3})?)?)?)?)?$";
-        addrW = new Widget("239.192.0.0 694 1 0",
-                           null, /* items */
-                           null, /* units */
-                           null, /* type */
-                           regexp,
-                           ADDR_COMBOBOX_WIDTH,
-                           null, /* abbrv */
-                           new AccessMode(ConfigData.AccessType.RO,
-                                          false)); /* only adv. mode */
+        addrW = WidgetFactory.createInstance(
+                                     Widget.GUESS_TYPE,
+                                     "239.192.0.0 694 1 0",
+                                     Widget.NO_ITEMS,
+                                     regexp,
+                                     ADDR_COMBOBOX_WIDTH,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    !AccessMode.ADVANCED),
+                                     Widget.NO_BUTTON);
 
         typeW.addListeners(
             new WidgetListener() {
@@ -1271,17 +1278,16 @@ final class HbConfig extends DialogCluster {
             } else {
                 size = 40;
             }
-            final Widget w = new Widget(OPTION_DEFAULTS.get(option),
-                                        optionValues.get(option),
-                                        null, /* units */
-                                        OPTION_TYPES.get(option),
-                                        "^" + OPTION_REGEXPS.get(option)
-                                            + "\\s*$",
-                                        size,
-                                        null,
-                                           new AccessMode(
-                                                  ConfigData.AccessType.ADMIN,
-                                                  false));
+            final Widget w = WidgetFactory.createInstance(
+                                    OPTION_TYPES.get(option),
+                                    OPTION_DEFAULTS.get(option),
+                                    optionValues.get(option),
+                                    "^" + OPTION_REGEXPS.get(option) + "\\s*$",
+                                    size,
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                                   !AccessMode.ADVANCED),
+                                    Widget.NO_BUTTON);
             optionsW.put(option, w);
             w.setAlwaysEditable(true);
             w.addListeners(getOptionListener());

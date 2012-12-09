@@ -28,7 +28,8 @@ import lcmc.data.ConfigData;
 import lcmc.data.Cluster;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
@@ -219,15 +220,16 @@ public final class VGCreate extends LV {
             }
             i++;
         }
-        vgNameWi = new Widget(defaultName,
-                              null,
-                              null, /* units */
-                              Widget.Type.TEXTFIELD,
-                              null, /* regexp */
-                              250,
-                              null, /* abbrv */
-                              new AccessMode(ConfigData.AccessType.OP,
-                                             false)); /* only adv. */
+        vgNameWi = WidgetFactory.createInstance(
+                                      Widget.Type.TEXTFIELD,
+                                      defaultName,
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
+                                      250,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.OP,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         inputPane.add(new JLabel("VG Name"));
         inputPane.add(vgNameWi);
 

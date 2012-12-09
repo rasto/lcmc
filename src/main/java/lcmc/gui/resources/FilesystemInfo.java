@@ -28,7 +28,8 @@ import lcmc.configs.DistResource;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
 
 import java.util.Map;
@@ -241,18 +242,19 @@ final class FilesystemInfo extends ServiceInfo {
             final Info[] commonBlockDevInfos =
                                         getCommonBlockDevInfos(defaultValue,
                                                                getName());
-            paramWi = new Widget(selectedValue,
-                                 commonBlockDevInfos,
-                                 null, /* units */
-                                 null, /* type */
-                                 null, /* regexp */
-                                 width,
-                                 null, /* abbrv */
-                                 new AccessMode(
+            blockDeviceParamWi = WidgetFactory.createInstance(
+                                   Widget.GUESS_TYPE,
+                                   selectedValue,
+                                   commonBlockDevInfos,
+                                   Widget.NO_REGEXP,
+                                   width,
+                                   Widget.NO_ABBRV,
+                                   new AccessMode(
                                            getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)));
-            paramWi.setAlwaysEditable(true);
-            blockDeviceParamWi = paramWi;
+                                           isEnabledOnlyInAdvancedMode(param)),
+                                   Widget.NO_BUTTON);
+            blockDeviceParamWi.setAlwaysEditable(true);
+            paramWi = blockDeviceParamWi;
             addParamComboListeners(paramWi);
             widgetAdd(param, prefix, paramWi);
         } else if ("fstype".equals(param)) {
@@ -265,17 +267,17 @@ final class FilesystemInfo extends ServiceInfo {
             if (selectedValue == null || "".equals(selectedValue)) {
                 selectedValue = defaultValue;
             }
-            paramWi = new Widget(
+            paramWi = WidgetFactory.createInstance(
+                              Widget.GUESS_TYPE,
                               selectedValue,
                               getBrowser().getCommonFileSystems(defaultValue),
-                              null, /* units */
-                              null, /* type */
-                              null, /* regexp */
+                              Widget.NO_REGEXP,
                               width,
-                              null, /* abbrv */
+                              Widget.NO_ABBRV,
                               new AccessMode(
                                        getAccessType(param),
-                                       isEnabledOnlyInAdvancedMode(param)));
+                                       isEnabledOnlyInAdvancedMode(param)),
+                              Widget.NO_BUTTON);
             fstypeParamWi = paramWi;
 
             widgetAdd(param, prefix, paramWi);
@@ -303,16 +305,17 @@ final class FilesystemInfo extends ServiceInfo {
                 selectedValue = defaultValue;
             }
             final String regexp = "^.+$";
-            paramWi = new Widget(selectedValue,
+            paramWi = WidgetFactory.createInstance(
+                                 Widget.GUESS_TYPE,
+                                 selectedValue,
                                  items,
-                                 null, /* units */
-                                 null, /* type */
                                  regexp,
                                  width,
-                                 null, /* abbrv */
+                                 Widget.NO_ABBRV,
                                  new AccessMode(
                                          getAccessType(param),
-                                         isEnabledOnlyInAdvancedMode(param)));
+                                         isEnabledOnlyInAdvancedMode(param)),
+                                 Widget.NO_BUTTON);
             widgetAdd(param, prefix, paramWi);
             paramWi.setAlwaysEditable(true);
         } else {

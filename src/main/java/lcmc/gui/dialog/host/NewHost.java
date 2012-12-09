@@ -27,7 +27,8 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.TerminalPanel;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JLabel;
@@ -270,15 +271,16 @@ public final class NewHost extends DialogHost {
                         Tools.getString("Dialog.Host.NewHost.EnterHost"));
         inputPane.add(hostLabel);
         final String regexp = "^[,\\w.-]+$";
-        hostField = new Widget(getHost().getHostnameEntered(),
-                                    null, /* items */
-                                    null, /* units */
-                                    null, /* type */
-                                    regexp,
-                                    FIELD_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(ConfigData.AccessType.RO,
-                                                   false)); /* only adv. mode */
+        hostField = WidgetFactory.createInstance(
+                                       Widget.GUESS_TYPE,
+                                       getHost().getHostnameEntered(),
+                                       Widget.NO_ITEMS,
+                                       regexp,
+                                       FIELD_WIDTH,
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
 
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
@@ -299,15 +301,16 @@ public final class NewHost extends DialogHost {
                 sshPort = SSH_PORT;
             }
         }
-        sshPortField = new Widget(sshPort,
-                                       null, /* items */
-                                       null, /* units */
-                                       null, /* type */
-                                       "^\\d+$",
-                                       50,
-                                       null, /* abbrv */
-                                       new AccessMode(ConfigData.AccessType.RO,
-                                                      false)); /* only adv. */
+        sshPortField = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      sshPort,
+                                      Widget.NO_ITEMS,
+                                      "^\\d+$",
+                                      50,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
@@ -334,15 +337,16 @@ public final class NewHost extends DialogHost {
             users.add(SSH_ROOT_USER);
         }
         users.add(user);
-        usernameField = new Widget(userName,
+        usernameField = WidgetFactory.createInstance(
+                                   Widget.GUESS_TYPE,
+                                   userName,
                                    users.toArray(new String[users.size()]),
-                                   null, /* units */
-                                   null, /* type */
                                    regexp,
                                    FIELD_WIDTH,
-                                   null, /* abbrv */
+                                   Widget.NO_ABBRV,
                                    new AccessMode(ConfigData.AccessType.RO,
-                                                  false)); /* only adv. mode */
+                                                  !AccessMode.ADVANCED),
+                                   Widget.NO_BUTTON);
         usernameField.setEditable(true);
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
@@ -362,15 +366,16 @@ public final class NewHost extends DialogHost {
                 useSudo = false;
             }
         }
-        useSudoField = new Widget(useSudo.toString(),
-                                  new String[]{"true", "false"}, /* items */
-                                  null, /* units */
-                                  null, /* type */
-                                  null, /* regexp */
-                                  50,
-                                  null, /* abbrv */
-                                  new AccessMode(ConfigData.AccessType.RO,
-                                                 false)); /* only adv. mode */
+        useSudoField = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      useSudo.toString(),
+                                      new String[]{"true", "false"},
+                                      Widget.NO_REGEXP,
+                                      50,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         //addCheckField(useSudoField);
         useSudoLabel.setLabelFor(useSudoField);
         inputPane.add(useSudoField);

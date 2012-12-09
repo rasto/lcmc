@@ -29,7 +29,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.SSH.ExecCommandThread;
 
@@ -405,40 +406,42 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         pane.setMaximumSize(new Dimension(maxX, CHOICE_BOX_HEIGHT));
 
         /* combo boxes */
-        drbdDistCombo = new Widget(null, /* selected value */
-                                   null, /* items */
-                                   null, /* units */
-                                   Widget.Type.COMBOBOX,
-                                   null, /* regexp */
-                                   0,    /* width */
-                                   null, /* abbrv */
-                                   new AccessMode(ConfigData.AccessType.RO,
-                                                  false)); /* only adv. */
+        drbdDistCombo = WidgetFactory.createInstance(
+                                       Widget.Type.COMBOBOX,
+                                       Widget.NO_DEFAULT,
+                                       Widget.NO_ITEMS,
+                                       Widget.NO_REGEXP,
+                                       0,    /* width */
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
 
         drbdDistCombo.setEnabled(false);
         pane.add(drbdDistCombo);
-        drbdKernelDirCombo = new Widget(null, /* selected value */
-                                        null, /* items */
-                                        null, /* units */
-                                        Widget.Type.COMBOBOX,
-                                        null, /* regexp */
-                                        0,    /* width */
-                                        null, /* abbrv */
-                                        new AccessMode(
-                                               ConfigData.AccessType.RO,
-                                               false)); /* only adv mode */
+        drbdKernelDirCombo = WidgetFactory.createInstance(
+                                       Widget.Type.COMBOBOX,
+                                       Widget.NO_DEFAULT,
+                                       Widget.NO_ITEMS,
+                                       Widget.NO_REGEXP,
+                                       0,    /* width */
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
 
         drbdKernelDirCombo.setEnabled(false);
         pane.add(drbdKernelDirCombo);
-        drbdArchCombo = new Widget(null, /* selected value */
-                                   null, /* items */
-                                   null, /* units */
-                                   Widget.Type.COMBOBOX,
-                                   null, /* regexp */
-                                   0,    /* width */
-                                   null, /* abbrv */
-                                   new AccessMode(ConfigData.AccessType.RO,
-                                                  false)); /* only adv. */
+        drbdArchCombo = WidgetFactory.createInstance(
+                                       Widget.Type.COMBOBOX,
+                                       Widget.NO_DEFAULT,
+                                       Widget.NO_ITEMS,
+                                       Widget.NO_REGEXP,
+                                       0,    /* width */
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
 
         drbdArchCombo.setEnabled(false);
         pane.add(drbdArchCombo);

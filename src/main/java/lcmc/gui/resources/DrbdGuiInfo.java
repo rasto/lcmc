@@ -24,7 +24,8 @@ package lcmc.gui.resources;
 import lcmc.Exceptions;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.Cluster;
 import lcmc.data.DrbdXML;
 import lcmc.data.ConfigData;
@@ -283,16 +284,18 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 };
             }
 
-            paramWi = new Widget(selectedValue,
+            paramWi = WidgetFactory.createInstance(
+                                 Widget.Type.TEXTFIELDWITHUNIT,
+                                 selectedValue,
                                  getPossibleChoices(param),
                                  units,
-                                 Widget.Type.TEXTFIELDWITHUNIT,
-                                 null, /* regexp */
+                                 Widget.NO_REGEXP,
                                  width,
-                                 null, /* abbrv */
+                                 Widget.NO_ABBRV,
                                  new AccessMode(
                                       getAccessType(param),
-                                      isEnabledOnlyInAdvancedMode(param)));
+                                      isEnabledOnlyInAdvancedMode(param)),
+                                 Widget.NO_BUTTON);
 
             widgetAdd(param, prefix, paramWi);
         } else {

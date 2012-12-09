@@ -26,7 +26,9 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.data.Host;
 import lcmc.data.HostLocation;
 import lcmc.data.ResourceAgent;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.gui.widget.TextfieldWithUnit;
 
 import java.awt.geom.Point2D;
 import lcmc.data.resources.Service;
@@ -1557,24 +1559,24 @@ public class ServiceInfo extends EditableInfo {
             abbreviations.put("I", CRMXML.INFINITY_STRING);
             abbreviations.put("a", "ALWAYS");
             abbreviations.put("n", "NEVER");
-            final Widget wi =
-                     new Widget(null,
-                                new String[]{null,
-                                             "0",
-                                             "2",
-                                             "ALWAYS",
-                                             "NEVER",
-                                             CRMXML.INFINITY_STRING,
-                                             CRMXML.MINUS_INFINITY_STRING,
-                                             CRMXML.INFINITY_STRING},
-                                null, /* units */
-                                null, /* type */
-                                "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
-                                + "))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
-                                rightWidth,
-                                abbreviations,
-                                new AccessMode(ConfigData.AccessType.ADMIN,
-                                               false));
+            final Widget wi = WidgetFactory.createInstance(
+                                  Widget.Type.COMBOBOX,
+                                  null,
+                                  new String[]{null,
+                                               "0",
+                                               "2",
+                                               "ALWAYS",
+                                               "NEVER",
+                                               CRMXML.INFINITY_STRING,
+                                               CRMXML.MINUS_INFINITY_STRING,
+                                               CRMXML.INFINITY_STRING},
+                                  "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
+                                  + "))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
+                                  rightWidth,
+                                  abbreviations,
+                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                                 false),
+                                  Widget.NO_BUTTON);
             wi.setEditable(true);
             final Widget prevWi = scoreComboBoxHash.get(hi);
             scoreComboBoxHash.put(hi, wi);
@@ -1673,27 +1675,27 @@ public class ServiceInfo extends EditableInfo {
         } else {
             savedPO = prevWi.getStringValue();
         }
-        final Widget pingWi =
-               new Widget(savedPO,
-                          new StringInfo[]{new StringInfo(
-                                             Widget.NOTHING_SELECTED,
-                                             null,
-                                             getBrowser()),
-                                           new StringInfo(
-                                             PING_ATTRIBUTES.get("defined"),
-                                             "defined",
-                                             getBrowser()),
-                                           new StringInfo(
-                                             PING_ATTRIBUTES.get("eq0"),
-                                             "eq0",
-                                             getBrowser())},
-                          null, /* units */
-                          null, /* type */
-                          null, /* regexp */
-                          rightWidth,
-                          null, /* abbreviations */
-                          new AccessMode(ConfigData.AccessType.ADMIN,
-                                         false));
+        final Widget pingWi = WidgetFactory.createInstance(
+                             Widget.Type.COMBOBOX,
+                             savedPO,
+                             new StringInfo[]{new StringInfo(
+                                                Widget.NOTHING_SELECTED,
+                                                null,
+                                                getBrowser()),
+                                              new StringInfo(
+                                                PING_ATTRIBUTES.get("defined"),
+                                                "defined",
+                                                getBrowser()),
+                                              new StringInfo(
+                                                PING_ATTRIBUTES.get("eq0"),
+                                                "eq0",
+                                                getBrowser())},
+                             Widget.NO_REGEXP,
+                             rightWidth,
+                             Widget.NO_ABBRV,
+                             new AccessMode(ConfigData.AccessType.ADMIN,
+                                            false),
+                             Widget.NO_BUTTON);
         addField(panel, pingLabel, pingWi, leftWidth, rightWidth, 0);
         pingWi.setLabel(pingLabel,
                         Tools.getString("ServiceInfo.PingdToolTip"));
@@ -1991,16 +1993,17 @@ public class ServiceInfo extends EditableInfo {
         if (savedOpIdRef != null) {
             defaultOpIdRef = savedOpIdRef.toString();
         }
-        sameAsOperationsWi = new Widget(defaultOpIdRef,
-                                        getSameServicesOperations(),
-                                        null, /* units */
-                                        null, /* type */
-                                        null, /* regexp */
-                                        rightWidth,
-                                        null, /* abbrv */
-                                        new AccessMode(
-                                                  ConfigData.AccessType.ADMIN,
-                                                  false));
+        sameAsOperationsWi = WidgetFactory.createInstance(
+                                          Widget.Type.COMBOBOX,
+                                          defaultOpIdRef,
+                                          getSameServicesOperations(),
+                                          Widget.NO_REGEXP,
+                                          rightWidth,
+                                          Widget.NO_ABBRV,
+                                          new AccessMode(
+                                                    ConfigData.AccessType.ADMIN,
+                                                    false),
+                                          Widget.NO_BUTTON);
         sameAsOperationsWi.setToolTipText(defaultOpIdRef);
         final JLabel label = new JLabel(Tools.getString(
                                            "ClusterBrowser.OperationsSameAs"));
@@ -2037,9 +2040,7 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = "";
                 }
-                Widget.Type type;
                 final String regexp = "^-?\\d*$";
-                type = Widget.Type.TEXTFIELDWITHUNIT;
                 // TODO: old style resources
                 if (defaultValue == null) {
                     defaultValue = "0";
@@ -2070,16 +2071,16 @@ public class ServiceInfo extends EditableInfo {
                 if (savedValue != null) {
                     defaultValue = savedValue;
                 }
-                final Widget wi = new Widget(defaultValue,
-                                             null, /* items */
+                final Widget wi = new TextfieldWithUnit(
+                                             defaultValue,
                                              getUnits(),
-                                             type,
                                              regexp,
                                              rightWidth,
-                                             null, /* abbrv */
+                                             Widget.NO_ABBRV,
                                              new AccessMode(
                                                    ConfigData.AccessType.ADMIN,
-                                                   false));
+                                                   !AccessMode.ADVANCED),
+                                             Widget.NO_BUTTON);
                 wi.setEnabled(savedOpIdRef == null);
 
                 mOperationsComboBoxHashWriteLock.lock();
@@ -2557,16 +2558,17 @@ public class ServiceInfo extends EditableInfo {
         if (savedMAIdRef != null) {
             defaultMAIdRef = savedMAIdRef.toString();
         }
-        sameAsMetaAttrsWi = new Widget(defaultMAIdRef,
-                                       getSameServicesMetaAttrs(),
-                                       null, /* units */
-                                       null, /* type */
-                                       null, /* regexp */
-                                       ClusterBrowser.SERVICE_FIELD_WIDTH,
-                                       null, /* abbrv */
-                                       new AccessMode(
+        sameAsMetaAttrsWi = WidgetFactory.createInstance(
+                                         Widget.Type.COMBOBOX,
+                                         defaultMAIdRef,
+                                         getSameServicesMetaAttrs(),
+                                         Widget.NO_REGEXP,
+                                         ClusterBrowser.SERVICE_FIELD_WIDTH,
+                                         Widget.NO_ABBRV,
+                                         new AccessMode(
                                                    ConfigData.AccessType.ADMIN,
-                                                   false));
+                                                   false),
+                                         Widget.NO_BUTTON);
         sameAsMetaAttrsWi.setToolTipText(defaultMAIdRef);
         final Map<String, Widget> sameAsFields = new HashMap<String, Widget>();
         sameAsFields.put("Meta Attributes", sameAsMetaAttrsWi);
@@ -2761,19 +2763,19 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!getResourceAgent().isClone() && getGroupInfo() == null) {
-            typeRadioGroup = new Widget(
+            typeRadioGroup = WidgetFactory.createInstance(
+                                     Widget.Type.RADIOGROUP,
                                      defaultValue,
                                      new String[]{PRIMITIVE_TYPE_STRING,
                                                   CLONE_TYPE_STRING,
                                                   MASTER_SLAVE_TYPE_STRING},
-                                     null, /* units */
-                                     Widget.Type.RADIOGROUP,
-                                     null, /* regexp */
+                                     Widget.NO_REGEXP,
                                      ClusterBrowser.SERVICE_LABEL_WIDTH
                                      + ClusterBrowser.SERVICE_FIELD_WIDTH,
-                                     null, /* abbrv */
+                                     Widget.NO_ABBRV,
                                      new AccessMode(ConfigData.AccessType.ADMIN,
-                                                    false));
+                                                    false),
+                                     Widget.NO_BUTTON);
 
             if (!getService().isNew()) {
                 typeRadioGroup.setEnabled(false);

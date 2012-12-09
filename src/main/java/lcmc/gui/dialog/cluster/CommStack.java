@@ -29,7 +29,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 
@@ -236,18 +237,19 @@ final class CommStack extends DialogCluster {
         if (defaultValue == null) {
             defaultValue = ConfigData.COROSYNC_NAME;
         }
-        chooseStackCombo = new Widget(defaultValue,
-                                      new String[]{
-                                               ConfigData.HEARTBEAT_NAME,
-                                               ConfigData.COROSYNC_NAME},
-                                      null, /* units */
-                                      Widget.Type.RADIOGROUP,
-                                      null, /* regexp */
-                                      500,
-                                      null, /* abbrv */
-                                      new AccessMode(
-                                             ConfigData.AccessType.ADMIN,
-                                             false)); /* only adv. mode */
+        chooseStackCombo = WidgetFactory.createInstance(
+                                          Widget.Type.RADIOGROUP,
+                                          defaultValue,
+                                          new String[]{
+                                                   ConfigData.HEARTBEAT_NAME,
+                                                   ConfigData.COROSYNC_NAME},
+                                          Widget.NO_REGEXP,
+                                          500,
+                                          Widget.NO_ABBRV,
+                                          new AccessMode(
+                                                 ConfigData.AccessType.ADMIN,
+                                                 false), /* only adv. mode */
+                                          Widget.NO_BUTTON);
         chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);

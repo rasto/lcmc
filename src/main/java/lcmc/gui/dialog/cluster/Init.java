@@ -37,7 +37,8 @@ import lcmc.utilities.SSH;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.ExecCallback;
 import lcmc.gui.ProgressBar;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.event.ActionListener;
@@ -125,17 +126,17 @@ public class Init extends DialogCluster {
     private static final String OPENAIS_INIT_SCRIPT = "/etc/init.d/openais";
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
-    private final Widget useOpenaisButton =
-                        new Widget(null,
+    private final Widget useOpenaisButton = WidgetFactory.createInstance(
+                                   Widget.Type.RADIOGROUP,
+                                   Widget.NO_DEFAULT,
                                    new String[]{COROSYNC_INIT_SCRIPT,
                                                 OPENAIS_INIT_SCRIPT},
-                                   null,
-                                   Widget.Type.RADIOGROUP,
-                                   null,
+                                   Widget.NO_REGEXP,
                                    0,
-                                   null,
+                                   Widget.NO_ABBRV,
                                    new AccessMode(ConfigData.AccessType.ADMIN,
-                                                  false));
+                                                  !AccessMode.ADVANCED),
+                                   Widget.NO_BUTTON);
 
     /** Prepares a new <code>Init</code> object. */
     public Init(final WizardDialog previousDialog,

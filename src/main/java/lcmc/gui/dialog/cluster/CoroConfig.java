@@ -37,7 +37,8 @@ import lcmc.data.AisCastAddress;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.Exceptions.IllegalVersionException;
@@ -926,43 +927,45 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final String[] types = {MCAST_TYPE};
 
-        typeW = new Widget(MCAST_TYPE,
-                                 types,
-                                 null, /* units */
-                                 null, /* type */
-                                 null, /* regexp */
-                                 TYPE_COMBOBOX_WIDTH,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.RO,
-                                                false)); /* only adv. mode */
+        typeW = WidgetFactory.createInstance(
+                                   Widget.GUESS_TYPE,
+                                   MCAST_TYPE,
+                                   types,
+                                   Widget.NO_REGEXP,
+                                   TYPE_COMBOBOX_WIDTH,
+                                   Widget.NO_ABBRV,
+                                   new AccessMode(ConfigData.AccessType.RO,
+                                                  !AccessMode.ADVANCED),
+                                   Widget.NO_BUTTON);
         typeW.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        ifaceW = new Widget(null, /* selected value */
-                                  ni,
-                                  null, /* units */
-                                  null, /* type */
-                                  null, /* regexp */
-                                  INTF_COMBOBOX_WIDTH,
-                                  null, /* abbrv */
-                                  new AccessMode(ConfigData.AccessType.RO,
-                                                 false)); /* only adv. mode */
+        ifaceW = WidgetFactory.createInstance(
+                                    Widget.GUESS_TYPE,
+                                    Widget.NO_DEFAULT,
+                                    ni,
+                                    Widget.NO_REGEXP,
+                                    INTF_COMBOBOX_WIDTH,
+                                    Widget.NO_ABBRV,
+                                    new AccessMode(ConfigData.AccessType.RO,
+                                                   false), /* only adv. mode */
+                                    Widget.NO_BUTTON);
 
         /* this matches something like this: 225.0.0.43 694 1 0
          * if you think that the regexp is too complicated for that, consider,
          * that it must match also during the thing is written.
          */
         final String regexp = "^[\\d.]+$";
-        addrW = new Widget(
+        addrW = WidgetFactory.createInstance(
+              Widget.GUESS_TYPE,
               Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress"),
-              null, /* items */
-              null, /* units */
-              null, /* type */
+              Widget.NO_ITEMS,
               regexp,
               ADDR_COMBOBOX_WIDTH,
-              null, /* abbrv */
+              Widget.NO_ABBRV,
               new AccessMode(ConfigData.AccessType.RO,
-                             false)); /* only adv. mode */
+                             !AccessMode.ADVANCED),
+              Widget.NO_BUTTON);
 
         typeW.addListeners(new WidgetListener() {
                                 @Override
@@ -979,16 +982,16 @@ final class CoroConfig extends DialogCluster {
                              });
 
         final String portRegexp = "^\\d+$";
-        portW = new Widget(
+        portW = WidgetFactory.createInstance(
+                Widget.GUESS_TYPE,
                 Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort"),
-                null, /* items */
-                null, /* units */
-                null, /* type */
+                Widget.NO_ITEMS,
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
-                null, /* abbrv */
+                Widget.NO_ABBRV,
                 new AccessMode(ConfigData.AccessType.RO,
-                               false)); /* only adv. mode */
+                               !AccessMode.ADVANCED),
+                Widget.NO_BUTTON);
         portW.addListeners(new WidgetListener() {
                                  @Override
                                  public void check(final Object value) {

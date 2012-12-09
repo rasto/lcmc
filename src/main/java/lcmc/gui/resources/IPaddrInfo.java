@@ -22,7 +22,8 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.ResourceAgent;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
@@ -110,16 +111,17 @@ final class IPaddrInfo extends ServiceInfo {
                                     getBrowser().getNetworksNode().children());
 
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
-            paramWi = new Widget(ip,
-                                 networks,
-                                 null, /* units */
+            paramWi = WidgetFactory.createInstance(
                                  Widget.Type.COMBOBOX,
+                                 ip,
+                                 networks,
                                  regexp,
                                  width,
-                                 null, /* abbrv */
+                                 Widget.NO_ABBRV,
                                  new AccessMode(
                                            getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)));
+                                           isEnabledOnlyInAdvancedMode(param)),
+                                 Widget.NO_BUTTON);
 
             paramWi.setAlwaysEditable(true);
             widgetAdd(param, prefix, paramWi);

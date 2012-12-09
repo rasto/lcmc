@@ -31,7 +31,8 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.StringInfo;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
@@ -298,15 +299,16 @@ final class CreateFS extends DrbdConfig {
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             defaultHost = hostNames[1];
         }
-        hostW = new Widget(defaultHost,
-                           hostNames,
-                           null, /* units */
-                           Widget.Type.COMBOBOX,
-                           null, /* regexp */
-                           COMBOBOX_WIDTH,
-                           null, /* abbrv */
-                           new AccessMode(ConfigData.AccessType.RO,
-                                          false)); /* only adv. mode */
+        hostW = WidgetFactory.createInstance(
+                                       Widget.Type.COMBOBOX,
+                                       defaultHost,
+                                       hostNames,
+                                       Widget.NO_REGEXP,
+                                       COMBOBOX_WIDTH,
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
         hostW.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
@@ -328,15 +330,16 @@ final class CreateFS extends DrbdConfig {
             getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
                                                                 defaultValue);
 
-        filesystemW = new Widget(defaultValue,
-                                 filesystems,
-                                 null, /* units */
-                                 Widget.Type.COMBOBOX,
-                                 null, /* regexp */
-                                 COMBOBOX_WIDTH,
-                                 null, /* abbrv */
-                                 new AccessMode(ConfigData.AccessType.RO,
-                                                false)); /* only adv. */
+        filesystemW = WidgetFactory.createInstance(
+                                     Widget.Type.COMBOBOX,
+                                     defaultValue,
+                                     filesystems,
+                                     Widget.NO_REGEXP,
+                                     COMBOBOX_WIDTH,
+                                     Widget.NO_ABBRV,
+                                     new AccessMode(ConfigData.AccessType.RO,
+                                                    !AccessMode.ADVANCED),
+                                     Widget.NO_BUTTON);
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemW);
         filesystemW.addListeners(new WidgetListener() {
@@ -364,16 +367,17 @@ final class CreateFS extends DrbdConfig {
         skipSyncLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));
         skipSyncLabel.setEnabled(false);
-        skipSyncW = new Widget(SKIP_SYNC_FALSE,
-                               new String[]{SKIP_SYNC_TRUE,
-                                            SKIP_SYNC_FALSE},
-                               null, /* units */
-                               Widget.Type.CHECKBOX,
-                               null, /* regexp */
-                               COMBOBOX_WIDTH,
-                               null, /* abbrv */
-                               new AccessMode(ConfigData.AccessType.RO,
-                                              false)); /* only adv. */
+        skipSyncW = WidgetFactory.createInstance(
+                                      Widget.Type.CHECKBOX,
+                                      SKIP_SYNC_FALSE,
+                                      new String[]{SKIP_SYNC_TRUE,
+                                                   SKIP_SYNC_FALSE},
+                                      Widget.NO_REGEXP,
+                                      COMBOBOX_WIDTH,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         skipSyncW.setEnabled(false);
         skipSyncW.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));

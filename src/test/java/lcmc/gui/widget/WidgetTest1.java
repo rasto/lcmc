@@ -1,4 +1,4 @@
-package lcmc.gui;
+package lcmc.gui.widget;
 
 import junit.framework.TestCase;
 import java.util.HashMap;
@@ -15,27 +15,22 @@ public final class WidgetTest1 extends TestCase {
     protected void setUp() {
         TestSuite1.initTest();
         for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
-            widget = new Widget(
-                          null,
+            widget = WidgetFactory.createInstance(
+                          Widget.GUESS_TYPE,
+                          Widget.NO_DEFAULT,
                           new String[]{"a", "b", "c"},
-                          null, /* units */
-                          null, /* type */
-                          null, /* regexp */
+                          Widget.NO_REGEXP,
                           100, /* width */
-                          new HashMap<String, String>(), /* abrv */
-                          new AccessMode(ConfigData.AccessType.ADMIN, true));
+                          Widget.NO_ABBRV,
+                          new AccessMode(ConfigData.AccessType.ADMIN,
+                                         AccessMode.ADVANCED),
+                          Widget.NO_BUTTON);
         }
     }
 
     @After
     protected void tearDown() {
         assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
-    @Test
-    public void testIsCheckBox() {
-        assertFalse(widget.isCheckBox());
     }
 
     @Test
@@ -52,20 +47,20 @@ public final class WidgetTest1 extends TestCase {
     @Test
     public void testSetEnabled() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.setEnabled(null, false);
-            widget.setEnabled(null, true);
-            widget.setEnabled("a", false);
-            widget.setEnabled("a", true);
+            //widget.setEnabled(null, false);
+            //widget.setEnabled(null, true);
+            //widget.setEnabled("a", false);
+            //widget.setEnabled("a", true);
         }
     }
 
     @Test
     public void testSetVisible() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.setEnabled(null, false);
-            widget.setEnabled(null, true);
-            widget.setEnabled("a", false);
-            widget.setEnabled("a", true);
+            //widget.setEnabled(null, false);
+            //widget.setEnabled(null, true);
+            //widget.setEnabled("a", false);
+            //widget.setEnabled("a", true);
         }
     }
 
@@ -80,10 +75,10 @@ public final class WidgetTest1 extends TestCase {
 
     @Test
     public void testSetLabelToolTipText() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.setLabelToolTipText(null);
-            widget.setLabelToolTipText("x");
-        }
+        //for (int i = 0; i < TestSuite1.getFactor(); i++) {
+        //    widget.setLabelToolTipText(null);
+        //    widget.setLabelToolTipText("x");
+        //}
     }
 
     @Test

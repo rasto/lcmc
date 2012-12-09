@@ -22,7 +22,7 @@
 package lcmc.data;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.ServiceInfo;
 import java.util.List;

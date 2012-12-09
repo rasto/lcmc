@@ -29,7 +29,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.util.Arrays;
@@ -270,29 +271,29 @@ public class DrbdAvailFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* drbd version combo box */
-        drbdVersionCombo = new Widget(null, /* selected value */
-                                      null, /* items */
-                                      null, /* units */
+        drbdVersionCombo = WidgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
-                                      null, /* regexp */
+                                      Widget.NO_DEFAULT,
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
                                       0,    /* width */
-                                      null, /* abbrv */
-                                      new AccessMode(
-                                             ConfigData.AccessType.RO,
-                                             false)); /* only adv. mode */
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
         pane.add(drbdVersionCombo);
 
         /* build combo box */
-        drbdBuildCombo = new Widget(null, /* selected value */
-                                    null, /* items */
-                                    null, /* units */
-                                    Widget.Type.COMBOBOX,
-                                    null, /* regexp */
-                                    0,    /* width */
-                                    null, /* abbrv */
-                                    new AccessMode(
-                                             ConfigData.AccessType.RO,
-                                             false)); /* only adv. mode */
+        drbdBuildCombo = WidgetFactory.createInstance(
+                                      Widget.Type.COMBOBOX,
+                                      Widget.NO_DEFAULT,
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
+                                      0,    /* width */
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
 
         pane.add(drbdBuildCombo);
 

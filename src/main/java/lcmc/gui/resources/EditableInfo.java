@@ -22,7 +22,9 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.gui.widget.Label;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -390,7 +392,7 @@ public abstract class EditableInfo extends Info {
                 }
             });
             int height = 0;
-            if (paramWi.getType() == Widget.Type.LABELFIELD) {
+            if (paramWi instanceof Label) {
                 height = Tools.getDefaultSize("Browser.LabelFieldHeight");
             }
             addField(panel, label, paramWi, leftWidth, rightWidth, height);
@@ -406,7 +408,7 @@ public abstract class EditableInfo extends Info {
                     continue;
                 }
                 int height = 0;
-                if (rpwi.getType() == Widget.Type.LABELFIELD) {
+                if (rpwi instanceof Label) {
                     height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
                 final Widget rpwi0 = rpwi;
@@ -695,17 +697,18 @@ public abstract class EditableInfo extends Info {
         } else if (isLabel(param)) {
             type = Widget.Type.LABELFIELD;
         }
-        final Widget paramWi = new Widget(
+        final Widget paramWi = WidgetFactory.createInstance(
+                                      type,
                                       initValue,
                                       getPossibleChoices(param),
                                       units,
-                                      type,
                                       regexp,
                                       width,
                                       abbreviations,
                                       new AccessMode(
                                         getAccessType(param),
-                                        isEnabledOnlyInAdvancedMode(param)));
+                                        isEnabledOnlyInAdvancedMode(param)),
+                                      null);
         widgetAdd(param, prefix, paramWi);
         paramWi.setEditable(true);
         return paramWi;

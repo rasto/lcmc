@@ -26,7 +26,8 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.BorderLayout;
@@ -152,15 +153,16 @@ public final class Name extends DialogCluster {
         }
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
-        nameField = new Widget(getCluster().getName(),
-                               null, /* items */
-                               null, /* units */
-                               null, /* type */
-                               regexp,
-                               NAME_FIELD_WIDTH,
-                               null, /* abbrv */
-                               new AccessMode(ConfigData.AccessType.RO,
-                                              false)); /* only adv. mode */
+        nameField = WidgetFactory.createInstance(
+                                       Widget.GUESS_TYPE,
+                                       getCluster().getName(),
+                                       Widget.NO_ITEMS,
+                                       regexp,
+                                       NAME_FIELD_WIDTH,
+                                       Widget.NO_ABBRV,
+                                       new AccessMode(ConfigData.AccessType.RO,
+                                                      !AccessMode.ADVANCED),
+                                       Widget.NO_BUTTON);
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField);
         pane.add(nameField);

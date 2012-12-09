@@ -28,7 +28,8 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.DRBD;
@@ -287,16 +288,16 @@ final class CreateMD extends DrbdConfig {
             makeMDButton.setText(
                  Tools.getString("Dialog.DrbdConfig.CreateMD.CreateMDButton"));
             final String metadataDefault = createNewMetadata;
-            metadataWi = new Widget(metadataDefault,
-                                    choices,
-                                    null, /* units */
-                                    Widget.Type.COMBOBOX,
-                                    null, /* regexp */
-                                    COMBOBOX_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(
-                                             ConfigData.AccessType.RO,
-                                             false)); /* only adv. mode */
+            metadataWi = WidgetFactory.createInstance(
+                                        Widget.Type.COMBOBOX,
+                                        metadataDefault,
+                                        choices,
+                                        Widget.NO_REGEXP,
+                                        COMBOBOX_WIDTH,
+                                        Widget.NO_ABBRV,
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       !AccessMode.ADVANCED),
+                                        Widget.NO_BUTTON);
         } else {
             final String[] choices = {useExistingMetadata,
                                       createNewMetadata,
@@ -309,16 +310,16 @@ final class CreateMD extends DrbdConfig {
                 metadataDefault = createNewMetadata;
                 makeMDButton.setEnabled(true);
             }
-            metadataWi = new Widget(metadataDefault,
-                                    choices,
-                                    null, /* units */
-                                    Widget.Type.COMBOBOX,
-                                    null, /* regexp */
-                                    COMBOBOX_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(
-                                             ConfigData.AccessType.RO,
-                                             false)); /* only adv. mode */
+            metadataWi = WidgetFactory.createInstance(
+                                        Widget.Type.COMBOBOX,
+                                        metadataDefault,
+                                        choices,
+                                        Widget.NO_REGEXP,
+                                        COMBOBOX_WIDTH,
+                                        Widget.NO_ABBRV,
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       !AccessMode.ADVANCED),
+                                        Widget.NO_BUTTON);
         }
 
         inputPane.add(metadataLabel);

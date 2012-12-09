@@ -24,7 +24,8 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.DiskData;
@@ -1978,14 +1979,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 defaultValue = DEFINED_ON_HOST_FALSE;
             }
             final MyButton hostBtn = getHostButton(host, prefix);
-            final Widget wi = new Widget(
-                                        defaultValue,
-                                        null, /* items */
-                                        null,
+            final Widget wi = WidgetFactory.createInstance(
                                         Widget.Type.CHECKBOX,
-                                        null,
+                                        defaultValue,
+                                        Widget.NO_ITEMS,
+                                        Widget.NO_REGEXP,
                                         ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
-                                        null, /* abbrv */
+                                        Widget.NO_ABBRV,
                                         new AccessMode(
                                           ConfigData.AccessType.ADMIN,
                                           false),

@@ -22,7 +22,8 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.ParallelSerialData;
 import lcmc.data.Host;
@@ -456,14 +457,13 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                 getParamSaved(ParallelSerialData.SOURCE_PATH);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
-            final Widget paramWi = new Widget(
-                                  sourceFile,
-                                  null,
-                                  null, /* units */
+            final Widget paramWi = WidgetFactory.createInstance(
                                   Widget.Type.TEXTFIELD,
+                                  sourceFile,
+                                  Widget.NO_ITEMS,
                                   regexp,
                                   width,
-                                  null, /* abbrv */
+                                  Widget.NO_ABBRV,
                                   new AccessMode(getAccessType(param),
                                                  false), /* only adv. mode */
                                   fileChooserBtn);

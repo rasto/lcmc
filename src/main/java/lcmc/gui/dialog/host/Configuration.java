@@ -27,7 +27,8 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JLabel;
@@ -353,17 +354,16 @@ final class Configuration extends DialogHost {
             hostnames = hostname.split(",");
         }
         for (int i = 0; i < hops; i++) {
-            hostnameField[i] = new Widget(hostnames[i],
-                                          null, /* items */
-                                          null, /* units */
-                                          null, /* type*/
-                                          null, /* regexp*/
-                                          COMBO_BOX_WIDTH,
-                                          null, /* abbrv */
-                                          new AccessMode(
-                                               ConfigData.AccessType.RO,
-                                               false)); /* only adv mode */
-
+            hostnameField[i] = WidgetFactory.createInstance(
+                                      Widget.GUESS_TYPE,
+                                      hostnames[i],
+                                      Widget.NO_ITEMS,
+                                      Widget.NO_REGEXP,
+                                      COMBO_BOX_WIDTH,
+                                      Widget.NO_ABBRV,
+                                      new AccessMode(ConfigData.AccessType.RO,
+                                                     !AccessMode.ADVANCED),
+                                      Widget.NO_BUTTON);
             inputPane.add(hostnameField[i]);
         }
 
@@ -375,16 +375,16 @@ final class Configuration extends DialogHost {
             if (getHost().getIp(i) == null) {
                 getHost().setIps(i, null);
             }
-            ipCombo[i] = new Widget(getHost().getIp(i),
-                                    getHost().getIps(i),
-                                    null, /* units */
-                                    Widget.Type.COMBOBOX,
-                                    null, /* regexp */
-                                    COMBO_BOX_WIDTH,
-                                    null, /* abbrv */
-                                    new AccessMode(
-                                                ConfigData.AccessType.RO,
-                                                false)); /* only adv. */
+            ipCombo[i] = WidgetFactory.createInstance(
+                                        Widget.Type.COMBOBOX,
+                                        getHost().getIp(i),
+                                        getHost().getIps(i),
+                                        Widget.NO_REGEXP,
+                                        COMBO_BOX_WIDTH,
+                                        Widget.NO_ABBRV,
+                                        new AccessMode(ConfigData.AccessType.RO,
+                                                       !AccessMode.ADVANCED),
+                                        Widget.NO_BUTTON);
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

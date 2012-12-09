@@ -25,7 +25,7 @@ import lcmc.Exceptions;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
-import lcmc.gui.Widget;
+import lcmc.gui.widget.Widget;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.Info;
 import java.awt.Robot;
