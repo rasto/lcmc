@@ -856,12 +856,14 @@ public final class TextResource extends java.util.ListResourceBundle {
          "DRBD is not loaded"},
 
         {"Dialog.About.Title",
-         "Linux Cluster Management Console. Release: "},
+         "Linux Cluster Management Console, release: "},
 
         {"Dialog.About.Description",
-         "<b> by "
-         + "rasto.levrinc@gmail.com.</b><br>"
-         + "(C)opyright 2011 - 2012 by Rasto Levrinc.<br>"
+         "<b>by rasto.levrinc@gmail.com.</b><br><br>"
+         + "<b>(C)opyright 2011 - 2012, Rastislav Levrinc</b><br><br>"
+         + "Based on DRBD Management Console<br>"
+         + "(C)opyright 2007 - 2011, Linbit HA-Solutions<br>"
+         + "written by Rasto Levrinc<br><br>"
          + "Please visit the website:<br><br>"
          + "http://lcmc.sourceforge.net<br>"
          + "http://github.com/rasto/lcmc<br>" },
@@ -893,7 +895,6 @@ public final class TextResource extends java.util.ListResourceBundle {
 + "* tightvnc, released under the terms of the GPL License\n"
 + "* ultravnc, released under the terms of the GPL License\n"
 + "* realvnc, released under the terms of the GPL License\n"
-+ "* DRBD MC, released under the terms of the GPL License\n"
          },
 
         {"Dialog.EditConfig.Title",
