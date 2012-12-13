@@ -193,16 +193,9 @@ public final class HostInfo extends Info {
                                     crmConfigureCommitButton,
                                     new AccessMode(ConfigData.AccessType.ADMIN,
                                                    false));
-        final MyButton crmMonButton =
+        final MyButton hostInfoButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
-        crmMonButton.miniButton();
-        final MyButton crmVerifyBtn =
-                        new MyButton(Tools.getString("HostInfo.crmVerifyBtn"));
-        crmVerifyBtn.miniButton();
-        final MyButton coroMembersBtn =
-                      new MyButton(Tools.getString("HostInfo.coroMembersBtn"));
-        coroMembersBtn.miniButton();
-        coroMembersBtn.setEnabled(host.isCorosync());
+        hostInfoButton.miniButton();
 
         final MyButton crmConfigureShowButton =
                   new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
@@ -216,9 +209,7 @@ public final class HostInfo extends Info {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
-                            crmMonButton.setEnabled(true);
-                            crmVerifyBtn.setEnabled(true);
-                            coroMembersBtn.setEnabled(host.isCorosync());
+                            hostInfoButton.setEnabled(true);
                             crmShowInProgress = false;
                         }
                     });
@@ -236,7 +227,7 @@ public final class HostInfo extends Info {
                 }
 
             };
-        crmMonButton.addActionListener(new ActionListener() {
+        hostInfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 registerComponentEditAccessMode(
@@ -244,54 +235,16 @@ public final class HostInfo extends Info {
                                 new AccessMode(ConfigData.AccessType.GOD,
                                                false));
                 crmInfo = true;
-                crmMonButton.setEnabled(false);
+                hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
-                host.execCommand("HostBrowser.getCrmMon",
+                host.execCommand("HostBrowser.getHostInfo",
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
                                  false,  /* outputVisible */
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             }
         });
-        host.registerEnableOnConnect(crmMonButton);
-
-        crmVerifyBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(
-                                ta,
-                                new AccessMode(ConfigData.AccessType.GOD,
-                                               false));
-                crmInfo = true;
-                crmVerifyBtn.setEnabled(false);
-                crmConfigureCommitButton.setEnabled(false);
-                host.execCommand("HostBrowser.getCrmVerify",
-                                 execCallback,
-                                 null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
-            }
-        });
-        host.registerEnableOnConnect(crmVerifyBtn);
-
-        coroMembersBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(
-                                ta,
-                                new AccessMode(ConfigData.AccessType.GOD,
-                                               false));
-                crmInfo = true;
-                coroMembersBtn.setEnabled(false);
-                crmConfigureCommitButton.setEnabled(false);
-                host.execCommand("HostBrowser.getCoroMembers",
-                                 execCallback,
-                                 null,  /* ConvertCmdCallback */
-                                 true,  /* outputVisible */
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
-            }
-        });
-        host.registerEnableOnConnect(coroMembersBtn);
+        host.registerEnableOnConnect(hostInfoButton);
 
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override
@@ -416,9 +369,9 @@ public final class HostInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, 75));
-        buttonPanel.setPreferredSize(new Dimension(0, 75));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 75));
+        buttonPanel.setMinimumSize(new Dimension(0, 50));
+        buttonPanel.setPreferredSize(new Dimension(0, 50));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -426,14 +379,12 @@ public final class HostInfo extends Info {
         final JPanel p = new JPanel(new SpringLayout());
         p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
-        p.add(crmMonButton);
+        p.add(hostInfoButton);
         p.add(crmConfigureShowButton);
         p.add(crmConfigureCommitButton);
 
-        p.add(coroMembersBtn);
-        p.add(crmVerifyBtn);
         p.add(new JLabel(""));
-        SpringUtilities.makeCompactGrid(p, 2, 3,  // rows, cols
+        SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(
@@ -445,7 +396,7 @@ public final class HostInfo extends Info {
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
-        host.execCommand("HostBrowser.getCrmMon",
+        host.execCommand("HostBrowser.getHostInfo",
                          execCallback,
                          null,  /* ConvertCmdCallback */
                          false,  /* outputVisible */

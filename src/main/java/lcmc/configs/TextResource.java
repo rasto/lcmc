@@ -1829,7 +1829,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "commit"},
 
         {"HostInfo.crmShellStatusButton",
-         "<html>crm mon<br>(status)</html>"},
+         "<html>node info<br>(refresh)</html>"},
 
         {"HostInfo.crmShellShowButton",
          "<html>crm shell<br>(config)</html>"},
