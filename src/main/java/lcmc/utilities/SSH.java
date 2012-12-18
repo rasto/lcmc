@@ -550,6 +550,7 @@ public final class SSH {
                 Tools.appWarning(host.getName() + ":" + e.getMessage()
                                + ":"  + command);
                 exitCode = ERROR_EXIT_CODE;
+                cancel();
             }
             final String outputString = res.toString();
             Tools.debug(this, "output" + exitCode + ": "
