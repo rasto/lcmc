@@ -17,7 +17,7 @@ Source3:	lcmc.applications
 
 BuildRequires:	ant, jpackage-utils >= 1.5
 Requires:	 java >= 0:1.6.0
-BuildRequires:	 java-devel >= 0:1.6.0
+BuildRequires:	 java-devel >= 0:1.7.0
 BuildRequires:	 desktop-file-utils
 Requires(post):	 desktop-file-utils
 Requires(postun):	desktop-file-utils
