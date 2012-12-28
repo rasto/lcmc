@@ -1643,9 +1643,11 @@ if (/etc/init.d/$script status 2>&1|grep 'Usage:' >/dev/null); then \
 	done; \
 	exit 3; \
 else \
-	service $script status >/dev/null 2>&1; \
-	if [ "\$?" -eq "0" ]; then exit 0; fi; \
-	out=`/etc/init.d/$script status 2>&1`; \
+	if [ -e /etc/init.d/$script ]; then \
+		out=`/etc/init.d/$script status 2>&1`; \
+	else \
+		out=`service $script status 2>&1`; \
+	fi; \
 	ret=\$?; \
 	if [ -z "\$out" ]; then exit 111; else exit \$ret; fi; \
 fi
