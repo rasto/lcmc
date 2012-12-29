@@ -370,7 +370,7 @@ public final class LVResize extends LV {
                                        size,
                                        false);
         if (ret) {
-            answerPaneSetText("Lodical volume was successfully resized on "
+            answerPaneSetText("Logical volume was successfully resized on "
                               + blockDevInfo.getHost() + ".");
             /* resize lvm volume on the other node. */
             final String lvm = blockDevInfo.getBlockDevice().getName();
@@ -390,7 +390,7 @@ public final class LVResize extends LV {
                                                         size,
                                                         false);
                         if (oRet) {
-                            answerPaneAddText("Lodical volume was successfully"
+                            answerPaneAddText("Logical volume was successfully"
                                               + " resized on "
                                               + h.getName() + ".");
                         } else {
