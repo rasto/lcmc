@@ -4407,7 +4407,7 @@ public final class RoboTest {
             }
             dialogColorTest("create config");
 
-            sleep(4000);
+            sleep(10000);
             moveTo("Create Config");
             sleep(4000);
             leftClick();
@@ -4422,7 +4422,7 @@ public final class RoboTest {
                     /* two hosts */
                     moveTo(firstHost, JCheckBox.class); /* deselect first */
                     leftClick();
-                    sleep(2000);
+                    sleep(10000);
                     moveTo("Create Config");
                     sleep(2000);
                     leftClick();
@@ -4436,7 +4436,7 @@ public final class RoboTest {
                     moveTo(secondHost, JCheckBox.class); /* deselect second */
                     sleep(1000);
                     leftClick();
-                    sleep(1000);
+                    sleep(10000);
                     moveTo("Create Config");
                     sleep(2000);
                     leftClick();
@@ -4445,7 +4445,7 @@ public final class RoboTest {
 
                     moveTo(secondHost, JCheckBox.class); /* select second */
                     leftClick();
-                    sleep(2000);
+                    sleep(10000);
                     moveTo("Create Config");
                     sleep(4000);
                     leftClick();
