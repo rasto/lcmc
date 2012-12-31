@@ -28,6 +28,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.Cluster;
 import lcmc.data.DrbdXML;
+import lcmc.data.DrbdProxy;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
@@ -329,13 +330,32 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
             if (params.length != 0) {
                 final StringBuilder sectionConfig = new StringBuilder("");
+                boolean inPlugin = false;
                 for (String param : params) {
                     final String value = getComboBoxValue(param);
                     if (value == null || "".equals(value)) {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
-                        if (!volumesAvailable
+                        if (param.startsWith(DrbdProxy.PLUGIN_PREFIX)) {
+                            if (!inPlugin) {
+                                sectionConfig.append("\t\tplugin {\n");
+                                inPlugin = true;
+                            }
+                            sectionConfig.append("\t\t\t");
+                            sectionConfig.append(param.substring(
+                                               DrbdProxy.PLUGIN_PREFIX.length(),
+                                               param.length()));
+                            if (value.equals(DrbdXML.CONFIG_YES)) {
+                                /* boolean parameter */
+                                /* also >= DRBD 8.4 */
+                                sectionConfig.append(";\n");
+                            } else {
+                                sectionConfig.append(' ');
+                                sectionConfig.append(value);
+                                sectionConfig.append(";\n");
+                            }
+                        } else if (!volumesAvailable
                             && (isCheckBox(param)
                                 || "booleanhandler".equals(
                                                         getParamType(param)))) {
@@ -375,6 +395,10 @@ abstract class DrbdGuiInfo extends EditableInfo {
                                 }
                             }
                         } else { /* name value parameter */
+                            if (inPlugin) {
+                                sectionConfig.append("\t\t}\n");
+                                inPlugin = false;
+                            }
                             sectionConfig.append("\t\t");
                             sectionConfig.append(param);
                             sectionConfig.append('\t');
@@ -382,6 +406,11 @@ abstract class DrbdGuiInfo extends EditableInfo {
                             sectionConfig.append(";\n");
                         }
                     }
+                }
+
+                if (inPlugin) {
+                    sectionConfig.append("\t\t}\n");
+                    inPlugin = false;
                 }
 
                 if (sectionConfig.length() > 0) {

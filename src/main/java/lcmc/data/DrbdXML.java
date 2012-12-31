@@ -29,6 +29,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.gui.resources.StringInfo;
+import lcmc.Exceptions;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -776,6 +777,37 @@ public final class DrbdXML extends XML {
                     }
                 }
                 nameValueMap.put(name, value);
+            } else if (option.getNodeName().equals("section")) {
+                final String name = getAttribute(option, "name");
+                if ("plugin".equals(name)) {
+                    /* proxy */
+                    parseProxyPluginNode(option.getChildNodes(), nameValueMap);
+                }
+            }
+        }
+    }
+
+    /** Parse proxy XML plugin section. */
+    private void parseProxyPluginNode(final NodeList options,
+                                      final Map<String, String> nameValueMap) {
+        for (int i = 0; i < options.getLength(); i++) {
+            final Node option = options.item(i);
+            if (option.getNodeName().equals("option")) {
+                final String nameValues = getAttribute(option, "name");
+                final int spacePos = nameValues.indexOf(' ');
+                String name;
+                String value;
+                if (spacePos > 0) {
+                    name = DrbdProxy.PLUGIN_PREFIX
+                           + nameValues.substring(0, spacePos);
+                    value = nameValues.substring(spacePos + 1,
+                                                 nameValues.length());
+                } else {
+                    /* boolean */
+                    name = DrbdProxy.PLUGIN_PREFIX + nameValues;
+                    value = CONFIG_YES;
+                }
+                nameValueMap.put(name, value);
             }
         }
     }
@@ -984,20 +1016,48 @@ public final class DrbdXML extends XML {
             if (n.getNodeName().equals("host")) {
                 /* <host> */
                 parseHostConfig(resName, n);
-            } else if (n.getNodeName().equals("section")) {
-                /* <resource> */
-                final String secName = getAttribute(n, "name");
-
-                Map<String, String> nameValueMap =
-                                      optionsMap.get(resName + "." + secName);
-                if (nameValueMap == null) {
-                    nameValueMap = new HashMap<String, String>();
+            } else if (n.getNodeName().equals("section")
+                       || (n.getNodeName().equals("#text")
+                           && !"".equals(n.getNodeValue().trim()))) {
+                String secName;
+                if (n.getNodeName().equals("#text")) {
+                    secName = "proxy";
+                    /* workaround for broken proxy xml in common section
+                       at least till drbd 8.4.2 */
+                    Map<String, String> nameValueMap =
+                                       optionsMap.get(resName + "." + secName);
+                    if (nameValueMap == null) {
+                        nameValueMap = new HashMap<String, String>();
+                    } else {
+                        optionsMap.remove(resName + "." + secName);
+                    }
+                    try {
+                        final boolean isProxy =
+                              DrbdProxy.parse(n.getNodeValue(), nameValueMap);
+                        if (!isProxy) {
+                            continue;
+                        }
+                    } catch (Exceptions.DrbdConfigException e) {
+                        Tools.appWarning(e.getMessage());
+                        Tools.appWarning(n.getNodeValue());
+                        continue;
+                    }
+                    optionsMap.put(resName + "." + secName, nameValueMap);
                 } else {
-                    optionsMap.remove(resName + "." + secName);
-                }
+                    /* <resource> */
+                    secName = getAttribute(n, "name");
 
-                parseConfigSectionNode(n, nameValueMap);
-                optionsMap.put(resName + "." + secName, nameValueMap);
+                    Map<String, String> nameValueMap =
+                                       optionsMap.get(resName + "." + secName);
+                    if (nameValueMap == null) {
+                        nameValueMap = new HashMap<String, String>();
+                    } else {
+                        optionsMap.remove(resName + "." + secName);
+                    }
+
+                    parseConfigSectionNode(n, nameValueMap);
+                    optionsMap.put(resName + "." + secName, nameValueMap);
+                }
                 if (!sectionParamsMap.containsKey(secName)
                     && !sectionParamsMap.containsKey(secName + "-options")) {
                     Tools.appWarning("DRBD: unknown section: " + secName);
