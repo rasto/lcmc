@@ -88,7 +88,7 @@ public final class ComboBox extends Widget {
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private JComboBox getComboBox(final String selectedValue,
+    private MComboBox getComboBox(final String selectedValue,
                                   final Object[] items,
                                   final String regexp,
                                   final Map<String, String> abbreviations) {
@@ -97,7 +97,7 @@ public final class ComboBox extends Widget {
         final Object selectedValueInfo = addItems(comboList,
                                                   selectedValue,
                                                   items);
-        final JComboBox cb = new JComboBox(comboList.toArray(
+        final MComboBox cb = new MComboBox(comboList.toArray(
                                             new Object[comboList.size()]));
         final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
@@ -135,42 +135,12 @@ public final class ComboBox extends Widget {
                 /* do nothing */
             }
         });
-        cb.addPopupMenuListener(new PopupMenuListener() {
-            @Override
-            public void popupMenuCanceled(final PopupMenuEvent pe) {
-                /* do nothing */
-            }
-            @Override
-            public void popupMenuWillBecomeInvisible(final PopupMenuEvent pe) {
-                /* do nothing */
-            }
-            @Override
-            public void popupMenuWillBecomeVisible(final PopupMenuEvent pe) {
-                /* workaround to have items with bigger widths than jcombobox */
-                final JComboBox thisCB = (JComboBox) pe.getSource();
-                final Object c = thisCB.getUI().getAccessibleChild(thisCB, 0);
-                if (!(c instanceof JPopupMenu)) {
-                    return;
-                }
-                final JScrollPane scrollPane =
-                            (JScrollPane) ((JPopupMenu) c).getComponent(0);
-                final Dimension size = scrollPane.getPreferredSize();
-                final JComponent view =
-                               (JComponent) scrollPane.getViewport().getView();
-                final int newSize = view.getPreferredSize().width;
-                if (newSize > size.width) {
-                    size.width = newSize;
-                    scrollPane.setPreferredSize(size);
-                    scrollPane.setMaximumSize(size);
-                }
-            }
-        });
         return cb;
     }
 
     /** Returns true if combo box has changed. */
     private boolean comboBoxChanged(final Object[] items) {
-        final JComboBox cb = (JComboBox) getComponent();
+        final MComboBox cb = (MComboBox) getComponent();
         if (items.length != cb.getItemCount()) {
             return true;
         }
@@ -196,7 +166,7 @@ public final class ComboBox extends Widget {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final JComboBox cb = (JComboBox) getComponent();
+                final MComboBox cb = (MComboBox) getComponent();
                 final Object selectedItem = cb.getSelectedItem();
                 boolean selectedChanged = false;
                 if (selectedValue == null
@@ -285,16 +255,16 @@ public final class ComboBox extends Widget {
                     o = null;
                 }
                 if (isAlwaysEditable()) {
-                    ((JComboBox) comp).setEditable(true);
+                    ((MComboBox) comp).setEditable(true);
                     final JTextComponent editor = getTextComponent();
                     if (o == null) {
                         editor.selectAll();
                     }
                 } else {
                     if (o == null) {
-                        ((JComboBox) comp).setEditable(false);
+                        ((MComboBox) comp).setEditable(false);
                     } else {
-                        ((JComboBox) comp).setEditable(editable);
+                        ((MComboBox) comp).setEditable(editable);
                     }
                 }
             }
@@ -317,7 +287,7 @@ public final class ComboBox extends Widget {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Object getValueInternal() {
-        final JComboBox cb = (JComboBox) getComponent();
+        final MComboBox cb = (MComboBox) getComponent();
         Object value;
         if (cb.isEditable()) {
             final JTextComponent editor =
@@ -349,7 +319,7 @@ public final class ComboBox extends Widget {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ((JComboBox) getComponent()).removeAllItems();
+                ((MComboBox) getComponent()).removeAllItems();
             }
         });
     }
@@ -357,13 +327,13 @@ public final class ComboBox extends Widget {
     /** Returns whether component is editable or not. */
     @Override
     boolean isEditable() {
-        return ((JComboBox) getComponent()).isEditable();
+        return ((MComboBox) getComponent()).isEditable();
     }
 
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Object item) {
-        final JComboBox cb = (JComboBox) getComponent();
+        final MComboBox cb = (MComboBox) getComponent();
         cb.setSelectedItem(item);
         if (Tools.isStringClass(item)) {
             Object selectedObject = null;
@@ -390,7 +360,7 @@ public final class ComboBox extends Widget {
     /** Set selected index. */
     @Override
     public void setSelectedIndex(final int index) {
-        final JComboBox cb = (JComboBox) getComponent();
+        final MComboBox cb = (MComboBox) getComponent();
         cb.setSelectedIndex(index);
     }
 
@@ -428,7 +398,7 @@ public final class ComboBox extends Widget {
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
         addDocumentListener(getDocument(), wl);
-        ((JComboBox) getComponent()).addItemListener(getItemListener(wl));
+        ((MComboBox) getComponent()).addItemListener(getItemListener(wl));
     }
 
     @Override
@@ -452,14 +422,14 @@ public final class ComboBox extends Widget {
     /** Returns item at the specified index. */
     @Override
     Object getItemAt(final int i) {
-        return ((JComboBox) getComponent()).getItemAt(i);
+        return ((MComboBox) getComponent()).getItemAt(i);
     }
 
     /** Cleanup whatever would cause a leak. */
     @Override
     public void cleanup() {
         getWidgetListeners().clear();
-        final JComboBox thisCB = ((JComboBox) getComponent());
+        final MComboBox thisCB = ((MComboBox) getComponent());
         final AbstractDocument dc = (AbstractDocument) getDocument();
         for (final DocumentListener dl : dc.getDocumentListeners()) {
             dc.removeDocumentListener(dl);
@@ -472,7 +442,57 @@ public final class ComboBox extends Widget {
     /** Returns the text component of the combo box. */
     private JTextComponent getTextComponent() {
         final JComponent comp = getComponent();
-        final ComboBoxEditor editor = ((JComboBox) comp).getEditor();
+        final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
+    }
+
+    /** Workaround for cut combobox popups. */
+    public final class MComboBox<E> extends JComboBox<E> {
+        /** Serial version UID. */
+        private static final long serialVersionUID = 1L;
+
+        public MComboBox() {
+        }
+
+        public MComboBox(final E[] items){
+            super(items);
+        }
+
+        public MComboBox(final java.util.Vector<E> items) {
+            super(items);
+        }
+
+        public MComboBox(javax.swing.ComboBoxModel<E> aModel) {
+            super(aModel);
+        }
+
+        private boolean layingOut = false;
+
+        public void doLayout(){
+            try {
+                layingOut = true;
+                super.doLayout();
+            } finally {
+                layingOut = false;
+            }
+        }
+
+        /** Get new size if popup items are wider than the item. */
+        public Dimension getSize(){
+            final Dimension dim = super.getSize();
+            if (!layingOut) {
+                final Object c = getUI().getAccessibleChild(this, 0);
+                if (c instanceof JPopupMenu) {
+                    final JScrollPane scrollPane =
+                                (JScrollPane) ((JPopupMenu) c).getComponent(0);
+                    final Dimension size = scrollPane.getPreferredSize();
+                    final JComponent view =
+                               (JComponent) scrollPane.getViewport().getView();
+                    final int newSize = view.getPreferredSize().width + 2;
+                    dim.width = Math.max(dim.width, newSize);
+                }
+            }
+            return dim;
+        }
     }
 }

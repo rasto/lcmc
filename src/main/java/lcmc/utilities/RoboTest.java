@@ -27,6 +27,7 @@ import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.ComboBox;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.Info;
 import java.awt.Robot;
@@ -43,7 +44,6 @@ import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JTree;
 import javax.swing.JLabel;
 import javax.swing.AbstractButton;
@@ -889,7 +889,7 @@ public final class RoboTest {
         moveTo("IPaddr2");
         leftClick();
 
-        moveTo("IPv4 address", JComboBox.class);
+        moveTo("IPv4 address", ComboBox.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN);
@@ -924,7 +924,7 @@ public final class RoboTest {
 
         /* pingd */
         moveScrollBar(true);
-        moveTo("pingd", JComboBox.class);
+        moveTo("pingd", ComboBox.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* no ping */
@@ -939,7 +939,7 @@ public final class RoboTest {
         sleep(2000);
         checkTest(testName, 2.1); /* 2.1 */
 
-        moveTo("pingd", JComboBox.class);
+        moveTo("pingd", ComboBox.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_UP); /* no ping */
@@ -1105,7 +1105,7 @@ public final class RoboTest {
 
         for (int i = 0; i < 2; i++) {
             sleep(1000);
-            moveTo("Same As", 2, JComboBox.class);
+            moveTo("Same As", 2, ComboBox.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -1121,7 +1121,7 @@ public final class RoboTest {
             sleep(4000);
             checkTest(testName, 3.2); /* 3.2 */
 
-            moveTo("Same As", 2, JComboBox.class);
+            moveTo("Same As", 2, ComboBox.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -1423,7 +1423,7 @@ public final class RoboTest {
         checkTest(testName, 11.9);
         sleep(3000);
         /* set clone max to 1 */
-        moveTo("Clone Max", JComboBox.class);
+        moveTo("Clone Max", ComboBox.MComboBox.class);
         sleep(3000);
         leftClick();
         sleep(3000);
@@ -1656,7 +1656,7 @@ public final class RoboTest {
         final String quorum = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("no-quorum-policy");
         if (!"ignore".equals(quorum)) {
-            moveTo("No Quorum Policy", JComboBox.class);
+            moveTo("No Quorum Policy", ComboBox.MComboBox.class);
             leftClick();
             press(KeyEvent.VK_DOWN);
             press(KeyEvent.VK_UP);
@@ -2437,7 +2437,7 @@ public final class RoboTest {
         }
         checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo("Resource Stickiness", JComboBox.class);
+        moveTo("Resource Stickiness", ComboBox.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);
@@ -2523,7 +2523,7 @@ public final class RoboTest {
     private static void setLocation(final Integer[] events) {
         moveScrollBar(true);
 
-        moveTo("on ", JComboBox.class);
+        moveTo("on ", ComboBox.MComboBox.class);
         sleep(1000);
         leftClick();
         sleep(1000);
@@ -2772,7 +2772,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* select */
 
-        moveTo("Target Role", JComboBox.class);
+        moveTo("Target Role", ComboBox.MComboBox.class);
         sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);
@@ -2983,7 +2983,7 @@ public final class RoboTest {
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
 
-            moveTo("block device", JComboBox.class); /* choose drbd */
+            moveTo("block device", ComboBox.MComboBox.class); /* choose drbd */
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -2992,7 +2992,7 @@ public final class RoboTest {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", JComboBox.class);
+            moveTo("mount point", ComboBox.MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -3001,7 +3001,7 @@ public final class RoboTest {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", JComboBox.class);
+            moveTo("filesystem type", ComboBox.MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_E);
@@ -3469,7 +3469,7 @@ public final class RoboTest {
     }
 
     private static void chooseDrbdResourceInterface(final String hostName) {
-        moveTo("on " + hostName, JComboBox.class); /* interface */
+        moveTo("on " + hostName, ComboBox.MComboBox.class); /* interface */
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* select first interface */
@@ -3832,14 +3832,14 @@ public final class RoboTest {
         moveTo(480, 202); /* select r0 */
         leftClick();
 
-        moveTo("Protocol", JComboBox.class);
+        moveTo("Protocol", ComboBox.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", JComboBox.class);
+        moveTo("Fence peer", ComboBox.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -3863,7 +3863,7 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(1000);
-        moveTo("Max buffers", JComboBox.class); /* Unit */
+        moveTo("Max buffers", ComboBox.MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3872,7 +3872,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", JComboBox.class);
+        moveTo("After", ComboBox.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3930,14 +3930,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", JComboBox.class);
+        moveTo("Protocol", ComboBox.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", JComboBox.class);
+        moveTo("Fence peer", ComboBox.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -3969,7 +3969,7 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_8);
         sleep(500);
-        moveTo("Max buffers", JComboBox.class); /* Unit */
+        moveTo("Max buffers", ComboBox.MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -3978,7 +3978,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", JComboBox.class);
+        moveTo("After", ComboBox.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -4041,7 +4041,7 @@ public final class RoboTest {
                 chooseDrbdResource();
             } else {
                 /* existing drbd resource */
-                moveTo("DRBD Resource", JComboBox.class);
+                moveTo("DRBD Resource", ComboBox.MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_DOWN); /* drbd: r0 */
                 sleep(200);
@@ -4083,14 +4083,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", JComboBox.class);
+        moveTo("Protocol", ComboBox.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", JComboBox.class);
+        moveTo("Fence peer", ComboBox.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -4154,14 +4154,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", JComboBox.class);
+        moveTo("Protocol", ComboBox.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", JComboBox.class);
+        moveTo("Fence peer", ComboBox.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -4282,7 +4282,7 @@ public final class RoboTest {
                 sleep(200);
             }
             /* type */
-            moveTo("Domain Type", JComboBox.class);
+            moveTo("Domain Type", ComboBox.MComboBox.class);
             leftClick();
             sleep(1000);
             if ("lxc".equals(type)) {
@@ -4304,7 +4304,7 @@ public final class RoboTest {
             if ("lxc".equals(type)) {
                 /* filesystem */
                 dialogColorTest("filesystem");
-                moveTo("Source Dir", JComboBox.class);
+                moveTo("Source Dir", ComboBox.MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -4348,7 +4348,7 @@ public final class RoboTest {
                 /* source file */
                 dialogColorTest("source file");
 
-                moveTo("Source File", JComboBox.class);
+                moveTo("Source File", ComboBox.MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -4485,7 +4485,7 @@ public final class RoboTest {
                 moveTo("Disk/block device");
                 leftClick();
                 sleep(2000);
-                moveTo("Source Device", JComboBox.class);
+                moveTo("Source Device", ComboBox.MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
                 press(KeyEvent.VK_D);
