@@ -41,6 +41,8 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
 
@@ -784,5 +786,55 @@ public abstract class Widget extends JPanel {
     /** Return access mode at which this component is enabled. */
     protected final AccessMode getEnableAccessMode() {
         return enableAccessMode;
+    }
+
+    /** Workaround for cut combobox popups. */
+    public final class MComboBox<E> extends JComboBox<E> {
+        /** Serial version UID. */
+        private static final long serialVersionUID = 1L;
+
+        public MComboBox() {
+        }
+
+        public MComboBox(final E[] items){
+            super(items);
+        }
+
+        public MComboBox(final java.util.Vector<E> items) {
+            super(items);
+        }
+
+        public MComboBox(javax.swing.ComboBoxModel<E> aModel) {
+            super(aModel);
+        }
+
+        private boolean layingOut = false;
+
+        public void doLayout(){
+            try {
+                layingOut = true;
+                super.doLayout();
+            } finally {
+                layingOut = false;
+            }
+        }
+
+        /** Get new size if popup items are wider than the item. */
+        public Dimension getSize(){
+            final Dimension dim = super.getSize();
+            if (!layingOut) {
+                final Object c = getUI().getAccessibleChild(this, 0);
+                if (c instanceof JPopupMenu) {
+                    final JScrollPane scrollPane =
+                                (JScrollPane) ((JPopupMenu) c).getComponent(0);
+                    final Dimension size = scrollPane.getPreferredSize();
+                    final JComponent view =
+                               (JComponent) scrollPane.getViewport().getView();
+                    final int newSize = view.getPreferredSize().width + 2;
+                    dim.width = Math.max(dim.width, newSize);
+                }
+            }
+            return dim;
+        }
     }
 }
