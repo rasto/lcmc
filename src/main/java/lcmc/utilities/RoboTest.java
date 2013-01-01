@@ -27,7 +27,6 @@ import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.ComboBox;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.Info;
 import java.awt.Robot;
@@ -889,7 +888,7 @@ public final class RoboTest {
         moveTo("IPaddr2");
         leftClick();
 
-        moveTo("IPv4 address", ComboBox.MComboBox.class);
+        moveTo("IPv4 address", Widget.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN);
@@ -924,7 +923,7 @@ public final class RoboTest {
 
         /* pingd */
         moveScrollBar(true);
-        moveTo("pingd", ComboBox.MComboBox.class);
+        moveTo("pingd", Widget.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* no ping */
@@ -939,7 +938,7 @@ public final class RoboTest {
         sleep(2000);
         checkTest(testName, 2.1); /* 2.1 */
 
-        moveTo("pingd", ComboBox.MComboBox.class);
+        moveTo("pingd", Widget.MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_UP); /* no ping */
@@ -1105,7 +1104,7 @@ public final class RoboTest {
 
         for (int i = 0; i < 2; i++) {
             sleep(1000);
-            moveTo("Same As", 2, ComboBox.MComboBox.class);
+            moveTo("Same As", 2, Widget.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -1121,7 +1120,7 @@ public final class RoboTest {
             sleep(4000);
             checkTest(testName, 3.2); /* 3.2 */
 
-            moveTo("Same As", 2, ComboBox.MComboBox.class);
+            moveTo("Same As", 2, Widget.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -1423,7 +1422,7 @@ public final class RoboTest {
         checkTest(testName, 11.9);
         sleep(3000);
         /* set clone max to 1 */
-        moveTo("Clone Max", ComboBox.MComboBox.class);
+        moveTo("Clone Max", Widget.MComboBox.class);
         sleep(3000);
         leftClick();
         sleep(3000);
@@ -1656,7 +1655,7 @@ public final class RoboTest {
         final String quorum = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("no-quorum-policy");
         if (!"ignore".equals(quorum)) {
-            moveTo("No Quorum Policy", ComboBox.MComboBox.class);
+            moveTo("No Quorum Policy", Widget.MComboBox.class);
             leftClick();
             press(KeyEvent.VK_DOWN);
             press(KeyEvent.VK_UP);
@@ -2437,7 +2436,7 @@ public final class RoboTest {
         }
         checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo("Resource Stickiness", ComboBox.MComboBox.class);
+        moveTo("Resource Stickiness", Widget.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);
@@ -2523,7 +2522,7 @@ public final class RoboTest {
     private static void setLocation(final Integer[] events) {
         moveScrollBar(true);
 
-        moveTo("on ", ComboBox.MComboBox.class);
+        moveTo("on ", Widget.MComboBox.class);
         sleep(1000);
         leftClick();
         sleep(1000);
@@ -2772,7 +2771,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* select */
 
-        moveTo("Target Role", ComboBox.MComboBox.class);
+        moveTo("Target Role", Widget.MComboBox.class);
         sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);
@@ -2983,7 +2982,7 @@ public final class RoboTest {
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
 
-            moveTo("block device", ComboBox.MComboBox.class); /* choose drbd */
+            moveTo("block device", Widget.MComboBox.class); /* choose drbd */
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -2992,7 +2991,7 @@ public final class RoboTest {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", ComboBox.MComboBox.class);
+            moveTo("mount point", Widget.MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -3001,7 +3000,7 @@ public final class RoboTest {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", ComboBox.MComboBox.class);
+            moveTo("filesystem type", Widget.MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_E);
@@ -3469,7 +3468,7 @@ public final class RoboTest {
     }
 
     private static void chooseDrbdResourceInterface(final String hostName) {
-        moveTo("on " + hostName, ComboBox.MComboBox.class); /* interface */
+        moveTo("on " + hostName, Widget.MComboBox.class); /* interface */
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* select first interface */
@@ -3832,14 +3831,14 @@ public final class RoboTest {
         moveTo(480, 202); /* select r0 */
         leftClick();
 
-        moveTo("Protocol", ComboBox.MComboBox.class);
+        moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", ComboBox.MComboBox.class);
+        moveTo("Fence peer", Widget.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -3863,7 +3862,7 @@ public final class RoboTest {
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(1000);
-        moveTo("Max buffers", ComboBox.MComboBox.class); /* Unit */
+        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3872,7 +3871,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", ComboBox.MComboBox.class);
+        moveTo("After", Widget.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -3930,14 +3929,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", ComboBox.MComboBox.class);
+        moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", ComboBox.MComboBox.class);
+        moveTo("Fence peer", Widget.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -3969,7 +3968,7 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_8);
         sleep(500);
-        moveTo("Max buffers", ComboBox.MComboBox.class); /* Unit */
+        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -3978,7 +3977,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", ComboBox.MComboBox.class);
+        moveTo("After", Widget.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -4041,7 +4040,7 @@ public final class RoboTest {
                 chooseDrbdResource();
             } else {
                 /* existing drbd resource */
-                moveTo("DRBD Resource", ComboBox.MComboBox.class);
+                moveTo("DRBD Resource", Widget.MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_DOWN); /* drbd: r0 */
                 sleep(200);
@@ -4083,14 +4082,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", ComboBox.MComboBox.class);
+        moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", ComboBox.MComboBox.class);
+        moveTo("Fence peer", Widget.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -4154,14 +4153,14 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", ComboBox.MComboBox.class);
+        moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", ComboBox.MComboBox.class);
+        moveTo("Fence peer", Widget.MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -4282,7 +4281,7 @@ public final class RoboTest {
                 sleep(200);
             }
             /* type */
-            moveTo("Domain Type", ComboBox.MComboBox.class);
+            moveTo("Domain Type", Widget.MComboBox.class);
             leftClick();
             sleep(1000);
             if ("lxc".equals(type)) {
@@ -4304,7 +4303,7 @@ public final class RoboTest {
             if ("lxc".equals(type)) {
                 /* filesystem */
                 dialogColorTest("filesystem");
-                moveTo("Source Dir", ComboBox.MComboBox.class);
+                moveTo("Source Dir", Widget.MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -4348,7 +4347,7 @@ public final class RoboTest {
                 /* source file */
                 dialogColorTest("source file");
 
-                moveTo("Source File", ComboBox.MComboBox.class);
+                moveTo("Source File", Widget.MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -4485,7 +4484,7 @@ public final class RoboTest {
                 moveTo("Disk/block device");
                 leftClick();
                 sleep(2000);
-                moveTo("Source Device", ComboBox.MComboBox.class);
+                moveTo("Source Device", Widget.MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
                 press(KeyEvent.VK_D);

@@ -29,24 +29,17 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
 import javax.swing.JComponent;
-import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
 import javax.swing.event.DocumentListener;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.ComboBoxEditor;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
-import javax.swing.event.PopupMenuListener;
-import javax.swing.event.PopupMenuEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -444,55 +437,5 @@ public final class ComboBox extends Widget {
         final JComponent comp = getComponent();
         final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
-    }
-
-    /** Workaround for cut combobox popups. */
-    public final class MComboBox<E> extends JComboBox<E> {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
-
-        public MComboBox() {
-        }
-
-        public MComboBox(final E[] items){
-            super(items);
-        }
-
-        public MComboBox(final java.util.Vector<E> items) {
-            super(items);
-        }
-
-        public MComboBox(javax.swing.ComboBoxModel<E> aModel) {
-            super(aModel);
-        }
-
-        private boolean layingOut = false;
-
-        public void doLayout(){
-            try {
-                layingOut = true;
-                super.doLayout();
-            } finally {
-                layingOut = false;
-            }
-        }
-
-        /** Get new size if popup items are wider than the item. */
-        public Dimension getSize(){
-            final Dimension dim = super.getSize();
-            if (!layingOut) {
-                final Object c = getUI().getAccessibleChild(this, 0);
-                if (c instanceof JPopupMenu) {
-                    final JScrollPane scrollPane =
-                                (JScrollPane) ((JPopupMenu) c).getComponent(0);
-                    final Dimension size = scrollPane.getPreferredSize();
-                    final JComponent view =
-                               (JComponent) scrollPane.getViewport().getView();
-                    final int newSize = view.getPreferredSize().width + 2;
-                    dim.width = Math.max(dim.width, newSize);
-                }
-            }
-            return dim;
-        }
     }
 }
