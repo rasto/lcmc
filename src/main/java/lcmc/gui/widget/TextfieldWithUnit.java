@@ -31,7 +31,6 @@ import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
@@ -39,18 +38,12 @@ import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
 import javax.swing.SpringLayout;
 import javax.swing.event.DocumentListener;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
-import javax.swing.event.PopupMenuListener;
-import javax.swing.event.PopupMenuEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -75,7 +68,7 @@ public final class TextfieldWithUnit extends Widget {
     /** Text field in widget with units. */
     private final JTextField textFieldPart;
     /** Combo box with units. */
-    private final JComboBox<Object> unitComboBox;
+    private final MComboBox<Object> unitComboBox;
     /** Pattern that matches value and unit. */
     private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
     /** Whether the unit combo box should be enabled. */
@@ -149,7 +142,7 @@ public final class TextfieldWithUnit extends Widget {
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private JComboBox<Object> getComboBox(
+    private MComboBox<Object> getComboBox(
                                   final String selectedValue,
                                   final Object[] items,
                                   final String regexp,
@@ -159,7 +152,7 @@ public final class TextfieldWithUnit extends Widget {
         final Object selectedValueInfo = ComboBox.addItems(comboList,
                                                            selectedValue,
                                                            items);
-        final JComboBox<Object> cb = new JComboBox<Object>(comboList.toArray(
+        final MComboBox<Object> cb = new MComboBox<Object>(comboList.toArray(
                                             new Object[comboList.size()]));
         final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
@@ -195,36 +188,6 @@ public final class TextfieldWithUnit extends Widget {
             @Override
             public void focusLost(final FocusEvent e) {
                 /* do nothing */
-            }
-        });
-        cb.addPopupMenuListener(new PopupMenuListener() {
-            @Override
-            public void popupMenuCanceled(final PopupMenuEvent pe) {
-                /* do nothing */
-            }
-            @Override
-            public void popupMenuWillBecomeInvisible(final PopupMenuEvent pe) {
-                /* do nothing */
-            }
-            @Override
-            public void popupMenuWillBecomeVisible(final PopupMenuEvent pe) {
-                /* workaround to have items with bigger widths than jcombobox */
-                final JComboBox thisCB = (JComboBox) pe.getSource();
-                final Object c = thisCB.getUI().getAccessibleChild(thisCB, 0);
-                if (!(c instanceof JPopupMenu)) {
-                    return;
-                }
-                final JScrollPane scrollPane =
-                            (JScrollPane) ((JPopupMenu) c).getComponent(0);
-                final Dimension size = scrollPane.getPreferredSize();
-                final JComponent view =
-                               (JComponent) scrollPane.getViewport().getView();
-                final int newSize = view.getPreferredSize().width;
-                if (newSize > size.width) {
-                    size.width = newSize;
-                    scrollPane.setPreferredSize(size);
-                    scrollPane.setMaximumSize(size);
-                }
             }
         });
         return cb;
