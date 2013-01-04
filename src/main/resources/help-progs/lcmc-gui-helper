@@ -290,10 +290,10 @@ sub get_bridges {
 # get_net_info()
 #
 # parses ifconfig output and prints out interface, ip and mac address one
-# interface per line. "lo" interface is skipped.
+# interface per line.
 sub get_net_info {
 	my $dev  = "";
-	my $mac  = "";
+	my $mac  = "no";
 	my $ip   = "";
 	my $mask = "";
 	my $bridges = get_bridges();
@@ -301,8 +301,9 @@ sub get_net_info {
 	for (`ifconfig`) {
 		if (!$dev) {
 			($dev) = /^(.*?)(:?\s|:)/ or net_info_error("no dev");
-			next if $dev eq "lo";
-			($mac) = /\sHWaddr\s+(\S+)/;
+			if (/\sHWaddr\s+(\S+)/) {
+				$mac = $1;
+			}
 		} else {
 			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
 				$ip = $1;
@@ -316,7 +317,10 @@ sub get_net_info {
 			}
 		}
 		if (/^$/) {
-			if ($dev && $dev ne "lo" && $ip && $mac && $mask) {
+			if ($dev
+			    && $ip
+			    && ($mac ne "no" || "lo" eq $dev)
+			    && $mask) {
 				$out .= "$dev $ip $mac $mask";
 				if ($$bridges{$dev}) {
 					$out .= " bridge\n";
@@ -325,7 +329,7 @@ sub get_net_info {
 				}
 			}
 			$dev = "";
-			$mac  = "";
+			$mac  = "no";
 			$ip   = "";
 			$mask = "";
 		}
