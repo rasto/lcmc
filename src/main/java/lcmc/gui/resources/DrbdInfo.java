@@ -33,10 +33,12 @@ import lcmc.data.DRBDtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
+import lcmc.configs.AppDefaults;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -67,6 +69,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+    private static final String PROXY_COMMON_SECTION = "common proxy";
+
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
                              Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
@@ -926,4 +930,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
         return DRBD_ICON;
     }
 
+    /** Return section color. */
+    @Override
+    protected Color getSectionColor(final String section) {
+        if (PROXY_COMMON_SECTION.equals(section)) {
+            return AppDefaults.LIGHT_ORANGE;
+        }
+        return super.getSectionColor(section);
+    }
 }

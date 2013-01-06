@@ -1461,6 +1461,7 @@ XML
 }
 
 sub get_drbd_xml {
+	get_drbd_proxy_xml();
 	my %missing; # handlers and startup don't come from drbdsetup xml-help, so
 		     # we parse them out of the man page.
 	my @missing;
@@ -1587,7 +1588,6 @@ sub get_drbd_xml {
 		}
 		print "</command>\n";
 	}
-	get_drbd_proxy_xml();
 
 	my ($v1, $v2, $v3) = get_drbd_version();
 	my @sections = ("net-options", "disk-options");

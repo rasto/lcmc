@@ -353,7 +353,8 @@ public abstract class EditableInfo extends Info {
                                                       advancedString) + 1);
             } else {
                 panel = new JPanel(new SpringLayout());
-                panel.setBackground(Browser.PANEL_BACKGROUND);
+
+                panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
                     final JPanel p = panel;
@@ -476,7 +477,7 @@ public abstract class EditableInfo extends Info {
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
             } else {
-                sectionPanel = getParamPanel(section);
+                sectionPanel = getParamPanel(section, getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
@@ -1148,5 +1149,12 @@ public abstract class EditableInfo extends Info {
             return prevParamWi.getStringValue();
         }
         return null;
+    }
+
+    /**
+     * Return section color.
+     */
+    protected Color getSectionColor(final String section) {
+        return Browser.PANEL_BACKGROUND;
     }
 }

@@ -43,6 +43,8 @@ public final class AppDefaults extends java.util.ListResourceBundle {
     /** Light blue background color. */
     public static final Color BACKGROUND_LIGHT2 = new Color(210, 230, 251);
 
+    public static final Color LIGHT_ORANGE = new Color(253, 180, 109);
+
 
     /** Get contents. */
     @Override

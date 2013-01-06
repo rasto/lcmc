@@ -25,6 +25,7 @@ package lcmc.data;
 
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.ProxyNetInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
@@ -142,6 +143,9 @@ public final class DrbdXML extends XML {
     private final MultiKeyMap<String, Map<String, String>>
                         resourceHostMetaDiskIndexMap =
                                 new MultiKeyMap<String, Map<String, String>>();
+    /** Map from resoure and host to the proxy information. */
+    private final MultiKeyMap<String, HostProxy> resourceHostProxyMap =
+                                         new MultiKeyMap<String, HostProxy>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
@@ -839,6 +843,8 @@ public final class DrbdXML extends XML {
                     resourceHostPortMap.put(resName, hostPortMap);
                 }
                 hostPortMap.put(hostName, port);
+            } else if (option.getNodeName().equals("proxy")) {
+                parseProxyHostConfig(hostName, resName, option);
             }
         }
     }
@@ -927,6 +933,7 @@ public final class DrbdXML extends XML {
                 }
                 hostPortMap.put(hostName, port);
             } else if (option.getNodeName().equals("proxy")) {
+                parseProxyHostConfig(hostName, resName, option);
                 if (!proxyDetected) {
                     Tools.appWarning("unsuported feature: proxy");
                     Tools.progressIndicatorFailed(hostName,
@@ -935,6 +942,33 @@ public final class DrbdXML extends XML {
                 }
             }
         }
+    }
+
+    /** Parses proxy config in the host section. */
+    private void parseProxyHostConfig(final String hostName,
+                                      final String resName,
+                                      final Node proxyNode) {
+        final String proxyHostName = getAttribute(proxyNode, "hostname");
+        final NodeList options = proxyNode.getChildNodes();
+        String insideIp = null;
+        String insidePort = null;
+        String outsideIp = null;
+        String outsidePort = null;
+        for (int i = 0; i < options.getLength(); i++) {
+            final Node option = options.item(i);
+            if (option.getNodeName().equals("inside")) {
+                insideIp = getText(option);
+                insidePort = getAttribute(option, "port");
+            } else if (option.getNodeName().equals("outside")) {
+                outsideIp = getText(option);
+                outsidePort = getAttribute(option, "port");
+            }
+        }
+        resourceHostProxyMap.put(resName, hostName, new HostProxy(proxyHostName,
+                                                                  insideIp,
+                                                                  insidePort,
+                                                                  outsideIp,
+                                                                  outsidePort));
     }
 
     /** Returns map with hosts as keys and disks as values. */
@@ -961,9 +995,26 @@ public final class DrbdXML extends XML {
     public String getVirtualInterface(final String hostName,
                                       final String resName) {
         if (resourceHostIpMap.containsKey(resName)) {
-            return resourceHostIpMap.get(resName).get(hostName);
+            final String ip = resourceHostIpMap.get(resName).get(hostName);
+            final HostProxy hostProxy = getHostProxy(hostName, resName);
+            if (hostProxy == null) {
+                return ip;
+            }
+            final String proxyHostName = hostProxy.getProxyHostName();
+            return ProxyNetInfo.displayString(ip, hostName, proxyHostName);
         }
         return null;
+    }
+
+    /** Gets virtual net interface for a host and a resource. */
+    public HostProxy getHostProxy(final String hostName,
+                                  final String resName) {
+        return resourceHostProxyMap.get(resName, hostName);
+    }
+
+    /** Returns whether a proxy is defined for this host and resource. */
+    public boolean isHostProxy(final String hostName, final String resName) {
+        return resourceHostProxyMap.containsKey(resName, hostName);
     }
 
     /** Gets meta-disk block device for a host and a resource. */
@@ -1378,7 +1429,46 @@ public final class DrbdXML extends XML {
      * want to overwrite.
      */
     public boolean isDrbdDisabled() {
-        return (unknownSections || proxyDetected)
-               && !Tools.getConfigData().isAdvancedMode();
+        return unknownSections && !Tools.getConfigData().isAdvancedMode();
+    }
+
+    public class HostProxy {
+        final private String proxyHostName;
+        final private String insideIp;
+        final private String insidePort;
+        final private String outsideIp;
+        final private String outsidePort;
+
+        public HostProxy(final String proxyHostName,
+                         final String insideIp,
+                         final String insidePort,
+                         final String outsideIp,
+                         final String outsidePort) {
+            this.proxyHostName = proxyHostName;
+            this.insideIp = insideIp;
+            this.insidePort = insidePort;
+            this.outsideIp = outsideIp;
+            this.outsidePort = outsidePort;
+        }
+
+        public String getProxyHostName() {
+            return proxyHostName;
+        }
+
+        public String getInsideIp() {
+            return insideIp;
+        }
+
+        public String getInsidePort() {
+            return insidePort;
+        }
+
+        public String getOutsideIp() {
+            return outsideIp;
+        }
+
+        public String getOutsidePort() {
+            return outsidePort;
+        }
     }
 }
