@@ -464,8 +464,6 @@ public final class LCMC extends JPanel {
             if (!tightvnc && !ultravnc && !realvnc) {
                 if (Tools.isLinux()) {
                     tightvnc = true;
-                } else if (Tools.isWindows()) {
-                    ultravnc = true;
                 } else {
                     tightvnc = true;
                     ultravnc = true;
