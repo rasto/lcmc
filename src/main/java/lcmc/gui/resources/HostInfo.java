@@ -237,7 +237,11 @@ public final class HostInfo extends Info {
                 crmInfo = true;
                 hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
-                host.execCommand("HostBrowser.getHostInfo",
+                String command = "HostBrowser.getHostInfo";
+                if (!host.isCsInit()) {
+                    command = "HostBrowser.getHostInfoHeartbeat";
+                }
+                host.execCommand(command,
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
                                  false,  /* outputVisible */
@@ -396,7 +400,11 @@ public final class HostInfo extends Info {
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
-        host.execCommand("HostBrowser.getHostInfo",
+        String command = "HostBrowser.getHostInfo";
+        if (!host.isCsInit()) {
+            command = "HostBrowser.getHostInfoHeartbeat";
+        }
+        host.execCommand(command,
                          execCallback,
                          null,  /* ConvertCmdCallback */
                          false,  /* outputVisible */
