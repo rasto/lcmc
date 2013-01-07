@@ -400,7 +400,7 @@ public final class DistResource extends java.util.ListResourceBundle {
 
          + ";echo -----------------------------------------------------------;"
          + "echo 'Interfaces:';"
-         + SUDO + "/sbin/ip -o -f inet a;"},
+         + "/sbin/ip -o -f inet a;"},
 
 
         {"HostBrowser.getCrmConfigureShow",
