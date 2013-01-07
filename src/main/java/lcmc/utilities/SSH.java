@@ -401,6 +401,7 @@ public final class SSH {
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
                 String sudoPwd = host.getSudoPassword();
                 boolean skipNextLine = false;
+                boolean cancelSudo = false;
                 while (true) {
                     if ((stdout.available() == 0)
                         && (stderr.available() == 0)) {
@@ -479,8 +480,8 @@ public final class SSH {
                     }
                     final int index = output.indexOf(SUDO_PROMPT);
                     if (index >= 0) {
-                        if (sudoPwd == null) {
-                            enterSudoPassword();
+                        if (sudoPwd == null && !cancelSudo) {
+                            cancelSudo = enterSudoPassword();
                         }
                         final String pwd = host.getSudoPassword() + "\n";
                         sudoPwd = null; // TODO: do I want to keep the pwd?
@@ -1419,8 +1420,11 @@ public final class SSH {
         }
     }
 
-    /** Enter sudo password. */
-    void enterSudoPassword() {
+    /**
+     * Enter sudo password.
+     * Return whether the dialog was cancelled.
+     */
+    private boolean enterSudoPassword() {
         if (host.isUseSudo() != null && host.isUseSudo()) {
             final String lastError = "";
             final String lastSudoPwd = host.getSudoPassword();
@@ -1435,14 +1439,14 @@ public final class SSH {
                     null,
                     null,
                     true);
-            host.setSudoPassword(sudoPwd);
             if (sudoPwd == null) {
-                mConnectionLock.lock();
-                connection = null;
-                mConnectionLock.unlock();
-                host.setConnected();
+                /* cancelled */
+                return true;
+            } else {
+                host.setSudoPassword(sudoPwd);
             }
         }
+        return false;
     }
 
     /** Installs gui-helper on the remote host. */
