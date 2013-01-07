@@ -399,10 +399,10 @@ public final class SSH {
                 final InputStream stderr = thisSession.getStderr();
                 //byte[] buff = new byte[8192];
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
-                String sudoPwd = host.getSudoPassword();
                 boolean skipNextLine = false;
                 boolean cancelSudo = false;
                 while (true) {
+                    String sudoPwd = host.getSudoPassword();
                     if ((stdout.available() == 0)
                         && (stderr.available() == 0)) {
                         /* Even though currently there is no data available,
