@@ -385,7 +385,25 @@ public final class DistResource extends java.util.ListResourceBundle {
          + "|awk '{printf(\"%s \", $0); if (NR%3==0) printf(\"\\n\")}'"
          + ";echo;" + SUDO + "/usr/sbin/corosync-cfgtool -s 2>/dev/null"
          + ";echo;" + SUDO + "/usr/sbin/corosync-quorumtool -l 2>/dev/null"
-         + ";" + SUDO + "/usr/bin/cl_status listnodes 2>/dev/null"
+
+         + ";echo -----------------------------------------------------------;"
+         + "echo -n 'crm verify:';"
+         + SUDO + "/usr/sbin/crm_verify -VL 2>&1 "
+         + "&& echo \" config Ok.\"|grep -v -e -V;"
+
+         + "echo -----------------------------------------------------------;"
+         + "echo 'crm mon:';"
+         + SUDO + "/usr/sbin/crm_mon -1Arfn 2>/dev/null"
+         + " || " + SUDO + "/usr/sbin/crm_mon -1rfn 2>/dev/null"
+         + " || " + SUDO + "/usr/sbin/crm_mon -1rn"
+
+         + ";echo -----------------------------------------------------------;"
+         + "echo 'Interfaces:';"
+         + "/sbin/ip -o -f inet a;"},
+
+        {"HostBrowser.getHostInfoHeartbeat",
+         "echo 'cluster members:';"
+         + SUDO + "/usr/bin/cl_status listnodes 2>/dev/null"
 
          + ";echo -----------------------------------------------------------;"
          + "echo -n 'crm verify:';"
