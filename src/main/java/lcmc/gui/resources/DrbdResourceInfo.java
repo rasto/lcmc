@@ -715,31 +715,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return haveToCreateMD;
     }
 
-    /** Sets stored parameters. */
-    public void setParameters() {
-        getDrbdResource().setCommited(true);
-        final DrbdXML dxml = getBrowser().getDrbdXML();
-        final String resName = getResource().getName();
-        for (final String sectionString : dxml.getSections()) {
-            /* remove -options */
-            final String section = sectionString.replaceAll("-options$", "");
-            for (final String param : dxml.getSectionParams(section)) {
-                String value = dxml.getConfigValue(resName, section, param);
-                final String defaultValue = getParamDefault(param);
-                final String oldValue = getParamSaved(param);
-                if ("".equals(value)) {
-                    value = defaultValue;
-                }
-                final Widget wi = getWidget(param, null);
-                if (!Tools.areEqual(value, oldValue)) {
-                    getResource().setValue(param, value);
-                    if (wi != null) {
-                        wi.setValue(value);
-                    }
-                }
-            }
-        }
-        /* set networks addresses */
+
+    /** Set networks addresses and port */
+    private void setNetworkParameters(final DrbdXML dxml) {
         String hostPort = null;
         final boolean infoPanelOk = infoPanel != null;
         for (final Host host : getHosts()) {
@@ -785,10 +763,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
+    }
 
-        /* set proxy info */
+    /** Set proxy parameters. */
+    private void setProxyParameters(final DrbdXML dxml) {
         String hostInsidePort = null;
         String hostOutsidePort = null;
+        final boolean infoPanelOk = infoPanel != null;
         for (final Host host : getHosts()) {
             final HostProxy hostProxy =
                                  dxml.getHostProxy(host.getName(), getName());
@@ -881,7 +862,34 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
+    }
 
+    /** Sets stored parameters. */
+    public void setParameters() {
+        getDrbdResource().setCommited(true);
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final String resName = getResource().getName();
+        for (final String sectionString : dxml.getSections()) {
+            /* remove -options */
+            final String section = sectionString.replaceAll("-options$", "");
+            for (final String param : dxml.getSectionParams(section)) {
+                String value = dxml.getConfigValue(resName, section, param);
+                final String defaultValue = getParamDefault(param);
+                final String oldValue = getParamSaved(param);
+                if ("".equals(value)) {
+                    value = defaultValue;
+                }
+                final Widget wi = getWidget(param, null);
+                if (!Tools.areEqual(value, oldValue)) {
+                    getResource().setValue(param, value);
+                    if (wi != null) {
+                        wi.setValue(value);
+                    }
+                }
+            }
+        }
+        setNetworkParameters(dxml);
+        setProxyParameters(dxml);
     }
 
     /**
@@ -943,6 +951,133 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return p >= 0 && p < 65536;
     }
 
+    /** Check port. */
+    private boolean checkPortCorrect() {
+        /* port */
+        final String port = portComboBox.getStringValue();
+        final Widget pwi = portComboBox;
+        final Widget pwizardWi = portComboBoxWizard;
+        boolean correct = true;
+        if (checkPort(port)) {
+            pwi.setBackground(null, savedPort, true);
+            if (pwizardWi != null) {
+                pwizardWi.setBackground(null, savedPort, true);
+            }
+        } else {
+            correct = false;
+            pwi.wrongValue();
+            if (pwizardWi != null) {
+                pwizardWi.wrongValue();
+            }
+        }
+        return correct;
+    }
+
+    /** Check addresses. */
+    private boolean checkAddressCorrect() {
+        final Map<Host, Widget> addressComboBoxHashClone =
+                           new HashMap<Host, Widget>(addressComboBoxHash);
+        boolean correct = true;
+        for (final Host host : addressComboBoxHashClone.keySet()) {
+            final Widget wi = addressComboBoxHashClone.get(host);
+            final Widget wizardWi = addressComboBoxHashWizard.get(host);
+            if (wi.getValue() == null) {
+                correct = false;
+                wi.wrongValue();
+                if (wizardWi != null) {
+                    wizardWi.wrongValue();
+                }
+            } else {
+                wi.setBackground(null, savedHostAddresses.get(host), true);
+                if (wizardWi != null) {
+                    wizardWi.setBackground(null,
+                                           savedHostAddresses.get(host),
+                                           true);
+                }
+            }
+        }
+        return correct;
+    }
+
+    /** Check proxy port. */
+    private boolean checkProxyPortCorrect(final Widget pwi,
+                                          final Widget pWizardWi,
+                                          final String savedPort) {
+        /* proxy ports */
+        final String port = pwi.getStringValue();
+        boolean correct = true;
+        if (checkPort(port)) {
+            pwi.setBackground(null, savedPort, true);
+            if (pWizardWi != null) {
+                pWizardWi.setBackground(null, savedPort, true);
+            }
+        } else {
+            correct = false;
+            pwi.wrongValue();
+            if (pWizardWi != null) {
+                pWizardWi.wrongValue();
+            }
+        }
+        return correct;
+    }
+
+    /** Check proxy inside Ip. */
+    private boolean checkProxyInsideIpCorrect() {
+        final Map<Host, Widget> insideIpComboBoxHashClone =
+                           new HashMap<Host, Widget>(insideIpComboBoxHash);
+        boolean correct = true;
+        for (final Host host : insideIpComboBoxHashClone.keySet()) {
+            final Widget wi = insideIpComboBoxHashClone.get(host);
+            final Widget wizardWi = insideIpComboBoxHashWizard.get(host);
+            if (wi.getValue() == null) {
+                correct = false;
+                wi.wrongValue();
+                if (wizardWi != null) {
+                    wizardWi.wrongValue();
+                }
+            } else {
+                final String defaultInsideIp = getDefaultInsideIp(host);
+                String savedInsideIp = savedInsideIps.get(host);
+                if (savedInsideIp == null) {
+                    savedInsideIp = defaultInsideIp;
+                }
+                wi.setBackground(defaultInsideIp, savedInsideIp, true);
+                if (wizardWi != null) {
+                    wizardWi.setBackground(defaultInsideIp,
+                                           savedInsideIp,
+                                           true);
+                }
+            }
+        }
+        return correct;
+    }
+
+    /** Check proxy outside ip. */
+    private boolean checkProxyOutsideIpCorrect() {
+        final Map<Host, Widget> outsideIpComboBoxHashClone =
+                           new HashMap<Host, Widget>(outsideIpComboBoxHash);
+        boolean correct = true;
+        for (final Host host : outsideIpComboBoxHashClone.keySet()) {
+            final Widget wi = outsideIpComboBoxHashClone.get(host);
+            final Widget wizardWi = outsideIpComboBoxHashWizard.get(host);
+            if (wi.getValue() == null) {
+                correct = false;
+                wi.wrongValue();
+                if (wizardWi != null) {
+                    wizardWi.wrongValue();
+                }
+            } else {
+                wi.setBackground(null, savedOutsideIps.get(host), true);
+                if (wizardWi != null) {
+                    wizardWi.setBackground(null,
+                                           savedOutsideIps.get(host),
+                                           true);
+                }
+            }
+        }
+        return correct;
+    }
+
     /**
      * Returns whether all the parameters are correct. If param is null,
      * all paremeters will be checked, otherwise only the param, but other
@@ -967,125 +1102,34 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
         }
 
-        /* port */
-        final String port = portComboBox.getStringValue();
-        final Widget pwi = portComboBox;
-        final Widget pwizardWi = portComboBoxWizard;
-        if (checkPort(port)) {
-            pwi.setBackground(null, savedPort, true);
-            if (pwizardWi != null) {
-                pwizardWi.setBackground(null, savedPort, true);
-            }
-        } else {
+        if (!checkPortCorrect()) {
             correct = false;
-            pwi.wrongValue();
-            if (pwizardWi != null) {
-                pwizardWi.wrongValue();
-            }
         }
 
-        /* address */
-        final Map<Host, Widget> addressComboBoxHashClone =
-                           new HashMap<Host, Widget>(addressComboBoxHash);
-        for (final Host host : addressComboBoxHashClone.keySet()) {
-            final Widget wi = addressComboBoxHashClone.get(host);
-            final Widget wizardWi = addressComboBoxHashWizard.get(host);
-            if (wi.getValue() == null) {
-                correct = false;
-                wi.wrongValue();
-                if (wizardWi != null) {
-                    wizardWi.wrongValue();
-                }
-            } else {
-                wi.setBackground(null, savedHostAddresses.get(host), true);
-                if (wizardWi != null) {
-                    wizardWi.setBackground(null,
-                                           savedHostAddresses.get(host),
-                                           true);
-                }
-            }
-        }
-
-        /* proxy ports */
-        final String insidePort = insidePortComboBox.getStringValue();
-        final Widget ipwi = insidePortComboBox;
-        final Widget ipwizardWi = insidePortComboBoxWizard;
-        if (checkPort(insidePort)) {
-            ipwi.setBackground(null, savedInsidePort, true);
-            if (ipwizardWi != null) {
-                ipwizardWi.setBackground(null, savedInsidePort, true);
-            }
-        } else {
+        if (!checkAddressCorrect()) {
             correct = false;
-            ipwi.wrongValue();
-            if (ipwizardWi != null) {
-                ipwizardWi.wrongValue();
-            }
         }
 
-        final String outsidePort = outsidePortComboBox.getStringValue();
-        final Widget opwi = outsidePortComboBox;
-        final Widget opwizardWi = outsidePortComboBoxWizard;
-        if (checkPort(outsidePort)) {
-            opwi.setBackground(null, savedOutsidePort, true);
-            if (opwizardWi != null) {
-                opwizardWi.setBackground(null, savedOutsidePort, true);
-            }
-        } else {
+        if (!checkProxyPortCorrect(insidePortComboBox,
+                                   insidePortComboBoxWizard,
+                                   savedInsidePort)) {
             correct = false;
-            opwi.wrongValue();
-            if (opwizardWi != null) {
-                opwizardWi.wrongValue();
-            }
         }
 
-        /* proxy */
-        final Map<Host, Widget> insideIpComboBoxHashClone =
-                           new HashMap<Host, Widget>(insideIpComboBoxHash);
-        for (final Host host : insideIpComboBoxHashClone.keySet()) {
-            final Widget wi = insideIpComboBoxHashClone.get(host);
-            final Widget wizardWi = insideIpComboBoxHashWizard.get(host);
-            if (wi.getValue() == null) {
-                correct = false;
-                wi.wrongValue();
-                if (wizardWi != null) {
-                    wizardWi.wrongValue();
-                }
-            } else {
-                final String defaultInsideIp = getDefaultInsideIp(host);
-                String savedInsideIp = savedInsideIps.get(host);
-                if (savedInsideIp == null) {
-                    savedInsideIp = defaultInsideIp;
-                }
-                wi.setBackground(defaultInsideIp, savedInsideIp, true);
-                if (wizardWi != null) {
-                    wizardWi.setBackground(defaultInsideIp,
-                                           savedInsideIp,
-                                           true);
-                }
-            }
+        if (!checkProxyPortCorrect(outsidePortComboBox,
+                                   outsidePortComboBoxWizard,
+                                   savedOutsidePort)) {
+            correct = false;
         }
 
-        final Map<Host, Widget> outsideIpComboBoxHashClone =
-                           new HashMap<Host, Widget>(outsideIpComboBoxHash);
-        for (final Host host : outsideIpComboBoxHashClone.keySet()) {
-            final Widget wi = outsideIpComboBoxHashClone.get(host);
-            final Widget wizardWi = outsideIpComboBoxHashWizard.get(host);
-            if (wi.getValue() == null) {
-                correct = false;
-                wi.wrongValue();
-                if (wizardWi != null) {
-                    wizardWi.wrongValue();
-                }
-            } else {
-                wi.setBackground(null, savedOutsideIps.get(host), true);
-                if (wizardWi != null) {
-                    wizardWi.setBackground(null,
-                                           savedOutsideIps.get(host),
-                                           true);
-                }
-            }
+        if (!checkProxyInsideIpCorrect()) {
+            correct = false;
         }
+
+        if (!checkProxyOutsideIpCorrect()) {
+            correct = false;
+        }
+
         return super.checkResourceFieldsCorrect(param, params) && correct;
     }
 
