@@ -96,6 +96,7 @@ public final class SSH {
     public static final int NO_COMMAND_TIMEOUT = 0;
     /** Sudo prompt. */
     public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
+    public static final String SUDO_FAIL = "Sorry, try again";
 
     /** Reconnect. */
     boolean reconnect() {
@@ -402,7 +403,7 @@ public final class SSH {
                 boolean skipNextLine = false;
                 boolean cancelSudo = false;
                 while (true) {
-                    String sudoPwd = host.getSudoPassword();
+                    final String sudoPwd = host.getSudoPassword();
                     if ((stdout.available() == 0)
                         && (stderr.available() == 0)) {
                         /* Even though currently there is no data available,
@@ -478,16 +479,16 @@ public final class SSH {
                             }
                         }
                     }
-                    final int index = output.indexOf(SUDO_PROMPT);
-                    if (index >= 0) {
-                        if (sudoPwd == null && !cancelSudo) {
+                    if (output.indexOf(SUDO_PROMPT) >= 0) {
+                        if (sudoPwd == null) {
                             cancelSudo = enterSudoPassword();
                         }
                         final String pwd = host.getSudoPassword() + "\n";
-                        sudoPwd = null; // TODO: do I want to keep the pwd?
                         stdin.write(pwd.getBytes());
                         skipNextLine = true;
                         continue;
+                    } else if (output.indexOf(SUDO_FAIL) >= 0) {
+                        host.setSudoPassword(null);
                     } else {
                         if (skipNextLine) {
                             /* this is the "enter" after pwd */
