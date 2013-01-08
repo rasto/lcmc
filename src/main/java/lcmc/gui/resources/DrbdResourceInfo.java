@@ -1430,7 +1430,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
-        insidePortWi.setValue(savedInsidePort);
+        insidePortWi.setValueAndWait(savedInsidePort);
 
         final JLabel insidePortLabel = new JLabel(
                         Tools.getString("DrbdResourceInfo.ProxyInsidePort"));
@@ -1443,7 +1443,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         insidePortWi.setLabel(insidePortLabel, "");
         if (wizard) {
             insidePortComboBoxWizard = insidePortWi;
-            insidePortComboBox.setValue(insideDefaultPort);
         } else {
             insidePortComboBox = insidePortWi;
         }
@@ -1461,7 +1460,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
-        outsidePortWi.setValue(savedOutsidePort);
+        outsidePortWi.setValueAndWait(savedOutsidePort);
 
         final JLabel outsidePortLabel = new JLabel(
                         Tools.getString("DrbdResourceInfo.ProxyOutsidePort"));
@@ -1474,7 +1473,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         outsidePortWi.setLabel(outsidePortLabel, "");
         if (wizard) {
             outsidePortComboBoxWizard = outsidePortWi;
-            outsidePortComboBox.setValue(outsideDefaultPort);
         } else {
             outsidePortComboBox = outsidePortWi;
         }
@@ -1535,7 +1533,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String insideIpSaved = hostProxy.getInsideIp();
             newInsideIpComboBoxHash.put(pHost, iIpWi);
             iIpWi.setEditable(true);
-            iIpWi.setValue(insideIpSaved);
+            iIpWi.setValueAndWait(insideIpSaved);
 
             final JLabel insideIpLabel = new JLabel(
                             Tools.getString("DrbdResourceInfo.ProxyInsideIp"));
@@ -1562,7 +1560,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String outsideIpSaved = hostProxy.getOutsideIp();
             newOutsideIpComboBoxHash.put(pHost, oIpWi);
             oIpWi.setEditable(true);
-            oIpWi.setValue(outsideIpSaved);
+            oIpWi.setValueAndWait(outsideIpSaved);
 
             final JLabel outsideIpLabel = new JLabel(
                             Tools.getString("DrbdResourceInfo.ProxyOutsideIp"));
