@@ -388,7 +388,7 @@ public abstract class EditableInfo extends Info {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    paramWi.setToolTipText(getToolTipText(param));
+                    paramWi.setToolTipText(getToolTipText(param, paramWi));
                     label.setToolTipText(longDesc);
                 }
             });
@@ -606,10 +606,10 @@ public abstract class EditableInfo extends Info {
                         if (revertButton != null) {
                             revertButton.setEnabled(changed);
                         }
-                        paramWi.setToolTipText(
-                                getToolTipText(param));
+                        final String toolTip = getToolTipText(param, paramWi);
+                        paramWi.setToolTipText(toolTip);
                         if (realParamWi != null) {
-                            realParamWi.setToolTipText(getToolTipText(param));
+                            realParamWi.setToolTipText(toolTip);
                         }
                     }
                 });
@@ -646,7 +646,7 @@ public abstract class EditableInfo extends Info {
             getResource().setValue(param, value);
             final Widget wi = getWidget(param, null);
             if (wi != null) {
-               wi.setToolTipText(getToolTipText(param));
+               wi.setToolTipText(getToolTipText(param, wi));
             }
         }
     }
@@ -817,10 +817,9 @@ public abstract class EditableInfo extends Info {
      * Returns on mouse over text for parameter. If value is different
      * from default value, default value will be returned.
      */
-    protected final String getToolTipText(final String param) {
+    protected final String getToolTipText(final String param, final Widget wi) {
         final String defaultValue = getParamDefault(param);
         final StringBuilder ret = new StringBuilder(120);
-        final Widget wi = getWidget(param, null);
         if (wi != null) {
             final Object value = wi.getStringValue();
             ret.append("<b>");

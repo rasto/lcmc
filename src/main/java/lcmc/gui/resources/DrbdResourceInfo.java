@@ -1311,10 +1311,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* host addresses combo boxes */
         for (final Host host : getHosts()) {
             final Widget wi = newAddressComboBoxHash.get(host);
-            final JLabel label = new JLabel(
+            final String addr =
                             Tools.getString("DrbdResourceInfo.AddressOnHost")
-                            + host.getName());
-            wi.setLabel(label, "");
+                            + host.getName();
+            final JLabel label = new JLabel(addr);
+            wi.setLabel(label, addr);
             addField(panel,
                      label,
                      wi,
@@ -1372,15 +1373,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         pwi.setAlwaysEditable(true);
-        final JLabel label = new JLabel(
-                        Tools.getString("DrbdResourceInfo.NetInterfacePort"));
+        final String port =
+                          Tools.getString("DrbdResourceInfo.NetInterfacePort");
+        final JLabel label = new JLabel(port);
         addField(panel,
                  label,
                  pwi,
                  leftWidth,
                  rightWidth,
                  0);
-        pwi.setLabel(label, "");
+        pwi.setLabel(label, port);
         if (wizard) {
             portComboBoxWizard = pwi;
             portComboBox.setValue(defaultPort);
@@ -1432,15 +1434,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         insidePortWi.setAlwaysEditable(true);
         insidePortWi.setValueAndWait(savedInsidePort);
 
-        final JLabel insidePortLabel = new JLabel(
-                        Tools.getString("DrbdResourceInfo.ProxyInsidePort"));
+        final String insidePort =
+                           Tools.getString("DrbdResourceInfo.ProxyInsidePort");
+        final JLabel insidePortLabel = new JLabel(insidePort);
         addField(panel,
                  insidePortLabel,
                  insidePortWi,
                  leftWidth,
                  rightWidth,
                  0);
-        insidePortWi.setLabel(insidePortLabel, "");
+        insidePortWi.setLabel(insidePortLabel, insidePort);
         if (wizard) {
             insidePortComboBoxWizard = insidePortWi;
         } else {
@@ -1462,15 +1465,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         outsidePortWi.setAlwaysEditable(true);
         outsidePortWi.setValueAndWait(savedOutsidePort);
 
-        final JLabel outsidePortLabel = new JLabel(
-                        Tools.getString("DrbdResourceInfo.ProxyOutsidePort"));
+        final String outsidePort =
+                        Tools.getString("DrbdResourceInfo.ProxyOutsidePort");
+        final JLabel outsidePortLabel = new JLabel(outsidePort);
         addField(panel,
                  outsidePortLabel,
                  outsidePortWi,
                  leftWidth,
                  rightWidth,
                  0);
-        outsidePortWi.setLabel(outsidePortLabel, "");
+        outsidePortWi.setLabel(outsidePortLabel, outsidePort);
         if (wizard) {
             outsidePortComboBoxWizard = outsidePortWi;
         } else {
@@ -1535,9 +1539,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             iIpWi.setEditable(true);
             iIpWi.setValueAndWait(insideIpSaved);
 
-            final JLabel insideIpLabel = new JLabel(
-                            Tools.getString("DrbdResourceInfo.ProxyInsideIp"));
-            iIpWi.setLabel(insideIpLabel, "");
+            final String insideIp =
+                            Tools.getString("DrbdResourceInfo.ProxyInsideIp");
+            final JLabel insideIpLabel = new JLabel(insideIp);
+            iIpWi.setLabel(insideIpLabel, insideIp);
             addField(panel,
                      insideIpLabel,
                      iIpWi,
@@ -1562,9 +1567,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             oIpWi.setEditable(true);
             oIpWi.setValueAndWait(outsideIpSaved);
 
-            final JLabel outsideIpLabel = new JLabel(
-                            Tools.getString("DrbdResourceInfo.ProxyOutsideIp"));
-            oIpWi.setLabel(outsideIpLabel, "");
+            final String outsideIp =
+                            Tools.getString("DrbdResourceInfo.ProxyOutsideIp");
+            final JLabel outsideIpLabel = new JLabel(outsideIp);
+            oIpWi.setLabel(outsideIpLabel, outsideIp);
             addField(panel,
                      outsideIpLabel,
                      oIpWi,
@@ -1811,19 +1817,19 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Widget comboBox = wi;
             final Widget realComboBox = rwi;
             comboBox.addListeners(new WidgetListener() {
-                                @Override
-                                public void check(final Object value) {
-                                    if (savedInsideIps.get(host) == null) {
-                                        insideIpComboBoxHash.get(host)
-                                          .setValue(getIp(comboBox.getValue()));
-                                    }
-                                    checkParameterFields(comboBox,
-                                                         realComboBox,
-                                                         null,
-                                                         null,
-                                                         thisApplyButton);
-                                }
-                            });
+                @Override
+                public void check(final Object value) {
+                    if (savedInsideIps.get(host) == null) {
+                        insideIpComboBoxHash.get(host)
+                          .setValue(getIp(comboBox.getValue()));
+                    }
+                    checkParameterFields(comboBox,
+                                         realComboBox,
+                                         null,
+                                         null,
+                                         thisApplyButton);
+                }
+            });
         }
     }
 
