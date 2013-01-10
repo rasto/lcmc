@@ -177,6 +177,8 @@ public final class DrbdXML extends XML {
         NOT_ADVANCED_PARAMS.add("after"); /* before 8.4 */
         NOT_ADVANCED_PARAMS.add("resync-after");
         NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
+        NOT_ADVANCED_PARAMS.add("memlimit"); /* proxy */
+        NOT_ADVANCED_PARAMS.add("plugin-zlib"); /* proxy */
     }
     /** Access types of some parameters. */
     static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =

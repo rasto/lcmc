@@ -2472,7 +2472,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Port"},
 
         {"DrbdResourceInfo.ProxyPorts",
-         "Common Proxy ports"},
+         "Common Proxy Ports"},
         {"DrbdResourceInfo.Proxy",
          "Proxy on "},
 

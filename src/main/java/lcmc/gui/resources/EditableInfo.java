@@ -70,6 +70,8 @@ public abstract class EditableInfo extends Info {
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
+    private final Map<String, JPanel> sectionPanels =
+                                                new HashMap<String, JPanel>();
     /** Returns section in which is this parameter. */
     protected abstract String getSection(String param);
     /** Returns whether this parameter is required. */
@@ -479,6 +481,7 @@ public abstract class EditableInfo extends Info {
             } else {
                 sectionPanel = getParamPanel(section, getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
+                sectionPanels.put(section, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
                     final Widget sameAsCombo = sameAsFields.get(section);
@@ -1155,5 +1158,12 @@ public abstract class EditableInfo extends Info {
      */
     protected Color getSectionColor(final String section) {
         return Browser.PANEL_BACKGROUND;
+    }
+
+    /**
+     * Return section panel.
+     */
+    protected JPanel getSectionPanel(final String section) {
+        return sectionPanels.get(section);
     }
 }

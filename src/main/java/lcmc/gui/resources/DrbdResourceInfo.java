@@ -60,6 +60,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Enumeration;
+import java.util.HashSet;
 import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -81,6 +82,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** List of volumes. */
     private final Set<DrbdVolumeInfo> drbdVolumes =
                                         new LinkedHashSet<DrbdVolumeInfo>();
+    /** Proxy on host panels. */
+    private final Map<Host, JPanel> proxyPanels = new HashMap<Host, JPanel>();
+    /** Common proxy ports panel. */
+    private JPanel commonProxyPortsPanel = null;
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
     /** Whether the meta-data has to be created or not. */
@@ -770,7 +775,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         String hostInsidePort = null;
         String hostOutsidePort = null;
         final boolean infoPanelOk = infoPanel != null;
-        for (final Host host : getHosts()) {
+        for (final Host host : getProxyHosts()) {
             final HostProxy hostProxy =
                                  dxml.getHostProxy(host.getName(), getName());
             if (hostProxy == null) {
@@ -831,7 +836,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set proxy ports */
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
-            for (final Host host : getHosts()) {
+            for (final Host host : getProxyHosts()) {
                 host.getBrowser().getDrbdVIPortList().add(savedPort);
             }
             if (infoPanelOk) {
@@ -848,7 +853,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
         if (!Tools.areEqual(hostOutsidePort, savedOutsidePort)) {
             savedOutsidePort = hostOutsidePort;
-            for (final Host host : getHosts()) {
+            for (final Host host : getProxyHosts()) {
                 host.getBrowser().getDrbdVIPortList().add(savedPort);
             }
             if (infoPanelOk) {
@@ -1301,9 +1306,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                            Widget.NO_ABBRV,
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            Widget.NO_BUTTON);
-            wi.setEditable(true);
             final String haSaved = savedHostAddresses.get(host);
-            wi.setValue(haSaved);
+            wi.setValueAndWait(haSaved);
             newAddressComboBoxHash.put(host, wi);
 
         }
@@ -1385,7 +1389,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         pwi.setLabel(label, port);
         if (wizard) {
             portComboBoxWizard = pwi;
-            portComboBox.setValue(defaultPort);
+            portComboBox.setValueAndWait(defaultPort);
         } else {
             portComboBox = pwi;
         }
@@ -1486,6 +1490,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
+        commonProxyPortsPanel = panel;
         addPortListeners(wizard,
                          thisApplyButton,
                          insidePortComboBoxWizard,
@@ -1505,7 +1510,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                              new HashMap<Host, Widget>();
         final Map<Host, Widget> newOutsideIpComboBoxHash =
                                              new HashMap<Host, Widget>();
-        for (final Host pHost : getHosts()) {
+        for (final Host pHost : getProxyHosts()) {
             final HostProxy hostProxy = 
               getBrowser().getDrbdXML().getHostProxy(pHost.getName(),
                                                      getName());
@@ -1515,6 +1520,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final JPanel sectionPanel =
                        getParamPanel(Tools.getString("DrbdResourceInfo.Proxy")
                                      + pHost.getName());
+            proxyPanels.put(pHost, sectionPanel);
             sectionPanel.setBackground(AppDefaults.LIGHT_ORANGE);
             final JPanel advancedPanel = new JPanel();
             addToAdvancedList(advancedPanel);
@@ -1529,18 +1535,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 //TODO: just textfield
             }
             final Widget iIpWi = WidgetFactory.createInstance(
-                           Widget.Type.COMBOBOX,
-                           Widget.NO_DEFAULT,
-                           proxyNetInterfaces,
-                           Widget.NO_REGEXP,
-                           rightWidth,
-                           Widget.NO_ABBRV,
-                           new AccessMode(ConfigData.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           Widget.NO_BUTTON);
+                                   Widget.Type.COMBOBOX,
+                                   Widget.NO_DEFAULT,
+                                   proxyNetInterfaces,
+                                   Widget.NO_REGEXP,
+                                   rightWidth,
+                                   Widget.NO_ABBRV,
+                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                                  !AccessMode.ADVANCED),
+                                   Widget.NO_BUTTON);
             final String insideIpSaved = hostProxy.getInsideIp();
             newInsideIpComboBoxHash.put(pHost, iIpWi);
-            iIpWi.setEditable(true);
             iIpWi.setValueAndWait(insideIpSaved);
 
             final String insideIp =
@@ -1574,7 +1579,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                            Widget.NO_BUTTON);
             final String outsideIpSaved = hostProxy.getOutsideIp();
             newOutsideIpComboBoxHash.put(pHost, oIpWi);
-            oIpWi.setEditable(true);
             oIpWi.setValueAndWait(outsideIpSaved);
 
             final String outsideIp =
@@ -1652,7 +1656,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* other nodes */
-        for (final Host h : getHosts()) {
+        for (final Host h : getProxyHosts()) {
             if (h == hostBrowser.getHost()) {
                 continue;
             }
@@ -1714,7 +1718,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* ips */
-        for (final Host host : getHosts()) {
+        for (final Host host : getProxyHosts()) {
             final Widget wi = insideIpComboBoxHash.get(host);
             if (wi == null) {
                 continue;
@@ -1730,7 +1734,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
         }
 
-        for (final Host host : getHosts()) {
+        for (final Host host : getProxyHosts()) {
             final Widget wi = outsideIpComboBoxHash.get(host);
             if (wi == null) {
                 continue;
@@ -1773,7 +1777,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         savedInsidePort = insidePortComboBox.getStringValue();
         savedOutsidePort = outsidePortComboBox.getStringValue();
         /* ips */
-        for (final Host host : getHosts()) {
+        for (final Host host : getProxyHosts()) {
 
             final Widget insideWi = insideIpComboBoxHash.get(host);
             if (insideWi != null) {
@@ -1802,6 +1806,28 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private String getNetInterfaceWithPort(final String address,
                                            final String port) {
         return address + ":" + port;
+    }
+
+    /** Return all proxy hosts. */
+    private Set<Host> getProxyHosts() {
+        return getHosts(); // TODO
+    }
+
+    /** Hide/show proxy panels for selected hosts. */
+    private void setProxyPanels() {
+        final Set<Host> visible = new HashSet<Host>();
+        for (final Host host : getHosts()) {
+            final Host proxyHost = getProxyHost(
+                                     addressComboBoxHash.get(host).getValue());
+            if (proxyHost != null) {
+                visible.add(proxyHost);
+            }
+        }
+        for (final Host pHost : getProxyHosts()) {
+            proxyPanels.get(pHost).setVisible(visible.contains(pHost));
+        }
+        commonProxyPortsPanel.setVisible(!visible.isEmpty());
+        getSectionPanel("proxy").setVisible(!visible.isEmpty());
     }
 
     /** Adds host address listener. */
@@ -1836,6 +1862,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                          null,
                                          null,
                                          thisApplyButton);
+                    setProxyPanels();
                 }
             });
         }
@@ -1846,7 +1873,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                 final MyButton thisApplyButton,
                                 final Map<Host, Widget> newIpComboBoxHash,
                                 final Map<Host, Widget> ipComboBoxHash) {
-        for (final Host host : getHosts()) {
+        for (final Host host : getProxyHosts()) {
             Widget wi;
             Widget rwi;
             if (wizard) {
@@ -2100,6 +2127,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final NetInfo ni = (NetInfo) o;
             return ni.getNetInterface().getIp();
         }
+    }
+
+    /** Get proxy from ip combo box value. Null, if it's not a proxy. */
+    private Host getProxyHost(final Object o) {
+        if (o == null) {
+            return null;
+        }
+        if (o instanceof ProxyNetInfo) {
+            final ProxyNetInfo pni = (ProxyNetInfo) o;
+            return pni.getProxyHost();
+        }
+        return null;
     }
 
     /** Return default inside ip, that is the same as the "address" field. */
