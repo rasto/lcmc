@@ -151,8 +151,6 @@ public final class DrbdXML extends XML {
                                                 new HashMap<String, Boolean>();
     /** Whether there are unknown sections in the config. */
     boolean unknownSections = false;
-    /** Whether there is proxy in the config. */
-    boolean proxyDetected = false;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol C, that is a default. */
@@ -936,12 +934,6 @@ public final class DrbdXML extends XML {
                 hostPortMap.put(hostName, port);
             } else if (option.getNodeName().equals("proxy")) {
                 parseProxyHostConfig(hostName, resName, option);
-                if (!proxyDetected) {
-                    Tools.appWarning("unsuported feature: proxy");
-                    Tools.progressIndicatorFailed(hostName,
-                                                  "unsupported feature: proxy");
-                    proxyDetected = true;
-                }
             }
         }
     }
