@@ -77,7 +77,7 @@ public final class HostBrowser extends Browser {
     private DefaultMutableTreeNode fileSystemsNode;
 
     /** List of used network interface ports. */
-    private final Set<String> drbdVIPortList = new HashSet<String>();
+    private final Set<String> usedPorts = new HashSet<String>();
     /** Host object. */
     private final Host host;
     /** Host info object of the host of this browser. */
@@ -626,8 +626,8 @@ public final class HostBrowser extends Browser {
     }
 
     /** Returns a list of used network interface ports. */
-    public Set<String> getDrbdVIPortList() {
-        return drbdVIPortList;
+    public Set<String> getUsedPorts() {
+        return usedPorts;
     }
 
     /** Lock block dev info objects. */

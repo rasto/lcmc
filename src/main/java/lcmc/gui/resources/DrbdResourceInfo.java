@@ -756,7 +756,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostPort, savedPort)) {
             savedPort = hostPort;
             for (final Host host : getHosts()) {
-                host.getBrowser().getDrbdVIPortList().add(savedPort);
+                host.getBrowser().getUsedPorts().add(savedPort);
             }
             if (infoPanelOk) {
                 final Widget wi = portComboBox;
@@ -841,7 +841,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
             for (final Host host : getProxyHosts()) {
-                host.getBrowser().getDrbdVIPortList().add(savedPort);
+                host.getBrowser().getUsedPorts().add(savedPort);
             }
             if (infoPanelOk) {
                 final Widget wi = insidePortComboBox;
@@ -858,7 +858,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostOutsidePort, savedOutsidePort)) {
             savedOutsidePort = hostOutsidePort;
             for (final Host host : getProxyHosts()) {
-                host.getBrowser().getDrbdVIPortList().add(savedPort);
+                host.getBrowser().getUsedPorts().add(savedPort);
             }
             if (infoPanelOk) {
                 final Widget wi = outsidePortComboBox;
@@ -1338,7 +1338,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         String dp = savedPort;
         int index = -1;
         for (final Host host : getHosts()) {
-            for (final String port : host.getBrowser().getDrbdVIPortList()) {
+            for (final String port : host.getBrowser().getUsedPorts()) {
                 if (Tools.isNumber(port)) {
                     final int p = Integer.parseInt(port);
                     if (index < 0 || p < index) {
@@ -1360,7 +1360,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String port = Integer.toString(index);
             boolean contains = false;
             for (final Host host : getHosts()) {
-                if (host.getBrowser().getDrbdVIPortList().contains(port)) {
+                if (host.getBrowser().getUsedPorts().contains(port)) {
                     contains = true;
                 }
             }
@@ -1770,7 +1770,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             } else {
                 savedHostAddresses.put(host, address);
             }
-            host.getBrowser().getDrbdVIPortList().add(savedPort);
+            host.getBrowser().getUsedPorts().add(savedPort);
         }
     }
 
@@ -1981,7 +1981,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         getBrowser().getDrbdXML().removeResource(getName());
         final Set<Host> hosts = getHosts();
         for (final Host host : hosts) {
-            host.getBrowser().getDrbdVIPortList().remove(savedPort);
+            host.getBrowser().getUsedPorts().remove(savedPort);
         }
 
         final Map<String, DrbdResourceInfo> drbdResHash =

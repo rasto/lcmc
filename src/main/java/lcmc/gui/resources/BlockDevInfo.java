@@ -535,7 +535,7 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            if (getBrowser().getDrbdVIPortList().contains(value)
+            if (getBrowser().getUsedPorts().contains(value)
                 && !value.equals(getBlockDevice().getValue(param))) {
                 ret = false;
             }
