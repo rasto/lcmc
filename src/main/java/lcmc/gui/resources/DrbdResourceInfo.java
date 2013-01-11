@@ -636,6 +636,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
               + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
+        setProxyPanels();
         infoPanelDone();
         return infoPanel;
     }
@@ -1823,11 +1824,24 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 visible.add(proxyHost);
             }
         }
+        final boolean isProxy = !visible.isEmpty();
         for (final Host pHost : getProxyHosts()) {
             proxyPanels.get(pHost).setVisible(visible.contains(pHost));
         }
-        commonProxyPortsPanel.setVisible(!visible.isEmpty());
-        getSectionPanel("proxy").setVisible(!visible.isEmpty());
+        commonProxyPortsPanel.setVisible(isProxy);
+        getSectionPanel(PROXY_SECTION).setVisible(isProxy);
+        String portLabel;
+        if (isProxy) {
+            portLabel =
+                    Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
+        } else {
+            portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
+        }
+        portComboBox.getLabel().setText(portLabel);
+        final Widget pw = portComboBoxWizard;
+        if (pw != null) {
+            pw.getLabel().setText(portLabel);
+        }
     }
 
     /** Adds host address listener. */

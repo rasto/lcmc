@@ -2471,6 +2471,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdResourceInfo.NetInterfacePort",
          "Port"},
 
+        {"DrbdResourceInfo.NetInterfacePortToProxy",
+         "<html><u>DRBD</u> \u2192 Proxy Port</html>"},
+
         {"DrbdResourceInfo.ProxyPorts",
          "Common Proxy Ports"},
         {"DrbdResourceInfo.Proxy",
