@@ -779,13 +779,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final Host host : getProxyHosts()) {
             final HostProxy hostProxy =
                                  dxml.getHostProxy(host.getName(), getName());
-            if (hostProxy == null) {
-                continue;
+            String insideIp = null;
+            String outsideIp = null;
+            String insidePort = null;
+            String outsidePort = null;
+            if (hostProxy != null) {
+                insideIp = hostProxy.getInsideIp();
+                outsideIp = hostProxy.getOutsideIp();
+                insidePort = hostProxy.getInsidePort();
+                outsidePort = hostProxy.getOutsidePort();
             }
-            final String insideIp = hostProxy.getInsideIp();
-            final String outsideIp = hostProxy.getOutsideIp();
-            final String insidePort = hostProxy.getInsidePort();
-            final String outsidePort = hostProxy.getOutsidePort();
 
             if (insidePort != null && !insidePort.equals(hostInsidePort)) {
                 Tools.appWarning("more proxy inside ports in " + getName()
@@ -1513,10 +1516,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                              new HashMap<Host, Widget>();
         for (final Host pHost : getProxyHosts()) {
             final HostProxy hostProxy = 
-              getBrowser().getDrbdXML().getHostProxy(pHost.getName(),
-                                                     getName());
-            if (hostProxy == null) {
-                continue;
+                      getBrowser().getDrbdXML().getHostProxy(pHost.getName(),
+                                                             getName());
+            String insideIpSaved = null;
+            String outsideIpSaved = null;
+            if (hostProxy != null) {
+                insideIpSaved = hostProxy.getInsideIp();
+                outsideIpSaved = hostProxy.getOutsideIp();
             }
             final JPanel sectionPanel =
                        getParamPanel(Tools.getString("DrbdResourceInfo.Proxy")
@@ -1545,7 +1551,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                    new AccessMode(ConfigData.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
-            final String insideIpSaved = hostProxy.getInsideIp();
             newInsideIpComboBoxHash.put(pHost, iIpWi);
             iIpWi.setValueAndWait(insideIpSaved);
 
@@ -1578,7 +1583,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            Widget.NO_BUTTON);
-            final String outsideIpSaved = hostProxy.getOutsideIp();
             newOutsideIpComboBoxHash.put(pHost, oIpWi);
             oIpWi.setValueAndWait(outsideIpSaved);
 
@@ -1826,10 +1830,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         final boolean isProxy = !visible.isEmpty();
         for (final Host pHost : getProxyHosts()) {
-            proxyPanels.get(pHost).setVisible(visible.contains(pHost));
+            final JPanel proxyPanel = proxyPanels.get(pHost);
+            if (proxyPanel != null) {
+                proxyPanel.setVisible(visible.contains(pHost));
+            }
         }
         commonProxyPortsPanel.setVisible(isProxy);
-        getSectionPanel(PROXY_SECTION).setVisible(isProxy);
         String portLabel;
         if (isProxy) {
             portLabel =
