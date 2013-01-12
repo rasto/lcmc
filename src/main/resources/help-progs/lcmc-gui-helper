@@ -1606,7 +1606,11 @@ sub get_drbd_xml {
 sub get_drbd_proxy_plugins {
 	my $out = `$DRBD_PROXY_GET_PLUGINS`;
 	my @parts = split /\n\n/, $out;
-	my %plugins;
+	my %plugins = (
+			debug=>"",
+			lzma=>"",
+			zlib=>"",
+			); # default in case proxy is not installed
 	for my $p (@parts) {
 		my ($name, $desc) = $p =~ /Plugin.*?:\s+(\S+)\s+(.*)/s;
 		$desc =~ s/\n/&lt;br&gt;/;
