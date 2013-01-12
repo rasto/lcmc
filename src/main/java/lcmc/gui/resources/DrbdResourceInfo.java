@@ -1334,47 +1334,20 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* Port */
-        final List<String> drbdVIPorts = new ArrayList<String>();
-        String dp = savedPort;
-        int index = -1;
-        for (final Host host : getHosts()) {
-            for (final String port : host.getBrowser().getUsedPorts()) {
-                if (Tools.isNumber(port)) {
-                    final int p = Integer.parseInt(port);
-                    if (index < 0 || p < index) {
-                        index = p;
-                    }
-                }
-            }
-        }
-        if (index < 0) {
-            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
-        }
-        if (dp == null) {
-            dp = Integer.toString(index);
+        String defaultPort = savedPort;
+        int defaultPortInt;
+        if (defaultPort == null) {
+            defaultPortInt = getLowestUsedPort();
+            defaultPort = Integer.toString(defaultPortInt);
         } else {
-            drbdVIPorts.add(dp);
+            defaultPortInt = Integer.parseInt(defaultPort);
         }
-        int i = 0;
-        while (i < 10) {
-            final String port = Integer.toString(index);
-            boolean contains = false;
-            for (final Host host : getHosts()) {
-                if (host.getBrowser().getUsedPorts().contains(port)) {
-                    contains = true;
-                }
-            }
-            if (!contains) {
-                drbdVIPorts.add(port);
-                i++;
-            }
-            index++;
-        }
-        final String defaultPort = drbdVIPorts.get(0);
+        final List<String> drbdPorts = getPossibleDrbdPorts(defaultPortInt);
+
         final Widget pwi = WidgetFactory.createInstance(
                           Widget.Type.COMBOBOX,
                           defaultPort,
-                          drbdVIPorts.toArray(new String[drbdVIPorts.size()]),
+                          drbdPorts.toArray(new String[drbdPorts.size()]),
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
@@ -1429,11 +1402,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         panel.setLayout(new SpringLayout());
         panel.setBackground(AppDefaults.LIGHT_ORANGE);
         /* inside port */
-        final String insideDefaultPort = "0"; //TODO
+        final int insideDefaultPortInt = getDefaultInsidePort();
+        final String insideDefaultPort = Integer.toString(insideDefaultPortInt);
+        final List<String> insideDrbdPorts =
+                                    getPossibleDrbdPorts(insideDefaultPortInt);
         final Widget insidePortWi = WidgetFactory.createInstance(
                           Widget.Type.COMBOBOX,
                           insideDefaultPort,
-                          Widget.NO_ITEMS, // TODO
+                          insideDrbdPorts.toArray(
+                                           new String[insideDrbdPorts.size()]),
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
@@ -1460,11 +1437,21 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         rows++;
 
         /* outside port */
-        final String outsideDefaultPort = "0"; //TODO
+        String outsideDefaultPort = savedOutsidePort;
+        int outsideDefaultPortInt;
+        if (outsideDefaultPort == null) {
+            outsideDefaultPortInt = getLowestUsedProxyPort();
+            outsideDefaultPort = Integer.toString(outsideDefaultPortInt);
+        } else {
+            outsideDefaultPortInt = Integer.parseInt(outsideDefaultPort);
+        }
+        final List<String> outsideDrbdPorts =
+                                   getPossibleDrbdPorts(outsideDefaultPortInt);
         final Widget outsidePortWi = WidgetFactory.createInstance(
                           Widget.Type.COMBOBOX,
                           outsideDefaultPort,
-                          Widget.NO_ITEMS, // TODO
+                          outsideDrbdPorts.toArray(
+                                          new String[outsideDrbdPorts.size()]),
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
@@ -1840,6 +1827,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (isProxy) {
             portLabel =
                     Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
+            if (savedInsidePort == null || "".equals(savedInsidePort)) {
+                insidePortComboBox.setValue(getDefaultInsidePort());
+            }
+            if (savedOutsidePort == null || "".equals(savedOutsidePort)) {
+                outsidePortComboBox.setValue(savedPort);
+            }
         } else {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
         }
@@ -2169,5 +2162,81 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             return getIp(wi.getValue());
         }
         return null;
+    }
+
+    /** Return the lowest used port. */
+    public int getLowestUsedPort() {
+        int index = -1;
+        for (final Host host : getHosts()) {
+            for (final String port : host.getBrowser().getUsedPorts()) {
+                if (Tools.isNumber(port)) {
+                    final int p = Integer.parseInt(port);
+                    if (index < 0 || p < index) {
+                        index = p;
+                    }
+                }
+            }
+        }
+        if (index < 0) {
+            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+        }
+        return index;
+    }
+
+    /** Return the lowest used port. */
+    public int getLowestUsedProxyPort() {
+        int index = -1;
+        for (final Host host : getHosts()) {
+            for (final String port : host.getBrowser().getUsedProxyPorts()) {
+                if (Tools.isNumber(port)) {
+                    final int p = Integer.parseInt(port);
+                    if (index < 0 || p < index) {
+                        index = p;
+                    }
+                }
+            }
+        }
+        if (index < 0) {
+            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+        }
+        return index;
+    }
+
+    /** Return list of DRBD ports for combobox. */
+    List<String> getPossibleDrbdPorts(int defaultPortInt) {
+        int i = 0;
+        final List<String> drbdPorts = new ArrayList<String>();
+        while (i < 10) {
+            final String port = Integer.toString(defaultPortInt);
+            boolean contains = false;
+            for (final Host host : getHosts()) {
+                if (host.getBrowser().getUsedPorts().contains(port)) {
+                    contains = true;
+                }
+            }
+            if (!contains || i == 0) {
+                drbdPorts.add(port);
+                i++;
+            }
+            defaultPortInt++;
+        }
+        return drbdPorts;
+    }
+
+    /** Return default proxy inside port, that is smaller than the drbd port.
+     */
+    private int getDefaultInsidePort() {
+        final String insideDefaultPort = savedInsidePort;
+        int insideDefaultPortInt;
+        if (insideDefaultPort == null || "".equals(insideDefaultPort)) {
+            if (savedPort == null || "".equals(savedPort)) {
+                insideDefaultPortInt = getLowestUsedPort();
+            } else {
+                insideDefaultPortInt = Integer.parseInt(savedPort) - 1;
+            }
+        } else {
+            insideDefaultPortInt = Integer.parseInt(insideDefaultPort);
+        }
+        return insideDefaultPortInt;
     }
 }

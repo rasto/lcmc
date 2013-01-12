@@ -78,6 +78,8 @@ public final class HostBrowser extends Browser {
 
     /** List of used network interface ports. */
     private final Set<String> usedPorts = new HashSet<String>();
+    /** List of used proxy ports. */
+    private final Set<String> usedProxyPorts = new HashSet<String>();
     /** Host object. */
     private final Host host;
     /** Host info object of the host of this browser. */
@@ -628,6 +630,11 @@ public final class HostBrowser extends Browser {
     /** Returns a list of used network interface ports. */
     public Set<String> getUsedPorts() {
         return usedPorts;
+    }
+
+    /** Returns a list of used proxy ports. */
+    public Set<String> getUsedProxyPorts() {
+        return usedProxyPorts;
     }
 
     /** Lock block dev info objects. */
