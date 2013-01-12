@@ -965,7 +965,7 @@ sub do_cluster_events {
 	my $info = get_cluster_info($hb_version);
 	my $command =
 		"PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat:/usr/lib/pacemaker:/usr/lib64/pacemaker"
-		." exec cibmon -udV -m1 2>&1";
+		." exec cibmon -udVVVV -m1 2>&1";
 	if ($hb_version && (compare_versions($hb_version, "2.1.4") <= 0)) {
 		$command =
 			" PATH=/usr/libexec/pacemaker:/usr/lib/heartbeat:/usr/lib64/heartbeat"
@@ -986,7 +986,7 @@ sub do_cluster_events {
 				if (/signon to CIB failed/i) {
 					print "ERROR: signon to CIB failed";
 					return;
-				} elsif (/error:/ || /cib_diff/) {
+				} elsif (/error:/ || /Diff: ---/) {
 					my $info =
 					get_cluster_info($hb_version);
 					if ($info ne $prev_info) {
