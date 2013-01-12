@@ -287,11 +287,11 @@ public final class ResourceAgent {
     }
 
     /** Returns an array of all service parameters. */
-    String[] getParameters(final boolean master) {
+    List<String> getParameters(final boolean master) {
         if (master) {
-            return masterParameters.toArray(new String[parameters.size()]);
+            return masterParameters;
         } else {
-            return parameters.toArray(new String[parameters.size()]);
+            return parameters;
         }
     }
 

@@ -306,8 +306,8 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns all drbd parameters. */
-    public String[] getParameters() {
-        return parametersList.toArray(new String[parametersList.size()]);
+    public List<String> getParameters() {
+        return parametersList;
     }
 
     /** Gets short description for the parameter. */
@@ -562,9 +562,8 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns parameters for the global section. */
-    public String[] getGlobalParams() {
-        return globalParametersList.toArray(
-                                     new String[globalParametersList.size()]);
+    public List<String> getGlobalParams() {
+        return globalParametersList;
     }
 
     /** Returns possible choices. */

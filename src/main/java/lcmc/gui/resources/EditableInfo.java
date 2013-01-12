@@ -135,6 +135,8 @@ public abstract class EditableInfo extends Info {
     private final JPanel moreOptionsPanel = new JPanel();
     /** Whether dialog was started. It disables the apply button. */
     private boolean dialogStarted = false;
+    /** Disabled section, their not visible. */
+    private final Set<String> disabledSections = new HashSet<String>();
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -481,7 +483,7 @@ public abstract class EditableInfo extends Info {
             } else {
                 sectionPanel = getParamPanel(section, getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
-                sectionPanels.put(section, sectionPanel);
+                addSectionPanel(section, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
                     final Widget sameAsCombo = sameAsFields.get(section);
@@ -503,6 +505,7 @@ public abstract class EditableInfo extends Info {
                     }
                 }
             }
+            sectionPanel.setVisible(!disabledSections.contains(section));
             sectionPanel.add(panel);
             if (advanced) {
                 advancedSections.add(sectionPanel);
@@ -1163,7 +1166,45 @@ public abstract class EditableInfo extends Info {
     /**
      * Return section panel.
      */
-    protected JPanel getSectionPanel(final String section) {
+    private final JPanel getSectionPanel(final String section) {
         return sectionPanels.get(section);
+    }
+
+    /** Add section panel. */
+    protected final void addSectionPanel(final String section,
+                                         final JPanel sectionPanel) {
+        sectionPanels.put(section, sectionPanel);
+    }
+
+    /** Enable/disable a section. */
+    protected final void enableSection(final String section,
+                                       final boolean enable) {
+        if (enable) {
+            disabledSections.remove(section);
+        } else {
+            disabledSections.add(section);
+        }
+        final JPanel p = getSectionPanel(section);
+        if (p != null) {
+            p.setVisible(enable);
+        }
+    }
+
+    /** Return parameters that are not in disabeld sections. */
+    protected final String[] getEnabledSectionParams(
+                                                   final List<String> params) {
+        final List<String> newParams = new ArrayList<String>();
+        for (final String param : params) {
+
+            if (!disabledSections.contains(getSection(param))) {
+                newParams.add(param);
+            }
+        }
+        return newParams.toArray(new String[newParams.size()]);
+    }
+
+    /** Return whether a section is enabled. */
+    protected final boolean isSectionEnabled(final String section) {
+        return !disabledSections.contains(section);
     }
 }

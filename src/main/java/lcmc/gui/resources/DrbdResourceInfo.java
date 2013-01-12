@@ -83,9 +83,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private final Set<DrbdVolumeInfo> drbdVolumes =
                                         new LinkedHashSet<DrbdVolumeInfo>();
     /** Proxy on host panels. */
-    private final Map<Host, JPanel> proxyPanels = new HashMap<Host, JPanel>();
-    /** Common proxy ports panel. */
-    private JPanel commonProxyPortsPanel = null;
+    //private final Map<Host, JPanel> proxyPanels = new HashMap<Host, JPanel>();
+    ///** Common proxy ports panel. */
+    //private JPanel commonProxyPortsPanel = null;
     /** Cache for getInfoPanel method. */
     private JComponent infoPanel = null;
     /** Whether the meta-data has to be created or not. */
@@ -144,7 +144,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Hosts. */
     private final Set<Host> hosts;
 
-    private static final String PROXY_SECTION = "proxy";
+    private static final String SECTION_PROXY = "proxy";
+    /** Proxy ports section. */
+    private static final String SECTION_PROXY_PORTS = 
+                                 Tools.getString("DrbdResourceInfo.ProxyPorts");
 
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
@@ -299,7 +302,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Returns all parameters. */
     @Override
     public String[] getParametersFromXML() {
-        return getBrowser().getDrbdXML().getParameters();
+        return getEnabledSectionParams(
+                                    getBrowser().getDrbdXML().getParameters());
     }
 
     /**
@@ -566,6 +570,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     ClusterBrowser.SERVICE_FIELD_WIDTH,
                     false,
                     getApplyButton());
+        enableSection(SECTION_PROXY, false);
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
@@ -933,8 +938,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             changed = true;
         }
 
-        if (checkProxyFieldsChanged()) {
-            changed = true;
+        if (isSectionEnabled(SECTION_PROXY)) {
+            if (checkProxyFieldsChanged()) {
+                changed = true;
+            }
         }
         return super.checkResourceFieldsChanged(param, params) || changed;
     }
@@ -1119,24 +1126,26 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             correct = false;
         }
 
-        if (!checkProxyPortCorrect(insidePortComboBox,
-                                   insidePortComboBoxWizard,
-                                   savedInsidePort)) {
-            correct = false;
-        }
+        if (isSectionEnabled(SECTION_PROXY)) {
+            if (!checkProxyPortCorrect(insidePortComboBox,
+                                       insidePortComboBoxWizard,
+                                       savedInsidePort)) {
+                correct = false;
+            }
 
-        if (!checkProxyPortCorrect(outsidePortComboBox,
-                                   outsidePortComboBoxWizard,
-                                   savedOutsidePort)) {
-            correct = false;
-        }
+            if (!checkProxyPortCorrect(outsidePortComboBox,
+                                       outsidePortComboBoxWizard,
+                                       savedOutsidePort)) {
+                correct = false;
+            }
 
-        if (!checkProxyInsideIpCorrect()) {
-            correct = false;
-        }
+            if (!checkProxyInsideIpCorrect()) {
+                correct = false;
+            }
 
-        if (!checkProxyOutsideIpCorrect()) {
-            correct = false;
+            if (!checkProxyOutsideIpCorrect()) {
+                correct = false;
+            }
         }
 
         return super.checkResourceFieldsCorrect(param, params) && correct;
@@ -1397,8 +1406,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                               final boolean wizard,
                               final MyButton thisApplyButton) {
         int rows = 0;
-        final JPanel panel =
-             getParamPanel(Tools.getString("DrbdResourceInfo.ProxyPorts"));
+        final JPanel panel = getParamPanel(SECTION_PROXY_PORTS);
+        addSectionPanel(SECTION_PROXY_PORTS, panel);
+        enableSection(SECTION_PROXY_PORTS, false);
         panel.setLayout(new SpringLayout());
         panel.setBackground(AppDefaults.LIGHT_ORANGE);
         /* inside port */
@@ -1481,7 +1491,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
-        commonProxyPortsPanel = panel;
+        //commonProxyPortsPanel = panel;
         addPortListeners(wizard,
                          thisApplyButton,
                          insidePortComboBoxWizard,
@@ -1511,10 +1521,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 insideIpSaved = hostProxy.getInsideIp();
                 outsideIpSaved = hostProxy.getOutsideIp();
             }
-            final JPanel sectionPanel =
-                       getParamPanel(Tools.getString("DrbdResourceInfo.Proxy")
-                                     + pHost.getName());
-            proxyPanels.put(pHost, sectionPanel);
+            final String section = Tools.getString("DrbdResourceInfo.Proxy")
+                                   + pHost.getName();
+            final JPanel sectionPanel = getParamPanel(section);
+            addSectionPanel(section, sectionPanel);
+            enableSection(section, false); /* enabled when proxy is used. */
             sectionPanel.setBackground(AppDefaults.LIGHT_ORANGE);
             final JPanel advancedPanel = new JPanel();
             addToAdvancedList(advancedPanel);
@@ -1817,22 +1828,24 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         final boolean isProxy = !visible.isEmpty();
         for (final Host pHost : getProxyHosts()) {
-            final JPanel proxyPanel = proxyPanels.get(pHost);
-            if (proxyPanel != null) {
-                proxyPanel.setVisible(visible.contains(pHost));
-            }
+            final String section = Tools.getString("DrbdResourceInfo.Proxy")
+                                   + pHost.getName();
+            enableSection(section, visible.contains(pHost));
         }
-        commonProxyPortsPanel.setVisible(isProxy);
+        enableSection(SECTION_PROXY, isProxy);
+        enableSection(SECTION_PROXY_PORTS, isProxy);
         String portLabel;
         if (isProxy) {
             portLabel =
                     Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
             if (savedInsidePort == null || "".equals(savedInsidePort)) {
-                insidePortComboBox.setValue(getDefaultInsidePort());
+                insidePortComboBox.setValue(
+                                    Integer.toString(getDefaultInsidePort()));
             }
             if (savedOutsidePort == null || "".equals(savedOutsidePort)) {
                 outsidePortComboBox.setValue(savedPort);
             }
+            getDrbdInfo().enableProxySection(); /* never disable */
         } else {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
         }
@@ -2123,7 +2136,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Return section color. */
     @Override
     protected Color getSectionColor(final String section) {
-        if (PROXY_SECTION.equals(section)) {
+        if (SECTION_PROXY.equals(section)) {
             return AppDefaults.LIGHT_ORANGE;
         }
         return super.getSectionColor(section);
@@ -2206,6 +2219,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     List<String> getPossibleDrbdPorts(int defaultPortInt) {
         int i = 0;
         final List<String> drbdPorts = new ArrayList<String>();
+        drbdPorts.add(null);
         while (i < 10) {
             final String port = Integer.toString(defaultPortInt);
             boolean contains = false;

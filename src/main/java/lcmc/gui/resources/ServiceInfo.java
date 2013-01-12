@@ -602,8 +602,9 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         /* Attributes */
-        final String[] params = crmXML.getParameters(resourceAgent,
-                                                     getService().isMaster());
+        final String[] params = getEnabledSectionParams(
+                                 crmXML.getParameters(resourceAgent,
+                                                      getService().isMaster()));
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
             boolean allMetaAttrsAreDefaultValues = true;
@@ -2149,7 +2150,8 @@ public class ServiceInfo extends EditableInfo {
     @Override
     public String[] getParametersFromXML() {
         final CRMXML crmXML = getBrowser().getCRMXML();
-        return crmXML.getParameters(resourceAgent, getService().isMaster());
+        return getEnabledSectionParams(
+                 crmXML.getParameters(resourceAgent, getService().isMaster()));
     }
 
     /** Returns the regexp of the parameter. */
