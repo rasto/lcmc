@@ -58,7 +58,7 @@ public final class DistResource_redhat_6 extends java.util.ListResourceBundle {
 
         {"PmInst.install.3",
          "yum -y install wget && wget -N -nd -P /etc/yum.repos.d/"
-         + " http://www.clusterlabs.org/rpm-next/rhel-6/clusterlabs.repo "
+         + " http://www.clusterlabs.org/rpm-test-next/rhel-6/clusterlabs.repo "
          + " && yum -y install pacemaker cman"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
