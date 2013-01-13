@@ -1346,7 +1346,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         String defaultPort = savedPort;
         int defaultPortInt;
         if (defaultPort == null) {
-            defaultPortInt = getLowestUsedPort();
+            defaultPortInt = getLowestUnusedPort();
             defaultPort = Integer.toString(defaultPortInt);
         } else {
             defaultPortInt = Integer.parseInt(defaultPort);
@@ -1450,7 +1450,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         String outsideDefaultPort = savedOutsidePort;
         int outsideDefaultPortInt;
         if (outsideDefaultPort == null) {
-            outsideDefaultPortInt = getLowestUsedProxyPort();
+            outsideDefaultPortInt = getLowestUnusedProxyPort();
             outsideDefaultPort = Integer.toString(outsideDefaultPortInt);
         } else {
             outsideDefaultPortInt = Integer.parseInt(outsideDefaultPort);
@@ -1987,7 +1987,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         getBrowser().getDrbdXML().removeResource(getName());
         final Set<Host> hosts = getHosts();
         for (final Host host : hosts) {
-            host.getBrowser().getUsedPorts().remove(savedPort);
+            host.getBrowser().getUsedPorts().remove(
+                                                portComboBox.getStringValue());
+            host.getBrowser().getUsedPorts().remove(
+                                          insidePortComboBox.getStringValue());
+            host.getBrowser().getUsedProxyPorts().remove(
+                                         outsidePortComboBox.getStringValue());
         }
 
         final Map<String, DrbdResourceInfo> drbdResHash =
@@ -2177,42 +2182,43 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return null;
     }
 
-    /** Return the lowest used port. */
-    public int getLowestUsedPort() {
-        int index = -1;
+    /** Return the lowest unused port. */
+    public int getLowestUnusedPort() {
+        int lowest = -1;
         for (final Host host : getHosts()) {
-            for (final String port : host.getBrowser().getUsedPorts()) {
-                if (Tools.isNumber(port)) {
-                    final int p = Integer.parseInt(port);
-                    if (index < 0 || p < index) {
-                        index = p;
+            for (final String usedPortS : host.getBrowser().getUsedPorts()) {
+                if (Tools.isNumber(usedPortS)) {
+                    final int usedPort = Integer.parseInt(usedPortS);
+                    if (lowest < 0 || usedPort > lowest) {
+                        lowest = usedPort;
                     }
                 }
             }
         }
-        if (index < 0) {
-            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+        if (lowest < 0) {
+            return Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
         }
-        return index;
+        return lowest + 1;
     }
 
     /** Return the lowest used port. */
-    public int getLowestUsedProxyPort() {
-        int index = -1;
+    public int getLowestUnusedProxyPort() {
+        int lowest = -1;
         for (final Host host : getHosts()) {
-            for (final String port : host.getBrowser().getUsedProxyPorts()) {
-                if (Tools.isNumber(port)) {
-                    final int p = Integer.parseInt(port);
-                    if (index < 0 || p < index) {
-                        index = p;
+            for (final String usedPortS
+                                    : host.getBrowser().getUsedProxyPorts()) {
+                if (Tools.isNumber(usedPortS)) {
+                    final int usedPort = Integer.parseInt(usedPortS);
+                    if (lowest < 0 || usedPort > lowest) {
+                        lowest = usedPort;
                     }
                 }
             }
         }
-        if (index < 0) {
-            index = Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
+        if (lowest < 0) {
+            return Tools.getDefaultInt("HostBrowser.DrbdNetInterfacePort");
         }
-        return index;
+        return lowest + 1;
     }
 
     /** Return list of DRBD ports for combobox. */
@@ -2244,7 +2250,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         int insideDefaultPortInt;
         if (insideDefaultPort == null || "".equals(insideDefaultPort)) {
             if (savedPort == null || "".equals(savedPort)) {
-                insideDefaultPortInt = getLowestUsedPort();
+                insideDefaultPortInt = getLowestUnusedPort();
             } else {
                 insideDefaultPortInt = Integer.parseInt(savedPort) - 1;
             }
