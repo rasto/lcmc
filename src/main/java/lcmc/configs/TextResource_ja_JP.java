@@ -107,7 +107,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"MainPanel.UpgradeAvailable",
          "<font color=black>新しいMC&nbsp;@LATEST@&nbsp;が利用できます。"
-         + "</font><br><a href=\"http://sourceforge.net/projects/lcmc/files/"
+         + "</font><br><a href=\"http://lcmc.sourceforge.net/"
          + "?from-lcmc\">さあ、入手しよう</a>！"},
 
         {"MainPanel.NoUpgradeAvailable",
