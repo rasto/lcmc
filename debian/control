@@ -9,6 +9,6 @@ Homepage: http://lcmc.sourceforge.net
 
 Package: lcmc
 Architecture: all
-Depends: openjdk-6-jre | sun-java6-jre | sun-java6-jre, 
+Depends: openjdk-6-jre | sun-java6-jre | sun-java6-jre | openjdk-7-jre,
  java-wrappers, ${misc:Depends}
 Description: Linux Cluster Management Console
