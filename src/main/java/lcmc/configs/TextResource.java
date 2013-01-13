@@ -117,7 +117,7 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"MainPanel.UpgradeAvailable",
          "<font color=black>there&nbsp;is&nbsp;a&nbsp;new&nbsp;MC&nbsp;@LATEST@&nbsp;"
          + "available</font><br>"
-         + "<a href=\"http://sourceforge.net/projects/lcmc/files/"
+         + "<a href=\"http://lcmc.sourceforge.net/"
          + "?from-lcmc\">Get it here</a>!"},
 
         {"MainPanel.NoUpgradeAvailable",
