@@ -64,6 +64,18 @@ public final class DistResource_redhat_6 extends java.util.ListResourceBundle {
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
 
+        /* Corosync/Pacemaker clusterlabs test */
+        {"PmInst.install.text.4",
+         "clusterlabs repo: 1.1.x/1.4.x" },
+
+        {"PmInst.install.4",
+         "yum -y install wget && wget -N -nd -P /etc/yum.repos.d/"
+         + " http://www.clusterlabs.org/rpm-test-next/rhel-6/clusterlabs.repo "
+         + " && yum -y install pacemaker cman"
+         + " && if [ -e /etc/corosync/corosync.conf ]; then"
+         + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
+         + " fi"},
+
         {"Corosync.addToRc",
          DistResource.SUDO + "/sbin/chkconfig --level 2345 corosync on "
          + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
