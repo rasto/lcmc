@@ -129,8 +129,8 @@ public abstract class EditableInfo extends Info {
     /** List of advanced panels. */
     private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
-    private final List<JPanel> advancedOnlySectionList =
-                                                      new ArrayList<JPanel>();
+    private final List<String> advancedOnlySectionList =
+                                                      new ArrayList<String>();
     /** More options panel. */
     private final JPanel moreOptionsPanel = new JPanel();
     /** Whether dialog was started. It disables the apply button. */
@@ -514,17 +514,19 @@ public abstract class EditableInfo extends Info {
             }
         }
         boolean advanced = false;
-        for (final JPanel sectionPanel : sectionMap.values()) {
+        for (final String section : sectionMap.keySet()) {
+            final JPanel sectionPanel = sectionMap.get(section);
             if (advancedSections.contains(sectionPanel)) {
                 advanced = true;
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
-                advancedOnlySectionList.add(sectionPanel);
+                advancedOnlySectionList.add(section);
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         sectionPanel.setVisible(
-                                      Tools.getConfigData().isAdvancedMode());
+                                      Tools.getConfigData().isAdvancedMode()
+                                      && !disabledSections.contains(section));
                     }
                 });
             }
@@ -1059,7 +1061,8 @@ public abstract class EditableInfo extends Info {
             });
             advanced = true;
         }
-        for (final JPanel p : advancedOnlySectionList) {
+        for (final String section : advancedOnlySectionList) {
+            final JPanel p = sectionPanels.get(section);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -1133,6 +1136,8 @@ public abstract class EditableInfo extends Info {
     protected void clearPanelLists() {
         advancedPanelList.clear();
         advancedOnlySectionList.clear();
+        sectionPanels.clear();
+        disabledSections.clear();
     }
 
     /** Cleanup. */
