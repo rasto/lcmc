@@ -447,7 +447,7 @@ public abstract class EditableInfo extends Info {
                                     checkParameterFields(paramWi,
                                                          realParamWi,
                                                          param,
-                                                         params,
+                                                         getParametersFromXML(),
                                                          thisApplyButton);
                                 }
                             });
@@ -1066,7 +1066,8 @@ public abstract class EditableInfo extends Info {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    p.setVisible(advancedMode);
+                    p.setVisible(advancedMode
+                                 && !disabledSections.contains(section));
                 }
             });
             advanced = true;
