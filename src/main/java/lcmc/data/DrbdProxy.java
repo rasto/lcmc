@@ -30,10 +30,8 @@ import java.util.StringTokenizer;
  * DRBD Proxy functions.
  */
 public final class DrbdProxy {
-    private static final boolean PROXY = true;
-    private static final boolean NOT_PROXY = false;
+    public static final boolean PROXY = true;
     private static final boolean DONE = true;
-    private static final boolean NOT_DONE = false;
 
     /** Prefix for the parameter. */
     public static final String PLUGIN_PREFIX = "plugin-";
@@ -77,7 +75,7 @@ public final class DrbdProxy {
                                                 "proxy config: parsing error");
             }
         }
-        return NOT_PROXY;
+        return !PROXY;
     }
 
     /**
@@ -119,14 +117,14 @@ public final class DrbdProxy {
         String nextToken = st.nextToken();
         if ("plugin".equals(nextToken)) {
             parsePlugin(st, nameValueMap);
-            return NOT_DONE;
+            return !DONE;
         } else if ("}".equals(nextToken)) {
             return DONE;
         } else if (endOfStatement(nextToken)) {
             final String param = nextToken.substring(0, nextToken.length() - 1);
             final String value = DrbdXML.CONFIG_YES;
             nameValueMap.put(prefix + param, value);
-            return NOT_DONE;
+            return !DONE;
         }
         final String param = nextToken;
         String value = null;
@@ -151,7 +149,7 @@ public final class DrbdProxy {
             throw new Exceptions.DrbdConfigException(
                                             "proxy config: statement error");
         }
-        return NOT_DONE;
+        return !DONE;
     }
 
     /**

@@ -36,6 +36,7 @@ import lcmc.data.DrbdXML.HostProxy;
 import lcmc.data.DRBDtestData;
 import lcmc.data.AccessMode;
 import lcmc.data.ConfigData;
+import lcmc.data.DrbdProxy;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
@@ -560,17 +561,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                          ClusterBrowser.SERVICE_FIELD_WIDTH,
                          false,
                          getApplyButton());
-        addProxyPorts(optionsPanel,
-                      ClusterBrowser.SERVICE_LABEL_WIDTH,
-                      ClusterBrowser.SERVICE_FIELD_WIDTH,
-                      false,
-                      getApplyButton());
-        addProxyIps(optionsPanel,
-                    ClusterBrowser.SERVICE_LABEL_WIDTH,
-                    ClusterBrowser.SERVICE_FIELD_WIDTH,
-                    false,
-                    getApplyButton());
-        enableSection(SECTION_PROXY, false);
+        enableSection(SECTION_PROXY, !DrbdProxy.PROXY, !WIZARD);
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
@@ -641,7 +632,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
               + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
-        setProxyPanels();
+        setProxyPanels(false);
         infoPanelDone();
         return infoPanel;
     }
@@ -1385,14 +1376,48 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1,           /* initX, initY */
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
+
+        addProxyPorts(optionsPanel,
+                      ClusterBrowser.SERVICE_LABEL_WIDTH,
+                      ClusterBrowser.SERVICE_FIELD_WIDTH,
+                      wizard,
+                      getApplyButton());
+
+        addProxyIps(optionsPanel,
+                    ClusterBrowser.SERVICE_LABEL_WIDTH,
+                    ClusterBrowser.SERVICE_FIELD_WIDTH,
+                    wizard,
+                    getApplyButton());
+
         addHostAddressListener(wizard,
                                thisApplyButton,
                                newAddressComboBoxHash,
                                addressComboBoxHash);
+
         addPortListeners(wizard,
                          thisApplyButton,
                          portComboBoxWizard,
                          portComboBox);
+
+        addPortListeners(wizard,
+                         thisApplyButton,
+                         insidePortComboBoxWizard,
+                         insidePortComboBox);
+
+        addPortListeners(wizard,
+                         thisApplyButton,
+                         outsidePortComboBoxWizard,
+                         outsidePortComboBox);
+
+        addIpListeners(wizard,
+                       thisApplyButton,
+                       insideIpComboBoxHashWizard,
+                       insideIpComboBoxHash);
+
+        addIpListeners(wizard,
+                       thisApplyButton,
+                       outsideIpComboBoxHashWizard,
+                       outsideIpComboBoxHash);
         if (wizard) {
             addressComboBoxHashWizard = newAddressComboBoxHash;
         } else {
@@ -1400,15 +1425,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
     }
 
-    public void addProxyPorts(final JPanel optionsPanel,
-                              final int leftWidth,
-                              final int rightWidth,
-                              final boolean wizard,
-                              final MyButton thisApplyButton) {
+    private void addProxyPorts(final JPanel optionsPanel,
+                               final int leftWidth,
+                               final int rightWidth,
+                               final boolean wizard,
+                               final MyButton thisApplyButton) {
         int rows = 0;
         final JPanel panel = getParamPanel(SECTION_PROXY_PORTS);
-        addSectionPanel(SECTION_PROXY_PORTS, panel);
-        enableSection(SECTION_PROXY_PORTS, false);
+        addSectionPanel(SECTION_PROXY_PORTS, wizard, panel);
+        enableSection(SECTION_PROXY_PORTS, !DrbdProxy.PROXY, wizard);
         panel.setLayout(new SpringLayout());
         panel.setBackground(AppDefaults.LIGHT_ORANGE);
         /* inside port */
@@ -1492,21 +1517,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                         1, 1);          /* xPad, yPad */
         optionsPanel.add(panel);
         //commonProxyPortsPanel = panel;
-        addPortListeners(wizard,
-                         thisApplyButton,
-                         insidePortComboBoxWizard,
-                         insidePortComboBox);
-        addPortListeners(wizard,
-                         thisApplyButton,
-                         outsidePortComboBoxWizard,
-                         outsidePortComboBox);
     }
 
-    public void addProxyIps(final JPanel optionsPanel,
-                            final int leftWidth,
-                            final int rightWidth,
-                            final boolean wizard,
-                            final MyButton thisApplyButton) {
+    private void addProxyIps(final JPanel optionsPanel,
+                             final int leftWidth,
+                             final int rightWidth,
+                             final boolean wizard,
+                             final MyButton thisApplyButton) {
         final Map<Host, Widget> newInsideIpComboBoxHash =
                                              new HashMap<Host, Widget>();
         final Map<Host, Widget> newOutsideIpComboBoxHash =
@@ -1524,8 +1541,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String section = Tools.getString("DrbdResourceInfo.Proxy")
                                    + pHost.getName();
             final JPanel sectionPanel = getParamPanel(section);
-            addSectionPanel(section, sectionPanel);
-            enableSection(section, false); /* enabled when proxy is used. */
+            addSectionPanel(section, wizard, sectionPanel);
+            enableSection(section, !DrbdProxy.PROXY, wizard);
             sectionPanel.setBackground(AppDefaults.LIGHT_ORANGE);
             final JPanel advancedPanel = new JPanel();
             addToAdvancedList(advancedPanel);
@@ -1599,14 +1616,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                             1, 1);          /* xPad, yPad */
             optionsPanel.add(sectionPanel);
         }
-        addIpListeners(wizard,
-                       thisApplyButton,
-                       newInsideIpComboBoxHash,
-                       insideIpComboBoxHash);
-        addIpListeners(wizard,
-                       thisApplyButton,
-                       newOutsideIpComboBoxHash,
-                       outsideIpComboBoxHash);
         if (wizard) {
             insideIpComboBoxHashWizard = newInsideIpComboBoxHash;
             outsideIpComboBoxHashWizard = newOutsideIpComboBoxHash;
@@ -1817,7 +1826,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Hide/show proxy panels for selected hosts. */
-    private void setProxyPanels() {
+    private void setProxyPanels(final boolean wizard) {
         final Set<Host> visible = new HashSet<Host>();
         for (final Host host : getHosts()) {
             final Host proxyHost = getProxyHost(
@@ -1830,10 +1839,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final Host pHost : getProxyHosts()) {
             final String section = Tools.getString("DrbdResourceInfo.Proxy")
                                    + pHost.getName();
-            enableSection(section, visible.contains(pHost));
+            enableSection(section, visible.contains(pHost), wizard);
         }
-        enableSection(SECTION_PROXY, isProxy);
-        enableSection(SECTION_PROXY_PORTS, isProxy);
+        enableSection(SECTION_PROXY, isProxy, wizard);
+        enableSection(SECTION_PROXY_PORTS, isProxy, wizard);
         String portLabel;
         if (isProxy) {
             portLabel =
@@ -1845,7 +1854,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (savedOutsidePort == null || "".equals(savedOutsidePort)) {
                 outsidePortComboBox.setValue(savedPort);
             }
-            getDrbdInfo().enableProxySection(); /* never disable */
+            getDrbdInfo().enableProxySection(wizard); /* never disable */
         } else {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
         }
@@ -1888,7 +1897,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                          null,
                                          null,
                                          thisApplyButton);
-                    setProxyPanels();
+                    setProxyPanels(wizard);
                 }
             });
         }

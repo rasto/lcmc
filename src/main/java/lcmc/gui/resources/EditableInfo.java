@@ -70,8 +70,8 @@ public abstract class EditableInfo extends Info {
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
-    private final Map<String, JPanel> sectionPanels =
-                                                new HashMap<String, JPanel>();
+    private final MultiKeyMap<String, JPanel> sectionPanels =
+                                             new MultiKeyMap<String, JPanel>();
     /** Returns section in which is this parameter. */
     protected abstract String getSection(String param);
     /** Returns whether this parameter is required. */
@@ -137,6 +137,8 @@ public abstract class EditableInfo extends Info {
     private boolean dialogStarted = false;
     /** Disabled section, their not visible. */
     private final Set<String> disabledSections = new HashSet<String>();
+    /** Whether is's a wizard element. */
+    protected final static boolean WIZARD = true;
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -402,10 +404,11 @@ public abstract class EditableInfo extends Info {
             }
             addField(panel, label, paramWi, leftWidth, rightWidth, height);
         }
+        final boolean wizard = "wizard".equals(prefix);
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
             Widget rpwi = null;
-            if ("wizard".equals(prefix)) {
+            if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
                     Tools.appError("unkown param: " + param
@@ -434,7 +437,7 @@ public abstract class EditableInfo extends Info {
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
             Widget rpwi = null;
-            if ("wizard".equals(prefix)) {
+            if (wizard) {
                 rpwi = getWidget(param, null);
             }
             final Widget realParamWi = rpwi;
@@ -483,7 +486,7 @@ public abstract class EditableInfo extends Info {
             } else {
                 sectionPanel = getParamPanel(section, getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
-                addSectionPanel(section, sectionPanel);
+                addSectionPanel(section, wizard, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
                     final Widget sameAsCombo = sameAsFields.get(section);
@@ -505,7 +508,7 @@ public abstract class EditableInfo extends Info {
                     }
                 }
             }
-            sectionPanel.setVisible(!disabledSections.contains(section));
+            sectionPanel.setVisible(isSectionEnabled(section));
             sectionPanel.add(panel);
             if (advanced) {
                 advancedSections.add(sectionPanel);
@@ -526,7 +529,7 @@ public abstract class EditableInfo extends Info {
                     public void run() {
                         sectionPanel.setVisible(
                                       Tools.getConfigData().isAdvancedMode()
-                                      && !disabledSections.contains(section));
+                                      && isSectionEnabled(section));
                     }
                 });
             }
@@ -1062,12 +1065,16 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         for (final String section : advancedOnlySectionList) {
-            final JPanel p = sectionPanels.get(section);
+            final JPanel p = sectionPanels.get(section,
+                                               Boolean.toString(!WIZARD));
+            final JPanel pw = sectionPanels.get(section,
+                                                Boolean.toString(WIZARD));
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    p.setVisible(advancedMode
-                                 && !disabledSections.contains(section));
+                    final boolean v = advancedMode && isSectionEnabled(section);
+                    p.setVisible(v);
+                    pw.setVisible(v);
                 }
             });
             advanced = true;
@@ -1172,25 +1179,28 @@ public abstract class EditableInfo extends Info {
     /**
      * Return section panel.
      */
-    private final JPanel getSectionPanel(final String section) {
-        return sectionPanels.get(section);
+    private final JPanel getSectionPanel(final String section,
+                                         final boolean wizard) {
+        return sectionPanels.get(section, Boolean.toString(wizard));
     }
 
     /** Add section panel. */
     protected final void addSectionPanel(final String section,
+                                         final boolean wizard,
                                          final JPanel sectionPanel) {
-        sectionPanels.put(section, sectionPanel);
+        sectionPanels.put(section, Boolean.toString(wizard), sectionPanel);
     }
 
     /** Enable/disable a section. */
     protected final void enableSection(final String section,
-                                       final boolean enable) {
+                                       final boolean enable,
+                                       final boolean wizard) {
         if (enable) {
             disabledSections.remove(section);
         } else {
             disabledSections.add(section);
         }
-        final JPanel p = getSectionPanel(section);
+        final JPanel p = getSectionPanel(section, wizard);
         if (p != null) {
             p.setVisible(enable);
         }
@@ -1202,7 +1212,7 @@ public abstract class EditableInfo extends Info {
         final List<String> newParams = new ArrayList<String>();
         for (final String param : params) {
 
-            if (!disabledSections.contains(getSection(param))) {
+            if (isSectionEnabled(getSection(param))) {
                 newParams.add(param);
             }
         }

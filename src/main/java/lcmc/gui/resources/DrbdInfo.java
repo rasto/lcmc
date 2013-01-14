@@ -468,7 +468,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         buttonPanel.add(getActionsButton(), BorderLayout.EAST);
 
         final String[] params = getParametersFromXML();
-        enableSection(SECTION_COMMON_PROXY, false);
+        enableSection(SECTION_COMMON_PROXY, false, !WIZARD);
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
@@ -941,7 +941,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Enable proxy section. It stays till the next restart. */
-    void enableProxySection() {
-        enableSection(SECTION_COMMON_PROXY, true);
+    void enableProxySection(final boolean wizard) {
+        enableSection(SECTION_COMMON_PROXY, true, wizard);
     }
 }
