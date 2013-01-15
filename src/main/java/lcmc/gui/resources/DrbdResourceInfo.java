@@ -632,7 +632,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
               + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
-        setProxyPanels(false);
+        setProxyPanels(!WIZARD);
         infoPanelDone();
         return infoPanel;
     }
@@ -799,12 +799,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             hostOutsidePort = outsidePort;
 
             String savedInsideIp = savedInsideIps.get(host);
-            final String defaultInsideIp = getDefaultInsideIp(host);
-            if (savedInsideIp == null) {
-                savedInsideIp = defaultInsideIp;
-            }
             if (!Tools.areEqual(insideIp, savedInsideIp)) {
-                if (insideIp != null && insideIp.equals(defaultInsideIp)) {
+                if (insideIp == null) {
                     savedInsideIps.remove(host);
                 } else {
                     savedInsideIps.put(host, insideIp);
@@ -1795,7 +1791,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (insideWi != null) {
                 final String defaultInsideIp = getDefaultInsideIp(host);
                 final String insideIp = getIp(insideWi.getValue());
-                if (insideIp != null && insideIp.equals(defaultInsideIp)) {
+                if (insideIp == null) {
                     savedInsideIps.remove(host);
                 } else {
                     savedInsideIps.put(host, insideIp);
@@ -1828,9 +1824,24 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Hide/show proxy panels for selected hosts. */
     private void setProxyPanels(final boolean wizard) {
         final Set<Host> visible = new HashSet<Host>();
+        Map<Host, Widget> addressHash;
+        Widget insidePortCB;
+        Widget outsidePortCB;
+        Widget portCB;
+        if (wizard) {
+            addressHash = addressComboBoxHashWizard;
+            insidePortCB = insidePortComboBoxWizard;
+            outsidePortCB = insidePortComboBoxWizard;
+            portCB = portComboBoxWizard;
+        } else {
+            addressHash = addressComboBoxHash;
+            insidePortCB = insidePortComboBox;
+            outsidePortCB = insidePortComboBox;
+            portCB = portComboBox;
+        }
         for (final Host host : getHosts()) {
-            final Host proxyHost = getProxyHost(
-                                     addressComboBoxHash.get(host).getValue());
+            final Host proxyHost =
+                                getProxyHost(addressHash.get(host).getValue());
             if (proxyHost != null) {
                 visible.add(proxyHost);
             }
@@ -1848,21 +1859,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             portLabel =
                     Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
             if (savedInsidePort == null || "".equals(savedInsidePort)) {
-                insidePortComboBox.setValue(
-                                    Integer.toString(getDefaultInsidePort()));
+                insidePortCB.setValue(Integer.toString(getDefaultInsidePort()));
             }
             if (savedOutsidePort == null || "".equals(savedOutsidePort)) {
-                outsidePortComboBox.setValue(savedPort);
+                outsidePortCB.setValue(savedPort);
             }
             getDrbdInfo().enableProxySection(wizard); /* never disable */
         } else {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
         }
-        portComboBox.getLabel().setText(portLabel);
-        final Widget pw = portComboBoxWizard;
-        if (pw != null) {
-            pw.getLabel().setText(portLabel);
-        }
+        portCB.getLabel().setText(portLabel);
     }
 
     /** Adds host address listener. */
@@ -1889,8 +1895,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 @Override
                 public void check(final Object value) {
                     if (savedInsideIps.get(host) == null) {
-                        insideIpComboBoxHash.get(host)
-                          .setValue(getIp(comboBox.getValue()));
+                        Map<Host, Widget> cb;
+                        if (wizard) {
+                            cb = insideIpComboBoxHashWizard;
+                        } else {
+                            cb = insideIpComboBoxHash;
+                        }
+                        cb.get(host).setValueAndWait(
+                                                   getIp(comboBox.getValue()));
                     }
                     checkParameterFields(comboBox,
                                          realComboBox,

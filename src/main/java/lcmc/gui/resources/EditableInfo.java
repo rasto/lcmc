@@ -1074,7 +1074,9 @@ public abstract class EditableInfo extends Info {
                 public void run() {
                     final boolean v = advancedMode && isSectionEnabled(section);
                     p.setVisible(v);
-                    pw.setVisible(v);
+                    if (pw != null) {
+                        pw.setVisible(v);
+                    }
                 }
             });
             advanced = true;
