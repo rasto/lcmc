@@ -69,7 +69,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    private static final String SECTION_COMMON_PROXY = "common proxy";
+    private static final String SECTION_COMMON_PROXY = "proxy";
 
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
@@ -324,18 +324,24 @@ public final class DrbdInfo extends DrbdGuiInfo {
         return getEnabledSectionParams(drbdXML.getGlobalParams());
     }
 
+    /** Section name that is displayed. */
+    @Override
+    protected String getSectionDisplayName(final String section) {
+        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+            return super.getSectionDisplayName(section);
+        } else {
+            return Tools.getString("DrbdInfo.CommonSection")
+                   + super.getSectionDisplayName(section);
+        }
+    }
+
     /**
      * Returns section to which this parameter belongs.
      * This is used for grouping in the info panel.
      */
     @Override
     protected String getSection(final String param) {
-        final String section = getBrowser().getDrbdXML().getSection(param);
-        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
-            return section;
-        } else {
-            return Tools.getString("DrbdInfo.CommonSection") + section;
-        }
+        return getBrowser().getDrbdXML().getSection(param);
     }
 
     /** Applies changes made in the info panel by user. */

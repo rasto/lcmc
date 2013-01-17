@@ -2460,7 +2460,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Loading meta data..."},
 
         {"DrbdInfo.CommonSection",
-         "common "},
+         "Common "},
 
         {"DrbdResourceInfo.HostAddresses",
          "Net Interface"},

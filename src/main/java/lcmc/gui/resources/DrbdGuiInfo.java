@@ -320,6 +320,9 @@ abstract class DrbdGuiInfo extends EditableInfo {
         final String[] sections = dxml.getSections();
         final boolean volumesAvailable = host.hasVolumes();
         for (final String sectionString : sections) {
+            if (!isSectionEnabled(sectionString)) {
+                continue;
+            }
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
             if ("resource".equals(section)

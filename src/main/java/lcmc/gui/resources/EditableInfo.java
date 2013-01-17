@@ -484,7 +484,8 @@ public abstract class EditableInfo extends Info {
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
             } else {
-                sectionPanel = getParamPanel(section, getSectionColor(section));
+                sectionPanel = getParamPanel(getSectionDisplayName(section),
+                                             getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
                 addSectionPanel(section, wizard, sectionPanel);
                 optionsPanel.add(sectionPanel);
@@ -1169,6 +1170,11 @@ public abstract class EditableInfo extends Info {
             return prevParamWi.getStringValue();
         }
         return null;
+    }
+
+    /** Section name that is displayed. */
+    protected String getSectionDisplayName(final String section) {
+        return Tools.ucfirst(section);
     }
 
     /**
