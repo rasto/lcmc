@@ -317,16 +317,15 @@ sub get_net_info {
 			}
 		}
 		if (/^$/) {
-			if ($dev
-			    && $ip
-			    && ($mac ne "no" || "lo" eq $dev)
-			    && $mask) {
+			if ($dev && $ip && $mac ne "no" && $mask) {
 				$out .= "$dev $ip $mac $mask";
 				if ($$bridges{$dev}) {
 					$out .= " bridge\n";
 				} else {
 					$out .= "\n";
 				}
+			} elsif ("lo" eq $dev) {
+				$out = "$dev $ip $mac $mask\n".$out;
 			}
 			$dev = "";
 			$mac  = "no";

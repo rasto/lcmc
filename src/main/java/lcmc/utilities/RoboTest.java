@@ -3471,7 +3471,7 @@ public final class RoboTest {
         moveTo("on " + hostName, Widget.MComboBox.class); /* interface */
         leftClick();
         sleep(500);
-        press(KeyEvent.VK_DOWN); /* select first interface */
+        press(KeyEvent.VK_E); /* select first interface */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(1000);
