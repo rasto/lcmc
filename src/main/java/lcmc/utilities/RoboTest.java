@@ -74,6 +74,9 @@ public final class RoboTest {
     private static Robot robot;
     /** Cluster. */
     private static Cluster cluster;
+
+    private static boolean PROXY = true;
+
     /** Private constructor, cannot be instantiated. */
     private RoboTest() {
         /* Cannot be instantiated. */
@@ -708,6 +711,25 @@ public final class RoboTest {
                                  + secs);
                             resetTerminalAreas();
                             i++;
+                        }
+                    } else if ("8".equals(index)) {
+                        /* proxy */
+                        int i = 1;
+                        final int blockDevY = getBlockDevY();
+                        while (!aborted) {
+                            final long startTime = System.currentTimeMillis();
+                            info("test" + index + " no " + i);
+                            startDRBDTest8(blockDevY);
+                            final int secs = (int) (System.currentTimeMillis()
+                                                     - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: "
+                                 + secs);
+                            resetTerminalAreas();
+                            i++;
+                            if (cluster.getHostsArray()[0].hasVolumes()) {
+                                Tools.getConfigData().setBigDRBDConf(
+                                      !Tools.getConfigData().getBigDRBDConf());
+                            }
                         }
                     }
                 } else if ("VMs (KVM, Xen)".equals(selected)) {
@@ -3147,6 +3169,10 @@ public final class RoboTest {
     }
 
     private static void moveScrollBar(final boolean down) {
+        moveScrollBar(down, 300);
+    }
+
+    private static void moveScrollBar(final boolean down, final int delta) {
         if (aborted) {
             return;
         }
@@ -3182,9 +3208,9 @@ public final class RoboTest {
             moveToAbs(scrollbarX, scrollbarY);
             leftPress();
             if (down) {
-                moveToAbs(scrollbarX, scrollbarY + 300);
+                moveToAbs(scrollbarX, scrollbarY + delta);
             } else {
-                moveToAbs(scrollbarX, scrollbarY - 300);
+                moveToAbs(scrollbarX, scrollbarY - delta);
             }
             leftRelease();
         }
@@ -3467,11 +3493,16 @@ public final class RoboTest {
         dialogColorTest("newDrbdResource");
     }
 
-    private static void chooseDrbdResourceInterface(final String hostName) {
+    private static void chooseDrbdResourceInterface(final String hostName,
+                                                    final boolean proxy) {
         moveTo("on " + hostName, Widget.MComboBox.class); /* interface */
         leftClick();
         sleep(500);
-        press(KeyEvent.VK_E); /* select first interface */
+        if (proxy) {
+            press(KeyEvent.VK_P); /* select first interface to proxy*/
+        } else {
+            press(KeyEvent.VK_E); /* select first interface */
+        }
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(1000);
@@ -3479,8 +3510,10 @@ public final class RoboTest {
     }
 
     private static void chooseDrbdResource() {
-        chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName());
-        chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName());
+        chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(),
+                                    !PROXY);
+        chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(),
+                                    !PROXY);
 
         drbdNext();
         sleep(10000);
@@ -4243,6 +4276,311 @@ public final class RoboTest {
             pvRemove(blockDevY + offset);
             offset += 40;
         }
+    }
+
+    /** DRBD Test 8 / proxy. */
+    private static void startDRBDTest8(final int blockDevY) {
+        /* Two drbds. */
+        final String drbdTest = "drbd-test8";
+        slowFactor = 0.2f;
+        aborted = false;
+        int offset = 0;
+        for (int i = 0; i < 2; i++) {
+            addDrbdResource(blockDevY + offset);
+            if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
+                newDrbdResource();
+            }
+            chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(),
+                                        PROXY);
+            chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(),
+                                        PROXY);
+            moveTo(Tools.getString("DrbdResourceInfo.ProxyInsidePort"),
+                   Widget.MComboBox.class); /* inside */
+            leftClick();
+            sleep(500);
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+            press(KeyEvent.VK_ENTER);
+
+            moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsidePort"),
+                   Widget.MComboBox.class); /* outside */
+            leftClick();
+            sleep(500);
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+            press(KeyEvent.VK_ENTER);
+            robot.mouseWheel(50);
+
+            moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
+                   Widget.MComboBox.class); /* outside */
+            leftClick();
+            sleep(500);
+            press(KeyEvent.VK_E);
+            sleep(500);
+            press(KeyEvent.VK_ENTER);
+
+            moveTo(Widget.MComboBox.class, 6); /* outside */
+            leftClick();
+            sleep(500);
+            press(KeyEvent.VK_E);
+            sleep(500);
+            press(KeyEvent.VK_ENTER);
+
+            drbdNext();
+            sleep(10000);
+            dialogColorTest("chooseDrbdResource");
+
+            addDrbdVolume();
+            addBlockDevice();
+            addBlockDevice();
+            sleep(20000);
+
+            if (offset == 0) {
+                checkDRBDTest(drbdTest, 1.1);
+            } else {
+                checkDRBDTest(drbdTest, 1.2);
+            }
+            sleep(10000);
+            addMetaData();
+            addFileSystem();
+            sleep(10000);
+            moveTo("Finish");
+            leftClick();
+            sleep(10000);
+
+            offset += 40;
+        }
+        checkDRBDTest(drbdTest, 2);
+
+        moveTo(730, 475); /* rectangle */
+        leftPress();
+        moveTo(225, 115);
+        leftRelease();
+
+        moveTo(334, blockDevY);
+        rightClick();
+        moveToSlowly(400, blockDevY + 160);
+
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* detach */
+        checkDRBDTest(drbdTest, 2.01);
+
+        moveTo(400, blockDevY);
+        rightClick();
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_ENTER); /* attach */
+        checkDRBDTest(drbdTest, 2.02);
+
+        moveTo(480, 202); /* select r0 */
+        leftClick();
+
+        moveTo("Protocol", Widget.MComboBox.class);
+        leftClick();
+        press(KeyEvent.VK_UP); /* protocol b */
+        sleep(200);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveTo("Fence peer", Widget.MComboBox.class);
+        leftClick();
+        sleep(2000);
+        press(KeyEvent.VK_DOWN);
+        sleep(200);
+        press(KeyEvent.VK_DOWN); /* select dopd */
+        sleep(200);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+        Tools.getGUIData().expandTerminalSplitPane(1);
+
+        moveTo("Wfc timeout", Widget.MTextField.class);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_9);
+        sleep(2000);
+
+        moveTo("Max buffers", Widget.MTextField.class);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_5);
+        sleep(1000);
+        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_DOWN);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveScrollBar(true);
+        moveTo("After", Widget.MComboBox.class);
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_DOWN);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(1000);
+
+        moveScrollBar(false);
+
+        moveTo("Apply");
+        sleep(6000); /* test */
+        leftClick(); /* apply/disables tooltip */
+        sleep(2000); /* test */
+        leftClick();
+        checkDRBDTest(drbdTest, 2.1); /* 2.1 */
+
+
+        /* common */
+        moveTo(500, 342); /* select background */
+        leftClick();
+        sleep(2000);
+        leftClick();
+
+        moveTo("Wfc timeout", Widget.MTextField.class);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_3);
+        sleep(2000);
+
+        moveTo("Apply");
+        sleep(6000); /* test */
+        leftClick(); /* apply/disables tooltip */
+        sleep(2000); /* test */
+        leftClick();
+        sleep(10000);
+        checkDRBDTest(drbdTest, 2.11); /* 2.11 */
+        moveTo("Wfc timeout", Widget.MTextField.class);
+        sleep(6000);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_0);
+        sleep(2000);
+
+        moveTo("Apply");
+        sleep(6000); /* test */
+        leftClick(); /* apply/disables tooltip */
+        sleep(2000); /* test */
+        leftClick();
+
+        /* resource */
+        moveTo(480, 202); /* select r0 */
+        leftClick();
+        sleep(2000);
+        leftClick();
+
+        moveTo("Protocol", Widget.MComboBox.class);
+        leftClick();
+        press(KeyEvent.VK_DOWN); /* protocol c */
+        sleep(200);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveTo("Fence peer", Widget.MComboBox.class);
+        leftClick();
+        sleep(2000);
+        press(KeyEvent.VK_DOWN);
+        sleep(200);
+        press(KeyEvent.VK_UP); /* deselect dopd */
+        sleep(200);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveTo("Wfc timeout", Widget.MTextField.class);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_5);
+        sleep(2000);
+
+        moveTo("Max buffers", Widget.MTextField.class);
+        leftClick();
+        sleep(1000);
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_2);
+        sleep(500);
+        press(KeyEvent.VK_0);
+        sleep(500);
+        press(KeyEvent.VK_4);
+        sleep(500);
+        press(KeyEvent.VK_8);
+        sleep(500);
+        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_UP);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+
+        moveScrollBar(true);
+        moveTo("After", Widget.MComboBox.class);
+        leftClick();
+        sleep(1000);
+        press(KeyEvent.VK_UP);
+        sleep(1000);
+        press(KeyEvent.VK_ENTER);
+        sleep(1000);
+
+        moveScrollBar(false);
+
+        moveTo("Apply");
+        sleep(6000); /* test */
+        leftClick(); /* apply/disables tooltip */
+        sleep(2000); /* test */
+        leftClick();
+        checkDRBDTest(drbdTest, 2.2); /* 2.2 */
+
+        moveTo("Wfc timeout", Widget.MTextField.class);
+        leftClick();
+        press(KeyEvent.VK_BACK_SPACE);
+        sleep(1000);
+        press(KeyEvent.VK_0);
+        sleep(2000);
+
+        moveTo("Apply");
+        sleep(6000); /* test */
+        leftClick();
+        checkDRBDTest(drbdTest, 2.3); /* 2.3 */
+
+        moveTo(480, 202); /* rsc popup */
+        rightClick();
+        moveTo("Remove DRBD Volume");
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 3);
+        moveTo(480, 202); /* rsc popup */
+        rightClick();
+        moveTo("Remove DRBD Volume");
+        leftClick();
+        confirmRemove();
+        checkDRBDTest(drbdTest, 4);
     }
 
     /** VM Test 1. */
