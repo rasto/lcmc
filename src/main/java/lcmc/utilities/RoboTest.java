@@ -4294,27 +4294,9 @@ public final class RoboTest {
                                         PROXY);
             chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(),
                                         PROXY);
-            moveTo(Tools.getString("DrbdResourceInfo.ProxyInsidePort"),
-                   Widget.MComboBox.class); /* inside */
-            leftClick();
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_ENTER);
 
-            moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsidePort"),
-                   Widget.MComboBox.class); /* outside */
+            moveTo(700, 450);
             leftClick();
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-            press(KeyEvent.VK_ENTER);
             robot.mouseWheel(50);
 
             moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
