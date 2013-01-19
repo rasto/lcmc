@@ -833,7 +833,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
             for (final Host host : getProxyHosts()) {
-                host.getBrowser().getUsedPorts().add(savedPort);
+                host.getBrowser().getUsedPorts().add(hostInsidePort);
             }
             if (infoPanelOk) {
                 final Widget wi = insidePortComboBox;
@@ -850,7 +850,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostOutsidePort, savedOutsidePort)) {
             savedOutsidePort = hostOutsidePort;
             for (final Host host : getProxyHosts()) {
-                host.getBrowser().getUsedPorts().add(savedPort);
+                host.getBrowser().getUsedProxyPorts().add(hostOutsidePort);
             }
             if (infoPanelOk) {
                 final Widget wi = outsidePortComboBox;
@@ -1448,7 +1448,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
-        insidePortWi.setValueAndWait(savedInsidePort);
 
         final String insidePort =
                            Tools.getString("DrbdResourceInfo.ProxyInsidePort");
@@ -1472,6 +1471,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         int outsideDefaultPortInt;
         if (outsideDefaultPort == null) {
             outsideDefaultPortInt = getLowestUnusedProxyPort();
+            if (outsideDefaultPortInt < insideDefaultPortInt - 1) {
+                outsideDefaultPortInt = insideDefaultPortInt - 1;
+            }
             outsideDefaultPort = Integer.toString(outsideDefaultPortInt);
         } else {
             outsideDefaultPortInt = Integer.parseInt(outsideDefaultPort);
@@ -1489,7 +1491,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
-        outsidePortWi.setValueAndWait(savedOutsidePort);
 
         final String outsidePort =
                         Tools.getString("DrbdResourceInfo.ProxyOutsidePort");
@@ -1782,8 +1783,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         savedInsideIps.clear();
         savedOutsideIps.clear();
         /* ports */
-        savedInsidePort = insidePortComboBox.getStringValue();
-        savedOutsidePort = outsidePortComboBox.getStringValue();
+        final String sip = insidePortComboBox.getStringValue();
+        savedInsidePort = sip;
+        final String sop = outsidePortComboBox.getStringValue();
+        savedOutsidePort = sop;
         /* ips */
         for (final Host host : getProxyHosts()) {
 
@@ -1797,6 +1800,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     savedInsideIps.put(host, insideIp);
                 }
             }
+            host.getBrowser().getUsedPorts().add(sip);
 
             final Widget outsideWi = outsideIpComboBoxHash.get(host);
             if (outsideWi != null) {
@@ -1807,6 +1811,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     savedOutsideIps.put(host, outsideIp);
                 }
             }
+            host.getBrowser().getUsedProxyPorts().add(sop);
         }
     }
 
@@ -1856,14 +1861,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         enableSection(SECTION_PROXY_PORTS, isProxy, wizard);
         String portLabel;
         if (isProxy) {
-            portLabel =
-                    Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
-            if (savedInsidePort == null || "".equals(savedInsidePort)) {
-                insidePortCB.setValue(Integer.toString(getDefaultInsidePort()));
+            if (insidePortCB.isNew()
+                && (savedInsidePort == null || "".equals(savedInsidePort))) {
+                insidePortCB.setValue(
+                                 Integer.toString(getDefaultInsidePort()));
             }
-            if (savedOutsidePort == null || "".equals(savedOutsidePort)) {
+            if (outsidePortCB.isNew()
+                && (savedOutsidePort == null || "".equals(savedOutsidePort))) {
                 outsidePortCB.setValue(savedPort);
             }
+            portLabel =
+                   Tools.getString("DrbdResourceInfo.NetInterfacePortToProxy");
+
             getDrbdInfo().enableProxySection(wizard); /* never disable */
         } else {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
@@ -2271,9 +2280,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         int insideDefaultPortInt;
         if (insideDefaultPort == null || "".equals(insideDefaultPort)) {
             if (savedPort == null || "".equals(savedPort)) {
-                insideDefaultPortInt = getLowestUnusedPort();
+                insideDefaultPortInt = getLowestUnusedPort() + 1;
             } else {
-                insideDefaultPortInt = Integer.parseInt(savedPort) - 1;
+                insideDefaultPortInt = Integer.parseInt(savedPort) + 1;
             }
         } else {
             insideDefaultPortInt = Integer.parseInt(insideDefaultPort);
