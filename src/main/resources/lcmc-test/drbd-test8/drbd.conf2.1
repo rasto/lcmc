@@ -85,10 +85,10 @@ resource r1 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7788;
+		address		127.0.0.1:7790;
 		proxy on host1 {
-			inside 127.0.0.1:7789;
-			outside IP:7788;
+			inside 127.0.0.1:7791;
+			outside IP:7790;
 		}
 	}
 	on host2 {
@@ -97,10 +97,10 @@ resource r1 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7788;
+		address		127.0.0.1:7790;
 		proxy on host2 {
-			inside 127.0.0.1:7789;
-			outside IP:7788;
+			inside 127.0.0.1:7791;
+			outside IP:7790;
 		}
 	}
 }

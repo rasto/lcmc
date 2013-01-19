@@ -34,11 +34,11 @@ resource r0 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7789;
+		address		127.0.0.1:7788;
 		proxy on host1 {
 			inside 127.0.0.1:7789;
 			outside IP:7788;
-                }
+		}
 	}
 	on host2 {
 		volume 0 {
@@ -46,11 +46,11 @@ resource r0 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7789;
+		address		127.0.0.1:7788;
 		proxy on host2 {
 			inside 127.0.0.1:7789;
 			outside IP:7788;
-                }
+		}
 	}
 }
 resource r1 {
@@ -60,11 +60,11 @@ resource r1 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7789;
+		address		127.0.0.1:7790;
 		proxy on host1 {
-			inside 127.0.0.1:7789;
-			outside IP:7788;
-                }
+			inside 127.0.0.1:7791;
+			outside IP:7790;
+		}
 	}
 	on host2 {
 		volume 0 {
@@ -72,10 +72,10 @@ resource r1 {
 			disk		DISK;
 			flexible-meta-disk	internal;
 		}
-		address		127.0.0.1:7789;
+		address		127.0.0.1:7790;
 		proxy on host2 {
-			inside 127.0.0.1:7789;
-			outside IP:7788;
-                }
+			inside 127.0.0.1:7791;
+			outside IP:7790;
+		}
 	}
 }

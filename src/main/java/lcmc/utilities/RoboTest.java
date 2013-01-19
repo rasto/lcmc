@@ -4376,6 +4376,9 @@ public final class RoboTest {
         moveTo(480, 202); /* select r0 */
         leftClick();
 
+        moveTo(900, 300);
+        robot.mouseWheel(100);
+
         moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
@@ -4416,7 +4419,8 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", Widget.MComboBox.class);
+        sleep(3000);
+        moveTo("after", Widget.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -4474,6 +4478,9 @@ public final class RoboTest {
         sleep(2000);
         leftClick();
 
+        moveTo(900, 300);
+        robot.mouseWheel(100);
+
         moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
@@ -4522,7 +4529,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", Widget.MComboBox.class);
+        moveTo("after", Widget.MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -5035,6 +5042,9 @@ public final class RoboTest {
                     }
                 }
             }
+        }
+        if (component == null) {
+            Tools.info("can't find " + text);
         }
         for (final Component c : component.getComponents()) {
             if (c instanceof Container) {
