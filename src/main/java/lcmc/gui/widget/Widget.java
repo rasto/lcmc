@@ -137,6 +137,8 @@ public abstract class Widget extends JPanel {
     /** List of widget listeners. */
     private final List<WidgetListener> widgetListeners =
                                               new ArrayList<WidgetListener>();
+    /** Whether the combobox was never set. */
+    private boolean newFlag = true;
 
     public static final Type GUESS_TYPE = null;
     public static final String NO_DEFAULT = null;
@@ -382,6 +384,7 @@ public abstract class Widget extends JPanel {
 
     /** Sets item/value in the component and waits till it is set. */
     public final void setValueAndWait(final Object item) {
+        newFlag = false;
         if (Tools.areEqual(item, getValue())) {
             return;
         }
@@ -395,6 +398,7 @@ public abstract class Widget extends JPanel {
 
     /** Sets item/value in the component, disable listeners. */
     public final void setValueNoListeners(final Object item) {
+        newFlag = false;
         if (Tools.areEqual(item, getValue())) {
             return;
         }
@@ -411,6 +415,7 @@ public abstract class Widget extends JPanel {
 
     /** Sets item/value in the component. */
     public final void setValue(final Object item) {
+        newFlag = false;
         if (Tools.areEqual(item, getValue())) {
             return;
         }
@@ -836,5 +841,10 @@ public abstract class Widget extends JPanel {
             }
             return dim;
         }
+    }
+
+    /** Return whether this widget was never set. */
+    public final boolean isNew() {
+        return newFlag;
     }
 }
