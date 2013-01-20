@@ -209,6 +209,18 @@ final class CreateMD extends DrbdConfig {
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);
+        if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
+            DRBD.proxyUp(bdi1.getHost(),
+                         getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                         getDrbdVolumeInfo().getName(),
+                         testOnly);
+        }
+        if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi2.getHost())) {
+            DRBD.proxyUp(bdi2.getHost(),
+                         getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                         getDrbdVolumeInfo().getName(),
+                         testOnly);
+        }
         final String device = getDrbdVolumeInfo().getDevice();
         final ClusterBrowser browser = 
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();

@@ -728,6 +728,37 @@ public final class DRBD {
         return 0;
     }
 
+    /** Executes the drbdadm proxy-up on the specified host and resource. */
+    public static int proxyUp(final Host host,
+                              final String resource,
+                              final String volume,
+                              final boolean testOnly) {
+        return proxyUp(host, resource, null, null, testOnly);
+    }
+
+    /**
+     * Executes the drbdadm proxy-up on the specified host and resource and
+     * calls the callback function.
+     */
+    public static int proxyUp(final Host host,
+                              final String resource,
+                              final String volume,
+                              final ExecCallback execCallback,
+                              final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.proxyUp",
+                                                   getResVolReplaceHash(
+                                                                      host,
+                                                                      resource,
+                                                                      volume));
+        final SSH.SSHOutput ret = execCommand(host,
+                                              command,
+                                              execCallback,
+                                              false,
+                                              testOnly);
+
+        return ret.getExitCode();
+    }
+
     /**
      * Executes the drbdadm get-gi on the specified host and resource
      * and return the result or null if there are meta-data on the block

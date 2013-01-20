@@ -353,6 +353,9 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"DRBD.getDrbdStatus",
          SUDO + "@GUI-HELPER@ get-drbd-events"},
 
+        {"DRBD.proxyUp",
+         SUDO + "/sbin/drbdadm @DRYRUN@ proxy-up @RES-VOL@"},
+
         {"DRBD.adjust",
          "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ adjust @RES-VOL@; fi"},
 

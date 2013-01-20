@@ -2289,4 +2289,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         return insideDefaultPortInt;
     }
+
+    /**
+     * Return if this resource uses proxy on the specified host.
+     */
+    public boolean isProxy(final Host host) {
+        return addressComboBoxHash.get(host).getValue() instanceof ProxyNetInfo;
+    }
 }
