@@ -2299,6 +2299,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * Return if this resource uses proxy on the specified host.
      */
     public boolean isProxy(final Host host) {
-        return addressComboBoxHash.get(host).getValue() instanceof ProxyNetInfo;
+        final Widget cb = addressComboBoxHash.get(host);
+        if (cb != null) {
+            return cb.getValue() instanceof ProxyNetInfo;
+        }
+        return false;
     }
 }
