@@ -833,6 +833,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
             for (final Host host : getProxyHosts()) {
+                if (!isProxy(host)) {
+                    continue;
+                }
                 host.getBrowser().getUsedPorts().add(hostInsidePort);
             }
             if (infoPanelOk) {
@@ -1789,7 +1792,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         savedOutsidePort = sop;
         /* ips */
         for (final Host host : getProxyHosts()) {
-
+            if (!isProxy(host)) {
+                continue;
+            }
             final Widget insideWi = insideIpComboBoxHash.get(host);
             if (insideWi != null) {
                 final String defaultInsideIp = getDefaultInsideIp(host);
