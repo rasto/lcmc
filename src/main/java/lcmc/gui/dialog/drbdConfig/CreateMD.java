@@ -212,13 +212,13 @@ final class CreateMD extends DrbdConfig {
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                         getDrbdVolumeInfo().getName(),
+                         null,
                          testOnly);
         }
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi2.getHost())) {
             DRBD.proxyUp(bdi2.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                         getDrbdVolumeInfo().getName(),
+                         null,
                          testOnly);
         }
         final String device = getDrbdVolumeInfo().getDevice();
