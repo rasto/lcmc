@@ -2183,15 +2183,32 @@ public final class BlockDevInfo extends EditableInfo {
         final MyMenuItem proxyItem =
             new MyMenuItem(Tools.getString("BlockDevInfo.Drbd.ProxyDown"),
                            null,
-                           getHost().getDistString("DRBD.proxyDown"),
+                           getMenuToolTip("DRBD.proxyDown"),
                            Tools.getString("BlockDevInfo.Drbd.ProxyUp"),
                            null,
-                           getHost().getDistString("DRBD.proxyUp"),
+                           getMenuToolTip("DRBD.proxyUp"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP, 
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
+                    return getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(
+                                                                    getHost());
+                }
+
+                @Override
+                public String enablePredicate() {
+                    if (!getHost().isDrbdProxyRunning()) {
+                        return "proxy daemon is not running";
+                    }
+                    return null;
+                }
 
                 @Override
                 public boolean predicate() {
@@ -2611,5 +2628,14 @@ public final class BlockDevInfo extends EditableInfo {
             }
         }
         return null;
+    }
+
+    /** Tool tip for menu items. */
+    private String getMenuToolTip(final String cmd) {
+        return DRBD.getDistCommand(
+                            cmd,
+                            getHost(),
+                            drbdVolumeInfo.getDrbdResourceInfo().getName(),
+                            drbdVolumeInfo.getName()).replaceAll("@.*?@", "");
     }
 }

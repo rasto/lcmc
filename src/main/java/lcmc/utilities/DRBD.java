@@ -745,11 +745,10 @@ public final class DRBD {
                               final String volume,
                               final ExecCallback execCallback,
                               final boolean testOnly) {
-        final String command = host.getDistCommand("DRBD.proxyUp",
-                                                   getResVolReplaceHash(
-                                                                      host,
-                                                                      resource,
-                                                                      volume));
+        final String command = getDistCommand("DRBD.proxyUp",
+                                              host,
+                                              resource,
+                                              volume);
         final SSH.SSHOutput ret = execCommand(host,
                                               command,
                                               execCallback,
@@ -1001,5 +1000,16 @@ public final class DRBD {
         final SSH.SSHOutput ret =
                     execCommand(host, command, null, true, testOnly);
         return ret.getExitCode() == 0;
+    }
+
+    /** Return command with replaced placeholders. */
+    public static String getDistCommand(final String cmd,
+                                        final Host host,
+                                        final String resource,
+                                        final String volume) {
+        return host.getDistCommand(cmd,
+                                   getResVolReplaceHash(host,
+                                                        resource,
+                                                        volume));
     }
 }
