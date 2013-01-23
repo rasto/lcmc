@@ -2212,8 +2212,12 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public boolean predicate() {
-                    return getHost().isDrbdProxyUp(
+                    if (getBlockDevice().isDrbd()) {
+                        return getHost().isDrbdProxyUp(
                              drbdVolumeInfo.getDrbdResourceInfo().getName());
+                    } else {
+                        return true;
+                    }
                 }
 
                 @Override
@@ -2632,10 +2636,14 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Tool tip for menu items. */
     private String getMenuToolTip(final String cmd) {
-        return DRBD.getDistCommand(
+        if (getBlockDevice().isDrbd()) {
+            return DRBD.getDistCommand(
                             cmd,
                             getHost(),
                             drbdVolumeInfo.getDrbdResourceInfo().getName(),
                             drbdVolumeInfo.getName()).replaceAll("@.*?@", "");
+        } else {
+            return null;
+        }
     }
 }
