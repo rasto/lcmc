@@ -201,14 +201,6 @@ final class CreateMD extends DrbdConfig {
         final boolean testOnly = false;
         final String clusterName = bdi1.getHost().getCluster().getName();
         Tools.startProgressIndicator(clusterName, "scanning block devices...");
-        DRBD.adjust(bdi1.getHost(),
-                    getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                    getDrbdVolumeInfo().getName(),
-                    testOnly);
-        DRBD.adjust(bdi2.getHost(),
-                    getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                    getDrbdVolumeInfo().getName(),
-                    testOnly);
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
@@ -221,6 +213,14 @@ final class CreateMD extends DrbdConfig {
                          null,
                          testOnly);
         }
+        DRBD.adjust(bdi1.getHost(),
+                    getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                    getDrbdVolumeInfo().getName(),
+                    testOnly);
+        DRBD.adjust(bdi2.getHost(),
+                    getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                    getDrbdVolumeInfo().getName(),
+                    testOnly);
         final String device = getDrbdVolumeInfo().getDevice();
         final ClusterBrowser browser = 
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
