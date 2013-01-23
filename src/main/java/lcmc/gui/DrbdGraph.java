@@ -488,13 +488,19 @@ public final class DrbdGraph extends ResourceGraph {
                 final String diskState = bdi.getBlockDevice().getDiskState();
                 Color color = null;
                 Color textColor = Color.BLACK;
+                final String proxyState = bdi.getProxyStateForGraph();
                 if ("StandAlone".equals(connState)
-                    || !"UpToDate".equals(diskState)) {
+                    || !"UpToDate".equals(diskState)
+                    || (proxyState != null &&
+                        !BlockDevInfo.PROXY_UP.equals(proxyState))) {
                     color = Color.RED;
                     textColor = Color.WHITE;
                 }
                 return new Subtext[]{
-                    new Subtext(connState + " / " + diskState,
+                    new Subtext(
+                                Tools.join(" / ", new String[]{connState,
+                                                               diskState,
+                                                               proxyState}),
                                 color,
                                 textColor)};
             }

@@ -1774,6 +1774,18 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostBrowser.Drbd.SetAllSecondary",
          "Set All DRBDs Secondary"},
 
+        {"HostDrbdInfo.Drbd.StartProxy",
+         "Start DRBD Proxy"},
+
+        {"HostDrbdInfo.Drbd.StopProxy",
+         "Stop DRBD Proxy"},
+
+        {"BlockDevInfo.Drbd.ProxyUp",
+         "Start DRBD Proxy"},
+
+        {"BlockDevInfo.Drbd.ProxyDown",
+         "Stop DRBD Proxy"},
+
         {"HostInfo.CRM.AllMigrateFrom",
          "Migrate All Resources Away"},
 

@@ -151,6 +151,8 @@ public final class Host {
     /** Options for GUI drop down lists. */
     private Map<String, List<String>> guiOptions =
                                           new HashMap<String, List<String>>();
+    /** Resources on which proxy connection is up. */
+    private Set<String> drbdResProxy = new HashSet<String>();
     /** Color of this host in graphs. */
     private Color defaultColor;
     /** Color of this host in graphs. */
@@ -180,6 +182,8 @@ public final class Host {
     private boolean commLayerStarting = false;
     /** Whether the pcmk is starting. */
     private boolean pcmkStarting = false;
+    /** Whether the drbd proxy is starting. */
+    private boolean drbdProxyStarting = false;
     /** Is "on" if corosync is in rc. */
     private boolean csIsRc = false;
     /** Is "on" if openais is in rc. */
@@ -206,6 +210,8 @@ public final class Host {
     private boolean pcmkIsRc = false;
     /** Is "on" if pacemaker is running. */
     private boolean pcmkRunning = false;
+    /** Is "on" if drbd proxy is running. */
+    private boolean drbdProxyRunning = false;
     /** Is "on" if pacemaker has an init script. */
     private boolean pcmkInit = false;
     /** Pacemaker service version. From version 1, use pacamker init script. */
@@ -1996,6 +2002,7 @@ public final class Host {
 
         final Map<String, List<String>> newGuiOptions =
                                           new HashMap<String, List<String>>();
+        final Set<String> newDrbdResProxy = new HashSet<String>();
 
         boolean netInfo = false;
         boolean diskInfo = false;
@@ -2010,6 +2017,7 @@ public final class Host {
         boolean installationInfo = false;
         boolean guiOptionsInfo = false;
         boolean versionInfo = false;
+        boolean drbdProxyInfo = false;
 
         newMountPoints.add("/mnt/");
         String guiOptionName = null;
@@ -2032,7 +2040,8 @@ public final class Host {
                 || "gui-info".equals(line)
                 || "installation-info".equals(line)
                 || "gui-options-info".equals(line)
-                || "version-info".equals(line)) {
+                || "version-info".equals(line)
+                || "drbd-proxy-info".equals(line)) {
                 type = line;
                 continue;
             }
@@ -2129,6 +2138,29 @@ public final class Host {
             } else if ("version-info".equals(type)) {
                 versionLines.add(line);
                 versionInfo = true;
+            } else if ("drbd-proxy-info".equals(type)) {
+                /* res-other.host-this.host */
+                drbdProxyInfo = true;
+                String res = null;
+                for (final Host otherHost : getCluster().getHosts()) {
+                    if (otherHost == this) {
+                        continue;
+                    }
+                    if (line.startsWith("up:")) {
+                        final String hostsPart = "-" + otherHost.getName()
+                                                 + "-" + getName();
+                        final int i = line.indexOf(hostsPart);
+                        if (i > 0) {
+                            res = line.substring(3, i);
+                            break;
+                        }
+                    }
+                }
+                if (res == null) {
+                    Tools.appWarning("could not parse proxy line: " + line);
+                } else {
+                    newDrbdResProxy.add(res);
+                }
             }
         }
 
@@ -2177,6 +2209,10 @@ public final class Host {
 
         if (guiOptionsInfo) {
             guiOptions = newGuiOptions;
+        }
+
+        if (drbdProxyInfo) {
+            drbdResProxy = newDrbdResProxy;
         }
 
         getBrowser().updateHWResources(getNetInterfaces(),
@@ -2337,6 +2373,12 @@ public final class Host {
             } else {
                 pcmkRunning = false;
             }
+        } else if ("drbdp-running".equals(tokens[0])) {
+            if (tokens.length == 2) {
+                drbdProxyRunning = "on".equals(tokens[1].trim());
+            } else {
+                drbdProxyRunning = false;
+            }
         } else if ("pcmk-init".equals(tokens[0])) {
             if (tokens.length == 2) {
                 pcmkInit = "on".equals(tokens[1].trim());
@@ -2390,6 +2432,9 @@ public final class Host {
         }
         if (pcmkStarting && pcmkRunning) {
             pcmkStarting = false;
+        }
+        if (drbdProxyStarting && drbdProxyRunning) {
+            drbdProxyStarting = false;
         }
         if (commLayerStopping
             && !csRunning
@@ -2671,6 +2716,11 @@ public final class Host {
        return pcmkRunning;
     }
 
+    /** Returns whether the drbd proxy is running. */
+    public boolean isDrbdProxyRunning() {
+       return drbdProxyRunning;
+    }
+
     /** Returns whether Openais is running script. */
     public boolean isAisRunning() {
        return aisRunning;
@@ -2878,6 +2928,16 @@ public final class Host {
         this.pcmkStarting = pcmkStarting;
     }
 
+    /** Returns true if drbd proxy is starting. */
+    public boolean isDrbdProxyStarting() {
+        return drbdProxyStarting;
+    }
+
+    /** Sets whether the drbd proxy is starting. */
+    public void setDrbdProxyStarting(final boolean drbdProxyStarting) {
+        this.drbdProxyStarting = drbdProxyStarting;
+    }
+
     /** Returns whether pacemaker is started by corosync. */
     public boolean isPcmkStartedByCorosync() {
         if (pcmkServiceVersion == 0) {
@@ -3004,6 +3064,11 @@ public final class Host {
             return new ArrayList<String>();
         }
         return new ArrayList<String>(guiOptions.get(name));
+    }
+
+    /** Return the DRBD proxy is up for this DRBD resource. */
+    public boolean isDrbdProxyUp(final String res) {
+        return drbdResProxy.contains(res);
     }
 }
 

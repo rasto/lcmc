@@ -50,6 +50,7 @@ our $VIRSH_COMMAND = "virsh -r";
 our $VIRSH_COMMAND_NO_RO = "virsh";
 our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
 our $DRBD_PROXY_GET_PLUGINS = "drbd-proxy-ctl -c 'show avail-plugins'";
+our $DRBD_PROXY_SHOW = "drbd-proxy-ctl -c show";
 
 our $PROC_DRBD = "/proc/drbd";
 our @SERVICE_CLASSES = ("service", "systemd", "upstart");
@@ -81,6 +82,8 @@ if ($option eq "all") {
 	print get_cpu_map_info();
 	print "mount-points-info\n";
 	print get_mount_points_info();
+	print "drbd-proxy-info\n";
+	print get_drbd_proxy_info();
 	print "gui-info\n";
 	print get_gui_info();
 	print "installation-info\n";
@@ -111,6 +114,8 @@ if ($option eq "all") {
 	print get_qemu_keymaps_info();
 } elsif ($option eq "get-cpu-map-info") {
 	print get_cpu_map_info();
+} elsif ($option eq "get-drbd-proxy-info") {
+	print get_drbd_proxy_info();
 } elsif ($option eq "get-gui-info") {
 	print get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
@@ -221,6 +226,8 @@ sub get_hw_info {
 	$out .= get_cpu_map_info();
 	$out .= "mount-points-info\n";
 	$out .= get_mount_points_info();
+	$out .= "drbd-proxy-info\n";
+	$out .= get_drbd_proxy_info();
 	#$out .= "gui-info\n";
 	#$out .= get_gui_info();
 	$out .= "installation-info\n";
@@ -1688,6 +1695,17 @@ OTHER
 	print $proxy;
 }
 
+sub get_drbd_proxy_info
+{
+	my $out = "";
+	for (`$DRBD_PROXY_SHOW 2>/dev/null`) {
+		if (/add connection\s+(\S*)/) {
+			$out .= "up:$1\n";
+		}
+	}
+	return $out;
+}
+
 sub get_drbd_version {
 	my (@version) = `echo|/sbin/drbdadm help 2>/dev/null`
 					=~ /Version:\s+(\d+)\.(\d+)\.(\d+)/;
@@ -1817,6 +1835,8 @@ sub get_cluster_versions {
 	}
 	my $pcmk_prog = "/usr/sbin/pacemakerd";
 	my $pcmk_script = "pacemaker";
+	my $drbdp_script = "drbdproxy";
+	my $drbdp_prog = "/sbin/drbd-proxy";
 	my $hb_init = is_init("heartbeat");
 	chomp $hb_init;
 	my $cs_init = is_init($cs_script);
@@ -1853,6 +1873,9 @@ sub get_cluster_versions {
 		system("$pcmk_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	my $drbd_loaded = (! -e $PROC_DRBD) || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf >/dev/null 2>&1") >> 8 || "on";
+	my $drbdp_running_cmd = is_running($drbdp_script, $drbdp_prog);
+	my $drbdp_running =
+		system("$drbdp_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	my $cs_ais_conf;
 	if ($cs_version) {
 		$cs_ais_conf =
@@ -1867,6 +1890,7 @@ sub get_cluster_versions {
 	chomp $ais_running;
 	chomp $cs_running;
 	chomp $pcmk_running;
+	chomp $drbdp_running;
 	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
 	my $pcmk_svc_ver = "no";
 	if ($service) {
@@ -1892,6 +1916,7 @@ sub get_cluster_versions {
 	       ."cs-running:$cs_running\n"
 	       ."ais-running:$ais_running\n"
 	       ."pcmk-running:$pcmk_running\n"
+	       ."drbdp-running:$drbdp_running\n"
 	       ."hb-init:$hb_init\n"
 	       ."cs-init:$cs_init\n"
 	       ."ais-init:$ais_init\n"

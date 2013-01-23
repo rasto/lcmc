@@ -308,6 +308,37 @@ public final class HostDrbdInfo extends Info {
             };
         items.add(loadItem);
 
+        /* proxy start/stop */
+        final MyMenuItem proxyItem =
+            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
+                           null,
+                           getHost().getDistString("DRBD.stopProxy"),
+                           Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
+                           null,
+                           getHost().getDistString("DRBD.startProxy"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean predicate() {
+                    return getHost().isDrbdProxyRunning();
+                }
+
+                @Override
+                public void action() {
+                    if (getHost().isDrbdProxyRunning()) {
+                        DRBD.stopProxy(getHost(), testOnly);
+                    } else {
+                        DRBD.startProxy(getHost(), testOnly);
+                    }
+                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                }
+            };
+        items.add(proxyItem);
+
         /* load DRBD config / adjust all */
         final MyMenuItem adjustAllItem =
             new MyMenuItem(

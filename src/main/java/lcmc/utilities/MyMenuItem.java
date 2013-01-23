@@ -279,6 +279,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     if (toolTip != null
                         && shortDesc1 != null
                         && !shortDesc1.equals(text1)) {
+                        origToolTipText = shortDesc1;
                         toolTip.setTipText(shortDesc1);
                     }
                 }
@@ -294,6 +295,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     if (toolTip != null
                         && shortDesc2 != null
                         && !shortDesc1.equals(text2)) {
+                        origToolTipText = shortDesc2;
                         toolTip.setTipText(shortDesc2);
                     }
                 }
