@@ -309,6 +309,37 @@ public final class Host {
     public static final String ROOT_USER = "root";
     /** Default SSH port. */
     public static final String DEFAULT_SSH_PORT = "22";
+
+    private static final String NET_INFO            = "net-info";
+    private static final String DISK_INFO           = "disk-info";
+    private static final String VG_INFO             = "vg-info";
+    private static final String FILESYSTEMS_INFO    = "filesystems-info";
+    private static final String CRYPTO_INFO         = "crypto-info";
+    private static final String QEMU_KEYMAPS_INFO   = "qemu-keymaps-info";
+    private static final String CPU_MAP_MODEL_INFO  = "cpu-map-model-info";
+    private static final String CPU_MAP_VENDOR_INFO = "cpu-map-vendor-info";
+    private static final String MOUNT_POINTS_INFO   = "mount-points-info";
+    private static final String GUI_INFO            = "gui-info";
+    private static final String INSTALLATION_INFO   = "installation-info";
+    private static final String GUI_OPTIONS_INFO    = "gui-options-info";
+    private static final String VERSION_INFO        = "version-info";
+    private static final String DRBD_PROXY_INFO     = "drbd-proxy-info";
+
+    private static final Set<String> INFO_TYPES =
+             new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
+                                                            DISK_INFO,
+                                                            VG_INFO,
+                                                            FILESYSTEMS_INFO,
+                                                            CRYPTO_INFO,
+                                                            QEMU_KEYMAPS_INFO,
+                                                            CPU_MAP_MODEL_INFO,
+                                                            CPU_MAP_VENDOR_INFO,
+                                                            MOUNT_POINTS_INFO,
+                                                            GUI_INFO,
+                                                            INSTALLATION_INFO,
+                                                            GUI_OPTIONS_INFO,
+                                                            VERSION_INFO,
+                                                            DRBD_PROXY_INFO}));
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -2004,19 +2035,7 @@ public final class Host {
                                           new HashMap<String, List<String>>();
         final Set<String> newDrbdResProxy = new HashSet<String>();
 
-        boolean netInfo = false;
-        boolean diskInfo = false;
-        boolean vgInfo = false;
-        boolean filesystemsInfo = false;
-        boolean cryptoInfo = false;
-        boolean qemuKeymapsInfo = false;
-        boolean cpuMapModelInfo = false;
-        boolean cpuMapVerndorInfo = false;
-        boolean mountPointsInfo = false;
-        boolean guiInfo = false;
-        boolean installationInfo = false;
-        boolean guiOptionsInfo = false;
-        boolean versionInfo = false;
+        final Set<String> changedTypes = new HashSet<String>();
 
         newMountPoints.add("/mnt/");
         String guiOptionName = null;
@@ -2027,21 +2046,9 @@ public final class Host {
             } else if (line.indexOf("WARNING:") == 0) {
                 continue;
             }
-            if ("net-info".equals(line)
-                || "disk-info".equals(line)
-                || "vg-info".equals(line)
-                || "filesystems-info".equals(line)
-                || "crypto-info".equals(line)
-                || "qemu-keymaps-info".equals(line)
-                || "cpu-map-model-info".equals(line)
-                || "cpu-map-vendor-info".equals(line)
-                || "mount-points-info".equals(line)
-                || "gui-info".equals(line)
-                || "installation-info".equals(line)
-                || "gui-options-info".equals(line)
-                || "version-info".equals(line)
-                || "drbd-proxy-info".equals(line)) {
+            if (INFO_TYPES.contains(line)) {
                 type = line;
+                changedTypes.add(type);
                 continue;
             }
             if ("net-info".equals(type)) {
@@ -2050,7 +2057,6 @@ public final class Host {
                     netInterface = netInterfaces.get(netInterface.getName());
                 }
                 newNetInterfaces.put(netInterface.getName(), netInterface);
-                netInfo = true;
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String name = blockDevice.getName();
@@ -2096,7 +2102,6 @@ public final class Host {
                 if (blockDevice.isPhysicalVolume()) {
                     newPhysicalVolumes.add(blockDevice);
                 }
-                diskInfo = true;
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
                 if (vgi.length == 2) {
@@ -2104,39 +2109,28 @@ public final class Host {
                 } else {
                     Tools.appWarning("could not parse volume info: " + line);
                 }
-                vgInfo = true;
             } else if ("filesystems-info".equals(type)) {
                 newFileSystems.add(line);
-                filesystemsInfo = true;
             } else if ("crypto-info".equals(type)) {
                 newCryptoModules.add(line);
-                cryptoInfo = true;
             } else if ("qemu-keymaps-info".equals(type)) {
                 newQemuKeymaps.add(line);
-                qemuKeymapsInfo = true;
             } else if ("cpu-map-model-info".equals(type)) {
                 newCpuMapModels.add(line);
-                cpuMapModelInfo = true;
             } else if ("cpu-map-vendor-info".equals(type)) {
                 newCpuMapVendors.add(line);
-                cpuMapVerndorInfo = true;
             } else if ("mount-points-info".equals(type)) {
                 newMountPoints.add(line);
-                mountPointsInfo = true;
             } else if ("gui-info".equals(type)) {
                 parseGuiInfo(line);
-                guiInfo = true;
             } else if ("installation-info".equals(type)) {
                 parseInstallationInfo(line);
-                installationInfo = true;
             } else if ("gui-options-info".equals(type)) {
                 guiOptionName = parseGuiOptionsInfo(line,
                                                     guiOptionName,
                                                     newGuiOptions);
-                guiOptionsInfo = true;
             } else if ("version-info".equals(type)) {
                 versionLines.add(line);
-                versionInfo = true;
             } else if ("drbd-proxy-info".equals(type)) {
                 /* res-other.host-this.host */
                 String res = null;
@@ -2162,54 +2156,56 @@ public final class Host {
             }
         }
 
-        if (netInfo) {
+        if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
         }
 
-        if (diskInfo) {
+        if (changedTypes.contains(DISK_INFO)) {
             blockDevices = newBlockDevices;
             drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsLVS = newVolumeGroupsLVS;
         }
 
-        if (vgInfo) {
+        if (changedTypes.contains(VG_INFO)) {
             volumeGroups = newVolumeGroups;
         }
 
-        if (filesystemsInfo) {
+        if (changedTypes.contains(FILESYSTEMS_INFO)) {
             fileSystems = newFileSystems;
         }
 
-        if (cryptoInfo) {
+        if (changedTypes.contains(CRYPTO_INFO)) {
             cryptoModules = newCryptoModules;
         }
 
-        if (qemuKeymapsInfo) {
+        if (changedTypes.contains(QEMU_KEYMAPS_INFO)) {
             qemuKeymaps = newQemuKeymaps;
         }
 
-        if (cpuMapModelInfo) {
+        if (changedTypes.contains(CPU_MAP_MODEL_INFO)) {
             cpuMapModels = newCpuMapModels;
         }
 
-        if (cpuMapVerndorInfo) {
+        if (changedTypes.contains(CPU_MAP_VENDOR_INFO)) {
             cpuMapVendors = newCpuMapVendors;
         }
 
-        if (mountPointsInfo) {
+        if (changedTypes.contains(MOUNT_POINTS_INFO)) {
             mountPoints = newMountPoints;
         }
 
-        if (versionInfo) {
+        if (changedTypes.contains(VERSION_INFO)) {
             setDistInfo(versionLines.toArray(new String[versionLines.size()]));
         }
 
-        if (guiOptionsInfo) {
+        if (changedTypes.contains(GUI_OPTIONS_INFO)) {
             guiOptions = newGuiOptions;
         }
 
-        drbdResProxy = newDrbdResProxy;
+        if (changedTypes.contains(DRBD_PROXY_INFO)) {
+            drbdResProxy = newDrbdResProxy;
+        }
 
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),
