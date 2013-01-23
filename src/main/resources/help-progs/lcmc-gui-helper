@@ -250,6 +250,8 @@ sub get_hw_info_lazy {
 	$out .= get_mount_points_info();
 	$out .= "installation-info\n";
 	$out .= get_installation_info();
+	$out .= "drbd-proxy-info\n";
+	$out .= get_drbd_proxy_info();
 	return $out;
 }
 

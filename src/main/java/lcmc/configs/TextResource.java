@@ -2638,6 +2638,18 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdMultiSelectionInfo.DiscardData",
          "Discard Data on selected BDs"},
 
+        {"DrbdMultiSelectionInfo.ProxyDown",
+         "Stop DRBD Proxy on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.ProxyUp",
+         "Start DRBD Proxy on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.HostStopProxy",
+         "Stop DRBD Proxy on selected hosts"},
+
+        {"DrbdMultiSelectionInfo.HostStartProxy",
+         "Start DRBD Proxy on selected hosts"},
+
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},
 

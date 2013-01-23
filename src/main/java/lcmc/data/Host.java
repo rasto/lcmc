@@ -2017,7 +2017,6 @@ public final class Host {
         boolean installationInfo = false;
         boolean guiOptionsInfo = false;
         boolean versionInfo = false;
-        boolean drbdProxyInfo = false;
 
         newMountPoints.add("/mnt/");
         String guiOptionName = null;
@@ -2140,7 +2139,6 @@ public final class Host {
                 versionInfo = true;
             } else if ("drbd-proxy-info".equals(type)) {
                 /* res-other.host-this.host */
-                drbdProxyInfo = true;
                 String res = null;
                 for (final Host otherHost : getCluster().getHosts()) {
                     if (otherHost == this) {
@@ -2211,9 +2209,7 @@ public final class Host {
             guiOptions = newGuiOptions;
         }
 
-        if (drbdProxyInfo) {
-            drbdResProxy = newDrbdResProxy;
-        }
+        drbdResProxy = newDrbdResProxy;
 
         getBrowser().updateHWResources(getNetInterfaces(),
                                        getBlockDevices(),

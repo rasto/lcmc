@@ -50,6 +50,8 @@ import java.awt.Component;
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -210,6 +212,70 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
         };
         addMouseOverListener(upAllItem, upAllItemCallback);
+
+        /* stop drbd proxy with init script */
+        final MyMenuItem stopProxyItem =
+            new MyMenuItem(
+                        Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
+                        null,
+                        Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
+                        new AccessMode(ConfigData.AccessType.OP, false),
+                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        if (hi.getHost().isDrbdProxyRunning()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public void action() {
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        DRBD.stopProxy(hi.getHost(), CRM.LIVE);
+                    }
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        getBrowser().updateHWInfo(hi.getHost());
+                    }
+                }
+            };
+        items.add(stopProxyItem);
+
+        /* start drbd proxy with init script */
+        final MyMenuItem startProxyItem =
+            new MyMenuItem(
+                      Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
+                      null,
+                      Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
+                      new AccessMode(ConfigData.AccessType.OP, false),
+                      new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        if (!hi.getHost().isDrbdProxyRunning()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public void action() {
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        DRBD.startProxy(hi.getHost(), CRM.LIVE);
+                    }
+                    for (final HostDrbdInfo hi : selectedHostInfos) {
+                        getBrowser().updateHWInfo(hi.getHost());
+                    }
+                }
+            };
+        items.add(startProxyItem);
 
         /* change host color */
         final MyMenuItem changeHostColorItem =
@@ -1059,6 +1125,108 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         items.add(discardDataItem);
+
+        /* proxy down */
+        final MyMenuItem proxyDownItem =
+            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
+                           null,
+                           Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP, 
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+                @Override
+                public boolean visiblePredicate() {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        if (bdi.getHost().isDrbdProxyUp(
+                             bdi.getDrbdVolumeInfo()
+                                    .getDrbdResourceInfo().getName())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public void action() {
+                    final Set<Host> hosts = new HashSet<Host>();
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        if (bdi.getHost().isDrbdProxyUp(
+                             bdi.getDrbdVolumeInfo()
+                                    .getDrbdResourceInfo().getName())) {
+                            DRBD.proxyDown(
+                                bdi.getHost(),
+                                bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                                    .getName(),
+                                bdi.getDrbdVolumeInfo().getName(),
+                                CRM.LIVE);
+                            hosts.add(bdi.getHost());
+                        }
+                    }
+                    for (final Host h : hosts) {
+                        getBrowser().updateHWInfo(h);
+                    }
+                }
+            };
+        items.add(proxyDownItem);
+
+        /* proxy up */
+        final MyMenuItem proxyUpItem =
+            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
+                           null,
+                           Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP, 
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+                @Override
+                public boolean visiblePredicate() {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        if (!bdi.getHost().isDrbdProxyUp(
+                                bdi.getDrbdVolumeInfo()
+                                    .getDrbdResourceInfo().getName())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public void action() {
+                    final Set<Host> hosts = new HashSet<Host>();
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        if (!bdi.getHost().isDrbdProxyUp(
+                                bdi.getDrbdVolumeInfo()
+                                    .getDrbdResourceInfo().getName())) {
+                            DRBD.proxyUp(
+                                bdi.getHost(),
+                                bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
+                                                                    .getName(),
+                                bdi.getDrbdVolumeInfo().getName(),
+                                CRM.LIVE);
+                            hosts.add(bdi.getHost());
+                        }
+                    }
+                    for (final Host h : hosts) {
+                        getBrowser().updateHWInfo(h);
+                    }
+                }
+            };
+        items.add(proxyUpItem);
     }
 
     /** @see EditableInfo#createPopup() */
