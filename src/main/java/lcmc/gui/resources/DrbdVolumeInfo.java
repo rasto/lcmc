@@ -713,7 +713,16 @@ public final class DrbdVolumeInfo extends EditableInfo
             bdi.removeMyself(testOnly);
         }
         if (lastVolume) {
-            getDrbdResourceInfo().removeMyself(testOnly);
+            final DrbdResourceInfo dri = getDrbdResourceInfo();
+            for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                if (dri.isProxy(bdi.getHost())) {
+                    DRBD.proxyDown(bdi.getHost(),
+                                   dri.getName(),
+                                   null,
+                                   testOnly);
+                }
+            }
+            dri.removeMyself(testOnly);
         }
         cb.updateCommonBlockDevices();
 
