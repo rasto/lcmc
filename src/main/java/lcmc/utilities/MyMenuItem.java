@@ -146,7 +146,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setNormalFont();
         this.text1 = text;
         this.icon1 = icon;
-        if (shortDesc1 == null) {
+        if (shortDesc == null) {
             this.shortDesc1 = "";
         } else {
             this.shortDesc1 = shortDesc;
@@ -294,7 +294,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     }
                     if (toolTip != null
                         && shortDesc2 != null
-                        && !shortDesc1.equals(text2)) {
+                        && !shortDesc2.equals(text2)) {
                         origToolTipText = shortDesc2;
                         toolTip.setTipText(shortDesc2);
                     }
