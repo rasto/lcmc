@@ -1775,16 +1775,16 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Set All DRBDs Secondary"},
 
         {"HostDrbdInfo.Drbd.StartProxy",
-         "Start DRBD Proxy"},
+         "Start Proxy Daemon"},
 
         {"HostDrbdInfo.Drbd.StopProxy",
-         "Stop DRBD Proxy"},
+         "Stop Proxy Daemon"},
 
         {"BlockDevInfo.Drbd.ProxyUp",
-         "Start DRBD Proxy"},
+         "Start Proxy Connection"},
 
         {"BlockDevInfo.Drbd.ProxyDown",
-         "Stop DRBD Proxy"},
+         "Stop Proxy Connection"},
 
         {"HostInfo.CRM.AllMigrateFrom",
          "Migrate All Resources Away"},
@@ -2639,16 +2639,16 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Discard Data on selected BDs"},
 
         {"DrbdMultiSelectionInfo.ProxyDown",
-         "Stop DRBD Proxy on selected BDs"},
+         "Stop Proxy on selected BDs"},
 
         {"DrbdMultiSelectionInfo.ProxyUp",
-         "Start DRBD Proxy on selected BDs"},
+         "Start Proxy on selected BDs"},
 
         {"DrbdMultiSelectionInfo.HostStopProxy",
-         "Stop DRBD Proxy on selected hosts"},
+         "Stop Proxy Daemon on selected hosts"},
 
         {"DrbdMultiSelectionInfo.HostStartProxy",
-         "Start DRBD Proxy on selected hosts"},
+         "Start Proxy Daemon on selected hosts"},
 
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},
