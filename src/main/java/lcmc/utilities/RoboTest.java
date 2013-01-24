@@ -3904,7 +3904,16 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", Widget.MComboBox.class);
+        final String v = cluster.getHostsArray()[0].getDrbdVersion();
+        try {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+                moveTo("After", Widget.MComboBox.class);
+            } else {
+                moveTo("after", Widget.MComboBox.class);
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -4010,7 +4019,16 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("After", Widget.MComboBox.class);
+        final String v = cluster.getHostsArray()[0].getDrbdVersion();
+        try {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+                moveTo("After", Widget.MComboBox.class);
+            } else {
+                moveTo("after", Widget.MComboBox.class);
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -4426,7 +4444,16 @@ public final class RoboTest {
 
         moveScrollBar(true);
         sleep(3000);
-        moveTo("after", Widget.MComboBox.class);
+        final String v = cluster.getHostsArray()[0].getDrbdVersion();
+        try {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+                moveTo("After", Widget.MComboBox.class);
+            } else {
+                moveTo("after", Widget.MComboBox.class);
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -4535,7 +4562,16 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        moveTo("after", Widget.MComboBox.class);
+        final String v = cluster.getHostsArray()[0].getDrbdVersion();
+        try {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+                moveTo("After", Widget.MComboBox.class);
+            } else {
+                moveTo("after", Widget.MComboBox.class);
+            }
+        } catch (Exceptions.IllegalVersionException e) {
+            Tools.appWarning(e.getMessage(), e);
+        }
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
