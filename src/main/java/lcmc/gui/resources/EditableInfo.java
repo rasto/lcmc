@@ -70,6 +70,8 @@ public abstract class EditableInfo extends Info {
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
+    private final MultiKeyMap<String, JPanel> sectionPanels =
+                                             new MultiKeyMap<String, JPanel>();
     /** Returns section in which is this parameter. */
     protected abstract String getSection(String param);
     /** Returns whether this parameter is required. */
@@ -127,12 +129,16 @@ public abstract class EditableInfo extends Info {
     /** List of advanced panels. */
     private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
-    private final List<JPanel> advancedOnlySectionList =
-                                                      new ArrayList<JPanel>();
+    private final List<String> advancedOnlySectionList =
+                                                      new ArrayList<String>();
     /** More options panel. */
     private final JPanel moreOptionsPanel = new JPanel();
     /** Whether dialog was started. It disables the apply button. */
     private boolean dialogStarted = false;
+    /** Disabled section, their not visible. */
+    private final Set<String> disabledSections = new HashSet<String>();
+    /** Whether is's a wizard element. */
+    protected final static boolean WIZARD = true;
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -353,7 +359,8 @@ public abstract class EditableInfo extends Info {
                                                       advancedString) + 1);
             } else {
                 panel = new JPanel(new SpringLayout());
-                panel.setBackground(Browser.PANEL_BACKGROUND);
+
+                panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
                     final JPanel p = panel;
@@ -387,7 +394,7 @@ public abstract class EditableInfo extends Info {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    paramWi.setToolTipText(getToolTipText(param));
+                    paramWi.setToolTipText(getToolTipText(param, paramWi));
                     label.setToolTipText(longDesc);
                 }
             });
@@ -397,10 +404,11 @@ public abstract class EditableInfo extends Info {
             }
             addField(panel, label, paramWi, leftWidth, rightWidth, height);
         }
+        final boolean wizard = "wizard".equals(prefix);
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
             Widget rpwi = null;
-            if ("wizard".equals(prefix)) {
+            if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
                     Tools.appError("unkown param: " + param
@@ -429,7 +437,7 @@ public abstract class EditableInfo extends Info {
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
             Widget rpwi = null;
-            if ("wizard".equals(prefix)) {
+            if (wizard) {
                 rpwi = getWidget(param, null);
             }
             final Widget realParamWi = rpwi;
@@ -442,7 +450,7 @@ public abstract class EditableInfo extends Info {
                                     checkParameterFields(paramWi,
                                                          realParamWi,
                                                          param,
-                                                         params,
+                                                         getParametersFromXML(),
                                                          thisApplyButton);
                                 }
                             });
@@ -476,8 +484,10 @@ public abstract class EditableInfo extends Info {
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
             } else {
-                sectionPanel = getParamPanel(section);
+                sectionPanel = getParamPanel(getSectionDisplayName(section),
+                                             getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
+                addSectionPanel(section, wizard, sectionPanel);
                 optionsPanel.add(sectionPanel);
                 if (sameAsFields != null) {
                     final Widget sameAsCombo = sameAsFields.get(section);
@@ -499,6 +509,7 @@ public abstract class EditableInfo extends Info {
                     }
                 }
             }
+            sectionPanel.setVisible(isSectionEnabled(section));
             sectionPanel.add(panel);
             if (advanced) {
                 advancedSections.add(sectionPanel);
@@ -507,17 +518,19 @@ public abstract class EditableInfo extends Info {
             }
         }
         boolean advanced = false;
-        for (final JPanel sectionPanel : sectionMap.values()) {
+        for (final String section : sectionMap.keySet()) {
+            final JPanel sectionPanel = sectionMap.get(section);
             if (advancedSections.contains(sectionPanel)) {
                 advanced = true;
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
-                advancedOnlySectionList.add(sectionPanel);
+                advancedOnlySectionList.add(section);
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         sectionPanel.setVisible(
-                                      Tools.getConfigData().isAdvancedMode());
+                                      Tools.getConfigData().isAdvancedMode()
+                                      && isSectionEnabled(section));
                     }
                 });
             }
@@ -605,10 +618,10 @@ public abstract class EditableInfo extends Info {
                         if (revertButton != null) {
                             revertButton.setEnabled(changed);
                         }
-                        paramWi.setToolTipText(
-                                getToolTipText(param));
+                        final String toolTip = getToolTipText(param, paramWi);
+                        paramWi.setToolTipText(toolTip);
                         if (realParamWi != null) {
-                            realParamWi.setToolTipText(getToolTipText(param));
+                            realParamWi.setToolTipText(toolTip);
                         }
                     }
                 });
@@ -645,7 +658,7 @@ public abstract class EditableInfo extends Info {
             getResource().setValue(param, value);
             final Widget wi = getWidget(param, null);
             if (wi != null) {
-               wi.setToolTipText(getToolTipText(param));
+               wi.setToolTipText(getToolTipText(param, wi));
             }
         }
     }
@@ -816,10 +829,9 @@ public abstract class EditableInfo extends Info {
      * Returns on mouse over text for parameter. If value is different
      * from default value, default value will be returned.
      */
-    protected final String getToolTipText(final String param) {
+    protected final String getToolTipText(final String param, final Widget wi) {
         final String defaultValue = getParamDefault(param);
         final StringBuilder ret = new StringBuilder(120);
-        final Widget wi = getWidget(param, null);
         if (wi != null) {
             final Object value = wi.getStringValue();
             ret.append("<b>");
@@ -1053,11 +1065,19 @@ public abstract class EditableInfo extends Info {
             });
             advanced = true;
         }
-        for (final JPanel p : advancedOnlySectionList) {
+        for (final String section : advancedOnlySectionList) {
+            final JPanel p = sectionPanels.get(section,
+                                               Boolean.toString(!WIZARD));
+            final JPanel pw = sectionPanels.get(section,
+                                                Boolean.toString(WIZARD));
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    p.setVisible(advancedMode);
+                    final boolean v = advancedMode && isSectionEnabled(section);
+                    p.setVisible(v);
+                    if (pw != null) {
+                        pw.setVisible(v);
+                    }
                 }
             });
             advanced = true;
@@ -1127,6 +1147,8 @@ public abstract class EditableInfo extends Info {
     protected void clearPanelLists() {
         advancedPanelList.clear();
         advancedOnlySectionList.clear();
+        sectionPanels.clear();
+        disabledSections.clear();
     }
 
     /** Cleanup. */
@@ -1148,5 +1170,65 @@ public abstract class EditableInfo extends Info {
             return prevParamWi.getStringValue();
         }
         return null;
+    }
+
+    /** Section name that is displayed. */
+    protected String getSectionDisplayName(final String section) {
+        return Tools.ucfirst(section);
+    }
+
+    /**
+     * Return section color.
+     */
+    protected Color getSectionColor(final String section) {
+        return Browser.PANEL_BACKGROUND;
+    }
+
+    /**
+     * Return section panel.
+     */
+    private final JPanel getSectionPanel(final String section,
+                                         final boolean wizard) {
+        return sectionPanels.get(section, Boolean.toString(wizard));
+    }
+
+    /** Add section panel. */
+    protected final void addSectionPanel(final String section,
+                                         final boolean wizard,
+                                         final JPanel sectionPanel) {
+        sectionPanels.put(section, Boolean.toString(wizard), sectionPanel);
+    }
+
+    /** Enable/disable a section. */
+    protected final void enableSection(final String section,
+                                       final boolean enable,
+                                       final boolean wizard) {
+        if (enable) {
+            disabledSections.remove(section);
+        } else {
+            disabledSections.add(section);
+        }
+        final JPanel p = getSectionPanel(section, wizard);
+        if (p != null) {
+            p.setVisible(enable);
+        }
+    }
+
+    /** Return parameters that are not in disabeld sections. */
+    protected final String[] getEnabledSectionParams(
+                                                   final List<String> params) {
+        final List<String> newParams = new ArrayList<String>();
+        for (final String param : params) {
+
+            if (isSectionEnabled(getSection(param))) {
+                newParams.add(param);
+            }
+        }
+        return newParams.toArray(new String[newParams.size()]);
+    }
+
+    /** Return whether a section is enabled. */
+    protected final boolean isSectionEnabled(final String section) {
+        return !disabledSections.contains(section);
     }
 }

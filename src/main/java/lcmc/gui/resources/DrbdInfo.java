@@ -33,10 +33,12 @@ import lcmc.data.DRBDtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
+import lcmc.configs.AppDefaults;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
@@ -67,6 +69,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+    private static final String SECTION_COMMON_PROXY = "proxy";
+
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
                              Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
@@ -317,7 +321,18 @@ public final class DrbdInfo extends DrbdGuiInfo {
         if (drbdXML == null) {
             return null;
         }
-        return drbdXML.getGlobalParams();
+        return getEnabledSectionParams(drbdXML.getGlobalParams());
+    }
+
+    /** Section name that is displayed. */
+    @Override
+    protected String getSectionDisplayName(final String section) {
+        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+            return super.getSectionDisplayName(section);
+        } else {
+            return Tools.getString("DrbdInfo.CommonSection")
+                   + super.getSectionDisplayName(section);
+        }
     }
 
     /**
@@ -326,12 +341,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
      */
     @Override
     protected String getSection(final String param) {
-        final String section = getBrowser().getDrbdXML().getSection(param);
-        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
-            return section;
-        } else {
-            return Tools.getString("DrbdInfo.CommonSection") + section;
-        }
+        return getBrowser().getDrbdXML().getSection(param);
     }
 
     /** Applies changes made in the info panel by user. */
@@ -464,6 +474,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         buttonPanel.add(getActionsButton(), BorderLayout.EAST);
 
         final String[] params = getParametersFromXML();
+        enableSection(SECTION_COMMON_PROXY, false, !WIZARD);
         addParams(optionsPanel,
                   params,
                   Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
@@ -926,4 +937,17 @@ public final class DrbdInfo extends DrbdGuiInfo {
         return DRBD_ICON;
     }
 
+    /** Return section color. */
+    @Override
+    protected Color getSectionColor(final String section) {
+        if (SECTION_COMMON_PROXY.equals(section)) {
+            return AppDefaults.LIGHT_ORANGE;
+        }
+        return super.getSectionColor(section);
+    }
+
+    /** Enable proxy section. It stays till the next restart. */
+    void enableProxySection(final boolean wizard) {
+        enableSection(SECTION_COMMON_PROXY, true, wizard);
+    }
 }

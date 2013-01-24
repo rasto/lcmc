@@ -171,6 +171,10 @@ public final class BlockDevInfo extends EditableInfo {
     /** Description LV snapshot. */
     private static final String LV_SNAPSHOT_MENU_DESCRIPTION =
                                     "Create a snapshot of the logical volume.";
+    /** "Proxy up" text for graph. */
+    public static final String PROXY_UP = "Proxy Up";
+    /** "Proxy down" text for graph. */
+    private static final String PROXY_DOWN = "Proxy Down";
 
     /**
      * Prepares a new <code>BlockDevInfo</code> object.
@@ -535,7 +539,7 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            if (getBrowser().getDrbdVIPortList().contains(value)
+            if (getBrowser().getUsedPorts().contains(value)
                 && !value.equals(getBlockDevice().getValue(param))) {
                 ret = false;
             }
@@ -2175,6 +2179,68 @@ public final class BlockDevInfo extends EditableInfo {
             };
         items.add(discardDataItem);
 
+        /* proxy up/down */
+        final MyMenuItem proxyItem =
+            new MyMenuItem(Tools.getString("BlockDevInfo.Drbd.ProxyDown"),
+                           null,
+                           getMenuToolTip("DRBD.proxyDown"),
+                           Tools.getString("BlockDevInfo.Drbd.ProxyUp"),
+                           null,
+                           getMenuToolTip("DRBD.proxyUp"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP, 
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
+                    return getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(
+                                                                    getHost());
+                }
+
+                @Override
+                public String enablePredicate() {
+                    if (!getHost().isDrbdProxyRunning()) {
+                        return "proxy daemon is not running";
+                    }
+                    return null;
+                }
+
+                @Override
+                public boolean predicate() {
+                    if (getBlockDevice().isDrbd()) {
+                        return getHost().isDrbdProxyUp(
+                             drbdVolumeInfo.getDrbdResourceInfo().getName());
+                    } else {
+                        return true;
+                    }
+                }
+
+                @Override
+                public void action() {
+                    if (getHost().isDrbdProxyUp(
+                             drbdVolumeInfo.getDrbdResourceInfo().getName())) {
+                        DRBD.proxyDown(
+                                getHost(),
+                                drbdVolumeInfo.getDrbdResourceInfo().getName(),
+                                drbdVolumeInfo.getName(),
+                                testOnly);
+                    } else {
+                        DRBD.proxyUp(
+                                getHost(),
+                                drbdVolumeInfo.getDrbdResourceInfo().getName(),
+                                drbdVolumeInfo.getName(),
+                                testOnly);
+                    }
+                    getBrowser().getClusterBrowser().updateHWInfo(getHost());
+                }
+            };
+        items.add(proxyItem);
+
         /* view log */
         final MyMenuItem viewDrbdLogItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewDrbdLog"),
@@ -2550,5 +2616,34 @@ public final class BlockDevInfo extends EditableInfo {
     boolean allowTwoPrimaries() {
         final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
         return "yes".equals(dri.getParamSaved(ALLOW_TWO_PRIMARIES));
+    }
+
+    /**
+     * Proxy status for graph, null if there's no proxy configured for the
+     * resource.
+     */
+    public String getProxyStateForGraph() {
+        final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+        if (dri.isProxy(getHost())) {
+            if (getHost().isDrbdProxyUp(dri.getName())) {
+                return PROXY_UP;
+            } else {
+                return PROXY_DOWN;
+            }
+        }
+        return null;
+    }
+
+    /** Tool tip for menu items. */
+    private String getMenuToolTip(final String cmd) {
+        if (getBlockDevice().isDrbd()) {
+            return DRBD.getDistCommand(
+                            cmd,
+                            getHost(),
+                            drbdVolumeInfo.getDrbdResourceInfo().getName(),
+                            drbdVolumeInfo.getName()).replaceAll("@.*?@", "");
+        } else {
+            return null;
+        }
     }
 }

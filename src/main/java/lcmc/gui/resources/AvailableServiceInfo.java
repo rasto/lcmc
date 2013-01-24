@@ -94,7 +94,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
         s.append("</h3>");
         s.append(crmXML.getLongDesc(resourceAgent));
         s.append("<br><br>");
-        final String[] params = crmXML.getParameters(resourceAgent, false);
+        final List<String> params = crmXML.getParameters(resourceAgent, false);
         for (final String param : params) {
             if (crmXML.isMetaAttr(resourceAgent, param)
                 || "ra".equals(param)

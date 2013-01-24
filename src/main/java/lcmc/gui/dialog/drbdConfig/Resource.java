@@ -68,13 +68,20 @@ public final class Resource extends DrbdConfig {
     private static final String SHARED_SECRET = "shared-secret";
     /** on-io-error option string. */
     private static final String ON_IO_ERROR = "on-io-error";
+    /** memlimit proxy option string. */
+    private static final String PROXY_MEMLIMIT = "memlimit";
+    private static final String PROXY_PLUGIN_ZLIB = "plugin-zlib";
+    private static final String PROXY_PLUGIN_LZMA = "plugin-lzma";
     /** Common configuration options. */
     private static final String[] COMMON_PARAMS = {PROTOCOL,
                                                    CRAM_HMAC_ALG,
                                                    SHARED_SECRET,
                                                    WFC_TIMEOUT_PARAM,
                                                    DEGR_WFC_TIMEOUT_PARAM,
-                                                   ON_IO_ERROR};
+                                                   ON_IO_ERROR,
+                                                   PROXY_MEMLIMIT,
+                                                   PROXY_PLUGIN_ZLIB,
+                                                   PROXY_PLUGIN_LZMA};
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
                                             PROTOCOL,
@@ -83,7 +90,10 @@ public final class Resource extends DrbdConfig {
                                             SHARED_SECRET,
                                             WFC_TIMEOUT_PARAM,
                                             DEGR_WFC_TIMEOUT_PARAM,
-                                            ON_IO_ERROR};
+                                            ON_IO_ERROR,
+                                            PROXY_MEMLIMIT,
+                                            PROXY_PLUGIN_ZLIB,
+                                            PROXY_PLUGIN_LZMA};
     /** Length of the secret string. */
     private static final int SECRET_STRING_LENGTH = 32;
 
@@ -195,6 +205,8 @@ public final class Resource extends DrbdConfig {
         commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
         commonPreferredValue.put(SHARED_SECRET, getRandomSecret());
         commonPreferredValue.put(ON_IO_ERROR, "detach");
+        commonPreferredValue.put(PROXY_MEMLIMIT, "100M");
+        commonPreferredValue.put(PROXY_PLUGIN_ZLIB, "level 9");
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 /* for the first resource set common options. */

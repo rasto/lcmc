@@ -1774,6 +1774,18 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostBrowser.Drbd.SetAllSecondary",
          "Set All DRBDs Secondary"},
 
+        {"HostDrbdInfo.Drbd.StartProxy",
+         "Start Proxy Daemon"},
+
+        {"HostDrbdInfo.Drbd.StopProxy",
+         "Stop Proxy Daemon"},
+
+        {"BlockDevInfo.Drbd.ProxyUp",
+         "Start Proxy Connection"},
+
+        {"BlockDevInfo.Drbd.ProxyDown",
+         "Stop Proxy Connection"},
+
         {"HostInfo.CRM.AllMigrateFrom",
          "Migrate All Resources Away"},
 
@@ -2460,7 +2472,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Loading meta data..."},
 
         {"DrbdInfo.CommonSection",
-         "common "},
+         "Common "},
 
         {"DrbdResourceInfo.HostAddresses",
          "Net Interface"},
@@ -2470,6 +2482,26 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdResourceInfo.NetInterfacePort",
          "Port"},
+
+        {"DrbdResourceInfo.NetInterfacePortToProxy",
+         "<html><u>DRBD</u> \u2192 Proxy Port</html>"},
+
+        {"DrbdResourceInfo.ProxyPorts",
+         "Common Proxy Ports"},
+        {"DrbdResourceInfo.Proxy",
+         "Proxy on "},
+
+        {"DrbdResourceInfo.ProxyInsideIp",
+         "<html>DRBD \u2192 <u>Proxy</u> IP</html>"},
+
+        {"DrbdResourceInfo.ProxyInsidePort",
+         "<html>DRBD \u2192 <u>Proxy</u> Port</html>"},
+
+        {"DrbdResourceInfo.ProxyOutsideIp",
+         "<html><u>Proxy</u> \u2192 Proxy IP</html>"},
+
+        {"DrbdResourceInfo.ProxyOutsidePort",
+         "<html><u>Proxy</u> \u2192 Proxy Port</html>"},
 
         {"BlockDevice.MetaDiskSection",
          "DRBD Meta Disk"},
@@ -2605,6 +2637,18 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdMultiSelectionInfo.DiscardData",
          "Discard Data on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.ProxyDown",
+         "Stop Proxy on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.ProxyUp",
+         "Start Proxy on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.HostStopProxy",
+         "Stop Proxy Daemon on selected hosts"},
+
+        {"DrbdMultiSelectionInfo.HostStartProxy",
+         "Start Proxy Daemon on selected hosts"},
 
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},

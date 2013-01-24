@@ -728,6 +728,67 @@ public final class DRBD {
         return 0;
     }
 
+    /** Executes the drbdadm proxy-up on the specified host and resource. */
+    public static int proxyUp(final Host host,
+                              final String resource,
+                              final String volume,
+                              final boolean testOnly) {
+        return proxyUp(host, resource, null, null, testOnly);
+    }
+
+    /**
+     * Executes the drbdadm proxy-up on the specified host and resource and
+     * calls the callback function.
+     */
+    public static int proxyUp(final Host host,
+                              final String resource,
+                              final String volume,
+                              final ExecCallback execCallback,
+                              final boolean testOnly) {
+        final String command = getDistCommand("DRBD.proxyUp",
+                                              host,
+                                              resource,
+                                              volume);
+        final SSH.SSHOutput ret = execCommand(host,
+                                              command,
+                                              execCallback,
+                                              false,
+                                              testOnly);
+
+        return ret.getExitCode();
+    }
+
+    /** Executes the drbdadm proxy-down on the specified host and resource. */
+    public static int proxyDown(final Host host,
+                                final String resource,
+                                final String volume,
+                                final boolean testOnly) {
+        return proxyDown(host, resource, null, null, testOnly);
+    }
+
+    /**
+     * Executes the drbdadm proxy-up on the specified host and resource and
+     * calls the callback function.
+     */
+    public static int proxyDown(final Host host,
+                                final String resource,
+                                final String volume,
+                                final ExecCallback execCallback,
+                                final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.proxyDown",
+                                                   getResVolReplaceHash(
+                                                                      host,
+                                                                      resource,
+                                                                      volume));
+        final SSH.SSHOutput ret = execCommand(host,
+                                              command,
+                                              execCallback,
+                                              false,
+                                              testOnly);
+
+        return ret.getExitCode();
+    }
+
     /**
      * Executes the drbdadm get-gi on the specified host and resource
      * and return the result or null if there are meta-data on the block
@@ -876,6 +937,44 @@ public final class DRBD {
         return ret.getExitCode() == 0;
     }
 
+    /** Start DRBD proxy on the specified host. */
+    public static boolean startProxy(final Host host, final boolean testOnly) {
+        return startProxy(host, null, testOnly);
+    }
+
+    /**
+     * Start DRBD proxy on the specified host and call the callback function
+     * after it is done.
+     */
+    public static boolean startProxy(final Host host,
+                                     final ExecCallback execCallback,
+                                     final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.startProxy",
+                                                   (ConvertCmdCallback) null);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, execCallback, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
+    /** Stop DRBD proxy on the specified host. */
+    public static boolean stopProxy(final Host host, final boolean testOnly) {
+        return stopProxy(host, null, testOnly);
+    }
+
+    /**
+     * Stop DRBD proxy on the specified host and call the callback function
+     * after it is done.
+     */
+    public static boolean stopProxy(final Host host,
+                                    final ExecCallback execCallback,
+                                    final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.stopProxy",
+                                                   (ConvertCmdCallback) null);
+        final SSH.SSHOutput ret =
+                    execCommand(host, command, execCallback, true, testOnly);
+        return ret.getExitCode() == 0;
+    }
+
     /** Delete minor, from DRBD 8.4. */
     public static boolean delMinor(final Host host,
                                    final String blockDevice,
@@ -901,5 +1000,16 @@ public final class DRBD {
         final SSH.SSHOutput ret =
                     execCommand(host, command, null, true, testOnly);
         return ret.getExitCode() == 0;
+    }
+
+    /** Return command with replaced placeholders. */
+    public static String getDistCommand(final String cmd,
+                                        final Host host,
+                                        final String resource,
+                                        final String volume) {
+        return host.getDistCommand(cmd,
+                                   getResVolReplaceHash(host,
+                                                        resource,
+                                                        volume));
     }
 }

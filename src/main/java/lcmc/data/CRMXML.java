@@ -1154,8 +1154,8 @@ public final class CRMXML extends XML {
      * Returns parameters for service. Parameters are obtained from
      * ocf meta-data.
      */
-    public String[] getParameters(final ResourceAgent ra,
-                                  final boolean master) {
+    public List<String> getParameters(final ResourceAgent ra,
+                                      final boolean master) {
         /* return cached values */
         return ra.getParameters(master);
     }

@@ -49,6 +49,8 @@ our $VIRSH_COMMAND = "virsh -r";
 # --secure-info and -r don't work together
 our $VIRSH_COMMAND_NO_RO = "virsh";
 our $PCMK_SERVICE_AGENTS = "crm_resource --list-agents ";
+our $DRBD_PROXY_GET_PLUGINS = "drbd-proxy-ctl -c 'show avail-plugins'";
+our $DRBD_PROXY_SHOW = "drbd-proxy-ctl -c show";
 
 our $PROC_DRBD = "/proc/drbd";
 our @SERVICE_CLASSES = ("service", "systemd", "upstart");
@@ -80,6 +82,8 @@ if ($option eq "all") {
 	print get_cpu_map_info();
 	print "mount-points-info\n";
 	print get_mount_points_info();
+	print "drbd-proxy-info\n";
+	print get_drbd_proxy_info();
 	print "gui-info\n";
 	print get_gui_info();
 	print "installation-info\n";
@@ -110,6 +114,8 @@ if ($option eq "all") {
 	print get_qemu_keymaps_info();
 } elsif ($option eq "get-cpu-map-info") {
 	print get_cpu_map_info();
+} elsif ($option eq "get-drbd-proxy-info") {
+	print get_drbd_proxy_info();
 } elsif ($option eq "get-gui-info") {
 	print get_gui_info();
 } elsif ($option eq "get-mount-point-info") {
@@ -220,6 +226,8 @@ sub get_hw_info {
 	$out .= get_cpu_map_info();
 	$out .= "mount-points-info\n";
 	$out .= get_mount_points_info();
+	$out .= "drbd-proxy-info\n";
+	$out .= get_drbd_proxy_info();
 	#$out .= "gui-info\n";
 	#$out .= get_gui_info();
 	$out .= "installation-info\n";
@@ -242,6 +250,8 @@ sub get_hw_info_lazy {
 	$out .= get_mount_points_info();
 	$out .= "installation-info\n";
 	$out .= get_installation_info();
+	$out .= "drbd-proxy-info\n";
+	$out .= get_drbd_proxy_info();
 	return $out;
 }
 
@@ -289,10 +299,10 @@ sub get_bridges {
 # get_net_info()
 #
 # parses ifconfig output and prints out interface, ip and mac address one
-# interface per line. "lo" interface is skipped.
+# interface per line.
 sub get_net_info {
 	my $dev  = "";
-	my $mac  = "";
+	my $mac  = "no";
 	my $ip   = "";
 	my $mask = "";
 	my $bridges = get_bridges();
@@ -300,8 +310,9 @@ sub get_net_info {
 	for (`ifconfig`) {
 		if (!$dev) {
 			($dev) = /^(.*?)(:?\s|:)/ or net_info_error("no dev");
-			next if $dev eq "lo";
-			($mac) = /\sHWaddr\s+(\S+)/;
+			if (/\sHWaddr\s+(\S+)/) {
+				$mac = $1;
+			}
 		} else {
 			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
 				$ip = $1;
@@ -315,16 +326,18 @@ sub get_net_info {
 			}
 		}
 		if (/^$/) {
-			if ($dev && $dev ne "lo" && $ip && $mac && $mask) {
+			if ($dev && $ip && $mac ne "no" && $mask) {
 				$out .= "$dev $ip $mac $mask";
 				if ($$bridges{$dev}) {
 					$out .= " bridge\n";
 				} else {
 					$out .= "\n";
 				}
+			} elsif ("lo" eq $dev) {
+				$out = "$dev $ip $mac $mask\n".$out;
 			}
 			$dev = "";
-			$mac  = "";
+			$mac  = "no";
 			$ip   = "";
 			$mask = "";
 		}
@@ -1456,6 +1469,7 @@ XML
 }
 
 sub get_drbd_xml {
+	get_drbd_proxy_xml();
 	my %missing; # handlers and startup don't come from drbdsetup xml-help, so
 		     # we parse them out of the man page.
 	my @missing;
@@ -1597,6 +1611,102 @@ sub get_drbd_xml {
 		print $xml;
 	}
 }
+sub get_drbd_proxy_plugins {
+	my $out = `$DRBD_PROXY_GET_PLUGINS`;
+	my @parts = split /\n\n/, $out;
+	my %plugins = (
+			debug=>"",
+			lzma=>"",
+			zlib=>"",
+			); # default in case proxy is not installed
+	for my $p (@parts) {
+		my ($name, $desc) = $p =~ /Plugin.*?:\s+(\S+)\s+(.*)/s;
+		$desc =~ s/\n/&lt;br&gt;/;
+		$desc =~ s!\*(.*?)\*!&lt;b&gt;$1&lt;/b&gt;!;
+		$plugins{$name} = $desc;
+	}
+	return \%plugins;
+
+}
+
+sub get_drbd_proxy_xml {
+	my $proxy=<<"MEMLIMIT";
+<command name="proxy">
+	<option name="memlimit" type="numeric">
+		<default>16</default>
+		<min>16777216</min>
+		<unit_prefix>M</unit_prefix>
+		<unit>bytes</unit>
+		<desc>&lt;html&gt;
+The amount of memory used by the proxy for incoming packets. This means&lt;br&gt;
+the raw data size of DRBD packets. The actual memory used is typically&lt;br&gt;
+twice as much (depending on the compression ratio)
+		&lt;/html&gt;</desc>
+	</option>
+MEMLIMIT
+	my $plugins = get_drbd_proxy_plugins();
+	my %boolean_plugins = (debug => 1,
+			       noop  => 1);
+	for my $plugin (sort keys %$plugins) {
+		if ($$plugins{$plugin} =~ /compress/i) {
+			$proxy .= <<"PLUGIN";
+	<option name="plugin-$plugin" type="handler">
+		<handler>level 9</handler>
+		<handler>contexts 4 level 9</handler>
+		<handler>level 8</handler>
+		<handler>level 7</handler>
+		<handler>level 6</handler>
+		<handler>level 5</handler>
+		<handler>level 4</handler>
+		<handler>level 3</handler>
+		<handler>level 2</handler>
+		<handler>level 1</handler>
+		<desc>&lt;html&gt;
+		$$plugins{$plugin}
+		&lt;/html&gt;</desc>
+	</option>
+PLUGIN
+		} else {
+			my $type = "string";
+			$type = "boolean" if $boolean_plugins{$plugin};
+			$proxy .= <<"PLUGIN";
+	<option name="plugin-$plugin" type="$type">
+		<desc>&lt;html&gt;
+		$$plugins{$plugin}
+		&lt;/html&gt;</desc>
+	</option>
+PLUGIN
+		}
+	}
+	# deprecated options
+			$proxy .= <<"OTHER";
+	<option name="read-loops" type="numeric">
+		<desc>&lt;html&gt;
+		&lt;b&gt;DEPRECATED&lt;/b&gt;: don't use
+		&lt;/html&gt;</desc>
+	</option>
+	<option name="compression" type="handler">
+		<handler>on</handler>
+		<handler>off</handler>
+		<desc>&lt;html&gt;
+		&lt;b&gt;DEPRECATED&lt;/b&gt;: don't use
+		&lt;/html&gt;</desc>
+	</option>
+OTHER
+	$proxy .= "</command>\n";
+	print $proxy;
+}
+
+sub get_drbd_proxy_info
+{
+	my $out = "";
+	for (`$DRBD_PROXY_SHOW 2>/dev/null`) {
+		if (/add connection\s+(\S*)/) {
+			$out .= "up:$1\n";
+		}
+	}
+	return $out;
+}
 
 sub get_drbd_version {
 	my (@version) = `echo|/sbin/drbdadm help 2>/dev/null`
@@ -1727,6 +1837,8 @@ sub get_cluster_versions {
 	}
 	my $pcmk_prog = "/usr/sbin/pacemakerd";
 	my $pcmk_script = "pacemaker";
+	my $drbdp_script = "drbdproxy";
+	my $drbdp_prog = "/sbin/drbd-proxy";
 	my $hb_init = is_init("heartbeat");
 	chomp $hb_init;
 	my $cs_init = is_init($cs_script);
@@ -1763,6 +1875,9 @@ sub get_cluster_versions {
 		system("$pcmk_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	my $drbd_loaded = (! -e $PROC_DRBD) || "on";
 	my $hb_conf = system("ls /etc/ha.d/ha.cf >/dev/null 2>&1") >> 8 || "on";
+	my $drbdp_running_cmd = is_running($drbdp_script, $drbdp_prog);
+	my $drbdp_running =
+		system("$drbdp_running_cmd >/dev/null 2>&1") >> 8 || "on";
 	my $cs_ais_conf;
 	if ($cs_version) {
 		$cs_ais_conf =
@@ -1777,6 +1892,7 @@ sub get_cluster_versions {
 	chomp $ais_running;
 	chomp $cs_running;
 	chomp $pcmk_running;
+	chomp $drbdp_running;
 	my $service=`/usr/sbin/corosync-objctl service 2>/dev/null`;
 	my $pcmk_svc_ver = "no";
 	if ($service) {
@@ -1802,6 +1918,7 @@ sub get_cluster_versions {
 	       ."cs-running:$cs_running\n"
 	       ."ais-running:$ais_running\n"
 	       ."pcmk-running:$pcmk_running\n"
+	       ."drbdp-running:$drbdp_running\n"
 	       ."hb-init:$hb_init\n"
 	       ."cs-init:$cs_init\n"
 	       ."ais-init:$ais_init\n"
@@ -2199,7 +2316,8 @@ sub gui_drbd_test {
 	$conf =~ s/^(## generated by drbd-gui )\S+/$1VERSION/m;
 	$conf =~ s/^(\s+shared-secret\s+)[^;]+/$1SECRET/m;
 	$conf =~ s/^(\s+disk\s+)[^;{]+(\s*;\s*)$/$1DISK$2/mg;
-	$conf =~ s/^(\s+address\s+)[^:]+/$1IP/mg;
+	$conf =~ s/^(\s+address\s+)(?!.*127\.0\.0\.1)[^:]+/$1IP/mg;
+	$conf =~ s/^(\s+outside\s+)[^:]+/$1IP/mg;
 	my $libdir = get_hb_lib_path();
 	$conf =~ s/$libdir/LIBDIR/g;
 	gui_test_compare("/tmp/lcmc-test/$testname/drbd.conf$index", $conf);

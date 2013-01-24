@@ -33,7 +33,7 @@ import javax.swing.JEditorPane;
 /**
  * This class holds info data for a net interface.
  */
-public final class NetInfo extends Info {
+public class NetInfo extends Info {
     /** Net interface icon. */
     static final ImageIcon NET_I_ICON = Tools.createImageIcon(
                                    Tools.getDefault("HostBrowser.NetIntIcon"));
@@ -123,6 +123,10 @@ public final class NetInfo extends Info {
         } else {
             return toString().equals(value.toString());
         }
+    }
+
+    public final boolean isLocalHost() {
+        return "lo".equals(getName());
     }
 
     //public int hashCode() {
