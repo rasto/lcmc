@@ -3845,11 +3845,17 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_DOWN);
         sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
         press(KeyEvent.VK_ENTER); /* detach */
         checkDRBDTest(drbdTest, 2.01);
 
         moveTo(400, blockDevY);
         rightClick();
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
         press(KeyEvent.VK_DOWN);
         sleep(500);
         press(KeyEvent.VK_DOWN);
@@ -3906,7 +3912,7 @@ public final class RoboTest {
         moveScrollBar(true);
         final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") >= 0) {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
                 moveTo("After", Widget.MComboBox.class);
             } else {
                 moveTo("after", Widget.MComboBox.class);
@@ -4019,9 +4025,8 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") >= 0) {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
                 moveTo("After", Widget.MComboBox.class);
             } else {
                 moveTo("after", Widget.MComboBox.class);
@@ -4446,7 +4451,7 @@ public final class RoboTest {
         sleep(3000);
         final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") >= 0) {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
                 moveTo("After", Widget.MComboBox.class);
             } else {
                 moveTo("after", Widget.MComboBox.class);
@@ -4562,9 +4567,8 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") >= 0) {
+            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
                 moveTo("After", Widget.MComboBox.class);
             } else {
                 moveTo("after", Widget.MComboBox.class);
