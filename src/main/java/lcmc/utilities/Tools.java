@@ -1326,12 +1326,16 @@ public final class Tools {
         }
         final StringBuilder ret = new StringBuilder("");
         for (int i = 0; i < strings.length - 1; i++) {
-            ret.append(strings[i]);
-            if (delim != null) {
-                ret.append(delim);
+            if (strings[i] != null) {
+                ret.append(strings[i]);
+                if (delim != null && strings[i + 1] != null) {
+                    ret.append(delim);
+                }
             }
         }
-        ret.append(strings[strings.length - 1]);
+        if (strings[strings.length - 1] != null) {
+            ret.append(strings[strings.length - 1]);
+        }
         return ret.toString();
     }
 
