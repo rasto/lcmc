@@ -1924,6 +1924,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                          null,
                                          thisApplyButton);
                     setProxyPanels(wizard);
+                    if (value instanceof ProxyNetInfo
+                        || value instanceof String) {
+                        comboBox.setAlwaysEditable(true);
+                    } else {
+                        comboBox.setAlwaysEditable(false);
+                    }
                 }
             });
         }
