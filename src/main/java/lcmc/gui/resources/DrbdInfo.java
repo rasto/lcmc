@@ -69,7 +69,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+    /** Common proxy section. */
     private static final String SECTION_COMMON_PROXY = "proxy";
+    /**
+     * Proxy hosts. Includes hosts and more can be added in the DRBD config
+     * wizard. */
+    private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
 
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
@@ -80,6 +85,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         super(name, browser);
         setResource(new Resource(name));
         ((ClusterBrowser) browser).getDrbdGraph().setDrbdInfo(this);
+        proxyHosts.addAll(getBrowser().getCluster().getHosts());
     }
 
     /** Sets stored parameters. */
@@ -950,4 +956,26 @@ public final class DrbdInfo extends DrbdGuiInfo {
     void enableProxySection(final boolean wizard) {
         enableSection(SECTION_COMMON_PROXY, true, wizard);
     }
+
+    /** Return all proxy hosts. */
+    Set<Host> getAllProxyHosts() {
+        return proxyHosts;
+    }
+
+    /** Add proxy host. */
+    public void addProxyHost(final Host host) {
+        proxyHosts.add(host);
+    }
+
+    /**
+     * Return proxy host by name. */
+    Host getProxyHostByName(final String name) {
+        for (final Host h : proxyHosts) {
+            if (h.getName().equals(name)) {
+                return h;
+            }
+        }
+        return null;
+    }
+
 }

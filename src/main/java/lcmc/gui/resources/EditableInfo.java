@@ -125,7 +125,7 @@ public abstract class EditableInfo extends Info {
     /** Revert button. */
     private MyButton revertButton;
     /** Is counted down, first time the info panel is initialized. */
-    private final CountDownLatch infoPanelLatch = new CountDownLatch(1);
+    private CountDownLatch infoPanelLatch = new CountDownLatch(1);
     /** List of advanced panels. */
     private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
@@ -1043,6 +1043,11 @@ public abstract class EditableInfo extends Info {
     /** Should be called after info panel is done. */
     final void infoPanelDone() {
         infoPanelLatch.countDown();
+    }
+
+    /** Reset info panel. */
+    public void resetInfoPanel() {
+        infoPanelLatch = new CountDownLatch(1);
     }
 
     /** Adds a panel to the advanced list. */

@@ -1690,8 +1690,9 @@ public final class Host {
                 Tools.debug(this, "could not parse: " + ts + " " + nfe);
             }
             mInfoTimestampLock.lock();
-            if (!infoTimestamp.containsKey(type)
-                || (timestamp != null && timestamp >= infoTimestamp.get(type))) {
+            if (timestamp != null
+                && (!infoTimestamp.containsKey(type)
+                    || timestamp >= infoTimestamp.get(type))) {
                 infoTimestamp.put(type, timestamp);
                 mInfoTimestampLock.unlock();
                 out = buffer.substring(s2 + 2, e);

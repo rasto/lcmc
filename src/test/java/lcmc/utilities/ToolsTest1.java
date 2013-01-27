@@ -549,6 +549,12 @@ public final class ToolsTest1 extends TestCase {
         assertEquals("", Tools.join(",", (String[]) null));
         assertEquals("ab", Tools.join(null, new String[]{"a", "b"}));
         assertEquals("a,b,c", Tools.join(",", new String[]{"a", "b", "c"}));
+        assertEquals("a", Tools.join(",", new String[]{"a", null}));
+        assertEquals("", Tools.join(",", new String[]{null, null}));
+        assertEquals("", Tools.join(",", new String[]{null, null}));
+        assertEquals("a", Tools.join(",", new String[]{"a", null, null}));
+        assertEquals("a", Tools.join(",", new String[]{null, "a", null}));
+        assertEquals("a", Tools.join(",", new String[]{null, null, "a"}));
 
 
         assertEquals("", Tools.join("-", (Collection<String>) null));

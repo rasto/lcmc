@@ -237,6 +237,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.Host.NewHost.EnterPassword",
          "Password:"},
 
+        {"Dialog.Host.NewProxyHost.Title",
+         "Add Proxy Host"},
+
+        {"Dialog.Host.NewProxyHost.Description",
+         "Enter the <b>hostname/IP</b> and <b>username</b> of the proxy host."},
+
         {"Dialog.Host.Configuration.Title",
          "Host configuration"},
 

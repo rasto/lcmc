@@ -438,4 +438,9 @@ public final class ComboBox extends Widget {
         final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
     }
+
+    /** Select the text component. */
+    public void select(final int selectionStart, final int selectionEnd) {
+        getTextComponent().select(selectionStart, selectionEnd);
+    }
 }

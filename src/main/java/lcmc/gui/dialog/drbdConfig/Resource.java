@@ -24,11 +24,14 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
+import lcmc.utilities.MyButton;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.data.Host;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -38,8 +41,9 @@ import javax.swing.JScrollPane;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -96,6 +100,8 @@ public final class Resource extends DrbdConfig {
                                             PROXY_PLUGIN_LZMA};
     /** Length of the secret string. */
     private static final int SECRET_STRING_LENGTH = 32;
+    /** Whether to add proxy host. */
+    private boolean proxyHostNextDialog = false;
 
     /** Prepares a new <code>Resource</code> object. */
     public Resource(final WizardDialog previousDialog,
@@ -111,6 +117,9 @@ public final class Resource extends DrbdConfig {
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
+        if (proxyHostNextDialog) {
+            return new NewProxyHost(this, new Host(), getDrbdVolumeInfo());
+        }
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
@@ -196,7 +205,6 @@ public final class Resource extends DrbdConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         /* common options */
         final Map<String, String> commonPreferredValue =
                                                 new HashMap<String, String>();
@@ -246,21 +254,52 @@ public final class Resource extends DrbdConfig {
         /* address combo boxes */
         dri.addHostAddresses(optionsPanel,
                              ClusterBrowser.SERVICE_LABEL_WIDTH,
-                             ClusterBrowser.SERVICE_FIELD_WIDTH,
+                             ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                              true,
                              buttonClass(nextButton()));
         dri.addWizardParams(
-                  optionsPanel,
-                  PARAMS,
-                  buttonClass(nextButton()),
-                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
-                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
-                  null);
+              optionsPanel,
+              PARAMS,
+              buttonClass(nextButton()),
+              Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+              Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth") * 2,
+              null);
 
         inputPane.add(optionsPanel);
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.add(getAddProxyHostButton());
+        inputPane.add(buttonPanel);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
         return sp;
+    }
+
+    /**
+     * Return "Add Proxy Host" button.
+     */
+    private MyButton getAddProxyHostButton() {
+        final MyButton btn = new MyButton("Add Proxy Host");
+        btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
+        btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                btn.setEnabled(false);
+                                proxyHostNextDialog = true;
+                                buttonClass(nextButton()).pressButton();
+                            }
+                        });
+                    }
+                });
+                t.start();
+            }
+        });
+        return btn;
     }
 }

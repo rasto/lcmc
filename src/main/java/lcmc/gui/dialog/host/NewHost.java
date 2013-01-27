@@ -51,7 +51,7 @@ import javax.swing.SwingUtilities;
  * @version $Id$
  *
  */
-public final class NewHost extends DialogHost {
+public class NewHost extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** hostField can be ip or hostname with or without domainname. */
@@ -111,7 +111,7 @@ public final class NewHost extends DialogHost {
      * next and finish buttons.
      */
     @Override
-    protected void checkFields(final Widget field) {
+    protected final void checkFields(final Widget field) {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
@@ -226,14 +226,14 @@ public final class NewHost extends DialogHost {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog. */
     @Override
-    protected void initDialogAfterVisible() {
+    protected final void initDialogAfterVisible() {
         enableComponents();
         checkFields((Widget) null);
         SwingUtilities.invokeLater(new Runnable() {
@@ -260,7 +260,7 @@ public final class NewHost extends DialogHost {
      * is normally root and host can be entered either as ip or node name etc.
      */
     @Override
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(Tools.getDefaultColor(
