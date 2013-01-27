@@ -22,28 +22,25 @@
 package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
  */
 public final class ProxyNetInfo extends NetInfo {
-    final static Host SAME_HOST = null;
-
+    /** Proxy is on the same host as the DRBD block device. */
+    static final Host SAME_HOST = null;
+    /** Proxy host. */
     private final Host proxyHost;
-    public final static String PROXY_PREFIX = "proxy: ";
+    /** Prefix in the host address field indicating a proxy address. */
+    public static final String PROXY_PREFIX = "proxy: ";
 
     /** Prepares a new <code>NetProxyInfo</code> object. */
-    public ProxyNetInfo(final NetInfo netInfo, final Host proxyHost) {
-        super(netInfo.getName(),
-              netInfo.getNetInterface(),
-              netInfo.getBrowser());
+    public ProxyNetInfo(final NetInfo netInfo,
+                        final Browser browser,
+                        final Host proxyHost) {
+        super(netInfo.getName(), netInfo.getNetInterface(), browser);
         this.proxyHost = proxyHost;
     }
 
@@ -59,7 +56,7 @@ public final class ProxyNetInfo extends NetInfo {
     /** Returns string representation of the net interface. */
     @Override
     public String toString() {
-        final String ip = getNetInterface().getIp();
+        final String ip = super.getStringValue();
         String proxyHostName = null;
         if (proxyHost != null) {
             proxyHostName = proxyHost.getName();

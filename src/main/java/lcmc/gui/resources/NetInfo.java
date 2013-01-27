@@ -40,6 +40,8 @@ public class NetInfo extends Info {
     /** Net interface icon. */
     static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
                               Tools.getDefault("HostBrowser.NetIntIconLarge"));
+    /** Placeholder where user can enter an ip. */
+    public static final String IP_PLACEHOLDER = "--.--.--.--";
     /** Prepares a new <code>NetInfo</code> object. */
     public NetInfo(final String name,
                    final NetInterface netInterface,
@@ -50,13 +52,13 @@ public class NetInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+    protected final HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
     /** Returns info of this net interface, which is updatable. */
     @Override
-    public void updateInfo(final JEditorPane ep) {
+    public final void updateInfo(final JEditorPane ep) {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -88,18 +90,22 @@ public class NetInfo extends Info {
 
     /** Returns icon of the net interface for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public final ImageIcon getMenuIcon(final boolean testOnly) {
         return NET_I_ICON;
     }
 
     /** Returns ip of the net interface. */
     @Override
-    public String getStringValue() {
-        return getNetInterface().getIp();
+    public final String getStringValue() {
+        final NetInterface ni = getNetInterface();
+        if (ni == null) {
+            return IP_PLACEHOLDER;
+        }
+        return ni.getIp();
     }
 
     /** Returns net interface resource. */
-    public NetInterface getNetInterface() {
+    public final NetInterface getNetInterface() {
         return (NetInterface) getResource();
     }
 
@@ -125,6 +131,9 @@ public class NetInfo extends Info {
         }
     }
 
+    /**
+     * Whether this interface is localhost.
+     */
     public final boolean isLocalHost() {
         return "lo".equals(getName());
     }
