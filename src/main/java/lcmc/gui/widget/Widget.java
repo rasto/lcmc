@@ -847,4 +847,9 @@ public abstract class Widget extends JPanel {
     public final boolean isNew() {
         return newFlag;
     }
+
+    /** Select the text component. */
+    public void select(final int selectionStart, final int selectionEnd) {
+        Tools.appWarning("select not implemented");
+    }
 }
