@@ -1557,12 +1557,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             addSectionPanel(section, wizard, sectionPanel);
             enableSection(section, !DrbdProxy.PROXY, wizard);
             sectionPanel.setBackground(AppDefaults.LIGHT_ORANGE);
-            final JPanel advancedPanel = new JPanel();
-            addToAdvancedList(advancedPanel);
-            advancedPanel.setVisible(Tools.getConfigData().isAdvancedMode());
-            advancedPanel.setBackground(AppDefaults.LIGHT_ORANGE);
-            advancedPanel.setLayout(new SpringLayout());
-            sectionPanel.add(advancedPanel);
             final Object[] proxyNetInterfaces =
                                     getNetInterfaces(pHost.getBrowser());
             /* inside ip */
@@ -1587,16 +1581,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             Tools.getString("DrbdResourceInfo.ProxyInsideIp");
             final JLabel insideIpLabel = new JLabel(insideIp);
             iIpWi.setLabel(insideIpLabel, insideIp);
-            addField(advancedPanel,
+            final JPanel panel = new JPanel();
+            addField(panel,
                      insideIpLabel,
                      iIpWi,
                      leftWidth,
                      rightWidth,
                      0);
-            SpringUtilities.makeCompactGrid(advancedPanel, 1, 2, /* rows, cols*/
-                                            1, 1,           /* initX, initY */
-                                            1, 1);          /* xPad, yPad */
-            final JPanel panel = new JPanel();
             panel.setBackground(AppDefaults.LIGHT_ORANGE);
             panel.setLayout(new SpringLayout());
             sectionPanel.add(panel);
@@ -1626,7 +1617,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                      leftWidth,
                      rightWidth,
                      0);
-            SpringUtilities.makeCompactGrid(panel, 1, 2, /* rows, cols */
+            SpringUtilities.makeCompactGrid(panel, 2, 2, /* rows, cols */
                                             1, 1,           /* initX, initY */
                                             1, 1);          /* xPad, yPad */
             optionsPanel.add(sectionPanel);
