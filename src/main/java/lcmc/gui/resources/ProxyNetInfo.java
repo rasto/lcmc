@@ -75,7 +75,7 @@ public final class ProxyNetInfo extends NetInfo {
             s.append(someIp);
         }
         if (!someHost.equals(someProxyHost)) {
-            s.append(" on ");
+            s.append(" \u2192 ");
             s.append(someProxyHost);
         }
         return s.toString();

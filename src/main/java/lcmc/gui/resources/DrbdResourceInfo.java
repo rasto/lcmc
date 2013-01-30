@@ -1680,7 +1680,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
             @SuppressWarnings("unchecked")
             final Enumeration<DefaultMutableTreeNode> nph =
-                         h.getBrowser().getNetInterfacesNode().children();
+                         hostBrowser.getNetInterfacesNode().children();
             if (nph.hasMoreElements()) {
                 while (nph.hasMoreElements()) {
                     final NetInfo i =
@@ -1691,9 +1691,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     list.add(new ProxyNetInfo(i, hostBrowser, h));
                 }
             }
-            /* User can enter an IP */
-            list.add(new ProxyNetInfo(
-                          new NetInfo("", null, hostBrowser), hostBrowser, h));
         }
         return list.toArray(new Object[list.size()]);
     }
