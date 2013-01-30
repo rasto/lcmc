@@ -1,9 +1,9 @@
 /*
- * This file is part of the LCMC by Rasto Levrinc.
+ * This file is part of LCMC written by Rasto Levrinc.
  *
  * Copyright (C) 2013, Rastislav Levrinc.
  *
- * The is free software; you can redistribute it and/or
+ * The LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2, or (at your option)
  * any later version.
@@ -23,51 +23,58 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.dialog.host.NewHost;
+import lcmc.gui.dialog.host.Devices;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.DrbdResourceInfo;
 
 /**
- * An implementation of a dialog where user can enter either ip or hostname of
- * the host and user name.
+ * An implementation of a dialog where hardware information is collected.
  *
  * @author Rasto Levrinc
+ * @version $Id$
  *
  */
-public final class NewProxyHost extends NewHost {
+final class DevicesProxy extends Devices {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
-    /** Prepares a new <code>NewProxyHost</code> object. */
-    public NewProxyHost(final WizardDialog previousDialog,
-                        final Host host,
-                        final DrbdVolumeInfo drbdVolumeInfo) {
+    /** Prepares a new <code>Devices</code> object. */
+    DevicesProxy(final WizardDialog previousDialog,
+                 final Host host,
+                 final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, host);
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
-    /** Sets nextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
-        return new ConfigurationProxy(this, getHost(), drbdVolumeInfo);
+        final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+        dri.getDrbdInfo().addProxyHost(getHost());
+        System.out.println("add proxy host: " + getHost());
+        dri.resetInfoPanel();
+        dri.getInfoPanel();
+        dri.waitForInfoPanel();
+        dri.selectMyself();
+        return new Resource(this, drbdVolumeInfo);
     }
 
     /**
-     * Returns the title of the dialog, defined as
-     * Dialog.Host.NewProxyHost.Title in TextResources.
+     * Returns the title of the dialog. It is defined as
+     * Dialog.Host.Devices.Title in TextResources.
      */
     @Override
     protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.Host.NewProxyHost.Title");
+        return Tools.getString("Dialog.Host.Devices.Title");
     }
 
     /**
-     * Returns the description of the dialog, defined as
-     * Dialog.Host.NewProxyHost.Description in TextResources.
+     * Returns the description of the dialog. It is defined as
+     * Dialog.Host.Devices.Description in TextResources.
      */
     @Override
     protected String getDescription() {
-        return Tools.getString("Dialog.Host.NewProxyHost.Description");
+        return Tools.getString("Dialog.Host.Devices.Description");
     }
 }

@@ -41,7 +41,7 @@ import javax.swing.BoxLayout;
  * @version $Id$
  *
  */
-public final class SSH extends DialogHost {
+public class SSH extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 

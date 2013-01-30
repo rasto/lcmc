@@ -42,12 +42,12 @@ import javax.swing.SpringLayout;
  * @version $Id$
  *
  */
-final class Devices extends DialogHost {
+public class Devices extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
     /** Prepares a new <code>Devices</code> object. */
-    Devices(final WizardDialog previousDialog, final Host host) {
+    public Devices(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
