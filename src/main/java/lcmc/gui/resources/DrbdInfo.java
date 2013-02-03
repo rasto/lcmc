@@ -91,6 +91,13 @@ public final class DrbdInfo extends DrbdGuiInfo {
     /** Sets stored parameters. */
     public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
+        for (final String hostName : dxml.getProxyHostNames()) {
+            if (getProxyHostByName(hostName) == null) {
+                final Host hp = new Host();
+                hp.setHostname(hostName);
+                proxyHosts.add(hp);
+            }
+        }
         for (final String param : getParametersFromXML()) {
             final String sectionString = dxml.getSection(param);
             /* remove -options */
@@ -153,7 +160,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void createDrbdConfig(final boolean testOnly)
                throws Exceptions.DrbdConfigException {
         /* resources */
-        final Set<Host> hosts = getBrowser().getCluster().getHosts();
+        final Set<Host> hosts = new LinkedHashSet<Host>(
+                                        getBrowser().getCluster().getHosts());
         hosts.addAll(proxyHosts);
         for (Host host : hosts) {
             final StringBuilder globalConfig = new StringBuilder(160);
@@ -958,7 +966,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Return all proxy hosts. */
-    Set<Host> getAllProxyHosts() {
+    public Set<Host> getAllProxyHosts() {
         return proxyHosts;
     }
 

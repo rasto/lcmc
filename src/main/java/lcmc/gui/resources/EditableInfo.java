@@ -138,7 +138,7 @@ public abstract class EditableInfo extends Info {
     /** Disabled section, their not visible. */
     private final Set<String> disabledSections = new HashSet<String>();
     /** Whether is's a wizard element. */
-    protected final static boolean WIZARD = true;
+    public final static boolean WIZARD = true;
 
     /** How much of the info is used. */
     public int getUsed() {
