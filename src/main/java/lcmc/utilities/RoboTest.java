@@ -4320,7 +4320,7 @@ public final class RoboTest {
 
             moveTo(700, 450);
             leftClick();
-            robot.mouseWheel(50);
+            robot.mouseWheel(70);
 
             moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
                    Widget.MComboBox.class); /* outside */
@@ -4330,7 +4330,7 @@ public final class RoboTest {
             sleep(500);
             press(KeyEvent.VK_ENTER);
 
-            moveTo(Widget.MComboBox.class, 6); /* outside */
+            moveTo(Widget.MComboBox.class, 8); /* outside */
             leftClick();
             sleep(500);
             press(KeyEvent.VK_E);
@@ -4448,7 +4448,7 @@ public final class RoboTest {
         sleep(2000);
 
         moveScrollBar(true);
-        sleep(3000);
+        sleep(5000);
         final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
             if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
