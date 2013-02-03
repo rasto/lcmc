@@ -50,7 +50,7 @@ import java.net.InetAddress;
  * @version $Id$
  *
  */
-final class Configuration extends DialogHost {
+public class Configuration extends DialogHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Maximum hops. */
@@ -69,8 +69,8 @@ final class Configuration extends DialogHost {
     private static final int DNS_TIMEOUT = 5000;
 
     /** Prepares a new <code>Configuration</code> object. */
-    Configuration(final WizardDialog previousDialog,
-                  final Host host) {
+    public Configuration(final WizardDialog previousDialog,
+                         final Host host) {
         super(previousDialog, host);
     }
 

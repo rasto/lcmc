@@ -38,6 +38,8 @@ import org.w3c.dom.Node;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -146,6 +148,8 @@ public final class DrbdXML extends XML {
     /** Map from resoure and host to the proxy information. */
     private final MultiKeyMap<String, HostProxy> resourceHostProxyMap =
                                          new MultiKeyMap<String, HostProxy>();
+    /** Set of all proxy hosts. */
+    private final Set<String> proxyHostNames = new HashSet<String>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
@@ -963,6 +967,7 @@ public final class DrbdXML extends XML {
                                                                   insidePort,
                                                                   outsideIp,
                                                                   outsidePort));
+        proxyHostNames.add(proxyHostName);
     }
 
     /** Returns map with hosts as keys and disks as values. */
@@ -1004,6 +1009,11 @@ public final class DrbdXML extends XML {
     public HostProxy getHostProxy(final String hostName,
                                   final String resName) {
         return resourceHostProxyMap.get(resName, hostName);
+    }
+
+    /** Get all proxy hosts. */
+    public Set<String> getProxyHostNames() {
+        return proxyHostNames;
     }
 
     /** Returns whether a proxy is defined for this host and resource. */

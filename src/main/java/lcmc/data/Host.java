@@ -2135,24 +2135,27 @@ public final class Host {
             } else if ("drbd-proxy-info".equals(type)) {
                 /* res-other.host-this.host */
                 String res = null;
-                for (final Host otherHost : getCluster().getHosts()) {
-                    if (otherHost == this) {
-                        continue;
-                    }
-                    if (line.startsWith("up:")) {
-                        final String hostsPart = "-" + otherHost.getName()
-                                                 + "-" + getName();
-                        final int i = line.indexOf(hostsPart);
-                        if (i > 0) {
-                            res = line.substring(3, i);
-                            break;
+                final Cluster cluster = getCluster();
+                if (cluster != null) {
+                    for (final Host otherHost : getCluster().getHosts()) {
+                        if (otherHost == this) {
+                            continue;
+                        }
+                        if (line.startsWith("up:")) {
+                            final String hostsPart = "-" + otherHost.getName()
+                                                     + "-" + getName();
+                            final int i = line.indexOf(hostsPart);
+                            if (i > 0) {
+                                res = line.substring(3, i);
+                                break;
+                            }
                         }
                     }
-                }
-                if (res == null) {
-                    Tools.appWarning("could not parse proxy line: " + line);
-                } else {
-                    newDrbdResProxy.add(res);
+                    if (res == null) {
+                        Tools.appWarning("could not parse proxy line: " + line);
+                    } else {
+                        newDrbdResProxy.add(res);
+                    }
                 }
             }
         }

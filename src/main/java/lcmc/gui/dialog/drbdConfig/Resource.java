@@ -29,21 +29,28 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.Host;
+import lcmc.data.AccessMode;
+import lcmc.data.ConfigData;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
+import javax.swing.JCheckBox;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -267,7 +274,7 @@ public final class Resource extends DrbdConfig {
 
         inputPane.add(optionsPanel);
         final JPanel buttonPanel = new JPanel();
-        buttonPanel.add(getAddProxyHostButton());
+        buttonPanel.add(getProxyHostsPanel());
         inputPane.add(buttonPanel);
         final JScrollPane sp = new JScrollPane(inputPane);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
@@ -278,8 +285,12 @@ public final class Resource extends DrbdConfig {
     /**
      * Return "Add Proxy Host" button.
      */
-    private MyButton getAddProxyHostButton() {
-        final MyButton btn = new MyButton("Add Proxy Host");
+    private JPanel getProxyHostsPanel() {
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(Tools.getBorder("Proxy Hosts"));
+
+        final MyButton btn = new MyButton("Add Host");
         btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
         btn.addActionListener(new ActionListener() {
             @Override
@@ -300,6 +311,28 @@ public final class Resource extends DrbdConfig {
                 t.start();
             }
         });
-        return btn;
+        panel.add(btn);
+
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        for (final Host h : dri.getDrbdInfo().getAllProxyHosts()) {
+            final JCheckBox cb = new JCheckBox(h.getName());
+            cb.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (e.getStateChange() == ItemEvent.SELECTED) {
+                                dri.addSelectedProxyHost(h);
+                            } else {
+                                dri.removeSelectedProxyHost(h);
+                            }
+                            dri.setProxyPanels(DrbdResourceInfo.WIZARD);
+                        }
+                    });
+                }
+            });
+            panel.add(cb);
+        }
+        return panel;
     }
 }
