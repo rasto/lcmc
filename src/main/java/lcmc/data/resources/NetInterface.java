@@ -201,4 +201,9 @@ public final class NetInterface extends Resource {
     public boolean isBridge() {
         return bridge;
     }
+
+    /** Return whether it's a localhost. */
+    public boolean isLocalHost() {
+        return "lo".equals(getName());
+    }
 }

@@ -617,6 +617,9 @@ public final class Host {
         final Map<String, String> networksIntersection =
                                            new LinkedHashMap<String, String>();
         for (final NetInterface ni : netInterfaces.values()) {
+            if (ni.isLocalHost()) {
+                continue;
+            }
             final String networkIp = ni.getNetworkIp();
             if (otherNetworkIps.containsKey(networkIp)
                 && !networksIntersection.containsKey(networkIp)) {
