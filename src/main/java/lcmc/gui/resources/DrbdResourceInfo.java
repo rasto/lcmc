@@ -1372,6 +1372,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                      leftWidth,
                      rightWidth,
                      0);
+            wi.setToolTipText(getToolTipText(null, wi));
             rows++;
         }
 
@@ -1659,10 +1660,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             } else {
                 proxyHost = host;
             }
-            newInsideIpComboBoxHash.get(proxyHost).setValueAndWait(
-                                                                insideIpSaved);
-            newOutsideIpComboBoxHash.get(proxyHost).setValueAndWait(
-                                                                outsideIpSaved);
+            final Widget iIpWi = newInsideIpComboBoxHash.get(proxyHost);
+            iIpWi.setValueAndWait(insideIpSaved);
+            iIpWi.setToolTipText(getToolTipText(null, iIpWi));
+            final Widget oIpWi = newOutsideIpComboBoxHash.get(proxyHost);
+            oIpWi.setValueAndWait(outsideIpSaved);
+            oIpWi.setToolTipText(getToolTipText(null, oIpWi));
         }
     }
 
