@@ -1536,7 +1536,7 @@ public final class Tools {
                                final int width,
                                final int height) {
         final Dimension d = new Dimension(width, height);
-        c.setMaximumSize(d);
+        c.setMaximumSize(new Dimension(Short.MAX_VALUE, height));
         c.setMinimumSize(d);
         c.setPreferredSize(d);
     }
