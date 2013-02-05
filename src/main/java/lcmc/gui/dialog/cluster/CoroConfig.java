@@ -941,9 +941,17 @@ final class CoroConfig extends DialogCluster {
         typeW.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
+        NetInterface defaultNi = null;
+        for (final NetInterface n : ni) {
+            /* skip lo */
+            if (!n.isLocalHost()) {
+                defaultNi = n;
+                break;
+            }
+        }
         ifaceW = WidgetFactory.createInstance(
                                     Widget.GUESS_TYPE,
-                                    Widget.NO_DEFAULT,
+                                    defaultNi.toString(),
                                     ni,
                                     Widget.NO_REGEXP,
                                     INTF_COMBOBOX_WIDTH,
