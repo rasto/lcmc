@@ -24,11 +24,21 @@
 package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
+import lcmc.data.AccessMode;
+import lcmc.data.ConfigData;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
+import lcmc.utilities.MyButton;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * DialogHost.
@@ -134,4 +144,151 @@ public abstract class DialogHost extends WizardDialog {
 
     /** Return title for getDialogTitle() function. */
     protected abstract String getHostDialogTitle();
+
+    /** This class holds install method names, and their indeces. */
+    protected final static class InstallMethods {
+        /** Name of the method like "CD". */
+        private final String name;
+        /** Index of the method. */
+        private final int index;
+        /** Method string. */
+        private final String method;
+
+        /** Creates new InstallMethods object. */
+        InstallMethods(final String name, final int index) {
+            this(name, index, "");
+        }
+
+        /** Creates new InstallMethods object. */
+        InstallMethods(final String name,
+                       final int index,
+                       final String method) {
+            this.name = name;
+            this.index = index;
+            this.method = method;
+        }
+
+        /** Returns name of the install method. */
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        /** Returns index of the install method. */
+        String getIndex() {
+            return Integer.toString(index);
+        }
+
+        /** Returns method. */
+        String getMethod() {
+            return method;
+        }
+
+        /** Returns whether the installation method is "source". */
+        boolean isSourceMethod() {
+            return "source".equals(method);
+        }
+
+        /** Returns whether the installation method is "linbit". */
+        boolean isLinbitMethod() {
+            return "linbit".equals(method);
+        }
+    }
+
+    /** Get installation methods. */
+    protected final Widget getInstallationMethods(
+                                           final String prefix,
+                                           final boolean staging,
+                                           final String installMethodSuffix,
+                                           final String lastInstalledMethod,
+                                           final String autoOption,
+                                           final MyButton installButton) {
+        final List<InstallMethods> methods = new ArrayList<InstallMethods>();
+        int i = 1;
+        String defaultValue = null;
+        while (true) {
+            final String index = Integer.toString(i);
+            final String text =
+                    getHost().getDistString(prefix + ".install.text." + index);
+            if (text == null || text.equals("")) {
+                if (i > 9) {
+                    break;
+                }
+                i++;
+                continue;
+            }
+            final String stagingMethod =
+                 getHost().getDistString(prefix + ".install.staging." + index);
+            if (stagingMethod != null && "true".equals(stagingMethod)
+                && !staging) {
+                /* skip staging */
+                i++;
+                continue;
+            }
+            String method =
+                  getHost().getDistString(prefix + ".install.method." + index);
+            if (method == null) {
+                method = "";
+            }
+            final InstallMethods installMethod = new InstallMethods(
+                              Tools.getString("Dialog.Host.CheckInstallation."
+                                              + installMethodSuffix)
+                              + text, i, method);
+            if (text.equals(lastInstalledMethod)) {
+                defaultValue = installMethod.toString();
+            }
+            methods.add(installMethod);
+            i++;
+        }
+        final Widget instMethodWi = WidgetFactory.createInstance(
+                       Widget.Type.COMBOBOX,
+                       defaultValue,
+                       (Object[]) methods.toArray(
+                                           new InstallMethods[methods.size()]),
+                       Widget.NO_REGEXP,
+                       0,    /* width */
+                       Widget.NO_ABBRV,
+                       new AccessMode(ConfigData.AccessType.RO,
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
+        if (Tools.getConfigData().getAutoOptionHost(autoOption) != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    instMethodWi.setSelectedIndex(
+                        Integer.parseInt(
+                         Tools.getConfigData().getAutoOptionHost(autoOption)));
+                }
+            });
+        }
+        instMethodWi.addListeners(new WidgetListener() {
+            @Override
+            public void check(final Object value) {
+                final InstallMethods method =
+                                      (InstallMethods) instMethodWi.getValue();
+                final String toolTip =
+                                    getInstToolTip(prefix, method.getIndex());
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        instMethodWi.setToolTipText(toolTip);
+                        installButton.setToolTipText(toolTip);
+                    }
+                });
+            }
+        });
+        return instMethodWi;
+    }
+
+    /**
+     * Returns tool tip texts for installation method combo box and
+     * install button.
+     */
+    protected final String getInstToolTip(final String prefix,
+                                          final String index) {
+        return Tools.html(
+            getHost().getDistString(
+                prefix + ".install." + index)).replaceAll(";", ";<br>&gt; ")
+                                           .replaceAll("&&", "<br>&gt; &&");
+    }
 }

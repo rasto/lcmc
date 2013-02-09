@@ -24,7 +24,9 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.NewHost;
+import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import javax.swing.JComponent;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
@@ -36,21 +38,28 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 public final class NewProxyHost extends NewHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Drbd info. */
+    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
     /** Prepares a new <code>NewProxyHost</code> object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
+                        final DrbdInfo drbdInfo,
                         final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, host);
+        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
     /** Sets nextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
-        return new ConfigurationProxy(this, getHost(), drbdVolumeInfo);
+        return new ConfigurationProxy(this,
+                                      getHost(),
+                                      drbdInfo,
+                                      drbdVolumeInfo);
     }
 
     /**
@@ -69,5 +78,19 @@ public final class NewProxyHost extends NewHost {
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.NewProxyHost.Description");
+    }
+
+    /** Buttons that are enabled/disabled during check. */
+    @Override
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton()),
+                                buttonClass(finishButton())};
+    }
+
+    /** Finishes the dialog. */
+    @Override
+    protected void finishDialog() {
+        super.finishDialog();
+        drbdInfo.addProxyHost(getHost());
     }
 }

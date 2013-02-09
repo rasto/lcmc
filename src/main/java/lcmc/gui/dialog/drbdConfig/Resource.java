@@ -29,13 +29,9 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.Host;
-import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -124,11 +120,14 @@ public final class Resource extends DrbdConfig {
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
-        if (proxyHostNextDialog) {
-            return new NewProxyHost(this, new Host(), getDrbdVolumeInfo());
-        }
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        if (proxyHostNextDialog) {
+            return new NewProxyHost(this,
+                                    new Host(),
+                                    drbdInfo,
+                                    getDrbdVolumeInfo());
+        }
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {

@@ -22,6 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.Exceptions;
+import lcmc.ProxyHostWizard;
 import lcmc.AddDrbdConfigDialog;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
@@ -30,9 +31,13 @@ import lcmc.data.Host;
 import lcmc.data.DrbdXML;
 import lcmc.data.resources.Resource;
 import lcmc.data.DRBDtestData;
+import lcmc.data.ConfigData;
+import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.MyMenuItem;
 import lcmc.configs.AppDefaults;
 
 import java.awt.Component;
@@ -44,6 +49,7 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.concurrent.CountDownLatch;
@@ -986,4 +992,36 @@ public final class DrbdInfo extends DrbdGuiInfo {
         return null;
     }
 
+    /**
+     * Returns background popup. Click on background represents cluster as
+     * whole.
+     */
+    @Override
+    public List<UpdatableItem> createPopup() {
+        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
+        final boolean testOnly = false;
+
+        /** Add proxy host */
+        final MyMenuItem addProxyHostMenu = new MyMenuItem(
+                Tools.getString("DrbdInfo.AddProxyHost"),
+                null,
+                Tools.getString("DrbdInfo.AddProxyHost"),
+                new AccessMode(ConfigData.AccessType.OP, false),
+                new AccessMode(ConfigData.AccessType.OP, false)) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void action() {
+                addProxyHostWizard();
+            }
+        };
+        items.add(addProxyHostMenu);
+        return items;
+    }
+
+    private void addProxyHostWizard() {
+        final ProxyHostWizard w = new ProxyHostWizard(new Host(), this, null);
+        w.showDialogs();
+    }
 }

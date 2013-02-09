@@ -25,7 +25,6 @@ package lcmc.gui.dialog.host;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
@@ -52,7 +51,7 @@ public class Devices extends DialogHost {
     }
 
     /** Checks the answer and makes it visible to the user. */
-    void checkAnswer(final String ans) {
+    final void checkAnswer(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
             progressBarDoneError();
             answerPaneSetTextError(Tools.getString(
@@ -74,14 +73,14 @@ public class Devices extends DialogHost {
 
     /** Inits the dialog and starts the info collecting thread. */
     @Override
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
-    protected void initDialogAfterVisible() {
+    protected final void initDialogAfterVisible() {
         final Thread t = new Thread(new Runnable() {
             public void run() {
                 getHost().getSSH().installGuiHelper();
@@ -92,8 +91,8 @@ public class Devices extends DialogHost {
     }
 
     /** Returns info for input pane. */
-    protected void getAllInfo() {
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    protected final void getAllInfo() {
+        enableComponentsLater(nextButtons());
         final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
                          getProgressBar(),
                          new ExecCallback() {
@@ -143,7 +142,7 @@ public class Devices extends DialogHost {
 
     /** Returns pane where collected info is displayed. */
     @Override
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(
@@ -153,5 +152,10 @@ public class Devices extends DialogHost {
                                               0, 0); //xPad, yPad
 
         return pane;
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton())};
     }
 }

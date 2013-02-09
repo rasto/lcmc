@@ -107,11 +107,13 @@ public class Configuration extends DialogHost {
      * Checks the fields and if they are correct the buttons will be enabled.
      */
     @Override
-    protected void checkFields(final Widget field) {
+    protected final void checkFields(final Widget field) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                buttonClass(nextButton()).setEnabled(hostnameOk);
+                for (final JComponent btn : nextButtons()) {
+                    btn.setEnabled(hostnameOk);
+                }
             }
         });
     }
@@ -138,7 +140,8 @@ public class Configuration extends DialogHost {
      * Checks the dns entries for all the hosts.
      * This assumes that getHost().hostnameEntered was set.
      */
-    protected boolean checkDNS(final int hop, final String hostnameEntered) {
+    protected final boolean checkDNS(final int hop,
+                                     final String hostnameEntered) {
         InetAddress[] addresses = null;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
@@ -236,21 +239,21 @@ public class Configuration extends DialogHost {
     }
 
     /** Returns number of hops. */
-    protected int getHops() {
+    protected final int getHops() {
         final String hostnameEntered = getHost().getHostnameEntered();
         return Tools.charCount(hostnameEntered, ',') + 1;
     }
 
     /** Inits dialog and starts dns check for every host. */
     @Override
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
-    protected void initDialogAfterVisible() {
+    protected final void initDialogAfterVisible() {
         if (getHost().getIp() == null || "".equals(getHost().getIp())) {
             final CheckDNSThread[] checkDNSThread =
                             new CheckDNSThread[MAX_HOPS];
@@ -339,7 +342,7 @@ public class Configuration extends DialogHost {
      * comma, can be entered.
      */
     @Override
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final int hops = getHops();
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -403,5 +406,10 @@ public class Configuration extends DialogHost {
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
         return pane;
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton())};
     }
 }

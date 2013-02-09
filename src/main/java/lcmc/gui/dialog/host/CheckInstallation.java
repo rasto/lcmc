@@ -24,15 +24,12 @@ package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -44,8 +41,6 @@ import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * An implementation of a dialog where
@@ -104,6 +99,21 @@ final class CheckInstallation extends DialogHost {
         Tools.createImageIcon(
               Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
 
+    private static final String PM_PREFIX = "PmInst";
+    private static final String HBPM_PREFIX = "HbPmInst";
+    private static final String DRBD_PREFIX = "DrbdInst";
+
+    private static final String PM_INSTALL_METHOD_SUFFIX = "PmInstallMethod";
+    private static final String HBPM_INSTALL_METHOD_SUFFIX =
+                                                           "HbPmInstallMethod";
+    private static final String DRBD_INSTALL_METHOD_SUFFIX =
+                                                           "DrbdInstallMethod";
+
+    /** Auto options for testing. */
+    private static final String PM_AUTO_OPTION = "pminst";
+    private static final String HBPM_AUTO_OPTION = "hbinst";
+    private static final String DRBD_AUTO_OPTION = "drbdinst";
+
     /** Drbd icon: checking ... */
     private final JLabel drbdIcon = new JLabel(CHECKING_ICON);
     /** Corosync/openais/pacemaker icon: checking ... */
@@ -116,8 +126,6 @@ final class CheckInstallation extends DialogHost {
     private boolean pmOk = false;
     /** Whether heartbeat/pacemaker installation was ok. */
     private boolean hbPmOk = false;
-    /** Whether there are drbd methods available. */
-    private boolean drbdInstallMethodsAvailable = false;
     /** Label of heartbeat that can be with or without pacemaker. */
     private final JLabel hbPmJLabel = new JLabel("Pcmk/Heartbeat");
     /** Label of pacemaker that can be with corosync or openais. */
@@ -274,14 +282,11 @@ final class CheckInstallation extends DialogHost {
                     drbdLabel.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
                     drbdIcon.setIcon(NOT_INSTALLED_ICON);
-                    final String toolTip =
-                                   getDrbdInstToolTip("1");
+                    final String toolTip = getInstToolTip(DRBD_PREFIX, "1");
                     drbdInstMethodWi.setToolTipText(toolTip);
                     drbdButton.setToolTipText(toolTip);
-                    if (drbdInstallMethodsAvailable) {
-                        drbdButton.setEnabled(true);
-                        drbdInstMethodWi.setEnabled(true);
-                    }
+                    drbdButton.setEnabled(true);
+                    drbdInstMethodWi.setEnabled(true);
                 }
             });
         } else {
@@ -294,15 +299,13 @@ final class CheckInstallation extends DialogHost {
                         drbdIcon.setIcon(UPGR_AVAIL_ICON);
                         drbdButton.setText(Tools.getString(
                           "Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
-                        if (drbdInstallMethodsAvailable) {
-                            drbdButton.setEnabled(true);
-                            drbdInstMethodWi.setEnabled(true);
-                        }
+                        drbdButton.setEnabled(true);
+                        drbdInstMethodWi.setEnabled(true);
                     } else {
                         drbdButton.setText(Tools.getString(
                      "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"
                         ));
-                        if (false && drbdInstallMethodsAvailable) {
+                        if (false) {
                             // TODO: disabled
                             drbdButton.setEnabled(true);
                             drbdInstMethodWi.setEnabled(true);
@@ -356,7 +359,8 @@ final class CheckInstallation extends DialogHost {
             if (hbim != null) {
                 hbPmButton.setEnabled(true);
                 hbPmInstMethodWi.setEnabled(true);
-                final String toolTip = getHbPmInstToolTip(hbim.getIndex());
+                final String toolTip =
+                                  getInstToolTip(HBPM_PREFIX, hbim.getIndex());
                 hbPmInstMethodWi.setToolTipText(toolTip);
                 hbPmButton.setToolTipText(toolTip);
             }
@@ -365,7 +369,8 @@ final class CheckInstallation extends DialogHost {
             if (pmim != null) {
                 pmButton.setEnabled(true);
                 pmInstMethodWi.setEnabled(true);
-                final String aisToolTip = getPmInstToolTip(pmim.getIndex());
+                final String aisToolTip =
+                                  getInstToolTip(PM_PREFIX, pmim.getIndex());
                 pmInstMethodWi.setToolTipText(aisToolTip);
                 pmButton.setToolTipText(aisToolTip);
             }
@@ -523,332 +528,34 @@ final class CheckInstallation extends DialogHost {
         return Tools.getString("Dialog.Host.CheckInstallation.Description");
     }
 
-    /** This class holds install method names, and their indeces. */
-    private static class InstallMethods {
-        /** Name of the method like "CD". */
-        private final String name;
-        /** Index of the method. */
-        private final int index;
-        /** Method string. */
-        private final String method;
-
-        /** Creates new InstallMethods object. */
-        InstallMethods(final String name, final int index) {
-            this(name, index, "");
-        }
-
-        /** Creates new InstallMethods object. */
-        InstallMethods(final String name,
-                       final int index,
-                       final String method) {
-            this.name = name;
-            this.index = index;
-            this.method = method;
-        }
-
-        /** Returns name of the install method. */
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        /** Returns index of the install method. */
-        String getIndex() {
-            return Integer.toString(index);
-        }
-
-        /** Returns method. */
-        String getMethod() {
-            return method;
-        }
-
-        /** Returns whether the installation method is "source". */
-        boolean isSourceMethod() {
-            return "source".equals(method);
-        }
-
-        /** Returns whether the installation method is "linbit". */
-        boolean isLinbitMethod() {
-            return "linbit".equals(method);
-        }
-    }
-
-    /**
-     * Returns tool tip texts for ais/pm installation method combo box and
-     * install button.
-     */
-    private String getPmInstToolTip(final String index) {
-        return Tools.html(
-            getHost().getDistString(
-                "PmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
-                                           .replaceAll("&&", "<br>&gt; &&");
-    }
-
-    /**
-     * Returns tool tip texts for hb/pm installation method combo box and
-     * install button.
-     */
-    private String getHbPmInstToolTip(final String index) {
-        return Tools.html(
-            getHost().getDistString(
-                "HbPmInst.install." + index)).replaceAll(";", ";<br>&gt; ")
-                                           .replaceAll("&&", "<br>&gt; &&");
-    }
-
-    /**
-     * Returns tool tip texts for drbd installation method combo box and install
-     * button.
-     */
-    private String getDrbdInstToolTip(final String index) {
-        return Tools.html(
-            getHost().getDistString(
-                "DrbdInst.install." + index)).replaceAll(";", ";<br>&gt; ")
-                                           .replaceAll("&&", "<br>&gt; &&");
-    }
     /**
      * Returns the pane, that checks the installation of different
      * components and provides buttons to update or upgrade.
      */
     private JPanel getInstallationPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        /* get corosync/pacemaker installation methods */
-        final List<InstallMethods> pmMethods =
-                                            new ArrayList<InstallMethods>();
-        int i = 1;
-        String pmDefaultValue = null;
-        while (true) {
-            final String index = Integer.toString(i);
-            final String text =
-                    getHost().getDistString("PmInst.install.text." + index);
-            if (text == null || text.equals("")) {
-                if (i > 9) {
-                    break;
-                }
-                i++;
-                continue;
-            }
-            final String staging =
-                    getHost().getDistString("PmInst.install.staging." + index);
-            if (staging != null && "true".equals(staging)
-                && !Tools.getConfigData().isStagingPacemaker()) {
-                /* skip staging */
-                i++;
-                continue;
-            }
-            final InstallMethods pmInstallMethod = new InstallMethods(
-              Tools.getString("Dialog.Host.CheckInstallation.PmInstallMethod")
-              + text, i);
-            if (text.equals(
-                     Tools.getConfigData().getLastHbPmInstalledMethod())) {
-                pmDefaultValue = pmInstallMethod.toString();
-            }
-            pmMethods.add(pmInstallMethod);
-            i++;
-        }
-        pmInstMethodWi = WidgetFactory.createInstance(
-                       Widget.Type.COMBOBOX,
-                       pmDefaultValue,
-                       (Object[]) pmMethods.toArray(
-                                          new InstallMethods[pmMethods.size()]),
-                       Widget.NO_REGEXP,
-                       0,    /* width */
-                       Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.RO,
-                                      !AccessMode.ADVANCED),
-                       Widget.NO_BUTTON);
-        if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    pmInstMethodWi.setSelectedIndex(
-                        Integer.parseInt(
-                            Tools.getConfigData().getAutoOptionHost(
-                                                                "pminst")));
-                }
-            });
-        }
-        pmInstMethodWi.addListeners(new WidgetListener() {
-            @Override
-            public void check(final Object value) {
-                InstallMethods method =
-                                    (InstallMethods) pmInstMethodWi.getValue();
-                final String toolTip = getPmInstToolTip(method.getIndex());
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        pmInstMethodWi.setToolTipText(toolTip);
-                        pmButton.setToolTipText(toolTip);
-                    }
-                });
+        pmInstMethodWi = getInstallationMethods(
+                            PM_PREFIX,
+                            Tools.getConfigData().isStagingPacemaker(),
+                            PM_INSTALL_METHOD_SUFFIX,
+                            Tools.getConfigData().getLastHbPmInstalledMethod(),
+                            PM_AUTO_OPTION,
+                            pmButton);
 
-            }
-        });
-        /* get hb/pm installation methods */
-        final List<InstallMethods> hbPmMethods =
-                                            new ArrayList<InstallMethods>();
-        i = 1;
-        String hbPmDefaultValue = null;
-        while (true) {
-            final String index = Integer.toString(i);
-            final String text =
-                     getHost().getDistString("HbPmInst.install.text." + index);
-            if (text == null || text.equals("")) {
-                if (i > 9) {
-                    break;
-                }
-                i++;
-                continue;
-            }
-            final String staging =
-                  getHost().getDistString("HbPmInst.install.staging." + index);
-            if (staging != null && "true".equals(staging)
-                && !Tools.getConfigData().isStagingPacemaker()) {
-                /* skip staging */
-                i++;
-                continue;
-            }
-            final InstallMethods hbPmInstallMethod = new InstallMethods(
-              Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallMethod")
-              + text, i);
-            hbPmMethods.add(hbPmInstallMethod);
-            if (text.equals(
-                       Tools.getConfigData().getLastHbPmInstalledMethod())) {
-                hbPmDefaultValue = hbPmInstallMethod.toString();
-            }
-            i++;
-        }
-        hbPmInstMethodWi = WidgetFactory.createInstance(
-                   Widget.Type.COMBOBOX,
-                   hbPmDefaultValue,
-                   (Object[]) hbPmMethods.toArray(
-                                        new InstallMethods[hbPmMethods.size()]),
-                   Widget.NO_REGEXP,
-                   0,    /* width */
-                   Widget.NO_ABBRV,
-                   new AccessMode(ConfigData.AccessType.RO,
-                                  !AccessMode.ADVANCED),
-                   Widget.NO_BUTTON);
-        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    hbPmInstMethodWi.setSelectedIndex(
-                        Integer.parseInt(
-                            Tools.getConfigData().getAutoOptionHost(
-                                                                "hbinst")));
-                }
-            });
-        }
-        hbPmInstMethodWi.addListeners(
-                    new WidgetListener() {
-                        @Override
-                        public void check(final Object value) {
-                            InstallMethods method =
-                                 (InstallMethods) hbPmInstMethodWi.getValue();
-                            final String toolTip =
-                                     getHbPmInstToolTip(method.getIndex());
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    hbPmInstMethodWi.setToolTipText(toolTip);
-                                    hbPmButton.setToolTipText(toolTip);
-                                }
-                            });
-                        }
-                    });
-        /* get drbd installation methods */
-        final List<InstallMethods> drbdMethods =
-                                               new ArrayList<InstallMethods>();
-        i = 1;
-        String drbdDefaultValue = null;
-        while (true) {
-            final String index = Integer.toString(i);
-            final String text =
-                      getHost().getDistString("DrbdInst.install.text." + index);
-            if (text == null || text.equals("")) {
-                if (i > 9) {
-                    break;
-                }
-                i++;
-                continue;
-            }
-            final String staging =
-                  getHost().getDistString("DrbdInst.install.staging." + index);
-            if (staging != null && "true".equals(staging)
-                && !Tools.getConfigData().isStagingDrbd()) {
-                /* skip staging */
-                i++;
-                continue;
-            }
-            String method =
-                   getHost().getDistString("DrbdInst.install.method." + index);
-            if (method == null) {
-                method = "";
-            }
-            final InstallMethods drbdInstallMethod = new InstallMethods(
-              Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallMethod")
-               + text, i, method);
-            if (text.equals(
-                        Tools.getConfigData().getLastDrbdInstalledMethod())) {
-                drbdDefaultValue = drbdInstallMethod.toString();
-            }
-            drbdMethods.add(drbdInstallMethod);
-            i++;
-        }
-        if (i > 1) {
-            drbdInstallMethodsAvailable = true;
-            drbdInstMethodWi = WidgetFactory.createInstance(
-                       Widget.Type.COMBOBOX,
-                       drbdDefaultValue,
-                       (Object[]) drbdMethods.toArray(
-                                        new InstallMethods[drbdMethods.size()]),
-                       Widget.NO_REGEXP,
-                       0,    /* width */
-                       Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.RO,
-                                      !AccessMode.ADVANCED),
-                       Widget.NO_BUTTON);
-            drbdInstMethodWi.addListeners(
-                        new WidgetListener() {
-                            @Override
-                            public void check(final Object value) {
-                                InstallMethods method =
-                                   (InstallMethods) drbdInstMethodWi.getValue();
-                                final String toolTip =
-                                     getDrbdInstToolTip(method.getIndex());
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                       drbdInstMethodWi.setToolTipText(toolTip);
-                                       drbdButton.setToolTipText(toolTip);
-                                    }
-                                });
-                            }
-                        });
-        } else {
-            drbdInstMethodWi = WidgetFactory.createInstance(
-                                      Widget.Type.COMBOBOX,
-                                      "",
-                                      Widget.NO_ITEMS,
-                                      Widget.NO_REGEXP,
-                                      0,    /* width */
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
-                                      Widget.NO_BUTTON);
-            drbdInstMethodWi.setEnabled(false);
-        }
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    drbdInstMethodWi.setSelectedIndex(
-                        Integer.parseInt(
-                            Tools.getConfigData().getAutoOptionHost(
-                                                                "drbdinst")));
-                }
-            });
-        }
+        hbPmInstMethodWi = getInstallationMethods(
+                            HBPM_PREFIX,
+                            Tools.getConfigData().isStagingPacemaker(),
+                            HBPM_INSTALL_METHOD_SUFFIX,
+                            Tools.getConfigData().getLastHbPmInstalledMethod(),
+                            HBPM_AUTO_OPTION,
+                            hbPmButton);
+        drbdInstMethodWi = getInstallationMethods(
+                            DRBD_PREFIX,
+                            Tools.getConfigData().isStagingDrbd(),
+                            DRBD_INSTALL_METHOD_SUFFIX,
+                            Tools.getConfigData().getLastDrbdInstalledMethod(),
+                            DRBD_AUTO_OPTION,
+                            drbdButton);
         final String lastInstalled =
                           Tools.getConfigData().getLastInstalledClusterStack();
         if (lastInstalled != null) {

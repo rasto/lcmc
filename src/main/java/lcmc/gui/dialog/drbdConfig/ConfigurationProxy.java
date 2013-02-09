@@ -25,8 +25,10 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
+import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
+import javax.swing.JComponent;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -39,14 +41,18 @@ import lcmc.gui.resources.DrbdResourceInfo;
 final class ConfigurationProxy extends Configuration {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Drbd info. */
+    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
     /** Prepares a new <code>ConfigurationProxy</code> object. */
     ConfigurationProxy(final WizardDialog previousDialog,
                        final Host host,
+                       final DrbdInfo drbdInfo,
                        final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, host);
+        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
@@ -57,15 +63,10 @@ final class ConfigurationProxy extends Configuration {
     @Override
     public WizardDialog nextDialog() {
         if (getHost().isConnected()) {
-            final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-            dri.getDrbdInfo().addProxyHost(getHost());
-            dri.resetInfoPanel();
-            dri.getInfoPanel();
-            dri.waitForInfoPanel();
-            dri.selectMyself();
+            resetDrbdResourcePanel();
             return new Resource(this, drbdVolumeInfo);
         } else {
-            return new SSHProxy(this, getHost(), drbdVolumeInfo);
+            return new SSHProxy(this, getHost(), drbdInfo, drbdVolumeInfo);
         }
     }
 
@@ -85,5 +86,25 @@ final class ConfigurationProxy extends Configuration {
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.Configuration.Description");
+    }
+
+    /**
+     * This causes the whole drbd resource panel to be reloaded.
+     */
+    private void resetDrbdResourcePanel() {
+        if (drbdVolumeInfo != null) {
+            final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+            dri.resetInfoPanel();
+            dri.getInfoPanel();
+            dri.waitForInfoPanel();
+            dri.selectMyself();
+        }
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    @Override
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton()),
+                                buttonClass(finishButton())};
     }
 }

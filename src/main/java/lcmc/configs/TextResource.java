@@ -2480,6 +2480,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdInfo.CommonSection",
          "Common "},
 
+        {"DrbdInfo.AddProxyHost",
+         "Add Proxy Host"},
+
         {"DrbdResourceInfo.HostAddresses",
          "Net Interface"},
 

@@ -24,7 +24,9 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
+import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import javax.swing.JComponent;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -36,28 +38,25 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 public final class SSHProxy extends SSH {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Drbd volume info. */
+    /** Drbd info. */
+    private final DrbdInfo drbdInfo;
+    /** drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
     /** Prepares a new <code>SSHProxy</code> object. */
     public SSHProxy(final WizardDialog previousDialog,
                     final Host host,
+                    final DrbdInfo drbdInfo,
                     final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, host);
+        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
     /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
-        //final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-        //dri.getDrbdInfo().addProxyHost(getHost());
-        //System.out.println("add proxy host: " + getHost());
-        //dri.resetInfoPanel();
-        //dri.getInfoPanel();
-        //dri.waitForInfoPanel();
-        //dri.selectMyself();
-        return new DevicesProxy(this, getHost(), drbdVolumeInfo);
+        return new DevicesProxy(this, getHost(), drbdInfo, drbdVolumeInfo);
     }
 
     /**
@@ -76,5 +75,11 @@ public final class SSHProxy extends SSH {
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.SSH.Description");
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    @Override
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(finishButton())};
     }
 }

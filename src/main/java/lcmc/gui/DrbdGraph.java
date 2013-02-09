@@ -491,8 +491,8 @@ public final class DrbdGraph extends ResourceGraph {
                 final String proxyState = bdi.getProxyStateForGraph();
                 if ("StandAlone".equals(connState)
                     || !"UpToDate".equals(diskState)
-                    || (proxyState != null &&
-                        !BlockDevInfo.PROXY_UP.equals(proxyState))) {
+                    || (proxyState != null
+                        && !BlockDevInfo.PROXY_UP.equals(proxyState))) {
                     color = Color.RED;
                     textColor = Color.WHITE;
                 }
@@ -644,8 +644,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected JPopupMenu handlePopupBackground(final Point2D pos) {
-        super.handlePopupBackground(pos);
-        return null;
+        return getDrbdInfo().getPopup(pos);
     }
 
     ///**

@@ -199,9 +199,9 @@ public class NewHost extends DialogHost {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                buttonClass(nextButton()).setEnabled(hostField
-                                                     && userField
-                                                     && sshPortField);
+                for (final JComponent btn : nextButtons()) {
+                    btn.setEnabled(hostField && userField && sshPortField);
+                }
             }
         });
     }
@@ -228,7 +228,7 @@ public class NewHost extends DialogHost {
     @Override
     protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog. */
@@ -389,5 +389,10 @@ public class NewHost extends DialogHost {
                                                    1, 1); // xPad, yPad
         p.add(inputPane, BorderLayout.SOUTH);
         return p;
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton())};
     }
 }

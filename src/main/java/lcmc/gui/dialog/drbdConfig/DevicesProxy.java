@@ -24,8 +24,10 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
+import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
+import javax.swing.JComponent;
 
 /**
  * An implementation of a dialog where hardware information is collected.
@@ -37,27 +39,30 @@ import lcmc.gui.resources.DrbdResourceInfo;
 final class DevicesProxy extends Devices {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Drbd info. */
+    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
     /** Prepares a new <code>Devices</code> object. */
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
+                 final DrbdInfo drbdInfo,
                  final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, host);
+        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
     @Override
     public WizardDialog nextDialog() {
-        final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-        dri.getDrbdInfo().addProxyHost(getHost());
-        System.out.println("add proxy host: " + getHost());
-        dri.resetInfoPanel();
-        dri.getInfoPanel();
-        dri.waitForInfoPanel();
-        dri.selectMyself();
-        return new Resource(this, drbdVolumeInfo);
+        resetDrbdResourcePanel();
+        //drbdInfo.addProxyHost(getHost());
+        //return new Resource(this, drbdVolumeInfo);
+        return new ProxyCheckInstallation(this,
+                                          getHost(),
+                                          drbdInfo,
+                                          drbdVolumeInfo);
     }
 
     /**
@@ -76,5 +81,22 @@ final class DevicesProxy extends Devices {
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.Devices.Description");
+    }
+
+    private void resetDrbdResourcePanel() {
+        if (drbdVolumeInfo != null) {
+            final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+            dri.resetInfoPanel();
+            dri.getInfoPanel();
+            dri.waitForInfoPanel();
+            dri.selectMyself();
+        }
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    @Override
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton()),
+                                buttonClass(finishButton())};
     }
 }

@@ -104,14 +104,14 @@ public class SSH extends DialogHost {
 
     /** Inits the dialog and start connecting to the hosts. */
     @Override
-    protected void initDialog() {
+    protected final void initDialog() {
         super.initDialog();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
-    protected void initDialogAfterVisible() {
+    protected final void initDialogAfterVisible() {
         final Thread thread = new Thread(
             new Runnable() {
                 @Override
@@ -142,7 +142,7 @@ public class SSH extends DialogHost {
 
     /** Returns a pane where ssh connection will be attempted. */
     @Override
-    protected JComponent getInputPane() {
+    protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         //final JPanel pane = new JPanel(new SpringLayout());
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -161,5 +161,10 @@ public class SSH extends DialogHost {
 //                                              1, 1,  // initX, initY
 //                                              1, 1); // xPad, yPad
         return pane;
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    protected JComponent[] nextButtons() {
+        return new JComponent[]{buttonClass(nextButton())};
     }
 }
