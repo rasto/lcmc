@@ -38,7 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -314,23 +314,7 @@ public final class Resource extends DrbdConfig {
 
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         for (final Host h : dri.getDrbdInfo().getAllProxyHosts()) {
-            final JCheckBox cb = new JCheckBox(h.getName());
-            cb.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(final ItemEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                dri.addSelectedProxyHost(h);
-                            } else {
-                                dri.removeSelectedProxyHost(h);
-                            }
-                            dri.setProxyPanels(DrbdResourceInfo.WIZARD);
-                        }
-                    });
-                }
-            });
-            panel.add(cb);
+            panel.add(new JLabel(h.getName()));
         }
         return panel;
     }
