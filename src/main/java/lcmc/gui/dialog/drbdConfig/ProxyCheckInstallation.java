@@ -236,11 +236,6 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void finishDialog() {
         if (isPressedButton(finishButton())
             || isPressedButton(nextButton())) {
-            System.out.println("pressed: "
-                               + isPressedButton(finishButton()) + " "
-                               + isPressedButton(nextButton()) + " "
-                               + (nextDialogObject == null) + " "
-                               + (origDialog != null) + " ");
             if (nextDialogObject == null && origDialog != null) {
                 nextDialogObject = origDialog;
                 drbdInfo.addProxyHost(getHost());

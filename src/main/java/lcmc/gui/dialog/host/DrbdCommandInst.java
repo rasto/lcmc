@@ -124,14 +124,6 @@ final class DrbdCommandInst extends DialogHost {
                          new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
-                                 System.out.println("command: " + command);
-                                 System.out.println("arch: " + archString);
-                                 System.out.println("drbdVersionUrlString: "
-                                                    + drbdVersionUrlString);
-                                 System.out.println("drbdVersion: "
-                                                    + drbdVersion);
-                                 System.out.println("install method: "
-                                                    + installMethod);
                                  return command.replaceAll("@ARCH@",
                                                            archString)
                                                .replaceAll(
