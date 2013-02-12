@@ -126,7 +126,8 @@ public final class Resource extends DrbdConfig {
             return new NewProxyHost(this,
                                     new Host(),
                                     drbdInfo,
-                                    getDrbdVolumeInfo());
+                                    getDrbdVolumeInfo(),
+                                    this);
         }
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
         if (drbdInfo.getDrbdResources().size() <= 1) {

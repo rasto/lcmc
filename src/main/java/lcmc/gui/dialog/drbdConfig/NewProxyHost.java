@@ -42,24 +42,52 @@ public final class NewProxyHost extends NewHost {
     private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
+    /** The dialog we came from. */
+    private final WizardDialog origDialog;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
+
 
     /** Prepares a new <code>NewProxyHost</code> object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
                         final DrbdInfo drbdInfo,
-                        final DrbdVolumeInfo drbdVolumeInfo) {
+                        final DrbdVolumeInfo drbdVolumeInfo,
+                        final WizardDialog origDialog) {
         super(previousDialog, host);
         this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
+        this.origDialog = origDialog;
     }
 
-    /** Sets nextDialog to Configuration. */
+    /** SetsnextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
-        return new ConfigurationProxy(this,
-                                      getHost(),
-                                      drbdInfo,
-                                      drbdVolumeInfo);
+        if (nextDialogObject == null) {
+            return new ConfigurationProxy(this,
+                                          getHost(),
+                                          drbdInfo,
+                                          drbdVolumeInfo,
+                                          origDialog);
+        } else {
+            return nextDialogObject;
+        }
+    }
+
+    /** Finish dialog. */
+    @Override
+    protected void finishDialog() {
+        super.finishDialog();
+        if (isPressedFinishButton()) {
+            if (origDialog != null) {
+                nextDialogObject = origDialog;
+            }
+            drbdInfo.addProxyHost(getHost());
+            if (drbdVolumeInfo != null) {
+                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            }
+            setPressedButton(nextButton());
+        }
     }
 
     /**
@@ -87,10 +115,11 @@ public final class NewProxyHost extends NewHost {
                                 buttonClass(finishButton())};
     }
 
-    /** Finishes the dialog. */
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
     @Override
-    protected void finishDialog() {
-        super.finishDialog();
-        drbdInfo.addProxyHost(getHost());
+    protected final WizardDialog dialogAfterCancel() {
+        return origDialog;
     }
 }

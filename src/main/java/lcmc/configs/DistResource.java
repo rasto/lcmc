@@ -71,6 +71,10 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions"},
+
+        {"ProxyCheck.version",
+         DistResource.SUDO + "drbd-proxy-ctl -c version 2>/dev/null"
+         + "|sed 's/.* \\([0-9.]\\+\\),.*/\\1/'"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
          *

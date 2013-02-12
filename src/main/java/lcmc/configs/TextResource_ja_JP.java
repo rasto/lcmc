@@ -392,13 +392,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"Dialog.Host.CheckInstallation.CheckingDrbd",
          "DRBDを確認しています..."},
 
-        {"Dialog.Host.CheckInstallation.PmInstallMethod",
-         "インストール方法: "},
-
-        {"Dialog.Host.CheckInstallation.HbPmInstallMethod",
-         "インストール方法: "},
-
-        {"Dialog.Host.CheckInstallation.DrbdInstallMethod",
+        {"Dialog.Host.CheckInstallation.InstallMethod",
          "インストール方法: "},
 
         {"Dialog.Host.LinbitLogin.Title",

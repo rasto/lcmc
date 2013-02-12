@@ -433,14 +433,26 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"Dialog.Host.CheckInstallation.CheckingDrbd",
          "checking..."},
 
-        {"Dialog.Host.CheckInstallation.PmInstallMethod",
+        {"Dialog.Host.CheckInstallation.InstallMethod",
          "Installation method: "},
 
-        {"Dialog.Host.CheckInstallation.HbPmInstallMethod",
-         "Installation method: "},
+        {"ProxyCheckInstallation.Title",
+         "DRBD Proxy Installation Check"},
 
-        {"Dialog.Host.CheckInstallation.DrbdInstallMethod",
-         "Installation method: "},
+        {"ProxyCheckInstallation.Description",
+         "Install the DRBD proxy."},
+
+        {"ProxyCheckInstallation.CheckingProxy",
+         "checking..."},
+
+        {"ProxyCheckInstallation.ProxyInstallButton",
+         "Install"},
+
+        {"ProxyCheckInstallation.ProxyNotInstalled",
+         "not installed"},
+
+        {"ProxyCheckInstallation.ProxyCheckForUpgradeButton",
+         "Check for Upgrade"},
 
         {"Dialog.Host.LinbitLogin.Title",
          "Log in"},
@@ -570,6 +582,22 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Pacemaker was successfully installed."},
 
         {"Dialog.Host.PacemakerInst.InstError",
+         "Installation error: you may have to go to the command line and fix "
+         + "whatever needs fixing there."},
+
+        {"Dialog.Host.ProxyInst.Title",
+         "DRBD Proxy Install"},
+
+        {"Dialog.Host.ProxyInst.Description",
+         "DRBD proxy package is being installed."},
+
+        {"Dialog.Host.ProxyInst.Executing",
+         "Installing..."},
+
+        {"Dialog.Host.ProxyInst.InstOk",
+         "DRBD Proxy was successfully installed."},
+
+        {"Dialog.Host.ProxyInst.InstError",
          "Installation error: you may have to go to the command line and fix "
          + "whatever needs fixing there."},
 

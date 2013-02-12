@@ -2433,4 +2433,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void removeSelectedProxyHost(final Host host) {
         selectedProxyHosts.remove(host);
     }
+
+    /**
+     * This causes the whole drbd resource panel to be reloaded.
+     */
+    public void resetDrbdResourcePanel() {
+        resetInfoPanel();
+        getInfoPanel();
+        waitForInfoPanel();
+        selectMyself();
+    }
 }

@@ -171,8 +171,19 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
          + " && make && make install"
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
+
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "yum install"},
+
+        {"ProxyInst.install.1",
+         "yum install -y drbd-proxy-3.0"},
+
         {"KVM.emulator",    "/usr/libexec/qemu-kvm"},
         {"libvirt.lxc.libpath", "/usr/libexec"},
         {"libvirt.xen.libpath", "/usr/lib/xen"},
+
+        {"ProxyCheck.version",
+         "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 }

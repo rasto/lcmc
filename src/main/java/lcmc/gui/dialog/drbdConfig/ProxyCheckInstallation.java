@@ -79,32 +79,33 @@ final class ProxyCheckInstallation extends DialogHost {
         Tools.createImageIcon(
               Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
 
-    private static final String PROXY_PREFIX = "PmInst";
-    private static final String PROXY_INSTALL_METHOD_SUFFIX = "PmInstallMethod";
-    private static final String PROXY_AUTO_OPTION = "pminst";
+    private static final String PROXY_PREFIX = "ProxyInst";
+    private static final String PROXY_AUTO_OPTION = "proxyinst";
 
     /** Proxy icon: checking ... */
     private final JLabel proxyIcon = new JLabel(CHECKING_ICON);
     /** Whether proxy installation was ok. */
     private boolean proxyOk = false;
-    /** Whether there are proxy methods available. */
-    private boolean proxyInstallMethodsAvailable = false;
     /** The proxy host. */
     private final Host host;
     /** Drbd info. */
     private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
+    /** The dialog we came from. */
+    private final WizardDialog origDialog;
 
     /** Prepares a new <code>ProxyCheckInstallation</code> object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
                            final DrbdInfo drbdInfo,
-                           final DrbdVolumeInfo drbdVolumeInfo) {
+                           final DrbdVolumeInfo drbdVolumeInfo,
+                           final WizardDialog origDialog) {
         super(previousDialog, host);
         this.host = host;
         this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
+        this.origDialog = origDialog;
     }
 
     /** Inits dialog. */
@@ -134,15 +135,20 @@ final class ProxyCheckInstallation extends DialogHost {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    nextDialogObject = new ProxyInst(thisClass,
+                                                     getHost(),
+                                                     drbdInfo,
+                                                     drbdVolumeInfo,
+                                                     origDialog);
                     final InstallMethods im =
-                                  (InstallMethods) proxyInstMethodWi.getValue();
-                    final String button = e.getActionCommand();
-                    if (!proxyOk || button.equals(Tools.getString(
-                       "ProxyCheckInstallation.ProxyCheckForUpgradeButton"))) {
-                        System.out.println("install");
-                    } else {
-                        System.out.println("install2");
-                    }
+                                 (InstallMethods) proxyInstMethodWi.getValue();
+                    getHost().setProxyInstallMethod(im.getIndex());
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            buttonClass(nextButton()).pressButton();
+                        }
+                    });
                 }
             }
         );
@@ -180,12 +186,13 @@ final class ProxyCheckInstallation extends DialogHost {
                     final String toolTip = getInstToolTip(PROXY_PREFIX, "1");
                     proxyInstMethodWi.setToolTipText(toolTip);
                     proxyButton.setToolTipText(toolTip);
-                    if (proxyInstallMethodsAvailable) {
-                        proxyButton.setEnabled(true);
-                        proxyInstMethodWi.setEnabled(true);
-                    }
+                    proxyButton.setEnabled(true);
+                    proxyInstMethodWi.setEnabled(true);
                 }
             });
+            progressBarDone();
+            printErrorAndRetry(Tools.getString(
+                                "Dialog.Host.CheckInstallation.SomeFailed"));
         } else {
             proxyOk = true;
             SwingUtilities.invokeLater(new Runnable() {
@@ -195,37 +202,54 @@ final class ProxyCheckInstallation extends DialogHost {
                     proxyButton.setText(Tools.getString(
                  "ProxyCheckInstallation.ProxyCheckForUpgradeButton"
                     ));
-                    if (false && proxyInstallMethodsAvailable) {
+                    if (false) {
                         // TODO: disabled
                         proxyButton.setEnabled(true);
                         proxyInstMethodWi.setEnabled(true);
                     }
                     proxyIcon.setIcon(INSTALLED_ICON);
+                    buttonClass(finishButton()).setEnabled(true);
+                    makeDefaultAndRequestFocus(buttonClass(finishButton()));
+                }
+            });
+            progressBarDone();
+            //nextButtonSetEnabled(true);
+            enableComponents();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    answerPaneSetText(Tools.getString(
+                                       "Dialog.Host.CheckInstallation.AllOk"));
                 }
             });
         }
-        getHost().execCommand("HbCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
-                             @Override
-                             public void done(final String ans) {
-                                 Tools.debug(this, "ans: " + ans, 2);
-                             }
-                             @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
-                                 done("");
-                             }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false,
-                         SSH.DEFAULT_COMMAND_TIMEOUT); /* outputVisible */
     }
 
     /** Returns the next dialog object. It is set dynamicaly. */
     @Override
     public WizardDialog nextDialog() {
         return nextDialogObject;
+    }
+
+    /** Finish dialog. */
+    @Override
+    protected void finishDialog() {
+        if (isPressedButton(finishButton())
+            || isPressedButton(nextButton())) {
+            System.out.println("pressed: "
+                               + isPressedButton(finishButton()) + " "
+                               + isPressedButton(nextButton()) + " "
+                               + (nextDialogObject == null) + " "
+                               + (origDialog != null) + " ");
+            if (nextDialogObject == null && origDialog != null) {
+                nextDialogObject = origDialog;
+                drbdInfo.addProxyHost(getHost());
+                if (drbdVolumeInfo != null) {
+                    drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                }
+                setPressedButton(nextButton());
+            }
+        }
     }
 
     /**
@@ -246,16 +270,6 @@ final class ProxyCheckInstallation extends DialogHost {
         return Tools.getString("ProxyCheckInstallation.Description");
     }
 
-    ///**
-    // * Returns tool tip texts for proxy installation method combo box and
-    // * install button.
-    // */
-    //private String getProxyInstToolTip(final String index) {
-    //    return Tools.html(
-    //        getHost().getDistString(
-    //            "ProxyInst.install." + index)).replaceAll(";", ";<br>&gt; ")
-    //                                       .replaceAll("&&", "<br>&gt; &&");
-    //}
     /**
      * Returns the pane, that checks the installation of different
      * components and provides buttons to update or upgrade.
@@ -266,81 +280,9 @@ final class ProxyCheckInstallation extends DialogHost {
         proxyInstMethodWi = getInstallationMethods(
                              PROXY_PREFIX,
                              Tools.getConfigData().isStagingPacemaker(),
-                             PROXY_INSTALL_METHOD_SUFFIX,
-                             Tools.getConfigData().getLastHbPmInstalledMethod(),
+                             null, /* last installed method */
                              PROXY_AUTO_OPTION,
                              proxyButton);
-        //final List<InstallMethods> proxyMethods =
-        //                                       new ArrayList<InstallMethods>();
-        //int i = 1;
-        //String proxyDefaultValue = null;
-        //while (true) {
-        //    final String index = Integer.toString(i);
-        //    final String text =
-        //             getHost().getDistString("ProxyInst.install.text." + index);
-        //    if (text == null || text.equals("")) {
-        //        if (i > 9) {
-        //            break;
-        //        }
-        //        i++;
-        //        continue;
-        //    }
-        //    final String staging =
-        //          getHost().getDistString("ProxyInst.install.staging." + index);
-        //    String method =
-        //           getHost().getDistString("ProxyInst.install.method." + index);
-        //    if (method == null) {
-        //        method = "";
-        //    }
-        //    final InstallMethods proxyInstallMethod = new InstallMethods(
-        //      Tools.getString("ProxyCheckInstallation.ProxyInstallMethod")
-        //       + text, i, method);
-        //    proxyMethods.add(proxyInstallMethod);
-        //    i++;
-        //}
-        //if (i > 1) {
-        //    proxyInstallMethodsAvailable = true;
-        //    proxyInstMethodWi = WidgetFactory.createInstance(
-        //               Widget.Type.COMBOBOX,
-        //               proxyDefaultValue,
-        //               (Object[]) proxyMethods.toArray(
-        //                               new InstallMethods[proxyMethods.size()]),
-        //               Widget.NO_REGEXP,
-        //               0,    /* width */
-        //               Widget.NO_ABBRV,
-        //               new AccessMode(ConfigData.AccessType.RO,
-        //                              !AccessMode.ADVANCED),
-        //               Widget.NO_BUTTON);
-        //    proxyInstMethodWi.addListeners(
-        //                new WidgetListener() {
-        //                    @Override
-        //                    public void check(final Object value) {
-        //                        InstallMethods method =
-        //                          (InstallMethods) proxyInstMethodWi.getValue();
-        //                        final String toolTip =
-        //                             getProxyInstToolTip(method.getIndex());
-        //                        SwingUtilities.invokeLater(new Runnable() {
-        //                            @Override
-        //                            public void run() {
-        //                               proxyInstMethodWi.setToolTipText(toolTip);
-        //                               proxyButton.setToolTipText(toolTip);
-        //                            }
-        //                        });
-        //                    }
-        //                });
-        //} else {
-        //    proxyInstMethodWi = WidgetFactory.createInstance(
-        //                              Widget.Type.COMBOBOX,
-        //                              "",
-        //                              Widget.NO_ITEMS,
-        //                              Widget.NO_REGEXP,
-        //                              0,    /* width */
-        //                              Widget.NO_ABBRV,
-        //                              new AccessMode(ConfigData.AccessType.RO,
-        //                                             !AccessMode.ADVANCED),
-        //                              Widget.NO_BUTTON);
-        //    proxyInstMethodWi.setEnabled(false);
-        //}
         pane.add(new JLabel("Proxy"));
         pane.add(proxyLabel);
         pane.add(proxyIcon);
@@ -360,7 +302,7 @@ final class ProxyCheckInstallation extends DialogHost {
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(Tools.getString(
-                                        "ProxyCheckInstallation.Checking")));
+                                     "ProxyCheckInstallation.CheckingProxy")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  //rows, cols
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
@@ -372,5 +314,13 @@ final class ProxyCheckInstallation extends DialogHost {
     @Override
     protected boolean skipButtonEnabled() {
         return true;
+    }
+
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
+    @Override
+    protected final WizardDialog dialogAfterCancel() {
+        return origDialog;
     }
 }

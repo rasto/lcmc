@@ -43,27 +43,52 @@ final class DevicesProxy extends Devices {
     private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
+    /** The dialog we came from. */
+    private final WizardDialog origDialog;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>Devices</code> object. */
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
                  final DrbdInfo drbdInfo,
-                 final DrbdVolumeInfo drbdVolumeInfo) {
+                 final DrbdVolumeInfo drbdVolumeInfo,
+                 final WizardDialog origDialog) {
         super(previousDialog, host);
         this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
+        this.origDialog = origDialog;
     }
 
     @Override
     public WizardDialog nextDialog() {
-        resetDrbdResourcePanel();
-        //drbdInfo.addProxyHost(getHost());
-        //return new Resource(this, drbdVolumeInfo);
-        return new ProxyCheckInstallation(this,
-                                          getHost(),
-                                          drbdInfo,
-                                          drbdVolumeInfo);
+        if (nextDialogObject == null) {
+            return new ProxyCheckInstallation(this,
+                                              getHost(),
+                                              drbdInfo,
+                                              drbdVolumeInfo,
+                                              origDialog);
+        } else {
+            return nextDialogObject;
+        }
     }
+
+    /** Finish dialog. */
+    @Override
+    protected void finishDialog() {
+        super.finishDialog();
+        if (isPressedFinishButton()) {
+            if (origDialog != null) {
+                nextDialogObject = origDialog;
+            }
+            drbdInfo.addProxyHost(getHost());
+            if (drbdVolumeInfo != null) {
+                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            }
+            setPressedButton(nextButton());
+        }
+    }
+
 
     /**
      * Returns the title of the dialog. It is defined as
@@ -83,20 +108,18 @@ final class DevicesProxy extends Devices {
         return Tools.getString("Dialog.Host.Devices.Description");
     }
 
-    private void resetDrbdResourcePanel() {
-        if (drbdVolumeInfo != null) {
-            final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-            dri.resetInfoPanel();
-            dri.getInfoPanel();
-            dri.waitForInfoPanel();
-            dri.selectMyself();
-        }
-    }
-
     /** Buttons that are enabled/disabled during checks. */
     @Override
     protected JComponent[] nextButtons() {
         return new JComponent[]{buttonClass(nextButton()),
                                 buttonClass(finishButton())};
+    }
+
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
+    @Override
+    protected final WizardDialog dialogAfterCancel() {
+        return origDialog;
     }
 }

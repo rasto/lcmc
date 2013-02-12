@@ -45,15 +45,21 @@ final class ConfigurationProxy extends Configuration {
     private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
+    /** The dialog we came from. */
+    private final WizardDialog origDialog;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>ConfigurationProxy</code> object. */
     ConfigurationProxy(final WizardDialog previousDialog,
                        final Host host,
                        final DrbdInfo drbdInfo,
-                       final DrbdVolumeInfo drbdVolumeInfo) {
+                       final DrbdVolumeInfo drbdVolumeInfo,
+                       final WizardDialog origDialog) {
         super(previousDialog, host);
         this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
+        this.origDialog = origDialog;
     }
 
     /**
@@ -62,11 +68,30 @@ final class ConfigurationProxy extends Configuration {
      */
     @Override
     public WizardDialog nextDialog() {
-        if (getHost().isConnected()) {
-            resetDrbdResourcePanel();
-            return new Resource(this, drbdVolumeInfo);
+        if (nextDialogObject == null) {
+            return new SSHProxy(this,
+                                getHost(),
+                                drbdInfo,
+                                drbdVolumeInfo,
+                                origDialog);
         } else {
-            return new SSHProxy(this, getHost(), drbdInfo, drbdVolumeInfo);
+            return nextDialogObject;
+        }
+    }
+
+    /** Finish dialog. */
+    @Override
+    protected void finishDialog() {
+        super.finishDialog();
+        if (isPressedFinishButton()) {
+            if (origDialog != null) {
+                nextDialogObject = origDialog;
+            }
+            drbdInfo.addProxyHost(getHost());
+            if (drbdVolumeInfo != null) {
+                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            }
+            setPressedButton(nextButton());
         }
     }
 
@@ -88,23 +113,18 @@ final class ConfigurationProxy extends Configuration {
         return Tools.getString("Dialog.Host.Configuration.Description");
     }
 
-    /**
-     * This causes the whole drbd resource panel to be reloaded.
-     */
-    private void resetDrbdResourcePanel() {
-        if (drbdVolumeInfo != null) {
-            final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-            dri.resetInfoPanel();
-            dri.getInfoPanel();
-            dri.waitForInfoPanel();
-            dri.selectMyself();
-        }
-    }
-
     /** Buttons that are enabled/disabled during checks. */
     @Override
     protected JComponent[] nextButtons() {
         return new JComponent[]{buttonClass(nextButton()),
                                 buttonClass(finishButton())};
+    }
+
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
+    @Override
+    protected final WizardDialog dialogAfterCancel() {
+        return origDialog;
     }
 }

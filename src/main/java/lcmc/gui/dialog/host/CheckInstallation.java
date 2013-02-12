@@ -103,12 +103,6 @@ final class CheckInstallation extends DialogHost {
     private static final String HBPM_PREFIX = "HbPmInst";
     private static final String DRBD_PREFIX = "DrbdInst";
 
-    private static final String PM_INSTALL_METHOD_SUFFIX = "PmInstallMethod";
-    private static final String HBPM_INSTALL_METHOD_SUFFIX =
-                                                           "HbPmInstallMethod";
-    private static final String DRBD_INSTALL_METHOD_SUFFIX =
-                                                           "DrbdInstallMethod";
-
     /** Auto options for testing. */
     private static final String PM_AUTO_OPTION = "pminst";
     private static final String HBPM_AUTO_OPTION = "hbinst";
@@ -537,7 +531,6 @@ final class CheckInstallation extends DialogHost {
         pmInstMethodWi = getInstallationMethods(
                             PM_PREFIX,
                             Tools.getConfigData().isStagingPacemaker(),
-                            PM_INSTALL_METHOD_SUFFIX,
                             Tools.getConfigData().getLastHbPmInstalledMethod(),
                             PM_AUTO_OPTION,
                             pmButton);
@@ -545,14 +538,12 @@ final class CheckInstallation extends DialogHost {
         hbPmInstMethodWi = getInstallationMethods(
                             HBPM_PREFIX,
                             Tools.getConfigData().isStagingPacemaker(),
-                            HBPM_INSTALL_METHOD_SUFFIX,
                             Tools.getConfigData().getLastHbPmInstalledMethod(),
                             HBPM_AUTO_OPTION,
                             hbPmButton);
         drbdInstMethodWi = getInstallationMethods(
                             DRBD_PREFIX,
                             Tools.getConfigData().isStagingDrbd(),
-                            DRBD_INSTALL_METHOD_SUFFIX,
                             Tools.getConfigData().getLastDrbdInstalledMethod(),
                             DRBD_AUTO_OPTION,
                             drbdButton);

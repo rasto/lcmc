@@ -256,6 +256,8 @@ public final class Host {
     private String hbPmInstallMethod;
     /** Drbd installation method index. */
     private String drbdInstallMethod;
+    /** Drbd proxy installation method index. */
+    private String proxyInstallMethod;
     /** Heartbeat lib path. */
     private String hbLibPath = null;
     /** MD5 checksum of VM Info from server. */
@@ -2667,6 +2669,16 @@ public final class Host {
     /** Returns drbd installation method. */
     public String getDrbdInstallMethod() {
         return drbdInstallMethod;
+    }
+
+    /** Sets proxy installation method index. */
+    public void setProxyInstallMethod(final String proxyInstallMethod) {
+        this.proxyInstallMethod = proxyInstallMethod;
+    }
+
+    /** Returns proxy installation method. */
+    public String getProxyInstallMethod() {
+        return proxyInstallMethod;
     }
 
     /** Returns whether Corosync is rc script. */

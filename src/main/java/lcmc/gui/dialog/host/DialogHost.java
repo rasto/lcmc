@@ -146,7 +146,7 @@ public abstract class DialogHost extends WizardDialog {
     protected abstract String getHostDialogTitle();
 
     /** This class holds install method names, and their indeces. */
-    protected final static class InstallMethods {
+    public final static class InstallMethods {
         /** Name of the method like "CD". */
         private final String name;
         /** Index of the method. */
@@ -155,14 +155,14 @@ public abstract class DialogHost extends WizardDialog {
         private final String method;
 
         /** Creates new InstallMethods object. */
-        InstallMethods(final String name, final int index) {
+        public InstallMethods(final String name, final int index) {
             this(name, index, "");
         }
 
         /** Creates new InstallMethods object. */
-        InstallMethods(final String name,
-                       final int index,
-                       final String method) {
+        public InstallMethods(final String name,
+                              final int index,
+                              final String method) {
             this.name = name;
             this.index = index;
             this.method = method;
@@ -175,7 +175,7 @@ public abstract class DialogHost extends WizardDialog {
         }
 
         /** Returns index of the install method. */
-        String getIndex() {
+        public String getIndex() {
             return Integer.toString(index);
         }
 
@@ -199,7 +199,6 @@ public abstract class DialogHost extends WizardDialog {
     protected final Widget getInstallationMethods(
                                            final String prefix,
                                            final boolean staging,
-                                           final String installMethodSuffix,
                                            final String lastInstalledMethod,
                                            final String autoOption,
                                            final MyButton installButton) {
@@ -231,9 +230,8 @@ public abstract class DialogHost extends WizardDialog {
                 method = "";
             }
             final InstallMethods installMethod = new InstallMethods(
-                              Tools.getString("Dialog.Host.CheckInstallation."
-                                              + installMethodSuffix)
-                              + text, i, method);
+                Tools.getString("Dialog.Host.CheckInstallation.InstallMethod")
+                + text, i, method);
             if (text.equals(lastInstalledMethod)) {
                 defaultValue = installMethod.toString();
             }

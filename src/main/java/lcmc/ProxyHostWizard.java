@@ -54,8 +54,11 @@ public final class ProxyHostWizard {
 
     /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
-        WizardDialog dialog =
-                        new NewProxyHost(null, host, drbdInfo, drbdVolumeInfo);
+        WizardDialog dialog = new NewProxyHost(null,
+                                               host,
+                                               drbdInfo,
+                                               drbdVolumeInfo,
+                                               null);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
@@ -63,7 +66,9 @@ public final class ProxyHostWizard {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
