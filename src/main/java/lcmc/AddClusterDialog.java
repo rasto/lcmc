@@ -63,7 +63,9 @@ public final class AddClusterDialog {
                 dialog.cancelDialog();
                 Tools.getGUIData().checkAddClusterButtons();
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }

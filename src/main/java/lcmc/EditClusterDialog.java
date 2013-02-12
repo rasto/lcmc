@@ -53,7 +53,9 @@ public final class EditClusterDialog {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton("Cancel")) {
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedButton("Finish")) {
                 break;
             }

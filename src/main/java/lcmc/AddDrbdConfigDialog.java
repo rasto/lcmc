@@ -94,7 +94,9 @@ public final class AddDrbdConfigDialog {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 //dri.getBrowser().reloadAllComboBoxes(null);
                 //dri.setDialogStarted(false);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }

@@ -60,7 +60,9 @@ public final class AddVMConfigDialog {
                 vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
                 vmsVirtualDomainInfo.removeMyself(false);
                 vmsVirtualDomainInfo.setDialogStarted(false);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }

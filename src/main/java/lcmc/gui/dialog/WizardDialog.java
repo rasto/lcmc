@@ -363,7 +363,7 @@ public abstract class WizardDialog extends ConfigDialog {
                 return this;
             }
         }
-        return null;
+        return dialogAfterCancel();
     }
 
     /**
@@ -549,5 +549,12 @@ public abstract class WizardDialog extends ConfigDialog {
         final JPanel p = progressBar.getProgressBarPane();
         p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         return p;
+    }
+
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
+    protected WizardDialog dialogAfterCancel() {
+        return null;
     }
 }

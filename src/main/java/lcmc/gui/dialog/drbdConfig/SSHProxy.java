@@ -42,21 +42,51 @@ public final class SSHProxy extends SSH {
     private final DrbdInfo drbdInfo;
     /** drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
+    /** The dialog we came from. */
+    private final WizardDialog origDialog;
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
 
     /** Prepares a new <code>SSHProxy</code> object. */
     public SSHProxy(final WizardDialog previousDialog,
                     final Host host,
                     final DrbdInfo drbdInfo,
-                    final DrbdVolumeInfo drbdVolumeInfo) {
+                    final DrbdVolumeInfo drbdVolumeInfo,
+                    final WizardDialog origDialog) {
         super(previousDialog, host);
         this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
+        this.origDialog = origDialog;
     }
 
     /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
-        return new DevicesProxy(this, getHost(), drbdInfo, drbdVolumeInfo);
+        if (nextDialogObject == null) {
+            return new DevicesProxy(this,
+                                    getHost(),
+                                    drbdInfo,
+                                    drbdVolumeInfo,
+                                    origDialog);
+        } else {
+            return nextDialogObject;
+        }
+    }
+
+    /** Finish dialog. */
+    @Override
+    protected void finishDialog() {
+        super.finishDialog();
+        if (isPressedFinishButton()) {
+            if (origDialog != null) {
+                nextDialogObject = origDialog;
+            }
+            drbdInfo.addProxyHost(getHost());
+            if (drbdVolumeInfo != null) {
+                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            }
+            setPressedButton(nextButton());
+        }
     }
 
     /**
@@ -81,5 +111,13 @@ public final class SSHProxy extends SSH {
     @Override
     protected JComponent[] nextButtons() {
         return new JComponent[]{buttonClass(finishButton())};
+    }
+
+    /**
+     * Return dialog that comes after "cancel" button was pressed.
+     */
+    @Override
+    protected final WizardDialog dialogAfterCancel() {
+        return origDialog;
     }
 }

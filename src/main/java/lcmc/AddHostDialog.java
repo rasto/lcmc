@@ -53,7 +53,9 @@ public final class AddHostDialog {
                 dialog.cancelDialog();
                 Tools.getGUIData().enableAddHostButtons(true);
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 Tools.getGUIData().allHostsUpdate();
                 Tools.getGUIData().checkAddClusterButtons();

@@ -57,7 +57,9 @@ public final class EditHostDialog {
                 if (!expanded) {
                     Tools.getGUIData().expandTerminalSplitPane(1);
                 }
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }

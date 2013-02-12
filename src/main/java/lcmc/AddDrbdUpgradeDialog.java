@@ -58,7 +58,9 @@ public final class AddDrbdUpgradeDialog {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                return;
+                if (newdialog == null) {
+                    return;
+                }
             } else if (dialog.isPressedFinishButton()) {
                 break;
             }
