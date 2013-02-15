@@ -238,11 +238,11 @@ final class ProxyCheckInstallation extends DialogHost {
             || isPressedButton(nextButton())) {
             if (nextDialogObject == null && origDialog != null) {
                 nextDialogObject = origDialog;
-                drbdInfo.addProxyHost(getHost());
-                if (drbdVolumeInfo != null) {
-                    drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                }
                 setPressedButton(nextButton());
+            }
+            drbdInfo.addProxyHost(getHost());
+            if (drbdVolumeInfo != null) {
+                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
         }
     }

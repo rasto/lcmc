@@ -86,12 +86,12 @@ final class ConfigurationProxy extends Configuration {
         if (isPressedFinishButton()) {
             if (origDialog != null) {
                 nextDialogObject = origDialog;
+                setPressedButton(nextButton());
             }
             drbdInfo.addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
-            setPressedButton(nextButton());
         }
     }
 

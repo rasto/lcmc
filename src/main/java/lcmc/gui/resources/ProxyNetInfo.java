@@ -2,7 +2,7 @@
  * This file is part of Linux Cluster Management Console
  * written by Rasto Levrinc.
  *
- * Copyright (C) 2009-2010, Rasto Levrinc
+ * Copyright (C) 2012-2013, Rasto Levrinc
  *
  * The LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with drbd; see the file COPYING.  If not, write to
+ * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 

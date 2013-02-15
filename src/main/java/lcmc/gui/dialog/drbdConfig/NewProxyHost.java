@@ -81,12 +81,12 @@ public final class NewProxyHost extends NewHost {
         if (isPressedFinishButton()) {
             if (origDialog != null) {
                 nextDialogObject = origDialog;
+                setPressedButton(nextButton());
             }
             drbdInfo.addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
-            setPressedButton(nextButton());
         }
     }
 

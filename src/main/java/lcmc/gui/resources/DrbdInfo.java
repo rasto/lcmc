@@ -979,6 +979,18 @@ public final class DrbdInfo extends DrbdGuiInfo {
     /** Add proxy host. */
     public void addProxyHost(final Host host) {
         proxyHosts.add(host);
+        host.setCluster(getBrowser().getCluster());
+        addProxyHostNode(new ProxyHostInfo(host, host.getBrowser()));
+    }
+
+    /** Add DRBD resource. */
+    public void addProxyHostNode(final ProxyHostInfo proxyHostInfo) {
+        final DefaultMutableTreeNode proxyHostNode =
+                                   new DefaultMutableTreeNode(proxyHostInfo);
+        getBrowser().reload(getBrowser().getDrbdNode(), true);
+        proxyHostInfo.setNode(proxyHostNode);
+        getBrowser().getDrbdNode().add(proxyHostNode);
+        getBrowser().reload(proxyHostNode, true);
     }
 
     /**

@@ -80,12 +80,12 @@ public final class SSHProxy extends SSH {
         if (isPressedFinishButton()) {
             if (origDialog != null) {
                 nextDialogObject = origDialog;
+                setPressedButton(nextButton());
             }
             drbdInfo.addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
-            setPressedButton(nextButton());
         }
     }
 

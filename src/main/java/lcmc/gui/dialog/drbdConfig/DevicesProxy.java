@@ -80,12 +80,12 @@ final class DevicesProxy extends Devices {
         if (isPressedFinishButton()) {
             if (origDialog != null) {
                 nextDialogObject = origDialog;
+                setPressedButton(nextButton());
             }
             drbdInfo.addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
-            setPressedButton(nextButton());
         }
     }
 
