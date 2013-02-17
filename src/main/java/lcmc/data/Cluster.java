@@ -68,6 +68,10 @@ public final class Cluster {
                                  };
     /** Whether this cluster should be saved. */
     private boolean savable = true;
+    /**
+     * Proxy hosts. More can be added in the DRBD config
+     * wizard. */
+    private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
 
 
     /** Prepares a new <code>Cluster</code> object. */
@@ -113,6 +117,7 @@ public final class Cluster {
             host.setColor(hostColors[id]);
         }
         hosts.add(host);
+        proxyHosts.add(host);
     }
 
     /** Gets set of hosts that are part of this cluster. */
@@ -355,5 +360,27 @@ public final class Cluster {
     /** Return whether this cluster should be saved. */
     public boolean isSavable() {
         return savable;
+    }
+
+    /** Return all proxy hosts. */
+    public Set<Host> getProxyHosts() {
+        return proxyHosts;
+    }
+
+    /** Add proxy host. */
+    public void addProxyHost(final Host host) {
+        proxyHosts.add(host);
+        host.setCluster(this);
+        getBrowser().getDrbdGraph().getDrbdInfo().addProxyHostNode(host);
+    }
+
+    /** Return proxy host by name. */
+    public Host getProxyHostByName(final String name) {
+        for (final Host h : proxyHosts) {
+            if (h.getName().equals(name)) {
+                return h;
+            }
+        }
+        return null;
     }
 }

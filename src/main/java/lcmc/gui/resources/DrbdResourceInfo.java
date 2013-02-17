@@ -294,7 +294,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             final String proxyIp = drbdpM.group(1);
                             final String hostName = drbdpM.group(3);
                             final Host proxyHost =
-                                    getDrbdInfo().getProxyHostByName(hostName);
+                                    getCluster().getProxyHostByName(hostName);
                             config.append(
                               proxyConfig(
                                   new ProxyNetInfo(
@@ -810,7 +810,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 outsideIp = hostProxy.getOutsideIp();
                 insidePort = hostProxy.getInsidePort();
                 outsidePort = hostProxy.getOutsidePort();
-                proxyHost = getDrbdInfo().getProxyHostByName(
+                proxyHost = getCluster().getProxyHostByName(
                                                 hostProxy.getProxyHostName());
             } else {
                 proxyHost = host;
@@ -1573,7 +1573,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                              final Map<Host, Widget> newOutsideIpComboBoxHash) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         for (final Host pHost
-                     : new HashSet<Host>(getDrbdInfo().getAllProxyHosts())) {
+                     : new HashSet<Host>(getCluster().getProxyHosts())) {
             final HostProxy hostProxy =
                                  dxml.getHostProxy(pHost.getName(), getName());
             final String section = Tools.getString("DrbdResourceInfo.Proxy")
@@ -1655,7 +1655,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (hostProxy != null) {
                 insideIpSaved = hostProxy.getInsideIp();
                 outsideIpSaved = hostProxy.getOutsideIp();
-                proxyHost = getDrbdInfo().getProxyHostByName(
+                proxyHost = getCluster().getProxyHostByName(
                                                 hostProxy.getProxyHostName());
             } else {
                 proxyHost = host;
@@ -1711,7 +1711,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* other nodes */
-        for (final Host h : getDrbdInfo().getAllProxyHosts()) {
+        for (final Host h : getCluster().getProxyHosts()) {
             if (h == hostBrowser.getHost()) {
                 continue;
             }
@@ -1797,7 +1797,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                  dxml.getHostProxy(host.getName(), getName());
             Host proxyHost;
             if (hostProxy != null) {
-                proxyHost = getDrbdInfo().getProxyHostByName(
+                proxyHost = getCluster().getProxyHostByName(
                                                 hostProxy.getProxyHostName());
             } else {
                 proxyHost = host;
@@ -1904,7 +1904,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         visible.addAll(selectedProxyHosts);
         final boolean isProxy = !visible.isEmpty();
-        for (final Host pHost : getDrbdInfo().getAllProxyHosts()) {
+        for (final Host pHost : getCluster().getProxyHosts()) {
             final String section = Tools.getString("DrbdResourceInfo.Proxy")
                                    + pHost.getName();
             enableSection(section, visible.contains(pHost), wizard);
@@ -2000,7 +2000,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                 final Map<Host, Widget> newIpComboBoxHash,
                                 final Map<Host, Widget> ipComboBoxHash) {
         for (final Host pHost
-                      : new HashSet<Host>(getDrbdInfo().getAllProxyHosts())) {
+                      : new HashSet<Host>(getCluster().getProxyHosts())) {
             Widget wi;
             Widget rwi;
             if (wizard) {
@@ -2290,7 +2290,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Matcher drbdpM = DRBDP_ADDRESS.matcher(o.toString());
             if (drbdpM.matches()) {
                 final String name = drbdpM.group(3);
-                return getDrbdInfo().getProxyHostByName(name);
+                return getCluster().getProxyHostByName(name);
             }
         }
         return null;

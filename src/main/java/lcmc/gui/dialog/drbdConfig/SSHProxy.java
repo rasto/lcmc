@@ -24,7 +24,6 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import javax.swing.JComponent;
 
@@ -38,8 +37,6 @@ import javax.swing.JComponent;
 public final class SSHProxy extends SSH {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Drbd info. */
-    private final DrbdInfo drbdInfo;
     /** drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -50,11 +47,9 @@ public final class SSHProxy extends SSH {
     /** Prepares a new <code>SSHProxy</code> object. */
     public SSHProxy(final WizardDialog previousDialog,
                     final Host host,
-                    final DrbdInfo drbdInfo,
                     final DrbdVolumeInfo drbdVolumeInfo,
                     final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
         this.origDialog = origDialog;
     }
@@ -65,7 +60,6 @@ public final class SSHProxy extends SSH {
         if (nextDialogObject == null) {
             return new DevicesProxy(this,
                                     getHost(),
-                                    drbdInfo,
                                     drbdVolumeInfo,
                                     origDialog);
         } else {
@@ -82,7 +76,7 @@ public final class SSHProxy extends SSH {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
             }
-            drbdInfo.addProxyHost(getHost());
+            getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }

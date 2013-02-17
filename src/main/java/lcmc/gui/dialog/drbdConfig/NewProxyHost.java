@@ -24,7 +24,6 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.NewHost;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import javax.swing.JComponent;
 
@@ -38,8 +37,6 @@ import javax.swing.JComponent;
 public final class NewProxyHost extends NewHost {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Drbd info. */
-    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -51,11 +48,9 @@ public final class NewProxyHost extends NewHost {
     /** Prepares a new <code>NewProxyHost</code> object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
-                        final DrbdInfo drbdInfo,
                         final DrbdVolumeInfo drbdVolumeInfo,
                         final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
         this.origDialog = origDialog;
     }
@@ -66,7 +61,6 @@ public final class NewProxyHost extends NewHost {
         if (nextDialogObject == null) {
             return new ConfigurationProxy(this,
                                           getHost(),
-                                          drbdInfo,
                                           drbdVolumeInfo,
                                           origDialog);
         } else {
@@ -83,7 +77,7 @@ public final class NewProxyHost extends NewHost {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
             }
-            drbdInfo.addProxyHost(getHost());
+            getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }

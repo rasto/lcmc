@@ -24,7 +24,6 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import javax.swing.JComponent;
@@ -39,8 +38,6 @@ import javax.swing.JComponent;
 final class DevicesProxy extends Devices {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Drbd info. */
-    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -51,11 +48,9 @@ final class DevicesProxy extends Devices {
     /** Prepares a new <code>Devices</code> object. */
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
-                 final DrbdInfo drbdInfo,
                  final DrbdVolumeInfo drbdVolumeInfo,
                  final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
         this.origDialog = origDialog;
     }
@@ -65,7 +60,6 @@ final class DevicesProxy extends Devices {
         if (nextDialogObject == null) {
             return new ProxyCheckInstallation(this,
                                               getHost(),
-                                              drbdInfo,
                                               drbdVolumeInfo,
                                               origDialog);
         } else {
@@ -82,7 +76,7 @@ final class DevicesProxy extends Devices {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
             }
-            drbdInfo.addProxyHost(getHost());
+            getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }

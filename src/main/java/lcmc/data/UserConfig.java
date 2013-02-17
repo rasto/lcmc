@@ -72,6 +72,8 @@ public final class UserConfig extends XML {
     private static final String CLUSTER_NAME_ATTR = "name";
     /** Name of the host node. */
     private static final String HOST_NODE_STRING = "host";
+    /** Name of the proxy host node. */
+    private static final String PROXY_HOST_NODE_STRING = "proxy-host";
     /** Download user. */
     private static final String DOWNLOAD_USER_ATTR = "dwuser";
     /** Download user password. */
@@ -102,43 +104,15 @@ public final class UserConfig extends XML {
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
             }
         }
-        final Element hosts = (Element) root.appendChild(
+        final Element hostsNode = (Element) root.appendChild(
                                                 doc.createElement("hosts"));
-        for (final Host host : Tools.getConfigData().getHosts().getHostSet()) {
+        final Set<Host> hosts = Tools.getConfigData().getHosts().getHostSet();
+        for (final Host host : hosts) {
             if (!saveAll && !host.isSavable()) {
                 continue;
             }
             host.setSavable(true);
-            final String hostName = host.getHostname();
-            final String ip = host.getIp();
-            final String username = host.getUsername();
-            final String sshPort = host.getSSHPort();
-            final Boolean useSudo = host.isUseSudo();
-            final String color = host.getColor();
-            final Element hostNode = (Element) hosts.appendChild(
-                                        doc.createElement(HOST_NODE_STRING));
-            hostNode.setAttribute(HOST_NAME_ATTR, hostName);
-            hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
-            if (color != null) {
-                hostNode.setAttribute(HOST_COLOR_ATTR, color);
-            }
-            if (useSudo != null && useSudo) {
-                hostNode.setAttribute(HOST_USESUDO_ATTR, "true");
-            }
-            if (ip != null) {
-                final Node ipNode = (Element) hostNode.appendChild(
-                                                       doc.createElement("ip"));
-
-                ipNode.appendChild(doc.createTextNode(ip));
-            }
-            if (username != null) {
-                final Node usernameNode =
-                                (Element) hostNode.appendChild(
-                                                    doc.createElement("user"));
-
-                usernameNode.appendChild(doc.createTextNode(username));
-            }
-
+            addHostConfigNode(doc, hostsNode, HOST_NODE_STRING, host);
         }
         final Element clusters = (Element) root.appendChild(
                                                 doc.createElement("clusters"));
@@ -154,10 +128,20 @@ public final class UserConfig extends XML {
             final Element clusterNode = (Element) clusters.appendChild(
                                                 doc.createElement("cluster"));
             clusterNode.setAttribute(CLUSTER_NAME_ATTR, clusterName);
-            for (final Host host : cluster.getHosts()) {
+            final Set<Host> clusterHosts = cluster.getHosts();
+            for (final Host host : clusterHosts) {
                 final String hostName = host.getHostname();
                 final Element hostNode = (Element) clusterNode.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
+                hostNode.appendChild(doc.createTextNode(hostName));
+            }
+            for (final Host pHost : cluster.getProxyHosts()) {
+                if (clusterHosts.contains(pHost)) {
+                    continue;
+                }
+                final String hostName = pHost.getHostname();
+                final Element hostNode = (Element) clusterNode.appendChild(
+                                    doc.createElement(PROXY_HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
         }
@@ -386,6 +370,42 @@ public final class UserConfig extends XML {
                     setHostCluster(hostMap, cluster, nodeName);
                 }
             }
+        }
+    }
+
+    /** Host node. */
+    private void addHostConfigNode(final Document doc,
+                                   final Element parent,
+                                   final String nodeName,
+                                   final Host host) {
+        final String hostName = host.getHostname();
+        final String ip = host.getIp();
+        final String username = host.getUsername();
+        final String sshPort = host.getSSHPort();
+        final Boolean useSudo = host.isUseSudo();
+        final String color = host.getColor();
+        final Element hostNode = (Element) parent.appendChild(
+                                                  doc.createElement(nodeName));
+        hostNode.setAttribute(HOST_NAME_ATTR, hostName);
+        hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
+        if (color != null) {
+            hostNode.setAttribute(HOST_COLOR_ATTR, color);
+        }
+        if (useSudo != null && useSudo) {
+            hostNode.setAttribute(HOST_USESUDO_ATTR, "true");
+        }
+        if (ip != null) {
+            final Node ipNode = (Element) hostNode.appendChild(
+                                                   doc.createElement("ip"));
+
+            ipNode.appendChild(doc.createTextNode(ip));
+        }
+        if (username != null) {
+            final Node usernameNode =
+                            (Element) hostNode.appendChild(
+                                                doc.createElement("user"));
+
+            usernameNode.appendChild(doc.createTextNode(username));
         }
     }
 }

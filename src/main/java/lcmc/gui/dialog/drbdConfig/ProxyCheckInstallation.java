@@ -29,7 +29,6 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 
 import javax.swing.JPanel;
@@ -88,8 +87,6 @@ final class ProxyCheckInstallation extends DialogHost {
     private boolean proxyOk = false;
     /** The proxy host. */
     private final Host host;
-    /** Drbd info. */
-    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -98,12 +95,10 @@ final class ProxyCheckInstallation extends DialogHost {
     /** Prepares a new <code>ProxyCheckInstallation</code> object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
-                           final DrbdInfo drbdInfo,
                            final DrbdVolumeInfo drbdVolumeInfo,
                            final WizardDialog origDialog) {
         super(previousDialog, host);
         this.host = host;
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
         this.origDialog = origDialog;
     }
@@ -137,7 +132,6 @@ final class ProxyCheckInstallation extends DialogHost {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new ProxyInst(thisClass,
                                                      getHost(),
-                                                     drbdInfo,
                                                      drbdVolumeInfo,
                                                      origDialog);
                     final InstallMethods im =
@@ -240,7 +234,7 @@ final class ProxyCheckInstallation extends DialogHost {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
             }
-            drbdInfo.addProxyHost(getHost());
+            getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }

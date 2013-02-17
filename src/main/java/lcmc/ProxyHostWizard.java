@@ -25,7 +25,6 @@ import lcmc.data.Host;
 
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.NewProxyHost;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 
 
@@ -38,17 +37,14 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 public final class ProxyHostWizard {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
-    private final DrbdInfo drbdInfo;
     private final DrbdVolumeInfo drbdVolumeInfo;
     private final Host host;
 
 
     /** Prepares new <code>ProxyHostWizard</code> object. */
     public ProxyHostWizard(final Host host,
-                           final DrbdInfo drbdInfo,
                            final DrbdVolumeInfo drbdVolumeInfo) {
         this.host = host;
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
     }
 
@@ -56,7 +52,6 @@ public final class ProxyHostWizard {
     public void showDialogs() {
         WizardDialog dialog = new NewProxyHost(null,
                                                host,
-                                               drbdInfo,
                                                drbdVolumeInfo,
                                                null);
         Tools.getGUIData().expandTerminalSplitPane(0);

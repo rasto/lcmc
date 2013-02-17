@@ -26,7 +26,6 @@ import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ConvertCmdCallback;
@@ -48,8 +47,6 @@ final class ProxyInst extends DialogHost {
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
-    /** Drbd info. */
-    private final DrbdInfo drbdInfo;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -58,11 +55,9 @@ final class ProxyInst extends DialogHost {
     /** Prepares a new <code>ProxyInst</code> object. */
     ProxyInst(final WizardDialog previousDialog,
               final Host host,
-              final DrbdInfo drbdInfo,
               final DrbdVolumeInfo drbdVolumeInfo,
               final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdInfo = drbdInfo;
         this.drbdVolumeInfo = drbdVolumeInfo;
         this.origDialog = origDialog;
     }
@@ -75,7 +70,6 @@ final class ProxyInst extends DialogHost {
         nextDialogObject = new ProxyCheckInstallation(
                                         getPreviousDialog().getPreviousDialog(),
                                         getHost(),
-                                        drbdInfo,
                                         drbdVolumeInfo,
                                         origDialog);
         progressBarDone();
@@ -150,7 +144,6 @@ final class ProxyInst extends DialogHost {
         if (nextDialogObject == null) {
             return new ProxyCheckInstallation(this,
                                               getHost(),
-                                              drbdInfo,
                                               drbdVolumeInfo,
                                               origDialog);
         } else {
@@ -167,7 +160,7 @@ final class ProxyInst extends DialogHost {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
             }
-            drbdInfo.addProxyHost(getHost());
+            getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }

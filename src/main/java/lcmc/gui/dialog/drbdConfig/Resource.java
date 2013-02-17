@@ -121,14 +121,15 @@ public final class Resource extends DrbdConfig {
     @Override
     public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final DrbdInfo drbdInfo = dri.getDrbdInfo();
         if (proxyHostNextDialog) {
+            final Host proxyHost = new Host();
+            proxyHost.setCluster(dri.getCluster());
             return new NewProxyHost(this,
-                                    new Host(),
-                                    drbdInfo,
+                                    proxyHost,
                                     getDrbdVolumeInfo(),
                                     this);
         }
+        final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
@@ -314,7 +315,7 @@ public final class Resource extends DrbdConfig {
         panel.add(btn);
 
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        for (final Host h : dri.getDrbdInfo().getAllProxyHosts()) {
+        for (final Host h : dri.getCluster().getProxyHosts()) {
             panel.add(new JLabel(h.getName()));
         }
         return panel;
