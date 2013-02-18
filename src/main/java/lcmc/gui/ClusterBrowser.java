@@ -605,6 +605,13 @@ public final class ClusterBrowser extends Browser {
         addNode(crmNode, servicesNode);
         addVMSNode();
         selectPath(new Object[]{getTreeTop(), crmNode});
+        addDrbdProxyNodes();
+    }
+
+    void addDrbdProxyNodes() {
+        for (final Host pHost : getCluster().getProxyHosts()) {
+            getDrbdGraph().getDrbdInfo().addProxyHostNode(pHost);
+        }
     }
 
     /**

@@ -79,6 +79,7 @@ public final class SSHProxy extends SSH {
             getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

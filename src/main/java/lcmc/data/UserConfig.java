@@ -78,6 +78,8 @@ public final class UserConfig extends XML {
     private static final String DOWNLOAD_USER_ATTR = "dwuser";
     /** Download user password. */
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
+    /** Whether the host is a proxy host. */
+    public static final boolean PROXY_HOST = true;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream,
@@ -341,7 +343,8 @@ public final class UserConfig extends XML {
     /** Set host as a cluster host. */
     public void setHostCluster(final Map<String, List<Host>> hostMap,
                                final Cluster cluster,
-                               final String nodeName) {
+                               final String nodeName,
+                               final boolean proxy) {
         final List<Host> hostList = hostMap.get(nodeName);
         if (hostList == null || hostList.isEmpty()) {
             return;
@@ -350,7 +353,11 @@ public final class UserConfig extends XML {
         hostList.remove(0);
         if (host != null && host.getCluster() == null) {
             host.setCluster(cluster);
-            cluster.addHost(host);
+            if (proxy) {
+                cluster.addProxyHost(host);
+            } else {
+                cluster.addHost(host);
+            }
         }
     }
 
@@ -367,7 +374,11 @@ public final class UserConfig extends XML {
                 final Node hostNode = hosts.item(i);
                 if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
                     final String nodeName = getText(hostNode);
-                    setHostCluster(hostMap, cluster, nodeName);
+                    setHostCluster(hostMap, cluster, nodeName, !PROXY_HOST);
+                } else if (hostNode.getNodeName().equals(
+                                                    PROXY_HOST_NODE_STRING)) {
+                    final String nodeName = getText(hostNode);
+                    setHostCluster(hostMap, cluster, nodeName, PROXY_HOST);
                 }
             }
         }

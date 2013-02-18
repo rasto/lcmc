@@ -371,7 +371,6 @@ public final class Cluster {
     public void addProxyHost(final Host host) {
         proxyHosts.add(host);
         host.setCluster(this);
-        getBrowser().getDrbdGraph().getDrbdInfo().addProxyHostNode(host);
     }
 
     /** Return proxy host by name. */

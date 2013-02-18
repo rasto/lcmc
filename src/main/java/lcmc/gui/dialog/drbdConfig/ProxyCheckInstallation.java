@@ -237,6 +237,7 @@ final class ProxyCheckInstallation extends DialogHost {
             getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

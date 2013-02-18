@@ -79,6 +79,7 @@ final class DevicesProxy extends Devices {
             getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

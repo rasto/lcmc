@@ -80,6 +80,7 @@ public final class NewProxyHost extends NewHost {
             getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

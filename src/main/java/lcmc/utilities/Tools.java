@@ -897,7 +897,10 @@ public final class Tools {
             cluster.setSavable(false);
             Tools.getConfigData().addClusterToClusters(cluster);
             for (final HostOptions ho : clusters.get(clusterName)) {
-                userConfig.setHostCluster(hostMap, cluster, ho.getHost());
+                userConfig.setHostCluster(hostMap,
+                                          cluster,
+                                          ho.getHost(),
+                                          !UserConfig.PROXY_HOST);
             }
         }
         return null;
