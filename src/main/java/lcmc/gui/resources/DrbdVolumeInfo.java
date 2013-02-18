@@ -212,8 +212,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
-                                                                         true);
+                    getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getHosts()) {
                         DRBD.adjust(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
@@ -279,8 +278,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getBrowser().getDrbdGraph().getDrbdInfo()
-                                                     .createDrbdConfig(false);
+                            getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getHosts()) {
                                 DRBD.adjust(h, DRBD.ALL, null, false);
                             }
@@ -727,14 +725,14 @@ public final class DrbdVolumeInfo extends EditableInfo
         cb.updateCommonBlockDevices();
 
         try {
-            cb.getDrbdGraph().getDrbdInfo().createDrbdConfig(testOnly);
+            getDrbdInfo().createDrbdConfig(testOnly);
         } catch (Exceptions.DrbdConfigException dce) {
             cb.drbdStatusUnlock();
             Tools.appError("config failed", dce);
             return;
         }
-        cb.getDrbdGraph().getDrbdInfo().setSelectedNode(null);
-        cb.getDrbdGraph().getDrbdInfo().selectMyself();
+        getDrbdInfo().setSelectedNode(null);
+        getDrbdInfo().selectMyself();
         cb.getDrbdGraph().updatePopupMenus();
         cb.resetFilesystems();
 
@@ -789,7 +787,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Return DRBD device in /dev/drbd/by-res...form. */
     public String getDeviceByRes() {
-        if (getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
+        if (getDrbdInfo().atLeastVersion("8.4")) {
             return BY_RES_DEV_DIR
                    + getDrbdResourceInfo().getName()
                    + "/"
@@ -1115,7 +1113,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                        final String[] params,
                                        final boolean fromDrbdInfo,
                                        final boolean fromDrbdResourceInfo) {
-        final DrbdInfo di = getDrbdResourceInfo().getDrbdInfo();
+        final DrbdInfo di = getDrbdInfo();
         if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
             di.setApplyButtons(null, di.getParametersFromXML());
         }
@@ -1164,7 +1162,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().getDrbdDevHash().put(drbdDevStr, this);
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
-            getDrbdResourceInfo().getDrbdInfo().setAllApplyButtons();
+            getDrbdInfo().setAllApplyButtons();
         }
     }
 
@@ -1275,7 +1273,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     @Override
     protected String isEnabled(final String param) {
         if (DRBD_VOL_PARAM_NUMBER.equals(param)
-            && !getDrbdResourceInfo().getDrbdInfo().atLeastVersion("8.4")) {
+            && !getDrbdInfo().atLeastVersion("8.4")) {
             return "available in DRBD 8.4";
         }
         if (getDrbdVolume().isCommited()) {
@@ -1369,5 +1367,10 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns whether this drbd resource is used by crm. */
     public boolean isUsedByCRM() {
         return getDrbdResourceInfo().isUsedByCRM();
+    }
+
+    /** Return DRBD info object. */
+    public DrbdInfo getDrbdInfo() {
+        return getDrbdResourceInfo().getDrbdInfo();
     }
 }
