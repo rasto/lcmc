@@ -97,6 +97,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 final Host hp = new Host();
                 hp.setHostname(hostName);
                 getCluster().addProxyHost(hp);
+                addProxyHostNode(hp);
             }
         }
         for (final String param : getParametersFromXML()) {

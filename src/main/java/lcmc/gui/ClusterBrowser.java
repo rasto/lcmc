@@ -609,8 +609,11 @@ public final class ClusterBrowser extends Browser {
     }
 
     void addDrbdProxyNodes() {
+        final Set<Host> clusterHosts = getCluster().getHosts();
         for (final Host pHost : getCluster().getProxyHosts()) {
-            getDrbdGraph().getDrbdInfo().addProxyHostNode(pHost);
+            if (!clusterHosts.contains(pHost)) {
+                getDrbdGraph().getDrbdInfo().addProxyHostNode(pHost);
+            }
         }
     }
 
