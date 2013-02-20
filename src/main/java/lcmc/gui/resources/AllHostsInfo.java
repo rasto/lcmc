@@ -792,7 +792,7 @@ public final class AllHostsInfo extends Info {
 
                 @Override
                 public void action() {
-                    final AddHostDialog dialog = new AddHostDialog();
+                    final AddHostDialog dialog = new AddHostDialog(new Host());
                     dialog.showDialogs();
                 }
             };

@@ -29,6 +29,7 @@ import lcmc.data.AccessMode;
 import lcmc.AddHostDialog;
 import lcmc.AddClusterDialog;
 import lcmc.gui.dialog.About;
+import lcmc.data.Host;
 
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
@@ -246,7 +247,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         final AddHostDialog h = new AddHostDialog();
+                         final AddHostDialog h = new AddHostDialog(new Host());
                          h.showDialogs();
                      }
                  });

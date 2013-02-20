@@ -38,10 +38,17 @@ import lcmc.gui.dialog.host.NewHost;
  * @version $Id$
  */
 public final class AddHostDialog {
+    /** The host object. */
+    private final Host host;
+
+    /** Prepares a new <code>EditHostDialog</code> object. */
+    public AddHostDialog(final Host host) {
+        this.host = host;
+    }
+
     /** Shows step by step dialogs that add and configure new host. */
     public void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
-        final Host host = new Host();
         DialogHost dialog = new NewHost(null, host);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

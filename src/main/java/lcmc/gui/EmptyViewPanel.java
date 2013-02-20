@@ -27,6 +27,7 @@ import lcmc.AddHostDialog;
 import lcmc.utilities.Tools;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.MyButton;
+import lcmc.data.Host;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -115,7 +116,8 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                     new Runnable() {
                         @Override
                         public void run() {
-                            final AddHostDialog ahd = new AddHostDialog();
+                            final AddHostDialog ahd = new AddHostDialog(
+                                                                   new Host());
                             ahd.showDialogs();
                         }
                     });
