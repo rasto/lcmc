@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -149,7 +150,7 @@ public final class DrbdXML extends XML {
     private final MultiKeyMap<String, HostProxy> resourceHostProxyMap =
                                          new MultiKeyMap<String, HostProxy>();
     /** Set of all proxy hosts. */
-    private final Set<String> proxyHostNames = new HashSet<String>();
+    private final Set<String> proxyHostNames = new LinkedHashSet<String>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
