@@ -272,9 +272,16 @@ public class NewHost extends DialogHost {
                         Tools.getString("Dialog.Host.NewHost.EnterHost"));
         inputPane.add(hostLabel);
         final String regexp = "^[,\\w.-]+$";
+        final String hostname = getHost().getHostname();
+        String hn;
+        if (hostname == null) {
+            hn = getHost().getHostnameEntered();
+        } else {
+            hn = hostname;
+        }
         hostField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       getHost().getHostnameEntered(),
+                                       hn,
                                        Widget.NO_ITEMS,
                                        regexp,
                                        FIELD_WIDTH,
@@ -282,6 +289,9 @@ public class NewHost extends DialogHost {
                                        new AccessMode(ConfigData.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
+        if (hostname != null) {
+            hostField.setEnabled(false);
+        }
 
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
