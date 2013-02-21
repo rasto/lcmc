@@ -22,7 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.AddDrbdUpgradeDialog;
-import lcmc.EditHostDialog;
+import lcmc.ProxyHostWizard;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.DrbdGraph;
@@ -233,7 +233,8 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public void action() {
-                    final EditHostDialog dialog = new EditHostDialog(host);
+                    final ProxyHostWizard dialog = new ProxyHostWizard(host,
+                                                                       null);
                     dialog.showDialogs();
                 }
             };
