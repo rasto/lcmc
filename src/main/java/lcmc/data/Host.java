@@ -86,7 +86,7 @@ public final class Host {
     /** Ips in the combo in Dialog.Host.Configuration. */
     private final Map<Integer, String[]> ips = new HashMap<Integer, String[]>();
     /** Hostname of the host. */
-    private String hostname = "unknown";
+    private String hostname = DEFAULT_HOSTNAME;
     /** Username, root most of the times. */
     private String username = null;
     /** Detected kernel name. */
@@ -302,6 +302,8 @@ public final class Host {
     private final int DRBD_EVENTS_TIMEOUT    = 40000;
     private final int CLUSTER_EVENTS_TIMEOUT = 40000;
     private final int HW_INFO_TIMEOUT        = 40000;
+
+    public static final String DEFAULT_HOSTNAME = "unknown";
 
     /** Choices for gui drop down menus. */
     public static final String VM_FILESYSTEM_SOURCE_DIR_LXC =

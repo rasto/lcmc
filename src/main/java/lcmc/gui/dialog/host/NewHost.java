@@ -274,7 +274,7 @@ public class NewHost extends DialogHost {
         final String regexp = "^[,\\w.-]+$";
         final String hostname = getHost().getHostname();
         String hn;
-        if (hostname == null) {
+        if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
             hn = getHost().getHostnameEntered();
         } else {
             hn = hostname;
@@ -289,7 +289,7 @@ public class NewHost extends DialogHost {
                                        new AccessMode(ConfigData.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
-        if (hostname != null) {
+        if (hostname != null && !Host.DEFAULT_HOSTNAME.equals(hostname)) {
             hostField.setEnabled(false);
         }
 
