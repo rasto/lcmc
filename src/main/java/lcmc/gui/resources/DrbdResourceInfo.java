@@ -2269,7 +2269,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Get proxy from ip combo box value. Null, if it's not a proxy. */
-    private Host getProxyHost(final Host host, final boolean wizard) {
+    Host getProxyHost(final Host host, final boolean wizard) {
         final Widget addrW;
         if (wizard) {
             addrW = addressComboBoxHashWizard.get(host);

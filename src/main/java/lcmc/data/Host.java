@@ -2144,11 +2144,12 @@ public final class Host {
                 String res = null;
                 final Cluster cluster = getCluster();
                 if (cluster != null) {
-                    for (final Host otherHost : getCluster().getHosts()) {
-                        if (otherHost == this) {
-                            continue;
-                        }
-                        if (line.startsWith("up:")) {
+                    if (line.startsWith("up:")) {
+                        for (final Host otherHost
+                                              : getCluster().getProxyHosts()) {
+                            if (otherHost == this) {
+                                continue;
+                            }
                             final String hostsPart = "-" + otherHost.getName()
                                                      + "-" + getName();
                             final int i = line.indexOf(hostsPart);

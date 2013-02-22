@@ -2624,8 +2624,10 @@ public final class BlockDevInfo extends EditableInfo {
      */
     public String getProxyStateForGraph() {
         final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+        final Host pHost =
+                         dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
         if (dri.isProxy(getHost())) {
-            if (getHost().isDrbdProxyUp(dri.getName())) {
+            if (pHost.isDrbdProxyUp(dri.getName())) {
                 return PROXY_UP;
             } else {
                 return PROXY_DOWN;
