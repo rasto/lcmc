@@ -215,6 +215,37 @@ public final class ProxyHostInfo extends Info {
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
+        /* connect */
+        final MyMenuItem connectItem =
+            new MyMenuItem(Tools.getString("HostDrbdInfo.Connect"),
+                           null,
+                           Tools.getString("HostDrbdInfo.Connect"),
+                           Tools.getString("HostDrbdInfo.Disconnect"),
+                           null,
+                           Tools.getString("HostDrbdInfo.Disconnect"),
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean predicate() {
+                    return !getHost().isConnected();
+                }
+
+                @Override
+                public void action() {
+                    if (getHost().isConnected()) {
+                        getHost().disconnect();
+                    } else {
+                        host.connect(null, null);
+                    }
+                    getBrowser().getClusterBrowser().updateProxyHWInfo(host);
+                }
+            };
+        items.add(connectItem);
+
         /* host wizard */
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),

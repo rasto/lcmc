@@ -1483,8 +1483,13 @@ public final class Host {
      * connection is established, callback.done() is called. In case
      * of error callback.doneError() is called.
      */
-    public void connect(final SSHGui sshGui,
+    public void connect(SSHGui sshGui,
                         final ConnectionCallback callback) {
+        if (sshGui == null) {
+            sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
+                                this,
+                                null);
+        }
         ssh.connect(sshGui, callback, this);
     }
 

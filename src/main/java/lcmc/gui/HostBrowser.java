@@ -33,6 +33,7 @@ import lcmc.data.AccessMode;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.FSInfo;
 import lcmc.gui.resources.HostDrbdInfo;
+import lcmc.gui.resources.ProxyHostInfo;
 import lcmc.gui.resources.HostInfo;
 import lcmc.gui.resources.NetInfo;
 
@@ -86,6 +87,8 @@ public final class HostBrowser extends Browser {
     private final HostInfo hostInfo;
     /** Host info object of the host in drbd view of this browser. */
     private final HostDrbdInfo hostDrbdInfo;
+    /** Proxy host info object. */
+    private ProxyHostInfo proxyHostInfo = null;
 
     /** Host icon. */
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(
@@ -164,6 +167,16 @@ public final class HostBrowser extends Browser {
     /** Returns host for drbd view info for this browser. */
     public HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
+    }
+
+    /** Return proxy host info object. */
+    public ProxyHostInfo getProxyHostInfo() {
+        return proxyHostInfo;
+    }
+
+    /** Set proxy host info object. */
+    public void setProxyHostInfo(final ProxyHostInfo proxyHostInfo) {
+        this.proxyHostInfo = proxyHostInfo;
     }
 
     /** Initializes host resources for host view. */

@@ -33,6 +33,7 @@ import lcmc.data.resources.Resource;
 import lcmc.data.DRBDtestData;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
@@ -92,12 +93,20 @@ public final class DrbdInfo extends DrbdGuiInfo {
     /** Sets stored parameters. */
     public void setParameters() {
         final DrbdXML dxml = getBrowser().getDrbdXML();
+        final Cluster cluster = getCluster();
         for (final String hostName : dxml.getProxyHostNames()) {
-            if (getCluster().getProxyHostByName(hostName) == null) {
+
+            final Host proxyHost = cluster.getProxyHostByName(hostName);
+            if (proxyHost == null) {
                 final Host hp = new Host();
                 hp.setHostname(hostName);
-                getCluster().addProxyHost(hp);
+                cluster.addProxyHost(hp);
                 addProxyHostNode(hp);
+            } else {
+                if (proxyHost.getBrowser().getProxyHostInfo()
+                                                          .getNode() == null) {
+                    addProxyHostNode(proxyHost);
+                }
             }
         }
         for (final String param : getParametersFromXML()) {
@@ -970,6 +979,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void addProxyHostNode(final Host host) {
         final ProxyHostInfo proxyHostInfo =
                                     new ProxyHostInfo(host, host.getBrowser());
+        host.getBrowser().setProxyHostInfo(proxyHostInfo);
         final DefaultMutableTreeNode proxyHostNode =
                                    new DefaultMutableTreeNode(proxyHostInfo);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
