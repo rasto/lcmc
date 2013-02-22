@@ -2658,6 +2658,15 @@ public final class ClusterBrowser extends Browser {
         drbdGraph.repaint();
     }
 
+    /** Updates proxy host hardware info immediatly. */
+    public void updateProxyHWInfo(final Host host) {
+        host.setIsLoading();
+        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+                       new ResourceGraph[]{drbdGraph, crmGraph});
+        updateCommonBlockDevices();
+        drbdGraph.repaint();
+    }
+
     /** Returns drbd parameter hash. */
     public Map<Host, String> getDrbdParameters() {
         return drbdParameters;

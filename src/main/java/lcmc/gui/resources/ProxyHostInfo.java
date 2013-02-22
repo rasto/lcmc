@@ -268,7 +268,7 @@ public final class ProxyHostInfo extends Info {
                     } else {
                         DRBD.startProxy(getHost(), testOnly);
                     }
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateProxyHWInfo(host);
                 }
             };
         items.add(proxyItem);
