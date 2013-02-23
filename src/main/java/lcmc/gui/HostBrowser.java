@@ -216,84 +216,87 @@ public final class HostBrowser extends Browser {
     public void updateHWResources(final NetInterface[] nis,
                                   final BlockDevice[] bds,
                                   final String[] fss) {
-        DefaultMutableTreeNode resource = null;
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces =
                                                         getNetInterfacesMap();
-        mNetInfosWriteLock.lock();
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+        final HostBrowser thisClass = this;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                mNetInfosWriteLock.lock();
+                try {
                     netInterfacesNode.removeAllChildren();
+                    for (final NetInterface ni : nis) {
+                        NetInfo nii;
+                        if (oldNetInterfaces.containsKey(ni)) {
+                            nii = oldNetInterfaces.get(ni);
+                        } else {
+                            nii = new NetInfo(ni.getName(), ni, thisClass);
+                        }
+                        final DefaultMutableTreeNode resource =
+                                                       new DefaultMutableTreeNode(nii);
+                        setNode(resource);
+                        netInterfacesNode.add(resource);
+                    }
+                    reloadAndWait(netInterfacesNode, false);
+                } finally {
+                    mNetInfosWriteLock.unlock();
                 }
-            });
-            for (final NetInterface ni : nis) {
-                NetInfo nii;
-                if (oldNetInterfaces.containsKey(ni)) {
-                    nii = oldNetInterfaces.get(ni);
-                } else {
-                    nii = new NetInfo(ni.getName(), ni, this);
-                }
-                resource = new DefaultMutableTreeNode(nii);
-                setNode(resource);
-                addNode(netInterfacesNode, resource);
             }
-            reload(netInterfacesNode, false);
-        } finally {
-            mNetInfosWriteLock.unlock();
-        }
+        });
 
         /* block devices */
         final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
                                                           getBlockDevicesMap();
-        mBlockDevInfosWriteLock.lock();
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                mBlockDevInfosWriteLock.lock();
+                try {
                     blockDevicesNode.removeAllChildren();
+                    for (final BlockDevice bd : bds) {
+                        BlockDevInfo bdi;
+                        if (oldBlockDevices.containsKey(bd)) {
+                            bdi = oldBlockDevices.get(bd);
+                            bdi.updateInfo();
+                        } else {
+                            bdi = new BlockDevInfo(bd.getName(), bd, thisClass);
+                        }
+                        final DefaultMutableTreeNode resource =
+                                               new DefaultMutableTreeNode(bdi);
+                        //setNode(resource);
+                        blockDevicesNode.add(resource);
+                    }
+                    reloadAndWait(blockDevicesNode, false);
+                } finally {
+                    mBlockDevInfosWriteLock.unlock();
                 }
-            });
-            for (final BlockDevice bd : bds) {
-                BlockDevInfo bdi;
-                if (oldBlockDevices.containsKey(bd)) {
-                    bdi = oldBlockDevices.get(bd);
-                    bdi.updateInfo();
-                } else {
-                    bdi = new BlockDevInfo(bd.getName(), bd, this);
-                }
-                resource = new DefaultMutableTreeNode(bdi);
-                //setNode(resource);
-                addNode(blockDevicesNode, resource);
             }
-            reload(blockDevicesNode, false);
-        } finally {
-            mBlockDevInfosWriteLock.unlock();
-        }
+        });
 
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
-        mFileSystemsWriteLock.lock();
-        try {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    fileSystemsNode.removeAllChildren();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                mFileSystemsWriteLock.lock();
+                try {
+                            fileSystemsNode.removeAllChildren();
+                    for (final String fs : fss) {
+                        FSInfo fsi;
+                        if (oldFilesystems.containsKey(fs)) {
+                            fsi = oldFilesystems.get(fs);
+                        } else {
+                            fsi = new FSInfo(fs, thisClass);
+                        }
+                        final DefaultMutableTreeNode resource =
+                                               new DefaultMutableTreeNode(fsi);
+                        setNode(resource);
+                        fileSystemsNode.add(resource);
+                    }
+                    reloadAndWait(fileSystemsNode, false);
+                } finally {
+                    mFileSystemsWriteLock.unlock();
                 }
-            });
-            for (final String fs : fss) {
-                FSInfo fsi;
-                if (oldFilesystems.containsKey(fs)) {
-                    fsi = oldFilesystems.get(fs);
-                } else {
-                    fsi = new FSInfo(fs, this);
-                }
-                resource = new DefaultMutableTreeNode(fsi);
-                setNode(resource);
-                addNode(fileSystemsNode, resource);
             }
-            reload(fileSystemsNode, false);
-        } finally {
-            mFileSystemsWriteLock.unlock();
-        }
+        });
     }
 
     /** Return list of block device info objects. Must be called in
