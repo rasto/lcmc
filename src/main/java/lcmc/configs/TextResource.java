@@ -1823,6 +1823,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ProxyHostInfo.NameInfo",
          "proxy: "},
 
+        {"ProxyHostInfo.NotConnectable",
+         "Missing connection data. Run the host wizard."},
+
         {"BlockDevInfo.Drbd.ProxyUp",
          "Start Proxy Connection"},
 

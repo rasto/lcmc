@@ -71,6 +71,9 @@ public final class ProxyHostInfo extends Info {
     /** Name prefix that appears in the menu. */
     private final String NAME_PREFIX =
                                     Tools.getString("ProxyHostInfo.NameInfo");
+    /** Not connectable. */
+    private final String NOT_CONNECTABLE_STRING =
+                               Tools.getString("ProxyHostInfo.NotConnectable");
     /** Prepares a new <code>ProxyHostInfo</code> object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
@@ -235,6 +238,14 @@ public final class ProxyHostInfo extends Info {
                 }
 
                 @Override
+                public String enablePredicate() {
+                    if (getHost().getUsername() == null) {
+                        return NOT_CONNECTABLE_STRING;
+                    }
+                    return null;
+                }
+
+                @Override
                 public void action() {
                     if (getHost().isConnected()) {
                         getHost().disconnect();
@@ -290,6 +301,14 @@ public final class ProxyHostInfo extends Info {
                 @Override
                 public boolean predicate() {
                     return getHost().isDrbdProxyRunning();
+                }
+
+                @Override
+                public String enablePredicate() {
+                    if (!getHost().isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                    return null;
                 }
 
                 @Override
