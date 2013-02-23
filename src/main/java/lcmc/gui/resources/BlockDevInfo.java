@@ -2622,15 +2622,23 @@ public final class BlockDevInfo extends EditableInfo {
      * Proxy status for graph, null if there's no proxy configured for the
      * resource.
      */
-    public String getProxyStateForGraph() {
+    public String getProxyStateForGraph(final boolean testOnly) {
         final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
         final Host pHost =
                          dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
         if (dri.isProxy(getHost())) {
-            if (pHost.isDrbdProxyUp(dri.getName())) {
-                return PROXY_UP;
+            if (pHost.isConnected()) {
+                if (pHost.isDrbdProxyUp(dri.getName())) {
+                    return PROXY_UP;
+                } else {
+                    return PROXY_DOWN;
+                }
             } else {
-                return PROXY_DOWN;
+                if (drbdVolumeInfo.isConnected(testOnly)) {
+                    return PROXY_UP;
+                } else {
+                    return pHost.getName();
+                }
             }
         }
         return null;
