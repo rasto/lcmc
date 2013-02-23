@@ -103,8 +103,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 cluster.addProxyHost(hp);
                 addProxyHostNode(hp);
             } else {
-                if (proxyHost.getBrowser().getProxyHostInfo()
-                                                          .getNode() == null) {
+                final ProxyHostInfo phi =
+                                     proxyHost.getBrowser().getProxyHostInfo();
+                if (phi != null && phi.getNode() == null) {
                     addProxyHostNode(proxyHost);
                 }
             }
