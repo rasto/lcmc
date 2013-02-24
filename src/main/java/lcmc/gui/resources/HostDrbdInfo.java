@@ -312,10 +312,10 @@ public final class HostDrbdInfo extends Info {
         final MyMenuItem proxyItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
                            null,
-                           getHost().getDistString("DRBD.stopProxy"),
+                           getMenuToolTip("DRBD.stopProxy"),
                            Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                            null,
-                           getHost().getDistString("DRBD.startProxy"),
+                           getMenuToolTip("DRBD.startProxy"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP,
@@ -952,5 +952,10 @@ public final class HostDrbdInfo extends Info {
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
         return null;
+    }
+
+    /** Tool tip for menu items. */
+    private String getMenuToolTip(final String cmd) {
+        return getHost().getDistString(cmd).replaceAll("@.*?@", "");
     }
 }
