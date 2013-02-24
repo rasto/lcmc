@@ -172,8 +172,7 @@ sub start_hw_info_daemon {
 		if ($count % 5 == 0) {
 			my $hw_info = get_hw_info();
 			if ($hw_info ne $prev_hw_info) {
-				print "--hw-info-start--";
-				print `date +%s%N`;
+				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info;
 				$prev_hw_info = $hw_info;
 				print "--hw-info-end--\n";
@@ -182,8 +181,7 @@ sub start_hw_info_daemon {
 		} else {
 			my $hw_info_lazy = get_hw_info_lazy();
 			if ($hw_info_lazy ne $prev_hw_info_lazy) {
-				print "--hw-info-start--";
-				print `date +%s%N`;
+				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info_lazy;
 				print "--hw-info-end--\n";
 				$prev_hw_info_lazy = $hw_info_lazy;
@@ -191,16 +189,14 @@ sub start_hw_info_daemon {
 		}
 		my $vm_info = get_vm_info();
 		if ($vm_info ne $prev_vm_info) {
-			print "--vm-info-start--";
-			print `date +%s%N`;
+			print "--vm-info-start--".`date +%s%N`;
 			print $vm_info;
 			print "--vm-info-end--\n";
 			$prev_vm_info = $vm_info;
 		}
 		my $drbd_info = get_drbd_dump_xml();
 		if ($drbd_info ne $prev_drbd_info) {
-			print "--drbd-info-start--";
-			print `date +%s%N`;
+			print "--drbd-info-start--".`date +%s%N`;
 			print $drbd_info;
 			print "--drbd-info-end--\n";
 			$prev_drbd_info = $drbd_info;
@@ -256,8 +252,7 @@ sub get_hw_info_lazy {
 }
 
 sub get_drbd_info {
-	print "--drbd-info-start--";
-	print `date +%s%N`;
+	print "--drbd-info-start--".`date +%s%N`;
 	print get_drbd_dump_xml();
 	print "--drbd-info-end--\n";
 }
@@ -870,14 +865,13 @@ sub do_drbd_events {
 			if ($_ && $_ !~ /\d+\s+ZZ/) {
 				my $drbd_info = get_drbd_dump_xml();
 				if ($drbd_info ne $prev_drbd_info) {
-					print "--drbd-info-start--";
-					print `date +%s%N`;
+					print "--drbd-info-start--"
+						.`date +%s%N`;
 					print $drbd_info;
 					print "--drbd-info-end--\n";
 					$prev_drbd_info = $drbd_info;
 				}
-				print "--event-info-start--";
-				print `date +%s%N`;
+				print "--event-info-start--".`date +%s%N`;
 				print "$_";
 				print "--event-info-end--\n";
 			}
