@@ -386,7 +386,10 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"DRBD.resDelConnection",
          SUDO + "/sbin/drbdsetup @DRYRUN@ @RES-VOL@ del-resource"},
 
-        {"DRBD.getProcDrbd",   SUDO + "@GUI-HELPER@ proc-drbd"},
+        {"DRBD.getProcDrbd",
+         SUDO + "@GUI-HELPER@ proc-drbd;"
+         + SUDO + "/sbin/drbd-proxy-ctl -c 'show hconnections'"
+              + " -c 'show hsubconnections' -c 'show memusage' 2>/dev/null;:"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
         {"DRBD.showProxyInfo",
          SUDO + "/sbin/drbd-proxy-ctl -c 'show hconnections'"
