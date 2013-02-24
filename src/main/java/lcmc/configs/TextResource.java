@@ -985,6 +985,12 @@ public final class TextResource extends java.util.ListResourceBundle {
          + "the fields, or you are satisfied with the defaults, press "
          + "<b>Next</b> to continue."},
 
+        {"Dialog.DrbdConfig.Resource.ProxyHosts",
+         "Proxy Hosts"},
+
+        {"Dialog.DrbdConfig.Resource.AddHost",
+         "Add Host"},
+
         {"Dialog.DrbdConfig.Volume.Title",
          "Configure DRBD Volume"},
 

@@ -289,9 +289,11 @@ public final class Resource extends DrbdConfig {
     private JPanel getProxyHostsPanel() {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(Tools.getBorder("Proxy Hosts"));
+        panel.setBorder(Tools.getBorder(
+                    Tools.getString("Dialog.DrbdConfig.Resource.ProxyHosts")));
 
-        final MyButton btn = new MyButton("Add Host");
+        final MyButton btn = new MyButton(
+                        Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
         btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
         btn.addActionListener(new ActionListener() {
             @Override
