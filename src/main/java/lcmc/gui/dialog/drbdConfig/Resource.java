@@ -122,6 +122,7 @@ public final class Resource extends DrbdConfig {
     public WizardDialog nextDialog() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         if (proxyHostNextDialog) {
+            proxyHostNextDialog = false;
             final Host proxyHost = new Host();
             proxyHost.setCluster(dri.getCluster());
             return new NewProxyHost(this,
