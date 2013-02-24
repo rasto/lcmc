@@ -816,14 +816,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 proxyHost = host;
             }
 
-            if (insidePort != null && !insidePort.equals(hostInsidePort)) {
-                Tools.appWarning("more proxy inside ports in " + getName()
+            if (insidePort != null
+                && hostInsidePort != null
+                && !insidePort.equals(hostInsidePort)) {
+                Tools.appWarning("multiple proxy inside ports in " + getName()
                                  + " " + insidePort + " " + hostInsidePort);
             }
             hostInsidePort = insidePort;
 
-            if (outsidePort != null && !outsidePort.equals(hostOutsidePort)) {
-                Tools.appWarning("more proxy outside ports in " + getName()
+            if (outsidePort != null
+                && hostOutsidePort != null
+                && !outsidePort.equals(hostOutsidePort)) {
+                Tools.appWarning("multiple proxy outside ports in " + getName()
                                  + " " + outsidePort + " " + hostOutsidePort);
             }
             hostOutsidePort = outsidePort;
