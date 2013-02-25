@@ -635,7 +635,8 @@ public final class Tools {
         }
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
-        errorString.append(getErrorString("AppError.Text"));
+        errorString.append(getErrorString(msg));
+        errorString.append('\n');
         errorString.append("\nrelease: ");
         errorString.append(getRelease());
         errorString.append("\njava: ");
@@ -643,8 +644,6 @@ public final class Tools {
         errorString.append(' ');
         errorString.append(System.getProperty("java.version"));
         errorString.append("\n\n");
-        errorString.append(getErrorString(msg));
-        errorString.append('\n');
         errorString.append(msg2);
         if (e != null) {
             errorString.append('\n');
@@ -675,7 +674,6 @@ public final class Tools {
 
         final JEditorPane errorPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
                                                       errorString.toString());
-        errorPane.setEditable(false);
         errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
         errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
         errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
@@ -2857,6 +2855,18 @@ public final class Tools {
                                          f.getStyle(),
                                          getConfigData().scaled(f.getSize()))); 
             }
+        }
+    }
+
+    /**
+     * Set maximum access type.
+     */
+    public static void setMaxAccessType(
+                                      final ConfigData.AccessType accessType) {
+        getConfigData().setAccessType(ConfigData.AccessType.RO);
+        getConfigData().setMaxAccessType(ConfigData.AccessType.RO);
+        for (final Cluster c : getConfigData().getClusters().getClusterSet()) {
+            c.getBrowser().checkAccessOfEverything();
         }
     }
 }

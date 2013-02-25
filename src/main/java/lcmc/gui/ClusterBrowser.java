@@ -2549,7 +2549,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Checks all fields in the application. */
-    void checkAccessOfEverything() {
+    public void checkAccessOfEverything() {
         servicesInfo.checkResourceFieldsChanged(
                                          null,
                                          servicesInfo.getParametersFromXML());
