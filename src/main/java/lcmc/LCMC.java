@@ -311,9 +311,13 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    Tools.appError("uncaught exception",
-                                   ex.toString(),
-                                   (Exception) ex);
+                    Tools.setMaxAccessType(ConfigData.AccessType.RO);
+                    Tools.appError(
+                           "Application Error: Switching to read-only mode\n"
+                           + "CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n"
+                           + "please...\n",
+                           ex.toString(),
+                           (Exception) ex);
                 }
             });
         float fps = 20.0f;
