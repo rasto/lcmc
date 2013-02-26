@@ -323,6 +323,76 @@ public final class ProxyHostInfo extends Info {
             };
         items.add(proxyItem);
 
+        /* all proxy connections up */
+        final MyMenuItem allProxyUpItem =
+            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
+                           null,
+                           getMenuToolTip("DRBD.proxyUp"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP, 
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    if (!host.isConnected()) {
+                        return false;
+                    }
+                    if (!host.isDrbdProxyRunning()) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    DRBD.proxyUp(host, DRBD.ALL, null, testOnly);
+                    getBrowser().getClusterBrowser().updateProxyHWInfo(host);
+                }
+            };
+        items.add(allProxyUpItem);
+
+        /* all proxy connections down */
+        final MyMenuItem allProxyDownItem =
+            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
+                           null,
+                           getMenuToolTip("DRBD.proxyDown"),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP, 
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    if (!host.isConnected()) {
+                        return false;
+                    }
+                    if (!host.isDrbdProxyRunning()) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    DRBD.proxyDown(host, DRBD.ALL, null, testOnly);
+                    getBrowser().getClusterBrowser().updateProxyHWInfo(host);
+                }
+            };
+        items.add(allProxyDownItem);
+
         /* view logs */
         final MyMenuItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
@@ -386,5 +456,10 @@ public final class ProxyHostInfo extends Info {
         }
         dg.getDrbdInfo().setSelectedNode(null);
         return dg.getDrbdInfo().getGraphicalView();
+    }
+
+    /** Tool tip for menu items. */
+    private String getMenuToolTip(final String cmd) {
+        return getHost().getDistString(cmd).replaceAll("@.*?@", "");
     }
 }

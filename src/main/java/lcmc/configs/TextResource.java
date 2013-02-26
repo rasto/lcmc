@@ -1826,6 +1826,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostDrbdInfo.Disconnect",
          "Diconnect"},
 
+        {"HostDrbdInfo.Drbd.AllProxyUp",
+         "Start All Proxy Connections"},
+
+        {"HostDrbdInfo.Drbd.AllProxyDown",
+         "Stop All Proxy Connections"},
+
         {"ProxyHostInfo.NameInfo",
          "proxy: "},
 
