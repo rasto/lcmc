@@ -2204,7 +2204,14 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isDrbdProxyRunning()) {
+                    final DrbdResourceInfo dri =
+                                          drbdVolumeInfo.getDrbdResourceInfo();
+                    final Host pHost =
+                         dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
+                    if (!pHost.isConnected()) {
+                        return Host.NOT_CONNECTED_STRING;
+                    }
+                    if (!pHost.isDrbdProxyRunning()) {
                         return "proxy daemon is not running";
                     }
                     return null;
@@ -2212,8 +2219,12 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public boolean predicate() {
+                    final DrbdResourceInfo dri =
+                                          drbdVolumeInfo.getDrbdResourceInfo();
+                    final Host pHost =
+                         dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
                     if (getBlockDevice().isDrbd()) {
-                        return getHost().isDrbdProxyUp(
+                        return pHost.isDrbdProxyUp(
                              drbdVolumeInfo.getDrbdResourceInfo().getName());
                     } else {
                         return true;
@@ -2222,21 +2233,25 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    if (getHost().isDrbdProxyUp(
+                    final DrbdResourceInfo dri =
+                                          drbdVolumeInfo.getDrbdResourceInfo();
+                    final Host pHost =
+                         dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
+                    if (pHost.isDrbdProxyUp(
                              drbdVolumeInfo.getDrbdResourceInfo().getName())) {
                         DRBD.proxyDown(
-                                getHost(),
+                                pHost,
                                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
                                 drbdVolumeInfo.getName(),
                                 testOnly);
                     } else {
                         DRBD.proxyUp(
-                                getHost(),
+                                pHost,
                                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
                                 drbdVolumeInfo.getName(),
                                 testOnly);
                     }
-                    getBrowser().getClusterBrowser().updateHWInfo(getHost());
+                    getBrowser().getClusterBrowser().updateProxyHWInfo(pHost);
                 }
             };
         items.add(proxyItem);
