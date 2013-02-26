@@ -2873,7 +2873,10 @@ public final class Tools {
         getConfigData().setAccessType(ConfigData.AccessType.RO);
         getConfigData().setMaxAccessType(ConfigData.AccessType.RO);
         for (final Cluster c : getConfigData().getClusters().getClusterSet()) {
-            c.getBrowser().checkAccessOfEverything();
+            final ClusterBrowser cb = c.getBrowser();
+            if (cb != null) {
+                cb.checkAccessOfEverything();
+            }
         }
     }
 }
