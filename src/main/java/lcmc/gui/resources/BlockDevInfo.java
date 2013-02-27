@@ -2211,6 +2211,9 @@ public final class BlockDevInfo extends EditableInfo {
                                           drbdVolumeInfo.getDrbdResourceInfo();
                     final Host pHost =
                          dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
+                    if (pHost == null) {
+                        return "not a proxy";
+                    }
                     if (!pHost.isConnected()) {
                         return Host.NOT_CONNECTED_STRING;
                     }
@@ -2229,6 +2232,9 @@ public final class BlockDevInfo extends EditableInfo {
                                           drbdVolumeInfo.getDrbdResourceInfo();
                     final Host pHost =
                          dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
+                    if (pHost == null) {
+                        return false;
+                    }
                     if (getBlockDevice().isDrbd()) {
                         return pHost.isDrbdProxyUp(
                              drbdVolumeInfo.getDrbdResourceInfo().getName());
