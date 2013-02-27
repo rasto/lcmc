@@ -383,7 +383,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public boolean predicate() {
-                return !isConnected(testOnly);
+                return !isConnectedOrWF(testOnly);
             }
 
             @Override
@@ -837,8 +837,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /**
-     * Returns whether the resources is connected, meaning both devices are
-     * connected.
+     * Returns whether the resources are connected.
+     * If all devices are waiting for connection it returns false
      */
     public boolean isConnected(final boolean testOnly) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
@@ -848,6 +848,19 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         return false;
     }
+
+    /**
+     * Returns whether the resources are connected or waiting for connection.
+     */
+    public boolean isConnectedOrWF(final boolean testOnly) {
+        for (final BlockDevInfo bdi : getBlockDevInfos()) {
+            if (!bdi.isConnectedOrWF(testOnly)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /** Returns whether the cluster is being verified. */
     public boolean isVerifying() {
