@@ -288,10 +288,10 @@ public final class ProxyHostInfo extends Info {
         final MyMenuItem proxyItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
                            null,
-                           getHost().getDistString("DRBD.stopProxy"),
+                           getMenuToolTip("DRBD.stopProxy"),
                            Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                            null,
-                           getHost().getDistString("DRBD.startProxy"),
+                           getMenuToolTip("DRBD.startProxy"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP,
