@@ -273,6 +273,9 @@ public final class Host {
     /** String that is displayed as a tool tip for disabled menu item. */
     public static final String NOT_CONNECTED_STRING =
                                                    "not connected to the host";
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String PROXY_NOT_CONNECTED_STRING =
+                                             "not connected to the proxy host";
     /** Block device with number pattern. */
     public static final Pattern BDP = Pattern.compile("(\\D+)\\d+");
     /** DRBD bd pattern. */

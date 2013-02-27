@@ -1136,19 +1136,47 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, 
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
+
                 @Override
                 public boolean visiblePredicate() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.getHost().isDrbdProxyUp(
-                             bdi.getDrbdVolumeInfo()
-                                    .getDrbdResourceInfo().getName())) {
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (pHost == null) {
+                            return false;
+                        }
+                        if (pHost.isDrbdProxyUp(dri.getName())) {
                             return true;
                         }
                     }
                     return false;
+                }
+
+                @Override
+                public String enablePredicate() {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (pHost == null) {
+                            return "";
+                        }
+                        if (!pHost.isConnected()) {
+                            return Host.PROXY_NOT_CONNECTED_STRING;
+                        }
+                    }
+                    return null;
                 }
 
                 @Override
@@ -1158,20 +1186,21 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.getHost().isDrbdProxyUp(
-                             bdi.getDrbdVolumeInfo()
-                                    .getDrbdResourceInfo().getName())) {
-                            DRBD.proxyDown(
-                                bdi.getHost(),
-                                bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                                    .getName(),
-                                bdi.getDrbdVolumeInfo().getName(),
-                                CRM.LIVE);
-                            hosts.add(bdi.getHost());
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (pHost.isDrbdProxyUp(dri.getName())) {
+                            DRBD.proxyDown(pHost,
+                                           dri.getName(),
+                                           bdi.getDrbdVolumeInfo().getName(),
+                                           CRM.LIVE);
+                            hosts.add(pHost);
                         }
                     }
                     for (final Host h : hosts) {
-                        getBrowser().updateHWInfo(h);
+                        getBrowser().updateProxyHWInfo(h);
                     }
                 }
             };
@@ -1187,19 +1216,44 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, 
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
+
                 @Override
                 public boolean visiblePredicate() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.getHost().isDrbdProxyUp(
-                                bdi.getDrbdVolumeInfo()
-                                    .getDrbdResourceInfo().getName())) {
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (!pHost.isDrbdProxyUp(dri.getName())) {
                             return true;
                         }
                     }
                     return false;
+                }
+
+                @Override
+                public String enablePredicate() {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (!bdi.getBlockDevice().isDrbd()) {
+                            continue;
+                        }
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (pHost == null) {
+                            return "";
+                        }
+                        if (!pHost.isConnected()) {
+                            return Host.PROXY_NOT_CONNECTED_STRING;
+                        }
+                    }
+                    return null;
                 }
 
                 @Override
@@ -1209,20 +1263,21 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.getHost().isDrbdProxyUp(
-                                bdi.getDrbdVolumeInfo()
-                                    .getDrbdResourceInfo().getName())) {
-                            DRBD.proxyUp(
-                                bdi.getHost(),
-                                bdi.getDrbdVolumeInfo().getDrbdResourceInfo()
-                                                                    .getName(),
-                                bdi.getDrbdVolumeInfo().getName(),
-                                CRM.LIVE);
-                            hosts.add(bdi.getHost());
+                        final DrbdResourceInfo dri = 
+                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost =
+                                    dri.getProxyHost(bdi.getHost(),
+                                                     !DrbdResourceInfo.WIZARD);
+                        if (!pHost.isDrbdProxyUp(dri.getName())) {
+                            DRBD.proxyUp(pHost,
+                                         dri.getName(),
+                                         bdi.getDrbdVolumeInfo().getName(),
+                                         CRM.LIVE);
+                            hosts.add(pHost);
                         }
                     }
                     for (final Host h : hosts) {
-                        getBrowser().updateHWInfo(h);
+                        getBrowser().updateProxyHWInfo(h);
                     }
                 }
             };

@@ -2700,10 +2700,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Discard Data on selected BDs"},
 
         {"DrbdMultiSelectionInfo.ProxyDown",
-         "Stop Proxy on selected BDs"},
+         "Stop Proxies on selected BDs"},
 
         {"DrbdMultiSelectionInfo.ProxyUp",
-         "Start Proxy on selected BDs"},
+         "Start Proxies on selected BDs"},
 
         {"DrbdMultiSelectionInfo.HostStopProxy",
          "Stop Proxy Daemon on selected hosts"},
