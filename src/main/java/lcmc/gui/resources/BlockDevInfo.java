@@ -2204,6 +2204,9 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public String enablePredicate() {
+                    if (!getBlockDevice().isDrbd()) {
+                        return NO_DRBD_RESOURCE_STRING;
+                    }
                     final DrbdResourceInfo dri =
                                           drbdVolumeInfo.getDrbdResourceInfo();
                     final Host pHost =
@@ -2219,6 +2222,9 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public boolean predicate() {
+                    if (!getBlockDevice().isDrbd()) {
+                        return false;
+                    }
                     final DrbdResourceInfo dri =
                                           drbdVolumeInfo.getDrbdResourceInfo();
                     final Host pHost =
