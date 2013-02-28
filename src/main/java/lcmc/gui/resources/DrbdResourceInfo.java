@@ -866,10 +866,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* set proxy ports */
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
-            for (final Host host : configuredProxyHosts) {
-                if (!isProxy(host)) {
-                    continue;
-                }
+            for (final Host host : getHosts()) {
                 host.getBrowser().getUsedPorts().add(hostInsidePort);
             }
             if (infoPanelOk) {
