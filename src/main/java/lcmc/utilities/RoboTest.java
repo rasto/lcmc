@@ -3847,8 +3847,6 @@ public final class RoboTest {
         sleep(500);
         press(KeyEvent.VK_DOWN);
         sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_ENTER); /* detach */
         checkDRBDTest(drbdTest, 2.01);
 

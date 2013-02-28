@@ -1228,6 +1228,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
                                                      !DrbdResourceInfo.WIZARD);
+                        if (pHost == null) {
+                            return false;
+                        }
                         if (!pHost.isDrbdProxyUp(dri.getName())) {
                             return true;
                         }
