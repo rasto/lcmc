@@ -2564,6 +2564,18 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdResourceInfo.ProxyOutsidePort",
          "<html><u>Proxy</u> \u2192 Proxy Port</html>"},
 
+        {"DrbdResourceInfo.ProxyInsideIp.ToolTip",
+         "Proxy Inside IP"},
+
+        {"DrbdResourceInfo.ProxyInsidePort.ToolTip",
+         "Proxy Inside Port"},
+
+        {"DrbdResourceInfo.ProxyOutsideIp.ToolTip",
+         "Proxy Outside IP"},
+
+        {"DrbdResourceInfo.ProxyOutsidePort.ToolTip",
+         "Proxy Outside Port"},
+
         {"BlockDevice.MetaDiskSection",
          "DRBD Meta Disk"},
 

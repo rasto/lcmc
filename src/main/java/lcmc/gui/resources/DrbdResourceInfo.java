@@ -1498,16 +1498,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
 
-        final String insidePort =
-                           Tools.getString("DrbdResourceInfo.ProxyInsidePort");
-        final JLabel insidePortLabel = new JLabel(insidePort);
+        final JLabel insidePortLabel = new JLabel(
+                          Tools.getString("DrbdResourceInfo.ProxyInsidePort"));
+        insidePortWi.setLabel(
+                  insidePortLabel,
+                  Tools.getString("DrbdResourceInfo.ProxyInsidePort.ToolTip"));
         addField(panel,
                  insidePortLabel,
                  insidePortWi,
                  leftWidth,
                  rightWidth,
                  0);
-        insidePortWi.setLabel(insidePortLabel, insidePort);
         if (wizard) {
             insidePortComboBoxWizard = insidePortWi;
         } else {
@@ -1541,16 +1542,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
 
-        final String outsidePort =
-                        Tools.getString("DrbdResourceInfo.ProxyOutsidePort");
-        final JLabel outsidePortLabel = new JLabel(outsidePort);
+        final JLabel outsidePortLabel = new JLabel(
+                         Tools.getString("DrbdResourceInfo.ProxyOutsidePort"));
+        outsidePortWi.setLabel(
+                 outsidePortLabel,
+                 Tools.getString("DrbdResourceInfo.ProxyOutsidePort.ToolTip"));
         addField(panel,
                  outsidePortLabel,
                  outsidePortWi,
                  leftWidth,
                  rightWidth,
                  0);
-        outsidePortWi.setLabel(outsidePortLabel, outsidePort);
         if (wizard) {
             outsidePortComboBoxWizard = outsidePortWi;
         } else {
@@ -1602,10 +1604,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             iIpWi.setAlwaysEditable(!pHost.isConnected());
             newInsideIpComboBoxHash.put(pHost, iIpWi);
 
-            final String insideIp =
-                            Tools.getString("DrbdResourceInfo.ProxyInsideIp");
-            final JLabel insideIpLabel = new JLabel(insideIp);
-            iIpWi.setLabel(insideIpLabel, insideIp);
+            final JLabel insideIpLabel = new JLabel(
+                            Tools.getString("DrbdResourceInfo.ProxyInsideIp"));
+            iIpWi.setLabel(
+                    insideIpLabel,
+                    Tools.getString("DrbdResourceInfo.ProxyInsideIp.ToolTip"));
             final JPanel panel = new JPanel();
             addField(panel,
                      insideIpLabel,
@@ -1631,10 +1634,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             oIpWi.setAlwaysEditable(!pHost.isConnected());
             newOutsideIpComboBoxHash.put(pHost, oIpWi);
 
-            final String outsideIp =
-                            Tools.getString("DrbdResourceInfo.ProxyOutsideIp");
-            final JLabel outsideIpLabel = new JLabel(outsideIp);
-            oIpWi.setLabel(outsideIpLabel, outsideIp);
+            final JLabel outsideIpLabel = new JLabel(
+                           Tools.getString("DrbdResourceInfo.ProxyOutsideIp"));
+            oIpWi.setLabel(
+                   outsideIpLabel,
+                   Tools.getString("DrbdResourceInfo.ProxyOutsideIp.ToolTip"));
             addField(panel,
                      outsideIpLabel,
                      oIpWi,
