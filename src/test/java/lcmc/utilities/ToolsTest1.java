@@ -737,7 +737,7 @@ public final class ToolsTest1 extends TestCase {
     public void testSetSize() {
         final JPanel p = new JPanel();
         Tools.setSize(p, 20, 10);
-        assertEquals(new Dimension(20, 10), p.getMaximumSize());
+        assertEquals(new Dimension(Short.MAX_VALUE, 10), p.getMaximumSize());
         assertEquals(new Dimension(20, 10), p.getMinimumSize());
         assertEquals(new Dimension(20, 10), p.getPreferredSize());
     }
