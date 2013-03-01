@@ -40,6 +40,7 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.configs.AppDefaults;
+import lcmc.gui.dialog.cluster.DrbdLogs;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -82,6 +83,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
                              Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
+    /** Device thath matches all drbd devices in the log. */
+    private static final String ALL_LOGS_PATTERN = "/dev/drbd[0-9]*";
 
     /** Prepares a new <code>DrbdInfo</code> object. */
     public DrbdInfo(final String name, final Browser browser) {
@@ -1014,6 +1017,30 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
         };
         items.add(addProxyHostMenu);
+
+        /* view log */
+        final MyMenuItem viewLogMenu = new MyMenuItem(
+                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
+                           LOGFILE_ICON,
+                           null,
+                           new AccessMode(ConfigData.AccessType.RO, false),
+                           new AccessMode(ConfigData.AccessType.RO, false)) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                hidePopup();
+                DrbdLogs l = new DrbdLogs(getCluster(), ALL_LOGS_PATTERN);
+                l.showDialog();
+            }
+        };
+        items.add(viewLogMenu);
         return items;
     }
 
