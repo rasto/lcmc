@@ -1382,50 +1382,51 @@ public final class ClusterBrowser extends Browser {
     /** Updates common block devices. */
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
-            DefaultMutableTreeNode resource;
-            final List<String> bd = cluster.getCommonBlockDevices();
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e =
-                                             commonBlockDevicesNode.children();
-            final List<DefaultMutableTreeNode> nodesToRemove =
-                                       new ArrayList<DefaultMutableTreeNode>();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final Info cbdi = (Info) node.getUserObject();
-                if (bd.contains(cbdi.getName())) {
-                    /* keeping */
-                    bd.remove(bd.indexOf(cbdi.getName()));
-                } else {
-                    /* remove not existing block devices */
-                    cbdi.setNode(null);
-                    nodesToRemove.add(node);
-                }
-            }
-
-            /* remove nodes */
+            final ClusterBrowser thisBrowser = this;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+                    final List<String> bd = cluster.getCommonBlockDevices();
+                    @SuppressWarnings("unchecked")
+                    final Enumeration<DefaultMutableTreeNode> e =
+                                                     commonBlockDevicesNode.children();
+                    final List<DefaultMutableTreeNode> nodesToRemove =
+                                               new ArrayList<DefaultMutableTreeNode>();
+                    while (e.hasMoreElements()) {
+                        final DefaultMutableTreeNode node = e.nextElement();
+                        final Info cbdi = (Info) node.getUserObject();
+                        if (bd.contains(cbdi.getName())) {
+                            /* keeping */
+                            bd.remove(bd.indexOf(cbdi.getName()));
+                        } else {
+                            /* remove not existing block devices */
+                            cbdi.setNode(null);
+                            nodesToRemove.add(node);
+                        }
+                    }
+
+                    /* remove nodes */
                     for (DefaultMutableTreeNode node : nodesToRemove) {
                         node.removeFromParent();
+                    }
+                    /* block devices */
+                    for (String device : bd) {
+                        /* add new block devices */
+                        final DefaultMutableTreeNode resource =
+                            new DefaultMutableTreeNode(
+                                 new CommonBlockDevInfo(
+                                          device,
+                                          cluster.getHostBlockDevices(device),
+                                          thisBrowser));
+                        setNode(resource);
+                        addNode(commonBlockDevicesNode, resource);
+                    }
+                    if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
+                        reload(commonBlockDevicesNode, false);
+                        reloadAllComboBoxes(null);
                     }
                 }
             });
 
-            /* block devices */
-            for (String device : bd) {
-                /* add new block devices */
-                resource = new DefaultMutableTreeNode(
-                     new CommonBlockDevInfo(
-                                          device,
-                                          cluster.getHostBlockDevices(device),
-                                          this));
-                setNode(resource);
-                addNode(commonBlockDevicesNode, resource);
-            }
-            if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
-                reload(commonBlockDevicesNode, false);
-                reloadAllComboBoxes(null);
-            }
         }
     }
 
