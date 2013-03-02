@@ -308,6 +308,7 @@ public final class CRMGraph extends ResourceGraph {
         final List<HbConnectionInfo> infos = new ArrayList<HbConnectionInfo>();
         final Vertex v = getVertex(si);
         if (v != null) {
+            mHbConnectionReadLock.lock();
             lockGraph();
             for (final Vertex pV : getGraph().getPredecessors(v)) {
                 Edge edge = getGraph().findEdge(pV, v);
@@ -316,10 +317,8 @@ public final class CRMGraph extends ResourceGraph {
                     edge = getGraph().findEdge(v, pV);
                 }
                 if (edge != null) {
-                    mHbConnectionReadLock.lock();
                     final HbConnectionInfo hbci =
                                               edgeToHbconnectionMap.get(edge);
-                    mHbConnectionReadLock.unlock();
                     if (hbci != null) {
                         infos.add(hbci);
                     }
@@ -332,16 +331,15 @@ public final class CRMGraph extends ResourceGraph {
                     edge = getGraph().findEdge(sV, v);
                 }
                 if (edge != null) {
-                    mHbConnectionReadLock.lock();
                     final HbConnectionInfo hbci =
                                               edgeToHbconnectionMap.get(edge);
-                    mHbConnectionReadLock.unlock();
                     if (hbci != null) {
                         infos.add(hbci);
                     }
                 }
             }
             unlockGraph();
+            mHbConnectionReadLock.unlock();
         }
         return infos.toArray(new HbConnectionInfo[infos.size()]);
     }
@@ -653,32 +651,32 @@ public final class CRMGraph extends ResourceGraph {
 
     /** Removes items from order list. */
     public void clearKeepOrderList() {
+        mHbConnectionReadLock.lock();
         lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
-            mHbConnectionReadLock.lock();
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-            mHbConnectionReadLock.unlock();
             if (hbci != null && !hbci.isNew()) {
                 /* don't remove the new ones. */
                 keepEdgeIsOrderList.remove(edge);
             }
         }
         unlockGraph();
+        mHbConnectionReadLock.unlock();
     }
 
     /** Removes items from colocation list. */
     public void clearKeepColocationList() {
+        mHbConnectionReadLock.lock();
         lockGraph();
         for (final Edge edge : getGraph().getEdges()) {
-            mHbConnectionReadLock.lock();
             final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-            mHbConnectionReadLock.unlock();
             if (hbci != null && !hbci.isNew()) {
                 /* don't remove the new ones. */
                 keepEdgeIsColocationList.remove(edge);
             }
         }
         unlockGraph();
+        mHbConnectionReadLock.unlock();
     }
 
     /** Returns label for service vertex. */
@@ -1273,11 +1271,9 @@ public final class CRMGraph extends ResourceGraph {
             unlockGraph();
             mHbConnectionWriteLock.lock();
             try {
-                mHbConnectionWriteLock.lock();
                 final HbConnectionInfo hbci =
                                         edgeToHbconnectionMap.get(e);
                 edgeToHbconnectionMap.remove(e);
-                mHbConnectionWriteLock.unlock();
                 if (hbci != null) {
                     hbconnectionToEdgeMap.remove(hbci);
                     hbci.removeMyself(testOnly);
