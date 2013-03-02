@@ -179,10 +179,16 @@ public class Browser {
 
     /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {
+        final String stacktrace = Tools.getStackTrace();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                treeModel.nodeChanged(node);
+                try {
+                    treeModel.nodeChanged(node);
+                } catch (Exception e) {
+                    Tools.appError("node changed error: ", e);
+                    Tools.appWarning("stacktrace: " + stacktrace);
+                }
             }
         });
     }
