@@ -437,13 +437,14 @@ public class Info implements Comparable<Info> {
     /** Selects and highlights this node. */
     public void selectMyself() {
         // this fires an event in ViewPanel.
-        if (node != null) {
+        final DefaultMutableTreeNode n = node;
+        if (n != null) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    getBrowser().reloadAndWait(node, true);
+                    getBrowser().reloadAndWait(n, true);
                 }
             });
-            getBrowser().nodeChanged(node);
+            getBrowser().nodeChanged(n);
         }
     }
 
