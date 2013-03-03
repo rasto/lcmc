@@ -311,7 +311,7 @@ public final class HostBrowser extends Browser {
      */
     public Set<BlockDevInfo> getBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
-        final Set<BlockDevInfo> values = new LinkedHashSet<BlockDevInfo>(
+        final Set<BlockDevInfo> values = new TreeSet<BlockDevInfo>(
                                                       blockDevInfos.values());
         mBlockDevInfosReadLock.unlock();
         return values;
