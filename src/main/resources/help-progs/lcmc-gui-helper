@@ -988,7 +988,7 @@ sub do_cluster_events {
 				if (/signon to CIB failed/i) {
 					print "ERROR: signon to CIB failed";
 					return;
-				} elsif (/error:/ || /Diff: ---/) {
+				} elsif (/error:/ || /\+\s+<cib\b/) {
 					my $info =
 					get_cluster_info($hb_version);
 					if ($info ne $prev_info) {
