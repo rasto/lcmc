@@ -51,8 +51,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
 import java.util.concurrent.locks.Lock;
@@ -120,6 +122,9 @@ public final class HostBrowser extends Browser {
     static final ImageIcon HOST_IN_CLUSTER_ICON_LEFT_SMALL =
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconLeftSmall"));
+    /** Map of block devices and their info objects. */
+    private final Map<BlockDevice, BlockDevInfo> blockDevInfos =
+                                new LinkedHashMap<BlockDevice, BlockDevInfo>();
     /** Block device infos lock. */
     private final ReadWriteLock mBlockDevInfosLock =
                                                   new ReentrantReadWriteLock();
@@ -245,13 +250,14 @@ public final class HostBrowser extends Browser {
         });
 
         /* block devices */
-        final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
-                                                          getBlockDevicesMap();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                mBlockDevInfosWriteLock.lock();
                 try {
+                    mBlockDevInfosWriteLock.lock();
+                    final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
+                         new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
                     blockDevicesNode.removeAllChildren();
+                    blockDevInfos.clear();
                     for (final BlockDevice bd : bds) {
                         BlockDevInfo bdi;
                         if (oldBlockDevices.containsKey(bd)) {
@@ -264,6 +270,7 @@ public final class HostBrowser extends Browser {
                                                new DefaultMutableTreeNode(bdi);
                         //setNode(resource);
                         blockDevicesNode.add(resource);
+                        blockDevInfos.put(bd, bdi);
                     }
                     reloadAndWait(blockDevicesNode, false);
                 } finally {
@@ -299,74 +306,15 @@ public final class HostBrowser extends Browser {
         });
     }
 
-    /** Return list of block device info objects. Must be called in
-     Swing thread. */
-    public Set<BlockDevInfo> getBlockDevInfos() {
-        final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
-        mBlockDevInfosReadLock.lock();
-        try {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e =
-                                                   blockDevicesNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode bdNode = e.nextElement();
-                final BlockDevInfo bdi = (BlockDevInfo) bdNode.getUserObject();
-                blockDevInfos.add(bdi);
-            }
-        } finally {
-            mBlockDevInfosReadLock.unlock();
-        }
-        return blockDevInfos;
-    }
-
-    /** Return list of block device info objects. Must NOT be called in
-     Swing thread. */
-    public Set<BlockDevInfo> getBlockDevInfosInSwing() {
-        final Set<BlockDevInfo> blockDevInfos = new TreeSet<BlockDevInfo>();
-        Tools.invokeAndWait(new Runnable() {
-            public void run() {
-                mBlockDevInfosReadLock.lock();
-                try {
-                    final Enumeration e = blockDevicesNode.children();
-                    while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode bdNode =
-                                     (DefaultMutableTreeNode) e.nextElement();
-                        final BlockDevInfo bdi =
-                                        (BlockDevInfo) bdNode.getUserObject();
-                        blockDevInfos.add(bdi);
-                    }
-                } finally {
-                    mBlockDevInfosReadLock.unlock();
-                }
-            }
-        });
-        return blockDevInfos;
-    }
-
     /**
-     * Returns map of block device objects with its block device info objects.
+     * Return list of block device info objects.
      */
-    Map<BlockDevice, BlockDevInfo> getBlockDevicesMap() {
-        final Map<BlockDevice, BlockDevInfo> blockDevices =
-                                      new HashMap<BlockDevice, BlockDevInfo>();
-        Tools.invokeAndWait(new Runnable() {
-            public void run() {
-                mBlockDevInfosReadLock.lock();
-                try {
-                    final Enumeration e = blockDevicesNode.children();
-                    while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode bdNode =
-                                      (DefaultMutableTreeNode) e.nextElement();
-                        final BlockDevInfo bdi =
-                                         (BlockDevInfo) bdNode.getUserObject();
-                        blockDevices.put(bdi.getBlockDevice(), bdi);
-                    }
-                } finally {
-                    mBlockDevInfosReadLock.unlock();
-                }
-            }
-        });
-        return blockDevices;
+    public Set<BlockDevInfo> getBlockDevInfos() {
+        mBlockDevInfosReadLock.lock();
+        final Set<BlockDevInfo> values = new LinkedHashSet<BlockDevInfo>(
+                                                      blockDevInfos.values());
+        mBlockDevInfosReadLock.unlock();
+        return values;
     }
 
     /** Returns map of net interface objects with its net info objects. */
@@ -661,11 +609,6 @@ public final class HostBrowser extends Browser {
     /** Unlock block dev info objects. */
     public void unlockBlockDevInfosRead() {
         mBlockDevInfosReadLock.unlock();
-    }
-
-    /** Returns block devices node from the menu. */
-    public DefaultMutableTreeNode getBlockDevicesNode() {
-        return blockDevicesNode;
     }
 
     /** Returns net interfaces node from the menu. */

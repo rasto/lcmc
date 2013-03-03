@@ -635,9 +635,9 @@ public final class BlockDevInfo extends EditableInfo {
             getBrowser().lockBlockDevInfosRead();
             @SuppressWarnings("unchecked")
             final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(
-                                internalMetaDisk,
-                                getName(),
-                                getBrowser().getBlockDevicesNode().children());
+                                            internalMetaDisk,
+                                            getName(),
+                                            getBrowser().getBlockDevInfos());
             getBrowser().unlockBlockDevInfosRead();
 
             getBlockDevice().setDefaultValue(DRBD_MD_PARAM,
@@ -702,7 +702,7 @@ public final class BlockDevInfo extends EditableInfo {
     protected Info[] getAvailableBlockDevicesForMetaDisk(
                                final Info defaultValue,
                                final String serviceName,
-                               final Enumeration<DefaultMutableTreeNode> e) {
+                               final Set<BlockDevInfo> blockDevInfos) {
         final List<Info> list = new ArrayList<Info>();
         final String savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
 
@@ -710,9 +710,7 @@ public final class BlockDevInfo extends EditableInfo {
             list.add(defaultValue);
         }
 
-        while (e.hasMoreElements()) {
-            final BlockDevInfo bdi =
-                                (BlockDevInfo) e.nextElement().getUserObject();
+        for (final BlockDevInfo bdi : blockDevInfos) {
             final BlockDevice bd = bdi.getBlockDevice();
             if (bd.toString().equals(savedMetaDisk)
                 || (!bd.isDrbd() && !bd.isUsedByCRM() && !bd.isMounted())) {
@@ -1682,7 +1680,7 @@ public final class BlockDevInfo extends EditableInfo {
                                 }
                             });
                             Set<BlockDevInfo> blockDevInfos =
-                                  oHost.getBrowser().getBlockDevInfosInSwing();
+                                        oHost.getBrowser().getBlockDevInfos();
                             List<BlockDevInfo> blockDevInfosS =
                                                 new ArrayList<BlockDevInfo>();
                             for (final BlockDevInfo oBdi : blockDevInfos) {
