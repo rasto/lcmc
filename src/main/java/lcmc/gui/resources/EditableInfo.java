@@ -197,7 +197,6 @@ public abstract class EditableInfo extends Info {
     /** Creates apply button and adds it to the panel. */
     protected final void addApplyButton(final JPanel panel) {
         panel.add(applyButton, BorderLayout.WEST);
-        Tools.getGUIData().getMainFrameRootPane().setDefaultButton(applyButton);
     }
 
     /** Creates revert button and adds it to the panel. */
