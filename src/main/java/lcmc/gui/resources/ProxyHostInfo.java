@@ -259,9 +259,9 @@ public final class ProxyHostInfo extends Info {
 
         /* host wizard */
         final MyMenuItem hostWizardItem =
-            new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
+            new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
-                           Tools.getString("HostBrowser.HostWizard"),
+                           Tools.getString("HostBrowser.ProxyHostWizard"),
                            new AccessMode(ConfigData.AccessType.RO,
                                           false),
                            new AccessMode(ConfigData.AccessType.RO,

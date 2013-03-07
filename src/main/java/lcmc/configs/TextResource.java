@@ -1699,6 +1699,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostBrowser.HostWizard",
          "Host Wizard"},
 
+        {"HostBrowser.ProxyHostWizard",
+         "Proxy Host Wizard"},
+
         {"HostBrowser.Drbd.NoInfoAvailable",
          "unknown..."},
 

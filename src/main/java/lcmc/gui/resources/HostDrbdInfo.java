@@ -24,6 +24,7 @@ package lcmc.gui.resources;
 
 import lcmc.AddDrbdUpgradeDialog;
 import lcmc.EditHostDialog;
+import lcmc.ProxyHostWizard;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.DrbdGraph;
@@ -277,6 +278,32 @@ public final class HostDrbdInfo extends Info {
             };
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
+
+        /* proxy host wizard */
+        final MyMenuItem proxyHostWizardItem =
+            new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
+                           HostBrowser.HOST_ICON_LARGE,
+                           Tools.getString("HostBrowser.ProxyHostWizard"),
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          false),
+                           new AccessMode(ConfigData.AccessType.RO,
+                                          false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    final ProxyHostWizard dialog = new ProxyHostWizard(host,
+                                                                       null);
+                    dialog.showDialogs();
+                }
+            };
+        items.add(proxyHostWizardItem);
+        Tools.getGUIData().registerAddHostButton(proxyHostWizardItem);
         final boolean testOnly = false;
         /* load drbd */
         final MyMenuItem loadItem =
