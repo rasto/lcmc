@@ -72,6 +72,8 @@ public class NewHost extends DialogHost {
     private static final String SSH_ROOT_USER = Tools.getDefault("SSH.User");
     /** Default ssh port. */
     private static final String SSH_PORT = Tools.getDefault("SSH.Port");
+    /** Enable hostname after it was enabled at least once. */
+    private boolean enableHostname = false;
 
     /** Prepares a new <code>NewHost</code> object. */
     public NewHost(final WizardDialog previousDialog, final Host host) {
@@ -289,8 +291,13 @@ public class NewHost extends DialogHost {
                                        new AccessMode(ConfigData.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
-        if (hostname != null && !Host.DEFAULT_HOSTNAME.equals(hostname)) {
-            hostField.setEnabled(false);
+        if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
+            /* so that hostname is not disabled after going back in the wizard*/
+            enableHostname = true;
+        } else {
+            if (!enableHostname) {
+                hostField.setEnabled(false);
+            }
         }
 
         addCheckField(hostField);
