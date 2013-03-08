@@ -2451,6 +2451,12 @@ public final class BlockDevInfo extends EditableInfo {
     /** Compares ignoring case and using drbd device names if available. */
     @Override
     public int compareTo(final Info o) {
+        if (o == null) {
+            return -1;
+        }
+        if (o == this) {
+            return 0;
+        }
         String name;
         String oName;
         int volume = 0;
