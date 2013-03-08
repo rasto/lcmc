@@ -250,34 +250,48 @@ public final class HostBrowser extends Browser {
         });
 
         /* block devices */
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    mBlockDevInfosWriteLock.lock();
-                    final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
+        mBlockDevInfosWriteLock.lock();
+        boolean changed = false;
+        try {
+            final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
                          new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
-                    blockDevicesNode.removeAllChildren();
-                    blockDevInfos.clear();
-                    for (final BlockDevice bd : bds) {
-                        BlockDevInfo bdi;
-                        if (oldBlockDevices.containsKey(bd)) {
-                            bdi = oldBlockDevices.get(bd);
-                            bdi.updateInfo();
-                        } else {
-                            bdi = new BlockDevInfo(bd.getName(), bd, thisClass);
-                        }
-                        final DefaultMutableTreeNode resource =
-                                               new DefaultMutableTreeNode(bdi);
-                        //setNode(resource);
-                        blockDevicesNode.add(resource);
-                        blockDevInfos.put(bd, bdi);
-                    }
-                    reloadAndWait(blockDevicesNode, false);
-                } finally {
-                    mBlockDevInfosWriteLock.unlock();
-                }
+            if (oldBlockDevices.size() != blockDevInfos.size()) {
+                changed = true;
             }
-        });
+            blockDevInfos.clear();
+            for (final BlockDevice bd : bds) {
+                BlockDevInfo bdi;
+                if (oldBlockDevices.containsKey(bd)) {
+                    bdi = oldBlockDevices.get(bd);
+                    bdi.updateInfo();
+                } else {
+                    changed = true;
+                    bdi = new BlockDevInfo(bd.getName(), bd, thisClass);
+                }
+                blockDevInfos.put(bd, bdi);
+            }
+        } finally {
+            mBlockDevInfosWriteLock.unlock();
+        }
+        if (changed) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    mBlockDevInfosWriteLock.lock();
+                    try {
+                        blockDevicesNode.removeAllChildren();
+                        for (final BlockDevice bd : blockDevInfos.keySet()) {
+                            final BlockDevInfo bdi = blockDevInfos.get(bd);
+                            final DefaultMutableTreeNode resource =
+                                               new DefaultMutableTreeNode(bdi);
+                            blockDevicesNode.add(resource);
+                        }
+                        reloadAndWait(blockDevicesNode, false);
+                    } finally {
+                        mBlockDevInfosWriteLock.unlock();
+                    }
+                }
+            });
+        }
 
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
