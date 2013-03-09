@@ -2636,15 +2636,6 @@ public final class ClusterBrowser extends Browser {
         return false;
     }
 
-    /** Returns all block devices from this clusters. */
-    List<BlockDevInfo> getAllBlockDevices() {
-        final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
-        for (final Host host : cluster.getHostsArray()) {
-            bdis.addAll(host.getBrowser().getBlockDevInfos());
-        }
-        return bdis;
-    }
-
     /** Updates host hardware info immediatly. */
     public void updateHWInfo(final Host host) {
         host.setIsLoading();

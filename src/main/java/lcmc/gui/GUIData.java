@@ -527,19 +527,6 @@ public final class GUIData  {
                                                                 required) >= 0);
     }
 
-    /** Returns all block devices from all clusters. */
-    public List<BlockDevInfo> getAllBlockDevices() {
-        final List<BlockDevInfo> bdis = new ArrayList<BlockDevInfo>();
-        for (final Cluster cluster
-                        : Tools.getConfigData().getClusters().getClusterSet()) {
-            final ClusterBrowser cb = cluster.getBrowser();
-            if (cb != null) {
-                bdis.addAll(cluster.getBrowser().getAllBlockDevices());
-            }
-        }
-        return bdis;
-    }
-
     private ServicesInfo getSelectedServicesInfo() {
         final ClustersPanel csp = clustersPanel;
         if (csp == null) {
