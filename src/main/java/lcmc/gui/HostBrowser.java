@@ -321,12 +321,16 @@ public final class HostBrowser extends Browser {
     }
 
     /**
-     * Return list of block device info objects.
+     * Return sorted list of block device info objects.
      */
     public Set<BlockDevInfo> getBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
-        final Set<BlockDevInfo> values = new TreeSet<BlockDevInfo>(
-                                                      blockDevInfos.values());
+        /* the comparison conditions in the tree set can change afterwards and
+           the contains function may not work properly, hence wrapping it to
+           linked hash set. */
+        final Set<BlockDevInfo> values = new LinkedHashSet<BlockDevInfo>(
+                                                new TreeSet<BlockDevInfo>(
+                                                      blockDevInfos.values()));
         mBlockDevInfosReadLock.unlock();
         return values;
     }
