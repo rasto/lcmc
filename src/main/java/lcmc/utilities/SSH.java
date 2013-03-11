@@ -493,9 +493,14 @@ public final class SSH {
                         if (skipNextLine) {
                             /* this is the "enter" after pwd */
                             skipNextLine = false;
-                            continue;
+                            if (output.charAt(0) == 13
+                                && output.charAt(0) == 10) {
+                                output.delete(0, 2);
+                                if (output.length() == 0) {
+                                    continue;
+                                }
+                            }
                         }
-                        skipNextLine = false;
                     }
 
                     /* stderr */
