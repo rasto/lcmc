@@ -26,6 +26,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.CRM;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.resources.ServicesInfo;
 import lcmc.Exceptions;
 
@@ -907,7 +909,12 @@ public final class CRMXML extends XML {
                 Tools.startProgressIndicator(hn, text);
                 ssi.setAllResources(ssi.getBrowser().getClusterStatus(),
                                     CRM.LIVE);
-                ssi.getBrowser().getClusterViewPanel().reloadRightComponent();
+                final Info li =
+                   ssi.getBrowser().getClusterViewPanel().getLastSelectedInfo();
+                if (li instanceof ServiceInfo) {
+                    ssi.getBrowser().getClusterViewPanel()
+                                                    .reloadRightComponent();
+                }
                 Tools.stopProgressIndicator(hn, text);
                 Tools.debug(this, "RAs loaded", 0);
             }

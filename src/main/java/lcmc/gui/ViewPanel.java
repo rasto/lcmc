@@ -279,4 +279,7 @@ public class ViewPanel extends JPanel {
         }
     }
 
+    public final Info getLastSelectedInfo() {
+        return lastSelectedInfo;
+    }
 }

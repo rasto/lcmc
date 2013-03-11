@@ -186,7 +186,8 @@ public class Browser {
                 try {
                     treeModel.nodeChanged(node);
                 } catch (Exception e) {
-                    Tools.appError("node changed error: ", e);
+                    Tools.appError(node.getUserObject()
+                                   + " node changed error: ", e);
                     Tools.appWarning("stacktrace: " + stacktrace);
                 }
             }
