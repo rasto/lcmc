@@ -80,6 +80,7 @@ public final class Resource extends DrbdConfig {
     private static final String PROXY_PLUGIN_LZMA = "plugin-lzma";
     /** Common configuration options. */
     private static final String[] COMMON_PARAMS = {DrbdXML.PROTOCOL_PARAM,
+                                                   DrbdXML.PING_TIMEOUT_PARAM,
                                                    CRAM_HMAC_ALG,
                                                    SHARED_SECRET,
                                                    WFC_TIMEOUT_PARAM,
@@ -91,6 +92,7 @@ public final class Resource extends DrbdConfig {
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
                                             DrbdXML.PROTOCOL_PARAM,
+                                            DrbdXML.PING_TIMEOUT_PARAM,
                                             ALLOW_TWO_PRIMARIES,
                                             CRAM_HMAC_ALG,
                                             SHARED_SECRET,

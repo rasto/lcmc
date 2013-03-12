@@ -155,6 +155,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Proxy ports section. */
     private static final String SECTION_PROXY_PORTS =
                                  Tools.getString("DrbdResourceInfo.ProxyPorts");
+    /** Default DRBD proxy protocol. */
+    private static final String PROXY_DEFAULT_PROTOCOL = "A";
+    /** Default DRBD proxy ping timeout. */
+    private static final String PROXY_DEFAULT_PING_TIMEOUT = "100";
 
     /** Parse ip and host name. */
     public static final Pattern DRBDP_ADDRESS =
@@ -1938,13 +1942,18 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         portCB.getLabel().setText(portLabel);
         final Widget protocolWi = getWidget(DrbdXML.PROTOCOL_PARAM,
                                             Widget.WIZARD_PREFIX);
+        final Widget pingTimeoutWi = getWidget(DrbdXML.PING_TIMEOUT_PARAM,
+                                               Widget.WIZARD_PREFIX);
         final DrbdXML dxml = getBrowser().getDrbdXML();
         if (protocolWi != null && getResource().isNew()) {
             if (isProxy) {
-                protocolWi.setValue("A");
+                protocolWi.setValue(PROXY_DEFAULT_PROTOCOL);
+                pingTimeoutWi.setValue(PROXY_DEFAULT_PING_TIMEOUT);
             } else {
                 protocolWi.setValue(dxml.getParamDefault(
                                                      DrbdXML.PROTOCOL_PARAM));
+                pingTimeoutWi.setValue(dxml.getParamDefault(
+                                                 DrbdXML.PING_TIMEOUT_PARAM));
             }
         }
     }

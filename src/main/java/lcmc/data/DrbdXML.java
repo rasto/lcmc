@@ -164,6 +164,8 @@ public final class DrbdXML extends XML {
     private static final String PROTOCOL_C = "C / Synchronous";
     /** Protocol parameter. */
     public static final String PROTOCOL_PARAM = "protocol";
+    /** Ping timeout parameter. */
+    public static final String PING_TIMEOUT_PARAM = "ping-timeout";
     /** DRBD communication protocols. */
     static final StringInfo[] PROTOCOLS =
         {new StringInfo(PROTOCOL_A,             "A", null),
