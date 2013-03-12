@@ -158,18 +158,22 @@ public final class DrbdXML extends XML {
     boolean unknownSections = false;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
+    /** DRBD protocol A. */
+    private static final String PROTOCOL_A = "A / Asynchronous";
     /** DRBD protocol C, that is a default. */
     private static final String PROTOCOL_C = "C / Synchronous";
+    /** Protocol parameter. */
+    public static final String PROTOCOL_PARAM = "protocol";
     /** DRBD communication protocols. */
     static final StringInfo[] PROTOCOLS =
-        {new StringInfo("A / Asynchronous",     "A", null),
+        {new StringInfo(PROTOCOL_A,             "A", null),
          new StringInfo("B / Semi-Synchronous", "B", null),
          new StringInfo(PROTOCOL_C,             "C", null)};
     /** Some non advanced parameters. */
     static final List<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
     static {
         NOT_ADVANCED_PARAMS.add("rate");
-        NOT_ADVANCED_PARAMS.add("protocol");
+        NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
         NOT_ADVANCED_PARAMS.add("fence-peer");
         NOT_ADVANCED_PARAMS.add("wfc-timeout");
         NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
@@ -203,7 +207,7 @@ public final class DrbdXML extends XML {
         HARDCODED_DEFAULTS.put("usage-count", "");
         HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
 
-        HARDCODED_DEFAULTS.put("protocol", "C");
+        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, "C");
         HARDCODED_DEFAULTS.put("after-sb-0pri", "disconnect");
         HARDCODED_DEFAULTS.put("after-sb-1pri", "disconnect");
         HARDCODED_DEFAULTS.put("after-sb-2pri", "disconnect");
@@ -266,10 +270,10 @@ public final class DrbdXML extends XML {
                     }
                 }
             }
-            if (!parametersList.contains("protocol")) {
+            if (!parametersList.contains(PROTOCOL_PARAM)) {
                 /* prior 8.4 */
                 addParameter("resource",
-                             "protocol",
+                             PROTOCOL_PARAM,
                              PROTOCOL_C,
                              PROTOCOLS,
                              true);
@@ -1053,7 +1057,7 @@ public final class DrbdXML extends XML {
     /** Parses resource xml. */
     private void parseConfigResourceNode(final Node resourceNode,
                                          final String resName) {
-        final String resProtocol = getAttribute(resourceNode, "protocol");
+        final String resProtocol = getAttribute(resourceNode, PROTOCOL_PARAM);
         if (resProtocol != null) {
             Map<String, String> nameValueMap =
                                     optionsMap.get(resName + "." + "resource");
@@ -1063,7 +1067,7 @@ public final class DrbdXML extends XML {
                 optionsMap.remove(resName + "." + "resource");
             }
 
-            nameValueMap.put("protocol", resProtocol);
+            nameValueMap.put(PROTOCOL_PARAM, resProtocol);
             optionsMap.put(resName + "." + "resource", nameValueMap);
         }
         final NodeList c = resourceNode.getChildNodes();

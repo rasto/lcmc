@@ -32,6 +32,7 @@ import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.Host;
+import lcmc.data.DrbdXML;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -64,8 +65,6 @@ public final class Resource extends DrbdConfig {
     /** Degr wfc timeout option string. */
     private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
 
-    /** Protocol option string. */
-    private static final String PROTOCOL = "protocol";
     /** Allow two primaries string. */
     private static final String ALLOW_TWO_PRIMARIES =
                                                   "allow-two-primaries";
@@ -80,7 +79,7 @@ public final class Resource extends DrbdConfig {
     private static final String PROXY_PLUGIN_ZLIB = "plugin-zlib";
     private static final String PROXY_PLUGIN_LZMA = "plugin-lzma";
     /** Common configuration options. */
-    private static final String[] COMMON_PARAMS = {PROTOCOL,
+    private static final String[] COMMON_PARAMS = {DrbdXML.PROTOCOL_PARAM,
                                                    CRAM_HMAC_ALG,
                                                    SHARED_SECRET,
                                                    WFC_TIMEOUT_PARAM,
@@ -91,7 +90,7 @@ public final class Resource extends DrbdConfig {
                                                    PROXY_PLUGIN_LZMA};
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
-                                            PROTOCOL,
+                                            DrbdXML.PROTOCOL_PARAM,
                                             ALLOW_TWO_PRIMARIES,
                                             CRAM_HMAC_ALG,
                                             SHARED_SECRET,
@@ -135,7 +134,7 @@ public final class Resource extends DrbdConfig {
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
-                    && PROTOCOL.equals(commonP)) {
+                    && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
                 final String value = dri.getComboBoxValue(commonP);
@@ -216,7 +215,7 @@ public final class Resource extends DrbdConfig {
         /* common options */
         final Map<String, String> commonPreferredValue =
                                                 new HashMap<String, String>();
-        commonPreferredValue.put(PROTOCOL, "C");
+        commonPreferredValue.put(DrbdXML.PROTOCOL_PARAM, "C");
         commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, "0");
         commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
         commonPreferredValue.put(SHARED_SECRET, getRandomSecret());
