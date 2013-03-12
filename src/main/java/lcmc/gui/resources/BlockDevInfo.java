@@ -515,7 +515,7 @@ public final class BlockDevInfo extends EditableInfo {
                     final boolean internal = "internal".equals(value);
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
-                                                  "wizard");
+                                                  Widget.WIZARD_PREFIX);
                     if (internal) {
                         ind.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         if (indW != null) {

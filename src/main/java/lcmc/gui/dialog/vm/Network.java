@@ -27,6 +27,7 @@ import lcmc.utilities.Tools;
 import lcmc.gui.resources.VMSVirtualDomainInfo;
 import lcmc.gui.resources.VMSInterfaceInfo;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML.InterfaceData;
 
 import javax.swing.JPanel;
@@ -151,7 +152,8 @@ final class Network extends VMConfig {
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-        vmsii.getWidget(InterfaceData.MODEL_TYPE, "wizard").setValue("");
+        vmsii.getWidget(InterfaceData.MODEL_TYPE,
+                        Widget.WIZARD_PREFIX).setValue("");
 
         panel.add(optionsPanel);
 

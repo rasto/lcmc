@@ -146,6 +146,7 @@ public abstract class Widget extends JPanel {
     public static final String NO_REGEXP = null;
     public static final Map<String, String> NO_ABBRV = null;
     public static final MyButton NO_BUTTON = null;
+    public static final String WIZARD_PREFIX = "widget";
 
     /** Prepares a new <code>Widget</code> object. */
     public Widget(final String regexp,

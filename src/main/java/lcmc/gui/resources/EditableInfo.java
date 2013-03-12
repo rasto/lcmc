@@ -258,7 +258,7 @@ public abstract class EditableInfo extends Info {
                                  final int rightWidth,
                                  final Map<String, Widget> sameAsFields) {
         addParams(optionsPanel,
-                  "wizard",
+                  Widget.WIZARD_PREFIX,
                   params,
                   wizardApplyButton,
                   leftWidth,
@@ -403,7 +403,7 @@ public abstract class EditableInfo extends Info {
             }
             addField(panel, label, paramWi, leftWidth, rightWidth, height);
         }
-        final boolean wizard = "wizard".equals(prefix);
+        final boolean wizard = Widget.WIZARD_PREFIX.equals(prefix);
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
             Widget rpwi = null;
@@ -922,7 +922,8 @@ public abstract class EditableInfo extends Info {
 
                 if (param == null || otherParam.equals(param)
                     || !paramCorrectValueMap.containsKey(param)) {
-                    final Widget wizardWi = getWidget(otherParam, "wizard");
+                    final Widget wizardWi = getWidget(otherParam,
+                                                      Widget.WIZARD_PREFIX);
                     final String enable = isEnabled(otherParam);
                     if (wizardWi != null) {
                         wizardWi.setDisabledReason(enable);
@@ -1109,7 +1110,7 @@ public abstract class EditableInfo extends Info {
             final Widget wi = getWidget(param, null);
             if (wi != null && !Tools.areEqual(wi.getStringValue(), v)) {
                 wi.setValue(v);
-                final Widget wizardWi = getWidget(param, "wizard");
+                final Widget wizardWi = getWidget(param, Widget.WIZARD_PREFIX);
                 if (wizardWi != null) {
                     wizardWi.setValue(v);
                 }

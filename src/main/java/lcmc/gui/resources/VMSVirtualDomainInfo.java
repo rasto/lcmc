@@ -3510,13 +3510,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         break;
                     }
                 }
-                final Widget emWi =
-                                getWidget(VMSXML.VM_PARAM_EMULATOR, "wizard");
-                final Widget loWi = getWidget(VMSXML.VM_PARAM_LOADER, "wizard");
-                final Widget voWi =
-                            getWidget(VMSXML.VM_PARAM_VIRSH_OPTIONS, "wizard");
-                final Widget typeWi = getWidget(VMSXML.VM_PARAM_TYPE, "wizard");
-                final Widget inWi = getWidget(VMSXML.VM_PARAM_INIT, "wizard");
+                final Widget emWi = getWidget(VMSXML.VM_PARAM_EMULATOR,
+                                              Widget.WIZARD_PREFIX);
+                final Widget loWi = getWidget(VMSXML.VM_PARAM_LOADER,
+                                              Widget.WIZARD_PREFIX);
+                final Widget voWi = getWidget(VMSXML.VM_PARAM_VIRSH_OPTIONS,
+                                              Widget.WIZARD_PREFIX);
+                final Widget typeWi = getWidget(VMSXML.VM_PARAM_TYPE,
+                                                Widget.WIZARD_PREFIX);
+                final Widget inWi = getWidget(VMSXML.VM_PARAM_INIT,
+                                              Widget.WIZARD_PREFIX);
                 if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
                     if (emWi != null) {
                         emWi.setValue(xenLibPath + "/bin/qemu-dm");

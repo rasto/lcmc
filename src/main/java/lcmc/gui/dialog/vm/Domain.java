@@ -164,7 +164,8 @@ public final class Domain extends VMConfig {
                           Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                           null);
-        domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME, "wizard");
+        domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME,
+                                     Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);
 
         final JScrollPane sp = new JScrollPane(panel);

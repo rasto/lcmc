@@ -141,7 +141,8 @@ final class Finish extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vdi.waitForInfoPanel();
-        optionsPanel.add(vdi.getDefinedOnHostsPanel("wizard", createConfigBtn));
+        optionsPanel.add(vdi.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX,
+                                                    createConfigBtn));
 
         optionsPanel.add(createConfigBtn);
         panel.add(optionsPanel);

@@ -677,8 +677,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     adrd.showDialogs();
                     /* remove wizard parameters from hashes. */
                     for (final String p : bd1.getParametersFromXML()) {
-                        bd1.widgetRemove(p, "wizard");
-                        bd2.widgetRemove(p, "wizard");
+                        bd1.widgetRemove(p, Widget.WIZARD_PREFIX);
+                        bd2.widgetRemove(p, Widget.WIZARD_PREFIX);
                     }
                     if (adrd.isCanceled()) {
                         final DrbdVolumeInfo dvi = bd1.getDrbdVolumeInfo();
