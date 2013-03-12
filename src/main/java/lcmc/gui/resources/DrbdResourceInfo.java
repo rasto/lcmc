@@ -475,6 +475,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             getBrowser().getDrbdGraph().repaint();
             getDrbdInfo().setAllApplyButtons();
             getDrbdInfo().reloadDRBDResourceComboBoxes();
+            getResource().setNew(false);
         }
     }
 

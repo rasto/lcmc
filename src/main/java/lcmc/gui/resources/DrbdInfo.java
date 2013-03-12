@@ -719,7 +719,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final int index = getNewDrbdResourceIndex();
         final String name = "r" + Integer.toString(index);
         /* search for next available drbd device */
-        return new DrbdResourceInfo(name, hosts, getBrowser());
+        final DrbdResourceInfo dri =
+                                new DrbdResourceInfo(name, hosts, getBrowser());
+        dri.getResource().setNew(true);
+        return dri;
     }
 
     /** Return new DRBD volume info object. */
