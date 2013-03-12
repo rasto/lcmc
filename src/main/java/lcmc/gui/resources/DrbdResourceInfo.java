@@ -1936,6 +1936,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             portLabel = Tools.getString("DrbdResourceInfo.NetInterfacePort");
         }
         portCB.getLabel().setText(portLabel);
+        final Widget protocolWi = getWidget(DrbdXML.PROTOCOL_PARAM,
+                                            Widget.WIZARD_PREFIX);
+        final DrbdXML dxml = getBrowser().getDrbdXML();
+        if (protocolWi != null && getResource().isNew()) {
+            if (isProxy) {
+                protocolWi.setValue("A");
+            } else {
+                protocolWi.setValue(dxml.getParamDefault(
+                                                     DrbdXML.PROTOCOL_PARAM));
+            }
+        }
     }
 
     /** Adds host address listener. */
