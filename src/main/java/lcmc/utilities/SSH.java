@@ -494,7 +494,7 @@ public final class SSH {
                             /* this is the "enter" after pwd */
                             skipNextLine = false;
                             if (output.charAt(0) == 13
-                                && output.charAt(0) == 10) {
+                                && output.charAt(1) == 10) {
                                 output.delete(0, 2);
                                 if (output.length() == 0) {
                                     continue;
