@@ -4408,7 +4408,7 @@ public final class RoboTest {
 
         moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
-        press(KeyEvent.VK_UP); /* protocol b */
+        press(KeyEvent.VK_DOWN); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
@@ -4519,7 +4519,7 @@ public final class RoboTest {
 
         moveTo("Protocol", Widget.MComboBox.class);
         leftClick();
-        press(KeyEvent.VK_DOWN); /* protocol c */
+        press(KeyEvent.VK_UP); /* protocol a */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);

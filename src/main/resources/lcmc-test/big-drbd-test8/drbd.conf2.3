@@ -17,8 +17,10 @@ common {
 	}
 
 	net {
+		protocol	A;
 		cram-hmac-alg	sha1;
 		shared-secret	SECRET;
+		ping-timeout	100;
 	}
 
 	disk {
