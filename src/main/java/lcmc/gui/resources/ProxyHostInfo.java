@@ -288,10 +288,10 @@ public final class ProxyHostInfo extends Info {
         final MyMenuItem proxyItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
                            null,
-                           getMenuToolTip("DRBD.stopProxy"),
+                           getMenuToolTip("DRBD.stopProxy", ""),
                            Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                            null,
-                           getMenuToolTip("DRBD.startProxy"),
+                           getMenuToolTip("DRBD.startProxy", ""),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP,
@@ -327,7 +327,7 @@ public final class ProxyHostInfo extends Info {
         final MyMenuItem allProxyUpItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                            null,
-                           getMenuToolTip("DRBD.proxyUp"),
+                           getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP, 
@@ -362,7 +362,7 @@ public final class ProxyHostInfo extends Info {
         final MyMenuItem allProxyDownItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                            null,
-                           getMenuToolTip("DRBD.proxyDown"),
+                           getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
                            new AccessMode(ConfigData.AccessType.OP, 
@@ -459,7 +459,8 @@ public final class ProxyHostInfo extends Info {
     }
 
     /** Tool tip for menu items. */
-    private String getMenuToolTip(final String cmd) {
-        return getHost().getDistString(cmd).replaceAll("@.*?@", "");
+    private String getMenuToolTip(final String cmd, final String res) {
+        return getHost().getDistString(cmd).replaceAll("@RES-VOL@", res)
+                                           .replaceAll("@.*?@", "");
     }
 }
