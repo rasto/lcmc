@@ -3092,5 +3092,14 @@ public final class Host {
     public boolean isDrbdProxyUp(final String res) {
         return drbdResProxy.contains(res);
     }
+
+    /** Update drbd parameters. */
+    public void updateDrbdParameters() {
+        final ClusterBrowser browser = getBrowser().getClusterBrowser();
+        final DrbdXML drbdXML = browser.getDrbdXML();
+        final String output = drbdXML.updateDrbdParameters(this);
+        drbdXML.parseDrbdParameters(this, output, browser.getClusterHosts());
+        browser.getDrbdParameters().put(this, output);
+    }
 }
 

@@ -227,59 +227,68 @@ public final class DrbdXML extends XML {
         for (final Host host : hosts) {
             String output = null;
             if (drbdParameters.get(host) == null) {
-                final String command =
-                                host.getDistCommand("Drbd.getParameters",
-                                                    (ConvertCmdCallback) null);
-
-                final SSH.SSHOutput ret =
-                              Tools.execCommand(host,
-                                                command,
-                                                null,   /* ExecCallback */
-                                                false,  /* outputVisible */
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
-                if (ret.getExitCode() != 0) {
-                    return;
-                }
-                output = ret.getOutput();
+                output = updateDrbdParameters(host);
+                drbdParameters.put(host, output);
                 if (output == null) {
                     return;
                 }
-                drbdParameters.put(host, output);
             } else {
                 output = drbdParameters.get(host);
             }
             /* TODO: move this part somewhere else, it should be called
                once per invocation or interactively. (drbd-get-xml) */
-            final String[] lines = output.split("\\r?\\n");
-            final Pattern bp = Pattern.compile("^<command name=\"(.*?)\".*");
-            final Pattern ep = Pattern.compile("^</command>$");
-            final StringBuilder xml = new StringBuilder();
-            String section = null;
+            parseDrbdParameters(host, output, hosts);
+        }
+    }
 
-            for (final String line : lines) {
-                final Matcher m = bp.matcher(line);
-                if (m.matches()) {
-                    section = m.group(1);
-                }
-                if (section != null) {
-                    xml.append(line);
-                    xml.append('\n');
-                    final Matcher m2 = ep.matcher(line);
-                    if (m2.matches()) {
-                        parseSection(section, xml.toString(), host, hosts);
-                        section = null;
-                        xml.delete(0, xml.length());
-                    }
+    public String updateDrbdParameters(final Host host) {
+        final String command = host.getDistCommand("Drbd.getParameters",
+                                                   (ConvertCmdCallback) null);
+
+        final SSH.SSHOutput ret =
+                              Tools.execCommand(host,
+                                                command,
+                                                null,   /* ExecCallback */
+                                                false,  /* outputVisible */
+                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+        if (ret.getExitCode() != 0) {
+            return null;
+        }
+        return ret.getOutput();
+    }
+
+    public void parseDrbdParameters(final Host host,
+                                    final String output,
+                                    final Host[] hosts) {
+        final String[] lines = output.split("\\r?\\n");
+        final Pattern bp = Pattern.compile("^<command name=\"(.*?)\".*");
+        final Pattern ep = Pattern.compile("^</command>$");
+        final StringBuilder xml = new StringBuilder();
+        String section = null;
+
+        for (final String line : lines) {
+            final Matcher m = bp.matcher(line);
+            if (m.matches()) {
+                section = m.group(1);
+            }
+            if (section != null) {
+                xml.append(line);
+                xml.append('\n');
+                final Matcher m2 = ep.matcher(line);
+                if (m2.matches()) {
+                    parseSection(section, xml.toString(), host, hosts);
+                    section = null;
+                    xml.delete(0, xml.length());
                 }
             }
-            if (!parametersList.contains(PROTOCOL_PARAM)) {
-                /* prior 8.4 */
-                addParameter("resource",
-                             PROTOCOL_PARAM,
-                             PROTOCOL_C,
-                             PROTOCOLS,
-                             true);
-            }
+        }
+        if (!parametersList.contains(PROTOCOL_PARAM)) {
+            /* prior 8.4 */
+            addParameter("resource",
+                         PROTOCOL_PARAM,
+                         PROTOCOL_C,
+                         PROTOCOLS,
+                         true);
         }
     }
 

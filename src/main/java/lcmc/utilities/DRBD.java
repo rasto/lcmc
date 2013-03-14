@@ -953,6 +953,8 @@ public final class DRBD {
                                                    (ConvertCmdCallback) null);
         final SSH.SSHOutput ret =
                     execCommand(host, command, execCallback, true, testOnly);
+        host.updateDrbdParameters(); /* deamon could be started even if ret != 0
+                                      */
         return ret.getExitCode() == 0;
     }
 
