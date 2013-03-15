@@ -263,5 +263,16 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
          + " && if [ -e /etc/corosync/corosync.conf ]; then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig;"
          + " fi"},
+
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "apt-get install"},
+
+        {"ProxyInst.install.1",
+         "apt-get install -y drbd-proxy"},
+
+        {"ProxyCheck.version",
+         "dpkg-query -W -f '${status}:${version}' drbd-proxy"
+         + "|grep '^install ok installed:'|cut -d ':' -f 2"},
     };
 }

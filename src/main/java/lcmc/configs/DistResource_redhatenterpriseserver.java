@@ -109,5 +109,15 @@ public final class DistResource_redhatenterpriseserver
         {"KVM.emulator",    "/usr/libexec/qemu-kvm"},
         {"libvirt.lxc.libpath", "/usr/libexec"},
         {"libvirt.xen.libpath", "/usr/lib/xen"},
+
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "yum install"},
+
+        {"ProxyInst.install.1",
+         "yum install -y drbd-proxy-3.0"},
+
+        {"ProxyCheck.version",
+         "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 }

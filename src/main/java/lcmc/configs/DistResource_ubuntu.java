@@ -202,5 +202,15 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
           "init-corosync-debian:/etc/init.d/corosync:755"
           + ":init-default-corosync-debian:/etc/default/corosync:644"},
 
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "apt-get install"},
+
+        {"ProxyInst.install.1",
+         "apt-get install -y drbd-proxy"},
+
+        {"ProxyCheck.version",
+         "dpkg-query -W -f '${status}:${version}' drbd-proxy"
+         + "|grep '^install ok installed:'|cut -d ':' -f 2"},
     };
 }

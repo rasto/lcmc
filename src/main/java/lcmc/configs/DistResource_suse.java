@@ -161,5 +161,15 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
 
         {"libvirt.lxc.libpath.x86_64", "/usr/lib64/libvirt"},
         {"libvirt.xen.libpath", "/usr/lib/xen"},
+
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "zypper install"},
+
+        {"ProxyInst.install.1",
+         "zypper install -y drbd-proxy-3.0"},
+
+        {"ProxyCheck.version",
+         "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 }

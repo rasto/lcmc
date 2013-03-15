@@ -260,6 +260,16 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
         {"Corosync.reloadCorosync",
          "if ! " + DistResource.SUDO + "/sbin/service corosync status >/dev/null 2>&1; then "
          + DistResource.SUDO + "/sbin/service corosync start; fi"},
+
+        /* Proxy install method 1 */
+        {"ProxyInst.install.text.1",
+         "yum install"},
+
+        {"ProxyInst.install.1",
+         "yum install -y drbd-proxy-3.0"},
+
+        {"ProxyCheck.version",
+         "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 
 }
