@@ -819,6 +819,7 @@ sub get_version_info {
 	 .'| sed "s/distro/openfiler/";'
 	 .'lsb_release -i -r 2>/dev/null '
 	 .'| sed "s/CentOS/redhat/"|sed "s/SUSE LINUX/suse/" '
+	 .'| sed "s/openSUSE project/suse/" '
 	 .'| sed "s/enterprise_linux\|ScientificSL/redhatenterpriseserver/" '
 	 .'| perl -lne "print lc((split /:\s*/)[1])"'
 	 .'| sed "s/oracleserver/redhat/"; '
