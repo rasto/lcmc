@@ -230,6 +230,10 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void finishDialog() {
         if (isPressedButton(finishButton())
             || isPressedButton(nextButton())) {
+            if (nextDialogObject == null) {
+                host.getBrowser().getClusterBrowser().getDrbdGraph()
+                                    .getDrbdInfo().addProxyHostNode(getHost());
+            }
             if (nextDialogObject == null && origDialog != null) {
                 nextDialogObject = origDialog;
                 setPressedButton(nextButton());
@@ -237,7 +241,6 @@ final class ProxyCheckInstallation extends DialogHost {
             getHost().getCluster().addProxyHost(getHost());
             if (drbdVolumeInfo != null) {
                 drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }
