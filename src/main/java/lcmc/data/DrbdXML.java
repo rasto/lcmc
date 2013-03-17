@@ -176,6 +176,7 @@ public final class DrbdXML extends XML {
     static {
         NOT_ADVANCED_PARAMS.add("rate");
         NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
+        NOT_ADVANCED_PARAMS.add(PING_TIMEOUT_PARAM);
         NOT_ADVANCED_PARAMS.add("fence-peer");
         NOT_ADVANCED_PARAMS.add("wfc-timeout");
         NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
