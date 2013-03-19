@@ -543,7 +543,7 @@ public class ServiceInfo extends EditableInfo {
 
         /* id-refs */
         if (sameAsMetaAttrsWi != null) {
-            final Info info = (Info) sameAsMetaAttrsWi.getValue();
+            final Info info = sameAsMetaAttrsWiValue();
             final boolean defaultValues =
                     info != null
                     && META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString());
@@ -2304,7 +2304,7 @@ public class ServiceInfo extends EditableInfo {
             return "";
         }
         if (isMetaAttr(param)) {
-            final Info info = (Info) sameAsMetaAttrsWi.getValue();
+            final Info info = sameAsMetaAttrsWiValue();
             if (info == null) {
                 return null;
             }
@@ -2578,8 +2578,7 @@ public class ServiceInfo extends EditableInfo {
                             @Override
                             public void check(final Object value) {
                                 Info i = null;
-                                final Object o =
-                                      sameAsMetaAttrsWi.getValue();
+                                final Object o = sameAsMetaAttrsWiValue();
                                 if (o instanceof Info) {
                                     i = (Info) o;
                                 }
@@ -3040,7 +3039,7 @@ public class ServiceInfo extends EditableInfo {
     protected String getMetaAttrsRefId() {
         String metaAttrsRefId = null;
         if (sameAsMetaAttrsWi != null) {
-            final Info i = (Info) sameAsMetaAttrsWi.getValue();
+            final Info i = sameAsMetaAttrsWiValue();
             if (!Widget.NOTHING_SELECTED.equals(i.toString())
                 && !META_ATTRS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
                 final ServiceInfo si  = (ServiceInfo) i;
@@ -6320,7 +6319,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsMetaAttrsWi != null) {
             String defaultMAIdRef = null;
-            final Info savedMAIdRef = (Info) sameAsMetaAttrsWi.getValue();
+            final Info savedMAIdRef = sameAsMetaAttrsWiValue();
             if (savedMAIdRef != null) {
                 defaultMAIdRef = savedMAIdRef.toString();
             }
@@ -6385,6 +6384,21 @@ public class ServiceInfo extends EditableInfo {
         }
         Info i = null;
         final Object o = sameAsOperationsWi.getValue();
+        if (o instanceof Info) {
+            i = (Info) o;
+        }
+        return i;
+    }
+
+    /**
+     * Returns value of the same as drop down menu as an info object or null.
+     */
+    final Info sameAsMetaAttrsWiValue() {
+        if (sameAsMetaAttrsWi == null) {
+            return null;
+        }
+        Info i = null;
+        final Object o = sameAsMetaAttrsWi.getValue();
         if (o instanceof Info) {
             i = (Info) o;
         }
