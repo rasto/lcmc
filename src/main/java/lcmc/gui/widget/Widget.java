@@ -112,6 +112,8 @@ public abstract class Widget extends JPanel {
     /** Nothing selected string, that returns null, if selected. */
     public static final String NOTHING_SELECTED_DISPLAY =
                                 Tools.getString("Widget.NothingSelected");
+    /** Nothing selected string, that returns null, if selected. */
+    public static final String NOTHING_SELECTED_INTERNAL = null;
     /** Label of this component. */
     private JLabel label = null;
     /** Whether the component should be enabled. */
