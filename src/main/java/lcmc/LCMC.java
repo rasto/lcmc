@@ -142,6 +142,8 @@ public final class LCMC extends JPanel {
     private static final String ADVANCED_OP = "advanced";
     /** The --one-host-cluster option. */
     private static final String ONE_HOST_CLUSTER_OP = "one-host-cluster";
+    /** The --no-passphrase. */
+    private static final String NO_PASSPHRASE = "no-passphrase";
 
     /**
      * Private constructor.
@@ -438,6 +440,10 @@ public final class LCMC extends JPanel {
                           ONE_HOST_CLUSTER_OP,
                           false,
                           "allow one host cluster");
+        options.addOption(null,
+                          NO_PASSPHRASE,
+                          false,
+                          "try no passphrase first");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -491,6 +497,7 @@ public final class LCMC extends JPanel {
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             Tools.getConfigData().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
+            Tools.getConfigData().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE));
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {

@@ -165,6 +165,8 @@ public final class ConfigData {
     private boolean oneHostCluster = false;
     /** Scale for fonts and GUI elements. 100 is the same size. */
     private int scale = 100;
+    /** Whether no passphrase should be tried first. */
+    private boolean noPassphrase = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -661,5 +663,16 @@ public final class ConfigData {
     /** Sets scale. */
     public final void setScale(final int scale) {
         this.scale = scale;
+    }
+
+    
+    /** Set whether no passphrase should be tried first. */
+    public void setNoPassphrase(final boolean noPassphrase) {
+        this.noPassphrase = noPassphrase;
+    }
+
+    /** Return whether no passphrase should be tried first. */
+    public boolean isNoPassphrase() {
+        return noPassphrase;
     }
 }

@@ -1123,6 +1123,7 @@ public final class SSH {
             final int connectTimeout =
                                     Tools.getDefaultInt("SSH.ConnectTimeout");
             final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");
+            final boolean noPassphrase = Tools.getConfigData().isNoPassphrase();
             while (!cancelIt) {
                 if (lastPassword == null) {
                     lastPassword =
@@ -1144,8 +1145,67 @@ public final class SSH {
                             String key = "";
                             if (lastDSAKey != null) {
                                 key = lastDSAKey;
+                            } else if (lastRSAKey != null) {
+                                key = lastRSAKey;
                             }
-                            if (key != null) {
+                            /* Passwordless auth */
+
+                            if (noPassphrase || !"".equals(key)) {
+                                /* try first passwordless authentication.  */
+                                if (lastRSAKey == null && dsaKey.exists()) {
+                                    try {
+                                        res = conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      dsaKey,
+                                                                      key);
+                                    } catch (Exception e) {
+                                        lastDSAKey = null;
+                                        Tools.debug(this,
+                                                    "dsa passwordless failed");
+                                    }
+                                    if (res) {
+                                        Tools.debug(
+                                           this,
+                                           "dsa passwordless auth successful");
+                                        lastDSAKey = key;
+                                        lastRSAKey = null;
+                                        lastPassword = null;
+                                        break;
+                                    }
+
+                                    conn.close();
+                                    conn.connect(new AdvancedVerifier(),
+                                                 connectTimeout,
+                                                 kexTimeout);
+                                }
+
+
+                                if (rsaKey.exists()) {
+                                    try {
+                                        res = conn.authenticateWithPublicKey(
+                                                                      username,
+                                                                      rsaKey,
+                                                                      key);
+                                    } catch (Exception e) {
+                                        lastRSAKey = null;
+                                        Tools.debug(this,
+                                                    "rsa passwordless failed");
+                                    }
+                                    if (res) {
+                                        Tools.debug(
+                                           this,
+                                           "rsa passwordless auth successful");
+                                        lastRSAKey = key;
+                                        lastDSAKey = null;
+                                        lastPassword = null;
+                                        break;
+                                    }
+
+                                    conn.close();
+                                    conn.connect(new AdvancedVerifier(),
+                                                 connectTimeout,
+                                                 kexTimeout);
+                                }
                             }
                             key = getKeyFromUser(lastError);
                             if (key == null) {
