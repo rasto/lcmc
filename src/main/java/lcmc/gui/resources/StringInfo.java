@@ -29,24 +29,24 @@ import lcmc.gui.Browser;
  */
 public final class StringInfo extends Info {
     /** Internal string. */
-    private final String string;
+    private final String internalValue;
 
     /**
      * Creates new <code>StringInfo</code> object.
      *
-     * @param name
+     * @param displayName
      *              user visible name
      * @param string
      *              string representation
      */
-    public StringInfo(final String name,
-                      final String string,
+    public StringInfo(final String displayName,
+                      final String internalValue,
                       final Browser browser) {
-        super(name, browser);
-        this.string = string;
+        super(displayName, browser);
+        this.internalValue = internalValue;
     }
 
-    /** Returns the name. It will be shown to the user. */
+    /** Returns the display name. It will be shown to the user. */
     @Override
     public String toString() {
         return getName();
@@ -54,8 +54,8 @@ public final class StringInfo extends Info {
 
     /** Returns the string that is used internally. */
     @Override
-    public String getStringValue() {
-        return string;
+    public String getInternalValue() {
+        return internalValue;
     }
 }
 

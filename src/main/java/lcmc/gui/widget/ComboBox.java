@@ -110,7 +110,7 @@ public final class ComboBox extends Widget {
             public void focusGained(final FocusEvent e) {
                 Object o = getValue();
                 if (o != null && !Tools.isStringClass(o)
-                    && ((Info) o).getStringValue() == null) {
+                    && ((Info) o).getInternalValue() == null) {
                     o = null;
                 }
                 if (o == null) {
@@ -141,7 +141,7 @@ public final class ComboBox extends Widget {
         for (int i = 0; i < items.length; i++) {
             Object item;
             if (items[i] == null) {
-                item = Widget.NOTHING_SELECTED;
+                item = Widget.NOTHING_SELECTED_DISPLAY;
             } else {
                 item = items[i];
             }
@@ -164,7 +164,7 @@ public final class ComboBox extends Widget {
                 boolean selectedChanged = false;
                 if (selectedValue == null
                     && (selectedItem != null
-                         && selectedItem != Widget.NOTHING_SELECTED)) {
+                         && selectedItem != Widget.NOTHING_SELECTED_DISPLAY)) {
                     selectedChanged = true;
                 } else if (selectedValue != null
                            && !selectedValue.equals(selectedItem)) {
@@ -209,11 +209,11 @@ public final class ComboBox extends Widget {
         if (items != null) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == null) {
-                    items[i] = Widget.NOTHING_SELECTED;
+                    items[i] = Widget.NOTHING_SELECTED_DISPLAY;
                 }
                 if (items[i] instanceof Info
-                    && ((Info) items[i]).getStringValue() != null
-                    && ((Info) items[i]).getStringValue().equals(
+                    && ((Info) items[i]).getInternalValue() != null
+                    && ((Info) items[i]).getInternalValue().equals(
                                                              selectedValue)) {
                     selectedValueInfo = items[i];
                 } else if (items[i] instanceof Unit
@@ -244,7 +244,7 @@ public final class ComboBox extends Widget {
                 Object o = getValue();
                 if (o != null
                     && !Tools.isStringClass(o)
-                    && ((Info) o).getStringValue() == null) {
+                    && ((Info) o).getInternalValue() == null) {
                     o = null;
                 }
                 if (isAlwaysEditable()) {
@@ -300,7 +300,7 @@ public final class ComboBox extends Widget {
         } else {
             value = cb.getSelectedItem();
         }
-        if (NOTHING_SELECTED.equals(value)) {
+        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
             return null;
         }
         return value;
@@ -336,8 +336,8 @@ public final class ComboBox extends Widget {
                     || it.toString().equals(item)
                     || it.equals(item)
                     || ((it instanceof Info)
-                        && Tools.areEqual(((Info) it).getStringValue(), item))
-                    || (NOTHING_SELECTED.equals(it) && item == null)) {
+                        && Tools.areEqual(((Info) it).getInternalValue(), item))
+                    || (NOTHING_SELECTED_DISPLAY.equals(it) && item == null)) {
                     selectedObject = it;
                     cb.setSelectedItem(it);
                     break;

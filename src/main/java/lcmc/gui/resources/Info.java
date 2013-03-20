@@ -465,7 +465,7 @@ public class Info implements Comparable<Info> {
      * they are usually the same as in toString() method, but e.g. in
      * combo boxes they can be different. It trims the result too.
      */
-    public String getStringValue() {
+    public String getInternalValue() {
         if (name != null) {
             return name.trim();
         }

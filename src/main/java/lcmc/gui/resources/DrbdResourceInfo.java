@@ -787,7 +787,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = portComboBox;
                 if (wi != null) {
                     if (hostPort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED);
+                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
                         wi.setValue(hostPort);
                     }
@@ -878,7 +878,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = insidePortComboBox;
                 if (wi != null) {
                     if (hostInsidePort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED);
+                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
                         wi.setValue(hostInsidePort);
                     }
@@ -895,7 +895,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = outsidePortComboBox;
                 if (wi != null) {
                     if (hostOutsidePort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED);
+                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
                         wi.setValue(hostOutsidePort);
                     }
@@ -2280,7 +2280,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             return null;
         }
         if (o instanceof ProxyNetInfo) {
-            return ((ProxyNetInfo) o).getStringValue();
+            return ((ProxyNetInfo) o).getInternalValue();
         } else if (isProxyAddress(o.toString())) {
             final Matcher drbdpM = DRBDP_ADDRESS.matcher(o.toString());
             if (drbdpM.matches()) {
@@ -2290,7 +2290,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         } else if (o instanceof String) {
             return (String) o;
         } else {
-            return ((NetInfo) o).getStringValue();
+            return ((NetInfo) o).getInternalValue();
         }
     }
 

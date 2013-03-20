@@ -56,7 +56,7 @@ public final class ProxyNetInfo extends NetInfo {
     /** Returns string representation of the net interface. */
     @Override
     public String toString() {
-        final String ip = super.getStringValue();
+        final String ip = super.getInternalValue();
         String proxyHostName = null;
         if (proxyHost != null) {
             proxyHostName = proxyHost.getName();

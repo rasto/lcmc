@@ -75,7 +75,7 @@ public final class Passwdfield extends Textfield {
     protected Object getValueInternal() {
         final Object value =
                  new String(((JPasswordField) getComponent()).getPassword());
-        if (NOTHING_SELECTED.equals(value)) {
+        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
             return null;
         }
         return value;

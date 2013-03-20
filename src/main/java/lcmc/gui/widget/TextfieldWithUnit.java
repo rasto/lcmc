@@ -172,7 +172,7 @@ public final class TextfieldWithUnit extends Widget {
             public void focusGained(final FocusEvent e) {
                 Object o = getValue();
                 if (o != null && !Tools.isStringClass(o)
-                    && ((Info) o).getStringValue() == null) {
+                    && ((Info) o).getInternalValue() == null) {
                     o = null;
                 }
                 if (o == null) {
@@ -267,7 +267,7 @@ public final class TextfieldWithUnit extends Widget {
         }
         final Object value = new Object[]{text, unit};
 
-        if (NOTHING_SELECTED.equals(value)) {
+        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
             return null;
         }
         return value;

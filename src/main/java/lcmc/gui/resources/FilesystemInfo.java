@@ -192,8 +192,8 @@ final class FilesystemInfo extends ServiceInfo {
                                     return;
                                 }
                                 final Info item = (Info) value;
-                                if (item.getStringValue() == null
-                                    || "".equals(item.getStringValue())) {
+                                if (item.getInternalValue() == null
+                                    || "".equals(item.getInternalValue())) {
                                     return;
                                 }
                                 final String selectedValue =
@@ -451,7 +451,7 @@ final class FilesystemInfo extends ServiceInfo {
                 return -1;
             }
             final Info item = (Info) value;
-            final String sValue = item.getStringValue();
+            final String sValue = item.getInternalValue();
             if (sValue == null || "".equals(sValue)) {
                 return -1;
             }

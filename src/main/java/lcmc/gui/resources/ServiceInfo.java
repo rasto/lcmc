@@ -549,7 +549,7 @@ public class ServiceInfo extends EditableInfo {
                     && META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString());
             final boolean nothingSelected =
                       info == null
-                      || Widget.NOTHING_SELECTED.equals(info.toString());
+                      || Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString());
             if (!nothingSelected
                 && !defaultValues
                 && info != savedMetaAttrInfoRef) {
@@ -566,7 +566,7 @@ public class ServiceInfo extends EditableInfo {
                                                META_ATTRS_DEFAULT_VALUES_TEXT);
                     } else {
                         sameAsMetaAttrsWi.setValueNoListeners(
-                                                     Widget.NOTHING_SELECTED);
+                                                     Widget.NOTHING_SELECTED_DISPLAY);
                     }
                 }
             }
@@ -680,7 +680,7 @@ public class ServiceInfo extends EditableInfo {
                         } else {
                             if (metaAttrInfoRef != null) {
                                 sameAsMetaAttrsWi.setValue(
-                                             Widget.NOTHING_SELECTED);
+                                             Widget.NOTHING_SELECTED_DISPLAY);
                             }
                         }
                     } else {
@@ -744,7 +744,7 @@ public class ServiceInfo extends EditableInfo {
             final Widget wi = pingComboBox;
             if (wi != null) {
                 if (pingOperation == null) {
-                    wi.setValue(Widget.NOTHING_SELECTED);
+                    wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                 } else {
                     wi.setValue(PING_ATTRIBUTES.get(pingOperation));
                 }
@@ -811,7 +811,7 @@ public class ServiceInfo extends EditableInfo {
                     } else {
                         if (savedOperationIdRef != null) {
                             sameAsOperationsWi.setValue(
-                                       Widget.NOTHING_SELECTED);
+                                       Widget.NOTHING_SELECTED_DISPLAY);
                         }
                     }
                 } else {
@@ -1292,7 +1292,7 @@ public class ServiceInfo extends EditableInfo {
         final Object o = pingComboBox.getValue();
         String value = null;
         if (o != null) {
-            value = ((StringInfo) o).getStringValue();
+            value = ((StringInfo) o).getInternalValue();
         }
         savedPingOperation = value;
     }
@@ -1347,7 +1347,7 @@ public class ServiceInfo extends EditableInfo {
                     && OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
             final boolean nothingSelected =
                       info == null
-                      || Widget.NOTHING_SELECTED.equals(info.toString());
+                      || Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString());
             if (!nothingSelected
                 && !defaultValues
                 && info != savedOperationIdRef) {
@@ -1372,7 +1372,7 @@ public class ServiceInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(
-                                         Widget.NOTHING_SELECTED);
+                                         Widget.NOTHING_SELECTED_DISPLAY);
                             }
                         });
                     }
@@ -1680,7 +1680,7 @@ public class ServiceInfo extends EditableInfo {
                              Widget.Type.COMBOBOX,
                              savedPO,
                              new StringInfo[]{new StringInfo(
-                                                Widget.NOTHING_SELECTED,
+                                                Widget.NOTHING_SELECTED_DISPLAY,
                                                 null,
                                                 getBrowser()),
                                               new StringInfo(
@@ -1739,7 +1739,7 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         boolean nothingSelected = false;
-        if (Widget.NOTHING_SELECTED.equals(info.toString())) {
+        if (Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString())) {
             nothingSelected = true;
         }
         boolean sameAs = true;
@@ -1823,7 +1823,7 @@ public class ServiceInfo extends EditableInfo {
      */
     private Info[] getSameServicesMetaAttrs() {
         final List<Info> sl = new ArrayList<Info>();
-        sl.add(new StringInfo(Widget.NOTHING_SELECTED,
+        sl.add(new StringInfo(Widget.NOTHING_SELECTED_DISPLAY,
                               null,
                               getBrowser()));
         sl.add(new StringInfo(META_ATTRS_DEFAULT_VALUES_TEXT,
@@ -1878,7 +1878,7 @@ public class ServiceInfo extends EditableInfo {
      */
     private Info[] getSameServicesOperations() {
         final List<Info> sl = new ArrayList<Info>();
-        sl.add(new StringInfo(Widget.NOTHING_SELECTED,
+        sl.add(new StringInfo(Widget.NOTHING_SELECTED_DISPLAY,
                               null,
                               getBrowser()));
         sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
@@ -1938,7 +1938,7 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         boolean nothingSelected = false;
-        if (info == null || Widget.NOTHING_SELECTED.equals(info.toString())) {
+        if (info == null || Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString())) {
             nothingSelected = true;
         }
         boolean sameAs = true;
@@ -2309,7 +2309,7 @@ public class ServiceInfo extends EditableInfo {
                 return null;
             }
             boolean nothingSelected = false;
-            if (Widget.NOTHING_SELECTED.equals(info.toString())) {
+            if (Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString())) {
                 nothingSelected = true;
             }
             boolean sameAs = true;
@@ -2951,7 +2951,7 @@ public class ServiceInfo extends EditableInfo {
             String value = null;
             final Object o = pwi.getValue();
             if (o != null) {
-                value = ((StringInfo) o).getStringValue();
+                value = ((StringInfo) o).getInternalValue();
             }
             final String locationId = null;
             if (!Tools.areEqual(savedPingOperation,
@@ -3040,7 +3040,7 @@ public class ServiceInfo extends EditableInfo {
         String metaAttrsRefId = null;
         if (sameAsMetaAttrsWi != null) {
             final Info i = sameAsMetaAttrsWiValue();
-            if (!Widget.NOTHING_SELECTED.equals(i.toString())
+            if (!Widget.NOTHING_SELECTED_DISPLAY.equals(i.toString())
                 && !META_ATTRS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
                 final ServiceInfo si  = (ServiceInfo) i;
                 final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -3059,7 +3059,7 @@ public class ServiceInfo extends EditableInfo {
         String operationsRefId = null;
         if (sameAsOperationsWi != null) {
             final Info i = sameAsOperationsWiValue();
-            if (!Widget.NOTHING_SELECTED.equals(i.toString())
+            if (!Widget.NOTHING_SELECTED_DISPLAY.equals(i.toString())
                 && !OPERATIONS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
                 final ServiceInfo si  = (ServiceInfo) i;
                 final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -3169,7 +3169,7 @@ public class ServiceInfo extends EditableInfo {
                     sameAsMetaAttrsWi.setValue(
                                 META_ATTRS_DEFAULT_VALUES_TEXT);
                 } else {
-                    sameAsMetaAttrsWi.setValue(Widget.NOTHING_SELECTED);
+                    sameAsMetaAttrsWi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                 }
             } else {
                 sameAs = true;
@@ -3231,7 +3231,7 @@ public class ServiceInfo extends EditableInfo {
         if (pwi != null) {
             final String spo = savedPingOperation;
             if (spo == null) {
-                pwi.setValue(Widget.NOTHING_SELECTED);
+                pwi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
             } else {
                 pwi.setValue(PING_ATTRIBUTES.get(spo));
             }
@@ -3290,7 +3290,7 @@ public class ServiceInfo extends EditableInfo {
                                OPERATIONS_DEFAULT_VALUES_TEXT);
                 } else {
                     if (operationIdRef != null) {
-                        sameAsOperationsWi.setValue(Widget.NOTHING_SELECTED);
+                        sameAsOperationsWi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
                     }
                 }
             } else {

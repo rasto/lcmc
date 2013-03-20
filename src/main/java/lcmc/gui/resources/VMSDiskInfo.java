@@ -197,7 +197,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         POSSIBLE_VALUES.put(DiskData.DRIVER_CACHE, new String[]{null, "default", "none", "writethrough", "writeback", "directsync", "unsafe"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
-            TARGET_BUS_TYPES.put(tbt.getStringValue(), tbt.toString());
+            TARGET_BUS_TYPES.put(tbt.getInternalValue(), tbt.toString());
         }
         DEFAULTS_MAP.put(DiskData.READONLY, "False");
         DEFAULTS_MAP.put(DiskData.SHAREABLE, "False");

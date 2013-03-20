@@ -102,7 +102,7 @@ public final class RadioGroup extends Widget {
 
             String v;
             if (item instanceof Info) {
-                v = ((Info) item).getStringValue();
+                v = ((Info) item).getInternalValue();
             } else {
                 v = item.toString();
             }
@@ -121,7 +121,7 @@ public final class RadioGroup extends Widget {
                     mComponentsReadLock.unlock();
                     String v;
                     if (item instanceof Info) {
-                        v = ((Info) item).getStringValue();
+                        v = ((Info) item).getInternalValue();
                     } else {
                         v = item.toString();
                     }
@@ -189,7 +189,7 @@ public final class RadioGroup extends Widget {
     @Override
     protected Object getValueInternal() {
         final Object value = radioGroupValue;
-        if (NOTHING_SELECTED.equals(value)) {
+        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
             return null;
         }
         return value;
@@ -235,7 +235,7 @@ public final class RadioGroup extends Widget {
                 rb.setSelected(true);
             }
             if (item instanceof Info) {
-                radioGroupValue = ((Info) item).getStringValue();
+                radioGroupValue = ((Info) item).getInternalValue();
             } else {
                 radioGroupValue = (String) item;
             }

@@ -1363,7 +1363,7 @@ public final class DrbdVolumeInfo extends EditableInfo
      * the filesystem resource.
      */
     @Override
-    public String getStringValue() {
+    public String getInternalValue() {
         return getDeviceByRes();
     }
 

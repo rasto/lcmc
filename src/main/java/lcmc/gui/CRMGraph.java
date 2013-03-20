@@ -817,8 +817,8 @@ public final class CRMGraph extends ResourceGraph {
                     repaint();
                 }
             };
-            if (asi.getStringValue().equals("Filesystem")
-                || asi.getStringValue().equals("IPaddr2")) {
+            if (asi.getInternalValue().equals("Filesystem")
+                || asi.getInternalValue().equals("IPaddr2")) {
 
                 mmi.setSpecialFont();
                 addServiceMenuItem.add(mmi);

@@ -423,7 +423,7 @@ public abstract class EditableInfo extends Info {
                     @Override
                     public void run() {
                         if (paramWi.getValue() == null
-                            || paramWi.getValue() == Widget.NOTHING_SELECTED) {
+                            || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
                             rpwi0.setValueAndWait(null);
                         } else {
                             final Object value = paramWi.getStringValue();
@@ -589,7 +589,7 @@ public abstract class EditableInfo extends Info {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null
-                                || paramWi.getValue() == Widget.NOTHING_SELECTED) {
+                                || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
                                 realParamWi.setValueAndWait(null);
                             } else {
                                 final Object value = paramWi.getStringValue();
@@ -645,7 +645,7 @@ public abstract class EditableInfo extends Info {
                 value += ((Unit) ((Object[]) o)[1]).getShortName();
             }
         } else {
-            value = ((Info) o).getStringValue();
+            value = ((Info) o).getInternalValue();
         }
         return value;
     }
@@ -917,7 +917,7 @@ public abstract class EditableInfo extends Info {
                         newValue += ((Unit) o1).getShortName();
                     }
                 } else {
-                    newValue = ((Info) o).getStringValue();
+                    newValue = ((Info) o).getInternalValue();
                 }
 
                 if (param == null || otherParam.equals(param)
@@ -936,7 +936,7 @@ public abstract class EditableInfo extends Info {
                                    ((Object[]) wo)[0].toString()
                                    + ((Unit) ((Object[]) wo)[1]).getShortName();
                         } else {
-                            newValue = ((Info) wo).getStringValue();
+                            newValue = ((Info) wo).getInternalValue();
                         }
                     }
                     wi.setDisabledReason(enable);

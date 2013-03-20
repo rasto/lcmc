@@ -2286,7 +2286,7 @@ public final class Tools {
         } else if (o1 != null && o1 instanceof DrbdResourceInfo) {
             /* this is special case, because this object represents devices in
              * filesystem ra and also after field in drbd.conf. */
-            final String device = ((DrbdResourceInfo) o1).getStringValue();
+            final String device = ((DrbdResourceInfo) o1).getInternalValue();
             if (device != null && device.equals(o2)) {
                 return true;
             }
@@ -2299,7 +2299,7 @@ public final class Tools {
             }
             return false;
         } else if (o1 != null && o1 instanceof Info) {
-            final String s1 = ((Info) o1).getStringValue();
+            final String s1 = ((Info) o1).getInternalValue();
             if (s1 == null) {
                 return o2 == null;
             }
@@ -2307,12 +2307,12 @@ public final class Tools {
                 return false;
             }
             if (o2 instanceof Info) {
-                return s1.equals(((Info) o2).getStringValue());
+                return s1.equals(((Info) o2).getInternalValue());
             } else {
                 return s1.equals(o2) || o1.toString().equals(o2);
             }
         } else if (o2 != null && o2 instanceof Info) {
-            final String s2 = ((Info) o2).getStringValue();
+            final String s2 = ((Info) o2).getInternalValue();
             if (s2 == null) {
                 return o1 == null;
             }
@@ -2320,7 +2320,7 @@ public final class Tools {
                 return false;
             }
             if (o1 instanceof Info) {
-                return s2.equals(((Info) o1).getStringValue());
+                return s2.equals(((Info) o1).getInternalValue());
             } else {
                 return s2.equals(o1) || o2.toString().equals(o1);
             }

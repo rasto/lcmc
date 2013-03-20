@@ -110,7 +110,7 @@ public abstract class Widget extends JPanel {
     /** Widget enclosing component default height. */
     private static final int WIDGET_COMPONENT_HEIGHT = 30;
     /** Nothing selected string, that returns null, if selected. */
-    public static final String NOTHING_SELECTED =
+    public static final String NOTHING_SELECTED_DISPLAY =
                                 Tools.getString("Widget.NothingSelected");
     /** Label of this component. */
     private JLabel label = null;
@@ -166,7 +166,7 @@ public abstract class Widget extends JPanel {
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             this.regexp =
-                    regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED);
+                    regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
         } else {
             this.regexp = regexp;
         }

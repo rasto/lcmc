@@ -107,7 +107,7 @@ public class Checkbox extends Widget {
         } else {
             value = checkBoxTrue;
         }
-        if (NOTHING_SELECTED.equals(value)) {
+        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
             return null;
         }
         return value;

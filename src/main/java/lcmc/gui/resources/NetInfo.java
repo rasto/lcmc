@@ -96,7 +96,7 @@ public class NetInfo extends Info {
 
     /** Returns ip of the net interface. */
     @Override
-    public final String getStringValue() {
+    public final String getInternalValue() {
         final NetInterface ni = getNetInterface();
         if (ni == null) {
             return IP_PLACEHOLDER;
