@@ -280,6 +280,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                     VMSXML.VM_PARAM_APIC,
                                     VMSXML.VM_PARAM_PAE,
                                     VMSXML.VM_PARAM_HAP,
+                                    VMSXML.VM_PARAM_CLOCK_OFFSET,
                                     VMSXML.VM_PARAM_CPU_MATCH,
                                     VMSXML.VM_PARAM_CPUMATCH_MODEL,
                                     VMSXML.VM_PARAM_CPUMATCH_VENDOR,
@@ -490,6 +491,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SECTION_MAP.put(VMSXML.VM_PARAM_PAE, VIRTUAL_SYSTEM_FEATURES);
         SECTION_MAP.put(VMSXML.VM_PARAM_HAP, VIRTUAL_SYSTEM_FEATURES);
 
+        SECTION_MAP.put(VMSXML.VM_PARAM_CLOCK_OFFSET,   VIRTUAL_SYSTEM_STRING);
+
         SECTION_MAP.put(VMSXML.VM_PARAM_CPU_MATCH, CPU_MATCH_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, CPU_MATCH_OPTIONS);
         SECTION_MAP.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, CPU_MATCH_OPTIONS);
@@ -561,7 +564,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         SHORTNAME_MAP.put(
                    VMSXML.VM_PARAM_HAP,
                    Tools.getString("VMSVirtualDomainInfo.Short.Hap"));
-
+        SHORTNAME_MAP.put(
+                   VMSXML.VM_PARAM_CLOCK_OFFSET,
+                   Tools.getString("VMSVirtualDomainInfo.Short.Clock.Offset"));
         SHORTNAME_MAP.put(
             VMSXML.VM_PARAM_CPU_MATCH,
             Tools.getString("VMSVirtualDomainInfo.Short.CPU.Match"));
@@ -619,6 +624,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_APIC, "True");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_PAE, "True");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_CLOCK_OFFSET, "utc");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF, "destroy");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_REBOOT, "restart");
         PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
@@ -695,6 +701,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             new String[]{"", "pc", "pc-0.12"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_INIT,
                             new String[]{"", "/bin/sh", "/init"});
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CLOCK_OFFSET,
+                            new String[]{"utc", "localtime"});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
                             new String[]{"destroy",
                                          "restart",

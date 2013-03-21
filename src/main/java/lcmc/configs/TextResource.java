@@ -2305,6 +2305,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSVirtualDomainInfo.Short.Hap",
          "HAP"},
 
+        {"VMSVirtualDomainInfo.Short.Clock.Offset",
+         "Clock Offset"},
+
         {"VMSVirtualDomainInfo.Short.CPU.Match",
          "Match"},
 

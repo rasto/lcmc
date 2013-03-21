@@ -183,6 +183,8 @@ public final class VMSXML extends XML {
     public static final String VM_PARAM_PAE = "pae";
     /** VM field: hap. */
     public static final String VM_PARAM_HAP = "hap";
+    /** VM field: clock offset. */
+    public static final String VM_PARAM_CLOCK_OFFSET = "offset";
     /** VM field: cpu match. */
     public static final String VM_PARAM_CPU_MATCH = "match";
     /** VM field: cpu model. */
@@ -566,6 +568,29 @@ public final class VMSXML extends XML {
         }
     }
 
+    /** Add clock offset. */
+    private void addClockOffset(final Document doc,
+                                final Node root,
+                                final Map<String, String> parametersMap) {
+        final Element clockNode = (Element) root.appendChild(
+                                                   doc.createElement("clock"));
+        final String offset = parametersMap.get(VM_PARAM_CLOCK_OFFSET);
+        clockNode.setAttribute("offset", offset);
+        final Element timer1 = (Element) clockNode.appendChild(
+                                                   doc.createElement("timer"));
+        timer1.setAttribute("name", "pit");
+        timer1.setAttribute("tickpolicy", "delay");
+        final Element timer2 = (Element) clockNode.appendChild(
+                                                   doc.createElement("timer"));
+        timer2.setAttribute("name", "rtc");
+        timer2.setAttribute("tickpolicy", "catchup");
+
+        final Element timer3 = (Element) clockNode.appendChild(
+                                                   doc.createElement("timer"));
+        timer3.setAttribute("name", "hpet");
+        timer3.setAttribute("present", "no");
+    }
+
     /** Return config name. */
     private String getConfigName(final String type, final String domainName) {
         if ("xen".equals(type)) {
@@ -681,6 +706,9 @@ public final class VMSXML extends XML {
         /* features */
         addFeatures(doc, root, parametersMap);
 
+        /* add clock offset */
+        addClockOffset(doc, root, parametersMap);
+
         /* cpu match */
         addCPUMatchNode(doc, root, parametersMap);
 
@@ -752,6 +780,7 @@ public final class VMSXML extends XML {
         paths.put(VM_PARAM_APIC, "features");
         paths.put(VM_PARAM_PAE, "features");
         paths.put(VM_PARAM_HAP, "features");
+        paths.put(VM_PARAM_CLOCK_OFFSET, "clock");
         paths.put(VM_PARAM_ON_POWEROFF, "on_poweroff");
         paths.put(VM_PARAM_ON_REBOOT, "on_reboot");
         paths.put(VM_PARAM_ON_CRASH, "on_crash");
@@ -786,6 +815,7 @@ public final class VMSXML extends XML {
                                         Tools.convertToKilobytes(value));
                 }
                 if (VM_PARAM_CPU_MATCH.equals(param)
+                    || VM_PARAM_CLOCK_OFFSET.equals(param)
                     || VM_PARAM_ACPI.equals(param)
                     || VM_PARAM_APIC.equals(param)
                     || VM_PARAM_PAE.equals(param)
@@ -823,6 +853,7 @@ public final class VMSXML extends XML {
             }
             addCPUMatchNode(doc, domainNode, parametersMap);
             addFeatures(doc, domainNode, parametersMap);
+            addClockOffset(doc, domainNode, parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             Tools.appError("could not evaluate: ", e);
             return null;
@@ -1414,6 +1445,11 @@ public final class VMSXML extends XML {
                         parameterValues.put(name, VM_PARAM_HAP, "True");
                     }
                 }
+            } else if ("clock".equals(option.getNodeName())) {
+                final String offset = getAttribute(option, "offset");
+                parameterValues.put(name,
+                                    VM_PARAM_CLOCK_OFFSET,
+                                    offset);
             } else if ("cpu".equals(option.getNodeName())) {
                 final String match = getAttribute(option, "match");
                 if (!"".equals(match)) {
