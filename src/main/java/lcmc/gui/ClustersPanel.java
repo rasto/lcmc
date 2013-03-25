@@ -26,11 +26,13 @@ package lcmc.gui;
 import lcmc.data.Clusters;
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
+import lcmc.utilities.MyButton;
 import lcmc.Exceptions;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -48,6 +50,10 @@ import java.awt.Component;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -167,12 +173,67 @@ public final class ClustersPanel extends JPanel {
         if (tabbedPane.getTabCount() == 1) {
             removeAllTabs();
         }
-        tabbedPane.addTab(cluster.getName(),
-                          CLUSTER_ICON,
-                          ct,
-                          Tools.join(" ", cluster.getHostNames()));
+        final String title = Tools.join(" ", cluster.getHostNames());
+        tabbedPane.addTab(cluster.getName(), CLUSTER_ICON, ct, title);
+
+        final ActionListener disconnectAction =
+                         new ActionListener() {
+                             @Override
+                             public void actionPerformed(final ActionEvent e) {
+                                 final Thread t = new Thread(new Runnable() {
+                                     @Override
+                                     public void run() {
+                                         Tools.stopCluster(cluster);
+                                         Tools.getGUIData().getEmptyBrowser()
+                                                .setDisconnected(cluster);
+                                     }
+                                 });
+                                 t.start();
+                             }
+                         };
+
+        addTabComponent(tabbedPane,
+                        cluster.getName(),
+                        CLUSTER_ICON,
+                        ct,
+                        disconnectAction);
         tabbedPane.setSelectedComponent(ct);
         refresh();
+    }
+
+    /** Add tab component with close button */
+    private void addTabComponent(final JTabbedPane tabPane,
+                                 final String title,
+                                 final ImageIcon icon,
+                                 final ClusterTab ct,
+                                 final ActionListener actionListener) {
+        final int index = tabPane.indexOfComponent(ct);
+        JPanel tabPanel = new JPanel(new GridBagLayout());
+        tabPanel.setOpaque(false);
+        final JLabel iconLabel = new JLabel(icon);
+        final JLabel lblTitle = new JLabel(title);
+
+        final MyButton clusterButton = new MyButton("X");
+        clusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
+        clusterButton.setMargin(new Insets(0, 0, 0, 0));
+        clusterButton.setIconTextGap(0);
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        tabPanel.add(iconLabel, gbc);
+
+        gbc.gridx++;
+        gbc.weightx = 1;
+        tabPanel.add(lblTitle, gbc);
+
+        gbc.gridx++;
+        gbc.weightx = 0;
+        tabPanel.add(clusterButton, gbc);
+
+        tabPane.setTabComponentAt(index, tabPanel);
+        clusterButton.addActionListener(actionListener);
     }
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
