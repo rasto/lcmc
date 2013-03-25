@@ -100,28 +100,6 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
             }
         });
 
-        /* disconnect cluster */
-        final MyButton disconnectButton = new MyButton(
-                            Tools.getString("ClusterViewPanel.DisconnectBtn"));
-        disconnectButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
-        disconnectButton.setPreferredSize(
-                            new Dimension(Tools.getConfigData().scaled(150),
-                                          Tools.getConfigData().scaled(20)));
-        disconnectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Tools.stopCluster(cluster);
-                        Tools.getGUIData().getEmptyBrowser().setDisconnected(
-                                                                      cluster);
-                    }
-                });
-                t.start();
-            }
-        });
-
         final JPanel clusterButtonsPanel = new JPanel();
         clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
         final TitledBorder titledBorder = Tools.getBorder(
@@ -129,7 +107,6 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
         clusterButtonsPanel.setBorder(titledBorder);
 
         clusterButtonsPanel.add(clusterWizardButton);
-        clusterButtonsPanel.add(disconnectButton);
         buttonPanel.add(clusterButtonsPanel);
 
         /* advanced mode button */

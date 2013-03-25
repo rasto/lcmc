@@ -163,9 +163,6 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterWizard",
          "クラスター設定ウィザード"},
 
-        {"ClusterViewPanel.DisconnectBtn",
-         "切断"},
-
         {"ClusterViewPanel.OperatingMode",
          "操作モード"},
 
