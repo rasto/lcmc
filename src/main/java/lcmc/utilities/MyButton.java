@@ -258,25 +258,26 @@ public class MyButton extends JButton implements ComponentWithTest {
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
-        gp1 = new GradientPaint(1.0f,
-                                (float) getHeight(),
-                                getBackground(),
-                                1.0f,
-                                (float) getHeight() * 0.3f,
-                                color1);
         gp2 = new GradientPaint(1.0f,
                                 0.0f,
-                                getBackground(),
+                                Tools.brighterColor(getBackground(), 1.1),
                                 1.0f,
-                                (float) getHeight() * 0.3f, color1);
-        rf1 = new Rectangle2D.Float(0.0f, (float) getHeight() * 0.3f,
-            (float) getWidth(), (float) getHeight());
+                                (float) getHeight() * 0.3f,
+                                Tools.brighterColor(getBackground(), 1.2));
+        gp1 = new GradientPaint(1.0f,
+                                (float) getHeight(),
+                                Tools.brighterColor(getBackground(), 0.85),
+                                1.0f,
+                                (float) getHeight() * 0.3f,
+                                Tools.brighterColor(getBackground(), 1.2));
         rf2 = new Rectangle2D.Float(0.0f, 0.0f, (float) getWidth(),
-            (float) getHeight() * 0.3f);
-        g2.setPaint(gp1);
-        g2.fill(rf1);
+            (float) getHeight());
+        rf1 = new Rectangle2D.Float(3.0f, (float) getHeight() * 0.5f,
+            (float) getWidth() - 6, (float) (getHeight() * 0.5 - 3));
         g2.setPaint(gp2);
         g2.fill(rf2);
+        g2.setPaint(gp1);
+        g2.fill(rf1);
 
         super.paintComponent(g);
     }

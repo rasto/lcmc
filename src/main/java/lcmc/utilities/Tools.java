@@ -2879,4 +2879,22 @@ public final class Tools {
             }
         }
     }
+
+    /** Return brigher version of the color (or darker). */
+    public static Color brighterColor(Color c, double x) {
+        double r = c.getRed() * x;
+        if (r > 255) {
+            r = 255;
+        }
+        double g = c.getGreen() * x;
+        if (g > 255) {
+            g = 255;
+        }
+        double b = c.getBlue() * x;
+        if (b > 255) {
+            b = 255;
+        }
+        return new Color((int) r, (int) g, (int) b);
+    }
+
 }

@@ -155,10 +155,10 @@ public final class LCMC extends JPanel {
     protected static void createAndShowGUI(final Container mainFrame) {
         final java.util.List<Object> buttonGradient = Arrays.asList(
           new Object[]{
-               new Float(.3f),
-               new Float(0f),
-               new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
+               new Float(.5f),
+               new Float(1f),
                new ColorUIResource(0xFFFFFF),
+               new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                new ColorUIResource(ClusterBrowser.BUTTON_PANEL_BACKGROUND)});
         final java.util.List<Object> checkboxGradient = Arrays.asList(
           new Object[]{new Float(.3f),
