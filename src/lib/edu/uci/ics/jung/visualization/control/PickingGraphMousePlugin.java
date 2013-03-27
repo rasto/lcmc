@@ -292,7 +292,9 @@ public class PickingGraphMousePlugin<V, E> extends AbstractGraphMousePlugin
                 Point2D out = e.getPoint();
                 if(e.getModifiers() == this.addToSelectionModifiers ||
                         e.getModifiers() == modifiers) {
-                    rect.setFrameFromDiagonal(down,out);
+                    if (down != null) {
+                        rect.setFrameFromDiagonal(down,out);
+                    }
                 }
             }
             if(vertex != null) e.consume();
