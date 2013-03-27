@@ -1665,7 +1665,7 @@ public class ServiceInfo extends EditableInfo {
                     /* do nothing */
                 }
             });
-            wi.setLabel(label, "");
+            wi.setLabel(label, text);
             addField(panel,
                      label,
                      wi,
@@ -2127,10 +2127,11 @@ public class ServiceInfo extends EditableInfo {
                     mOperationsComboBoxHashWriteLock.unlock();
                 }
                 rows++;
-                final JLabel wiLabel = new JLabel(Tools.ucfirst(op)
-                                                  + " / "
-                                                  + Tools.ucfirst(param));
-                wi.setLabel(wiLabel, "");
+                final String labelText = Tools.ucfirst(op)
+                                         + " / "
+                                         + Tools.ucfirst(param);
+                final JLabel wiLabel = new JLabel(labelText);
+                wi.setLabel(wiLabel, labelText);
                 JPanel panel;
                 if (getBrowser().isCRMOperationAdvanced(op, param)) {
                     panel = advancedOpPanel;
@@ -2145,6 +2146,11 @@ public class ServiceInfo extends EditableInfo {
                          leftWidth,
                          rightWidth,
                          0);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        wiLabel.setToolTipText(labelText);
+                    }
+                });
             }
         }
         SpringUtilities.makeCompactGrid(normalOpPanel, normalRows, 2,
