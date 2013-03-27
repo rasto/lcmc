@@ -1321,24 +1321,41 @@ public class ServiceInfo extends EditableInfo {
                 if (wi == null) {
                     continue;
                 }
-                final Object[] defaultValueE = Tools.extractUnit(defaultValue);
-                Object value = wi.getValue();
-                if (Tools.areEqual(value, new Object[]{"", ""})) {
-                    value = new Object[]{getOpDefaultsDefault(param), null};
-                }
-                if (!Tools.areEqual(value, defaultValueE)) {
-                    allAreDefaultValues = false;
-                }
-                final String savedOp = savedOperation.get(op, param);
-                final Object[] savedOpE = Tools.extractUnit(savedOp);
-                if (savedOp == null) {
-                    if (!Tools.areEqual(value, defaultValueE)) {
+                if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
+                    Object value = wi.getValue();
+                    if (!Tools.areEqual(value, defaultValue)) {
+                        allAreDefaultValues = false;
+                    }
+                    final String savedOp = savedOperation.get(op, param);
+                    if (savedOp == null) {
+                        if (!Tools.areEqual(value, defaultValue)) {
+                            changed = true;
+                        }
+                    } else if (!Tools.areEqual(value, savedOp)) {
                         changed = true;
                     }
-                } else if (!Tools.areEqual(value, savedOpE)) {
-                    changed = true;
+                    wi.setBackground(defaultValue, savedOp, false);
+                } else {
+                    final Object[] defaultValueE =
+                                                Tools.extractUnit(defaultValue);
+                    Object value = wi.getValue();
+                    if (Tools.areEqual(value, new Object[]{"", ""})) {
+                        value = new Object[]{getOpDefaultsDefault(param), null};
+                    }
+                    if (!Tools.areEqual(value, defaultValueE)) {
+                        allAreDefaultValues = false;
+                    }
+                    final String savedOp = savedOperation.get(op, param);
+                    final Object[] savedOpE = Tools.extractUnit(savedOp);
+                    if (savedOp == null) {
+                        if (!Tools.areEqual(value, defaultValueE)) {
+                            changed = true;
+                        }
+                    } else if (!Tools.areEqual(value, savedOpE)) {
+                        changed = true;
+                    }
+                    wi.setBackground(defaultValueE, savedOpE, false);
                 }
-                wi.setBackground(defaultValueE, savedOpE, false);
             }
         }
         if (sameAsOperationsWi != null) {
@@ -2075,16 +2092,32 @@ public class ServiceInfo extends EditableInfo {
                 if (savedValue != null) {
                     defaultValue = savedValue;
                 }
-                final Widget wi = new TextfieldWithUnit(
-                                             defaultValue,
-                                             getUnits(),
-                                             regexp,
-                                             rightWidth,
-                                             Widget.NO_ABBRV,
-                                             new AccessMode(
+                Widget wi;
+                if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
+                    wi = WidgetFactory.createInstance(
+                                  Widget.Type.COMBOBOX,
+                                  defaultValue,
+                                  new String[]{"",
+                                               "10",
+                                               "20"},
+                                  "^\\d*$",
+                                  rightWidth,
+                                  Widget.NO_ABBRV,
+                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                                 false),
+                                  Widget.NO_BUTTON);
+                    wi.setAlwaysEditable(true);
+                } else {
+                    wi = new TextfieldWithUnit(defaultValue,
+                                               getUnits(),
+                                               regexp,
+                                               rightWidth,
+                                               Widget.NO_ABBRV,
+                                               new AccessMode(
                                                    ConfigData.AccessType.ADMIN,
                                                    !AccessMode.ADVANCED),
-                                             Widget.NO_BUTTON);
+                                               Widget.NO_BUTTON);
+                }
                 wi.setEnabled(savedOpIdRef == null);
 
                 mOperationsComboBoxHashWriteLock.lock();

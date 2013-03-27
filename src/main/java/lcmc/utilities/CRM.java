@@ -252,7 +252,12 @@ public final class CRM {
             for (final String op : pacemakerOps.keySet()) {
                 final Map<String, String> opHash = pacemakerOps.get(op);
                 xml.append("<op");
+                boolean checkLevel = false;
                 for (final String name : opHash.keySet()) {
+                    if (CRMXML.PAR_CHECK_LEVEL.equals(name)) {
+                        checkLevel = true;
+                        continue;
+                    }
                     final String value = opHash.get(name);
                     xml.append(' ');
                     xml.append(name);
@@ -260,7 +265,23 @@ public final class CRM {
                     xml.append(value);
                     xml.append('"');
                 }
-                xml.append("/>");
+                if (checkLevel) {
+                    xml.append(">");
+                    final String iaId = resId + "-monitor-instance_attributes";
+                    xml.append("<instance_attributes id=\"");
+                    xml.append(iaId);
+                    xml.append("\"><nvpair id=\"");
+                    xml.append(iaId);
+                    xml.append('-');
+                    xml.append(CRMXML.PAR_CHECK_LEVEL);
+                    xml.append("\" name=\"");
+                    xml.append(CRMXML.PAR_CHECK_LEVEL);
+                    xml.append("\" value=\"");
+                    xml.append(opHash.get(CRMXML.PAR_CHECK_LEVEL));
+                    xml.append("\"/></instance_attributes></op>");
+                } else {
+                    xml.append("/>");
+                }
             }
             xml.append("</operations>");
         }

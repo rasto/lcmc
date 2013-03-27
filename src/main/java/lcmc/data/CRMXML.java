@@ -371,6 +371,8 @@ public final class CRMXML extends XML {
     private final static String PCMK_HOST_CHECK_STATIC = "static-list";
     /** TODO: If this is set PCMK_HOST_LIST must not be set. */
     private final static String PCMK_HOST_CHECK_DYNAMIC = "dynamic-list";
+    /** OCF check level. */
+    public static final String PAR_CHECK_LEVEL = "OCF_CHECK_LEVEL";
 
     static {
         /* target-role */
@@ -1890,6 +1892,7 @@ public final class CRMXML extends XML {
                 ra.addOperationDefault(name, "role", role);
             }
         }
+        ra.addOperationDefault("monitor", PAR_CHECK_LEVEL, "");
     }
 
     /** Parses the actions node that is list of values for action param. */
@@ -2325,6 +2328,13 @@ public final class CRMXML extends XML {
                                           "start-delay",
                                           startDelay);
                         opIds.put(name, opId);
+                        if ("monitor".equals(name)) {
+                            final String checkLevel = parseCheckLevel(opNode);
+                            operationsMap.put(crmId,
+                                              name,
+                                              PAR_CHECK_LEVEL,
+                                              checkLevel);
+                        }
                     }
                 }
             } else {
@@ -2368,6 +2378,27 @@ public final class CRMXML extends XML {
             } else {
                 metaAttrsIdRefs.put(crmId, metaAttrsIdRef);
             }
+        }
+    }
+
+    /** Parse the OCF_CHECK_LEVEL monitor attribute. */
+    private String parseCheckLevel(final Node opNode) {
+        final Node iaNode = getChildNode(opNode, "instance_attributes");
+        if (iaNode == null) {
+            return "";
+        }
+        final Node nvpairNode = getChildNode(iaNode, "nvpair");
+        if (nvpairNode == null) {
+            return "";
+        }
+        final String name = getAttribute(nvpairNode, "name");
+        final String value = getAttribute(nvpairNode, "value");
+        if (PAR_CHECK_LEVEL.equals(name)) {
+            return value;
+        } else {
+            Tools.appWarning(
+                        "unexpected instance attribute: " + name + " " + value);
+            return "";
         }
     }
 

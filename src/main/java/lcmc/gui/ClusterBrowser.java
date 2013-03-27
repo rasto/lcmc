@@ -322,14 +322,16 @@ public final class ClusterBrowser extends Browser {
                                                   new HashMap<Host, String>();
     /** All parameters for the hb operations, so that it is possible to create
      * arguments for up_rsc_full_ops. */
-    public static final String[] HB_OPERATION_PARAM_LIST = {HB_PAR_DESC,
-                                                            HB_PAR_INTERVAL,
-                                                            HB_PAR_TIMEOUT,
-                                                            HB_PAR_START_DELAY,
-                                                            HB_PAR_DISABLED,
-                                                            HB_PAR_ROLE,
-                                                            HB_PAR_PREREQ,
-                                                            HB_PAR_ON_FAIL};
+    public static final String[] HB_OPERATION_PARAM_LIST = {
+                                                        HB_PAR_DESC,
+                                                        HB_PAR_INTERVAL,
+                                                        HB_PAR_TIMEOUT,
+                                                        CRMXML.PAR_CHECK_LEVEL,
+                                                        HB_PAR_START_DELAY,
+                                                        HB_PAR_DISABLED,
+                                                        HB_PAR_ROLE,
+                                                        HB_PAR_PREREQ,
+                                                        HB_PAR_ON_FAIL};
     /** Starting ptest tooltip. */
     public static final String STARTING_PTEST_TOOLTIP =
                                 Tools.getString("ClusterBrowser.StartingPtest");
@@ -368,6 +370,7 @@ public final class ClusterBrowser extends Browser {
         hbOpNotAdvanced.put(HB_OP_STOP, HB_PAR_TIMEOUT, 1);
         hbOpNotAdvanced.put(HB_OP_MONITOR, HB_PAR_TIMEOUT, 1);
         hbOpNotAdvanced.put(HB_OP_MONITOR, HB_PAR_INTERVAL, 1);
+        hbOpNotAdvanced.put(HB_OP_MONITOR, CRMXML.PAR_CHECK_LEVEL, 1);
 
         crmOperationParams.put(HB_OP_START,
                                 new ArrayList<String>(
@@ -397,14 +400,16 @@ public final class ClusterBrowser extends Browser {
         if (Tools.versionBeforePacemaker(dcHost)) {
             crmOperationParams.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT,
-                                                          HB_PAR_INTERVAL)));
+                                    Arrays.asList(HB_PAR_TIMEOUT,
+                                                  HB_PAR_INTERVAL,
+                                                  CRMXML.PAR_CHECK_LEVEL)));
         } else {
             crmOperationParams.put(HB_OP_MONITOR,
                                 new ArrayList<String>(
-                                            Arrays.asList(HB_PAR_TIMEOUT,
-                                                          HB_PAR_INTERVAL,
-                                                          HB_PAR_START_DELAY)));
+                                        Arrays.asList(HB_PAR_TIMEOUT,
+                                                      HB_PAR_INTERVAL,
+                                                      CRMXML.PAR_CHECK_LEVEL,
+                                                      HB_PAR_START_DELAY)));
         }
         crmOperationParams.put(HB_OP_PROMOTE,
                                 new ArrayList<String>(
