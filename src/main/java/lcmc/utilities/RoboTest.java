@@ -28,6 +28,7 @@ import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.DrbdGraph;
+import lcmc.gui.CRMGraph;
 import lcmc.gui.resources.Info;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
@@ -3035,6 +3036,7 @@ public final class RoboTest {
             leftClick();
             sleep(2000);
             checkTest(testName, 2);
+            checkNumberOfVertices(testName, 4);
             stopEverything();
             checkTest(testName, 3);
             removeEverything();
@@ -5134,5 +5136,22 @@ public final class RoboTest {
         }
         prevP = getAppPosition();
         info("continue...");
+    }
+
+    private static void checkNumberOfVertices(final String name,
+                                              final int should) {
+        if (aborted) {
+            return;
+        }
+        final CRMGraph graph = cluster.getBrowser().getCRMGraph();
+        int i = 0;
+        while (i < 10 && should != graph.getNumberOfVertices()) {
+            Tools.info(name
+                       + " number of vertices: "
+                       + should + " -> "
+                       + graph.getNumberOfVertices());
+            Tools.sleep(1000);
+            i++;
+        }
     }
 }

@@ -2035,4 +2035,9 @@ public abstract class ResourceGraph {
     public final Point2D getLocation(final Info i) {
         return layout.transform(getVertex(i));
     }
+
+    /** Number of vertices. It is used to check in tests. */
+    public int getNumberOfVertices() {
+        return getGraph().getVertices().size();
+    }
 }
