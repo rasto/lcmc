@@ -3520,12 +3520,6 @@ public class ServiceInfo extends EditableInfo {
                 || (clInfo != null && !clInfo.getService().isNew())) {
                 command = "-U";
             }
-            if (!testOnly) {
-                getService().setNew(false);
-                if (clInfo != null) {
-                    clInfo.getService().setNew(false);
-                }
-            }
             CRM.setParameters(dcHost,
                               command,
                               heartbeatId,
