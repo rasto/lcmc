@@ -780,7 +780,7 @@ public final class GroupInfo extends ServiceInfo {
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
-            removeInfo();
+            super.removeInfo();
             getService().doneRemoving();
             return;
         }
@@ -819,10 +819,29 @@ public final class GroupInfo extends ServiceInfo {
                 getService().setRemoved(true);
             }
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
-            removeInfo();
+            super.removeInfo();
             getService().setNew(false);
         }
         getService().doneRemoving();
+    }
+
+    public void removeInfo() {
+        @SuppressWarnings("unchecked")
+        final DefaultMutableTreeNode node = getNode();
+        if (node == null)
+            return;
+        final Enumeration<DefaultMutableTreeNode> e = node.children();
+        try {
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode n = e.nextElement();
+                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                child.removeInfo();
+            }
+        } catch (java.util.NoSuchElementException ele) {
+            Tools.info("removing aborted");
+            return;
+        }
+        super.removeInfo();
     }
 
     /** Remove all the services in the group and the group. */
