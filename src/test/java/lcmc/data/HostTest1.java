@@ -415,6 +415,7 @@ public final class HostTest1 extends TestCase {
                               "LENNY", 
                               "LUCID", 
                               "HARDY", 
+                              "wheezy/sid/12.10",
                               "wheezy/sid/12.04",
                               "wheezy/sid/11.10",
                               "wheezy/sid/testing",
