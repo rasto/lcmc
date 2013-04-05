@@ -2514,8 +2514,16 @@ public final class CRMXML extends XML {
                 final Map<String, String> operationsIdtoCRMId,
                 final Map<String, String> metaAttrsIdRefs,
                 final Map<String, String> metaAttrsIdToCRMId) {
-        final String raClass = getAttribute(primitiveNode, "class");
+        final String templateId = getAttribute(primitiveNode, "template");
         final String crmId = getAttribute(primitiveNode, "id");
+        if (templateId != null) {
+            Tools.info("templates not implemented, ignoring: "
+                       + crmId
+                       + "/"
+                       + templateId);
+            return;
+        }
+        final String raClass = getAttribute(primitiveNode, "class");
         String provider = getAttribute(primitiveNode, "provider");
         if (provider == null) {
             provider = ResourceAgent.HEARTBEAT_PROVIDER;
@@ -3351,7 +3359,8 @@ public final class CRMXML extends XML {
                                      getAttribute(expNode, "value");
                             if ((booleanOp == null
                                  || "and".equals(booleanOp))
-                                && "#uname".equals(attr)) {
+                                && "#uname".equals(attr)
+                                && value != null) {
                                 hostScoreMap.put(value.toLowerCase(Locale.US),
                                                  new HostLocation(score2,
                                                                   op,
