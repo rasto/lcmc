@@ -137,6 +137,8 @@ public final class ConfigData {
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     /** Name of the group pacemaker object. */
     public static final String PM_GROUP_NAME = "Group";
+    /** Default frames per second for animations. */
+    public static final float DEFAULT_ANIM_FPS = 20.0f;
     /** Remote port offset when making ssh tunnel for vnc. */
     private int vncPortOffset = 0;
     /** Whether tight vnc viewer should be used. */
@@ -152,7 +154,7 @@ public final class ConfigData {
     /** Do not show resources that are only in LRM. */
     private boolean noLRM = false;
     /** Frames per second for animations. */
-    private float animFPS = 15;
+    private float animFPS = DEFAULT_ANIM_FPS;
     /** Access type of the application at the moment. */
     private AccessType accessType = AccessType.ADMIN;
     /** Maximum allowed access type of the application. */
@@ -571,6 +573,16 @@ public final class ConfigData {
     /** Returns frames per second for animations. */
     public float getAnimFPS() {
         return animFPS;
+    }
+
+    /** Returns whether anim fps is slower than default. */
+    public boolean isSlow() {
+        return animFPS < DEFAULT_ANIM_FPS;
+    }
+
+    /** Returns whether anim fps is faster than default. */
+    public boolean isFast() {
+        return animFPS > DEFAULT_ANIM_FPS;
     }
 
     /** Sets frames per second for animations. */
