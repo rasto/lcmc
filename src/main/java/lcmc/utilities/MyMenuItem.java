@@ -42,6 +42,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.PointerInfo;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
@@ -435,12 +436,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                     xOffset = -x1;
                 }
             }
-            final Point2D p = MouseInfo.getPointerInfo().getLocation();
-            robot.mouseMove((int) p.getX() + xOffset - 1,
-                            (int) p.getY());
-            robot.mouseMove((int) p.getX() + xOffset + 1,
-                            (int) p.getY());
-            robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
+            final PointerInfo pi = MouseInfo.getPointerInfo();
+            if (pi != null) {
+                final Point2D p = pi.getLocation();
+                robot.mouseMove((int) p.getX() + xOffset - 1,
+                                (int) p.getY());
+                robot.mouseMove((int) p.getX() + xOffset + 1,
+                                (int) p.getY());
+                robot.mouseMove((int) p.getX() + xOffset, (int) p.getY());
+            }
         }
     }
 
