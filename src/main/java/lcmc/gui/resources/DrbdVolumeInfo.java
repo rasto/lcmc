@@ -186,7 +186,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }
                 mouseStillOver = false;
                 getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

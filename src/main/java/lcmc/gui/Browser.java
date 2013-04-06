@@ -308,9 +308,9 @@ public class Browser {
                 if (icon != null) {
                     setIcon(icon);
                 }
-                setToolTipText(null);
+                setToolTipText("");
             } else {
-                setToolTipText(null);
+                setToolTipText("");
                 ImageIcon icon = i.getCategoryIcon(false);
                 if (icon == null) {
                     icon = CATEGORY_ICON;

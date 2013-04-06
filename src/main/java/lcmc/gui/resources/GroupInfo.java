@@ -220,7 +220,7 @@ public final class GroupInfo extends ServiceInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    getApplyButton().setToolTipText(null);
+                    getApplyButton().setToolTipText("");
                     final Widget idField = getWidget(GUI_ID, null);
                     idField.setEnabled(false);
                 }

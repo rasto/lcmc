@@ -515,7 +515,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
                 mouseStillOver = false;
                 getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

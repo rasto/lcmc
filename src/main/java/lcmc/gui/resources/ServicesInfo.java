@@ -243,7 +243,7 @@ public final class ServicesInfo extends EditableInfo {
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText(null);
+                    getApplyButton().setToolTipText("");
                 }
             });
         }
@@ -1000,7 +1000,7 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 hg.stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

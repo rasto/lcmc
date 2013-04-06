@@ -1469,7 +1469,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

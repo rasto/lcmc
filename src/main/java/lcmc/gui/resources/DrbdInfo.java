@@ -383,7 +383,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText(null);
+                    getApplyButton().setToolTipText("");
                 }
             });
             storeComboBoxValues(params);
@@ -439,7 +439,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 }
                 mouseStillOver = false;
                 getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override
