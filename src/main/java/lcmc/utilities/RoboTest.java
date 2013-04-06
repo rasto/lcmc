@@ -413,6 +413,10 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
+                            startTestG(5);
+                            if (aborted) {
+                                break;
+                            }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -564,6 +568,14 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
+                    } else if ("g".equals(index)) {
+                        /* big group */
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        startTestG(15);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
                     }
                 } else if ("Storage (DRBD, LVM)".equals(selected)) {
                     Tools.getGUIData().expandTerminalSplitPane(1);
@@ -2477,6 +2489,71 @@ public final class RoboTest {
         checkTest(testName, 4);
         removeResource(gx, gy, CONFIRM_REMOVE);
         resetTerminalAreas();
+        System.gc();
+    }
+
+    private static void startTestG(final int count) {
+        slowFactor = 0.5f;
+        aborted = false;
+        final int gx = 235;
+        final int gy = 207;
+        disableStonith();
+        checkTest("testG", 1);
+        /* group with dummy resources */
+        moveTo(gx, gy);
+        sleep(1000);
+        rightClick(); /* popup */
+        sleep(1000);
+        moveTo("Add Group");
+        leftClick();
+        sleep(3000);
+        /* create dummy */
+        moveTo(gx + 46, gy + 11);
+        rightClick(); /* group popup */
+        sleep(2000);
+
+        for (int i = 0; i < count; i++) {
+            /* another group resource */
+            moveTo(gx + 10, gy - 25);
+            rightClick(); /* popup */
+            sleep(10000);
+            moveTo("Add Group Service");
+            sleep(1000);
+            moveTo("OCF Resource Agents");
+            sleep(1000);
+            typeDummy();
+            sleep(i * 300);
+            setTimeouts(true);
+            moveTo("Apply");
+            sleep(6000);
+            leftClick();
+            sleep(1000);
+        }
+        checkTest("testG", 2);
+        sleep(4000);
+        stopResource(gx, gy);
+        sleep(6000);
+        checkTest("testG", 3);
+
+        /* copy/paste */
+        moveTo(gx + 10 , gy + 10);
+        leftClick();
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        press(KeyEvent.VK_C);
+        press(KeyEvent.VK_V);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+        moveTo(gx + 10 , gy + 90);
+        leftClick();
+        moveTo("Apply");
+        sleep(4000);
+        leftClick();
+        checkTest("testG", 4);
+
+        if (count < 10) {
+            removeResource(gx, gy, CONFIRM_REMOVE);
+            removeResource(gx, gy + 90, CONFIRM_REMOVE);
+            resetTerminalAreas();
+        }
         System.gc();
     }
 
