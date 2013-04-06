@@ -161,7 +161,6 @@ public final class ClusterBrowserTest1 extends TestCase {
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCRMGraph().repaint();
             }
-            Tools.sleep(100);
             Tools.stopProgressIndicator(i + ": " + file);
             for (final Host host : TestSuite1.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
@@ -173,7 +172,6 @@ public final class ClusterBrowserTest1 extends TestCase {
                                         testOnly);
                 Tools.waitForSwing();
             }
-            Tools.sleep(250);
         }
         TestSuite1.clearStdout();
     }
