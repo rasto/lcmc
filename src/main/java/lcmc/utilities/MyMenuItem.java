@@ -42,6 +42,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.PointerInfo;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
