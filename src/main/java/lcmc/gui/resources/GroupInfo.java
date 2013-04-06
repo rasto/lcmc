@@ -697,78 +697,80 @@ public final class GroupInfo extends ServiceInfo {
         }
 
         /* group services */
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
+        if (!Tools.getConfigData().isSlow()) {
+            final ClusterStatus cs = getBrowser().getClusterStatus();
+            final List<String> resources = cs.getGroupResources(
                                                       getHeartbeatId(testOnly),
                                                       testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo gsi =
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo gsi =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                if (gsi == null) {
-                    continue;
-                }
-                final MyMenu groupServicesMenu = new MyMenu(
+                    if (gsi == null) {
+                        continue;
+                    }
+                    final MyMenu groupServicesMenu = new MyMenu(
                             gsi.toString(),
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
-                    private static final long serialVersionUID = 1L;
-                    private final Lock mUpdateLock = new ReentrantLock();
+                        private static final long serialVersionUID = 1L;
+                        private final Lock mUpdateLock = new ReentrantLock();
 
-                    @Override
-                    public String enablePredicate() {
-                        return null;
-                    }
+                        @Override
+                        public String enablePredicate() {
+                            return null;
+                        }
 
-                    @Override
-                    public void update() {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mUpdateLock.tryLock()) {
-                                    try {
-                                        updateThread();
-                                    } finally {
-                                        mUpdateLock.unlock();
+                        @Override
+                        public void update() {
+                            final Thread t = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mUpdateLock.tryLock()) {
+                                        try {
+                                            updateThread();
+                                        } finally {
+                                            mUpdateLock.unlock();
+                                        }
                                     }
                                 }
-                            }
-                        });
-                        t.start();
-                    }
-
-                    public void updateThread() {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                setEnabled(false);
-                            }
-                        });
-                        Tools.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                removeAll();
-                            }
-                        });
-                        final List<UpdatableItem> serviceMenus =
-                                        new ArrayList<UpdatableItem>();
-                        for (final UpdatableItem u : gsi.createPopup()) {
-                            serviceMenus.add(u);
-                            u.update();
+                            });
+                            t.start();
                         }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (final UpdatableItem u
-                                                     : serviceMenus) {
-                                    add((JMenuItem) u);
+
+                        public void updateThread() {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setEnabled(false);
                                 }
+                            });
+                            Tools.invokeAndWait(new Runnable() {
+                                @Override
+                                public void run() {
+                                    removeAll();
+                                }
+                            });
+                            final List<UpdatableItem> serviceMenus =
+                                            new ArrayList<UpdatableItem>();
+                            for (final UpdatableItem u : gsi.createPopup()) {
+                                serviceMenus.add(u);
+                                u.update();
                             }
-                        });
-                        super.update();
-                    }
-                };
-                items.add((UpdatableItem) groupServicesMenu);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    for (final UpdatableItem u
+                                                         : serviceMenus) {
+                                        add((JMenuItem) u);
+                                    }
+                                }
+                            });
+                            super.update();
+                        }
+                    };
+                    items.add((UpdatableItem) groupServicesMenu);
+                }
             }
         }
         return items;
@@ -1363,16 +1365,18 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
+        if (!Tools.getConfigData().isSlow()) {
+            final ClusterStatus cs = getBrowser().getClusterStatus();
+            final List<String> resources = cs.getGroupResources(
                                                          getHeartbeatId(false),
                                                          false);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
+            if (resources != null) {
+                for (final String hbId : resources) {
+                    final ServiceInfo si =
                                     getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null) {
-                    si.updateMenus(pos);
+                    if (si != null) {
+                        si.updateMenus(pos);
+                    }
                 }
             }
         }
