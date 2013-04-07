@@ -322,7 +322,7 @@ public final class LCMC extends JPanel {
                            (Exception) ex);
                 }
             });
-        float fps = 20.0f;
+        float fps = ConfigData.DEFAULT_ANIM_FPS;
         final Options options = new Options();
 
         options.addOption("h", HELP_OP, false, "print this help");
