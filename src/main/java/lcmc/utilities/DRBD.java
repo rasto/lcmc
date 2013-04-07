@@ -102,6 +102,7 @@ public final class DRBD {
                                                 null,
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+            System.out.println(cmd + " output: " + output.getOutput());
             M_DRBD_TEST_WRITELOCK.lock();
             if (drbdtestOutput == null) {
                 drbdtestOutput = output.getOutput();
@@ -812,36 +813,6 @@ public final class DRBD {
             return ret.getOutput();
         }
         return null;
-    }
-
-    /**
-     * Executes the drbdadm adjust on the specified host and resource
-     * This is done without actually to make an
-     * adjust with -d option to catch possible changes.
-     * TODO: obsolete
-     */
-    public static void adjustDryrun(final Host host,
-                                    final String resource,
-                                    final String volume) {
-        adjustDryrun(host, resource, volume, null);
-    }
-
-    /**
-     * Executes the drbdadm adjust on the specified host and resource and
-     * calls the callback function. This is done without actually to make an
-     * adjust with -d option to catch possible changes.
-     */
-    public static void adjustDryrun(final Host host,
-                                    final String resource,
-                                    final String volume,
-                                    final ExecCallback execCallback) {
-        final String command = host.getDistCommand("DRBD.adjust.dryrun",
-                                                   getResVolReplaceHash(
-                                                                      host,
-                                                                      resource,
-                                                                      volume));
-        execCommand(host, command, execCallback, true, false);
-
     }
 
     /** Executes the drbdadm down on the specified host and resource. */

@@ -370,10 +370,8 @@ public final class DistResource extends java.util.ListResourceBundle {
          SUDO + "/etc/init.d/drbdproxy stop"},
 
         {"DRBD.adjust",
-         "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ adjust @RES-VOL@; fi"},
+         "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ adjust @DRYRUNCONF@ @RES-VOL@; fi"},
 
-        {"DRBD.adjust.dryrun",
-         "echo|" + SUDO + "/sbin/drbdadm -d adjust @RES-VOL@"},
         {"DRBD.down",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ down @RES-VOL@"},
         {"DRBD.up",
