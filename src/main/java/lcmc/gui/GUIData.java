@@ -478,6 +478,7 @@ public final class GUIData  {
             final ClusterBrowser cb = cluster.getBrowser();
             if (cb != null) {
                 cb.getClusterViewPanel().setAdvancedMode(advancedMode);
+                cluster.getBrowser().checkAccessOfEverything();
             }
         }
     }
