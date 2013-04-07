@@ -1148,6 +1148,9 @@ public final class DrbdXML extends XML {
     private void parseConfig(final String configXML) {
         final int start = configXML.indexOf("<config");
         if (start < 0) {
+            if (configXML.trim().length() != 0) {
+                Tools.appError("drbd config error: " + configXML);
+            }
             return;
         }
         final Document document = getXMLDocument(configXML.substring(start));
