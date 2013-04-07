@@ -154,7 +154,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.adjust(hi.getHost(), DRBD.ALL, null, CRM.LIVE);
+                        DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost());
@@ -168,7 +168,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.adjust(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
+                    DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
                 }
             }
         };

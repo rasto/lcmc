@@ -1027,7 +1027,7 @@ public final class BlockDevInfo extends EditableInfo {
                                                                           true);
                     for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                        DRBD.adjust(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -1089,7 +1089,7 @@ public final class BlockDevInfo extends EditableInfo {
                                               .createDrbdConfig(false);
                                 for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                                    DRBD.adjust(h, DRBD.ALL, null, false);
+                                    DRBD.adjustApply(h, DRBD.ALL, null, false);
                                 }
                             } catch (Exceptions.DrbdConfigException e) {
                                 getBrowser()
