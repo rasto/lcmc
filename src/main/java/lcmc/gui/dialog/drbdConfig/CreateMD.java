@@ -213,11 +213,11 @@ final class CreateMD extends DrbdConfig {
                          null,
                          testOnly);
         }
-        DRBD.adjust(bdi1.getHost(),
+        DRBD.adjustApply(bdi1.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);
-        DRBD.adjust(bdi2.getHost(),
+        DRBD.adjustApply(bdi2.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
                     testOnly);

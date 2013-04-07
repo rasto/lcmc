@@ -191,6 +191,12 @@ public final class DrbdXML extends XML {
         NOT_ADVANCED_PARAMS.add("plugin-zlib"); /* proxy */
         NOT_ADVANCED_PARAMS.add("plugin-lzma"); /* proxy */
     }
+
+    /** Drbd config "errors" that are to be ignored. */
+    static final Set<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
+    static {
+        IGNORE_CONFIG_ERRORS.add("no resources defined!");
+    }
     /** Access types of some parameters. */
     static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
                                 new HashMap<String, ConfigData.AccessType>();
@@ -1148,6 +1154,10 @@ public final class DrbdXML extends XML {
     private void parseConfig(final String configXML) {
         final int start = configXML.indexOf("<config");
         if (start < 0) {
+            final String c = configXML.trim();
+            if (c.length() != 0 && !IGNORE_CONFIG_ERRORS.contains(c)) {
+                Tools.appError("drbd config error: " + c);
+            }
             return;
         }
         final Document document = getXMLDocument(configXML.substring(start));

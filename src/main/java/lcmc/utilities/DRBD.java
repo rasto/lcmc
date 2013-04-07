@@ -696,7 +696,7 @@ public final class DRBD {
                              final String resource,
                              final String volume,
                              final boolean testOnly) {
-        return adjust(host, resource, null, null, testOnly);
+        return adjustApply(host, resource, null, null, testOnly);
     }
 
     /**
@@ -709,6 +709,43 @@ public final class DRBD {
                              final ExecCallback execCallback,
                              final boolean testOnly) {
         final String command = host.getDistCommand("DRBD.adjust",
+                                                   getResVolReplaceHash(
+                                                                      host,
+                                                                      resource,
+                                                                      volume));
+        final SSH.SSHOutput ret = execCommand(host,
+                                              command,
+                                              execCallback,
+                                              false,
+                                              testOnly);
+
+        final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*",
+                                          Pattern.DOTALL);
+        final Matcher m = p.matcher(ret.getOutput());
+        if (m.matches()) {
+            return Integer.parseInt(m.group(1));
+        }
+        return 0;
+    }
+
+    /** Executes the drbdadm adjust on the specified host and resource. */
+    public static int adjustApply(final Host host,
+                             final String resource,
+                             final String volume,
+                             final boolean testOnly) {
+        return adjustApply(host, resource, null, null, testOnly);
+    }
+
+    /**
+     * Executes the drbdadm adjust on the specified host and resource and
+     * calls the callback function.
+     */
+    public static int adjustApply(final Host host,
+                             final String resource,
+                             final String volume,
+                             final ExecCallback execCallback,
+                             final boolean testOnly) {
+        final String command = host.getDistCommand("DRBD.adjust.apply",
                                                    getResVolReplaceHash(
                                                                       host,
                                                                       resource,
@@ -812,36 +849,6 @@ public final class DRBD {
             return ret.getOutput();
         }
         return null;
-    }
-
-    /**
-     * Executes the drbdadm adjust on the specified host and resource
-     * This is done without actually to make an
-     * adjust with -d option to catch possible changes.
-     * TODO: obsolete
-     */
-    public static void adjustDryrun(final Host host,
-                                    final String resource,
-                                    final String volume) {
-        adjustDryrun(host, resource, volume, null);
-    }
-
-    /**
-     * Executes the drbdadm adjust on the specified host and resource and
-     * calls the callback function. This is done without actually to make an
-     * adjust with -d option to catch possible changes.
-     */
-    public static void adjustDryrun(final Host host,
-                                    final String resource,
-                                    final String volume,
-                                    final ExecCallback execCallback) {
-        final String command = host.getDistCommand("DRBD.adjust.dryrun",
-                                                   getResVolReplaceHash(
-                                                                      host,
-                                                                      resource,
-                                                                      volume));
-        execCommand(host, command, execCallback, true, false);
-
     }
 
     /** Executes the drbdadm down on the specified host and resource. */

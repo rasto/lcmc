@@ -670,7 +670,7 @@ public class Init extends DialogCluster {
                                     final boolean testOnly = false;
                                     DRBD.load(host, testOnly);
                                     if (host.isDrbdUpgraded()) {
-                                        DRBD.adjust(host,
+                                        DRBD.adjustApply(host,
                                                     DRBD.ALL,
                                                     null,
                                                     testOnly);

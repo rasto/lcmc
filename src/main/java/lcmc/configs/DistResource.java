@@ -371,9 +371,8 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"DRBD.adjust",
          "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ adjust @RES-VOL@; fi"},
-
-        {"DRBD.adjust.dryrun",
-         "echo|" + SUDO + "/sbin/drbdadm -d adjust @RES-VOL@"},
+        {"DRBD.adjust.apply",
+         "if [ -e /proc/drbd ]; then echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ @DRYRUNCONF@ adjust @RES-VOL@; fi"},
         {"DRBD.down",
          "echo|" + SUDO + "/sbin/drbdadm @DRYRUN@ down @RES-VOL@"},
         {"DRBD.up",

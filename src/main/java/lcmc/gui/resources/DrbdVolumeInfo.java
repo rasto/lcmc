@@ -214,7 +214,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 try {
                     getDrbdInfo().createDrbdConfig(true);
                     for (final Host h : getHosts()) {
-                        DRBD.adjust(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
@@ -280,7 +280,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                         try {
                             getDrbdInfo().createDrbdConfig(false);
                             for (final Host h : getHosts()) {
-                                DRBD.adjust(h, DRBD.ALL, null, false);
+                                DRBD.adjustApply(h, DRBD.ALL, null, false);
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
