@@ -996,7 +996,7 @@ public final class BlockDevInfo extends EditableInfo {
                 mouseStillOver = false;
                 final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
                 drbdGraph.stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

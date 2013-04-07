@@ -312,7 +312,7 @@ public final class HostInfo extends Info {
                 }
                 mouseStillOver = false;
                 crmg.stopTestAnimation(crmConfigureCommitButton);
-                crmConfigureCommitButton.setToolTipText(null);
+                crmConfigureCommitButton.setToolTipText("");
             }
 
             @Override

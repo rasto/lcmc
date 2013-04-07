@@ -2692,7 +2692,7 @@ public class ServiceInfo extends EditableInfo {
                 mouseStillOver = false;
                 getBrowser().getCRMGraph().stopTestAnimation(
                                                              getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override
@@ -3408,7 +3408,7 @@ public class ServiceInfo extends EditableInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    getApplyButton().setToolTipText(null);
+                    getApplyButton().setToolTipText("");
                     getWidget(GUI_ID, null).setEnabled(false);
                     if (clInfo != null) {
                         clInfo.getWidget(GUI_ID, null).setEnabled(false);

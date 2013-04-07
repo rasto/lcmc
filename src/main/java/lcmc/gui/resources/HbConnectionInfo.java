@@ -250,7 +250,7 @@ public class HbConnectionInfo extends EditableInfo {
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText(null);
+                    getApplyButton().setToolTipText("");
                 }
             });
         }
@@ -382,7 +382,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText(null);
+                getApplyButton().setToolTipText("");
             }
 
             @Override

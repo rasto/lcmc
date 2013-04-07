@@ -2205,7 +2205,7 @@ public final class ClusterBrowser extends Browser {
             if (isEnabled()) {
                 mouseStillOver = false;
                 crmGraph.stopTestAnimation((JComponent) component);
-                component.setToolTipText(null);
+                component.setToolTipText("");
             }
         }
 
@@ -2277,7 +2277,7 @@ public final class ClusterBrowser extends Browser {
             }
             mouseStillOver = false;
             drbdGraph.stopTestAnimation((JComponent) component);
-            component.setToolTipText(null);
+            component.setToolTipText("");
         }
 
         /** Mouse over, starts animation, calls action() and sets tooltip. */
