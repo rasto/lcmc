@@ -296,6 +296,9 @@ public final class RoboTest {
 
     /** Automatic tests. */
     public static void startTest(final String index, final Cluster c) {
+        Tools.getGUIData().getMainFrame().setSize(
+                                  Tools.getDefaultInt("DrbdMC.width"),
+                                  Tools.getDefaultInt("DrbdMC.height") + 50);
         cluster = c;
         aborted = false;
         info("start test " + index + " in 3 seconds");
