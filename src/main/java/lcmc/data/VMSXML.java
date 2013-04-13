@@ -292,24 +292,44 @@ public final class VMSXML extends XML {
         INTERFACE_TAG_MAP.put(InterfaceData.SCRIPT_PATH, "script");
         INTERFACE_ATTRIBUTE_MAP.put(InterfaceData.SCRIPT_PATH, "path");
 
-        DISK_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
-        DISK_TAG_MAP.put(DiskData.TARGET_DEVICE, "target");
-        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_DEVICE, "dev");
-        DISK_TAG_MAP.put(DiskData.SOURCE_FILE, "source");
-        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_FILE, "file");
-        DISK_TAG_MAP.put(DiskData.SOURCE_DEVICE, "source");
-        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE, "dev");
-        DISK_TAG_MAP.put(DiskData.TARGET_BUS, "target");
-        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_BUS, "bus");
-        DISK_TAG_MAP.put(DiskData.DRIVER_NAME, "driver");
-        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_NAME, "name");
-        DISK_TAG_MAP.put(DiskData.DRIVER_TYPE, "driver");
-        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_TYPE, "type");
-        DISK_TAG_MAP.put(DiskData.DRIVER_CACHE, "driver");
-        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_CACHE, "cache");
-        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE, "device");
-        DISK_TAG_MAP.put(DiskData.READONLY, "readonly");
-        DISK_TAG_MAP.put(DiskData.SHAREABLE, "shareable");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TYPE,              "type");
+        DISK_TAG_MAP.put(DiskData.TARGET_DEVICE,           "target");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_DEVICE,     "dev");
+        DISK_TAG_MAP.put(DiskData.SOURCE_FILE,             "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_FILE,       "file");
+        DISK_TAG_MAP.put(DiskData.SOURCE_DEVICE,           "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_DEVICE,     "dev");
+
+        DISK_TAG_MAP.put(DiskData.SOURCE_PROTOCOL,         "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_PROTOCOL,   "protocol");
+        DISK_TAG_MAP.put(DiskData.SOURCE_NAME,             "source");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_NAME,       "name");
+
+        DISK_TAG_MAP.put(DiskData.SOURCE_HOST_NAME,        "source:host");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_HOST_NAME,  "name");
+        DISK_TAG_MAP.put(DiskData.SOURCE_HOST_PORT,        "source:host");
+        DISK_ATTRIBUTE_MAP.put(DiskData.SOURCE_HOST_PORT,  "port");
+
+        DISK_TAG_MAP.put(DiskData.AUTH_USERNAME,           "auth");
+        DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_USERNAME,     "username");
+        DISK_TAG_MAP.put(DiskData.AUTH_SECRET_TYPE,        "auth:secret");
+        DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_TYPE,  "type");
+        DISK_TAG_MAP.put(DiskData.AUTH_SECRET_USAGE,       "auth:secret");
+        DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_USAGE, "usage");
+        DISK_TAG_MAP.put(DiskData.AUTH_SECRET_UUID,        "auth:secret");
+        DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_UUID,  "uuid");
+
+        DISK_TAG_MAP.put(DiskData.TARGET_BUS,              "target");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_BUS,        "bus");
+        DISK_TAG_MAP.put(DiskData.DRIVER_NAME,             "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_NAME,       "name");
+        DISK_TAG_MAP.put(DiskData.DRIVER_TYPE,             "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_TYPE,       "type");
+        DISK_TAG_MAP.put(DiskData.DRIVER_CACHE,            "driver");
+        DISK_ATTRIBUTE_MAP.put(DiskData.DRIVER_CACHE,      "cache");
+        DISK_ATTRIBUTE_MAP.put(DiskData.TARGET_TYPE,       "device");
+        DISK_TAG_MAP.put(DiskData.READONLY,                "readonly");
+        DISK_TAG_MAP.put(DiskData.SHAREABLE,               "shareable");
 
         FILESYSTEM_ATTRIBUTE_MAP.put(InterfaceData.TYPE, "type");
         FILESYSTEM_TAG_MAP.put(FilesystemData.SOURCE_DIR, "source");
@@ -893,6 +913,8 @@ public final class VMSXML extends XML {
                 hwNode = (Element) devicesNode.appendChild(
                      domainNode.getOwnerDocument().createElement(elementName));
             }
+            final Map<String, Element> parentNodes =
+                                                new HashMap<String, Element>();
             for (final String param : parametersMap.keySet()) {
                 final String value = parametersMap.get(param);
                 if (!tagMap.containsKey(param)
@@ -912,18 +934,34 @@ public final class VMSXML extends XML {
                     }
                     continue;
                 }
-                Element node = (Element) getChildNode(hwNode,
-                                                      tagMap.get(param));
+                final String tag0 = tagMap.get(param);
+                if (tag0 == null) {
+                    continue;
+                }
+                String tag;
+                String parent = null;
+                int i = tag0.indexOf(':');
+                Element pNode;
+                if (i > 0) {
+                    /* with parent */
+                    parent = tag0.substring(0, i);
+                    tag = tag0.substring(i + 1);
+                    pNode = parentNodes.get(parent);
+                } else {
+                    tag = tag0;
+                    pNode = hwNode;
+                }
+                Element node = (Element) getChildNode(pNode, tag);
                 if ((attributeMap.containsKey(param) || "True".equals(value))
                     && node == null) {
-                    node = (Element) hwNode.appendChild(
-                          domainNode.getOwnerDocument().createElement(
-                                                           tagMap.get(param)));
+                    node = (Element) pNode.appendChild(
+                          domainNode.getOwnerDocument().createElement(tag));
                 } else if (node != null
                            && !attributeMap.containsKey(param)
                            && (value == null || "".equals(value))) {
-                    hwNode.removeChild(node);
+                    pNode.removeChild(node);
                 }
+                parentNodes.put(tag, node);
                 if (attributeMap.containsKey(param)) {
                     final Node attributeNode =
                                     node.getAttributes().getNamedItem(
@@ -1347,6 +1385,95 @@ public final class VMSXML extends XML {
         }
     }
 
+    /** Parse disk xml and populate the devMap */
+    private void parseDiskNode(final Node diskNode,
+                               final Map<String, DiskData> devMap) {
+        final String type = getAttribute(diskNode, "type");
+        final String device = getAttribute(diskNode, "device");
+        final NodeList opts = diskNode.getChildNodes();
+        String sourceFile = null;
+        String sourceDev = null;
+        String sourceProtocol = null;
+        String sourceName = null;
+        String sourceHostName = null;
+        String sourceHostPort = null;
+        String authUsername = null;
+        String authSecretType = null;
+        String authSecretUsage = null;
+        String authSecretUuid = null;
+        String targetDev = null;
+        String targetBus = null;
+        String driverName = null;
+        String driverType = null;
+        String driverCache = null;
+        boolean readonly = false;
+        boolean shareable = false;
+        for (int k = 0; k < opts.getLength(); k++) {
+            final Node optionNode = opts.item(k);
+            final String nodeName = optionNode.getNodeName();
+            if ("source".equals(nodeName)) {
+                sourceFile = getAttribute(optionNode, "file");
+                final String dir = Tools.getDirectoryPart(sourceFile);
+                if (dir != null) {
+                    sourceFileDirs.add(dir);
+                }
+                sourceDev = getAttribute(optionNode, "dev");
+                sourceProtocol = getAttribute(optionNode, "protocol");
+                sourceName = getAttribute(optionNode, "name");
+                final Node hostN = getChildNode(optionNode, "host");
+                if (hostN != null) {
+                    sourceHostName = getAttribute(hostN, "name");
+                    sourceHostPort = getAttribute(hostN, "port");
+                }
+            } else if ("auth".equals(nodeName)) {
+                authUsername = getAttribute(optionNode, "username");
+                final Node secretN = getChildNode(optionNode, "secret");
+                if (secretN != null) {
+                    authSecretType = getAttribute(secretN, "type");
+                    authSecretUsage = getAttribute(secretN, "usage");
+                    authSecretUuid = getAttribute(secretN, "uuid");
+                }
+
+            } else if ("target".equals(nodeName)) {
+                targetDev = getAttribute(optionNode, "dev");
+                targetBus = getAttribute(optionNode, "bus");
+            } else if ("driver".equals(nodeName)) {
+                driverName = getAttribute(optionNode, "name");
+                driverType = getAttribute(optionNode, "type");
+                driverCache = getAttribute(optionNode, "cache");
+            } else if ("readonly".equals(nodeName)) {
+                readonly = true;
+            } else if ("shareable".equals(nodeName)) {
+                shareable = true;
+            } else if (HW_ADDRESS.equals(nodeName)) {
+                /* it's generated, ignoring. */
+            } else if (!"#text".equals(nodeName)) {
+                Tools.appWarning("unknown disk option: " + nodeName);
+            }
+        }
+        if (targetDev != null) {
+            final DiskData diskData = new DiskData(type,
+                                                   targetDev,
+                                                   sourceFile,
+                                                   sourceDev,
+                                                   sourceProtocol,
+                                                   sourceName,
+                                                   sourceHostName,
+                                                   sourceHostPort,
+                                                   authUsername,
+                                                   authSecretType,
+                                                   authSecretUsage,
+                                                   authSecretUuid,
+                                                   targetBus + "/" + device,
+                                                   driverName,
+                                                   driverType,
+                                                   driverCache,
+                                                   readonly,
+                                                   shareable);
+            devMap.put(targetDev, diskData);
+        }
+    }
+
     /** Parses the libvirt config file. */
     private String parseConfig(final Node configNode,
                              final String nameInFilename) {
@@ -1585,62 +1712,7 @@ public final class VMSXML extends XML {
                                                             display),
                                         graphicsData);
                     } else if ("disk".equals(deviceNode.getNodeName())) {
-                        final String type = getAttribute(deviceNode, "type");
-                        final String device = getAttribute(deviceNode,
-                                                           "device");
-                        final NodeList opts = deviceNode.getChildNodes();
-                        String sourceFile = null;
-                        String sourceDev = null;
-                        String targetDev = null;
-                        String targetBus = null;
-                        String driverName = null;
-                        String driverType = null;
-                        String driverCache = null;
-                        boolean readonly = false;
-                        boolean shareable = false;
-                        for (int k = 0; k < opts.getLength(); k++) {
-                            final Node optionNode = opts.item(k);
-                            final String nodeName = optionNode.getNodeName();
-                            if ("source".equals(nodeName)) {
-                                sourceFile = getAttribute(optionNode, "file");
-                                final String dir = Tools.getDirectoryPart(
-                                                                  sourceFile);
-                                if (dir != null) {
-                                    sourceFileDirs.add(dir);
-                                }
-                                sourceDev = getAttribute(optionNode, "dev");
-                            } else if ("target".equals(nodeName)) {
-                                targetDev = getAttribute(optionNode, "dev");
-                                targetBus = getAttribute(optionNode, "bus");
-                            } else if ("driver".equals(nodeName)) {
-                                driverName = getAttribute(optionNode, "name");
-                                driverType = getAttribute(optionNode, "type");
-                                driverCache = getAttribute(optionNode, "cache");
-                            } else if ("readonly".equals(nodeName)) {
-                                readonly = true;
-                            } else if ("shareable".equals(nodeName)) {
-                                shareable = true;
-                            } else if (HW_ADDRESS.equals(nodeName)) {
-                                /* it's generated, ignoring. */
-                            } else if (!"#text".equals(nodeName)) {
-                                Tools.appWarning("unknown disk option: "
-                                                 + nodeName);
-                            }
-                        }
-                        if (targetDev != null) {
-                            final DiskData diskData =
-                                         new DiskData(type,
-                                                      targetDev,
-                                                      sourceFile,
-                                                      sourceDev,
-                                                      targetBus + "/" + device,
-                                                      driverName,
-                                                      driverType,
-                                                      driverCache,
-                                                      readonly,
-                                                      shareable);
-                            devMap.put(targetDev, diskData);
-                        }
+                        parseDiskNode(deviceNode, devMap);
                     } else if ("filesystem".equals(deviceNode.getNodeName())) {
                         final String type = getAttribute(deviceNode, "type");
                         final NodeList opts = deviceNode.getChildNodes();
@@ -2378,6 +2450,22 @@ public final class VMSXML extends XML {
         private final String sourceFile;
         /** Source device: /dev/drbd0... */
         private final String sourceDev;
+        /** Source protocol. */
+        private final String sourceProtocol;
+        /** Source name. */
+        private final String sourceName;
+        /** Source host name. */
+        private final String sourceHostName;
+        /** Source host port. */
+        private final String sourceHostPort;
+        /** Auth user name. */
+        private final String authUsername;
+        /** Auth secret type. */
+        private final String authSecretType;
+        /** Auth secret usage. */
+        private final String authSecretUsage;
+        /** Auth secret uuid. */
+        private final String authSecretUuid;
         /** Target bus: ide... and type: disk..., delimited with, */
         private final String targetBusType;
         /** Driver name: qemu... */
@@ -2396,10 +2484,30 @@ public final class VMSXML extends XML {
         public static final String TARGET_DEVICE = "target_device";
         /** Saved target device string. */
         public static final String SAVED_TARGET_DEVICE = "saved_target_device";
+
         /** Source file. */
         public static final String SOURCE_FILE = "source_file";
         /** Source dev. */
         public static final String SOURCE_DEVICE = "source_dev";
+
+        /** Source protocol. */
+        public static final String SOURCE_PROTOCOL = "source_protocol";
+        /** Source name. */
+        public static final String SOURCE_NAME = "source_name";
+        /** Source host name. */
+        public static final String SOURCE_HOST_NAME = "source_host_name";
+        /** Source host port. */
+        public static final String SOURCE_HOST_PORT = "source_host_port";
+
+        /** Auth user name. */
+        public static final String AUTH_USERNAME = "auth_username";
+        /** Auth secret type. */
+        public static final String AUTH_SECRET_TYPE = "auth_secret_type";
+        /** Auth secret usage. */
+        public static final String AUTH_SECRET_USAGE = "auth_secret_usage";
+        /** Auth secret uuid. */
+        public static final String AUTH_SECRET_UUID = "auth_secret_uuid";
+
         /** Target bus and type. */
         public static final String TARGET_BUS_TYPE = "target_bus_type";
         /** Target bus. */
@@ -2422,6 +2530,14 @@ public final class VMSXML extends XML {
                         final String targetDev,
                         final String sourceFile,
                         final String sourceDev,
+                        final String sourceProtocol,
+                        final String sourceName,
+                        final String sourceHostName,
+                        final String sourceHostPort,
+                        final String authUsername,
+                        final String authSecretType,
+                        final String authSecretUsage,
+                        final String authSecretUuid,
                         final String targetBusType,
                         final String driverName,
                         final String driverType,
@@ -2437,6 +2553,24 @@ public final class VMSXML extends XML {
             setValue(SOURCE_FILE, sourceFile);
             this.sourceDev = sourceDev;
             setValue(SOURCE_DEVICE, sourceDev);
+
+            this.sourceProtocol = sourceProtocol;
+            setValue(SOURCE_PROTOCOL, sourceProtocol);
+            this.sourceName = sourceName;
+            setValue(SOURCE_NAME, sourceName);
+            this.sourceHostName = sourceHostName;
+            setValue(SOURCE_HOST_NAME, sourceHostName);
+            this.sourceHostPort = sourceHostPort;
+            setValue(SOURCE_HOST_PORT, sourceHostPort);
+            this.authUsername = authUsername;
+            setValue(AUTH_USERNAME, authUsername);
+            this.authSecretType = authSecretType;
+            setValue(AUTH_SECRET_TYPE, authSecretType);
+            this.authSecretUsage = authSecretUsage;
+            setValue(AUTH_SECRET_USAGE, authSecretUsage);
+            this.authSecretUuid = authSecretUuid;
+            setValue(AUTH_SECRET_UUID, authSecretUuid);
+
             this.targetBusType = targetBusType;
             setValue(TARGET_BUS_TYPE, targetBusType);
             this.driverName = driverName;
@@ -2477,6 +2611,46 @@ public final class VMSXML extends XML {
         /** Returns source device. */
         public String getSourceDev() {
             return sourceDev;
+        }
+
+        /** Return source protocol. */
+        public String getSourceProtocol() {
+            return sourceProtocol;
+        }
+
+        /** Return source name. */
+        public String getSourceName() {
+            return sourceName;
+        }
+
+        /** Return source host name. */
+        public String getSourceHostName() {
+            return sourceHostName;
+        }
+
+        /** Return source host port. */
+        public String getSourceHostPort() {
+            return sourceHostPort;
+        }
+
+        /** Return auth user name. */
+        public String getAuthUsername() {
+            return authUsername;
+        }
+
+        /** Return auth secret type. */
+        public String getAuthSecretType() {
+            return authSecretType;
+        }
+
+        /** Return auth secret usage. */
+        public String getAuthSecretUsage() {
+            return authSecretUsage;
+        }
+
+        /** Return auth secret uuid. */
+        public String getAuthSecretUuid() {
+            return authSecretUuid;
         }
 
         /** Returns target bus. */

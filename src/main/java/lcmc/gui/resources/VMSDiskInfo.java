@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.event.ActionListener;
@@ -59,6 +60,24 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Source block combo box, so that it can be disabled, depending on type.*/
     private final Map<String, Widget> sourceDeviceWi =
                                             new HashMap<String, Widget>();
+
+    private final Map<String, Widget> sourceNameWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> sourceProtocolWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> sourceHostNameWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> sourceHostPortWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> authUsernameWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> authSecretTypeWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> authSecretUsageWi =
+                                                 new HashMap<String, Widget>();
+    private final Map<String, Widget> authSecretUuidWi =
+                                                 new HashMap<String, Widget>();
+
     /** Target device combo box, that needs to be reloaded if target type has
      * changed. */
     private final Map<String, Widget> targetDeviceWi =
@@ -83,6 +102,17 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                 DiskData.TARGET_DEVICE,
                                                 DiskData.SOURCE_FILE,
                                                 DiskData.SOURCE_DEVICE,
+
+                                                DiskData.SOURCE_PROTOCOL,
+                                                DiskData.SOURCE_NAME,
+                                                DiskData.SOURCE_HOST_NAME,
+                                                DiskData.SOURCE_HOST_PORT,
+
+                                                DiskData.AUTH_USERNAME,
+                                                DiskData.AUTH_SECRET_TYPE,
+                                                DiskData.AUTH_SECRET_USAGE,
+                                                DiskData.AUTH_SECRET_UUID,
+
                                                 DiskData.DRIVER_NAME,
                                                 DiskData.DRIVER_TYPE,
                                                 DiskData.DRIVER_CACHE,
@@ -108,6 +138,28 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                      DiskData.DRIVER_CACHE,
                                                      DiskData.READONLY,
                                                      DiskData.SHAREABLE};
+
+    /** Network parameters. */
+    private static final String[] NETWORK_PARAMETERS = {
+                                                    DiskData.TYPE,
+                                                    DiskData.TARGET_BUS_TYPE,
+                                                    DiskData.TARGET_DEVICE,
+
+                                                    DiskData.SOURCE_PROTOCOL,
+                                                    DiskData.SOURCE_NAME,
+                                                    DiskData.SOURCE_HOST_NAME,
+                                                    DiskData.SOURCE_HOST_PORT,
+
+                                                    DiskData.AUTH_USERNAME,
+                                                    DiskData.AUTH_SECRET_TYPE,
+                                                    DiskData.AUTH_SECRET_USAGE,
+                                                    DiskData.AUTH_SECRET_UUID,
+
+                                                    DiskData.DRIVER_NAME,
+                                                    DiskData.DRIVER_TYPE,
+                                                    DiskData.DRIVER_CACHE,
+                                                    DiskData.READONLY,
+                                                    DiskData.SHAREABLE};
     /** Whether the parameter is enabled only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
@@ -137,14 +189,41 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     static {
         SHORTNAME_MAP.put(DiskData.TYPE, "Type");
         SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
-        SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "Source File");
-        SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Source Device");
+        SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "File");
+        SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Device");
+
+        SHORTNAME_MAP.put(DiskData.SOURCE_PROTOCOL, "Protocol");
+        SHORTNAME_MAP.put(DiskData.SOURCE_NAME, "Name");
+        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_NAME, "Host Name");
+        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_PORT, "Host Port");
+
+        SHORTNAME_MAP.put(DiskData.AUTH_USERNAME, "Username");
+        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_TYPE, "Secret Type");
+        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_USAGE, "Secret Usage");
+        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_UUID, "Secred UUID");
+
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
         SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
         SHORTNAME_MAP.put(DiskData.DRIVER_TYPE, "Driver Type");
         SHORTNAME_MAP.put(DiskData.DRIVER_CACHE, "Driver Cache");
         SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
         SHORTNAME_MAP.put(DiskData.SHAREABLE, "Shareable");
+    }
+    /** Sections. */
+    private static final Map<String, String> SECTION_MAP =
+                                                 new HashMap<String, String>();
+    static {
+        SECTION_MAP.put(DiskData.SOURCE_FILE, "Source");
+        SECTION_MAP.put(DiskData.SOURCE_DEVICE, "Source");
+        SECTION_MAP.put(DiskData.SOURCE_PROTOCOL, "Source");
+        SECTION_MAP.put(DiskData.SOURCE_NAME, "Source");
+        SECTION_MAP.put(DiskData.SOURCE_HOST_NAME, "Source");
+        SECTION_MAP.put(DiskData.SOURCE_HOST_PORT, "Source");
+
+        SECTION_MAP.put(DiskData.AUTH_USERNAME, "Authentication");
+        SECTION_MAP.put(DiskData.AUTH_SECRET_TYPE, "Authentication");
+        SECTION_MAP.put(DiskData.AUTH_SECRET_USAGE, "Authentication");
+        SECTION_MAP.put(DiskData.AUTH_SECRET_UUID, "Authentication");
     }
 
     /** Preferred values. */
@@ -166,6 +245,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Disk types. */
     private static final String FILE_TYPE = "file";
     private static final String BLOCK_TYPE = "block";
+    private static final String NETWORK_TYPE = "network";
 
     /** Drivers. */
     private static final String DRIVER_NAME_DEFUALT = null;
@@ -178,6 +258,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                  new StringInfo("Image file", FILE_TYPE, null),
                                  new StringInfo("Disk/block device",
                                                 BLOCK_TYPE,
+                                                null),
+                                 new StringInfo("Network",
+                                                NETWORK_TYPE,
                                                 null)});
         POSSIBLE_VALUES.put(
                     DiskData.TARGET_BUS_TYPE,
@@ -293,8 +376,10 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     public String[] getRealParametersFromXML() {
         if (BLOCK_TYPE.equals(getComboBoxValue(DiskData.TYPE))) {
             return BLOCK_PARAMETERS.clone();
-        } else {
+        } else if (FILE_TYPE.equals(getComboBoxValue(DiskData.TYPE))) {
             return FILE_PARAMETERS.clone();
+        } else {
+            return NETWORK_PARAMETERS.clone();
         }
     }
 
@@ -333,7 +418,12 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns section to which the specified parameter belongs. */
     @Override
     protected String getSection(final String param) {
-        return "Disk Options";
+        final String section = SECTION_MAP.get(param);
+        if (section == null) {
+            return "Disk Options";
+        } else {
+            return section;
+        }
     }
 
     /** Returns true if the specified parameter is required. */
@@ -399,7 +489,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getRealParametersFromXML();
-        final Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters =
+                                           new LinkedHashMap<String, String>();
         for (final String param : params) {
             final String value = getComboBoxValue(param);
             if (DiskData.TYPE.equals(param)) {
@@ -428,7 +519,15 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 }
             } else if (!Tools.areEqual(getParamSaved(param), value)
                        || DiskData.SOURCE_FILE.equals(param)
-                       || DiskData.SOURCE_DEVICE.equals(param)) {
+                       || DiskData.SOURCE_DEVICE.equals(param)
+                       || DiskData.SOURCE_PROTOCOL.equals(param)
+                       || DiskData.SOURCE_NAME.equals(param)
+                       || DiskData.SOURCE_HOST_NAME.equals(param)
+                       || DiskData.SOURCE_HOST_PORT.equals(param)
+                       || DiskData.AUTH_USERNAME.equals(param)
+                       || DiskData.AUTH_SECRET_TYPE.equals(param)
+                       || DiskData.AUTH_SECRET_USAGE.equals(param)
+                       || DiskData.AUTH_SECRET_UUID.equals(param)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
@@ -534,14 +633,30 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    final boolean file = FILE_TYPE.equals(newValue);
+                    final boolean block = BLOCK_TYPE.equals(newValue);
+                    final boolean network = NETWORK_TYPE.equals(newValue);
                     for (final String p : sourceFileWi.keySet()) {
-                        sourceFileWi.get(p).setVisible(
-                                                FILE_TYPE.equals(newValue));
+                        sourceFileWi.get(p).setVisible(file);
                     }
                     for (final String p : sourceDeviceWi.keySet()) {
-                        sourceDeviceWi.get(p).setVisible(
-                                                BLOCK_TYPE.equals(newValue));
+                        sourceDeviceWi.get(p).setVisible(block);
                     }
+                    for (final Map<String, Widget> w
+                                : new ArrayList<Map<String, Widget>>(
+                                            Arrays.asList(sourceNameWi,
+                                                          sourceProtocolWi,
+                                                          sourceHostNameWi,
+                                                          sourceHostPortWi,
+                                                          authUsernameWi,
+                                                          authSecretTypeWi,
+                                                          authSecretUsageWi,
+                                                          authSecretUuidWi))) {
+                        for (String p : w.keySet()) {
+                            w.get(p).setVisible(network);
+                        }
+                    }
+
                 }
             });
             checkOneParam(DiskData.SOURCE_FILE);
@@ -677,6 +792,12 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
+        String prefixS;
+        if (prefix == null) {
+            prefixS = "";
+        } else {
+            prefixS = prefix;
+        }
         if (DiskData.SOURCE_FILE.equals(param)) {
             final String sourceFile = getParamSaved(DiskData.SOURCE_FILE);
             final String regexp = ".*[^/]$";
@@ -693,11 +814,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                     false), /* only adv. mode */
                                      fileChooserBtn);
             paramWi.setAlwaysEditable(true);
-            if (prefix == null) {
-                sourceFileWi.put("", paramWi);
-            } else {
-                sourceFileWi.put(prefix, paramWi);
-            }
+            sourceFileWi.put(prefixS, paramWi);
             if (Tools.isWindows()) {
                 /* does not work on windows and I tried, ultimately because
                    FilePane.usesShellFolder(fc) in BasicFileChooserUI returns
@@ -736,42 +853,34 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 paramWi.setAlwaysEditable(false);
             } else if (DiskData.SOURCE_DEVICE.equals(param)) {
                 paramWi.setAlwaysEditable(true);
-                if (prefix == null) {
-                    sourceDeviceWi.put("", paramWi);
-                } else {
-                    sourceDeviceWi.put(prefix, paramWi);
-                }
+                sourceDeviceWi.put(prefixS, paramWi);
+            } else if (DiskData.SOURCE_NAME.equals(param)) {
+                sourceNameWi.put(prefixS, paramWi);
+            } else if (DiskData.SOURCE_PROTOCOL.equals(param)) {
+                sourceProtocolWi.put(prefixS, paramWi);
+            } else if (DiskData.SOURCE_HOST_NAME.equals(param)) {
+                sourceHostNameWi.put(prefixS, paramWi);
+            } else if (DiskData.SOURCE_HOST_PORT.equals(param)) {
+                sourceHostPortWi.put(prefixS, paramWi);
+            } else if (DiskData.AUTH_USERNAME.equals(param)) {
+                authUsernameWi.put(prefixS, paramWi);
+            } else if (DiskData.AUTH_SECRET_TYPE.equals(param)) {
+                authSecretTypeWi.put(prefixS, paramWi);
+            } else if (DiskData.AUTH_SECRET_USAGE.equals(param)) {
+                authSecretUsageWi.put(prefixS, paramWi);
+            } else if (DiskData.AUTH_SECRET_UUID.equals(param)) {
+                authSecretUuidWi.put(prefixS, paramWi);
             } else if (DiskData.TARGET_DEVICE.equals(param)) {
                 paramWi.setAlwaysEditable(true);
-                if (prefix == null) {
-                    targetDeviceWi.put("", paramWi);
-                } else {
-                    targetDeviceWi.put(prefix, paramWi);
-                }
+                targetDeviceWi.put(prefixS, paramWi);
             } else if (DiskData.DRIVER_NAME.equals(param)) {
-                if (prefix == null) {
-                    driverNameWi.put("", paramWi);
-                } else {
-                    driverNameWi.put(prefix, paramWi);
-                }
+                driverNameWi.put(prefixS, paramWi);
             } else if (DiskData.DRIVER_TYPE.equals(param)) {
-                if (prefix == null) {
-                    driverTypeWi.put("", paramWi);
-                } else {
-                    driverTypeWi.put(prefix, paramWi);
-                }
+                driverTypeWi.put(prefixS, paramWi);
             } else if (DiskData.DRIVER_CACHE.equals(param)) {
-                if (prefix == null) {
-                    driverCacheWi.put("", paramWi);
-                } else {
-                    driverCacheWi.put(prefix, paramWi);
-                }
+                driverCacheWi.put(prefixS, paramWi);
             } else if (DiskData.READONLY.equals(param)) {
-                if (prefix == null) {
-                    readonlyWi.put("", paramWi);
-                } else {
-                    readonlyWi.put(prefix, paramWi);
-                }
+                readonlyWi.put(prefixS, paramWi);
             }
             return paramWi;
         }
