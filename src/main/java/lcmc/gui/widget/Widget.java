@@ -345,6 +345,11 @@ public abstract class Widget extends JPanel {
                     label.setVisible(visible);
                 }
                 comp.setVisible(visible);
+                if (visible) {
+                    setHeight(WIDGET_COMPONENT_HEIGHT);
+                } else {
+                    setHeight(0);
+                }
                 repaint();
             }
         });
@@ -703,6 +708,27 @@ public abstract class Widget extends JPanel {
         setMinimumSize(new Dimension(newWidth, h));
         setPreferredSize(new Dimension(newWidth, h));
         setMaximumSize(new Dimension(newWidth, h));
+        revalidate();
+        component.revalidate();
+        repaint();
+        component.repaint();
+    }
+
+    /** Sets the height of the widget. */
+    public final void setHeight(final int newHeight) {
+        final int wc = (int) component.getPreferredSize().getWidth();
+        final int w = (int) getPreferredSize().getWidth();
+        component.setMinimumSize(new Dimension(wc, newHeight));
+        component.setPreferredSize(new Dimension(wc, newHeight));
+        component.setMaximumSize(new Dimension(wc, newHeight));
+        setMinimumSize(new Dimension(w, newHeight));
+        setPreferredSize(new Dimension(w, newHeight));
+        setMaximumSize(new Dimension(w, newHeight));
+        if (label != null) {
+            label.setMinimumSize(new Dimension(wc, newHeight));
+            label.setPreferredSize(new Dimension(wc, newHeight));
+            label.setMaximumSize(new Dimension(wc, newHeight));
+        }
         revalidate();
         component.revalidate();
         repaint();
