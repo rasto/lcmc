@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.awt.Component;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -131,9 +132,10 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
 
-        final JPanel optionsPanel = new JPanel(
-                                        new FlowLayout(FlowLayout.LEFT, 0, 20));
+        final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final String[] params = getParametersFromXML();
         initApplyButton(null);
@@ -204,8 +206,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+                              ClusterBrowser.SERVICE_LABEL_WIDTH
+                              + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
         SwingUtilities.invokeLater(new Runnable() {
             @Override

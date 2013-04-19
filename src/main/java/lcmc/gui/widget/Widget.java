@@ -180,10 +180,6 @@ public abstract class Widget extends JPanel {
             component = newComp;
         } else {
             componentPart = newComp;
-            componentPart.setPreferredSize(new Dimension(width / 3 * 2,
-                                                         WIDGET_HEIGHT));
-            componentPart.setMinimumSize(componentPart.getPreferredSize());
-            componentPart.setMaximumSize(componentPart.getPreferredSize());
             component = new JPanel();
             component.setLayout(new SpringLayout());
 
@@ -700,39 +696,66 @@ public abstract class Widget extends JPanel {
 
     /** Sets the width of the widget. */
     public final void setWidth(final int newWidth) {
-        final int hc = (int) component.getPreferredSize().getHeight();
-        final int h = (int) getPreferredSize().getHeight();
-        component.setMinimumSize(new Dimension(newWidth, hc));
-        component.setPreferredSize(new Dimension(newWidth, hc));
-        component.setMaximumSize(new Dimension(newWidth, hc));
-        setMinimumSize(new Dimension(newWidth, h));
-        setPreferredSize(new Dimension(newWidth, h));
-        setMaximumSize(new Dimension(newWidth, h));
+        JComponent c;
+        if (fieldButton == null) {
+            c = component;
+        } else {
+            c = componentPart;
+        }
+        c.setMinimumSize(new Dimension(newWidth,
+                                       (int) c.getMinimumSize().getHeight()));
+        c.setPreferredSize(
+                       new Dimension(newWidth,
+                                     (int) c.getPreferredSize().getHeight()));
+        c.setMaximumSize(new Dimension(newWidth,
+                                       (int) c.getMaximumSize().getHeight()));
+        setMinimumSize(new Dimension(newWidth,
+                                     (int) getMinimumSize().getHeight()));
+        setPreferredSize(new Dimension(newWidth,
+                                       (int) getPreferredSize().getHeight()));
+        setMaximumSize(new Dimension(newWidth,
+                                     (int) getMaximumSize().getHeight()));
         revalidate();
-        component.revalidate();
+        c.revalidate();
         repaint();
-        component.repaint();
+        c.repaint();
     }
 
     /** Sets the height of the widget. */
     public final void setHeight(final int newHeight) {
-        final int wc = (int) component.getPreferredSize().getWidth();
-        final int w = (int) getPreferredSize().getWidth();
-        component.setMinimumSize(new Dimension(wc, newHeight));
-        component.setPreferredSize(new Dimension(wc, newHeight));
-        component.setMaximumSize(new Dimension(wc, newHeight));
-        setMinimumSize(new Dimension(w, newHeight));
-        setPreferredSize(new Dimension(w, newHeight));
-        setMaximumSize(new Dimension(w, newHeight));
+        JComponent c;
+        if (fieldButton == null) {
+            c = component;
+        } else {
+            c = componentPart;
+        }
+        c.setMinimumSize(new Dimension((int) c.getMinimumSize().getWidth(),
+                                       newHeight));
+        c.setPreferredSize(new Dimension((int) c.getPreferredSize().getWidth(),
+                                         newHeight));
+        c.setMaximumSize(new Dimension((int) c.getMaximumSize().getWidth(),
+                                       newHeight));
+        setMinimumSize(new Dimension((int) getMinimumSize().getWidth(),
+                                     newHeight));
+        setPreferredSize(new Dimension((int) getPreferredSize().getWidth(),
+                                       newHeight));
+        setMaximumSize(new Dimension((int) getMaximumSize().getWidth(),
+                                     newHeight));
         if (label != null) {
-            label.setMinimumSize(new Dimension(wc, newHeight));
-            label.setPreferredSize(new Dimension(wc, newHeight));
-            label.setMaximumSize(new Dimension(wc, newHeight));
+            label.setMinimumSize(
+                        new Dimension((int) label.getMinimumSize().getWidth(),
+                                      newHeight));
+            label.setPreferredSize(
+                        new Dimension((int) label.getPreferredSize().getWidth(),
+                                      newHeight));
+            label.setMaximumSize(
+                        new Dimension((int) c.getMaximumSize().getWidth(),
+                                      newHeight));
         }
         revalidate();
-        component.revalidate();
+        c.revalidate();
         repaint();
-        component.repaint();
+        c.repaint();
     }
 
     /** Returns its component. */

@@ -148,12 +148,12 @@ final class InstallationDisk extends VMConfig {
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
                                      VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
         vmsdi.addWizardParams(
-                          optionsPanel,
-                          PARAMS,
-                          buttonClass(nextButton()),
-                          Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                          Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                          null);
+                      optionsPanel,
+                      PARAMS,
+                      buttonClass(nextButton()),
+                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                      null);
         vmsdi.setApplyButtons(null, vmsdi.getParametersFromXML());
         panel.add(optionsPanel);
 

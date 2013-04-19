@@ -573,7 +573,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         mainPanel.add(buttonPanel);
 
