@@ -54,6 +54,16 @@ final class InstallationDisk extends VMConfig {
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
                                             DiskData.SOURCE_DEVICE,
+
+                                            DiskData.SOURCE_PROTOCOL,
+                                            DiskData.SOURCE_NAME,
+                                            DiskData.SOURCE_HOST_NAME,
+                                            DiskData.SOURCE_HOST_PORT,
+
+                                            DiskData.AUTH_USERNAME,
+                                            DiskData.AUTH_SECRET_TYPE,
+                                            DiskData.AUTH_SECRET_USAGE,
+                                            DiskData.AUTH_SECRET_UUID,
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE,
