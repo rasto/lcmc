@@ -715,10 +715,8 @@ public abstract class Widget extends JPanel {
                                        (int) getPreferredSize().getHeight()));
         setMaximumSize(new Dimension(newWidth,
                                      (int) getMaximumSize().getHeight()));
-        revalidate();
-        c.revalidate();
-        repaint();
-        c.repaint();
+        getParent().validate();
+        getParent().repaint();
     }
 
     /** Sets the height of the widget. */
@@ -752,10 +750,8 @@ public abstract class Widget extends JPanel {
                         new Dimension((int) c.getMaximumSize().getWidth(),
                                       newHeight));
         }
-        revalidate();
-        c.revalidate();
-        repaint();
-        c.repaint();
+        getParent().validate();
+        getParent().repaint();
     }
 
     /** Returns its component. */
