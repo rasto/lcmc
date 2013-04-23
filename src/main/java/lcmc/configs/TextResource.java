@@ -2466,6 +2466,15 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSDiskInfo.Approve.ToolTip",
          "Select this image."},
 
+        {"VMSDiskInfo.Section.DiskOptions",
+         "Disk Options"},
+
+        {"VMSDiskInfo.Section.Source",
+         "Source"},
+
+        {"VMSDiskInfo.Section.Authentication",
+         "Authentication"},
+
         {"VMSVideoInfo.ModelType",
          "Type"},
 

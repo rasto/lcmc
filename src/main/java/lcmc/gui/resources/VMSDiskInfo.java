@@ -212,18 +212,26 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Sections. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
-    static {
-        SECTION_MAP.put(DiskData.SOURCE_FILE, "Source");
-        SECTION_MAP.put(DiskData.SOURCE_DEVICE, "Source");
-        SECTION_MAP.put(DiskData.SOURCE_PROTOCOL, "Source");
-        SECTION_MAP.put(DiskData.SOURCE_NAME, "Source");
-        SECTION_MAP.put(DiskData.SOURCE_HOST_NAME, "Source");
-        SECTION_MAP.put(DiskData.SOURCE_HOST_PORT, "Source");
+    private static final String SECTION_DISK_OPTIONS =
+                         Tools.getString("VMSDiskInfo.Section.DiskOptions");
+    private static final String SECTION_SOURCE =
+                         Tools.getString("VMSDiskInfo.Section.Source");
+    private static final String SECTION_AUTHENTICATION =
+                         Tools.getString("VMSDiskInfo.Section.Authentication");
 
-        SECTION_MAP.put(DiskData.AUTH_USERNAME, "Authentication");
-        SECTION_MAP.put(DiskData.AUTH_SECRET_TYPE, "Authentication");
-        SECTION_MAP.put(DiskData.AUTH_SECRET_USAGE, "Authentication");
-        SECTION_MAP.put(DiskData.AUTH_SECRET_UUID, "Authentication");
+    static {
+        SECTION_MAP.put(DiskData.TYPE, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_FILE, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_DEVICE, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_PROTOCOL, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_NAME, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_HOST_NAME, SECTION_SOURCE);
+        SECTION_MAP.put(DiskData.SOURCE_HOST_PORT, SECTION_SOURCE);
+
+        SECTION_MAP.put(DiskData.AUTH_USERNAME, SECTION_AUTHENTICATION);
+        SECTION_MAP.put(DiskData.AUTH_SECRET_TYPE, SECTION_AUTHENTICATION);
+        SECTION_MAP.put(DiskData.AUTH_SECRET_USAGE, SECTION_AUTHENTICATION);
+        SECTION_MAP.put(DiskData.AUTH_SECRET_UUID, SECTION_AUTHENTICATION);
     }
 
     /** Preferred values. */
@@ -420,7 +428,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     protected String getSection(final String param) {
         final String section = SECTION_MAP.get(param);
         if (section == null) {
-            return "Disk Options";
+            return SECTION_DISK_OPTIONS;
         } else {
             return section;
         }
