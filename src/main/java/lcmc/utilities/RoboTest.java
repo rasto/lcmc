@@ -4937,7 +4937,7 @@ public final class RoboTest {
                 moveTo("Disk/block device");
                 leftClick();
                 sleep(2000);
-                moveTo("Source Device", Widget.MComboBox.class);
+                moveTo("Device", Widget.MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
                 press(KeyEvent.VK_D);
