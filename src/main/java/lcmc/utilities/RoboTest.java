@@ -4800,7 +4800,7 @@ public final class RoboTest {
                 /* source file */
                 dialogColorTest("source file");
 
-                moveTo("Source File", Widget.MComboBox.class);
+                moveTo("File", Widget.MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
