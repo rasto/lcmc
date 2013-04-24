@@ -286,6 +286,17 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                           DRIVER_NAME_PHY});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
         POSSIBLE_VALUES.put(DiskData.DRIVER_CACHE, new String[]{null, "default", "none", "writethrough", "writeback", "directsync", "unsafe"});
+        POSSIBLE_VALUES.put(DiskData.SOURCE_PROTOCOL, new String[]{null,
+                                                                   "rbd",
+                                                                   "nbd",
+                                                                   "iscsi",
+                                                                   "sheepdog",
+                                                                   "gluster"});
+
+        POSSIBLE_VALUES.put(DiskData.SOURCE_NAME,
+                            new String[]{"",
+                                         "poolname/imagename",
+                                         "poolname/imagename:rbd_cache=1"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
             TARGET_BUS_TYPES.put(tbt.getInternalValue(), tbt.toString());
