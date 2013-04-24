@@ -529,13 +529,7 @@ public class ServiceInfo extends EditableInfo {
                 if (wi != null && wi.isVisible() != visible) {
                     final boolean v = visible;
                     final Widget c = wi;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            c.setVisible(v);
-                            getLabel(c).setVisible(v);
-                        }
-                    });
+                    c.setVisible(v);
                 }
                 wi = prevWi;
             }
