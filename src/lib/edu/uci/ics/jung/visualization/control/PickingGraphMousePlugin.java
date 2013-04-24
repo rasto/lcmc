@@ -283,8 +283,10 @@ public class PickingGraphMousePlugin<V, E> extends AbstractGraphMousePlugin
                 
                 for(V v : ps.getPicked()) {
                     Point2D vp = layout.transform(v);
-                    vp.setLocation(vp.getX()+dx, vp.getY()+dy);
-                    layout.setLocation(v, vp);
+                    if (vp != null) {
+                        vp.setLocation(vp.getX()+dx, vp.getY()+dy);
+                        layout.setLocation(v, vp);
+                    }
                 }
                 down = p;
 
