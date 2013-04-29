@@ -55,6 +55,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
+import java.awt.Container;
 
 import java.awt.Component;
 
@@ -715,8 +716,11 @@ public abstract class Widget extends JPanel {
                                        (int) getPreferredSize().getHeight()));
         setMaximumSize(new Dimension(newWidth,
                                      (int) getMaximumSize().getHeight()));
-        getParent().validate();
-        getParent().repaint();
+        final Container p = getParent();
+        if (p != null) {
+            p.validate();
+            p.repaint();
+        }
     }
 
     /** Sets the height of the widget. */
@@ -750,8 +754,11 @@ public abstract class Widget extends JPanel {
                         new Dimension((int) c.getMaximumSize().getWidth(),
                                       newHeight));
         }
-        getParent().validate();
-        getParent().repaint();
+        final Container p = getParent();
+        if (p != null) {
+            p.validate();
+            p.repaint();
+        }
     }
 
     /** Returns its component. */
