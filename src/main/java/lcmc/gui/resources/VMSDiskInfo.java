@@ -170,6 +170,14 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{DiskData.TYPE}));
+    static {
+        IS_REQUIRED.add(DiskData.SOURCE_PROTOCOL);
+        IS_REQUIRED.add(DiskData.SOURCE_NAME);
+        IS_REQUIRED.add(DiskData.SOURCE_HOST_NAME);
+        IS_REQUIRED.add(DiskData.SOURCE_HOST_PORT);
+        IS_REQUIRED.add(DiskData.AUTH_USERNAME);
+        IS_REQUIRED.add(DiskData.AUTH_SECRET_TYPE);
+    }
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
                                        new HashMap<String, Widget.Type>();
@@ -297,6 +305,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                             new String[]{"",
                                          "poolname/imagename",
                                          "poolname/imagename:rbd_cache=1"});
+        POSSIBLE_VALUES.put(DiskData.AUTH_SECRET_TYPE,
+                            new String[]{"", "ceph", "iscsi"});
         for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
                                                   DiskData.TARGET_BUS_TYPE)) {
             TARGET_BUS_TYPES.put(tbt.getInternalValue(), tbt.toString());
