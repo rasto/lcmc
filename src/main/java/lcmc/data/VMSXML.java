@@ -314,8 +314,6 @@ public final class VMSXML extends XML {
         DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_USERNAME,     "username");
         DISK_TAG_MAP.put(DiskData.AUTH_SECRET_TYPE,        "auth:secret");
         DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_TYPE,  "type");
-        DISK_TAG_MAP.put(DiskData.AUTH_SECRET_USAGE,       "auth:secret");
-        DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_USAGE, "usage");
         DISK_TAG_MAP.put(DiskData.AUTH_SECRET_UUID,        "auth:secret");
         DISK_ATTRIBUTE_MAP.put(DiskData.AUTH_SECRET_UUID,  "uuid");
 
@@ -1399,7 +1397,6 @@ public final class VMSXML extends XML {
         String sourceHostPort = null;
         String authUsername = null;
         String authSecretType = null;
-        String authSecretUsage = null;
         String authSecretUuid = null;
         String targetDev = null;
         String targetBus = null;
@@ -1430,7 +1427,6 @@ public final class VMSXML extends XML {
                 final Node secretN = getChildNode(optionNode, "secret");
                 if (secretN != null) {
                     authSecretType = getAttribute(secretN, "type");
-                    authSecretUsage = getAttribute(secretN, "usage");
                     authSecretUuid = getAttribute(secretN, "uuid");
                 }
 
@@ -1462,7 +1458,6 @@ public final class VMSXML extends XML {
                                                    sourceHostPort,
                                                    authUsername,
                                                    authSecretType,
-                                                   authSecretUsage,
                                                    authSecretUuid,
                                                    targetBus + "/" + device,
                                                    driverName,
@@ -2462,8 +2457,6 @@ public final class VMSXML extends XML {
         private final String authUsername;
         /** Auth secret type. */
         private final String authSecretType;
-        /** Auth secret usage. */
-        private final String authSecretUsage;
         /** Auth secret uuid. */
         private final String authSecretUuid;
         /** Target bus: ide... and type: disk..., delimited with, */
@@ -2503,8 +2496,6 @@ public final class VMSXML extends XML {
         public static final String AUTH_USERNAME = "auth_username";
         /** Auth secret type. */
         public static final String AUTH_SECRET_TYPE = "auth_secret_type";
-        /** Auth secret usage. */
-        public static final String AUTH_SECRET_USAGE = "auth_secret_usage";
         /** Auth secret uuid. */
         public static final String AUTH_SECRET_UUID = "auth_secret_uuid";
 
@@ -2536,7 +2527,6 @@ public final class VMSXML extends XML {
                         final String sourceHostPort,
                         final String authUsername,
                         final String authSecretType,
-                        final String authSecretUsage,
                         final String authSecretUuid,
                         final String targetBusType,
                         final String driverName,
@@ -2566,8 +2556,6 @@ public final class VMSXML extends XML {
             setValue(AUTH_USERNAME, authUsername);
             this.authSecretType = authSecretType;
             setValue(AUTH_SECRET_TYPE, authSecretType);
-            this.authSecretUsage = authSecretUsage;
-            setValue(AUTH_SECRET_USAGE, authSecretUsage);
             this.authSecretUuid = authSecretUuid;
             setValue(AUTH_SECRET_UUID, authSecretUuid);
 
@@ -2641,11 +2629,6 @@ public final class VMSXML extends XML {
         /** Return auth secret type. */
         public String getAuthSecretType() {
             return authSecretType;
-        }
-
-        /** Return auth secret usage. */
-        public String getAuthSecretUsage() {
-            return authSecretUsage;
         }
 
         /** Return auth secret uuid. */

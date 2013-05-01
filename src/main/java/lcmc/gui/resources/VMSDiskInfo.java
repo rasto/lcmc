@@ -73,8 +73,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                  new HashMap<String, Widget>();
     private final Map<String, Widget> authSecretTypeWi =
                                                  new HashMap<String, Widget>();
-    private final Map<String, Widget> authSecretUsageWi =
-                                                 new HashMap<String, Widget>();
     private final Map<String, Widget> authSecretUuidWi =
                                                  new HashMap<String, Widget>();
 
@@ -110,7 +108,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
                                                 DiskData.AUTH_USERNAME,
                                                 DiskData.AUTH_SECRET_TYPE,
-                                                DiskData.AUTH_SECRET_USAGE,
                                                 DiskData.AUTH_SECRET_UUID,
 
                                                 DiskData.DRIVER_NAME,
@@ -152,7 +149,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
                                                     DiskData.AUTH_USERNAME,
                                                     DiskData.AUTH_SECRET_TYPE,
-                                                    DiskData.AUTH_SECRET_USAGE,
                                                     DiskData.AUTH_SECRET_UUID,
 
                                                     DiskData.DRIVER_NAME,
@@ -207,7 +203,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
         SHORTNAME_MAP.put(DiskData.AUTH_USERNAME, "Username");
         SHORTNAME_MAP.put(DiskData.AUTH_SECRET_TYPE, "Secret Type");
-        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_USAGE, "Secret Usage");
         SHORTNAME_MAP.put(DiskData.AUTH_SECRET_UUID, "Secred UUID");
 
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
@@ -238,7 +233,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
 
         SECTION_MAP.put(DiskData.AUTH_USERNAME, SECTION_AUTHENTICATION);
         SECTION_MAP.put(DiskData.AUTH_SECRET_TYPE, SECTION_AUTHENTICATION);
-        SECTION_MAP.put(DiskData.AUTH_SECRET_USAGE, SECTION_AUTHENTICATION);
         SECTION_MAP.put(DiskData.AUTH_SECRET_UUID, SECTION_AUTHENTICATION);
     }
 
@@ -555,7 +549,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                        || DiskData.SOURCE_HOST_PORT.equals(param)
                        || DiskData.AUTH_USERNAME.equals(param)
                        || DiskData.AUTH_SECRET_TYPE.equals(param)
-                       || DiskData.AUTH_SECRET_USAGE.equals(param)
                        || DiskData.AUTH_SECRET_UUID.equals(param)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
@@ -679,7 +672,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                           sourceHostPortWi,
                                                           authUsernameWi,
                                                           authSecretTypeWi,
-                                                          authSecretUsageWi,
                                                           authSecretUuidWi))) {
                         for (String p : w.keySet()) {
                             w.get(p).setVisible(network);
@@ -895,8 +887,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 authUsernameWi.put(prefixS, paramWi);
             } else if (DiskData.AUTH_SECRET_TYPE.equals(param)) {
                 authSecretTypeWi.put(prefixS, paramWi);
-            } else if (DiskData.AUTH_SECRET_USAGE.equals(param)) {
-                authSecretUsageWi.put(prefixS, paramWi);
             } else if (DiskData.AUTH_SECRET_UUID.equals(param)) {
                 authSecretUuidWi.put(prefixS, paramWi);
             } else if (DiskData.TARGET_DEVICE.equals(param)) {

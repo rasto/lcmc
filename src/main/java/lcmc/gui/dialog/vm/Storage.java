@@ -63,7 +63,6 @@ final class Storage extends VMConfig {
 
                                             DiskData.AUTH_USERNAME,
                                             DiskData.AUTH_SECRET_TYPE,
-                                            DiskData.AUTH_SECRET_USAGE,
                                             DiskData.AUTH_SECRET_UUID,
 
                                             DiskData.DRIVER_NAME,
