@@ -751,7 +751,7 @@ public abstract class Widget extends JPanel {
                         new Dimension((int) label.getPreferredSize().getWidth(),
                                       newHeight));
             label.setMaximumSize(
-                        new Dimension((int) c.getMaximumSize().getWidth(),
+                        new Dimension((int) label.getMaximumSize().getWidth(),
                                       newHeight));
         }
         final Container p = getParent();
