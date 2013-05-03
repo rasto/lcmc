@@ -879,6 +879,76 @@ public final class VMSXML extends XML {
         return domainNode;
     }
 
+    private void modifyXMLOption(final Node domainNode,
+                                 final Element hwNode,
+                                 final String param,
+                                 final String value,
+                                 final String tag0,
+                                 final String attribute,
+                                 final Map<String, Element> parentNodes) {
+        if (tag0 == null && attribute != null) {
+            /* attribute */
+            final Node attributeNode =
+                                hwNode.getAttributes().getNamedItem(attribute);
+            if (attributeNode == null) {
+                if (value != null && !"".equals(value)) {
+                    hwNode.setAttribute(attribute, value);
+                }
+            } else if (value == null || "".equals(value)) {
+                hwNode.removeAttribute(attribute);
+            } else {
+                attributeNode.setNodeValue(value);
+            }
+            return;
+        }
+
+        if (tag0 == null) {
+            return;
+        }
+
+        String tag;
+        String parent = null;
+        int i = tag0.indexOf(':');
+        Element pNode;
+        if (i > 0) {
+            /* with parent */
+            parent = tag0.substring(0, i);
+            tag = tag0.substring(i + 1);
+            pNode = parentNodes.get(parent);
+        } else {
+            tag = tag0;
+            pNode = hwNode;
+        }
+
+        Element node = (Element) getChildNode(pNode, tag);
+        if ((attribute != null || "True".equals(value))
+            && node == null) {
+            node = (Element) pNode.appendChild(
+                              domainNode.getOwnerDocument().createElement(tag));
+        } else if (node != null
+                   && attribute == null
+                   && (value == null || "".equals(value))) {
+            pNode.removeChild(node);
+        }
+        parentNodes.put(tag, node);
+
+        if (attribute != null) {
+            final Node attributeNode = node.getAttributes().getNamedItem(
+                                                                    attribute);
+            if (attributeNode == null) {
+                if (value != null && !"".equals(value)) {
+                    node.setAttribute(attribute, value);
+                }
+            } else {
+                if (value == null || "".equals(value)) {
+                    node.removeAttribute(attribute);
+                } else {
+                    attributeNode.setNodeValue(value);
+                }
+            }
+        }
+    }
+
     /** Modify xml of some device element. */
     private void modifyXML(final Node domainNode,
                            final String domainName,
@@ -892,7 +962,6 @@ public final class VMSXML extends XML {
         if (configName == null) {
             return;
         }
-        //final Node domainNode = getDomainNode(domainName);
         if (domainNode == null) {
             return;
         }
@@ -915,67 +984,13 @@ public final class VMSXML extends XML {
                                                 new HashMap<String, Element>();
             for (final String param : parametersMap.keySet()) {
                 final String value = parametersMap.get(param);
-                if (!tagMap.containsKey(param)
-                    && attributeMap.containsKey(param)) {
-                    /* attribute */
-                    final Node attributeNode =
-                         hwNode.getAttributes().getNamedItem(
-                                                    attributeMap.get(param));
-                    if (attributeNode == null) {
-                        if (value != null && !"".equals(value)) {
-                            hwNode.setAttribute(attributeMap.get(param), value);
-                        }
-                    } else if (value == null || "".equals(value)) {
-                        hwNode.removeAttribute(attributeMap.get(param));
-                    } else {
-                        attributeNode.setNodeValue(value);
-                    }
-                    continue;
-                }
-                final String tag0 = tagMap.get(param);
-                if (tag0 == null) {
-                    continue;
-                }
-                String tag;
-                String parent = null;
-                int i = tag0.indexOf(':');
-                Element pNode;
-                if (i > 0) {
-                    /* with parent */
-                    parent = tag0.substring(0, i);
-                    tag = tag0.substring(i + 1);
-                    pNode = parentNodes.get(parent);
-                } else {
-                    tag = tag0;
-                    pNode = hwNode;
-                }
-                Element node = (Element) getChildNode(pNode, tag);
-                if ((attributeMap.containsKey(param) || "True".equals(value))
-                    && node == null) {
-                    node = (Element) pNode.appendChild(
-                          domainNode.getOwnerDocument().createElement(tag));
-                } else if (node != null
-                           && !attributeMap.containsKey(param)
-                           && (value == null || "".equals(value))) {
-                    pNode.removeChild(node);
-                }
-                parentNodes.put(tag, node);
-                if (attributeMap.containsKey(param)) {
-                    final Node attributeNode =
-                                    node.getAttributes().getNamedItem(
-                                                      attributeMap.get(param));
-                    if (attributeNode == null) {
-                        if (value != null && !"".equals(value)) {
-                            node.setAttribute(attributeMap.get(param), value);
-                        }
-                    } else {
-                        if (value == null || "".equals(value)) {
-                            node.removeAttribute(attributeMap.get(param));
-                        } else {
-                            attributeNode.setNodeValue(value);
-                        }
-                    }
-                }
+                modifyXMLOption(domainNode,
+                                hwNode,
+                                param,
+                                value,
+                                tagMap.get(param),
+                                attributeMap.get(param),
+                                parentNodes);
             }
             final Element hwAddressNode = (Element) getChildNode(hwNode,
                                                                  HW_ADDRESS);
