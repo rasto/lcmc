@@ -394,7 +394,7 @@ public abstract class EditableInfo extends Info {
                 @Override
                 public void run() {
                     paramWi.setToolTipText(getToolTipText(param, paramWi));
-                    label.setToolTipText(longDesc);
+                    label.setToolTipText(longDesc + additionalToolTip(param));
                 }
             });
             int height = 0;
@@ -844,6 +844,7 @@ public abstract class EditableInfo extends Info {
             ret.append(defaultValue);
             ret.append("</td></tr></table>");
         }
+        ret.append(additionalToolTip(param));
         return ret.toString();
 
     }
@@ -1235,5 +1236,10 @@ public abstract class EditableInfo extends Info {
     /** Return whether a section is enabled. */
     protected final boolean isSectionEnabled(final String section) {
         return !disabledSections.contains(section);
+    }
+
+    /** Additional tool tip. */
+    protected String additionalToolTip(final String param) {
+        return "";
     }
 }
