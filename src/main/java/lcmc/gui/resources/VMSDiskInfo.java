@@ -190,26 +190,43 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        SHORTNAME_MAP.put(DiskData.TYPE, "Type");
-        SHORTNAME_MAP.put(DiskData.TARGET_DEVICE, "Target Device");
-        SHORTNAME_MAP.put(DiskData.SOURCE_FILE, "File");
-        SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE, "Device");
+        SHORTNAME_MAP.put(DiskData.TYPE,
+                          Tools.getString("VMSDiskInfo.Param.Type"));
+        SHORTNAME_MAP.put(DiskData.TARGET_DEVICE,
+                          Tools.getString("VMSDiskInfo.Param.TargetDevice"));
+        SHORTNAME_MAP.put(DiskData.SOURCE_FILE,
+                          Tools.getString("VMSDiskInfo.Param.SourceFile"));
+        SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE,
+                          Tools.getString("VMSDiskInfo.Param.SourceDevice"));
 
-        SHORTNAME_MAP.put(DiskData.SOURCE_PROTOCOL, "Protocol");
-        SHORTNAME_MAP.put(DiskData.SOURCE_NAME, "Name");
-        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_NAME, "Host Name");
-        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_PORT, "Host Port");
+        SHORTNAME_MAP.put(DiskData.SOURCE_PROTOCOL,
+                          Tools.getString("VMSDiskInfo.Param.SourceProtocol"));
+        SHORTNAME_MAP.put(DiskData.SOURCE_NAME,
+                          Tools.getString("VMSDiskInfo.Param.SourceName"));
+        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_NAME,
+                          Tools.getString("VMSDiskInfo.Param.SourceHostName"));
+        SHORTNAME_MAP.put(DiskData.SOURCE_HOST_PORT,
+                          Tools.getString("VMSDiskInfo.Param.SourceHostPort"));
 
-        SHORTNAME_MAP.put(DiskData.AUTH_USERNAME, "Username");
-        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_TYPE, "Secret Type");
-        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_UUID, "Secred UUID");
+        SHORTNAME_MAP.put(DiskData.AUTH_USERNAME,
+                          Tools.getString("VMSDiskInfo.Param.AuthUsername"));
+        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_TYPE,
+                          Tools.getString("VMSDiskInfo.Param.AuthSecretType"));
+        SHORTNAME_MAP.put(DiskData.AUTH_SECRET_UUID,
+                          Tools.getString("VMSDiskInfo.Param.AuthSecretUuid"));
 
-        SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE, "Disk Type");
-        SHORTNAME_MAP.put(DiskData.DRIVER_NAME, "Driver Name");
-        SHORTNAME_MAP.put(DiskData.DRIVER_TYPE, "Driver Type");
-        SHORTNAME_MAP.put(DiskData.DRIVER_CACHE, "Driver Cache");
-        SHORTNAME_MAP.put(DiskData.READONLY, "Readonly");
-        SHORTNAME_MAP.put(DiskData.SHAREABLE, "Shareable");
+        SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE,
+                          Tools.getString("VMSDiskInfo.Param.TargetBusType"));
+        SHORTNAME_MAP.put(DiskData.DRIVER_NAME,
+                          Tools.getString("VMSDiskInfo.Param.DriverName"));
+        SHORTNAME_MAP.put(DiskData.DRIVER_TYPE,
+                          Tools.getString("VMSDiskInfo.Param.DriverType"));
+        SHORTNAME_MAP.put(DiskData.DRIVER_CACHE,
+                          Tools.getString("VMSDiskInfo.Param.DriverCache"));
+        SHORTNAME_MAP.put(DiskData.READONLY,
+                          Tools.getString("VMSDiskInfo.Param.Readonly"));
+        SHORTNAME_MAP.put(DiskData.SHAREABLE,
+                          Tools.getString("VMSDiskInfo.Param.Shareable"));
     }
     /** Sections. */
     private static final Map<String, String> SECTION_MAP =
@@ -320,6 +337,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         TARGET_DEVICES_MAP.put("virtio/disk",
                                new String[]{"vda", "vdb", "vdc", "vdd", "vde"});
     }
+    /** Default source port if none is specified (and it is needed) */
+    public static final String DEFAULT_SOURCE_HOST_PORT = "6789";
+
     /** Table panel. */
     private JComponent tablePanel = null;
 
@@ -561,6 +581,50 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         return parameters;
     }
 
+    /**
+     * Fix ports. Make the number of ports delimited with "," to match the host
+     * names.
+     */
+    private static void fixSourceHostParams(final Map<String, String> params) {
+        final String names = params.get(DiskData.SOURCE_HOST_NAME);
+        String ports = params.get(DiskData.SOURCE_HOST_PORT);
+        if (names == null) {
+            params.put(DiskData.SOURCE_HOST_PORT, null);
+            return;
+        }
+        if ("".equals(names)) {
+            params.put(DiskData.SOURCE_HOST_PORT, "");
+            return;
+        }
+
+        if (ports == null || "".equals(ports)) {
+            ports = DEFAULT_SOURCE_HOST_PORT;
+        }
+
+        final String[] namesA = names.trim().split("\\s*,\\s*");
+        final String[] portsA = ports.trim().split("\\s*,\\s*");
+
+        final String lastPort = portsA[portsA.length - 1];
+
+        final String fixedNames = Tools.join(", ", namesA);
+        String fixedPorts;
+        if (namesA.length == portsA.length) {
+            fixedPorts = Tools.join(", ", portsA);
+        } else if (portsA.length < namesA.length) {
+            /* add ports */
+            fixedPorts = Tools.join(", ", portsA);
+            for (int i = 0; i < namesA.length - portsA.length; i++) {
+                fixedPorts += ", " + lastPort;
+            }
+        } else {
+            /* remove ports */
+            fixedPorts = Tools.join(", ", portsA, namesA.length);
+        }
+        params.put(DiskData.SOURCE_HOST_NAME, fixedNames);
+        params.put(DiskData.SOURCE_HOST_PORT, fixedPorts);
+    }
+
+
     /** Applies the changes. */
     @Override
     void apply(final boolean testOnly) {
@@ -585,6 +649,20 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
+                /* fix host ports */
+
+                fixSourceHostParams(parameters);
+                final String fixedNames =
+                                    parameters.get(DiskData.SOURCE_HOST_NAME);
+                final String fixedPorts =
+                                    parameters.get(DiskData.SOURCE_HOST_PORT);
+
+                for (final String p : sourceHostNameWi.keySet()) {
+                    sourceHostNameWi.get(p).setValueAndWait(fixedNames);
+                }
+                for (final String p : sourceHostPortWi.keySet()) {
+                    sourceHostPortWi.get(p).setValueAndWait(fixedPorts);
+                }
                 modifyXML(vmsxml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();

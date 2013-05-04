@@ -57,6 +57,25 @@ abstract class XML {
         return null;
     }
 
+    /** Returns child node of the node identified by the tag on the specified
+     * position. */
+    protected final Node getChildNode(final Node node,
+                                      final String tag,
+                                      final int pos) {
+        final NodeList nodeList = node.getChildNodes();
+        int foundPos = 0;
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            final Node n = nodeList.item(i);
+            if (n.getNodeName().equals(tag)) {
+                if (pos == foundPos) {
+                    return n;
+                }
+                foundPos++;
+            }
+        }
+        return null;
+    }
+
     /** Returns attribute value for node and name of the attribute. */
     final String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {

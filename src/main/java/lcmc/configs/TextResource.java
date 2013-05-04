@@ -2475,6 +2475,57 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSDiskInfo.Section.Authentication",
          "Authentication"},
 
+        {"VMSDiskInfo.Param.Type",
+         "Type"},
+
+        {"VMSDiskInfo.Param.TargetDevice",
+         "Target Device"},
+
+        {"VMSDiskInfo.Param.SourceFile",
+         "File"},
+
+        {"VMSDiskInfo.Param.SourceDevice",
+         "Device"},
+
+        {"VMSDiskInfo.Param.SourceProtocol",
+         "Protocol"},
+
+        {"VMSDiskInfo.Param.SourceName",
+         "Name"},
+
+        {"VMSDiskInfo.Param.SourceHostName",
+         "Host Names"},
+
+        {"VMSDiskInfo.Param.SourceHostPort",
+         "Host Ports"},
+
+        {"VMSDiskInfo.Param.AuthUsername",
+         "Username"},
+
+        {"VMSDiskInfo.Param.AuthSecretType",
+         "Secret Type"},
+
+        {"VMSDiskInfo.Param.AuthSecretUuid",
+         "Secred UUID"},
+
+        {"VMSDiskInfo.Param.TargetBusType",
+         "Disk Type"},
+
+        {"VMSDiskInfo.Param.DriverName",
+         "Driver Name"},
+
+        {"VMSDiskInfo.Param.DriverType",
+         "Driver Type"},
+
+        {"VMSDiskInfo.Param.DriverCache",
+         "Driver Cache"},
+
+        {"VMSDiskInfo.Param.Readonly",
+         "Readonly"},
+
+        {"VMSDiskInfo.Param.Shareable",
+         "Shareable"},
+
         {"VMSVideoInfo.ModelType",
          "Type"},
 

@@ -879,10 +879,14 @@ public final class VMSXML extends XML {
         return domainNode;
     }
 
+    /**
+     * @param pos position of tag that repeats itself
+     */
     private void modifyXMLOption(final Node domainNode,
                                  final Element hwNode,
                                  final String param,
                                  final String value,
+                                 final int pos,
                                  final String tag0,
                                  final String attribute,
                                  final Map<String, Element> parentNodes) {
@@ -911,6 +915,10 @@ public final class VMSXML extends XML {
         int i = tag0.indexOf(':');
         Element pNode;
         if (i > 0) {
+            if (value == null) {
+                /* don't make empty parent */
+                return;
+            } 
             /* with parent */
             parent = tag0.substring(0, i);
             tag = tag0.substring(i + 1);
@@ -920,7 +928,7 @@ public final class VMSXML extends XML {
             pNode = hwNode;
         }
 
-        Element node = (Element) getChildNode(pNode, tag);
+        Element node = (Element) getChildNode(pNode, tag, pos);
         if ((attribute != null || "True".equals(value))
             && node == null) {
             node = (Element) pNode.appendChild(
@@ -947,6 +955,38 @@ public final class VMSXML extends XML {
                 }
             }
         }
+    }
+
+    private void removeXMLOption(final Element hwNode,
+                                 int pos,
+                                 final String tag0,
+                                 final Map<String, Element> parentNodes) {
+        if (tag0 == null) {
+            return;
+        }
+
+        String tag;
+        String parent = null;
+        int i = tag0.indexOf(':');
+        Element pNode;
+        if (i > 0) {
+            /* with parent */
+            parent = tag0.substring(0, i);
+            tag = tag0.substring(i + 1);
+            pNode = parentNodes.get(parent);
+        } else {
+            tag = tag0;
+            pNode = hwNode;
+        }
+
+        Element node;
+        do {
+            node = (Element) getChildNode(pNode, tag, pos);
+            if (node != null) {
+                pNode.removeChild(node);
+                pos++;
+            }
+        } while (node != null);
     }
 
     /** Modify xml of some device element. */
@@ -984,13 +1024,33 @@ public final class VMSXML extends XML {
                                                 new HashMap<String, Element>();
             for (final String param : parametersMap.keySet()) {
                 final String value = parametersMap.get(param);
-                modifyXMLOption(domainNode,
-                                hwNode,
-                                param,
-                                value,
-                                tagMap.get(param),
-                                attributeMap.get(param),
-                                parentNodes);
+                final String tag = tagMap.get(param);
+                final String attribute = attributeMap.get(param);
+                if (value == null) {
+                    modifyXMLOption(domainNode,
+                                    hwNode,
+                                    param,
+                                    value,
+                                    0,
+                                    tag,
+                                    attribute,
+                                    parentNodes);
+                } else {
+                    final String[] values = value.split("\\s*,\\s*");
+                    int pos = 0;
+                    for (final String v : values) {
+                        modifyXMLOption(domainNode,
+                                        hwNode,
+                                        param,
+                                        v,
+                                        pos,
+                                        tag,
+                                        attribute,
+                                        parentNodes);
+                        pos++;
+                    }
+                    removeXMLOption(hwNode, pos, tag, parentNodes);
+                }
             }
             final Element hwAddressNode = (Element) getChildNode(hwNode,
                                                                  HW_ADDRESS);
@@ -1398,6 +1458,22 @@ public final class VMSXML extends XML {
         }
     }
 
+    /**
+     * Zero, one or more host nodes.
+     */
+    private void getHostNodes(final Node n,
+                              final List<String> names,
+                              final List<String> ports) {
+        final NodeList nodes = n.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            final Node hostN = nodes.item(i);
+            if ("host".equals(hostN.getNodeName())) {
+                names.add(getAttribute(hostN, "name"));
+                ports.add(getAttribute(hostN, "port"));
+            }
+        }
+    }
+
     /** Parse disk xml and populate the devMap */
     private void parseDiskNode(final Node diskNode,
                                final Map<String, DiskData> devMap) {
@@ -1408,8 +1484,8 @@ public final class VMSXML extends XML {
         String sourceDev = null;
         String sourceProtocol = null;
         String sourceName = null;
-        String sourceHostName = null;
-        String sourceHostPort = null;
+        List<String> sourceHostNames = new ArrayList<String>();
+        List<String> sourceHostPorts = new ArrayList<String>();
         String authUsername = null;
         String authSecretType = null;
         String authSecretUuid = null;
@@ -1432,11 +1508,7 @@ public final class VMSXML extends XML {
                 sourceDev = getAttribute(optionNode, "dev");
                 sourceProtocol = getAttribute(optionNode, "protocol");
                 sourceName = getAttribute(optionNode, "name");
-                final Node hostN = getChildNode(optionNode, "host");
-                if (hostN != null) {
-                    sourceHostName = getAttribute(hostN, "name");
-                    sourceHostPort = getAttribute(hostN, "port");
-                }
+                getHostNodes(optionNode, sourceHostNames, sourceHostPorts);
             } else if ("auth".equals(nodeName)) {
                 authUsername = getAttribute(optionNode, "username");
                 final Node secretN = getChildNode(optionNode, "secret");
@@ -1463,23 +1535,24 @@ public final class VMSXML extends XML {
             }
         }
         if (targetDev != null) {
-            final DiskData diskData = new DiskData(type,
-                                                   targetDev,
-                                                   sourceFile,
-                                                   sourceDev,
-                                                   sourceProtocol,
-                                                   sourceName,
-                                                   sourceHostName,
-                                                   sourceHostPort,
-                                                   authUsername,
-                                                   authSecretType,
-                                                   authSecretUuid,
-                                                   targetBus + "/" + device,
-                                                   driverName,
-                                                   driverType,
-                                                   driverCache,
-                                                   readonly,
-                                                   shareable);
+            final DiskData diskData = new DiskData(
+                                           type,
+                                           targetDev,
+                                           sourceFile,
+                                           sourceDev,
+                                           sourceProtocol,
+                                           sourceName,
+                                           Tools.join(", ", sourceHostNames),
+                                           Tools.join(", ", sourceHostPorts),
+                                           authUsername,
+                                           authSecretType,
+                                           authSecretUuid,
+                                           targetBus + "/" + device,
+                                           driverName,
+                                           driverType,
+                                           driverCache,
+                                           readonly,
+                                           shareable);
             devMap.put(targetDev, diskData);
         }
     }
