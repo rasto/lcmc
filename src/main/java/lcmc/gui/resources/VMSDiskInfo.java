@@ -228,6 +228,16 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(DiskData.SHAREABLE,
                           Tools.getString("VMSDiskInfo.Param.Shareable"));
     }
+    /** Tool tips. */
+    private static final Map<String, String> TOOLTIP_MAP =
+                                                 new HashMap<String, String>();
+    static {
+        TOOLTIP_MAP.put(DiskData.SOURCE_HOST_NAME,
+                  Tools.getString("VMSDiskInfo.Param.SourceHostName.ToolTip"));
+        TOOLTIP_MAP.put(DiskData.SOURCE_HOST_PORT,
+                  Tools.getString("VMSDiskInfo.Param.SourceHostPort.ToolTip"));
+    }
+
     /** Sections. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
@@ -1058,5 +1068,15 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             return ".*[^/]$";
         }
         return super.getParamRegexp(param);
+    }
+
+    /** Additional tool tip. */
+    @Override
+    protected String additionalToolTip(final String param) {
+        final String tt = TOOLTIP_MAP.get(param);
+        if (tt == null) {
+            return "";
+        }
+        return tt;
     }
 }

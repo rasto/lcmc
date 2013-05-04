@@ -2496,8 +2496,14 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"VMSDiskInfo.Param.SourceHostName",
          "Host Names"},
 
+        {"VMSDiskInfo.Param.SourceHostName.ToolTip",
+         "<br>Enter multiple hosts delimited by comma."},
+
         {"VMSDiskInfo.Param.SourceHostPort",
          "Host Ports"},
+
+        {"VMSDiskInfo.Param.SourceHostPort.ToolTip",
+         "<br>Enter multiple ports delimited by comma."},
 
         {"VMSDiskInfo.Param.AuthUsername",
          "Username"},
