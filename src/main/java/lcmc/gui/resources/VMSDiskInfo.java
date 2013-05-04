@@ -172,7 +172,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         IS_REQUIRED.add(DiskData.SOURCE_HOST_NAME);
         IS_REQUIRED.add(DiskData.SOURCE_HOST_PORT);
         IS_REQUIRED.add(DiskData.AUTH_USERNAME);
-        IS_REQUIRED.add(DiskData.AUTH_SECRET_TYPE);
     }
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
