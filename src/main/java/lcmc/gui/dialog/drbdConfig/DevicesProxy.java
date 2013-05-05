@@ -25,7 +25,6 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
 import javax.swing.JComponent;
 
 /**

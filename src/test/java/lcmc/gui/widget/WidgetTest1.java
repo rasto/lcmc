@@ -1,7 +1,6 @@
 package lcmc.gui.widget;
 
 import junit.framework.TestCase;
-import java.util.HashMap;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;

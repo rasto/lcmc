@@ -23,7 +23,6 @@
 
 package lcmc.gui;
 
-import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServicesInfo;
 import lcmc.data.Cluster;

@@ -47,7 +47,6 @@ import lcmc.utilities.WidgetListener;
 import lcmc.configs.AppDefaults;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.event.ActionListener;

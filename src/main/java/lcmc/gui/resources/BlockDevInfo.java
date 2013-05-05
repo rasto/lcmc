@@ -65,7 +65,6 @@ import java.awt.BorderLayout;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
@@ -76,7 +75,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
