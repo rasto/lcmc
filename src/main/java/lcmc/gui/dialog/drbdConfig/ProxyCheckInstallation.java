@@ -73,18 +73,12 @@ final class ProxyCheckInstallation extends DialogHost {
     private static final ImageIcon INSTALLED_ICON =
         Tools.createImageIcon(
               Tools.getDefault("Dialog.Host.CheckInstallation.InstalledIcon"));
-    /** Upgrade available icon. */
-    private static final ImageIcon UPGR_AVAIL_ICON =
-        Tools.createImageIcon(
-              Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
 
     private static final String PROXY_PREFIX = "ProxyInst";
     private static final String PROXY_AUTO_OPTION = "proxyinst";
 
     /** Proxy icon: checking ... */
     private final JLabel proxyIcon = new JLabel(CHECKING_ICON);
-    /** Whether proxy installation was ok. */
-    private boolean proxyOk = false;
     /** The proxy host. */
     private final Host host;
     /** Drbd volume info. */
@@ -113,8 +107,6 @@ final class ProxyCheckInstallation extends DialogHost {
     /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
-        proxyOk = false;
-
         nextDialogObject = null;
         final ProxyCheckInstallation thisClass = this;
         SwingUtilities.invokeLater(new Runnable() {
@@ -188,7 +180,6 @@ final class ProxyCheckInstallation extends DialogHost {
             printErrorAndRetry(Tools.getString(
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         } else {
-            proxyOk = true;
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -313,7 +304,7 @@ final class ProxyCheckInstallation extends DialogHost {
      * Return dialog that comes after "cancel" button was pressed.
      */
     @Override
-    protected final WizardDialog dialogAfterCancel() {
+    protected WizardDialog dialogAfterCancel() {
         return origDialog;
     }
 }

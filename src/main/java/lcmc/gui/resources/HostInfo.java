@@ -332,7 +332,8 @@ public final class HostInfo extends Info {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                crmg.startTestAnimation(crmConfigureCommitButton, startTestLatch);
+                crmg.startTestAnimation(crmConfigureCommitButton,
+                                        startTestLatch);
                 final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
                 getBrowser().getClusterBrowser().ptestLockAcquire();

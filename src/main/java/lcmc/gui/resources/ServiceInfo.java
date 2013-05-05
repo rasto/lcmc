@@ -175,9 +175,6 @@ public class ServiceInfo extends EditableInfo {
     /** Don't Manage by CRM icon. */
     static final ImageIcon UNMANAGE_BY_CRM_ICON = Tools.createImageIcon(
                  Tools.getDefault("ServiceInfo.UnmanageByCRMIcon"));
-    /** Unmanage service icon. */
-    private static final ImageIcon UNMANAGE_ICON = Tools.createImageIcon(
-                            Tools.getDefault("CRMGraph.ServiceUnmanagedIcon"));
     /** Icon that indicates a running service. */
     public static final ImageIcon SERVICE_RUNNING_ICON_SMALL =
                                      Tools.createImageIcon(Tools.getDefault(
@@ -1316,7 +1313,7 @@ public class ServiceInfo extends EditableInfo {
                     continue;
                 }
                 if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
-                    Object value = wi.getValue();
+                    final Object value = wi.getValue();
                     if (!Tools.areEqual(value, defaultValue)) {
                         allAreDefaultValues = false;
                     }
@@ -4722,10 +4719,12 @@ public class ServiceInfo extends EditableInfo {
                     }
                 });
 
-                final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
+                final MyListModel<MyMenuItem> dlm =
+                                                new MyListModel<MyMenuItem>();
                 final Map<MyMenuItem, ButtonCallback> callbackHash =
                                  new HashMap<MyMenuItem, ButtonCallback>();
-                final MyList<MyMenuItem> list = new MyList<MyMenuItem>(dlm, getBackground());
+                final MyList<MyMenuItem> list =
+                                   new MyList<MyMenuItem>(dlm, getBackground());
 
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final ServiceInfo asi
@@ -5119,7 +5118,7 @@ public class ServiceInfo extends EditableInfo {
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final List<ResourceAgent> services = getAddServiceList(cl);
-                    if (services.size() == 0) {
+                    if (services.isEmpty()) {
                         /* no services, don't show */
                         continue;
                     }
@@ -5150,7 +5149,8 @@ public class ServiceInfo extends EditableInfo {
                             ClusterBrowser.getClassMenu(cl),
                             new AccessMode(ConfigData.AccessType.ADMIN, mode),
                             new AccessMode(ConfigData.AccessType.OP, mode));
-                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
+                    final MyListModel<MyMenuItem> dlm =
+                                                 new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
                         try {
                             SwingUtilities.invokeAndWait(new Runnable() {
@@ -5180,7 +5180,8 @@ public class ServiceInfo extends EditableInfo {
                                         colOrdPanel,
                                         classItem,
                                         dlm,
-                                        new MyList<MyMenuItem>(dlm, getBackground()),
+                                        new MyList<MyMenuItem>(dlm,
+                                                               getBackground()),
                                         thisClass,
                                         popups,
                                         null);

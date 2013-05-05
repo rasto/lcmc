@@ -108,7 +108,7 @@ final class BlockDev extends DrbdConfig {
                     getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
                                                                           true);
                 }
-                final ClusterBrowser browser = 
+                final ClusterBrowser browser =
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
                 Tools.getGUIData().expandTerminalSplitPane(1);

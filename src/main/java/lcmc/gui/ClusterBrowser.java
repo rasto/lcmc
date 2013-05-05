@@ -350,9 +350,9 @@ public final class ClusterBrowser extends Browser {
                                                Arrays.asList(HB_PAR_TIMEOUT,
                                                              HB_PAR_INTERVAL));
     private static final String RESET_STRING = "---reset---\r\n";
-    private static int RESET_STRING_LEN = RESET_STRING.length();
-    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4 */
-    private final static Pattern BY_RES_PATTERN =
+    private static final int RESET_STRING_LEN = RESET_STRING.length();
+    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
+    private static final Pattern BY_RES_PATTERN =
                     Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
     /** Prepares a new <code>CusterBrowser</code> object. */
     public ClusterBrowser(final Cluster cluster) {
@@ -807,7 +807,6 @@ public final class ClusterBrowser extends Browser {
         final String hostName = host.getName();
         final CategoryInfo[] infosToUpdate =
                                         new CategoryInfo[]{clusterHostsInfo};
-        long count = 0;
         while (true) {
             if (host.isServerStatusLatch()) {
                 Tools.startProgressIndicator(
@@ -1040,7 +1039,7 @@ public final class ClusterBrowser extends Browser {
                                }
                                firstTime.countDown();
                                return;
-                           } 
+                           }
                            firstTime.countDown();
                            if (!host.isDrbdStatus()) {
                                Tools.debug(this, "drbd status update: "
@@ -1057,7 +1056,7 @@ public final class ClusterBrowser extends Browser {
                            do {
                                host.drbdStatusLock();
                                drbdConfig =
-                                        host.getOutput("drbd", outputBuffer); 
+                                        host.getOutput("drbd", outputBuffer);
                                if (drbdConfig != null) {
                                    final DrbdXML newDrbdXML =
                                             new DrbdXML(cluster.getHostsArray(),
@@ -1068,7 +1067,7 @@ public final class ClusterBrowser extends Browser {
                                    firstTime.countDown();
                                }
                                host.drbdStatusUnlock();
-                               event = host.getOutput("event", outputBuffer); 
+                               event = host.getOutput("event", outputBuffer);
                                if (event != null) {
                                    if (drbdXML.parseDrbdEvent(host.getName(),
                                                               drbdGraph,
@@ -1393,9 +1392,9 @@ public final class ClusterBrowser extends Browser {
                     final List<String> bd = cluster.getCommonBlockDevices();
                     @SuppressWarnings("unchecked")
                     final Enumeration<DefaultMutableTreeNode> e =
-                                                     commonBlockDevicesNode.children();
+                                             commonBlockDevicesNode.children();
                     final List<DefaultMutableTreeNode> nodesToRemove =
-                                               new ArrayList<DefaultMutableTreeNode>();
+                                       new ArrayList<DefaultMutableTreeNode>();
                     while (e.hasMoreElements()) {
                         final DefaultMutableTreeNode node = e.nextElement();
                         final Info cbdi = (Info) node.getUserObject();
@@ -1972,7 +1971,7 @@ public final class ClusterBrowser extends Browser {
                                  nameToServiceInfoHash.get(service.getName());
         if (idToInfoHash != null) {
             idToInfoHash.remove(service.getId());
-            if (idToInfoHash.size() == 0) {
+            if (idToInfoHash.isEmpty()) {
                 nameToServiceInfoHash.remove(service.getName());
             }
         }
@@ -2679,7 +2678,7 @@ public final class ClusterBrowser extends Browser {
         mClStatusLock.unlock();
     }
 
-    /** Return name of the classes in the menu. */ 
+    /** Return name of the classes in the menu. */
     public static String getClassMenu(final String cl) {
         final String name = ClusterBrowser.HB_CLASS_MENU.get(cl);
         if (name == null) {

@@ -118,7 +118,7 @@ final class ConfigurationProxy extends Configuration {
      * Return dialog that comes after "cancel" button was pressed.
      */
     @Override
-    protected final WizardDialog dialogAfterCancel() {
+    protected WizardDialog dialogAfterCancel() {
         return origDialog;
     }
 }

@@ -60,10 +60,10 @@ public final class ProxyHostInfo extends Info {
     /** Host data. */
     private final Host host;
     /** Name prefix that appears in the menu. */
-    private final String NAME_PREFIX =
+    private static final String NAME_PREFIX =
                                     Tools.getString("ProxyHostInfo.NameInfo");
     /** Not connectable. */
-    private final String NOT_CONNECTABLE_STRING =
+    private static final String NOT_CONNECTABLE_STRING =
                                Tools.getString("ProxyHostInfo.NotConnectable");
     /** Prepares a new <code>ProxyHostInfo</code> object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
@@ -321,7 +321,7 @@ public final class ProxyHostInfo extends Info {
                            getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -356,7 +356,7 @@ public final class ProxyHostInfo extends Info {
                            getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 

@@ -479,7 +479,7 @@ public final class LCMC extends JPanel {
                     ultravnc = true;
                 }
             }
-            boolean advanced = cmd.hasOption(ADVANCED_OP);
+            final boolean advanced = cmd.hasOption(ADVANCED_OP);
             Tools.getConfigData().setAdvancedMode(advanced);
             Tools.getConfigData().setTightvnc(tightvnc);
             Tools.getConfigData().setUltravnc(ultravnc);

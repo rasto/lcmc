@@ -155,7 +155,7 @@ public final class DrbdXML extends XML {
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
     /** Whether there are unknown sections in the config. */
-    boolean unknownSections = false;
+    private boolean unknownSections = false;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol A. */
@@ -319,8 +319,7 @@ public final class DrbdXML extends XML {
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() == 0) {
             final StringBuffer confSB = new StringBuffer(ret.getOutput());
-            final String conf = host.getOutput("drbd", confSB);
-            return conf;
+            return host.getOutput("drbd", confSB);
         }
         return null;
     }
@@ -1464,11 +1463,11 @@ public final class DrbdXML extends XML {
     }
 
     public class HostProxy {
-        final private String proxyHostName;
-        final private String insideIp;
-        final private String insidePort;
-        final private String outsideIp;
-        final private String outsidePort;
+        private final String proxyHostName;
+        private final String insideIp;
+        private final String insidePort;
+        private final String outsideIp;
+        private final String outsidePort;
 
         public HostProxy(final String proxyHostName,
                          final String insideIp,

@@ -412,9 +412,9 @@ public final class HostTest1 extends TestCase {
     public void testGetDistVersionString() {
         final Set<String> values = new HashSet<String>(
                 Arrays.asList("SQUEEZE",
-                              "LENNY", 
-                              "LUCID", 
-                              "HARDY", 
+                              "LENNY",
+                              "LUCID",
+                              "HARDY",
                               "wheezy/sid/12.10",
                               "wheezy/sid/12.04",
                               "wheezy/sid/11.10",

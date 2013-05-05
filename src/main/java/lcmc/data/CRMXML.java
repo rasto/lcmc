@@ -368,9 +368,9 @@ public final class CRMXML extends XML {
     private static final String FENCING_ACTION_PARAM = "action";
 
     /** TODO: If this is set PCMK_HOST_LIST must be set. */
-    private final static String PCMK_HOST_CHECK_STATIC = "static-list";
+    private static final String PCMK_HOST_CHECK_STATIC = "static-list";
     /** TODO: If this is set PCMK_HOST_LIST must not be set. */
-    private final static String PCMK_HOST_CHECK_DYNAMIC = "dynamic-list";
+    private static final String PCMK_HOST_CHECK_DYNAMIC = "dynamic-list";
     /** OCF check level. */
     public static final String PAR_CHECK_LEVEL = "OCF_CHECK_LEVEL";
 
@@ -898,7 +898,7 @@ public final class CRMXML extends XML {
         paramColPossibleChoices.put("sequential", booleanValues);
         paramColPreferredMap.put("sequential", hbBooleanFalse);
         hbGroup.setMetaDataLoaded(true);
-       
+
         initOCFMetaDataQuick();
         initOCFMetaDataConfigured();
         Tools.debug(this, "cluster loaded", 0);
@@ -959,7 +959,7 @@ public final class CRMXML extends XML {
         String resourceClass = null;
         String provider = null;
         String serviceName = null;
-        boolean masterSlave = false; /* is probably m/s ...*/
+        final boolean masterSlave = false; /* is probably m/s ...*/
         for (int i = 0; i < lines.length; i++) {
             final Matcher cm = cp.matcher(lines[i]);
             if (cm.matches()) {
@@ -1060,7 +1060,8 @@ public final class CRMXML extends XML {
         final String[] lines = output.split("\\r?\\n");
         final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
         final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
-        final Pattern bp = Pattern.compile("<resource-agent.*\\s+name=\"(.*?)\".*");
+        final Pattern bp =
+                       Pattern.compile("<resource-agent.*\\s+name=\"(.*?)\".*");
         final Pattern ep = Pattern.compile("</resource-agent>");
         final StringBuilder xml = new StringBuilder("");
         String provider = null;
@@ -1829,7 +1830,7 @@ public final class CRMXML extends XML {
                                        new String[]{"0", "5", "10"});
             ra.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
             ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "0");
-    
+
             /* pcmk_host_check for stonithd */
             ra.addParameter(PCMK_HOST_CHECK_PARAM);
             ra.setParamPossibleChoices(PCMK_HOST_CHECK_PARAM,

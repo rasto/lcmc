@@ -701,7 +701,7 @@ public final class VMSXML extends XML {
         final String init = parametersMap.get(VM_PARAM_INIT);
         if (init != null && !"".equals(init)) {
             final Element initNode = (Element) osNode.appendChild(
-                                                      doc.createElement("init"));
+                                                    doc.createElement("init"));
             initNode.appendChild(doc.createTextNode(init));
         }
         final Element bootNode = (Element) osNode.appendChild(
@@ -884,7 +884,6 @@ public final class VMSXML extends XML {
      */
     private void modifyXMLOption(final Node domainNode,
                                  final Element hwNode,
-                                 final String param,
                                  final String value,
                                  final int pos,
                                  final String tag0,
@@ -912,13 +911,13 @@ public final class VMSXML extends XML {
 
         String tag;
         String parent = null;
-        int i = tag0.indexOf(':');
+        final int i = tag0.indexOf(':');
         Element pNode;
         if (i > 0) {
             if (value == null) {
                 /* don't make empty parent */
                 return;
-            } 
+            }
             /* with parent */
             parent = tag0.substring(0, i);
             tag = tag0.substring(i + 1);
@@ -967,7 +966,7 @@ public final class VMSXML extends XML {
 
         String tag;
         String parent = null;
-        int i = tag0.indexOf(':');
+        final int i = tag0.indexOf(':');
         Element pNode;
         if (i > 0) {
             /* with parent */
@@ -1029,7 +1028,6 @@ public final class VMSXML extends XML {
                 if (value == null) {
                     modifyXMLOption(domainNode,
                                     hwNode,
-                                    param,
                                     value,
                                     0,
                                     tag,
@@ -1041,7 +1039,6 @@ public final class VMSXML extends XML {
                     for (final String v : values) {
                         modifyXMLOption(domainNode,
                                         hwNode,
-                                        param,
                                         v,
                                         pos,
                                         tag,
@@ -1474,7 +1471,7 @@ public final class VMSXML extends XML {
         }
     }
 
-    /** Parse disk xml and populate the devMap */
+    /** Parse disk xml and populate the devMap. */
     private void parseDiskNode(final Node diskNode,
                                final Map<String, DiskData> devMap) {
         final String type = getAttribute(diskNode, "type");
@@ -1484,8 +1481,8 @@ public final class VMSXML extends XML {
         String sourceDev = null;
         String sourceProtocol = null;
         String sourceName = null;
-        List<String> sourceHostNames = new ArrayList<String>();
-        List<String> sourceHostPorts = new ArrayList<String>();
+        final List<String> sourceHostNames = new ArrayList<String>();
+        final List<String> sourceHostPorts = new ArrayList<String>();
         String authUsername = null;
         String authSecretType = null;
         String authSecretUuid = null;
@@ -2757,13 +2754,13 @@ public final class VMSXML extends XML {
 
     /** Class that holds data about virtual filesystems. */
     public static final class FilesystemData extends HardwareData {
-        /** Type: mount */
+        /** Type: mount. */
         private final String type;
         /** Source dir. */
         private final String sourceDir;
         /** Source name. */
         private final String sourceName;
-        /** Target dir: / */
+        /** Target dir. / */
         private final String targetDir;
         /** Type. */
         public static final String TYPE = "type";

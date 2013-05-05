@@ -373,7 +373,7 @@ public final class HostDrbdInfo extends Info {
                            getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -408,7 +408,7 @@ public final class HostDrbdInfo extends Info {
                            getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 

@@ -199,7 +199,7 @@ public abstract class ResourceGraph {
     private static final Paint EDGE_PICKED_PAINT =
                 (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
     /** Cache for text layouts. */
-    final private Map<String, TextLayout> textLayoutCache =
+    private final Map<String, TextLayout> textLayoutCache =
                                             new HashMap<String, TextLayout>();
 
     static {
@@ -1730,7 +1730,8 @@ public abstract class ResourceGraph {
         }
         final Font font = Tools.getGUIData().getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
-        TextLayout tl = new TextLayout(text,
+        final TextLayout tl =
+               new TextLayout(text,
                               new Font(font.getName(),
                                        font.getStyle(),
                                        (int) (font.getSize() * fontSizeFactor)),

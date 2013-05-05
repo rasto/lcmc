@@ -157,8 +157,6 @@ public final class Host {
     private Color defaultColor;
     /** Color of this host in graphs. */
     private Color savedColor;
-    /** Thread where connection status command is running. */
-    private ExecCommandThread connectionStatusThread = null;
     /** Thread where drbd status command is running. */
     private ExecCommandThread drbdStatusThread = null;
     /** Thread where hb status command is running. */
@@ -295,16 +293,16 @@ public final class Host {
     private final Lock mDRBDStatusLock = new ReentrantLock();
     /** Update VMS lock. */
     private final Lock mUpdateVMSlock = new ReentrantLock();
-    /** Time stamp lock */
+    /** Time stamp lock. */
     private final Lock mInfoTimestampLock = new ReentrantLock();
     /** Time stamp hash. */
     private final Map<String, Double> infoTimestamp =
                                                 new HashMap<String, Double>();
     /** Timeout after which the connection is considered to be dead. */
-    private final int PING_TIMEOUT           = 40000;
-    private final int DRBD_EVENTS_TIMEOUT    = 40000;
-    private final int CLUSTER_EVENTS_TIMEOUT = 40000;
-    private final int HW_INFO_TIMEOUT        = 40000;
+    private static final int PING_TIMEOUT           = 40000;
+    private static final int DRBD_EVENTS_TIMEOUT    = 40000;
+    private static final int CLUSTER_EVENTS_TIMEOUT = 40000;
+    private static final int HW_INFO_TIMEOUT        = 40000;
 
     public static final String DEFAULT_HOSTNAME = "unknown";
 
@@ -1813,19 +1811,19 @@ public final class Host {
                                  String drbdUpdate = null;
                                  do {
                                      i++;
-                                     hw = getOutput("hw", outputBuffer); 
+                                     hw = getOutput("hw", outputBuffer);
                                      if (hw != null) {
                                          hwUpdate = hw;
                                      }
                                      vmStatusLock();
-                                     vm = getOutput("vm", outputBuffer); 
+                                     vm = getOutput("vm", outputBuffer);
                                      if (vm != null) {
                                          vmUpdate = vm;
                                      }
                                      vmStatusUnlock();
                                      drbdStatusLock();
                                      drbdConfig = getOutput("drbd",
-                                                            outputBuffer); 
+                                                            outputBuffer);
                                      if (drbdConfig != null) {
                                          drbdUpdate = drbdConfig;
                                      }
@@ -3074,7 +3072,7 @@ public final class Host {
         mUpdateVMSlock.unlock();
     }
 
-    /** Return whether the user is root */
+    /** Return whether the user is root. */
     public boolean isRoot() {
         return ROOT_USER.equals(username);
     }

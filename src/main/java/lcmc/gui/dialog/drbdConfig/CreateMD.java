@@ -222,7 +222,7 @@ final class CreateMD extends DrbdConfig {
                     getDrbdVolumeInfo().getName(),
                     testOnly);
         final String device = getDrbdVolumeInfo().getDevice();
-        final ClusterBrowser browser = 
+        final ClusterBrowser browser =
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
         browser.updateHWInfo(bdi1.getHost());
         browser.updateHWInfo(bdi2.getHost());

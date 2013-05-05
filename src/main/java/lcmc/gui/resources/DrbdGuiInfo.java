@@ -238,7 +238,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
             if (index > -1) {
                 unitPart = unit.substring(index);
             }
-            Widget.Type type = null;
+            final Widget.Type type = null;
             Unit[] units = null;
             if ("".equals(unit)) {
                 units = new Unit[]{

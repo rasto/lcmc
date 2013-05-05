@@ -1427,7 +1427,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         addProxyPorts(optionsPanel, leftWidth, rightWidth, wizard);
 
         addProxyIps(optionsPanel,
-                    leftWidth, 
+                    leftWidth,
                     rightWidth,
                     wizard,
                     newInsideIpComboBoxHash,

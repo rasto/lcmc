@@ -830,8 +830,9 @@ public final class GroupInfo extends ServiceInfo {
     public void removeInfo() {
         @SuppressWarnings("unchecked")
         final DefaultMutableTreeNode node = getNode();
-        if (node == null)
+        if (node == null) {
             return;
+        }
         final Enumeration<DefaultMutableTreeNode> e = node.children();
         try {
             while (e.hasMoreElements()) {

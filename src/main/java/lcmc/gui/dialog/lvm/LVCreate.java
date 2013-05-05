@@ -69,8 +69,8 @@ public final class LVCreate extends LV {
     private final String volumeGroup;
     /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    /** Selected block device */
-    private BlockDevice selectedBlockDevice;
+    /** Selected block device. */
+    private final BlockDevice selectedBlockDevice;
 
     /** Description create LV. */
     private static final String LV_CREATE_DESCRIPTION =
