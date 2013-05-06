@@ -4925,6 +4925,38 @@ public final class RoboTest {
             sleep(1000);
             checkVMTest(vmTest, 3, name);
 
+            if (j  == 0) {
+                for (int i = 0; i < count2; i++) {
+                    /* remove net interface */
+                    moveToMenu("dmc");
+                    leftClick();
+                    moveToMenu("default (:");
+                    rightClick();
+                    moveTo("Remove");
+                    leftClick();
+                    confirmRemove();
+                    checkVMTest(vmTest, 3.001, name);
+
+                    /* add net interface */
+                    moveToMenu("dmc");
+                    rightClick();
+                    sleep(1000);
+                    moveTo("Add Hardware");
+                    sleep(1000);
+                    moveTo("New Disk");
+                    moveTo("New Network Interface");
+                    leftClick();
+                    sleep(2000);
+                    moveTo("network");
+                    leftClick();
+                    sleep(2000);
+                    moveTo("Apply");
+                    leftClick();
+                    checkVMTest(vmTest, 3, name);
+                }
+            }
+            checkVMTest(vmTest, 3, name);
+
             if (j  == 0 && !"lxc".equals(type)) {
                 /* add disk */
                 moveToMenu("dmc");
