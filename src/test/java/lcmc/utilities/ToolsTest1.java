@@ -1442,4 +1442,10 @@ public final class ToolsTest1 extends TestCase {
         assertEquals(" a\n",    ssb(" a\n\n"));
         assertEquals(" a \n",    ssb(" a \n"));
     }
+
+    @Test
+    public void testGenerateVMMacAddress() {
+       final String mac = Tools.generateVMMacAddress();
+       assertEquals(mac.length(), 17);
+    }
 }

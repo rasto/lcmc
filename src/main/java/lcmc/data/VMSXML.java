@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -130,6 +131,8 @@ public final class VMSXML extends XML {
                                     new LinkedHashMap<String, NetworkData>();
     /** Directories where are source files. */
     private final Set<String> sourceFileDirs = new TreeSet<String>();
+    /** All used mac addresses. */
+    private final Set<String> macAddresses = new HashSet<String>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -1863,6 +1866,7 @@ public final class VMSXML extends XML {
                                                                 modelType,
                                                                 scriptPath);
                             macMap.put(macAddress, interfaceData);
+                            macAddresses.add(macAddress);
                         }
                     } else if ("sound".equals(deviceNode.getNodeName())) {
                         final String model = getAttribute(deviceNode, "model");
@@ -3179,5 +3183,10 @@ public final class VMSXML extends XML {
     /** Returns source file directories. */
     public Set<String> getsourceFileDirs() {
         return sourceFileDirs;
+    }
+
+    /** Return set of mac addresses. */
+    public Set<String> getMacAddresses() {
+        return macAddresses;
     }
 }

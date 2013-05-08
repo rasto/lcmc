@@ -2895,4 +2895,12 @@ public final class Tools {
         return new Color((int) r, (int) g, (int) b);
     }
 
+    public static String generateVMMacAddress() {
+        StringBuilder mac = new StringBuilder("52:54:00");
+        for (int i = 0; i < 3; i++) {
+            mac.append(':');
+            mac.append(String.format("%02x", (int) (Math.random() * 256)));
+        }
+        return mac.toString();
+    }
 }

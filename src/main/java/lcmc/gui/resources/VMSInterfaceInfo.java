@@ -119,7 +119,6 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     private static final Map<String, Object[]> POSSIBLE_VALUES =
                                                new HashMap<String, Object[]>();
     static {
-        DEFAULTS_MAP.put(InterfaceData.MAC_ADDRESS, "generate");
         PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, "default");
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
                             new String[]{null,
@@ -182,9 +181,31 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         return name;
     }
 
+    private String generateMacAddress() {
+        final Map<String, InterfaceData> interfaces =
+                                    getVMSVirtualDomainInfo().getInterfaces();
+        String mac;
+        LOOP: while(true) {
+            mac = Tools.generateVMMacAddress();
+            for (final Host h : getBrowser().getClusterHosts()) {
+                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                if (vmsxml != null) {
+                    if (vmsxml.getMacAddresses().contains(mac)) {
+                        continue LOOP;
+                    }
+                }
+            }
+            break;
+        }
+        return mac;
+    }
+
     /** Returns preferred value for specified parameter. */
     @Override
     protected String getParamPreferred(final String param) {
+        if (InterfaceData.MAC_ADDRESS.equals(param)) {
+            return generateMacAddress();
+        }
         return PREFERRED_MAP.get(param);
     }
 
