@@ -169,7 +169,7 @@ public abstract class Widget extends JPanel {
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
             this.regexp =
-                    regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
+             regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
         } else {
             this.regexp = regexp;
         }
@@ -856,7 +856,7 @@ public abstract class Widget extends JPanel {
         public MComboBox() {
         }
 
-        public MComboBox(final E[] items){
+        public MComboBox(final E[] items) {
             super(items);
         }
 
@@ -864,13 +864,13 @@ public abstract class Widget extends JPanel {
             super(items);
         }
 
-        public MComboBox(javax.swing.ComboBoxModel<E> aModel) {
+        public MComboBox(final javax.swing.ComboBoxModel<E> aModel) {
             super(aModel);
         }
 
         private boolean layingOut = false;
 
-        public void doLayout(){
+        public void doLayout() {
             try {
                 layingOut = true;
                 super.doLayout();
@@ -880,7 +880,7 @@ public abstract class Widget extends JPanel {
         }
 
         /** Get new size if popup items are wider than the item. */
-        public Dimension getSize(){
+        public Dimension getSize() {
             final Dimension dim = super.getSize();
             if (!layingOut) {
                 final Object c = getUI().getAccessibleChild(this, 0);

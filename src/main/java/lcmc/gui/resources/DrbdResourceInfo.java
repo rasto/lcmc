@@ -47,7 +47,6 @@ import lcmc.utilities.WidgetListener;
 import lcmc.configs.AppDefaults;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.event.ActionListener;
@@ -1428,7 +1427,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         addProxyPorts(optionsPanel, leftWidth, rightWidth, wizard);
 
         addProxyIps(optionsPanel,
-                    leftWidth, 
+                    leftWidth,
                     rightWidth,
                     wizard,
                     newInsideIpComboBoxHash,

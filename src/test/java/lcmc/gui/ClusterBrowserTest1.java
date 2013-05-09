@@ -66,8 +66,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                     CRM.LIVE);
             assertEquals("cdabc", buffer.toString());
         }
-                    
-        
+
         if (TestSuite1.QUICK) {
             return;
         }

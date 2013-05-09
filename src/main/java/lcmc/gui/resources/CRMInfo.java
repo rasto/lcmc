@@ -32,7 +32,7 @@ import javax.swing.JComponent;
  */
 public final class CRMInfo extends HbCategoryInfo {
     /** Cluster manager icon. */
-    protected static final ImageIcon CRM_ICON =
+    private static final ImageIcon CRM_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
     /** Prepares a new <code>ServicesInfo</code> object. */

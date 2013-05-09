@@ -55,10 +55,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Source block combo box, so that it can be disabled, depending on type.*/
     private final Map<String, Widget> sourceNameWi =
                                             new HashMap<String, Widget>();
-    /** Choices for source directories */
+    /** Choices for source directories. */
     private final String[] sourceDirs;
-    /** Previous target bus value. */
-    private String prevTargetBus = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
                                                 FilesystemData.SOURCE_DIR,
@@ -118,7 +116,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Filesystem types. */
     private static final String TEMPLATE_TYPE = "template";
 
-    /** LXC source dir */
+    /** LXC source dir. */
     private static final String LXC_SOURCE_DIR = "/var/lib/lxc";
 
     static {

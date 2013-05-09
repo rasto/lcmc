@@ -21,15 +21,12 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.DrbdXML;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
@@ -208,7 +205,7 @@ final class ProxyInst extends DialogHost {
      * Return dialog that comes after "cancel" button was pressed.
      */
     @Override
-    protected final WizardDialog dialogAfterCancel() {
+    protected WizardDialog dialogAfterCancel() {
         return origDialog;
     }
 }

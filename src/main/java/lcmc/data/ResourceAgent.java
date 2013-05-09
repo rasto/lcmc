@@ -117,9 +117,9 @@ public final class ResourceAgent {
     private boolean metaDataLoaded = false;
     /** Name of service resource (upstart, systemd). */
     public static final String SERVICE_CLASS = "service";
-    /** Name of upstart class */
+    /** Name of upstart class. */
     public static final String UPSTART_CLASS = "upstart";
-    /** Name of systemd class */
+    /** Name of systemd class. */
     public static final String SYSTEMD_CLASS = "systemd";
     /** Name of lsb style resource (/etc/init.d/*). */
     public static final String LSB_CLASS = "lsb";
@@ -589,12 +589,12 @@ public final class ResourceAgent {
     }
 
     /** Whether the meta data are loaded. */
-    public final boolean isMetaDataLoaded() {
+    public boolean isMetaDataLoaded() {
         return metaDataLoaded;
     }
 
     /** Set whether the meta data are loaded. */
-    public final void setMetaDataLoaded(final boolean metaDataLoaded) {
+    public void setMetaDataLoaded(final boolean metaDataLoaded) {
         this.metaDataLoaded = metaDataLoaded;
     }
 

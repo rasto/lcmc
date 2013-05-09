@@ -313,7 +313,14 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                           DRIVER_NAME_QEMU,
                                                           DRIVER_NAME_PHY});
         POSSIBLE_VALUES.put(DiskData.DRIVER_TYPE, new String[]{null, "raw"});
-        POSSIBLE_VALUES.put(DiskData.DRIVER_CACHE, new String[]{null, "default", "none", "writethrough", "writeback", "directsync", "unsafe"});
+        POSSIBLE_VALUES.put(DiskData.DRIVER_CACHE, new String[]{null,
+                                                                "default",
+                                                                "none",
+                                                                "writethrough",
+                                                                "writeback",
+                                                                "directsync",
+                                                                "unsafe"});
+
         POSSIBLE_VALUES.put(DiskData.SOURCE_PROTOCOL, new String[]{null,
                                                                    "rbd",
                                                                    "nbd",
@@ -347,7 +354,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         TARGET_DEVICES_MAP.put("virtio/disk",
                                new String[]{"vda", "vdb", "vdc", "vdd", "vde"});
     }
-    /** Default source port if none is specified (and it is needed) */
+    /** Default source port if none is specified (and it is needed). */
     public static final String DEFAULT_SOURCE_HOST_PORT = "6789";
 
     /** Table panel. */

@@ -75,7 +75,6 @@ public final class VIRSH {
     private static boolean execCommand(final Host[] hosts,
                                        final Map<Host, String> hostCommands,
                                        final boolean outputVisible) {
-        boolean exitCode = false;
         for (final Host host : hosts) {
             final String commands = hostCommands.get(host);
             if (commands.length() > 0) {

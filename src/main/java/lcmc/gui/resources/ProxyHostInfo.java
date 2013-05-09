@@ -21,26 +21,19 @@
 
 package lcmc.gui.resources;
 
-import lcmc.AddDrbdUpgradeDialog;
 import lcmc.ProxyHostWizard;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.dialog.lvm.VGCreate;
-import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.drbd.DrbdsLog;
 import lcmc.data.Host;
-import lcmc.data.Subtext;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
-import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.SSH;
@@ -48,7 +41,6 @@ import lcmc.utilities.SSH;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Font;
-import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -60,7 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.JColorChooser;
 
 /**
  * This class holds info data for a host.
@@ -69,10 +60,10 @@ public final class ProxyHostInfo extends Info {
     /** Host data. */
     private final Host host;
     /** Name prefix that appears in the menu. */
-    private final String NAME_PREFIX =
+    private static final String NAME_PREFIX =
                                     Tools.getString("ProxyHostInfo.NameInfo");
     /** Not connectable. */
-    private final String NOT_CONNECTABLE_STRING =
+    private static final String NOT_CONNECTABLE_STRING =
                                Tools.getString("ProxyHostInfo.NotConnectable");
     /** Prepares a new <code>ProxyHostInfo</code> object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
@@ -330,7 +321,7 @@ public final class ProxyHostInfo extends Info {
                            getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -365,7 +356,7 @@ public final class ProxyHostInfo extends Info {
                            getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 

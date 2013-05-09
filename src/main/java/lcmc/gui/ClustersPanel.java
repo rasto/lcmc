@@ -201,14 +201,14 @@ public final class ClustersPanel extends JPanel {
         refresh();
     }
 
-    /** Add tab component with close button */
+    /** Add tab component with close button. */
     private void addTabComponent(final JTabbedPane tabPane,
                                  final String title,
                                  final ImageIcon icon,
                                  final ClusterTab ct,
                                  final ActionListener actionListener) {
         final int index = tabPane.indexOfComponent(ct);
-        JPanel tabPanel = new JPanel(new GridBagLayout());
+        final JPanel tabPanel = new JPanel(new GridBagLayout());
         tabPanel.setOpaque(false);
         final JLabel iconLabel = new JLabel(icon);
         final JLabel lblTitle = new JLabel(title);

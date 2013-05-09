@@ -1457,7 +1457,7 @@ public final class ServicesInfo extends EditableInfo {
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final List<ResourceAgent> services = getAddServiceList(cl);
-                    if (services.size() == 0) {
+                    if (services.isEmpty()) {
                         /* no services, don't show */
                         continue;
                     }
@@ -1523,7 +1523,8 @@ public final class ServicesInfo extends EditableInfo {
                                         null, /* options */
                                         classItem,
                                         dlm,
-                                        new MyList<MyMenuItem>(dlm, getBackground()),
+                                        new MyList<MyMenuItem>(dlm,
+                                                               getBackground()),
                                         thisClass,
                                         popups,
                                         null);
@@ -2025,7 +2026,7 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     public void pasteServices(final List<Info> oldInfos) {
-        if (oldInfos.size() == 0) {
+        if (oldInfos.isEmpty()) {
             return;
         }
         final String cn = getBrowser().getCluster().getName();

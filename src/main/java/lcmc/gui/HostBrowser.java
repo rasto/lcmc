@@ -238,7 +238,7 @@ public final class HostBrowser extends Browser {
                             nii = new NetInfo(ni.getName(), ni, thisClass);
                         }
                         final DefaultMutableTreeNode resource =
-                                                       new DefaultMutableTreeNode(nii);
+                                               new DefaultMutableTreeNode(nii);
                         setNode(resource);
                         netInterfacesNode.add(resource);
                     }

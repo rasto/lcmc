@@ -26,7 +26,6 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
 import javax.swing.JComponent;
 
 /**
@@ -119,7 +118,7 @@ final class ConfigurationProxy extends Configuration {
      * Return dialog that comes after "cancel" button was pressed.
      */
     @Override
-    protected final WizardDialog dialogAfterCancel() {
+    protected WizardDialog dialogAfterCancel() {
         return origDialog;
     }
 }

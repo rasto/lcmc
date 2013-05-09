@@ -23,7 +23,6 @@
 
 package lcmc.gui;
 
-import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServicesInfo;
 import lcmc.data.Cluster;
@@ -224,7 +223,8 @@ public final class GUIData  {
 
     /** Returns whether the terminal panel is expanded. */
     public boolean isTerminalPanelExpanded() {
-        return terminalSplitPane.getBottomComponent().getSize().getHeight() != 0;
+        return terminalSplitPane.getBottomComponent().getSize().getHeight()
+               != 0;
     }
 
     /** Expands the terminal split pane. */

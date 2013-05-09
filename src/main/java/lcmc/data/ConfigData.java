@@ -653,31 +653,30 @@ public final class ConfigData {
     }
 
     /** Return whether one host cluster is allowed. */
-    public final boolean isOneHostCluster() {
+    public boolean isOneHostCluster() {
         return oneHostCluster;
     }
 
     /** Set whether one host cluster is allowed. */
-    public final void setOneHostCluster(final boolean oneHostCluster) {
+    public void setOneHostCluster(final boolean oneHostCluster) {
         this.oneHostCluster = oneHostCluster;
     }
 
     /** Return scaled size. */
-    public final int scaled(final int size) {
+    public int scaled(final int size) {
         return size * scale / 100;
     }
 
     /** Returns scale for fonts and GUI elements. */
-    public final int getScale() {
+    public int getScale() {
         return scale;
     }
 
     /** Sets scale. */
-    public final void setScale(final int scale) {
+    public void setScale(final int scale) {
         this.scale = scale;
     }
 
-    
     /** Set whether no passphrase should be tried first. */
     public void setNoPassphrase(final boolean noPassphrase) {
         this.noPassphrase = noPassphrase;

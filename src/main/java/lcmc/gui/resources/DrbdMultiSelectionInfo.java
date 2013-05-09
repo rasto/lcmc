@@ -154,7 +154,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, CRM.LIVE);
+                        DRBD.adjustApply(hi.getHost(),
+                                         DRBD.ALL,
+                                         null,
+                                         CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost());
@@ -168,7 +171,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
+                    DRBD.adjustApply(hi.getHost(),
+                                     DRBD.ALL,
+                                     null,
+                                     CRM.TESTONLY);
                 }
             }
         };
@@ -1133,7 +1139,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                            Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1143,7 +1149,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
@@ -1164,7 +1170,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
@@ -1186,7 +1192,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
@@ -1213,7 +1219,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                            Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
                            new AccessMode(ConfigData.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP, 
+                           new AccessMode(ConfigData.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1223,7 +1229,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
@@ -1244,7 +1250,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
@@ -1266,7 +1272,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri = 
+                        final DrbdResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),

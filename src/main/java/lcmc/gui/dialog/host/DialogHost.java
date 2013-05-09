@@ -146,7 +146,7 @@ public abstract class DialogHost extends WizardDialog {
     protected abstract String getHostDialogTitle();
 
     /** This class holds install method names, and their indeces. */
-    public final static class InstallMethods {
+    public static final class InstallMethods {
         /** Name of the method like "CD". */
         private final String name;
         /** Index of the method. */

@@ -211,7 +211,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        new HashMap<String, VMSVideoInfo>();
     /** Previous type. */
     private volatile String prevType = null;
-    /** Autostart possible values - hosts */
+    /** Autostart possible values - hosts. */
     private final String[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
@@ -952,7 +952,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 if (!(node.getUserObject() instanceof VMSFilesystemInfo)) {
                     continue;
                 }
-                final VMSFilesystemInfo v = (VMSFilesystemInfo) node.getUserObject();
+                final VMSFilesystemInfo v =
+                                      (VMSFilesystemInfo) node.getUserObject();
                 final String n = v.getName();
                 if (n != null && filesystem.compareTo(n) < 0) {
                     break;
@@ -3849,9 +3850,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         final Enumeration eee = thisNode.children();
                         while (eee.hasMoreElements()) {
                             final DefaultMutableTreeNode node =
-                                        (DefaultMutableTreeNode) eee.nextElement();
+                                    (DefaultMutableTreeNode) eee.nextElement();
                             final VMSHardwareInfo vmshi =
-                                            (VMSHardwareInfo) node.getUserObject();
+                                        (VMSHardwareInfo) node.getUserObject();
                             if (vmshi != null) {
                                 final MyButton mb = vmshi.getApplyButton();
                                 if (mb != null) {
@@ -5373,25 +5374,25 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         return uuid;
     }
 
-    /** Return virsh options like -c xen:/// */
-    public final String getVirshOptions() {
+    /** Return virsh options like -c xen:///. */
+    public String getVirshOptions() {
         return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS);
     }
 
     /** Return whether domain type needs "display" section. */
-    public final boolean needDisplay() {
+    public boolean needDisplay() {
         return NEED_DISPLAY.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs "console" section. */
-    public final boolean needConsole() {
+    public boolean needConsole() {
         return NEED_CONSOLE.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }
 
     /** Return whether domain type needs filesystem instead of disk device. */
-    public final boolean needFilesystem() {
+    public boolean needFilesystem() {
         return NEED_FILESYSTEM.contains(getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
     }

@@ -186,8 +186,6 @@ public final class Tools {
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     /** Pattern that matches a number and unit. */
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
-    /** Random number generator. */
-    private static final Random RANDOM = new Random();
     /** Time when the application started in seconds. */
     private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Private constructor. */
@@ -1567,9 +1565,9 @@ public final class Tools {
         } else {
             version1a = version1;
         }
-        int index = version1a.indexOf("-");
+        int index = version1a.indexOf('-');
         if (index < 0) {
-            index = version1a.indexOf("_");
+            index = version1a.indexOf('_');
         }
         if (index >= 0) {
             version1a = version1a.substring(0, index);
@@ -2831,7 +2829,7 @@ public final class Tools {
         while (i > 0 && (sb.charAt(i - 1) == '\n')) {
             i--;
         }
-        if (i >=0 && i < l - 1) {
+        if (i >= 0 && i < l - 1) {
             sb.delete(i, l - 1);
         }
     }
@@ -2860,7 +2858,7 @@ public final class Tools {
                               new FontUIResource(
                                          f.getName(),
                                          f.getStyle(),
-                                         getConfigData().scaled(f.getSize()))); 
+                                         getConfigData().scaled(f.getSize())));
             }
         }
     }
@@ -2881,7 +2879,7 @@ public final class Tools {
     }
 
     /** Return brigher version of the color (or darker). */
-    public static Color brighterColor(Color c, double x) {
+    public static Color brighterColor(final Color c, final double x) {
         double r = c.getRed() * x;
         if (r > 255) {
             r = 255;
@@ -2897,4 +2895,12 @@ public final class Tools {
         return new Color((int) r, (int) g, (int) b);
     }
 
+    public static String generateVMMacAddress() {
+        StringBuilder mac = new StringBuilder("52:54:00");
+        for (int i = 0; i < 3; i++) {
+            mac.append(':');
+            mac.append(String.format("%02x", (int) (Math.random() * 256)));
+        }
+        return mac.toString();
+    }
 }

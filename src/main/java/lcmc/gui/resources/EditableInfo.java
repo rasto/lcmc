@@ -138,7 +138,7 @@ public abstract class EditableInfo extends Info {
     /** Disabled section, their not visible. */
     private final Set<String> disabledSections = new HashSet<String>();
     /** Whether is's a wizard element. */
-    public final static boolean WIZARD = true;
+    public static final boolean WIZARD = true;
 
     /** How much of the info is used. */
     public int getUsed() {
@@ -423,7 +423,8 @@ public abstract class EditableInfo extends Info {
                     @Override
                     public void run() {
                         if (paramWi.getValue() == null
-                            || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
+                            || paramWi.getValue()
+                               == Widget.NOTHING_SELECTED_DISPLAY) {
                             rpwi0.setValueAndWait(null);
                         } else {
                             final Object value = paramWi.getStringValue();
@@ -589,7 +590,8 @@ public abstract class EditableInfo extends Info {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null
-                                || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
+                                || paramWi.getValue()
+                                   == Widget.NOTHING_SELECTED_DISPLAY) {
                                 realParamWi.setValueAndWait(null);
                             } else {
                                 final Object value = paramWi.getStringValue();
@@ -1031,7 +1033,7 @@ public abstract class EditableInfo extends Info {
     /** Waits till the info panel is done for the first time. */
     public final void waitForInfoPanel() {
         try {
-            boolean ret = infoPanelLatch.await(20, TimeUnit.SECONDS);
+            final boolean ret = infoPanelLatch.await(20, TimeUnit.SECONDS);
             if (!ret) {
                 Tools.printStackTrace("latch timeout detected");
             }
@@ -1193,8 +1195,7 @@ public abstract class EditableInfo extends Info {
     /**
      * Return section panel.
      */
-    private final JPanel getSectionPanel(final String section,
-                                         final boolean wizard) {
+    private JPanel getSectionPanel(final String section, final boolean wizard) {
         return sectionPanels.get(section, Boolean.toString(wizard));
     }
 

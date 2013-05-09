@@ -76,7 +76,7 @@ public final class RoboTest {
     /** Cluster. */
     private static Cluster cluster;
 
-    private static boolean PROXY = true;
+    private static final boolean PROXY = true;
 
     /** Private constructor, cannot be instantiated. */
     private RoboTest() {
@@ -2255,7 +2255,7 @@ public final class RoboTest {
         final int dummy1X = 235;
         final int dummy1Y = 207;
         disableStonith();
-        String testName = "testB";
+        final String testName = "testB";
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -2295,7 +2295,7 @@ public final class RoboTest {
         final int statefulX = 500;
         final int statefulY = 207;
         disableStonith();
-        String testName = "testC";
+        final String testName = "testC";
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -2431,7 +2431,7 @@ public final class RoboTest {
         final int gx = 235;
         final int gy = 207;
         disableStonith();
-        String testName = "testF";
+        final String testName = "testF";
         final String distro = cluster.getHostsArray()[0].getDist();
         checkTest(testName, 1);
         /* group with dummy resources */
@@ -2826,7 +2826,7 @@ public final class RoboTest {
     /** Removes placeholder. */
     private static void removePlaceHolder(final int x,
                                           final int y,
-                                          boolean confirm) {
+                                          final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
         sleep(1000);
@@ -3070,7 +3070,7 @@ public final class RoboTest {
         slowFactor = 0.3f;
         aborted = false;
         disableStonith();
-        String testName = "test3";
+        final String testName = "test3";
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);
@@ -3267,11 +3267,12 @@ public final class RoboTest {
             Tools.printStackTrace("can't find the scrollbar");
             return;
         }
-        int minY = 0;
         Component scrollbar = null;
         final Component app = Tools.getGUIData().getMainFrameContentPane();
-        final int mX = (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
-        final int mY = (int) app.getLocationOnScreen().getY() + app.getHeight() / 2;
+        final int mX =
+                  (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
+        final int mY =
+                  (int) app.getLocationOnScreen().getY() + app.getHeight() / 2;
         int scrollbarX = 0;
         int scrollbarY = 0;
         for (final Component c : res) {
@@ -3303,7 +3304,7 @@ public final class RoboTest {
             Component c = w.getFocusOwner();
             if (c != null) {
                 while (c.getParent() != null
-                       && !(c instanceof JDialog ||c instanceof JFrame)) {
+                       && !(c instanceof JDialog || c instanceof JFrame)) {
                     c = c.getParent();
                 }
                 return c;
@@ -4346,7 +4347,7 @@ public final class RoboTest {
         checkDRBDTest(drbdTest, 4);
     }
 
-    /** Create LV */
+    /** Create LV. */
     private static void startDRBDTest5(final int blockDevY) {
         /* Two bds. */
         slowFactor = 0.6f;
@@ -4361,7 +4362,7 @@ public final class RoboTest {
             resizeLV();
         }
     }
-    /** Remove LV */
+    /** Remove LV. */
     private static void startDRBDTest6(final int blockDevY) {
         /* Two bds. */
         slowFactor = 0.6f;
@@ -4870,7 +4871,7 @@ public final class RoboTest {
             final String firstHost = cluster.getHostsArray()[0].getName();
             final String secondHost = cluster.getHostsArray()[1].getName();
             if (cluster.getHosts().size() > 1) {
-                for (int i = 0; i < 3; i ++) {
+                for (int i = 0; i < 3; i++) {
                     /* two hosts */
                     moveTo(firstHost, JCheckBox.class); /* deselect first */
                     leftClick();
@@ -4922,6 +4923,38 @@ public final class RoboTest {
             sleep(1000);
             leftClick();
             sleep(1000);
+            checkVMTest(vmTest, 3, name);
+
+            if (j  == 0) {
+                for (int i = 0; i < count2; i++) {
+                    /* remove net interface */
+                    moveToMenu("dmc");
+                    leftClick();
+                    moveToMenu("default (:");
+                    rightClick();
+                    moveTo("Remove");
+                    leftClick();
+                    confirmRemove();
+                    checkVMTest(vmTest, 3.001, name);
+
+                    /* add net interface */
+                    moveToMenu("dmc");
+                    rightClick();
+                    sleep(1000);
+                    moveTo("Add Hardware");
+                    sleep(1000);
+                    moveTo("New Disk");
+                    moveTo("New Network Interface");
+                    leftClick();
+                    sleep(2000);
+                    moveTo("network");
+                    leftClick();
+                    sleep(2000);
+                    moveTo("Apply");
+                    leftClick();
+                    checkVMTest(vmTest, 3, name);
+                }
+            }
             checkVMTest(vmTest, 3, name);
 
             if (j  == 0 && !"lxc".equals(type)) {
