@@ -3046,7 +3046,11 @@ public class ServiceInfo extends EditableInfo {
                     mOperationsComboBoxHashReadLock.unlock();
                     String value;
                     if (wi == null) {
-                        value = "0";
+                        if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
+                            value = "";
+                        } else {
+                            value = "0";
+                        }
                     } else {
                         value = wi.getStringValue();
                     }
