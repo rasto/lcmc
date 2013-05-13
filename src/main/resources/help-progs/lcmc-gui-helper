@@ -258,7 +258,7 @@ sub get_drbd_info {
 }
 
 sub get_drbd_dump_xml {
-	return `/sbin/drbdadm dump-xml 2>&1`;
+	return `/sbin/drbdadm dump-xml 2>&1` || "";
 }
 
 sub print_debug {
