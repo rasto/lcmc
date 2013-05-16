@@ -144,6 +144,11 @@ public final class LCMC extends JPanel {
     private static final String ONE_HOST_CLUSTER_OP = "one-host-cluster";
     /** The --no-passphrase. */
     private static final String NO_PASSPHRASE = "no-passphrase";
+    /** The --embed. Embed in the browser option. */
+    private static final String EMBED_OP = "embed";
+
+    /** The --no-embed. Don't embed in the browser option. */
+    private static final String NO_EMBED_OP = "no-embed";
 
     /**
      * Private constructor.
@@ -444,6 +449,14 @@ public final class LCMC extends JPanel {
                           NO_PASSPHRASE,
                           false,
                           "try no passphrase first");
+        options.addOption(null,
+                          EMBED_OP,
+                          false,
+                          "embed applet in the browser");
+        options.addOption(null,
+                          NO_EMBED_OP,
+                          false,
+                          "don't embed applet in the browser");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -498,6 +511,12 @@ public final class LCMC extends JPanel {
             Tools.getConfigData().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
             Tools.getConfigData().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE));
+            if (cmd.hasOption(EMBED_OP)) {
+                Tools.getConfigData().setEmbed(true);
+            }
+            if (cmd.hasOption(NO_EMBED_OP)) {
+                Tools.getConfigData().setEmbed(false);
+            }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
@@ -695,11 +714,7 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         final String autoArgs = initApp(args);
-        mainFrame.setGlassPane(getMainGlassPane());
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.addWindowListener(new ExitListener());
-        mainFrame.setJMenuBar(getMenuBar());
-        mainFrame.setContentPane(getMainPanel());
+        createMainFrame(mainFrame);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -715,5 +730,13 @@ public final class LCMC extends JPanel {
         //    }
         //});
         //t.start();
+    }
+
+    static void createMainFrame(final JFrame mainFrame) {
+        mainFrame.setGlassPane(getMainGlassPane());
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new ExitListener());
+        mainFrame.setJMenuBar(getMenuBar());
+        mainFrame.setContentPane(getMainPanel());
     }
 }

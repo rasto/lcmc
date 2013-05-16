@@ -169,6 +169,8 @@ public final class ConfigData {
     private int scale = 100;
     /** Whether no passphrase should be tried first. */
     private boolean noPassphrase = false;
+    /** Whether to embed applet in the browser. Embed in Linux by default. */
+    private boolean embed = Tools.isLinux();
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -685,5 +687,15 @@ public final class ConfigData {
     /** Return whether no passphrase should be tried first. */
     public boolean isNoPassphrase() {
         return noPassphrase;
+    }
+
+    /** Set whether to embed applet in the browser. */
+    public void setEmbed(final boolean embed) {
+        this.embed = embed;
+    }
+
+    /** Return whether to embed applet in the browser. */
+    public boolean isEmbed() {
+        return embed;
     }
 }
