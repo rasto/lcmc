@@ -143,7 +143,7 @@ public final class LCMC extends JPanel {
     /** The --one-host-cluster option. */
     private static final String ONE_HOST_CLUSTER_OP = "one-host-cluster";
     /** The --no-passphrase. */
-    private static final String NO_PASSPHRASE = "no-passphrase";
+    private static final String NO_PASSPHRASE_OP = "no-passphrase";
     /** The --embed. Embed in the browser option. */
     private static final String EMBED_OP = "embed";
 
@@ -347,9 +347,8 @@ public final class LCMC extends JPanel {
                           + "admin - administrator");
         options.addOption(null, NOLRM_OP, false,
                           "do not show removed resources from LRM.");
-        options.addOption(null, "auto", true, "for testing");
         options.addOption("v", VERSION_OP, false, "print version");
-        options.addOption(null, AUTO_OP, true, "for testing");
+        options.addOption(null, AUTO_OP, true, "ADVANCED USE: for testing");
         options.addOption(null,
                           NO_UPGRADE_CHECK_OP,
                           false,
@@ -386,7 +385,7 @@ public final class LCMC extends JPanel {
         options.addOption(null,
                           RESTORE_MOUSE_OP,
                           false,
-                          "for testing");
+                          "ADVANCED USE: for testing");
         options.addOption(null,
                           SCALE_OP,
                           true,
@@ -446,7 +445,7 @@ public final class LCMC extends JPanel {
                           false,
                           "allow one host cluster");
         options.addOption(null,
-                          NO_PASSPHRASE,
+                          NO_PASSPHRASE_OP,
                           false,
                           "try no passphrase first");
         options.addOption(null,
@@ -510,7 +509,8 @@ public final class LCMC extends JPanel {
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             Tools.getConfigData().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
-            Tools.getConfigData().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE));
+            Tools.getConfigData().setNoPassphrase(
+                                           cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
                 Tools.getConfigData().setEmbed(true);
             }
