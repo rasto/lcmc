@@ -714,6 +714,9 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         final String autoArgs = initApp(args);
+        if (autoArgs != null) {
+            Tools.parseAutoArgs(autoArgs);
+        }
         createMainFrame(mainFrame);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -721,9 +724,6 @@ public final class LCMC extends JPanel {
                 createAndShowGUI((Container) mainFrame);
             }
         });
-        if (autoArgs != null) {
-            Tools.parseAutoArgs(autoArgs);
-        }
         //final Thread t = new Thread(new Runnable() {
         //    public void run() {
         //        drbd.utilities.RoboTest.startMover(600000, true);
