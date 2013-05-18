@@ -394,7 +394,7 @@ sub get_mount {
 				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
 				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
 				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
-					$dev = "$group/$name";
+					$dev = "/dev/$group/$name";
 				}
 			}
 			print_debug("mount: $dev, $mountpoint, $filesystem");
