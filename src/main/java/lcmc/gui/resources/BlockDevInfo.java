@@ -2446,6 +2446,25 @@ public final class BlockDevInfo extends EditableInfo {
         b.setDRBDtestData(drbdtestData);
     }
 
+    /**
+     * Return whether the block device is unimportant (for the GUI), e.g.
+     * cdrom or swap.
+     */
+    private static boolean isUnimportant(final String name,
+                                         final String type,
+                                         final String mountedOn) {
+        return "swap".equals(type)
+               || "/".equals(mountedOn)
+               || "/boot".equals(mountedOn)
+               || name.startsWith("/dev/cdrom")
+               || name.startsWith("/dev/fd")
+               || name.startsWith("/dev/sr")
+               || name.endsWith("/root")
+               || name.endsWith("/lv_root")
+               || name.endsWith("/lv_swap")
+               || name.contains("/swap");
+    }
+
     /** Compares ignoring case and using drbd device names if available. */
     @Override
     public int compareTo(final Info o) {
@@ -2489,6 +2508,23 @@ public final class BlockDevInfo extends EditableInfo {
             && obdi.getBlockDevice().isDrbd()) {
             return 1;
         }
+
+        /* cdroms, swap etc down */
+        final boolean unimportant =
+                                isUnimportant(name,
+                                              getBlockDevice().getFsType(),
+                                              getBlockDevice().getMountedOn());
+        final boolean oUnimportant =
+                           isUnimportant(oName,
+                                         obdi.getBlockDevice().getFsType(),
+                                         obdi.getBlockDevice().getMountedOn());
+        if (unimportant && !oUnimportant) {
+            return 1;
+        }
+        if (!unimportant && oUnimportant) {
+            return -1;
+        }
+
         /* volume groups down */
         if (getBlockDevice().isVolumeGroupOnPhysicalVolume()
             && !obdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()) {
