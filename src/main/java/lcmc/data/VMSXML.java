@@ -2157,7 +2157,12 @@ public final class VMSXML extends XML {
 
     /** Returns remote port. */
     public int getRemotePort(final String name) {
-        return remotePorts.get(name);
+        final Integer port = remotePorts.get(name);
+        if (port == null) {
+            return -1;
+        } else {
+            return port;
+        }
     }
 
     /** Returns host. */
