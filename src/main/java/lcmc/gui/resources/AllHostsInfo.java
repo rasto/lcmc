@@ -219,7 +219,7 @@ public final class AllHostsInfo extends Info {
         mainPanel.setBackground(Color.WHITE);
 
         final Set<Cluster> clusters =
-                Tools.getConfigData().getClusters().getClusterSet();
+                           Tools.getConfigData().getClusters().getClusterSet();
         if (clusters != null) {
             final JPanel bPanel =
                            new JPanel(new BorderLayout());

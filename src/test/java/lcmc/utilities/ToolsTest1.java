@@ -20,6 +20,7 @@ import javax.swing.JCheckBox;
 import java.net.InetAddress;
 import lcmc.Exceptions;
 import lcmc.data.Host;
+import mockit.Deencapsulation;
 
 public final class ToolsTest1 extends TestCase {
     @Before
@@ -1447,5 +1448,47 @@ public final class ToolsTest1 extends TestCase {
     public void testGenerateVMMacAddress() {
        final String mac = Tools.generateVMMacAddress();
        assertEquals(mac.length(), 17);
+    }
+
+    public String invokeGetNameParts(Object name) {
+        if (name == null) {
+            name = String.class;
+        }
+        return Tools.join(",", (List<String>) Deencapsulation.invoke(
+                                                                Tools.class,
+                                                                "getNameParts",
+                                                                name));
+    }
+    @Test
+    public void testGetNameParts() {
+        assertEquals("22, aa ,11", invokeGetNameParts("22 aa 11"));
+        assertEquals("22", invokeGetNameParts("22"));
+        assertEquals("aa", invokeGetNameParts("aa"));
+        assertEquals("Cluster ,1", invokeGetNameParts("Cluster 1"));
+        assertEquals("", invokeGetNameParts(""));
+        assertEquals("", invokeGetNameParts(null));
+    }
+
+    @Test
+    public void testCompareNames() {
+        assertTrue(Tools.compareNames("a", "a") == 0);
+        assertTrue(Tools.compareNames("a", "b") < 0);
+        assertTrue(Tools.compareNames("10a", "2a") > 0);
+        assertTrue(Tools.compareNames("1a", "2a") < 0);
+        assertTrue(Tools.compareNames("2a", "2a") == 0);
+        assertTrue(Tools.compareNames("2a1", "2a") > 0);
+        assertTrue(Tools.compareNames("2a", "2a1") < 0);
+        assertTrue(Tools.compareNames("a10", "a2") > 0);
+        assertTrue(Tools.compareNames("a10b", "a2b") > 0);
+        assertTrue(Tools.compareNames("a2b", "a10b") < 0);
+        assertTrue(Tools.compareNames("a2b3", "a10b") < 0);
+        assertTrue(Tools.compareNames("a2b", "a10b3") < 0);
+        assertTrue(Tools.compareNames("1a2b3c4", "1a2b3c4") == 0);
+        assertTrue(Tools.compareNames(null, null) == 0);
+        assertTrue(Tools.compareNames("a", "") > 0);
+        assertTrue(Tools.compareNames("", "a") < 0);
+        assertTrue(Tools.compareNames("1", "") > 0);
+        assertTrue(Tools.compareNames("1", null) > 0);
+        assertTrue(Tools.compareNames(null, "1") < 0);
     }
 }

@@ -2903,4 +2903,47 @@ public final class Tools {
         }
         return mac.toString();
     }
+
+    private static List<String> getNameParts(final String name) {
+        final List<String> parts = new ArrayList<String>();
+        if (name == null) {
+            return parts;
+        }
+        final Pattern p = Pattern.compile("(\\d+|\\D+)");
+        final Matcher m = p.matcher(name);
+        while (m.find()) {
+            parts.add(m.group());
+        }
+        return parts;
+    }
+
+    /**
+     * Compare two names, doing the right thing there are numbers in the
+     * beginning or in the end of the string.
+     */
+    public static int compareNames(final String s1, final String s2) {
+        final List<String> parts1 = getNameParts(s1);
+        final List<String> parts2 = getNameParts(s2);
+        int i = 0;
+        for (final String p1 : parts1) {
+            if (i >= parts2.size()) {
+                return 1;
+            }
+            final String p2 = parts2.get(i);
+            int res;
+            if (Character.isDigit(p1.charAt(0))) {
+                res = Long.compare(Long.parseLong(p1), Long.parseLong(p2));
+            } else {
+                res = p1.compareToIgnoreCase(p2);
+            }
+            if (res != 0) {
+                return res;
+            }
+            i++;
+        }
+        if (parts1.size() == parts2.size()) {
+            return 0;
+        }
+        return -1;
+    }
 }

@@ -23,6 +23,7 @@
 package lcmc.data;
 
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -42,7 +43,7 @@ public final class Clusters {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Set of cluster objects. */
-    private final Set<Cluster> clusters = new LinkedHashSet<Cluster>();
+    private final Set<Cluster> clusters = new TreeSet<Cluster>();
     /** Clusters set lock. */
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();
     /** Clusters set read lock. */
@@ -80,16 +81,12 @@ public final class Clusters {
 
     /** Gets set of clusters. */
     public Set<Cluster> getClusterSet() {
-        final Set<Cluster> copy = new LinkedHashSet<Cluster>();
         mClustersReadLock.lock();
         try {
-            for (final Cluster c : clusters) {
-                copy.add(c);
-            }
+            return new LinkedHashSet<Cluster>(clusters);
         } finally {
             mClustersReadLock.unlock();
         }
-        return copy;
     }
 
     /** Return default name with incremented index. */
