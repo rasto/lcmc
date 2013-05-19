@@ -655,13 +655,8 @@ public final class Tools {
 
         if (e == null) {
             /* stack trace */
-            final Throwable th = new Throwable();
-            final StringWriter sw = new StringWriter();
-            final PrintWriter pw = new PrintWriter(sw);
-            th.printStackTrace(pw);
-            pw.close();
             errorString.append('\n');
-            errorString.append(sw.toString());
+            errorString.append(getStackTrace());
         }
 
 
