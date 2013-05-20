@@ -384,15 +384,13 @@ public final class Tools {
      *          error message
      */
     public static void error(final String msg) {
-        System.out.println(ERROR_STRING + getErrorString(msg));
+        System.out.println(ERROR_STRING + msg);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
-                            new JScrollPane(new JTextArea(getErrorString(msg),
-                                                          20,
-                                                          60)),
+                            new JScrollPane(new JTextArea(msg, 20, 60)),
                             Tools.getString("Error.Title"),
                             JOptionPane.ERROR_MESSAGE);
             }
@@ -633,7 +631,11 @@ public final class Tools {
         }
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
-        errorString.append(getErrorString(msg));
+        errorString.append("Application Error: Switching to read-only mode\n");
+        errorString.append("CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n");
+        errorString.append("please...\n\n");
+
+        errorString.append(msg);
         errorString.append('\n');
         errorString.append("\nrelease: ");
         errorString.append(getRelease());
@@ -675,7 +677,7 @@ public final class Tools {
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(errorPane),
-                                              getErrorString("AppError.Title"),
+                                              getString("AppError.Title"),
                                               JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -696,7 +698,7 @@ public final class Tools {
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(infoPane),
-                                              getErrorString(title),
+                                              title,
                                               JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -1080,15 +1082,6 @@ public final class Tools {
             appError("unresolved resource: " + text);
             return text;
         }
-    }
-
-    /**
-     * Returns converted error string. TODO: at the moment there is no
-     * conversion.
-     * TODO: ?
-     */
-    public static String getErrorString(final String text) {
-        return text;
     }
 
     /** Returns string that is specific to a distribution and version. */

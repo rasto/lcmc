@@ -319,12 +319,7 @@ public final class LCMC extends JPanel {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
                     Tools.setMaxAccessType(ConfigData.AccessType.RO);
-                    Tools.appError(
-                           "Application Error: Switching to read-only mode\n"
-                           + "CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n"
-                           + "please...\n",
-                           ex.toString(),
-                           (Exception) ex);
+                    Tools.appError("", ex.toString(), (Exception) ex);
                 }
             });
         float fps = ConfigData.DEFAULT_ANIM_FPS;
