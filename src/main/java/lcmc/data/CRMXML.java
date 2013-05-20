@@ -1781,6 +1781,10 @@ public final class CRMXML extends XML {
                         // Workaround, default is "0" and should be false
                         defaultValue = "false";
                     }
+                    if ("".equals(defaultValue)
+                        && "force_clones".equals(param)) {
+                        defaultValue = "false";
+                    }
                     if (ra.isPingService()) {
                         /* workaround: all types are integer in this ras. */
                         ra.setProbablyClone(true);
