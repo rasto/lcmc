@@ -645,10 +645,15 @@ sub get_disk_info {
 		my $readlink = `readlink -f $device`;
 		chomp $readlink;
 		my $dev_sec = $by_uuids{$readlink} || $readlink || $device;
+
+		my $mount = $$dev_to_mount{$device} || $$dev_to_mount{$dev_sec};
+		my $swap = $$dev_to_swap{$device} || $$dev_to_swap{$dev_sec};
+		my $used = $$dev_to_used{$device} || $$dev_to_used{$dev_sec};
+
 		$info.= "$device rl:$dev_sec size:$blocks";
-		$info.= " mp:".$$dev_to_mount{$device} if $$dev_to_mount{$device};
-		$info.= " fs:swap mp:swap" if $$dev_to_swap{$device};
-		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
+		$info.= " mp:$mount" if $mount;
+		$info.= " fs:swap mp:swap" if $swap;
+		$info.= " used:$used" if defined $used;
 		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
 		$info.= " pv:".$$pvs{$name} if defined $$pvs{$name};
