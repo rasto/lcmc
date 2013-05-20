@@ -2920,7 +2920,7 @@ public final class Tools {
             final String p2 = parts2.get(i);
             int res;
             if (Character.isDigit(p1.charAt(0))) {
-                res = Long.compare(Long.parseLong(p1), Long.parseLong(p2));
+                res = Integer.parseInt(p1) - Integer.parseInt(p2);
             } else {
                 res = p1.compareToIgnoreCase(p2);
             }
