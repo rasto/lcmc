@@ -84,6 +84,14 @@ public final class LCMC extends JPanel {
     private static final String NOLRM_OP = "nolrm";
     /** The --auto option. */
     private static final String AUTO_OP = "auto";
+    /** The --pcmktest option. */
+    private static final String PCMKTEST_OP = "pcmktest";
+    /** The --drbdtest option. */
+    private static final String DRBDTEST_OP = "drbdtest";
+    /** The --vmtest option. */
+    private static final String VMTEST_OP = "vmtest";
+    /** The --guitest option. */
+    private static final String GUITEST_OP = "guitest";
     /** The --ro option. */
     private static final String RO_OP = "ro";
     /** The --op option. */
@@ -343,6 +351,10 @@ public final class LCMC extends JPanel {
                           "do not show removed resources from LRM.");
         options.addOption("v", VERSION_OP, false, "print version");
         options.addOption(null, AUTO_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, PCMKTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, DRBDTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, VMTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, GUITEST_OP, true, "ADVANCED USE: for testing");
         options.addOption(null,
                           NO_UPGRADE_CHECK_OP,
                           false,
@@ -673,6 +685,30 @@ public final class LCMC extends JPanel {
                 }
                 for (final HostOptions ho : hostsOptions) {
                     ho.setPort(port);
+                }
+            } else if (PCMKTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
+                }
+            } else if (DRBDTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
+                }
+            } else if (VMTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
+                }
+            } else if (GUITEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
         }

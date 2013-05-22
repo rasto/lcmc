@@ -78,6 +78,39 @@ public final class RoboTest {
 
     private static final boolean PROXY = true;
 
+    public static class Test {
+        private final RoboTest.Type type;
+        private final char index;
+
+        public Test(final RoboTest.Type type, final char index) {
+            this.type = type;
+            this.index = index;
+        }
+
+        public RoboTest.Type getType() {
+            return type;
+        }
+
+        public char getIndex() {
+            return index;
+        }
+    }
+
+
+    public enum Type {
+        PCMK("pcmk"), DRBD("drbd"), VM("vm"), GUI("gui");
+
+        private String testName;
+
+        private Type(final String name) {
+            testName = "start" + name + "test";
+        }
+
+        public String getTestName() {
+            return testName;
+        }
+    }
+
     /** Private constructor, cannot be instantiated. */
     private RoboTest() {
         /* Cannot be instantiated. */
@@ -295,7 +328,10 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final String index, final Cluster c) {
+    public static void startTest(final Test autoTest,
+                                 final Cluster c) {
+        final Type type = autoTest.getType();
+        final char index = autoTest.getIndex();
         Tools.getGUIData().getMainFrame().setSize(
                                   Tools.getDefaultInt("DrbdMC.width"),
                                   Tools.getDefaultInt("DrbdMC.height") + 50);
@@ -306,6 +342,8 @@ public final class RoboTest {
             for (final Host host : cluster.getHosts()) {
                 host.getSSH().installTestFiles();
             }
+            final Host firstHost = cluster.getHostsArray()[0];
+            Tools.getGUIData().setTerminalPanel(firstHost.getTerminalPanel());
         }
         final Thread thread = new Thread(new Runnable() {
             @Override
@@ -321,15 +359,11 @@ public final class RoboTest {
                 if (robot == null) {
                     return;
                 }
-                String selected = null;
-                if (cluster != null) {
-                    selected =
-                         cluster.getBrowser().getTree()
-                                   .getLastSelectedPathComponent().toString();
-                }
-                if (selected == null) {
+                if (type == Type.GUI) {
+                    moveTo(30, 20);
+                    leftClick();
                     final int count = 200;
-                    if ("1".equals(index)) {
+                    if (index == '1') {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -337,7 +371,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("2".equals(index)) {
+                    } else if (index == '2') {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -346,11 +380,11 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                     }
-                } else if ("Services".equals(selected)
-                    || Tools.getString("ClusterBrowser.ClusterManager").equals(
-                                                                   selected)) {
+                } else if (type == Type.PCMK) {
+                    moveToMenu("CRM ");
+                    leftClick();
                     final int count = 200;
-                    if ("0".equals(index)) {
+                    if (index == '0') {
                         /* all pacemaker tests */
                         int i = 1;
                         while (true) {
@@ -426,7 +460,7 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
-                    } else if ("1".equals(index)) {
+                    } else if (index == '1') {
                         /* pacemaker */
                         int i = 1;
                         while (!aborted) {
@@ -440,7 +474,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("2".equals(index)) {
+                    } else if (index == '2') {
                         /* resource sets */
                         int i = 1;
                         while (!aborted) {
@@ -454,7 +488,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("3".equals(index)) {
+                    } else if (index == '3') {
                         /* pacemaker drbd */
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
@@ -463,7 +497,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + " no " + i + ", secs: " + secs);
-                    } else if ("4".equals(index)) {
+                    } else if (index == '4') {
                         /* placeholders 6 dummies */
                         int i = 1;
                         while (!aborted) {
@@ -476,7 +510,7 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
-                    } else if ("5".equals(index)) {
+                    } else if (index == '5') {
                         int i = 1;
                         while (!aborted) {
                             /* pacemaker */
@@ -489,7 +523,7 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
-                    } else if ("6".equals(index)) {
+                    } else if (index == '6') {
                         int i = 1;
                         while (!aborted) {
                             /* pacemaker */
@@ -502,7 +536,7 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
-                    } else if ("7".equals(index)) {
+                    } else if (index == '7') {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -510,7 +544,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("8".equals(index)) {
+                    } else if (index == '8') {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -518,7 +552,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("a".equals(index)) {
+                    } else if (index == 'a') {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -526,7 +560,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("b".equals(index)) {
+                    } else if (index == 'b') {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -534,7 +568,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("c".equals(index)) {
+                    } else if (index == 'c') {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -542,7 +576,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("d".equals(index)) {
+                    } else if (index == 'd') {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -550,7 +584,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("e".equals(index)) {
+                    } else if (index == 'e') {
                         /* host wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -558,7 +592,7 @@ public final class RoboTest {
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
-                    } else if ("f".equals(index)) {
+                    } else if (index == 'f') {
                         int i = 1;
                         while (!aborted) {
                             /* cloned group */
@@ -571,7 +605,7 @@ public final class RoboTest {
                                  + secs);
                             i++;
                         }
-                    } else if ("g".equals(index)) {
+                    } else if (index == 'g') {
                         /* big group */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -580,9 +614,11 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                     }
-                } else if ("Storage (DRBD, LVM)".equals(selected)) {
+                } else if (type == Type.DRBD) {
+                    moveToMenu("Storage ");
+                    leftClick();
                     Tools.getGUIData().expandTerminalSplitPane(1);
-                    if ("0".equals(index)) {
+                    if (index == '0') {
                         /* all DRBD tests */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -618,7 +654,7 @@ public final class RoboTest {
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
                         }
-                    } else if ("1".equals(index)) {
+                    } else if (index == '1') {
                         /* DRBD 1 link */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -637,7 +673,7 @@ public final class RoboTest {
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
                         }
-                    } else if ("2".equals(index)) {
+                    } else if (index == '2') {
                         /* DRBD cancel */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -652,7 +688,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("3".equals(index)) {
+                    } else if (index == '3') {
                         /* DRBD 2 resoruces */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -671,7 +707,7 @@ public final class RoboTest {
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
                         }
-                    } else if ("4".equals(index)) {
+                    } else if (index == '4') {
                         /* DRBD 2 volumes */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -690,7 +726,7 @@ public final class RoboTest {
                                       !Tools.getConfigData().getBigDRBDConf());
                             }
                         }
-                    } else if ("5".equals(index)) {
+                    } else if (index == '5') {
                         /* pv create */
                         final int blockDevY = getBlockDevY();
                         final long startTime = System.currentTimeMillis();
@@ -700,7 +736,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                         resetTerminalAreas();
-                    } else if ("6".equals(index)) {
+                    } else if (index == '6') {
                         /* pv create */
                         final int blockDevY = getBlockDevY();
                         final long startTime = System.currentTimeMillis();
@@ -710,7 +746,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                         resetTerminalAreas();
-                    } else if ("7".equals(index)) {
+                    } else if (index == '7') {
                         int i = 1;
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
@@ -728,7 +764,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("8".equals(index)) {
+                    } else if (index == '8') {
                         /* proxy */
                         int i = 1;
                         final int blockDevY = getBlockDevY();
@@ -748,8 +784,10 @@ public final class RoboTest {
                             }
                         }
                     }
-                } else if ("VMs (KVM, Xen)".equals(selected)) {
-                    if ("1".equals(index)) {
+                } else if (type == Type.VM) {
+                    moveToMenu("VMs ");
+                    leftClick();
+                    if (index == '1') {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
@@ -763,7 +801,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("2".equals(index)) {
+                    } else if (index == '2') {
                         /* VMs */
                         int i = 1;
                         String testIndex = "1";
@@ -778,7 +816,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("3".equals(index) || "x3".equals(index)) {
+                    } else if (index == '3') {
                         /* VMs */
                         int i = 1;
                         String testIndex = "1";
@@ -793,7 +831,7 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                         }
-                    } else if ("4".equals(index)) {
+                    } else if (index == '4') {
                         /* VMs dialog disabled textfields check. */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
@@ -802,7 +840,7 @@ public final class RoboTest {
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                         resetTerminalAreas();
-                    } else if ("5".equals(index)) {
+                    } else if (index == '5') {
                         /* VMs */
                         int i = 1;
                         while (!aborted) {
@@ -818,7 +856,7 @@ public final class RoboTest {
                         }
                     }
                 }
-                info(selected + " test " + index + " done");
+                info(type + " test " + index + " done");
             }
         });
         thread.start();
@@ -2572,7 +2610,7 @@ public final class RoboTest {
             sleep(500);
             leftClick();
             sleep(1000);
-            if (!isColor(360, 442, new Color(255, 100, 100), true)) {
+            if (!isColor(360, 462, new Color(255, 100, 100), true)) {
                 info("gui-test1 1: error");
                 break;
             }
@@ -2580,7 +2618,7 @@ public final class RoboTest {
             for (int error = 0; error < 5; error++) {
                 sleep(100);
                 press(KeyEvent.VK_X);
-                if (!isColor(360, 442, new Color(255, 100, 100), false)) {
+                if (!isColor(360, 462, new Color(255, 100, 100), false)) {
                     sleepNoFactor(1000);
                     ok = true;
                     break;
@@ -2590,7 +2628,7 @@ public final class RoboTest {
                 info("gui-test1 2: failed");
                 break;
             }
-            moveTo(910 , 517); /* cancel */
+            moveTo("Cancel"); /* cancel */
             sleep(500);
             leftClick();
             sleep(1000);
@@ -3514,9 +3552,10 @@ public final class RoboTest {
         info("move to position, start in 3 seconds");
         sleepNoFactor(3000);
         final Point2D pos = getAppPosition();
+        final int x = (int) pos.getX();
         final int y = (int) pos.getY();
-        if (y > 532) {
-            return 267;
+        if (y > 532 || x < 200) {
+            return 210;
         }
         return y;
     }
