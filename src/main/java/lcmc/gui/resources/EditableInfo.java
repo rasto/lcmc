@@ -411,7 +411,8 @@ public abstract class EditableInfo extends Info {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
                     Tools.appError("unkown param: " + param
-                                   + ". Man pages not installed?");
+                                   + ". Could not find man pages for "
+                                   + "your DRBD versions.");
                     continue;
                 }
                 int height = 0;

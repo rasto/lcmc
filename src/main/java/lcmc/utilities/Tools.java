@@ -629,6 +629,7 @@ public final class Tools {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
+        Tools.setMaxAccessType(ConfigData.AccessType.RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
         errorString.append("Application Error: Switching to read-only mode\n");
@@ -2117,7 +2118,7 @@ public final class Tools {
         } catch (final IOException e) {
             Tools.appError("wrong uri", e);
         } catch (final URISyntaxException e) {
-            Tools.appError("error opening browser", e);
+            Tools.error("error opening browser: " + e.getMessage());
         }
     }
 
@@ -2138,7 +2139,10 @@ public final class Tools {
         try {
             host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
         } catch (final java.io.IOException e) {
-            Tools.appError("unable to create tunnel", e);
+            Tools.error("unable to create the tunnel "
+                        + remotePort + " -> " + localPort
+                        + ": " + e.getMessage()
+                        + "\ntry the --vnc-port-offset option");
             return -1;
         }
         return localPort;

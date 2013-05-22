@@ -1155,7 +1155,7 @@ public final class DrbdXML extends XML {
         if (start < 0) {
             final String c = configXML.trim();
             if (c.length() != 0 && !IGNORE_CONFIG_ERRORS.contains(c)) {
-                Tools.appError("drbd config error: " + c);
+                Tools.error("drbd config error: " + c);
             }
             return;
         }

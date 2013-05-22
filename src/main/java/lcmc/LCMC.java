@@ -318,7 +318,6 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    Tools.setMaxAccessType(ConfigData.AccessType.RO);
                     Tools.appError("", ex.toString(), (Exception) ex);
                 }
             });
