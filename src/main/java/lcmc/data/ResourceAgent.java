@@ -173,7 +173,7 @@ public final class ResourceAgent {
         addInfoParameter(section, ServiceInfo.PCMK_ID, "new...", "Id", "Id");
         if (!isClone() && !isGroup()) {
             addInfoParameter("Resource",
-                             "ra",
+                             ServiceInfo.RA_PARAM,
                              getRAString(),
                              "Resource Agent",
                              "Resource Agent");

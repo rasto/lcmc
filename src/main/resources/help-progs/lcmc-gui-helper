@@ -258,7 +258,7 @@ sub get_drbd_info {
 }
 
 sub get_drbd_dump_xml {
-	return `/sbin/drbdadm dump-xml 2>&1`;
+	return `/sbin/drbdadm dump-xml 2>&1` || "";
 }
 
 sub print_debug {
@@ -394,7 +394,7 @@ sub get_mount {
 				# convert mapper/vg00--sepp-sources to vg00-sepp/sources
 				my ($group, $name) = map { s/--/-/g;$_ } $1 =~ /(.*[^-])-([^-].*)/;
 				if ($group && $name) { # && !$$lvm_devs{"$group/$name"}) {
-					$dev = "$group/$name";
+					$dev = "/dev/$group/$name";
 				}
 			}
 			print_debug("mount: $dev, $mountpoint, $filesystem");
@@ -583,7 +583,7 @@ sub get_disk_info {
 	my @raids;
 	my @lvms;
 	my @partitions;
-	my @info;
+	my $info;
 	my $device_mapper_major = get_device_mapper_major();
 	my $dir = "/dev/disk/by-uuid";
 	my %by_uuids;
@@ -645,24 +645,23 @@ sub get_disk_info {
 		my $readlink = `readlink -f $device`;
 		chomp $readlink;
 		my $dev_sec = $by_uuids{$readlink} || $readlink || $device;
-		my $info = "$device rl:$dev_sec size:$blocks";
-		$info.= " mp:".$$dev_to_mount{$device} if $$dev_to_mount{$device};
-		$info.= " fs:swap mp:swap" if $$dev_to_swap{$device};
-		$info.= " used:".$$dev_to_used{$device} if defined $$dev_to_used{$device};
+
+		my $mount = $$dev_to_mount{$device} || $$dev_to_mount{$dev_sec};
+		my $swap = $$dev_to_swap{$device} || $$dev_to_swap{$dev_sec};
+		my $used = $$dev_to_used{$device} || $$dev_to_used{$dev_sec};
+
+		$info.= "$device rl:$dev_sec size:$blocks";
+		$info.= " mp:$mount" if $mount;
+		$info.= " fs:swap mp:swap" if $swap;
+		$info.= " used:$used" if defined $used;
 		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
 		$info.= " pv:".$$pvs{$name} if defined $$pvs{$name};
 		$info.= "\n";
-		push @info, $info;
 	}
 	close PT;
 	
-	return join "", map { $_->[0] } 
-	  sort { 
-	   (($a->[1] =~ /(^\D+)/)[0] || "") cmp (($b->[1]  =~ /(^\D+)/)[0] || "")
-				||
-	   (($a->[1] =~ /(\d+$)/)[0] || 0) <=> (($b->[1]  =~ /(\d+$)/)[0] || 0) 
-	  } map { [$_, /([^\/]+?) /] } @info;
+	return $info;
 }
 
 # returns volume group info

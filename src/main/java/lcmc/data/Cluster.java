@@ -47,7 +47,7 @@ import java.awt.Window;
  * @version $Id$
  *
  */
-public final class Cluster {
+public final class Cluster implements Comparable<Cluster> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the cluster. */
@@ -381,5 +381,11 @@ public final class Cluster {
             }
         }
         return null;
+    }
+
+    /** Compares ignoring case. */
+    @Override
+    public int compareTo(final Cluster c) {
+        return Tools.compareNames(getName(), c.getName());
     }
 }

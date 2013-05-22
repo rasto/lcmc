@@ -789,7 +789,7 @@ public class Info implements Comparable<Info> {
     /** Compares ignoring case. */
     @Override
     public int compareTo(final Info o) {
-        return toString().compareToIgnoreCase(o.toString());
+        return Tools.compareNames(toString(), o.toString());
     }
 
     /** Retruns panel with table and border. */

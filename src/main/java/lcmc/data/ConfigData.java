@@ -25,6 +25,7 @@ package lcmc.data;
 import java.io.IOException;
 import java.io.File;
 import lcmc.utilities.Tools;
+import lcmc.utilities.RoboTest;
 import ch.ethz.ssh2.KnownHosts;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.List;
@@ -169,6 +170,10 @@ public final class ConfigData {
     private int scale = 100;
     /** Whether no passphrase should be tried first. */
     private boolean noPassphrase = false;
+    /** Whether to embed applet in the browser. Embed in Linux by default. */
+    private boolean embed = Tools.isLinux();
+    /** Auto test, null no auto test. */
+    private RoboTest.Test autoTest = null;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -685,5 +690,25 @@ public final class ConfigData {
     /** Return whether no passphrase should be tried first. */
     public boolean isNoPassphrase() {
         return noPassphrase;
+    }
+
+    /** Set whether to embed applet in the browser. */
+    public void setEmbed(final boolean embed) {
+        this.embed = embed;
+    }
+
+    /** Return whether to embed applet in the browser. */
+    public boolean isEmbed() {
+        return embed;
+    }
+
+    /** Set auto test. */
+    public void setAutoTest(final RoboTest.Test autoTest) {
+        this.autoTest = autoTest;
+    }
+
+    /** Get auto test. */
+    public RoboTest.Test getAutoTest() {
+        return autoTest;
     }
 }

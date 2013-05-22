@@ -572,7 +572,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                     final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
-            Tools.appError("Connection to host lost.");
+            Tools.error("Connection to host lost.");
             return;
         }
         final VMSHardwareInfo thisClass = this;

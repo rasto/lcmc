@@ -26,6 +26,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.CRM;
+import lcmc.utilities.RoboTest;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.resources.ServicesInfo;
@@ -919,6 +920,12 @@ public final class CRMXML extends XML {
                 }
                 Tools.stopProgressIndicator(hn, text);
                 Tools.debug(this, "RAs loaded", 0);
+                final RoboTest.Test autoTest =
+                                          Tools.getConfigData().getAutoTest();
+                if (autoTest != null) {
+                    RoboTest.startTest(autoTest,
+                                       ssi.getBrowser().getCluster());
+                }
             }
         });
         t.start();
@@ -1779,6 +1786,10 @@ public final class CRMXML extends XML {
                     if ("force_stop".equals(param)
                         && "0".equals(defaultValue)) {
                         // Workaround, default is "0" and should be false
+                        defaultValue = "false";
+                    }
+                    if ("".equals(defaultValue)
+                        && "force_clones".equals(param)) {
                         defaultValue = "false";
                     }
                     if (ra.isPingService()) {

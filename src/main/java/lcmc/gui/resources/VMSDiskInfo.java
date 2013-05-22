@@ -450,7 +450,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             sourceFileDirs.add(LIBVIRT_IMAGE_LOCATION);
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                sourceFileDirs.addAll(vmsxml.getsourceFileDirs());
+                if (vmsxml != null) {
+                    sourceFileDirs.addAll(vmsxml.getsourceFileDirs());
+                }
             }
             return sourceFileDirs.toArray(new String[sourceFileDirs.size()]);
         } else if (DiskData.SOURCE_DEVICE.equals(param)) {

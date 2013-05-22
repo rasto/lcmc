@@ -826,7 +826,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         for (final String sectionString : sections) {
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
-            final String[] params = dxml.getSectionParams(section);
+            final String[] params = dxml.getSectionParams(sectionString);
             for (String param : params) {
                 String value = dxml.getConfigValue(name, section, param);
                 if ("".equals(value)) {

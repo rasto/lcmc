@@ -143,40 +143,21 @@ public final class TerminalPanel extends JScrollPane {
     /** Command to decrement debug level. */
     private static final String DEBUG_DEC = "debugdec";
     /** Starts tests. */
-    private static final Map<String, String> TESTS =
-                                            new HashMap<String, String>();
+    private static final Map<String, RoboTest.Test> TESTS =
+                                          new HashMap<String, RoboTest.Test>();
     static {
-        TESTS.put("starttest0", "0");
-        TESTS.put("starttest1", "1");
-        TESTS.put("starttest2", "2");
-        TESTS.put("starttest3", "3");
-        TESTS.put("starttest4", "4");
-        TESTS.put("starttest5", "5");
-        TESTS.put("starttest6", "6");
-        TESTS.put("starttest7", "7");
-        TESTS.put("starttest8", "8");
-        TESTS.put("starttest9", "9");
-
-        TESTS.put("starttestx1", "x1");
-        TESTS.put("starttestx2", "x2");
-        TESTS.put("starttestx3", "x3");
-        TESTS.put("starttestx4", "x4");
-        TESTS.put("starttestx5", "x5");
-        TESTS.put("starttestx6", "x6");
-        TESTS.put("starttestx7", "x7");
-        TESTS.put("starttestx8", "x8");
-        TESTS.put("starttestx9", "x9");
-
-        TESTS.put("starttesta", "a");
-        TESTS.put("starttestb", "b");
-        TESTS.put("starttestc", "c");
-        TESTS.put("starttestd", "d");
-        TESTS.put("startteste", "e");
-        TESTS.put("starttestf", "f");
-        TESTS.put("starttestg", "g");
-        TESTS.put("starttesth", "h");
-        TESTS.put("starttesti", "i");
-        TESTS.put("starttestj", "j");
+        for (final RoboTest.Type type : new RoboTest.Type[]{
+                                                          RoboTest.Type.PCMK,
+                                                          RoboTest.Type.DRBD,
+                                                          RoboTest.Type.VM,
+                                                          RoboTest.Type.GUI}) {
+            for (final char index : new Character[]{
+                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
+                TESTS.put(type.getTestName() + index,
+                          new RoboTest.Test(type, index));
+            }
+        }
     }
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";

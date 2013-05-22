@@ -28,6 +28,7 @@ package lcmc;
 
 import lcmc.utilities.Tools;
 import javax.swing.JApplet;
+import javax.swing.JFrame;
 
 
 /**
@@ -53,11 +54,19 @@ public final class LCMCApplet extends JApplet {
         }
 
         LCMC.initApp(params);
-        Tools.getGUIData().setMainFrame(this);
-        setJMenuBar(LCMC.getMenuBar());
-        setContentPane(LCMC.getMainPanel());
-        setGlassPane(LCMC.getMainGlassPane());
-        LCMC.createAndShowGUI(this);
+
+        if (Tools.getConfigData().isEmbed()) {
+            Tools.getGUIData().setMainFrame(this);
+            setJMenuBar(LCMC.getMenuBar());
+            setContentPane(LCMC.getMainPanel());
+            setGlassPane(LCMC.getMainGlassPane());
+            LCMC.createAndShowGUI(this);
+        } else {
+            final JFrame mainFrame = new JFrame();
+            Tools.getGUIData().setMainFrame(mainFrame);
+            LCMC.createMainFrame(mainFrame);
+            LCMC.createAndShowGUI(mainFrame);
+        }
         //TODO: save on quit
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //addWindowListener(new ExitListener());

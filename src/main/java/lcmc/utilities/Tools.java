@@ -384,15 +384,13 @@ public final class Tools {
      *          error message
      */
     public static void error(final String msg) {
-        System.out.println(ERROR_STRING + getErrorString(msg));
+        System.out.println(ERROR_STRING + msg);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(
                             guiData.getMainFrame(),
-                            new JScrollPane(new JTextArea(getErrorString(msg),
-                                                          20,
-                                                          60)),
+                            new JScrollPane(new JTextArea(msg, 20, 60)),
                             Tools.getString("Error.Title"),
                             JOptionPane.ERROR_MESSAGE);
             }
@@ -631,9 +629,14 @@ public final class Tools {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
+        Tools.setMaxAccessType(ConfigData.AccessType.RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
-        errorString.append(getErrorString(msg));
+        errorString.append("Application Error: Switching to read-only mode\n");
+        errorString.append("CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n");
+        errorString.append("please...\n\n");
+
+        errorString.append(msg);
         errorString.append('\n');
         errorString.append("\nrelease: ");
         errorString.append(getRelease());
@@ -655,13 +658,8 @@ public final class Tools {
 
         if (e == null) {
             /* stack trace */
-            final Throwable th = new Throwable();
-            final StringWriter sw = new StringWriter();
-            final PrintWriter pw = new PrintWriter(sw);
-            th.printStackTrace(pw);
-            pw.close();
             errorString.append('\n');
-            errorString.append(sw.toString());
+            errorString.append(getStackTrace());
         }
 
 
@@ -680,7 +678,7 @@ public final class Tools {
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(errorPane),
-                                              getErrorString("AppError.Title"),
+                                              getString("AppError.Title"),
                                               JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -701,7 +699,7 @@ public final class Tools {
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(infoPane),
-                                              getErrorString(title),
+                                              title,
                                               JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -1085,15 +1083,6 @@ public final class Tools {
             appError("unresolved resource: " + text);
             return text;
         }
-    }
-
-    /**
-     * Returns converted error string. TODO: at the moment there is no
-     * conversion.
-     * TODO: ?
-     */
-    public static String getErrorString(final String text) {
-        return text;
     }
 
     /** Returns string that is specific to a distribution and version. */
@@ -2129,7 +2118,7 @@ public final class Tools {
         } catch (final IOException e) {
             Tools.appError("wrong uri", e);
         } catch (final URISyntaxException e) {
-            Tools.appError("error opening browser", e);
+            Tools.error("error opening browser: " + e.getMessage());
         }
     }
 
@@ -2150,7 +2139,10 @@ public final class Tools {
         try {
             host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
         } catch (final java.io.IOException e) {
-            Tools.appError("unable to create tunnel", e);
+            Tools.error("unable to create the tunnel "
+                        + remotePort + " -> " + localPort
+                        + ": " + e.getMessage()
+                        + "\ntry the --vnc-port-offset option");
             return -1;
         }
         return localPort;
@@ -2902,5 +2894,48 @@ public final class Tools {
             mac.append(String.format("%02x", (int) (Math.random() * 256)));
         }
         return mac.toString();
+    }
+
+    private static List<String> getNameParts(final String name) {
+        final List<String> parts = new ArrayList<String>();
+        if (name == null) {
+            return parts;
+        }
+        final Pattern p = Pattern.compile("(\\d+|\\D+)");
+        final Matcher m = p.matcher(name);
+        while (m.find()) {
+            parts.add(m.group());
+        }
+        return parts;
+    }
+
+    /**
+     * Compare two names, doing the right thing there are numbers in the
+     * beginning or in the end of the string.
+     */
+    public static int compareNames(final String s1, final String s2) {
+        final List<String> parts1 = getNameParts(s1);
+        final List<String> parts2 = getNameParts(s2);
+        int i = 0;
+        for (final String p1 : parts1) {
+            if (i >= parts2.size()) {
+                return 1;
+            }
+            final String p2 = parts2.get(i);
+            int res;
+            if (Character.isDigit(p1.charAt(0))) {
+                res = Integer.parseInt(p1) - Integer.parseInt(p2);
+            } else {
+                res = p1.compareToIgnoreCase(p2);
+            }
+            if (res != 0) {
+                return res;
+            }
+            i++;
+        }
+        if (parts1.size() == parts2.size()) {
+            return 0;
+        }
+        return -1;
     }
 }

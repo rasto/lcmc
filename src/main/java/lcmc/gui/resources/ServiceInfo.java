@@ -244,6 +244,8 @@ public class ServiceInfo extends EditableInfo {
     public static final String GUI_ID = "__drbdmcid";
     /** PCMK ID parameter. */
     public static final String PCMK_ID = "__pckmkid";
+    /** RA parameter. */
+    public static final String RA_PARAM = "__ra";
     /** String that appears as a tooltip in menu items if item is being
      * removed. */
     static final String IS_BEING_REMOVED_STRING = "it is being removed";
@@ -3046,7 +3048,11 @@ public class ServiceInfo extends EditableInfo {
                     mOperationsComboBoxHashReadLock.unlock();
                     String value;
                     if (wi == null) {
-                        value = "0";
+                        if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
+                            value = "";
+                        } else {
+                            value = "0";
+                        }
                     } else {
                         value = wi.getStringValue();
                     }
@@ -3133,7 +3139,8 @@ public class ServiceInfo extends EditableInfo {
                 continue;
             }
             if (GUI_ID.equals(param)
-                || PCMK_ID.equals(param)) {
+                || PCMK_ID.equals(param)
+                || RA_PARAM.equals(param)) {
                 continue;
             }
             String value = getComboBoxValue(param);
@@ -3162,7 +3169,8 @@ public class ServiceInfo extends EditableInfo {
                 continue;
             }
             if (GUI_ID.equals(param)
-                || PCMK_ID.equals(param)) {
+                || PCMK_ID.equals(param)
+                || RA_PARAM.equals(param)) {
                 continue;
             }
             String value = getComboBoxValue(param);
@@ -3479,7 +3487,8 @@ public class ServiceInfo extends EditableInfo {
             if (clInfo != null) {
                 for (String param : cloneParams) {
                     if (GUI_ID.equals(param)
-                        || PCMK_ID.equals(param)) {
+                        || PCMK_ID.equals(param)
+                        || RA_PARAM.equals(param)) {
                         continue;
                     }
                     final String value = clInfo.getComboBoxValue(param);
@@ -3494,7 +3503,8 @@ public class ServiceInfo extends EditableInfo {
             if (gInfo != null) {
                 for (String param : groupParams) {
                     if (GUI_ID.equals(param)
-                        || PCMK_ID.equals(param)) {
+                        || PCMK_ID.equals(param)
+                        || RA_PARAM.equals(param)) {
                         continue;
                     }
                     final String value = gInfo.getComboBoxValue(param);
@@ -3620,7 +3630,8 @@ public class ServiceInfo extends EditableInfo {
             if (clInfo != null) {
                 for (String param : cloneParams) {
                     if (GUI_ID.equals(param)
-                        || PCMK_ID.equals(param)) {
+                        || PCMK_ID.equals(param)
+                        || RA_PARAM.equals(param)) {
                         continue;
                     }
                     final String value = clInfo.getComboBoxValue(param);
@@ -3635,7 +3646,8 @@ public class ServiceInfo extends EditableInfo {
             if (gInfo != null) {
                 for (String param : groupParams) {
                     if (GUI_ID.equals(param)
-                        || PCMK_ID.equals(param)) {
+                        || PCMK_ID.equals(param)
+                        || RA_PARAM.equals(param)) {
                         continue;
                     }
                     final String value = gInfo.getComboBoxValue(param);

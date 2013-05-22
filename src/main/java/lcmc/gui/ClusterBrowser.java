@@ -907,13 +907,7 @@ public final class ClusterBrowser extends Browser {
                 }
             });
             pingThread.start();
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    host.startConnectionStatus();
-                }
-            });
-            thread.start();
+            host.startConnectionStatus();
         }
     }
 

@@ -84,6 +84,14 @@ public final class LCMC extends JPanel {
     private static final String NOLRM_OP = "nolrm";
     /** The --auto option. */
     private static final String AUTO_OP = "auto";
+    /** The --pcmktest option. */
+    private static final String PCMKTEST_OP = "pcmktest";
+    /** The --drbdtest option. */
+    private static final String DRBDTEST_OP = "drbdtest";
+    /** The --vmtest option. */
+    private static final String VMTEST_OP = "vmtest";
+    /** The --guitest option. */
+    private static final String GUITEST_OP = "guitest";
     /** The --ro option. */
     private static final String RO_OP = "ro";
     /** The --op option. */
@@ -143,7 +151,12 @@ public final class LCMC extends JPanel {
     /** The --one-host-cluster option. */
     private static final String ONE_HOST_CLUSTER_OP = "one-host-cluster";
     /** The --no-passphrase. */
-    private static final String NO_PASSPHRASE = "no-passphrase";
+    private static final String NO_PASSPHRASE_OP = "no-passphrase";
+    /** The --embed. Embed in the browser option. */
+    private static final String EMBED_OP = "embed";
+
+    /** The --no-embed. Don't embed in the browser option. */
+    private static final String NO_EMBED_OP = "no-embed";
 
     /**
      * Private constructor.
@@ -313,13 +326,7 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    Tools.setMaxAccessType(ConfigData.AccessType.RO);
-                    Tools.appError(
-                           "Application Error: Switching to read-only mode\n"
-                           + "CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n"
-                           + "please...\n",
-                           ex.toString(),
-                           (Exception) ex);
+                    Tools.appError("", ex.toString(), (Exception) ex);
                 }
             });
         float fps = ConfigData.DEFAULT_ANIM_FPS;
@@ -342,9 +349,12 @@ public final class LCMC extends JPanel {
                           + "admin - administrator");
         options.addOption(null, NOLRM_OP, false,
                           "do not show removed resources from LRM.");
-        options.addOption(null, "auto", true, "for testing");
         options.addOption("v", VERSION_OP, false, "print version");
-        options.addOption(null, AUTO_OP, true, "for testing");
+        options.addOption(null, AUTO_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, PCMKTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, DRBDTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, VMTEST_OP, true, "ADVANCED USE: for testing");
+        options.addOption(null, GUITEST_OP, true, "ADVANCED USE: for testing");
         options.addOption(null,
                           NO_UPGRADE_CHECK_OP,
                           false,
@@ -381,7 +391,7 @@ public final class LCMC extends JPanel {
         options.addOption(null,
                           RESTORE_MOUSE_OP,
                           false,
-                          "for testing");
+                          "ADVANCED USE: for testing");
         options.addOption(null,
                           SCALE_OP,
                           true,
@@ -441,9 +451,17 @@ public final class LCMC extends JPanel {
                           false,
                           "allow one host cluster");
         options.addOption(null,
-                          NO_PASSPHRASE,
+                          NO_PASSPHRASE_OP,
                           false,
                           "try no passphrase first");
+        options.addOption(null,
+                          EMBED_OP,
+                          false,
+                          "embed applet in the browser");
+        options.addOption(null,
+                          NO_EMBED_OP,
+                          false,
+                          "don't embed applet in the browser");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -497,7 +515,14 @@ public final class LCMC extends JPanel {
             Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             Tools.getConfigData().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
-            Tools.getConfigData().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE));
+            Tools.getConfigData().setNoPassphrase(
+                                           cmd.hasOption(NO_PASSPHRASE_OP));
+            if (cmd.hasOption(EMBED_OP)) {
+                Tools.getConfigData().setEmbed(true);
+            }
+            if (cmd.hasOption(NO_EMBED_OP)) {
+                Tools.getConfigData().setEmbed(false);
+            }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
@@ -661,6 +686,30 @@ public final class LCMC extends JPanel {
                 for (final HostOptions ho : hostsOptions) {
                     ho.setPort(port);
                 }
+            } else if (PCMKTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
+                }
+            } else if (DRBDTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
+                }
+            } else if (VMTEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
+                }
+            } else if (GUITEST_OP.equals(op)) {
+                final String index = option.getValue();
+                if (index != null && index.length() > 0) {
+                    Tools.getConfigData().setAutoTest(
+                       new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
+                }
             }
         }
         for (final String cn : clusters.keySet()) {
@@ -695,25 +744,29 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         final String autoArgs = initApp(args);
-        mainFrame.setGlassPane(getMainGlassPane());
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.addWindowListener(new ExitListener());
-        mainFrame.setJMenuBar(getMenuBar());
-        mainFrame.setContentPane(getMainPanel());
+        if (autoArgs != null) {
+            Tools.parseAutoArgs(autoArgs);
+        }
+        createMainFrame(mainFrame);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 createAndShowGUI((Container) mainFrame);
             }
         });
-        if (autoArgs != null) {
-            Tools.parseAutoArgs(autoArgs);
-        }
         //final Thread t = new Thread(new Runnable() {
         //    public void run() {
         //        drbd.utilities.RoboTest.startMover(600000, true);
         //    }
         //});
         //t.start();
+    }
+
+    static void createMainFrame(final JFrame mainFrame) {
+        mainFrame.setGlassPane(getMainGlassPane());
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new ExitListener());
+        mainFrame.setJMenuBar(getMenuBar());
+        mainFrame.setContentPane(getMainPanel());
     }
 }

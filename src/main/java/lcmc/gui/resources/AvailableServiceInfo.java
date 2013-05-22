@@ -97,7 +97,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
         final List<String> params = crmXML.getParameters(resourceAgent, false);
         for (final String param : params) {
             if (crmXML.isMetaAttr(resourceAgent, param)
-                || "ra".equals(param)
+                || ServiceInfo.RA_PARAM.equals(param)
                 || ServiceInfo.PCMK_ID.equals(param)
                 || ServiceInfo.GUI_ID.equals(param)) {
                 continue;
