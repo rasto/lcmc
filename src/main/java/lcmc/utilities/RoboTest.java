@@ -3452,8 +3452,11 @@ public final class RoboTest {
         }
         Component c = null;
         int i = 0;
-        while (c == null && i < 60 && !aborted) {
+        while (c == null && i < 30 && !aborted) {
             c = (Component) findComponent(text, number);
+            if (i > 0) {
+                Tools.info("can't find: " + text);
+            }
             sleepNoFactor(1000);
             i++;
         }
@@ -5263,6 +5266,7 @@ public final class RoboTest {
         }
         if (component == null) {
             Tools.info("can't find " + text);
+            return null;
         }
         for (final Component c : component.getComponents()) {
             if (c instanceof Container) {
