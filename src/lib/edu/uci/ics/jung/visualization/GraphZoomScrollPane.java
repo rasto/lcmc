@@ -104,17 +104,22 @@ public class GraphZoomScrollPane extends JPanel {
      */
     class HorizontalAdjustmentListenerImpl implements AdjustmentListener {
         int previous = 0;
-        public void adjustmentValueChanged(AdjustmentEvent e) {
-            int hval = e.getValue();
-            float dh = previous - hval;
-            previous = hval;
-            if(dh != 0 && scrollBarsMayControlAdjusting) {
-                // get the uniform scale of all transforms
-                float layoutScale = (float) vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).getScale();
-                dh *= layoutScale;
-                AffineTransform at = AffineTransform.getTranslateInstance(dh, 0);
-                vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).preConcatenate(at);
-            }
+        public void adjustmentValueChanged(final AdjustmentEvent e) {
+            // LCMC fix
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    int hval = e.getValue();
+                    float dh = previous - hval;
+                    previous = hval;
+                    if(dh != 0 && scrollBarsMayControlAdjusting) {
+                        // get the uniform scale of all transforms
+                        float layoutScale = (float) vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).getScale();
+                        dh *= layoutScale;
+                        AffineTransform at = AffineTransform.getTranslateInstance(dh, 0);
+                        vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).preConcatenate(at);
+                    }
+                }
+            });
         }
     }
     
@@ -124,20 +129,25 @@ public class GraphZoomScrollPane extends JPanel {
      */
     class VerticalAdjustmentListenerImpl implements AdjustmentListener {
         int previous = 0;
-        public void adjustmentValueChanged(AdjustmentEvent e) {
-            JScrollBar sb = (JScrollBar)e.getSource();
-            BoundedRangeModel m = sb.getModel();
-            int vval = m.getValue();
-            float dv = previous - vval;
-            previous = vval;
-            if(dv != 0 && scrollBarsMayControlAdjusting) {
-            
-                // get the uniform scale of all transforms
-                float layoutScale = (float) vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).getScale();
-                dv *= layoutScale;
-                AffineTransform at = AffineTransform.getTranslateInstance(0, dv);
-                vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).preConcatenate(at);
-            }
+        public void adjustmentValueChanged(final AdjustmentEvent e) {
+            // LCMC fix
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    JScrollBar sb = (JScrollBar)e.getSource();
+                    BoundedRangeModel m = sb.getModel();
+                    int vval = m.getValue();
+                    float dv = previous - vval;
+                    previous = vval;
+                    if(dv != 0 && scrollBarsMayControlAdjusting) {
+                    
+                        // get the uniform scale of all transforms
+                        float layoutScale = (float) vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).getScale();
+                        dv *= layoutScale;
+                        AffineTransform at = AffineTransform.getTranslateInstance(0, dv);
+                        vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).preConcatenate(at);
+                    }
+                }
+            });
         }
     }
     
