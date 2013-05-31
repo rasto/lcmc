@@ -314,6 +314,8 @@ public final class Host {
     public static final String ROOT_USER = "root";
     /** Default SSH port. */
     public static final String DEFAULT_SSH_PORT = "22";
+    /** Log commands on the servers. */
+    private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
 
     private static final String NET_INFO            = "net-info";
     private static final String DISK_INFO           = "disk-info";
@@ -1993,7 +1995,17 @@ public final class Host {
             command = command.replaceAll("@DRBDDIR@", drbdDir);
         }
         if (command.indexOf("@GUI-HELPER@") > -1) {
-            command = command.replaceAll("@GUI-HELPER@",
+            final StringBuilder helperProg = new StringBuilder(
+                                         "/usr/local/bin/lcmc-gui-helper-");
+            helperProg.append(Tools.getRelease());
+            if (Tools.getConfigData().isCmdLog()) {
+                helperProg.append(' ');
+                helperProg.append(GUI_HELPER_CMD_LOG_OP);
+            }
+            command = command.replaceAll("@GUI-HELPER@", helperProg.toString());
+        }
+        if (command.indexOf("@GUI-HELPER-PROG@") > -1) {
+            command = command.replaceAll("@GUI-HELPER-PROG@",
                                          "/usr/local/bin/lcmc-gui-helper-"
                                          + Tools.getRelease());
         }

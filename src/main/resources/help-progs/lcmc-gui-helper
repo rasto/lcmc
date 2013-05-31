@@ -40,8 +40,13 @@ for (keys %ENV) {
 
 our $DEBUG = 0;
 
+our $CMD_LOG_OP = "--cmd-log";
+our ($HELPER_OPTIONS, $ACTION_OPTIONS) = parse_options(\@ARGV);
+
+my $action = shift @$ACTION_OPTIONS || die;
+
 # log
-our $DO_LOG = 0; # or --log options
+our $DO_LOG = $$HELPER_OPTIONS{$CMD_LOG_OP} || 0;
 our $LOG_FILE = "/var/log/lcmc.log";
 our $LOG_FH;
 
@@ -71,9 +76,7 @@ our @VM_OPTIONS = ("",
 our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
 
-my $option = shift || die;
-
-if ($option eq "all") {
+if ($action eq "all") {
 	print "net-info\n";
 	print get_net_info();
 	print "disk-info\n";
@@ -99,49 +102,49 @@ if ($option eq "all") {
 	print get_gui_options_info();
 	print "version-info\n";
 	print get_version_info();
-} elsif ($option eq "hw-info-daemon") {
+} elsif ($action eq "hw-info-daemon") {
 	start_hw_info_daemon();
-} elsif ($option eq "hw-info") {
+} elsif ($action eq "hw-info") {
 	print get_hw_info();
-} elsif ($option eq "hw-info-lazy") {
+} elsif ($action eq "hw-info-lazy") {
 	print get_hw_info_lazy();
-} elsif ($option eq "installation-info") {
+} elsif ($action eq "installation-info") {
 	print get_installation_info();
-} elsif ($option eq "get-net-info") {
+} elsif ($action eq "get-net-info") {
 	print get_net_info();
-} elsif ($option eq "get-disk-info") {
+} elsif ($action eq "get-disk-info") {
 	print get_disk_info();
-} elsif ($option eq "get-vg-info") {
+} elsif ($action eq "get-vg-info") {
 	print get_vg_info();
-} elsif ($option eq "get-filesystems-info") {
+} elsif ($action eq "get-filesystems-info") {
 	print get_filesystems_info();
-} elsif ($option eq "get-crypto-info") {
+} elsif ($action eq "get-crypto-info") {
 	print get_crypto_info();
-} elsif ($option eq "get-qemu-keymaps-info") {
+} elsif ($action eq "get-qemu-keymaps-info") {
 	print get_qemu_keymaps_info();
-} elsif ($option eq "get-cpu-map-info") {
+} elsif ($action eq "get-cpu-map-info") {
 	print get_cpu_map_info();
-} elsif ($option eq "get-drbd-proxy-info") {
+} elsif ($action eq "get-drbd-proxy-info") {
 	print get_drbd_proxy_info();
-} elsif ($option eq "get-gui-info") {
+} elsif ($action eq "get-gui-info") {
 	print get_gui_info();
-} elsif ($option eq "get-mount-point-info") {
+} elsif ($action eq "get-mount-point-info") {
 	print get_mount_points_info();
-} elsif ($option eq "get-drbd-info") {
+} elsif ($action eq "get-drbd-info") {
 	print get_drbd_info();
-} elsif ($option eq "get-drbd-events") {
+} elsif ($action eq "get-drbd-events") {
 	get_drbd_events();
-} elsif ($option eq "get-resource-agents") {
-	get_resource_agents(@ARGV);
-} elsif ($option eq "get-old-style-resources") {
-	get_old_style_resources(@ARGV);
-} elsif ($option eq "get-lsb-resources") {
-	get_lsb_resources(@ARGV);
-} elsif ($option eq "get-stonith-devices") {
-	get_stonith_devices(@ARGV);
-} elsif ($option eq "get-drbd-xml") {
+} elsif ($action eq "get-resource-agents") {
+	get_resource_agents(@$ACTION_OPTIONS);
+} elsif ($action eq "get-old-style-resources") {
+	get_old_style_resources(@$ACTION_OPTIONS);
+} elsif ($action eq "get-lsb-resources") {
+	get_lsb_resources(@$ACTION_OPTIONS);
+} elsif ($action eq "get-stonith-devices") {
+	get_stonith_devices(@$ACTION_OPTIONS);
+} elsif ($action eq "get-drbd-xml") {
 	get_drbd_xml();
-} elsif ($option eq "get-cluster-events") {
+} elsif ($action eq "get-cluster-events") {
 	my $ret = get_cluster_events();
 	if ($ret) {
 		print "---start---\n";
@@ -149,25 +152,25 @@ if ($option eq "all") {
 		print "---done---\n";
 		exit 1;
 	}
-} elsif ($option eq "get-cluster-metadata") {
+} elsif ($action eq "get-cluster-metadata") {
 	get_cluster_metadata();
-} elsif ($option eq "get-cluster-versions") {
+} elsif ($action eq "get-cluster-versions") {
 	print get_cluster_versions();
-} elsif ($option eq "get-vm-info") {
+} elsif ($action eq "get-vm-info") {
 	print get_vm_info();
-} elsif ($option eq "gui-test") {
-	gui_test(@ARGV);
-} elsif ($option eq "gui-drbd-test") {
-	gui_drbd_test(@ARGV);
-} elsif ($option eq "gui-vm-test") {
-	gui_vm_test(@ARGV);
-} elsif ($option eq "proc-drbd") {
+} elsif ($action eq "gui-test") {
+	gui_test(@$ACTION_OPTIONS);
+} elsif ($action eq "gui-drbd-test") {
+	gui_drbd_test(@$ACTION_OPTIONS);
+} elsif ($action eq "gui-vm-test") {
+	gui_vm_test(@$ACTION_OPTIONS);
+} elsif ($action eq "proc-drbd") {
 	get_proc_drbd();
-} elsif ($option eq "check-log") {
+} elsif ($action eq "check-log") {
 	check_log();
-} elsif ($option eq "print-log") {
+} elsif ($action eq "print-log") {
 	print_log();
-} elsif ($option eq "clear-log") {
+} elsif ($action eq "clear-log") {
 	clear_log();
 } else {
 	die "unknown command";
@@ -2603,4 +2606,26 @@ sub clear_log {
 	}
 
 	print LOG "";
+}
+
+# options: --log, ...
+# action options: all, get-cluster-events ...
+sub parse_options {
+	my $args = shift;
+	my %options;
+	my @action_options;
+	for (@$args) {
+		if ($_ !~ /^--/) {
+			# old options
+			push @action_options, $_;
+			next;
+		}
+		if (/=/) {
+			my @parts = split /=/, $_, 2;
+			$options{$parts[0]} = $parts[1];
+		} else {
+			$options{$_} = 1;
+		}
+	}
+	return (\%options, \@action_options);
 }

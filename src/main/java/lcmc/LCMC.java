@@ -531,7 +531,7 @@ public final class LCMC extends JPanel {
                 Tools.getConfigData().setEmbed(false);
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
-                Tools.getConfigData().setCmdLog(false);
+                Tools.getConfigData().setCmdLog(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");

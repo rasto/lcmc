@@ -1521,7 +1521,7 @@ public final class SSH {
             final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
-                scp(file, "@GUI-HELPER@", "0700", false, null, null, null);
+                scp(file, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
             }
         }
     }
