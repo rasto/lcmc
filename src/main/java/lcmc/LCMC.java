@@ -157,6 +157,8 @@ public final class LCMC extends JPanel {
 
     /** The --no-embed. Don't embed in the browser option. */
     private static final String NO_EMBED_OP = "no-embed";
+    /** The --cmd-log. /var/log/lcmc.log on the servers. */
+    private static final String CMD_LOG_OP = "cmd-log";
 
     /**
      * Private constructor.
@@ -462,6 +464,11 @@ public final class LCMC extends JPanel {
                           NO_EMBED_OP,
                           false,
                           "don't embed applet in the browser");
+        options.addOption(
+                      null,
+                      CMD_LOG_OP,
+                      false,
+                      "Log executed commands to the lcmc.log on the servers");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -522,6 +529,9 @@ public final class LCMC extends JPanel {
             }
             if (cmd.hasOption(NO_EMBED_OP)) {
                 Tools.getConfigData().setEmbed(false);
+            }
+            if (cmd.hasOption(CMD_LOG_OP)) {
+                Tools.getConfigData().setCmdLog(false);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");

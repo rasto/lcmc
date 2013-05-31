@@ -172,6 +172,8 @@ public final class ConfigData {
     private boolean noPassphrase = false;
     /** Whether to embed applet in the browser. Embed in Linux by default. */
     private boolean embed = Tools.isLinux();
+    /** Whether to log commands on the servers. */
+    private boolean cmdLog = false;
     /** Auto test, null no auto test. */
     private RoboTest.Test autoTest = null;
 
@@ -710,5 +712,15 @@ public final class ConfigData {
     /** Get auto test. */
     public RoboTest.Test getAutoTest() {
         return autoTest;
+    }
+
+    /** Set whether to log commands on the servers. */
+    public void setCmdLog(final boolean cmdLog) {
+        this.cmdLog = cmdLog;
+    }
+
+    /** Return whether to log commands on the servers. */
+    public boolean isCmdLog() {
+        return cmdLog;
     }
 }
