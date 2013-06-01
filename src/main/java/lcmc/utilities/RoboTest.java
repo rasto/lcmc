@@ -954,6 +954,26 @@ public final class RoboTest {
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
         leftClick();
+        final float savedSlowFactor = slowFactor;
+        slowFactor = 0.00001f;
+        for (final Integer pos1 : new Integer[]{850, 900, 1000}) {
+            for (final Integer pos2 : new Integer[]{850, 900, 1000}) {
+                if (pos1 == pos2) {
+                    continue;
+                }
+                for (int i = 0; i < 70; i++) {
+                    moveTo(pos1, 200);
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    Tools.sleep(20);
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                    moveTo(pos2, 200);
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    Tools.sleep(20);
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                }
+            }
+        }
+        slowFactor = savedSlowFactor;
         removeResource(ipX, ipY, !CONFIRM_REMOVE);
         /* again */
         moveTo(ipX, ipY);
@@ -3181,7 +3201,7 @@ public final class RoboTest {
         robot.mousePress(InputEvent.BUTTON1_MASK);
         Tools.sleep(400);
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
-        sleepNoFactor(300);
+        Tools.sleep(300);
     }
 
     /** Left press. */

@@ -176,6 +176,10 @@ public class Browser {
             });
         }
     }
+    /** Sets the node change for the node. */
+    public final void nodeChangedAndWait(final DefaultMutableTreeNode node) {
+        treeModel.nodeChanged(node);
+    }
 
     /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {

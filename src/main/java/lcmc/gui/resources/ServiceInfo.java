@@ -2505,6 +2505,7 @@ public class ServiceInfo extends EditableInfo {
             });
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
             final CloneInfo ci = getCloneInfo();
+            setCloneInfo(null);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -2531,8 +2532,8 @@ public class ServiceInfo extends EditableInfo {
                     getBrowser().mHeartbeatIdToServiceUnlock();
                     getBrowser().removeFromServiceInfoHash(ci);
                     infoPanel = null;
-                    setCloneInfo(null);
-                    selectMyself();
+                    getBrowser().reloadAndWait(node, true);
+                    getBrowser().nodeChangedAndWait(node);
                     ciNode.setUserObject(null); /* would leak without it */
                 }
             });
@@ -2819,6 +2820,7 @@ public class ServiceInfo extends EditableInfo {
             typeRadioGroup.addListeners(new WidgetListener() {
                 @Override
                 public void check(final Object value) {
+                    typeRadioGroup.setEnabled(false);
                     changeType(((JRadioButton) value).getText());
                 }
             });
