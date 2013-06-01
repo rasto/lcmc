@@ -200,7 +200,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Command failed."},
 
         {"Dialog.Dialog.Ok",
-         "OK"},
+         "Close"},
 
         {"Dialog.Dialog.Save",
          "Save"},
