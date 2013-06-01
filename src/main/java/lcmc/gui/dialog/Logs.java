@@ -35,9 +35,12 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -77,11 +80,11 @@ class Logs extends ConfigDialog {
     /** Map from pattern name to its checkbox. */
     private final Map<String, JCheckBox> checkBoxMap =
                                             new HashMap<String, JCheckBox>();
-    /** Refresh button. */
-    private final MyButton refreshBtn =
-                    new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
     /** Refresh lock. */
     private final Lock mRefreshLock = new ReentrantLock();
+    /** Additional components. */
+    private final List<JComponent> additionalComponents =
+                                                   new ArrayList<JComponent>();
 
     /**
      * Command that gets the log. The command must be specified in the
@@ -119,7 +122,7 @@ class Logs extends ConfigDialog {
     }
 
     /** Refresh logs in a thread. */
-    private void refreshLogsThread() {
+    protected void refreshLogsThread() {
         final Thread thread = new Thread(
             new Runnable() {
                 @Override
@@ -143,16 +146,25 @@ class Logs extends ConfigDialog {
     }
 
     /** Enables/disables all the components. */
-    private void enableAllComponents(final boolean enable) {
+    protected void enableAllComponents(final boolean enable) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                refreshBtn.setEnabled(enable);
                 for (final String name : checkBoxMap.keySet()) {
                     checkBoxMap.get(name).setEnabled(enable);
                 }
+                for (final JComponent ac : additionalComponents) {
+                    ac.setEnabled(enable);
+                }
             }
         });
+    }
+
+    /** Options for the log command. */
+    protected Map<String, String> getOptionsHash() {
+        final Map<String, String> replaceHash = new HashMap<String, String>();
+        replaceHash.put("@GREPPATTERN@", grepPattern());
+        return replaceHash;
     }
 
     /**
@@ -166,8 +178,7 @@ class Logs extends ConfigDialog {
         Thread[] threads = new Thread[hosts.length];
         final String[] texts = new String[hosts.length];
 
-        final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@GREPPATTERN@", grepPattern());
+        final Map<String, String> replaceHash = getOptionsHash();
 
         int i = 0;
         final String stacktrace = Tools.getStackTrace();
@@ -314,7 +325,7 @@ class Logs extends ConfigDialog {
      * TextResource.
      */
     @Override
-    protected final String getDescription() {
+    protected String getDescription() {
         return "";
     }
 
@@ -353,14 +364,29 @@ class Logs extends ConfigDialog {
             });
             pane.add(cb);
         }
+        for (final JComponent ac : getAdditionalComponents()) {
+            additionalComponents.add(ac);
+            pane.add(ac);
+        }
+        return pane;
+    }
+
+    /** Return refresh button. */
+    protected MyButton getRefreshBtn() {
+        final MyButton refreshBtn =
+                    new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
         refreshBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 refreshLogsThread();
             }
         });
-        pane.add(refreshBtn);
-        return pane;
+        return refreshBtn;
+    }
+
+    /** Return components for extra functionality. */
+    protected JComponent[] getAdditionalComponents() {
+        return new JComponent[]{getRefreshBtn()};
     }
 
     /** Returns panel for logs. */

@@ -69,6 +69,8 @@ public class HostLogs extends Logs {
      */
     @Override
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.HostLogs.Title");
+        return Tools.getString("Dialog.HostLogs.Title") + " ("
+               + host.getName() + ")";
+                
     }
 }

@@ -40,13 +40,18 @@ for (keys %ENV) {
 
 our $DEBUG = 0;
 
-our $CMD_LOG_OP = "--cmd-log";
+# options
+our $CMD_LOG_OP       = "--cmd-log";
+our $CMD_LOG_DEFAULT  = 0;
+our $LOG_TIME_OP      = "--log-time";
+our $LOG_TIME_DEFAULT = 300;
+
 our ($HELPER_OPTIONS, $ACTION_OPTIONS) = parse_options(\@ARGV);
 
 my $action = shift @$ACTION_OPTIONS || die;
 
 # log
-our $DO_LOG = $$HELPER_OPTIONS{$CMD_LOG_OP} || 0;
+our $DO_LOG = $$HELPER_OPTIONS{$CMD_LOG_OP} || $CMD_LOG_DEFAULT;
 our $LOG_FILE = "/var/log/lcmc.log";
 our $LOG_FH;
 
@@ -166,14 +171,14 @@ if ($action eq "all") {
 	gui_vm_test(@$ACTION_OPTIONS);
 } elsif ($action eq "proc-drbd") {
 	get_proc_drbd();
-} elsif ($action eq "check-log") {
-	check_log();
-} elsif ($action eq "print-log") {
-	print_log();
+} elsif ($action eq "processed-log") {
+	processed_log();
+} elsif ($action eq "raw-log") {
+	raw_log();
 } elsif ($action eq "clear-log") {
 	clear_log();
 } else {
-	die "unknown command";
+	die "unknown command: $action";
 }
 
 # periodic stuff
@@ -2449,7 +2454,7 @@ sub _format_time {
 
 sub _cut {
 	my $line = shift;
-	my $max_line = 80;
+	my $max_line = 160;
 	if (length $line > $max_line) {
 		return (substr $line, 0, $max_line - 3) . "...";
 	}
@@ -2532,8 +2537,27 @@ sub compute_cmd_times {
 	}
 }
 
-sub check_log {
+sub _convert_to_sec {
+	my $time = shift;
+	my ($t, $unit) = $time =~ /(\d+)(\D+)/;
+	return $LOG_TIME_DEFAULT if !$t;
+	return $t if !$unit;
+	if ("s" eq $unit) {
+		return $t;
+	} elsif ("m" eq $unit) {
+		return $t * 60;
+	} elsif ("h" eq $unit) {
+		return $t * 60 * 60;
+	} elsif ("d" eq $unit) {
+		return $t * 60 * 60 * 24;
+	}
+	return $LOG_TIME_DEFAULT;
+}
+
+sub processed_log {
 	my $now = _log_time();
+	my $log_time = $$HELPER_OPTIONS{"--log-time"} || $LOG_TIME_DEFAULT;
+	my $from_time = $now - _convert_to_sec($log_time) * 1000;
 	if (!open LOG, $LOG_FILE) {
 		print "can't open $LOG_FILE\n";
 		return;
@@ -2550,10 +2574,15 @@ sub check_log {
 			print "ERROR: can't parse: $_\n";
 			next;
 		}
+		if ($time < $from_time) {
+			next;
+		}
 		if ("start" eq $action) {
 			$start{$code} = $time;
 			$cmds{$code} = $cmd;
 		} elsif ("done" eq $action) {
+			next if !$start{$code}; # ignore without start
+
 			my $duration = $time - $start{$code};
 			delete $start{$code};
 			compute_cmd_times(\%cmd_times, \%cmd_no, $cmd, $duration);
@@ -2580,7 +2609,7 @@ sub check_log {
 	print for @cmd_log;
 }
 
-sub print_log {
+sub raw_log {
 	my $now = _log_time();
 	if (!open LOG, $LOG_FILE) {
 		print "can't open $LOG_FILE\n";
@@ -2588,10 +2617,15 @@ sub print_log {
 	}
 	my %start;
 	my %cmds;
+	my $log_time = $$HELPER_OPTIONS{$LOG_TIME_OP} || $LOG_TIME_DEFAULT;
+	my $from_time = $now - _convert_to_sec($log_time) * 1000;
 	while (<LOG>) {
 		my ($time, $rest) = /(\d+)\s+(.*)/;
 		if (!$time || !$rest) {
 			print "ERROR: can't parse: $_\n";
+			next;
+		}
+		if ($time < $from_time) {
 			next;
 		}
 		print _format_time($time)." $rest\n";

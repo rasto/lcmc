@@ -524,6 +524,10 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"LVM.lvsnapshot",
          SUDO + "lvcreate -s -n@LVNAME@ -L@SIZE@ @DEVICE@"},
 
+        {"CmdLog.Raw", "@GUI-HELPER-PROG@ @OPTIONS@ raw-log"},
+        {"CmdLog.Processed", "@GUI-HELPER-PROG@ @OPTIONS@ processed-log"},
+        {"CmdLog.Clear", "@GUI-HELPER-PROG@ clear-log"},
+
         {"libvirt.lxc.libpath", "/usr/lib/libvirt"},
         {"libvirt.xen.libpath", "/usr/lib/xen-default"},
 

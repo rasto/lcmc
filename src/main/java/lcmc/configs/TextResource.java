@@ -1959,6 +1959,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HostBrowser.MakeKernelReboot",
          "make instant reboot on "},
 
+        {"HostBrowser.CmdLog",
+         "Commnad Log Dialog"},
+
         {"CRMXML.GlobalRequiredOptions",
          "Global Required Options"},
 
@@ -2798,5 +2801,22 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"HbOrderInfo.NotAvailableForThisVersion",
           "Not available in this version"},
 
+        {"CmdLog.Clear.Btn",
+         "Clear"},
+
+        {"CmdLog.Processed.Btn",
+         "Processed"},
+
+        {"CmdLog.Raw.Btn",
+         "Raw"},
+
+        {"CmdLog.Last.Label",
+         "Last"},
+
+        {"CmdLog.Description",
+         "Commands executed on the server. You have to start the LCMC "
+         + "with <b>--cmd-log</b> option to see the logs from the start.<br>"
+         + "100 (2) cmd ... Time in 1/100 secs (how many times).<br>"
+         + "100+ not finished (or interrupted)"},
     };
 }

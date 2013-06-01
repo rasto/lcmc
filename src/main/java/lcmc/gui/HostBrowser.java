@@ -30,12 +30,14 @@ import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.gui.resources.Info;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.FSInfo;
 import lcmc.gui.resources.HostDrbdInfo;
 import lcmc.gui.resources.ProxyHostInfo;
 import lcmc.gui.resources.HostInfo;
 import lcmc.gui.resources.NetInfo;
+import lcmc.gui.dialog.CmdLog;
 
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
@@ -393,6 +395,31 @@ public final class HostBrowser extends Browser {
         if (submenu.getItemCount() > 0) {
             return;
         }
+        /* Command log */
+        final MyMenuItem cmdLogMenuItem = new MyMenuItem(
+                        Tools.getString("HostBrowser.CmdLog"),
+                        Info.LOGFILE_ICON,
+                        "",
+                        new AccessMode(ConfigData.AccessType.ADMIN, false),
+                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String enablePredicate() {
+                if (!host.isConnected()) {
+                    return Host.NOT_CONNECTED_STRING;
+                }
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final CmdLog l = new CmdLog(host);
+                l.showDialog();
+            }
+        };
+        submenu.add(cmdLogMenuItem);
+
         /* panic */
         final MyMenuItem panicMenuItem = new MyMenuItem(
                     Tools.getString("HostBrowser.MakeKernelPanic")
