@@ -362,14 +362,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    final JPanel p = panel;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            p.setVisible(
-                                     Tools.getConfigData().isAdvancedMode());
-                        }
-                    });
+                    panel.setVisible(Tools.getConfigData().isAdvancedMode());
                 }
                 panelPartsMap.put(section,
                                   accessTypeString,
@@ -390,13 +383,8 @@ public abstract class EditableInfo extends Info {
             paramWi.setLabel(label, longDesc);
 
             /* tool tip */
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    paramWi.setToolTipText(getToolTipText(param, paramWi));
-                    label.setToolTipText(longDesc + additionalToolTip(param));
-                }
-            });
+            paramWi.setToolTipText(getToolTipText(param, paramWi));
+            label.setToolTipText(longDesc + additionalToolTip(param));
             int height = 0;
             if (paramWi instanceof Label) {
                 height = Tools.getDefaultSize("Browser.LabelFieldHeight");
@@ -419,20 +407,13 @@ public abstract class EditableInfo extends Info {
                 if (rpwi instanceof Label) {
                     height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
-                final Widget rpwi0 = rpwi;
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (paramWi.getValue() == null
-                            || paramWi.getValue()
-                               == Widget.NOTHING_SELECTED_DISPLAY) {
-                            rpwi0.setValueAndWait(null);
-                        } else {
-                            final Object value = paramWi.getStringValue();
-                            rpwi0.setValueAndWait(value);
-                        }
-                    }
-                });
+                if (paramWi.getValue() == null
+                    || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
+                    rpwi.setValueAndWait(null);
+                } else {
+                    final Object value = paramWi.getStringValue();
+                    rpwi.setValueAndWait(value);
+                }
             }
         }
         for (final String param : params) {
@@ -442,22 +423,16 @@ public abstract class EditableInfo extends Info {
                 rpwi = getWidget(param, null);
             }
             final Widget realParamWi = rpwi;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    paramWi.addListeners(new WidgetListener() {
-                                @Override
-                                public void check(final Object value) {
-                                    checkParameterFields(paramWi,
-                                                         realParamWi,
-                                                         param,
-                                                         getParametersFromXML(),
-                                                         thisApplyButton);
-                                }
-                            });
-
-                }
-            });
+            paramWi.addListeners(new WidgetListener() {
+                        @Override
+                        public void check(final Object value) {
+                            checkParameterFields(paramWi,
+                                                 realParamWi,
+                                                 param,
+                                                 getParametersFromXML(),
+                                                 thisApplyButton);
+                        }
+                    });
         }
 
         /* add sub panels to the option panel */
@@ -526,24 +501,12 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(section);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        sectionPanel.setVisible(
-                                      Tools.getConfigData().isAdvancedMode()
-                                      && isSectionEnabled(section));
-                    }
-                });
+                sectionPanel.setVisible(Tools.getConfigData().isAdvancedMode()
+                                        && isSectionEnabled(section));
             }
         }
-        final boolean a = advanced;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                moreOptionsPanel.setVisible(
-                                a && !Tools.getConfigData().isAdvancedMode());
-            }
-        });
+        moreOptionsPanel.setVisible(advanced
+                                    && !Tools.getConfigData().isAdvancedMode());
     }
 
     /** Returns a more panel with "more options are available" message. */
