@@ -2455,10 +2455,10 @@ public class ServiceInfo extends EditableInfo {
                                                title,
                                                masterSlave,
                                                getBrowser());
-            setCloneInfo(ci);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    setCloneInfo(ci);
                     if (oldCI == null) {
                         getBrowser().getCRMGraph()
                                     .exchangeObjectInTheVertex(ci, thisClass);
@@ -2500,15 +2500,20 @@ public class ServiceInfo extends EditableInfo {
                                                GUI_ID, null).getStringValue());
                     }
                     ci.setCloneServicePanel(thisClass);
+                    resetInfoPanel();
                     infoPanel = null;
+                    getInfoPanel();
                 }
             });
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-            final CloneInfo ci = getCloneInfo();
-            setCloneInfo(null);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    final CloneInfo ci = getCloneInfo();
+                    if (ci == null) {
+                        return;
+                    }
+                    setCloneInfo(null);
                     setPingComboBox(ci.getPingComboBox());
                     for (final HostInfo hi
                                         : ci.getScoreComboBoxHash().keySet()) {
@@ -2531,7 +2536,9 @@ public class ServiceInfo extends EditableInfo {
                                             ci.getService().getHeartbeatId());
                     getBrowser().mHeartbeatIdToServiceUnlock();
                     getBrowser().removeFromServiceInfoHash(ci);
+                    resetInfoPanel();
                     infoPanel = null;
+                    getInfoPanel();
                     getBrowser().reloadAndWait(node, true);
                     getBrowser().nodeChangedAndWait(node);
                     ciNode.setUserObject(null); /* would leak without it */
