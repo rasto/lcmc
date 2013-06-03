@@ -2938,4 +2938,14 @@ public final class Tools {
         }
         return -1;
     }
+
+    /**
+     * Print stack trace if it's not in a swing thread.
+     */
+    public static void isSwingThread() {
+        final String st = Tools.getStackTrace();
+        if (st.indexOf("java.awt.event.InvocationEvent.dispatch") < 0) {
+            System.out.println("st: " + st);
+        }
+    }
 }

@@ -1073,8 +1073,12 @@ public final class ClusterBrowser extends Browser {
                            } while (event != null || drbdConfig != null);
                            Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
-                               getDrbdGraph().getDrbdInfo().setParameters();
-                               updateDrbdResources();
+                               SwingUtilities.invokeLater(new Runnable() {
+                                   public void run() {
+                                       getDrbdGraph().getDrbdInfo().setParameters();
+                                       updateDrbdResources();
+                                   }
+                               });
                            }
                            if (eventUpdate) {
                                drbdGraph.repaint();
@@ -1568,6 +1572,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates drbd resources. */
     public void updateDrbdResources() {
+        Tools.isSwingThread();
         final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
         boolean atLeastOneAdded = false;
@@ -1641,7 +1646,8 @@ public final class ClusterBrowser extends Browser {
                 }
                 dri.setParameters();
                 dvi.setParameters();
-                dri.getInfoPanel();
+                final DrbdResourceInfo dri0 = dri;
+                dri0.getInfoPanel();
             }
         }
         //TODO: it would remove it during drbd wizards
@@ -1649,18 +1655,9 @@ public final class ClusterBrowser extends Browser {
         drbdStatusUnlock();
         if (atLeastOneAdded) {
             drbdInfo.getInfoPanel();
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    drbdInfo.setAllApplyButtons();
-                }
-            });
+            drbdInfo.setAllApplyButtons();
             drbdInfo.reloadDRBDResourceComboBoxes();
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    drbdGraph.scale();
-                }
-            });
+            drbdGraph.scale();
         }
     }
 

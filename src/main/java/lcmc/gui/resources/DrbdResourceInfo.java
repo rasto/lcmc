@@ -461,9 +461,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
+                    getInfoPanel();
                 }
             });
-            getInfoPanel();
             waitForInfoPanel();
             getBrowser().getDrbdResHash().remove(getName());
             getBrowser().putDrbdResHash();
@@ -493,8 +493,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Returns panel with form to configure a drbd resource. */
     @Override
     public JComponent getInfoPanel() {
+        Tools.isSwingThread();
         //getBrowser().getDrbdGraph().pickInfo(this);
         if (infoPanel != null) {
+            infoPanelDone();
             return infoPanel;
         }
         final ButtonCallback buttonCallback = new ButtonCallback() {
@@ -769,7 +771,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (infoPanelOk) {
                     final Widget wi = addressComboBoxHash.get(host);
                     if (wi != null) {
-                        wi.setValue(hostAddress);
+                        wi.setValueAndWait(hostAddress);
                     }
                 }
             }
@@ -785,9 +787,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = portComboBox;
                 if (wi != null) {
                     if (hostPort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
+                        wi.setValueAndWait(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
-                        wi.setValue(hostPort);
+                        wi.setValueAndWait(hostPort);
                     }
                 }
             }
@@ -845,7 +847,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (infoPanelOk) {
                     final Widget wi = insideIpComboBoxHash.get(proxyHost);
                     if (wi != null) {
-                        wi.setValue(insideIp);
+                        wi.setValueAndWait(insideIp);
                     }
                 }
             }
@@ -860,7 +862,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (infoPanelOk) {
                     final Widget wi = outsideIpComboBoxHash.get(proxyHost);
                     if (wi != null) {
-                        wi.setValue(outsideIp);
+                        wi.setValueAndWait(outsideIp);
                     }
                 }
             }
@@ -876,9 +878,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = insidePortComboBox;
                 if (wi != null) {
                     if (hostInsidePort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
+                        wi.setValueAndWait(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
-                        wi.setValue(hostInsidePort);
+                        wi.setValueAndWait(hostInsidePort);
                     }
                 }
             }
@@ -893,9 +895,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget wi = outsidePortComboBox;
                 if (wi != null) {
                     if (hostOutsidePort == null) {
-                        wi.setValue(Widget.NOTHING_SELECTED_DISPLAY);
+                        wi.setValueAndWait(Widget.NOTHING_SELECTED_DISPLAY);
                     } else {
-                        wi.setValue(hostOutsidePort);
+                        wi.setValueAndWait(hostOutsidePort);
                     }
                 }
             }
@@ -904,6 +906,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Sets stored parameters. */
     public void setParameters() {
+        Tools.isSwingThread();
         getDrbdResource().setCommited(true);
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final String resName = getResource().getName();
@@ -921,7 +924,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (!Tools.areEqual(value, oldValue)) {
                     getResource().setValue(param, value);
                     if (wi != null) {
-                        wi.setValue(value);
+                        wi.setValueAndWait(value);
                     }
                 }
             }
@@ -2428,13 +2431,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                                  ProxyNetInfo.PROXY_PREFIX));
     }
 
-    /** Reset the info panel. */
-    @Override
-    public void resetInfoPanel() {
-        super.resetInfoPanel();
-        infoPanel = null;
-    }
-
     /**
      * Return proxy hosts that are used in this resource. */
     public Set<Host> getConfiguredProxyHosts() {
@@ -2463,6 +2459,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      */
     public void resetDrbdResourcePanel() {
         resetInfoPanel();
+        infoPanel = null;
         getInfoPanel();
         waitForInfoPanel();
         selectMyself();

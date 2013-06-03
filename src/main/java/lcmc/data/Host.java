@@ -1857,8 +1857,12 @@ public final class Host {
                                                        cb.getDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXML(dxml);
-                                     cb.getDrbdGraph().getDrbdInfo().setParameters();
-                                     cb.updateDrbdResources();
+                                     SwingUtilities.invokeLater(new Runnable() {
+                                         public void run() {
+                                             cb.getDrbdGraph().getDrbdInfo().setParameters();
+                                             cb.updateDrbdResources();
+                                         }
+                                     });
                                  }
                                  if (drbdUpdate != null
                                      || vmUpdate != null) {

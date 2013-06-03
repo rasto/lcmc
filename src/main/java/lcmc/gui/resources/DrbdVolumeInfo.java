@@ -156,6 +156,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
+        Tools.isSwingThread();
         getBrowser().getDrbdGraph().pickInfo(this);
         final JComponent driPanel = getDrbdResourceInfo().getInfoPanel();
         getInfoPanelVolume();
@@ -746,11 +747,15 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         cb.setDrbdXML(dxml);
         cb.drbdStatusUnlock();
-        cb.updateDrbdResources();
-        if (!testOnly) {
-            removeNode();
-        }
-        cb.getDrbdGraph().scale();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                cb.updateDrbdResources();
+                if (!testOnly) {
+                    removeNode();
+                }
+                cb.getDrbdGraph().scale();
+            }
+        });
     }
 
     /** Removes this drbd resource with confirmation dialog. */
@@ -1158,9 +1163,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
+                    getInfoPanel();
                 }
             });
-            getInfoPanel();
             waitForInfoPanel();
             getBrowser().getDrbdDevHash().remove(getDevice());
             getBrowser().putDrbdDevHash();
@@ -1369,6 +1374,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Sets stored parameters. */
     public void setParameters() {
+        Tools.isSwingThread();
         getDrbdVolume().setCommited(true);
     }
 

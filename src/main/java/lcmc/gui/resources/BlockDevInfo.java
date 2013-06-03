@@ -924,6 +924,7 @@ public final class BlockDevInfo extends EditableInfo {
     /** Returns the info panel. */
     @Override
     public JComponent getInfoPanel() {
+        Tools.isSwingThread();
         return getInfoPanelBD();
     }
 
@@ -946,9 +947,9 @@ public final class BlockDevInfo extends EditableInfo {
                 public void run() {
                     getApplyButton().setEnabled(false);
                     getRevertButton().setEnabled(false);
+                    getInfoPanel();
                 }
             });
-            getInfoPanel();
             waitForInfoPanel();
             if (getBlockDevice().getMetaDisk() != null) {
                 getBlockDevice().getMetaDisk().removeMetadiskOfBlockDevice(
@@ -971,7 +972,9 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns block device panel. */
     JComponent getInfoPanelBD() {
+        Tools.isSwingThread();
         if (infoPanel != null) {
+            infoPanelDone();
             return infoPanel;
         }
         final BlockDevInfo thisClass = this;
@@ -1199,8 +1202,10 @@ public final class BlockDevInfo extends EditableInfo {
                 final DrbdInfo drbdInfo =
                                     getBrowser().getDrbdGraph().getDrbdInfo();
                 cleanup();
+                resetInfoPanel();
                 setInfoPanel(null);
                 oBdi.cleanup();
+                oBdi.resetInfoPanel();
                 oBdi.setInfoPanel(null);
                 drbdInfo.addDrbdVolume(thisClass,
                                        oBdi,
@@ -2543,6 +2548,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Sets stored parameters. */
     public void setParameters(final String resName) {
+        Tools.isSwingThread();
         getBlockDevice().setNew(false);
 
         final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();
@@ -2583,7 +2589,7 @@ public final class BlockDevInfo extends EditableInfo {
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
                 if (wi != null) {
-                    wi.setValue(value);
+                    wi.setValueAndWait(value);
                 }
             }
         }
