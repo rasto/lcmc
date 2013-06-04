@@ -78,14 +78,21 @@ our @VM_OPTIONS = ("",
 		   "-c openvz:///system",
 		   "-c vbox:///session",
 		   "-c uml:///system");
+
+our $LVM_CACHE;
+our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
+our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
+our $NO_LVM_CACHE = 0;
+
 our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
 
 if ($action eq "all") {
+	clear_lvm_cache();
 	print "net-info\n";
 	print get_net_info();
 	print "disk-info\n";
-	print get_disk_info();
+	print get_disk_info($NO_LVM_CACHE);
 	print "vg-info\n";
 	print get_vg_info();
 	print "filesystems-info\n";
@@ -110,6 +117,7 @@ if ($action eq "all") {
 } elsif ($action eq "hw-info-daemon") {
 	start_hw_info_daemon();
 } elsif ($action eq "hw-info") {
+	clear_lvm_cache();
 	print get_hw_info();
 } elsif ($action eq "hw-info-lazy") {
 	print get_hw_info_lazy();
@@ -118,7 +126,7 @@ if ($action eq "all") {
 } elsif ($action eq "get-net-info") {
 	print get_net_info();
 } elsif ($action eq "get-disk-info") {
-	print get_disk_info();
+	print get_disk_info($NO_LVM_CACHE);
 } elsif ($action eq "get-vg-info") {
 	print get_vg_info();
 } elsif ($action eq "get-filesystems-info") {
@@ -188,10 +196,15 @@ sub start_hw_info_daemon {
 	my $prev_vm_info = 0;
 	my $prev_drbd_info = 0;
 	my $count = 0;
+	my $use_lvm_cache = 0;
 	while (1) {
 		print "\n";
+		if (!-e $LVM_CACHE_FILE) {
+			$use_lvm_cache = 0;
+			_exec("touch $LVM_CACHE_FILE");
+		}
 		if ($count % 5 == 0) {
-			my $hw_info = get_hw_info();
+			my $hw_info = get_hw_info($use_lvm_cache);
 			if ($hw_info ne $prev_hw_info) {
 				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info;
@@ -200,7 +213,7 @@ sub start_hw_info_daemon {
 			}
 			$count = 0;
 		} else {
-			my $hw_info_lazy = get_hw_info_lazy();
+			my $hw_info_lazy = get_hw_info_lazy($use_lvm_cache);
 			if ($hw_info_lazy ne $prev_hw_info_lazy) {
 				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info_lazy;
@@ -208,6 +221,7 @@ sub start_hw_info_daemon {
 				$prev_hw_info_lazy = $hw_info_lazy;
 			}
 		}
+		$use_lvm_cache = 1;
 		my $vm_info = get_vm_info();
 		if ($vm_info ne $prev_vm_info) {
 			print "--vm-info-start--".`date +%s%N`;
@@ -228,10 +242,11 @@ sub start_hw_info_daemon {
 }
 
 sub get_hw_info {
+	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
 	$out .= "disk-info\n";
-	$out .= get_disk_info();
+	$out .= get_disk_info($use_lvm_cache);
 	$out .= "vg-info\n";
 	$out .= get_vg_info();
 	$out .= "filesystems-info\n";
@@ -255,10 +270,11 @@ sub get_hw_info {
 }
 
 sub get_hw_info_lazy {
+	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
 	$out .= "disk-info\n";
-	$out .= get_disk_info();
+	$out .= get_disk_info($use_lvm_cache);
 	$out .= "vg-info\n";
 	$out .= get_vg_info();
 	$out .= "filesystems-info\n";
@@ -477,6 +493,10 @@ sub get_swaps {
 # minor numbers are separated with ":". And a hash that contains block devices
 # that have lvm on top of them.
 sub get_lvm {
+	my $use_cache = shift || 0;
+	if ($use_cache && $LVM_CACHE) {
+		return @$LVM_CACHE;
+	}
 	my $path = "/usr/sbin/";
 	if (-e "/sbin/pvdisplay") {
 		$path = "/sbin";
@@ -515,13 +535,14 @@ sub get_lvm {
 		$lvm_devs{"$group/$name"}++;
 
 	}
-	return (\%pv_to_group,
-		\%group_to_pv,
-		\%major_minor_to_dev,
-		\%devs_with_lvm,
-		\%lvm_devs,
-		\%major_minor_to_group,
-		\%major_minor_to_lv_name);
+	$LVM_CACHE = [\%pv_to_group,
+		      \%group_to_pv,
+		      \%major_minor_to_dev,
+		      \%devs_with_lvm,
+		      \%lvm_devs,
+		      \%major_minor_to_group,
+		      \%major_minor_to_lv_name];
+	return @$LVM_CACHE;
 }
 
 # this is used if the devices is dm but not lvm
@@ -587,6 +608,7 @@ sub get_device_mapper_major {
 # It doesn't show block devices, that are in raid or there is lvm on top of
 # them. In this case only device names of raid or lvm are used.
 sub get_disk_info {
+	my $use_lvm_cache = shift;
 	my $devs_in_raid = get_raid();
 	my ($pvs,
 	    $group_to_pv,
@@ -594,7 +616,7 @@ sub get_disk_info {
 	    $devs_with_lvm,
 	    $lvm_devs,
 	    $lvm_major_minor_to_group,
-	    $lvm_major_minor_to_lv_name) = get_lvm();
+	    $lvm_major_minor_to_lv_name) = get_lvm($use_lvm_cache);
 	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
 	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
@@ -2662,4 +2684,9 @@ sub parse_options {
 		}
 	}
 	return (\%options, \@action_options);
+}
+
+# force daemon to reread the lvm information
+sub clear_lvm_cache {
+	unlink glob $LVM_ALL_CACHE_FILES;
 }
