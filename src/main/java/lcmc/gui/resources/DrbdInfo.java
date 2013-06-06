@@ -786,13 +786,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
             bdi1.getBlockDevice().setDrbdBlockDevice(
                                     bdi1.getHost().getDrbdBlockDevice(device));
             bdi1.cleanup();
-            Tools.invokeAndWait(new Runnable() {
-                public void run() {
-                    bdi1.resetInfoPanel();
-                    bdi1.setInfoPanel(null); /* reload panel */
-                    bdi1.getInfoPanel();
-                }
-            });
+            bdi1.resetInfoPanel();
+            bdi1.setInfoPanel(null); /* reload panel */
+            bdi1.getInfoPanel();
         }
         if (bdi2 != null) {
             bdi2.setDrbd(true);
@@ -800,13 +796,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
             bdi2.getBlockDevice().setDrbdBlockDevice(
                                     bdi2.getHost().getDrbdBlockDevice(device));
             bdi2.cleanup();
-            Tools.invokeAndWait(new Runnable() {
-                public void run() {
-                    bdi2.resetInfoPanel();
-                    bdi2.setInfoPanel(null); /* reload panel */
-                    bdi2.getInfoPanel();
-                }
-            });
+            bdi2.resetInfoPanel();
+            bdi2.setInfoPanel(null); /* reload panel */
+            bdi2.getInfoPanel();
         }
 
         final DefaultMutableTreeNode drbdVolumeNode =

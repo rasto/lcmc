@@ -174,13 +174,17 @@ final class BlockDev extends DrbdConfig {
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();
         blockDevInfo.waitForInfoPanel();
-        blockDevInfo.addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                blockDevInfo.addWizardParams(
                  optionsPanel,
                  params,
                  buttonClass(nextButton()),
                  Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
                  Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
                  null);
+            }
+        });
 
         final JPanel p = new JPanel();
         p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));

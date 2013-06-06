@@ -142,7 +142,6 @@ public final class Resource extends DrbdConfig {
                 drbdInfo.getWidget(commonP, null).setValue(value);
             }
         }
-        Tools.waitForSwing();
         drbdInfo.apply(false);
         dri.apply(false);
         return new Volume(this, getDrbdVolumeInfo());
@@ -206,7 +205,6 @@ public final class Resource extends DrbdConfig {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         dri.waitForInfoPanel();
-        Tools.waitForSwing();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 
@@ -264,13 +262,19 @@ public final class Resource extends DrbdConfig {
                              ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                              true,
                              buttonClass(nextButton()));
-        dri.addWizardParams(
-              optionsPanel,
-              PARAMS,
-              buttonClass(nextButton()),
-              Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
-              Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth") * 2,
-              null);
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                dri.addWizardParams(
+                  optionsPanel,
+                  PARAMS,
+                  buttonClass(nextButton()),
+                  Tools.getDefaultSize(
+                                "Dialog.DrbdConfig.Resource.LabelWidth"),
+                  Tools.getDefaultSize(
+                                "Dialog.DrbdConfig.Resource.FieldWidth") * 2,
+                  null);
+            }
+        });
 
         inputPane.add(optionsPanel);
         final JPanel buttonPanel = new JPanel();

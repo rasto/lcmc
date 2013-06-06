@@ -82,7 +82,11 @@ public final class AddDrbdConfigDialog {
                             drbdInfo.getNewDrbdVolume(drbdResourceInfo, bdis);
             drbdResourceInfo.addDrbdVolume(dvi);
             drbdInfo.addDrbdResource(drbdResourceInfo);
-            drbdInfo.addDrbdVolume(dvi);
+            Tools.invokeAndWait(new Runnable() {
+                public void run() {
+                    drbdInfo.addDrbdVolume(dvi);
+                }
+            });
             dialog = new Resource(null, dvi);
         }
         Tools.getGUIData().expandTerminalSplitPane(0);

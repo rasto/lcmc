@@ -127,7 +127,6 @@ public final class Volume extends DrbdConfig {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         getDrbdVolumeInfo().waitForInfoPanel();
-        Tools.waitForSwing();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 
@@ -135,13 +134,17 @@ public final class Volume extends DrbdConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        getDrbdVolumeInfo().addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                getDrbdVolumeInfo().addWizardParams(
                   optionsPanel,
                   PARAMS,
                   buttonClass(nextButton()),
                   Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
                   Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
                   null);
+            }
+        });
 
         inputPane.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(inputPane);
