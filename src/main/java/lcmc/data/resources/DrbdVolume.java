@@ -45,7 +45,6 @@ implements ClusterBlockDeviceInterface {
      */
     public DrbdVolume(final String name) {
         super(name);
-        setValue("device", device);
     }
 
     /** Returns drbd device. */
