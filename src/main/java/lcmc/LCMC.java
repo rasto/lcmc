@@ -328,7 +328,7 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    Tools.appError("", ex.toString(), (Exception) ex);
+                    Tools.appError("", ex.toString(), ex);
                 }
             });
         float fps = ConfigData.DEFAULT_ANIM_FPS;

@@ -607,7 +607,7 @@ public final class Tools {
     }
 
     /** Shows application error message dialog, with a stacktrace. */
-    public static void appError(final String msg, final Exception e) {
+    public static void appError(final String msg, final Throwable e) {
         appError(msg, "", e);
     }
 
@@ -625,7 +625,7 @@ public final class Tools {
      */
     public static void appError(final String msg,
                                 final String msg2,
-                                final Exception e) {
+                                final Throwable e) {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
