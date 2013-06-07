@@ -325,6 +325,7 @@ public abstract class EditableInfo extends Info {
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, Widget> sameAsFields) {
+        Tools.isSwingThread();
         if (params == null) {
             return;
         }

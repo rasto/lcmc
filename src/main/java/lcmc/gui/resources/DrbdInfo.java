@@ -144,7 +144,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
                 if (wi != null) {
-                    wi.setValue(value);
+                    wi.setValueAndWait(value);
                 }
             }
         }

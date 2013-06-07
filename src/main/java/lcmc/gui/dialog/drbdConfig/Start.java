@@ -102,8 +102,12 @@ public final class Start extends WizardDialog {
                                 new ArrayList<BlockDevInfo>(Arrays.asList(
                                                               blockDevInfo1,
                                                               blockDevInfo2)));
-        drbdResourceInfo.addDrbdVolume(dvi);
-        drbdInfo.addDrbdVolume(dvi);
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                drbdResourceInfo.addDrbdVolume(dvi);
+                drbdInfo.addDrbdVolume(dvi);
+            }
+        });
         if (newResource) {
             return new Resource(this, dvi);
         } else {
