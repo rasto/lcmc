@@ -159,6 +159,8 @@ public final class LCMC extends JPanel {
     private static final String NO_EMBED_OP = "no-embed";
     /** The --cmd-log. /var/log/lcmc.log on the servers. */
     private static final String CMD_LOG_OP = "cmd-log";
+    /** The --check-swing. */
+    private static final String CHECK_SWING_OP = "check-swing";
 
     /**
      * Private constructor.
@@ -469,6 +471,11 @@ public final class LCMC extends JPanel {
                       CMD_LOG_OP,
                       false,
                       "Log executed commands to the lcmc.log on the servers");
+        options.addOption(
+                      null,
+                      CHECK_SWING_OP,
+                      false,
+                      "ADVANCED USE: for testing");
         final CommandLineParser parser = new PosixParser();
         String autoArgs = null;
         try {
@@ -532,6 +539,9 @@ public final class LCMC extends JPanel {
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
                 Tools.getConfigData().setCmdLog(true);
+            }
+            if (cmd.hasOption(CHECK_SWING_OP)) {
+                Tools.getConfigData().setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");

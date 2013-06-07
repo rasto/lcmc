@@ -176,6 +176,8 @@ public final class ConfigData {
     private boolean cmdLog = false;
     /** Auto test, null no auto test. */
     private RoboTest.Test autoTest = null;
+    /** Check swing threads. Print stack traces. */
+    private boolean checkSwing = false;
 
     /**
      * Prepares a new <code>ConfigData</code> object and creates new hosts
@@ -722,5 +724,15 @@ public final class ConfigData {
     /** Return whether to log commands on the servers. */
     public boolean isCmdLog() {
         return cmdLog;
+    }
+
+    /** Return whether to check swing threads. Testing only. */
+    public final boolean isCheckSwing() {
+        return checkSwing;
+    }
+
+    /** Set whether to check swing threads. Testing only. */
+    public final void setCheckSwing(final boolean checkSwing) {
+        this.checkSwing = checkSwing;
     }
 }

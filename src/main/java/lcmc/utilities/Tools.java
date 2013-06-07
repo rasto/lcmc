@@ -2703,6 +2703,7 @@ public final class Tools {
 
     /** Convenience invoke and wait function. */
     public static void invokeAndWait(final Runnable runnable) {
+        isNotSwingThread();
         try {
             SwingUtilities.invokeAndWait(runnable);
         } catch (final InterruptedException ix) {
@@ -2943,9 +2944,25 @@ public final class Tools {
      * Print stack trace if it's not in a swing thread.
      */
     public static void isSwingThread() {
+        if (!getConfigData().isCheckSwing()) {
+            return;
+        }
         final String st = Tools.getStackTrace();
         if (st.indexOf("java.awt.event.InvocationEvent.dispatch") < 0) {
-            System.out.println("st: " + st);
+            System.out.println("not a swing thread: " + st);
+        }
+    }
+
+    /**
+     * Print stack trace if it's not in a swing thread.
+     */
+    public static void isNotSwingThread() {
+        if (!getConfigData().isCheckSwing()) {
+            return;
+        }
+        final String st = Tools.getStackTrace();
+        if (st.indexOf("java.awt.event.InvocationEvent.dispatch") >= 0) {
+            System.out.println("swing thread: " + st);
         }
     }
 }
