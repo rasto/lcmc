@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
@@ -103,7 +102,7 @@ public final class PVCreate extends WizardDialog {
     /** Enables and disabled buttons. */
     protected void checkButtons() {
         if (!blockDevInfo.getBlockDevice().isPhysicalVolume()) {
-            SwingUtilities.invokeLater(new EnableCreateRunnable(true));
+            Tools.invokeLater(new EnableCreateRunnable(true));
         }
     }
 

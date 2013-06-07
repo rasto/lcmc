@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Dimension;
@@ -173,7 +172,7 @@ public final class ProgressBar implements ActionListener {
                         /* show progress bar after delay */
                         if (time > progressBarDelay && !isVisible) {
                             isVisible = true;
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setVisible(true);
@@ -184,7 +183,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                         if (!holdIt) {
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setValue(
@@ -203,7 +202,7 @@ public final class ProgressBar implements ActionListener {
                         }
                         if (progress >= timeout) {
                             /* premature end */
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setIndeterminate(true);
@@ -211,7 +210,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBar.setIndeterminate(false);
@@ -241,7 +240,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = timeout;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -257,7 +256,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = 0;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -274,7 +273,7 @@ public final class ProgressBar implements ActionListener {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisible(false);
@@ -293,7 +292,7 @@ public final class ProgressBar implements ActionListener {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisible(false);
@@ -309,7 +308,7 @@ public final class ProgressBar implements ActionListener {
      * state.
      */
     public void hold() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisible(true);
@@ -327,7 +326,7 @@ public final class ProgressBar implements ActionListener {
      * hold().
      */
     void cont() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);

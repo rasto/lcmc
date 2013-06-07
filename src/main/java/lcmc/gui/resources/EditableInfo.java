@@ -39,7 +39,6 @@ import lcmc.gui.SpringUtilities;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
@@ -537,7 +536,7 @@ public abstract class EditableInfo extends Info {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //SwingUtilities.invokeLater(new Runnable() {
+                //Tools.invokeLater(new Runnable() {
                 //    @Override
                 //    public void run() {
                 //        paramWi.setEditable();
@@ -550,7 +549,7 @@ public abstract class EditableInfo extends Info {
                     ch = checkResourceFieldsChanged(param, params);
                     c = checkResourceFieldsCorrect(param, params);
                 } else {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null
@@ -568,7 +567,7 @@ public abstract class EditableInfo extends Info {
                 }
                 final boolean check = c;
                 final boolean changed = ch;
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (thisApplyButton == applyButton) {
@@ -820,7 +819,7 @@ public abstract class EditableInfo extends Info {
                                       final String[] params) {
         final boolean ch = checkResourceFieldsChanged(param, params);
         final boolean cor = checkResourceFieldsCorrect(param, params);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
@@ -1029,7 +1028,7 @@ public abstract class EditableInfo extends Info {
         final boolean advancedMode = Tools.getConfigData().isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     apl.setVisible(advancedMode);
@@ -1042,7 +1041,7 @@ public abstract class EditableInfo extends Info {
                                                Boolean.toString(!WIZARD));
             final JPanel pw = sectionPanels.get(section,
                                                 Boolean.toString(WIZARD));
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean v = advancedMode && isSectionEnabled(section);
@@ -1055,7 +1054,7 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         final boolean a = advanced;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 moreOptionsPanel.setVisible(a && !advancedMode);

@@ -41,7 +41,6 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
@@ -148,7 +147,7 @@ public class NewHost extends DialogHost {
         }
 
         if (hf) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setBackground(getHost().getHostnameEntered(),
@@ -161,7 +160,7 @@ public class NewHost extends DialogHost {
         }
 
         if (uf) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     usernameField.setBackground(getHost().getUsername(),
@@ -183,7 +182,7 @@ public class NewHost extends DialogHost {
         }
 
         if (pf) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sshPortField.setBackground(getHost().getSSHPort(),
@@ -198,7 +197,7 @@ public class NewHost extends DialogHost {
         final boolean hostField = hf;
         final boolean userField = hf;
         final boolean sshPortField = pf;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent btn : nextButtons()) {
@@ -238,14 +237,14 @@ public class NewHost extends DialogHost {
     protected final void initDialogAfterVisible() {
         enableComponents();
         checkFields((Widget) null);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hostField.requestFocus();
             }
         });
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setValue(

@@ -33,7 +33,6 @@ import lcmc.utilities.MyButton;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -147,7 +146,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                                    VMSVirtualDomainInfo.GRAPHICS_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -393,7 +392,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         getBrowser().reload(getNode(), false);
         getBrowser().periodicalVMSUpdate(
                                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -457,7 +456,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = "vnc".equals(newValue);
             final boolean sdl = "sdl".equals(newValue);
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     for (final String p : listenWi.keySet()) {

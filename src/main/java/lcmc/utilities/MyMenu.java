@@ -26,7 +26,6 @@ import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import java.awt.Component;
 import java.awt.geom.Point2D;
@@ -121,14 +120,14 @@ public class MyMenu extends JMenu implements UpdatableItem {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
             }
         });
         if (isVisible()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!accessible && enableAccessMode.getAccessType()

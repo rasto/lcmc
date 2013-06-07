@@ -53,7 +53,6 @@ import java.util.ArrayList;
 
 import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 
 /**
  * This class creates graph and provides methods to add new block device
@@ -208,7 +207,7 @@ public final class DrbdGraph extends ResourceGraph {
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(
                                                                           dvi);
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
@@ -298,7 +297,7 @@ public final class DrbdGraph extends ResourceGraph {
         e.reset();
         edgeToDrbdVolumeMap.remove(e);
         drbdVolumeToEdgeMap.remove(dvi);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -379,7 +378,8 @@ public final class DrbdGraph extends ResourceGraph {
                 if (sourceBDI.isWFConnection(tOnly)
                     && !destBDI.isWFConnection(tOnly)) {
                     edge.setDirection(dest, source);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
                         @Override
                         public void run() {
                             repaint();
@@ -389,7 +389,7 @@ public final class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         repaint();

@@ -24,7 +24,6 @@
 package lcmc.gui.dialog;
 
 import lcmc.utilities.Tools;
-import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JComponent;
@@ -149,7 +148,7 @@ public final class ConfirmDialog extends ConfigDialog {
         super.initDialog();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 buttonClass(noButton()).setEnabled(true);
             }
@@ -160,7 +159,7 @@ public final class ConfirmDialog extends ConfigDialog {
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 buttonClass(noButton()).requestFocus();
             }

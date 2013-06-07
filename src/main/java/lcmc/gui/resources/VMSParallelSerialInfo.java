@@ -34,7 +34,6 @@ import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -204,7 +203,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                    getTableName(),
                                    getNewBtn0(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -344,7 +343,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         getBrowser().reload(getNode(), false);
         getBrowser().periodicalVMSUpdate(
                                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -423,7 +422,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     protected final boolean checkParam(final String param,
                                        final String newValue) {
         if (ParallelSerialData.TYPE.equals(param)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final String param : PARAMETERS) {

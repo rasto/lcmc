@@ -32,7 +32,6 @@ import lcmc.gui.dialog.WizardDialog;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 
 import java.awt.Component;
@@ -106,13 +105,13 @@ public final class Volume extends DrbdConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     pressNextButton();

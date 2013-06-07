@@ -335,7 +335,7 @@ public abstract class Widget extends JPanel {
         }
         final JComponent comp = c;
         super.setVisible(visible);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -424,7 +424,7 @@ public abstract class Widget extends JPanel {
         if (Tools.areEqual(item, getValue())) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 mValueWriteLock.lock();
@@ -768,7 +768,7 @@ public abstract class Widget extends JPanel {
 
     /** Sets background color. */
     public void setBackgroundColor(final Color bg) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

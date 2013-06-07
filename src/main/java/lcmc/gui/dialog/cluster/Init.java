@@ -50,7 +50,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.Color;
@@ -319,7 +318,7 @@ public class Init extends DialogCluster {
             final JLabel drbdLoadedInfo = drbdLoadedInfos.get(i);
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString(
@@ -332,7 +331,7 @@ public class Init extends DialogCluster {
                 drbdFailed = true;
                 if (drbdLoadedChanged) {
                     final MyButton drbdLoadButton = drbdLoadButtons.get(i);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString(
@@ -430,7 +429,7 @@ public class Init extends DialogCluster {
             final String initScript = is;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             pmStartedInfo.setText(
@@ -456,7 +455,7 @@ public class Init extends DialogCluster {
             } else {
                 csAisFailed = true;
                 if (csAisChanged || hbChanged) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
@@ -499,7 +498,7 @@ public class Init extends DialogCluster {
             final MyButton hbStartButton = hbStartButtons.get(i);
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             hbStartedInfo.setText(Tools.getString(
@@ -523,7 +522,7 @@ public class Init extends DialogCluster {
             } else {
                 hbFailed = true;
                 if (hbChanged || csAisChanged) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (csAisRunning || csAisIsRc) {
@@ -563,7 +562,7 @@ public class Init extends DialogCluster {
             i++;
         }
         final boolean nob = needOpenaisButton;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 useOpenaisButton.setEnabled(nob);
@@ -571,7 +570,7 @@ public class Init extends DialogCluster {
         });
 
         if (oneChanged || !periodic) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mainPanel.invalidate();
@@ -581,7 +580,7 @@ public class Init extends DialogCluster {
             });
 
             if (oneFailed) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(button).setEnabled(false);
@@ -660,7 +659,7 @@ public class Init extends DialogCluster {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    SwingUtilities.invokeLater(new Runnable() {
+                                    Tools.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             drbdLoadButtons.get(
@@ -713,7 +712,7 @@ public class Init extends DialogCluster {
                                 @Override
                                 public void run() {
                                     disableComponents();
-                                    SwingUtilities.invokeLater(new Runnable() {
+                                    Tools.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             hbStartButtons.get(
@@ -772,7 +771,7 @@ public class Init extends DialogCluster {
                                 @Override
                                 public void run() {
                                     disableComponents();
-                                    SwingUtilities.invokeLater(new Runnable() {
+                                    Tools.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             pmStartButtons.get(

@@ -29,7 +29,6 @@ import lcmc.gui.resources.CategoryInfo;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import javax.swing.SwingUtilities;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
@@ -157,7 +156,7 @@ public class Browser {
             oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
         }
         final DefaultMutableTreeNode oldNode = oldN;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (node != null) {
@@ -166,7 +165,7 @@ public class Browser {
             }
         });
         if (!select && t != null && oldNode != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     /* if don't want to select, we reselect the old path. */
@@ -184,7 +183,7 @@ public class Browser {
     /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -338,7 +337,7 @@ public class Browser {
 
     /** Selects specified path. */
     protected void selectPath(final Object[] path) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final TreePath tp = new TreePath(path);
@@ -351,7 +350,7 @@ public class Browser {
     /** Add node. */
     public final void addNode(final DefaultMutableTreeNode node,
                               final DefaultMutableTreeNode child) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             public void run() {
               node.add(child);
             }

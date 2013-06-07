@@ -33,7 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -106,7 +105,7 @@ final class Display extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = vmsgi.checkResourceFieldsCorrect(

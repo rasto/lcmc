@@ -38,7 +38,6 @@ import lcmc.utilities.MyMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
@@ -355,6 +354,7 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     public final JComponent getInfoPanel() {
+        Tools.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -501,7 +501,7 @@ public class HbConnectionInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, null);

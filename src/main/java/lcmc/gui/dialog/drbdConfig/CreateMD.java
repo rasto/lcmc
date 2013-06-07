@@ -42,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -77,7 +76,7 @@ final class CreateMD extends DrbdConfig {
 
     /** Creates meta-data and checks the results. */
     private void createMetadata(final boolean destroyData) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeMDButton.setEnabled(false);
@@ -101,7 +100,7 @@ final class CreateMD extends DrbdConfig {
                         new ExecCallback() {
                             @Override
                             public void done(final String ans) {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeMDButton.setEnabled(false);
@@ -175,7 +174,7 @@ final class CreateMD extends DrbdConfig {
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answer));
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMDButton.setEnabled(false);
@@ -270,7 +269,7 @@ final class CreateMD extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMDButton.pressButton();

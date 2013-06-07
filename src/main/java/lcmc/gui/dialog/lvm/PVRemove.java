@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
@@ -99,7 +98,7 @@ public final class PVRemove extends LV {
     protected void checkButtons() {
         if (blockDevInfo.getBlockDevice().isPhysicalVolume()
             || blockDevInfo.getBlockDevice().isDrbdPhysicalVolume()) {
-            SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
+            Tools.invokeLater(new EnableRemoveRunnable(true));
         }
     }
 

@@ -46,7 +46,6 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.SwingUtilities;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -209,7 +208,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                               ClusterBrowser.SERVICE_LABEL_WIDTH
                               + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setVisible(

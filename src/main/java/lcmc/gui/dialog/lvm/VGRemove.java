@@ -42,7 +42,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -102,7 +101,7 @@ public final class VGRemove extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        SwingUtilities.invokeLater(new EnableRemoveRunnable(true));
+        Tools.invokeLater(new EnableRemoveRunnable(true));
     }
 
     private class EnableRemoveRunnable implements Runnable {

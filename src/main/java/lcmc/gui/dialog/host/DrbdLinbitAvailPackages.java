@@ -38,7 +38,6 @@ import lcmc.utilities.SSH.ExecCommandThread;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 
 import java.awt.Dimension;
@@ -125,7 +124,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Checks the available distributions. */
     protected final void availDistributions() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 drbdKernelDirCombo.setEnabled(false);
@@ -141,7 +140,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 ans = NO_MATCH_STRING + "\n" + ans;
                                 final String[] items = ans.split(NEWLINE);
                                 drbdDistItems = Arrays.asList(items);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         drbdDistCombo.reloadComboBox(
@@ -171,7 +170,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     protected final void availKernels() {
         final String distVersion = getHost().getDistVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     drbdKernelDirCombo.reloadComboBox(
@@ -191,7 +190,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 ans = NO_MATCH_STRING + "\n" + ans;
                                 final String[] items = ans.split(NEWLINE);
                                 drbdKernelDirItems = Arrays.asList(items);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         drbdKernelDirCombo.reloadComboBox(
@@ -228,7 +227,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             || arch == null
             || !drbdDistItems.contains(getHost().getDistVersion())
             || !drbdKernelDirItems.contains(kernelVersion)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     drbdArchCombo.reloadComboBox(null,
@@ -248,7 +247,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 ans = NO_MATCH_STRING + "\n" + ans;
                                 final String[] items = ans.split(NEWLINE);
                                 drbdArchItems = Arrays.asList(items);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         drbdArchCombo.reloadComboBox(

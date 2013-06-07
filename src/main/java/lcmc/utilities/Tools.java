@@ -70,7 +70,6 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
 import javax.swing.JTable;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -81,6 +80,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.JDialog;
 import javax.swing.AbstractButton;
+import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -188,6 +188,8 @@ public final class Tools {
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     /** Time when the application started in seconds. */
     private static final long START_TIME = System.currentTimeMillis() / 1000;
+    /** Do not check the swing thread. */
+    public static final boolean CHECK_SWING_THREAD = true;
     /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
@@ -385,7 +387,7 @@ public final class Tools {
      */
     public static void error(final String msg) {
         System.out.println(ERROR_STRING + msg);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(
@@ -673,7 +675,7 @@ public final class Tools {
         errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
         errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
         errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
@@ -694,7 +696,7 @@ public final class Tools {
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(guiData.getMainFrame(),
@@ -1752,7 +1754,7 @@ public final class Tools {
                     @Override
                     public void run() {
                         final int index = list.locationToIndex(evt.getPoint());
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 list.setSelectedIndex(index);
@@ -1790,7 +1792,7 @@ public final class Tools {
                             return;
                         }
                         prevScrollingMenuIndex = index;
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 list.setSelectedIndex(index);
@@ -1825,7 +1827,7 @@ public final class Tools {
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             typeToSearchField.requestFocus();
                         }
@@ -1837,7 +1839,7 @@ public final class Tools {
                     infoObject.hidePopup();
                 } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
                     final MyMenuItem item = list.getSelectedValue();
-                    //SwingUtilities.invokeLater(new Runnable() {
+                    //Tools.invokeLater(new Runnable() {
                     //    @Override
                     //    public void run() {
                     //        //menu.setPopupMenuVisible(false);
@@ -1871,7 +1873,7 @@ public final class Tools {
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_DOWN) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             list.requestFocus();
                             /* don't need to press down arrow twice */
@@ -1907,7 +1909,7 @@ public final class Tools {
             }
 
             public void menuDeselected(final MenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         boolean pVisible = false;
@@ -1932,7 +1934,7 @@ public final class Tools {
 
             public void menuSelected(final MenuEvent e) {
                 final Point l = menu.getLocationOnScreen();
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         for (final JDialog otherP : popups) {
                             otherP.dispose();
@@ -1945,7 +1947,7 @@ public final class Tools {
                         typeToSearchField.requestFocus();
                     }
                 });
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         /* Setting location again. Moving it one pixel fixes
@@ -2711,6 +2713,20 @@ public final class Tools {
         } catch (final InvocationTargetException x) {
             Tools.printStackTrace();
         }
+    }
+
+    /** Convenience invoke later function. */
+    public static void invokeLater(final Runnable runnable) {
+        invokeLater(CHECK_SWING_THREAD, runnable);
+    }
+
+    /** Convenience invoke later function. */
+    public static void invokeLater(final boolean checkSwingThread,
+                                   final Runnable runnable) {
+        if (checkSwingThread) {
+            isNotSwingThread();
+        }
+        SwingUtilities.invokeLater(runnable);
     }
 
     /** Return directory part (to the /) of the filename. */

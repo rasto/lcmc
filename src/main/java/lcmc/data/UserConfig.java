@@ -50,7 +50,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.swing.SwingUtilities;
 
 /**
  * This class parses xml from user configs and creates data objects,
@@ -199,7 +198,7 @@ public final class UserConfig extends XML {
                             host.waitOnLoading();
                         }
                         cluster.getClusterTab().addClusterView();
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             public void run() {
                                 cluster.getClusterTab().requestFocus();
                             }

@@ -78,7 +78,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.BoxLayout;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
@@ -840,7 +839,7 @@ public class ServiceInfo extends EditableInfo {
                             final Widget wi = operationsComboBoxHash.get(op,
                                                                          param);
                             mOperationsComboBoxHashReadLock.unlock();
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     wi.setEnabled(operationIdRef == null);
@@ -1372,7 +1371,8 @@ public class ServiceInfo extends EditableInfo {
                 if (savedOperationIdRef == null
                     && defaultValues != allAreDefaultValues) {
                     if (allAreDefaultValues) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(
@@ -1380,7 +1380,8 @@ public class ServiceInfo extends EditableInfo {
                             }
                         });
                     } else {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(
@@ -1637,7 +1638,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public final void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (currentText.equals(onText)) {
@@ -1785,7 +1786,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final String newValue = defaultValue;
                     if (!Tools.areEqual(oldValue, newValue)) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 if (wi != null) {
@@ -2139,7 +2140,7 @@ public class ServiceInfo extends EditableInfo {
                          leftWidth,
                          rightWidth,
                          0);
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     public void run() {
                         wiLabel.setToolTipText(labelText);
                     }
@@ -2167,7 +2168,7 @@ public class ServiceInfo extends EditableInfo {
                                 setOperationsSameAs(info);
                                 final String[] params = getParametersFromXML();
                                 setApplyButtons(CACHED_FIELD, params);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         if (info != null) {
@@ -2455,7 +2456,7 @@ public class ServiceInfo extends EditableInfo {
                                                title,
                                                masterSlave,
                                                getBrowser());
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     setCloneInfo(ci);
@@ -2506,7 +2507,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             });
         } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final CloneInfo ci = getCloneInfo();
@@ -2557,7 +2558,7 @@ public class ServiceInfo extends EditableInfo {
                                 @Override
                                 public void check(final Object value) {
                                     setApplyButtons(CACHED_FIELD, params);
-                                    SwingUtilities.invokeLater(
+                                    Tools.invokeLater(
                                         new Runnable() {
                                             @Override
                                             public void run() {
@@ -2630,7 +2631,7 @@ public class ServiceInfo extends EditableInfo {
                                 final String[] params =
                                                     getParametersFromXML();
                                 setApplyButtons(CACHED_FIELD, params);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         if (info != null) {
@@ -2894,7 +2895,7 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -3359,7 +3360,7 @@ public class ServiceInfo extends EditableInfo {
                     final Widget wi = operationsComboBoxHash.get(op, param);
                     mOperationsComboBoxHashReadLock.unlock();
                     if (wi != null) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.setEnabled(savedOpIdRef == null);
@@ -3413,7 +3414,7 @@ public class ServiceInfo extends EditableInfo {
 
         }
         if (!testOnly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -3718,7 +3719,7 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     setApplyButtons(null, params);
                     final DefaultMutableTreeNode node = getNode();
@@ -4227,7 +4228,7 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     final DefaultMutableTreeNode newServiceNode =
                                        new DefaultMutableTreeNode(serviceInfo);
@@ -4252,7 +4253,7 @@ public class ServiceInfo extends EditableInfo {
         }
         getBrowser().getCRMGraph().reloadServiceMenus();
         if (reloadNode) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().getCRMGraph().scale();
@@ -4558,7 +4559,7 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         final CloneInfo ci = cloneInfo;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();
@@ -4646,7 +4647,7 @@ public class ServiceInfo extends EditableInfo {
                                         true,
                                         getBrowser().getDCHost(),
                                         testOnly);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 repaint();
@@ -4727,7 +4728,7 @@ public class ServiceInfo extends EditableInfo {
                 colocationWi.setPreferredSize(colocationWi.getMinimumSize());
                 orderWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 orderWi.setPreferredSize(orderWi.getMinimumSize());
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         setEnabled(false);
@@ -4782,29 +4783,23 @@ public class ServiceInfo extends EditableInfo {
                 colOrdPanel.add(colocationWi);
                 colOrdPanel.add(orderWi);
                 final MyMenu thisM = this;
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean ret =
-                                        Tools.getScrollingMenu(name,
-                                                               colOrdPanel,
-                                                               thisM,
-                                                               dlm,
-                                                               list,
-                                                               thisClass,
-                                                               popups,
-                                                               callbackHash);
-                            if (!ret) {
-                                setEnabled(false);
-                            }
+                Tools.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        final boolean ret =
+                                    Tools.getScrollingMenu(name,
+                                                           colOrdPanel,
+                                                           thisM,
+                                                           dlm,
+                                                           list,
+                                                           thisClass,
+                                                           popups,
+                                                           callbackHash);
+                        if (!ret) {
+                            setEnabled(false);
                         }
-                    });
-                } catch (final InterruptedException ix) {
-                    Thread.currentThread().interrupt();
-                } catch (final InvocationTargetException x) {
-                    Tools.printStackTrace();
-                }
+                    }
+                });
                 super.update();
             }
         };
@@ -5034,7 +5029,7 @@ public class ServiceInfo extends EditableInfo {
             }
 
             private void updateThread() {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                        setEnabled(false);
@@ -5058,43 +5053,30 @@ public class ServiceInfo extends EditableInfo {
                     final ResourceAgent linbitDrbdService =
                                                   crmXML.getHbLinbitDrbd();
                     /* Linbit:DRBD */
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                addDrbdLinbitMenu(thisMenu,
-                                                  crmXML,
-                                                  pos,
-                                                  fsService,
-                                                  testOnly);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
-                    }
-
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            addDrbdLinbitMenu(thisMenu,
+                                              crmXML,
+                                              pos,
+                                              fsService,
+                                              testOnly);
+                        }
+                    });
                 }
                 if (crmXML.isDrbddiskPresent()) { /* just skip it,
                                                      if it is not */
                     /* drbddisk */
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                addDrbddiskMenu(thisMenu,
-                                                crmXML,
-                                                pos,
-                                                fsService,
-                                                testOnly);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
-                    }
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            addDrbddiskMenu(thisMenu,
+                                            crmXML,
+                                            pos,
+                                            fsService,
+                                            testOnly);
+                        }
+                    });
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                          "IPaddr2",
@@ -5102,39 +5084,27 @@ public class ServiceInfo extends EditableInfo {
                                          ResourceAgent.OCF_CLASS);
                 if (ipService != null) { /* just skip it, if it is not*/
                     /* ipaddr */
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                addIpMenu(thisMenu,
-                                          pos,
-                                          ipService,
-                                          testOnly);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
-                    }
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            addIpMenu(thisMenu,
+                                      pos,
+                                      ipService,
+                                      testOnly);
+                        }
+                    });
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     /* Filesystem */
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                addFilesystemMenu(thisMenu,
-                                                  pos,
-                                                  fsService,
-                                                  testOnly);
-                            }
-                        });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
-                    }
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            addFilesystemMenu(thisMenu,
+                                              pos,
+                                              fsService,
+                                              testOnly);
+                        }
+                    });
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -5173,50 +5143,38 @@ public class ServiceInfo extends EditableInfo {
                     final MyListModel<MyMenuItem> dlm =
                                                  new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
-                        try {
-                            SwingUtilities.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    addResourceAgentMenu(ra,
-                                                         dlm,
-                                                         pos,
-                                                         popups,
-                                                         colocationWi,
-                                                         orderWi,
-                                                         testOnly);
-                                }
-                            });
-                        } catch (final InterruptedException ix) {
-                            Thread.currentThread().interrupt();
-                        } catch (final InvocationTargetException x) {
-                            Tools.printStackTrace();
-                        }
-                    }
-                    try {
-                        SwingUtilities.invokeAndWait(new Runnable() {
+                        Tools.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
-                                final boolean ret = Tools.getScrollingMenu(
-                                        ClusterBrowser.getClassMenu(cl),
-                                        colOrdPanel,
-                                        classItem,
-                                        dlm,
-                                        new MyList<MyMenuItem>(dlm,
-                                                               getBackground()),
-                                        thisClass,
-                                        popups,
-                                        null);
-                                if (!ret) {
-                                    classItem.setEnabled(false);
-                                }
-                                thisMenu.add(classItem);
+                                addResourceAgentMenu(ra,
+                                                     dlm,
+                                                     pos,
+                                                     popups,
+                                                     colocationWi,
+                                                     orderWi,
+                                                     testOnly);
                             }
                         });
-                    } catch (final InterruptedException ix) {
-                        Thread.currentThread().interrupt();
-                    } catch (final InvocationTargetException x) {
-                        Tools.printStackTrace();
                     }
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            final boolean ret = Tools.getScrollingMenu(
+                                    ClusterBrowser.getClassMenu(cl),
+                                    colOrdPanel,
+                                    classItem,
+                                    dlm,
+                                    new MyList<MyMenuItem>(dlm,
+                                                           getBackground()),
+                                    thisClass,
+                                    popups,
+                                    null);
+                            if (!ret) {
+                                classItem.setEnabled(false);
+                            }
+                            thisMenu.add(classItem);
+                        }
+                    });
                 }
                 super.update();
             }
@@ -5697,7 +5655,7 @@ public class ServiceInfo extends EditableInfo {
             public void update() {
                 super.update();
                 final MyMenu self = this;
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     public void run() {
                         removeAll();
                         addFilesMenuItems(self);
@@ -6362,7 +6320,7 @@ public class ServiceInfo extends EditableInfo {
                 defaultOpIdRef = savedOpIdRef.toString();
             }
             final String idRef = defaultOpIdRef;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsOperationsWi.reloadComboBox(
@@ -6378,7 +6336,7 @@ public class ServiceInfo extends EditableInfo {
                 defaultMAIdRef = savedMAIdRef.toString();
             }
             final String idRef = defaultMAIdRef;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsMetaAttrsWi.reloadComboBox(

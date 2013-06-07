@@ -70,7 +70,6 @@ import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.ButtonCallback;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -640,7 +639,7 @@ public final class ClusterBrowser extends Browser {
         DefaultMutableTreeNode resource;
 
         /* cluster hosts */
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 clusterHostsNode.removeAllChildren();
             }
@@ -660,7 +659,7 @@ public final class ClusterBrowser extends Browser {
 
         /* networks */
         updateNetworks();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 crmGraph.scale();
@@ -687,7 +686,7 @@ public final class ClusterBrowser extends Browser {
                         host.getName(),
                         Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 }
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(
@@ -834,7 +833,7 @@ public final class ClusterBrowser extends Browser {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 drbdGraph.scale();
             }
@@ -954,7 +953,7 @@ public final class ClusterBrowser extends Browser {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         drbdGraph.scale();
                     }
@@ -1073,7 +1072,7 @@ public final class ClusterBrowser extends Browser {
                            } while (event != null || drbdConfig != null);
                            Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
-                               SwingUtilities.invokeLater(new Runnable() {
+                               Tools.invokeLater(new Runnable() {
                                    public void run() {
                                        getDrbdGraph().getDrbdInfo().setParameters();
                                        updateDrbdResources();
@@ -1093,7 +1092,7 @@ public final class ClusterBrowser extends Browser {
                                        public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
-                                           SwingUtilities.invokeLater(
+                                           Tools.invokeLater(
                                                new Runnable() {
                                                    @Override
                                                    public void run() {
@@ -1293,7 +1292,7 @@ public final class ClusterBrowser extends Browser {
                         clusterName,
                         Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                            crmGraph.scale();
@@ -1385,7 +1384,7 @@ public final class ClusterBrowser extends Browser {
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
                     @SuppressWarnings("unchecked")
@@ -1436,7 +1435,7 @@ public final class ClusterBrowser extends Browser {
     private void updateAvailableServices() {
         DefaultMutableTreeNode resource;
         Tools.debug(this, "update available services");
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 availableServicesNode.removeAllChildren();
             }
@@ -1501,7 +1500,7 @@ public final class ClusterBrowser extends Browser {
         }
 
         /* remove nodes */
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 for (final DefaultMutableTreeNode node : nodesToRemove) {
                     node.removeFromParent();
@@ -1696,7 +1695,7 @@ public final class ClusterBrowser extends Browser {
         if (networksNode != null) {
             DefaultMutableTreeNode resource;
             final Network[] networks = cluster.getCommonNetworks();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     networksNode.removeAllChildren();
                 }

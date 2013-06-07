@@ -51,7 +51,6 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JCheckBox;
@@ -217,7 +216,7 @@ public final class GroupInfo extends ServiceInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         if (!testOnly) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -614,7 +613,7 @@ public final class GroupInfo extends ServiceInfo {
             }
 
             private void updateThread() {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         setEnabled(false);
@@ -679,7 +678,7 @@ public final class GroupInfo extends ServiceInfo {
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             add(classItem);
@@ -739,7 +738,7 @@ public final class GroupInfo extends ServiceInfo {
                         }
 
                         public void updateThread() {
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     setEnabled(false);
@@ -757,7 +756,7 @@ public final class GroupInfo extends ServiceInfo {
                                 serviceMenus.add(u);
                                 u.update();
                             }
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     for (final UpdatableItem u

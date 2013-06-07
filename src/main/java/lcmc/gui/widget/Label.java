@@ -23,9 +23,9 @@ package lcmc.gui.widget;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
+import lcmc.utilities.Tools;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.JLabel;
 
@@ -113,7 +113,7 @@ public final class Label extends Widget {
     /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

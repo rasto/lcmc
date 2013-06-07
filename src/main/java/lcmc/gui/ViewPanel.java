@@ -41,7 +41,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeModelEvent;
-import javax.swing.SwingUtilities;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
@@ -186,7 +185,8 @@ public class ViewPanel extends JPanel {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 tree.expandPath(tp);
@@ -229,7 +229,7 @@ public class ViewPanel extends JPanel {
             lastSelectedInfo = (Info) nodeInfo;
         }
         if (nodeInfo != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -252,7 +252,7 @@ public class ViewPanel extends JPanel {
     final void setRightComponentInView(final Browser browser,
                                        final Info nodeInfo) {
         if (viewSP != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {

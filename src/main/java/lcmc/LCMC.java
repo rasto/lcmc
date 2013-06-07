@@ -768,7 +768,7 @@ public final class LCMC extends JPanel {
             Tools.parseAutoArgs(autoArgs);
         }
         createMainFrame(mainFrame);
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 createAndShowGUI((Container) mainFrame);

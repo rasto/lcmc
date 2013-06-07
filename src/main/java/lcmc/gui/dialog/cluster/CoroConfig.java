@@ -65,7 +65,6 @@ import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import javax.swing.JComponent;
 import java.awt.Component;
@@ -158,7 +157,7 @@ final class CoroConfig extends DialogCluster {
                         new Runnable() {
                             @Override
                             public void run() {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeConfigButton.setEnabled(false);
@@ -255,7 +254,7 @@ final class CoroConfig extends DialogCluster {
                 @Override
                 public void run() {
                     boolean configOk = updateOldAisConfig();
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             makeConfigButton.setEnabled(false);
@@ -416,7 +415,7 @@ final class CoroConfig extends DialogCluster {
         }
 
         if (configs[0].equals(AIS_CONF_ERROR_STRING)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     configStatus.setText(hosts[0] + Tools.getString(
@@ -434,7 +433,7 @@ final class CoroConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(AIS_CONF_ERROR_STRING)) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(host + ": "
@@ -445,7 +444,7 @@ final class CoroConfig extends DialogCluster {
                     });
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(Tools.getString(
@@ -467,7 +466,7 @@ final class CoroConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configStatus.setText(
@@ -495,7 +494,7 @@ final class CoroConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (noConfigsF) {
@@ -521,7 +520,7 @@ final class CoroConfig extends DialogCluster {
     /** Shows all corosync or openais.conf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeConfigButton.setEnabled(false);
@@ -566,7 +565,7 @@ final class CoroConfig extends DialogCluster {
     private void updateConfigPanelEditable(final boolean configChanged) {
         this.configChanged = configChanged;
         final Host[] hosts = getCluster().getHostsArray();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!configChanged) {
@@ -622,7 +621,7 @@ final class CoroConfig extends DialogCluster {
 
                         @Override
                         public void componentMoved(final ComponentEvent e) {
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (alreadyMoved) {
@@ -731,7 +730,7 @@ final class CoroConfig extends DialogCluster {
 
         for (final AisCastAddress c : aisCastAddresses) {
             if (c.equals("\t", type, bindnetaddr, address, port)) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         addButton.setEnabled(false);
@@ -740,7 +739,7 @@ final class CoroConfig extends DialogCluster {
                 return;
             }
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 addButton.setEnabled(true);
@@ -1059,7 +1058,7 @@ final class CoroConfig extends DialogCluster {
                         public void run() {
                             if (EDIT_CONFIG_STRING.equals(text)) {
                                 updateConfigPanelEditable(configChanged);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(
@@ -1071,7 +1070,7 @@ final class CoroConfig extends DialogCluster {
                                 });
                             } else if (SEE_EXISTING_STRING.equals(text)) {
                                 updateConfigPanelExisting();
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(

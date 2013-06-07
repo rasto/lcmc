@@ -41,7 +41,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 /**
@@ -104,7 +103,7 @@ public final class LVSnapshot extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        SwingUtilities.invokeLater(new EnableSnapshotRunnable(true));
+        Tools.invokeLater(new EnableSnapshotRunnable(true));
     }
 
     private class EnableSnapshotRunnable implements Runnable {

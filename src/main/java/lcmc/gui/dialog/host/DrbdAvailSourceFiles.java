@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -108,7 +107,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                         }
                     }
                     drbdTarballCombo.clear();
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdTarballCombo.reloadComboBox(
@@ -125,7 +124,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 @Override
                 public void doneError(final String ans,
                                                 final int exitCode) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBarDoneError();

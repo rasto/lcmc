@@ -39,7 +39,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -263,7 +262,7 @@ public final class VMSInfo extends CategoryInfo {
         getBrowser().setNode(resource);
         getNode().add(resource);
         getBrowser().reload(getNode(), true);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 vmsdi.getInfoPanel();

@@ -74,7 +74,6 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
@@ -479,7 +478,7 @@ public final class BlockDevInfo extends EditableInfo {
         if (DRBD_MD_INDEX_PARAM.equals(param)) {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            //SwingUtilities.invokeLater(new Runnable() {
+            //Tools.invokeLater(new Runnable() {
             //    @Override
             //    public void run() {
             //        gwi.setAlwaysEditable(true);
@@ -488,7 +487,7 @@ public final class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     gwi.setEditable(false);
@@ -520,14 +519,16 @@ public final class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
                         @Override
                         public void run() {
                             ind.setEnabled(!internal);
                         }
                     });
                     if (indW != null) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 indW.setEnabled(!internal);

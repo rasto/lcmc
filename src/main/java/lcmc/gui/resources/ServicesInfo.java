@@ -64,7 +64,6 @@ import java.util.concurrent.CountDownLatch;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
@@ -321,7 +320,7 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         if (infoPanel == null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getInfoPanel();
@@ -582,7 +581,7 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         if (newService) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     getBrowser().reloadAndWait(
                                         getBrowser().getServicesNode(), false);
@@ -897,7 +896,7 @@ public final class ServicesInfo extends EditableInfo {
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 hg.killRemovedEdges();
                 final Map<String, ServiceInfo> idToInfoHash =
@@ -1101,7 +1100,7 @@ public final class ServicesInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -1222,7 +1221,7 @@ public final class ServicesInfo extends EditableInfo {
                 getBrowser().reload(newServiceNode, true);
             }
             getBrowser().reloadAllComboBoxes(newServiceInfo);
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hg.scale();
@@ -1315,7 +1314,7 @@ public final class ServicesInfo extends EditableInfo {
                 t.start();
             }
             private void updateThread() {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         setEnabled(false);
@@ -1370,7 +1369,7 @@ public final class ServicesInfo extends EditableInfo {
                         ldMenuItem.setEnabled(false);
                     }
                     ldMenuItem.setPos(pos);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             add(ldMenuItem);
@@ -1405,7 +1404,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     };
                     ipMenuItem.setPos(pos);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             add(ipMenuItem);
@@ -1447,7 +1446,7 @@ public final class ServicesInfo extends EditableInfo {
                         ddMenuItem.setEnabled(false);
                     }
                     ddMenuItem.setPos(pos);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             add(ddMenuItem);
@@ -1531,7 +1530,7 @@ public final class ServicesInfo extends EditableInfo {
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             add(classItem);
@@ -1578,7 +1577,7 @@ public final class ServicesInfo extends EditableInfo {
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             hg.scale();
@@ -1635,7 +1634,7 @@ public final class ServicesInfo extends EditableInfo {
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             hg.scale();
@@ -1977,7 +1976,7 @@ public final class ServicesInfo extends EditableInfo {
             return;
         }
         final String oldValue = oldWi.getStringValue();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             public void run() {
                 if ("".equals(oldValue)) {
                     newWi.setValueNoListeners(null);
@@ -2051,7 +2050,7 @@ public final class ServicesInfo extends EditableInfo {
                                     null, /* clone id */
                                     null,
                                     CRM.LIVE);
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         if (!(newSi instanceof CloneInfo)) {
                             oldSi.getInfoPanel();
@@ -2091,7 +2090,7 @@ public final class ServicesInfo extends EditableInfo {
                                 continue;
                             }
                         }
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             public void run() {
                                 copyPasteField(oldCi0.getWidget(param, null),
                                                newCi.getWidget(param, null));
@@ -2119,13 +2118,13 @@ public final class ServicesInfo extends EditableInfo {
                         newChild.getInfoPanel();
                         newChild.waitForInfoPanel();
                         Tools.waitForSwing();
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             public void run() {
                                 copyPasteFields(oldChild, newChild);
                             }
                         });
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             getBrowser().reload(newGi.getNode(), false);
                         }

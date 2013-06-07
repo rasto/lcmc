@@ -60,7 +60,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -1526,7 +1525,7 @@ public final class Host {
         if (!enableOnConnectList.contains(c)) {
             enableOnConnectList.add(c);
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 c.setEnabled(isConnected());
@@ -1541,7 +1540,7 @@ public final class Host {
      */
     public void setConnected() {
         final boolean con = isConnected();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent c : enableOnConnectList) {
@@ -1857,7 +1856,7 @@ public final class Host {
                                                        cb.getDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXML(dxml);
-                                     SwingUtilities.invokeLater(new Runnable() {
+                                     Tools.invokeLater(new Runnable() {
                                          public void run() {
                                              cb.getDrbdGraph().getDrbdInfo().setParameters();
                                              cb.updateDrbdResources();

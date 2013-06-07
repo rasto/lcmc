@@ -61,7 +61,6 @@ import java.util.TreeSet;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import edu.uci.ics.jung.visualization.Layer;
 
 import java.util.concurrent.locks.Lock;
@@ -422,7 +421,7 @@ public final class CRMGraph extends ResourceGraph {
                 addOrder(null, parent, serviceInfo);
             }
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 repaint();
@@ -468,7 +467,7 @@ public final class CRMGraph extends ResourceGraph {
         final Vertex vP0 = vP;
         final Vertex v0 = v;
 
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 mHbConnectionWriteLock.lock();
                 Edge edge = null;
@@ -608,7 +607,7 @@ public final class CRMGraph extends ResourceGraph {
         final Vertex vWithRsc0 = vWithRsc;
         final Vertex vRsc0 = vRsc;
         final ServiceInfo withRsc0 = withRsc;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 mHbConnectionWriteLock.lock();
                 Edge edge = null;
@@ -1565,7 +1564,7 @@ public final class CRMGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         removeEdge(edge, testOnly);
                     }
@@ -1597,7 +1596,7 @@ public final class CRMGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         removeEdge(edge, testOnly);
                     }
@@ -1655,7 +1654,7 @@ public final class CRMGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         removeEdge(edge, testOnly);
                     }

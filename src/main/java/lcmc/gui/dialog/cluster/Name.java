@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
@@ -76,7 +75,7 @@ public final class Name extends DialogCluster {
     protected void checkFields(final Widget field) {
         final boolean isValid =
                             (nameField.getStringValue().trim().length() > 0);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
@@ -114,7 +113,7 @@ public final class Name extends DialogCluster {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 nameField.requestFocus();
@@ -123,14 +122,14 @@ public final class Name extends DialogCluster {
         if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
             final String name = Tools.getConfigData().getAutoClusters().get(0);
             if (!".".equals(name)) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         nameField.setValue(name);
                     }
                 });
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     pressNextButton();

@@ -57,7 +57,6 @@ import javax.swing.BoxLayout;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -1715,7 +1714,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                              + host.getName());
         hostBtn.miniButton();
         final MyButton hBtn = hostBtn;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
@@ -1736,7 +1735,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                           remotePort);
                             } else if (hBtn.getIcon()
                                        == HostBrowser.HOST_ON_ICON) {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         hBtn.setEnabled(false);
@@ -1944,7 +1943,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         updateTable(SERIAL_TABLE);
         updateTable(PARALLEL_TABLE);
         updateTable(VIDEO_TABLE);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, getParametersFromXML());
@@ -2009,7 +2008,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
             final Widget realParamWi = rpwi;
             if (!host.isConnected()) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         wi.setEnabled(false);
@@ -2195,7 +2194,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                               ClusterBrowser.SERVICE_LABEL_WIDTH
                               + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -3744,7 +3743,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         Tools.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final Widget wizardHostWi =
@@ -3842,7 +3841,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
         if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode thisNode = getNode();
@@ -3877,7 +3876,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         updateParameters();
         Tools.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Host host : getBrowser().getClusterHosts()) {
@@ -5235,7 +5234,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                   final boolean stopped) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable && stopped);
@@ -5253,7 +5252,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                  final MyButton hostBtn) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable);
@@ -5271,7 +5270,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                        final Widget hostWi,
                                        final MyButton hostBtn) {
         if (hostWi != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(false);

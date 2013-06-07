@@ -63,7 +63,6 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 
@@ -387,7 +386,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 }
             });
             storeComboBoxValues(params);
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final DrbdResourceInfo dri : getDrbdResources()) {

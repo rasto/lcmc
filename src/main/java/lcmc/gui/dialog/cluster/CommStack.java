@@ -40,7 +40,6 @@ import java.awt.Color;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 
@@ -155,7 +154,7 @@ final class CommStack extends DialogCluster {
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
         if (ais || hb) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (ais) {
@@ -171,7 +170,7 @@ final class CommStack extends DialogCluster {
         }
         enableComponents();
         if (ais || hb) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(true);

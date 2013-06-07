@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -148,7 +147,7 @@ public class DrbdAvailFiles extends DialogHost {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         printErrorAndRetry(
@@ -183,7 +182,7 @@ public class DrbdAvailFiles extends DialogHost {
                                 }
                                 final String[] filesA = files.toArray(
                                                 new String[files.size()]);
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         answerPaneSetText(Tools.join("\n",
@@ -194,7 +193,7 @@ public class DrbdAvailFiles extends DialogHost {
                                                        Tools.shellList(filesA));
                                 allDone();
                             } else {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         printErrorAndRetry(Tools.getString(
@@ -207,7 +206,7 @@ public class DrbdAvailFiles extends DialogHost {
                         @Override
                         public void doneError(final String ans,
                                                         final int exitCode) {
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     printErrorAndRetry(
@@ -315,7 +314,7 @@ public class DrbdAvailFiles extends DialogHost {
                             new JComponent[]{buttonClass(nextButton())});
                     disableComponents(new JComponent[]{drbdBuildCombo});
                     final String item = drbdVersionCombo.getStringValue();
-                    SwingUtilities.invokeLater(
+                    Tools.invokeLater(
                         new Runnable() {
                             @Override
                             public void run() {

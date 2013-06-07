@@ -33,7 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -120,7 +119,7 @@ final class InstallationDisk extends VMConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enable);

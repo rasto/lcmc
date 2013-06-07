@@ -36,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -109,7 +108,7 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void initDialogAfterVisible() {
         nextDialogObject = null;
         final ProxyCheckInstallation thisClass = this;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 proxyButton.setBackgroundColor(
@@ -129,7 +128,7 @@ final class ProxyCheckInstallation extends DialogHost {
                     final InstallMethods im =
                                  (InstallMethods) proxyInstMethodWi.getValue();
                     getHost().setProxyInstallMethod(im.getIndex());
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -163,7 +162,7 @@ final class ProxyCheckInstallation extends DialogHost {
      */
     void checkProxy(final String ans) {
         if ("".equals(ans) || "\n".equals(ans)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     proxyLabel.setText(": " + Tools.getString(
@@ -180,7 +179,7 @@ final class ProxyCheckInstallation extends DialogHost {
             printErrorAndRetry(Tools.getString(
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     proxyLabel.setText(": " + ans.trim());
@@ -200,7 +199,7 @@ final class ProxyCheckInstallation extends DialogHost {
             progressBarDone();
             //nextButtonSetEnabled(true);
             enableComponents();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     answerPaneSetText(Tools.getString(

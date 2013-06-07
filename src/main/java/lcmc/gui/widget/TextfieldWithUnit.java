@@ -32,7 +32,6 @@ import lcmc.utilities.WidgetListener;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
@@ -176,7 +175,7 @@ public final class TextfieldWithUnit extends Widget {
                     o = null;
                 }
                 if (o == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             editor.setText("");
@@ -241,7 +240,8 @@ public final class TextfieldWithUnit extends Widget {
                 if (!u.isEmpty()) {
                     u.setEmpty(true);
                     unitEnabled = false;
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
                         @Override
                         public void run() {
                             unitComboBox.repaint();
@@ -254,7 +254,8 @@ public final class TextfieldWithUnit extends Widget {
                     u.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 unitComboBox.repaint();
@@ -277,7 +278,7 @@ public final class TextfieldWithUnit extends Widget {
     @Override
     protected void setComponentsVisible(final boolean visible) {
         super.setComponentsEnabled(visible);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 textFieldPart.setVisible(visible);
@@ -366,7 +367,7 @@ public final class TextfieldWithUnit extends Widget {
     /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -37,7 +37,6 @@ import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.UIManager;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.border.LineBorder;
@@ -365,7 +364,7 @@ public final class ClustersPanel extends JPanel {
                 }
                 final String text = upgradeCheck;
                 mUpgradeLock.unlock();
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final JEditorPane field : upgradeTextFields) {

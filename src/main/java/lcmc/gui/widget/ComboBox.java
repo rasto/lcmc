@@ -29,7 +29,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
@@ -114,7 +113,7 @@ public final class ComboBox extends Widget {
                     o = null;
                 }
                 if (o == null) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             editor.setText("");
@@ -156,7 +155,7 @@ public final class ComboBox extends Widget {
     @Override
     public void reloadComboBox(final String selectedValue,
                                final Object[] items) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MComboBox cb = (MComboBox) getComponent();
@@ -238,7 +237,7 @@ public final class ComboBox extends Widget {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getComponent();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 Object o = getValue();
@@ -309,7 +308,7 @@ public final class ComboBox extends Widget {
     /** Clears the combo box. */
     @Override
     public void clear() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 ((MComboBox) getComponent()).removeAllItems();
@@ -377,7 +376,7 @@ public final class ComboBox extends Widget {
         }
         final int pos = p + 3;
         if (pos >= 0 && pos < ip.length()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tc.select(pos, ip.length());
@@ -404,7 +403,7 @@ public final class ComboBox extends Widget {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getComponent();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

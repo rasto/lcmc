@@ -747,7 +747,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         cb.setDrbdXML(dxml);
         cb.drbdStatusUnlock();
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 cb.updateDrbdResources();
                 if (!testOnly) {

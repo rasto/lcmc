@@ -26,7 +26,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -45,7 +44,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     /** Prepares a new <code>MyListModel</code> object. */
     public MyListModel() {
         super();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 filterField.selectAll();
             }
@@ -77,7 +76,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         filteredItems.clear();
         String filter = filterField.getText();
         if (START_TEXT.equals(filter)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 public void run() {
                     filterField.selectAll();
                 }

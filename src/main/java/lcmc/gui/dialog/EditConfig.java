@@ -32,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.text.Document;
@@ -213,7 +212,7 @@ public final class EditConfig extends ConfigDialog {
             hcb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             setConfigArea(
                                      results[index],
@@ -238,7 +237,7 @@ public final class EditConfig extends ConfigDialog {
                 }
             });
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 setConfigArea(results[0], errors[0], true);
             }

@@ -44,7 +44,6 @@ import javax.swing.event.CaretEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.DefaultCaret;
-import javax.swing.SwingUtilities;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Dimension;
@@ -503,7 +502,7 @@ public final class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public void nextCommand() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(prompt(), promptColor);
@@ -515,7 +514,7 @@ public final class TerminalPanel extends JScrollPane {
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(lines[0], commandColor);
@@ -530,7 +529,7 @@ public final class TerminalPanel extends JScrollPane {
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(output, outputColor);
@@ -540,7 +539,7 @@ public final class TerminalPanel extends JScrollPane {
 
     /** Adds array of command output to the terminal textarea and scrolls up. */
     void addCommandOutput(final String[] output) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < output.length; i++) {
@@ -558,7 +557,7 @@ public final class TerminalPanel extends JScrollPane {
 
     /** Adds content string (output of a command) to the terminal area. */
     public void addContent(final String c) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, outputColor);
@@ -568,7 +567,7 @@ public final class TerminalPanel extends JScrollPane {
 
     /** Adds content to the terminal textarea and scrolls up. */
     public void addContentErr(final String c) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, errorColor);

@@ -69,7 +69,7 @@ public final class About extends ConfigDialog {
                       getAnswerPane(Tools.getString("Dialog.About.Licences"));
 
         pane.add(sp);
-        //SwingUtilities.invokeLater(new Runnable() {
+        //Tools.invokeLater(new Runnable() {
         //    @Override
         //    public void run() {
         //        sp.getVerticalScrollBar().setValue(0);

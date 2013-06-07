@@ -31,7 +31,6 @@ import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 
 /**
@@ -70,7 +69,7 @@ public class SSH extends DialogHost {
                              answerPaneSetText(
                                 Tools.getString("Dialog.Host.SSH.Connected"));
                              //enableComponents();
-                             SwingUtilities.invokeLater(new Runnable() {
+                             Tools.invokeLater(new Runnable() {
                                  @Override
                                  public void run() {
                                     buttonClass(nextButton()).pressButton();
@@ -81,7 +80,7 @@ public class SSH extends DialogHost {
                          @Override
                          public void doneError(final String errorText) {
                              getHost().setConnected();
-                             SwingUtilities.invokeLater(new Runnable() {
+                             Tools.invokeLater(new Runnable() {
                                  @Override
                                  public void run() {
                                     printErrorAndRetry(Tools.getString(

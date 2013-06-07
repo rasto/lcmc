@@ -28,7 +28,6 @@ import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
@@ -146,7 +145,7 @@ public final class RadioGroup extends Widget {
         final JComponent c = componentsHash.get(s);
         mComponentsReadLock.unlock();
         if (c != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);
@@ -200,7 +199,7 @@ public final class RadioGroup extends Widget {
     protected void setComponentsVisible(final boolean visible) {
         final JComponent comp = getComponent();
         final JLabel label = getLabel();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -275,7 +274,7 @@ public final class RadioGroup extends Widget {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getComponent();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

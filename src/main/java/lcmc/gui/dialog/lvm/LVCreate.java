@@ -50,7 +50,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SpringLayout;
 
 /** Create LV dialog. */
@@ -122,7 +121,7 @@ public final class LVCreate extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        SwingUtilities.invokeLater(new EnableCreateRunnable(true));
+        Tools.invokeLater(new EnableCreateRunnable(true));
     }
 
     private class EnableCreateRunnable implements Runnable {

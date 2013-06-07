@@ -36,7 +36,6 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -250,7 +249,7 @@ public abstract class DialogHost extends WizardDialog {
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         if (Tools.getConfigData().getAutoOptionHost(autoOption) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     instMethodWi.setSelectedIndex(
@@ -266,7 +265,7 @@ public abstract class DialogHost extends WizardDialog {
                                       (InstallMethods) instMethodWi.getValue();
                 final String toolTip =
                                     getInstToolTip(prefix, method.getIndex());
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         instMethodWi.setToolTipText(toolTip);

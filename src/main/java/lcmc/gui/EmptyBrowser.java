@@ -29,7 +29,6 @@ import lcmc.gui.resources.Info;
 import lcmc.gui.resources.AllHostsInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.SwingUtilities;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -104,7 +103,7 @@ public final class EmptyBrowser extends Browser {
         /* all hosts */
         final Host[] allHosts =
                               Tools.getConfigData().getHosts().getHostsArray();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 DefaultMutableTreeNode resource;

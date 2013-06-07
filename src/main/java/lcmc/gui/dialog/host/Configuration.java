@@ -36,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.awt.Component;
 
 import java.net.UnknownHostException;
@@ -108,7 +107,7 @@ public class Configuration extends DialogHost {
      */
     @Override
     protected final void checkFields(final Widget field) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent btn : nextButtons()) {
@@ -223,7 +222,7 @@ public class Configuration extends DialogHost {
             }
             final String[] items = getHost().getIps(hop);
             if (items != null) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         ipCombo[hop].reloadComboBox(getHost().getIp(hop),
@@ -317,7 +316,7 @@ public class Configuration extends DialogHost {
                     if (name == null || "null".equals(name)) {
                         name = "";
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (int i = 0; i < getHops(); i++) {

@@ -27,8 +27,6 @@ import lcmc.gui.SSHGui;
 import lcmc.gui.ProgressBar;
 import lcmc.configs.DistResource;
 
-import javax.swing.SwingUtilities;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1397,7 +1395,7 @@ public final class SSH {
                 connection = conn;
                 mConnectionLock.unlock();
                 host.setConnected();
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         host.getTerminalPanel().nextCommand();

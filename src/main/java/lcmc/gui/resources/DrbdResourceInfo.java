@@ -61,7 +61,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Enumeration;
 import java.util.HashSet;
-import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -1993,7 +1992,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         final int s = ProxyNetInfo.PROXY_PREFIX.length();
                         /* select the IP part */
                         comboBox.setAlwaysEditable(true);
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             public void run() {
                                 comboBox.select(
                                        s, s + NetInfo.IP_PLACEHOLDER.length());
@@ -2216,7 +2215,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
 
                 public void updateThread() {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             setEnabled(false);
@@ -2234,7 +2233,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         volumeMenus.add(u);
                         u.update();
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (final UpdatableItem u

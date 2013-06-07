@@ -35,7 +35,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 
 /**.
@@ -84,7 +83,7 @@ public class LinbitLogin extends DialogHost {
      * TODO: two checkfields?
      */
     protected final void checkFields() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 boolean v =
@@ -99,7 +98,7 @@ public class LinbitLogin extends DialogHost {
     /** Check all fields if they are correct. */
     @Override
     protected final void checkFields(final Widget field) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 boolean v =
@@ -141,7 +140,7 @@ public class LinbitLogin extends DialogHost {
     protected void initDialogAfterVisible() {
         enableComponents();
         checkFields();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 downloadUserField.requestFocus();

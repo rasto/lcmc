@@ -26,7 +26,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.JCheckBox;
 
@@ -149,7 +148,7 @@ public class Checkbox extends Widget {
     /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

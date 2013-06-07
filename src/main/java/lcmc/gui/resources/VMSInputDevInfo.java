@@ -32,7 +32,6 @@ import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -96,7 +95,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
                                    VMSVirtualDomainInfo.INPUTDEVS_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -237,7 +236,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
         getBrowser().reload(getNode(), false);
         getBrowser().periodicalVMSUpdate(
                                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

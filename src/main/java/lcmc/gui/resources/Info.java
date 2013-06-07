@@ -34,6 +34,7 @@ import lcmc.utilities.MyCellRenderer;
 import lcmc.utilities.MyButtonCellRenderer;
 import lcmc.utilities.MyButton;
 
+import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -42,7 +43,6 @@ import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollPane;
 import javax.swing.JMenuItem;
 import javax.swing.table.DefaultTableModel;
@@ -307,7 +307,7 @@ public class Info implements Comparable<Info> {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         ria.setText(newInfo);
@@ -439,7 +439,7 @@ public class Info implements Comparable<Info> {
         // this fires an event in ViewPanel.
         final DefaultMutableTreeNode n = node;
         if (n != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 public void run() {
                     getBrowser().reloadAndWait(n, true);
                 }
@@ -481,7 +481,7 @@ public class Info implements Comparable<Info> {
             public void run() {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             pm.show(c, x, y);
@@ -509,7 +509,7 @@ public class Info implements Comparable<Info> {
         final JPopupMenu popup0 = popup;
         mPopupLock.unlock();
         if (popup0 != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     popup0.setVisible(false);
@@ -528,19 +528,13 @@ public class Info implements Comparable<Info> {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
                 registerAllMenuItems(items);
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            popup = new JPopupMenu();
-                        }
-                    });
-                } catch (final InterruptedException ix) {
-                    Thread.currentThread().interrupt();
-                } catch (final InvocationTargetException x) {
-                    Tools.printStackTrace();
-                }
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        popup = new JPopupMenu();
+                    }
+                });
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final UpdatableItem u : items) {
@@ -565,20 +559,14 @@ public class Info implements Comparable<Info> {
             final List<UpdatableItem> items = createPopup();
             if (items != null) {
                 registerAllMenuItems(items);
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            popup = new JPopupMenu();
-                        }
-                    });
-                } catch (final InterruptedException ix) {
-                    Thread.currentThread().interrupt();
-                } catch (final InvocationTargetException x) {
-                    Tools.printStackTrace();
-                }
+                Tools.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        popup = new JPopupMenu();
+                    }
+                });
                 for (final UpdatableItem u : items) {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             popup.add((JMenuItem) u);
@@ -602,7 +590,7 @@ public class Info implements Comparable<Info> {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     public void run() {
                         b.setSelected(false);
                     }
@@ -610,7 +598,7 @@ public class Info implements Comparable<Info> {
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     public void run() {
                         b.setSelected(false);
                     }
@@ -651,7 +639,7 @@ public class Info implements Comparable<Info> {
                     final JToggleButton source =
                                               (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             public void run() {
                                 b.setSelected(true);
                             }
@@ -662,7 +650,7 @@ public class Info implements Comparable<Info> {
                             public void run() {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
-                                    SwingUtilities.invokeLater(new Runnable() {
+                                    Tools.invokeLater(new Runnable() {
                                         public void run() {
                                             showPopup(pm, b);
                                         }
@@ -1086,7 +1074,7 @@ public class Info implements Comparable<Info> {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
@@ -1161,7 +1149,7 @@ public class Info implements Comparable<Info> {
     }
 
     final void removeNode() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();

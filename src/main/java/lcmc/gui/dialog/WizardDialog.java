@@ -28,7 +28,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.CancelCallback;
 import lcmc.gui.ProgressBar;
 
-import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
@@ -177,7 +176,7 @@ public abstract class WizardDialog extends ConfigDialog {
             } else {
                 skipButtonSetEnabled(true);
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(enable);
@@ -227,7 +226,7 @@ public abstract class WizardDialog extends ConfigDialog {
     protected final void enableComponents(
                                      final JComponent[] componentsToDisable) {
         super.enableComponents(componentsToDisable);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (buttonClass(retryButton()) != null
@@ -255,7 +254,7 @@ public abstract class WizardDialog extends ConfigDialog {
 
     /** Requests focus in the swing thread. */
     protected final void makeDefaultAndRequestFocusLater(final JComponent b) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 makeDefaultAndRequestFocus(b);
             }
@@ -286,7 +285,7 @@ public abstract class WizardDialog extends ConfigDialog {
 
         /* disable back button if there is no previous dialog */
         if (previousDialog == null && buttonClass(backButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(backButton()).setEnabled(false);
@@ -296,7 +295,7 @@ public abstract class WizardDialog extends ConfigDialog {
 
         /* disable next and finish buttons */
         if (buttonClass(nextButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(false);
@@ -304,7 +303,7 @@ public abstract class WizardDialog extends ConfigDialog {
             });
         }
         if (buttonClass(finishButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
@@ -312,7 +311,7 @@ public abstract class WizardDialog extends ConfigDialog {
             });
         }
         if (buttonClass(retryButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(retryButton()).setVisible(false);
@@ -388,7 +387,7 @@ public abstract class WizardDialog extends ConfigDialog {
         answerPaneSetTextError(text);
         addRetryButton();
         if (buttonClass(retryButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(retryButton()).requestFocus();
@@ -397,7 +396,7 @@ public abstract class WizardDialog extends ConfigDialog {
         }
         if (buttonClass(nextButton()) != null) {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(false);
@@ -410,7 +409,7 @@ public abstract class WizardDialog extends ConfigDialog {
     public final void retry() {
         addRetryButton();
         if (buttonClass(retryButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(retryButton()).requestFocus();
@@ -418,7 +417,7 @@ public abstract class WizardDialog extends ConfigDialog {
             });
             if (buttonClass(nextButton()) != null) {
                 enableComponents(new JComponent[]{buttonClass(nextButton())});
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(nextButton()).setEnabled(false);
@@ -431,7 +430,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Adds the retry button. */
     final void addRetryButton() {
         if (buttonClass(retryButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getOptionPane().setInitialValue(
@@ -445,7 +444,7 @@ public abstract class WizardDialog extends ConfigDialog {
         layout.setAlignment(FlowLayout.RIGHT);
 
         if (buttonClass(cancelButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final Container parent =
@@ -459,7 +458,7 @@ public abstract class WizardDialog extends ConfigDialog {
         }
 
         if (buttonClass(retryButton()) != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(retryButton()).setVisible(true);
@@ -474,7 +473,7 @@ public abstract class WizardDialog extends ConfigDialog {
         final MyButton rb = buttonClass(retryButton());
 
         if (rb != null && rb.isVisible()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     rb.setVisible(false);
@@ -488,7 +487,7 @@ public abstract class WizardDialog extends ConfigDialog {
         final MyButton rb = buttonClass(retryButton());
 
         if (rb != null && rb.isVisible() && rb.isEnabled()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     rb.pressButton();
@@ -501,7 +500,7 @@ public abstract class WizardDialog extends ConfigDialog {
     public final void pressNextButton() {
         final MyButton nb = buttonClass(nextButton());
         if (nb != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (nb.isVisible() && nb.isEnabled()) {

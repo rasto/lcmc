@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -142,7 +141,7 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final boolean enableButton = enable;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);
@@ -262,7 +261,7 @@ final class ClusterHosts extends DialogCluster {
         //        }
 
         //        public final void componentMoved(final ComponentEvent e) {
-        //            SwingUtilities.invokeLater(new Runnable() {
+        //            Tools.invokeLater(new Runnable() {
         //                @Override
         //                public void run() {
         //                    if (alreadyMoved) {

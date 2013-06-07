@@ -33,7 +33,6 @@ import java.awt.geom.Point2D;
 import javax.swing.JMenuItem;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 
 import java.awt.MouseInfo;
 import java.awt.Robot;
@@ -101,7 +100,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 toolTip.setTipText(text);
@@ -137,7 +136,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         super(text);
         if (shortDesc != null && !"".equals(shortDesc)) {
             toolTip = createToolTip();
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     toolTip.setTipText(shortDesc);
@@ -219,7 +218,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -233,7 +232,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -270,7 +269,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     @Override
     public void update() {
         if (predicate()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     setText(text1);
@@ -286,7 +285,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 }
             });
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     setText(text2);
@@ -311,7 +310,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setEnabled(disableTooltip == null && accessible);
@@ -321,7 +320,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             }
         });
         if (toolTip != null && isVisible()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!accessible && enableAccessMode.getAccessType()

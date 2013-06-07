@@ -56,7 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {
@@ -117,7 +116,7 @@ public final class VGCreate extends LV {
                 break;
             }
         }
-        SwingUtilities.invokeLater(new EnableCreateRunnable(enable));
+        Tools.invokeLater(new EnableCreateRunnable(enable));
     }
 
     private class EnableCreateRunnable implements Runnable {

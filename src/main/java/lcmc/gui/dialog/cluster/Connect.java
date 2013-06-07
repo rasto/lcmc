@@ -32,7 +32,6 @@ import lcmc.gui.dialog.WizardDialog;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a dialog where connection to every host will be checked
@@ -101,7 +100,7 @@ final class Connect extends DialogCluster {
                  Thread.currentThread().interrupt();
              }
 
-             SwingUtilities.invokeLater(new Runnable() {
+             Tools.invokeLater(new Runnable() {
                  @Override
                  public void run() {
                     buttonClass(nextButton()).pressButton();

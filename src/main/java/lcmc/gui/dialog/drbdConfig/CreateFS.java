@@ -42,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -141,7 +140,7 @@ final class CreateFS extends DrbdConfig {
                 getProgressBar().start(1);
                 answerPaneSetText(
                         Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(finishButton()).setEnabled(false);
@@ -212,7 +211,7 @@ final class CreateFS extends DrbdConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeFsButton.pressButton();
@@ -229,7 +228,7 @@ final class CreateFS extends DrbdConfig {
         final boolean noHost = hostW.getStringValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemW.getStringValue().equals(
                                                         NO_FILESYSTEM_STRING);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (noHost) {
@@ -245,7 +244,7 @@ final class CreateFS extends DrbdConfig {
             }
         });
         if (noFileSystem) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(true);
@@ -254,7 +253,7 @@ final class CreateFS extends DrbdConfig {
                 }
             });
         } else if (noHost) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
@@ -262,7 +261,7 @@ final class CreateFS extends DrbdConfig {
             });
             makeFsButton.setEnabled(false);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);

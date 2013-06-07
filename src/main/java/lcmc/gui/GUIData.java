@@ -37,7 +37,6 @@ import javax.swing.JRootPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -199,7 +198,8 @@ public final class GUIData  {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
                     if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
                             @Override
                             public void run() {
                                 expandTerminalSplitPane(1);
@@ -232,7 +232,7 @@ public final class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final int height = (int)
@@ -264,7 +264,7 @@ public final class GUIData  {
 
     /** Repaints hosts and clusters panels. */
     void repaintWithNewData() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.repaintTabs();
@@ -274,7 +274,7 @@ public final class GUIData  {
 
     /** Adds tab with new cluster to the clusters panel. */
     public void addClusterTab(final Cluster cluster) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.addTab(cluster);
@@ -284,7 +284,7 @@ public final class GUIData  {
 
     /** changes name of the selected cluster tab. */
     public void renameSelectedClusterTab(final String newName) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.renameSelectedTab(newName);
@@ -297,7 +297,7 @@ public final class GUIData  {
      * it was canceled.
      */
     public void removeSelectedClusterTab() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.removeTab();
@@ -307,7 +307,7 @@ public final class GUIData  {
 
     /** Revalidates and repaints clusters panel. */
     public void refreshClustersPanel() {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.refresh();
@@ -364,7 +364,7 @@ public final class GUIData  {
     public void checkAddClusterButtons() {
         final boolean enabled =
                             Tools.getConfigData().danglingHostsCount() >= 1;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddClusterButtonListReadLock.lock();
@@ -382,7 +382,7 @@ public final class GUIData  {
 
     /** Enable/Disable all 'Add Cluster' buttons. */
     public void enableAddClusterButtons(final boolean enable) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddClusterButtonListReadLock.lock();
@@ -399,7 +399,7 @@ public final class GUIData  {
 
     /** Enable/Disable all 'Add Host' buttons. */
     public void enableAddHostButtons(final boolean enable) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddHostButtonListReadLock.lock();

@@ -44,7 +44,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
 import javax.swing.border.TitledBorder;
-import javax.swing.SwingUtilities;
 
 /**
  * An implementation of a custer view with tree of services.
@@ -222,7 +221,7 @@ public final class ClusterViewPanel extends ViewPanel
 
     /** Modify the operating modes combo box according to the godmode. */
     void resetOperatingModes(final boolean godMode) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (godMode) {
@@ -237,7 +236,7 @@ public final class ClusterViewPanel extends ViewPanel
 
     /** Sets operating mode. */
     void setOperatingMode(final String opMode) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 operatingModesCB.setSelectedItem(opMode);
@@ -247,7 +246,7 @@ public final class ClusterViewPanel extends ViewPanel
 
     /** Sets advanced mode. */
     void setAdvancedMode(final boolean advancedMode) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 advancedModeCB.setSelected(advancedMode);

@@ -40,7 +40,6 @@ import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.JMenuBar;
 import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
 import javax.swing.JColorChooser;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -1570,7 +1569,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */

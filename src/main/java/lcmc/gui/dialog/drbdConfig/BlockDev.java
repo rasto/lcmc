@@ -35,7 +35,6 @@ import lcmc.Exceptions;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
 
@@ -147,14 +146,14 @@ final class BlockDev extends DrbdConfig {
         enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 buttonClass(nextButton()).setEnabled(
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
             }
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     pressNextButton();

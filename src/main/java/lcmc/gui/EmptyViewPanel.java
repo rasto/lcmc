@@ -31,7 +31,6 @@ import lcmc.data.Host;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 
 import java.awt.FlowLayout;
@@ -156,7 +155,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addHostButton.pressButton();

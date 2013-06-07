@@ -69,7 +69,6 @@ import javax.swing.JColorChooser;
 import javax.swing.text.Document;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 
 /**
@@ -206,7 +205,7 @@ public final class HostInfo extends Info {
                 @Override
                 public void done(final String ans) {
                     ta.setText(ans);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
                             hostInfoButton.setEnabled(true);
@@ -219,7 +218,7 @@ public final class HostInfo extends Info {
                 public void doneError(final String ans, final int exitCode) {
                     ta.setText(ans);
                     Tools.sshError(host, "", ans, "", exitCode);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);
                         }

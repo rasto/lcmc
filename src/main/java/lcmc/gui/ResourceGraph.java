@@ -84,7 +84,6 @@ import java.awt.Paint;
 import javax.swing.JPopupMenu;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import javax.swing.JScrollBar;
 
 import java.awt.geom.Area;
@@ -278,7 +277,7 @@ public abstract class ResourceGraph {
         mTestOnlyFlag.lock();
         testOnlyFlag = false;
         mTestOnlyFlag.unlock();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 Tools.setMenuOpaque(component, false);
             }
@@ -353,7 +352,7 @@ public abstract class ResourceGraph {
         }
         removeExistingTestEdge();
         removeTestEdge();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 Tools.setMenuOpaque(component, true);
             }
@@ -920,7 +919,7 @@ public abstract class ResourceGraph {
          * object. */
         @Override
         public void mouseReleased(final MouseEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     final PickedState<Vertex> ps =
                             vv.getRenderContext().getPickedVertexState();
@@ -930,7 +929,7 @@ public abstract class ResourceGraph {
                 }
             });
             if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     public void run() {
                         handlePopup0(e);
                     }
@@ -987,7 +986,7 @@ public abstract class ResourceGraph {
                             final JPopupMenu backgroundPopup =
                                                   handlePopupBackground(popP);
                             if (backgroundPopup != null) {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         backgroundPopup.show(vv, posX, posY);
@@ -998,7 +997,7 @@ public abstract class ResourceGraph {
                         } else {
                             final JPopupMenu edgePopup = handlePopupEdge(edge);
                             if (edgePopup != null) {
-                                SwingUtilities.invokeLater(new Runnable() {
+                                Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         edgePopup.show(vv, posX, posY);
@@ -1015,11 +1014,11 @@ public abstract class ResourceGraph {
                         final JPopupMenu vertexPopup =
                                            handlePopupVertex(v, pickedV, popP);
                         if (vertexPopup != null) {
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     vertexPopup.show(vv, posX, posY);
-                                    //SwingUtilities.invokeLater(new Runnable() {
+                                    //Tools.invokeLater(new Runnable() {
                                     //    @Override
                                     //    public void run() {
                                     //        vertexPopup.pack();
@@ -1027,7 +1026,7 @@ public abstract class ResourceGraph {
                                     //});
                                 }
                             });
-                            SwingUtilities.invokeLater(new Runnable() {
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     vertexPopup.pack();
@@ -1156,7 +1155,7 @@ public abstract class ResourceGraph {
                 final Point2D p = new Point2D.Double(x, y);
                 vertexReleased(vertex, p);
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     scale();
                 }
@@ -1530,7 +1529,8 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
                         public void run() {
                             scale();
                         }
@@ -1785,7 +1785,7 @@ public abstract class ResourceGraph {
     /** Removes test edges. */
     protected final void removeTestEdge() {
         if (testEdge != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     mTestEdgeLock.lock();
                     mGraphLock.lock();
@@ -1803,7 +1803,7 @@ public abstract class ResourceGraph {
 
     /** Creates a test edge. */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 if (!mTestEdgeLock.tryLock()) {
                     return;
@@ -1936,7 +1936,7 @@ public abstract class ResourceGraph {
                                  getVisualizationViewer().getSize().getWidth();
                 final double height =
                                  getVisualizationViewer().getSize().getHeight();
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Point2D prevPoint =

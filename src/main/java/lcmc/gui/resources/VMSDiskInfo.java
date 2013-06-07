@@ -35,7 +35,6 @@ import lcmc.utilities.MyButton;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashSet;
@@ -373,7 +372,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                    VMSVirtualDomainInfo.DISK_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -692,7 +691,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         getBrowser().reload(getNode(), false);
         getBrowser().periodicalVMSUpdate(
                                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -748,7 +747,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override
     protected boolean checkParam(final String param, final String newValue) {
         if (DiskData.TYPE.equals(param)) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     final boolean file = FILE_TYPE.equals(newValue);
@@ -804,7 +803,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 || !prevTargetBus.equals(selected)) {
                 final String sel = selected;
                 for (final String p : targetDeviceWi.keySet()) {
-                    //SwingUtilities.invokeLater(new Runnable() {
+                    //Tools.invokeLater(new Runnable() {
                     //    @Override
                     //    public void run() {
                             targetDeviceWi.get(p).reloadComboBox(

@@ -30,7 +30,6 @@ import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
@@ -109,7 +108,7 @@ final class Finish extends DialogHost {
         if (Tools.getConfigData().getAutoHosts().isEmpty()) {
             if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         confClusterButton.pressButton();
@@ -118,7 +117,7 @@ final class Finish extends DialogHost {
             }
         } else {
             Tools.sleep(1000);
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addAnotherHostButton.pressButton();
@@ -171,7 +170,7 @@ final class Finish extends DialogHost {
                                  getHost().getSSH().getLastPassword());
                         nextDialog = new NewHost(thisClass, newHost);
                         Tools.getGUIData().allHostsUpdate();
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
@@ -194,7 +193,7 @@ final class Finish extends DialogHost {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 confClusterButton.setEnabled(false);

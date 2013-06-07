@@ -45,7 +45,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -169,7 +168,7 @@ public final class LVResize extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        SwingUtilities.invokeLater(new EnableResizeRunnable(true));
+        Tools.invokeLater(new EnableResizeRunnable(true));
     }
 
     private class EnableResizeRunnable implements Runnable {

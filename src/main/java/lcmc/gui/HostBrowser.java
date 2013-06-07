@@ -46,7 +46,6 @@ import lcmc.gui.resources.CategoryInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -227,7 +226,7 @@ public final class HostBrowser extends Browser {
         final Map<NetInterface, NetInfo> oldNetInterfaces =
                                                         getNetInterfacesMap();
         final HostBrowser thisClass = this;
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 mNetInfosWriteLock.lock();
                 try {
@@ -276,7 +275,7 @@ public final class HostBrowser extends Browser {
             mBlockDevInfosWriteLock.unlock();
         }
         if (changed) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 public void run() {
                     mBlockDevInfosWriteLock.lock();
                     try {
@@ -297,7 +296,7 @@ public final class HostBrowser extends Browser {
 
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 mFileSystemsWriteLock.lock();
                 try {

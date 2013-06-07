@@ -36,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
-import javax.swing.SwingUtilities;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JApplet;
@@ -161,7 +160,7 @@ public abstract class ConfigDialog {
 
     /** Sets text to the answer pane. */
     protected final void answerPaneSetText(final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final int l = answerPaneText.length();
@@ -176,7 +175,7 @@ public abstract class ConfigDialog {
 
     /** Appends text to the answer pane. */
     protected final void answerPaneAddText(final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -191,7 +190,7 @@ public abstract class ConfigDialog {
      * Sets the error text in the answer pane and sets the text color to red.
      */
     protected final void answerPaneSetTextError(final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPane.setForeground(
@@ -208,7 +207,7 @@ public abstract class ConfigDialog {
 
     /** Appends the error text to the answer pane. */
     protected final void answerPaneAddTextError(final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -552,7 +551,7 @@ public abstract class ConfigDialog {
                 dialogPanel.setVisible(true);
             }
         });
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 dialogPanel.setLocationRelativeTo(
                                Tools.getGUIData().getMainFrameContentPane());
@@ -588,7 +587,7 @@ public abstract class ConfigDialog {
      * can be later enabled with call to enableComponents.
      */
     protected final void disableComponents(final JComponent[] components) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final String b : buttons()) {
@@ -624,7 +623,7 @@ public abstract class ConfigDialog {
     protected void enableComponents(final JComponent[] componentsToDisable) {
         final HashSet<JComponent> ctdHash =
                 new HashSet<JComponent>(Arrays.asList(componentsToDisable));
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent dc : disabledComponents) {
@@ -673,7 +672,7 @@ public abstract class ConfigDialog {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    SwingUtilities.invokeLater(new Runnable() {
+                    Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             optionPane.setValue(

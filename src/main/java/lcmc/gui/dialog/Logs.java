@@ -62,7 +62,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.JTextPane;
 import javax.swing.JCheckBox;
-import javax.swing.SwingUtilities;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -147,7 +146,7 @@ class Logs extends ConfigDialog {
 
     /** Enables/disables all the components. */
     protected void enableAllComponents(final boolean enable) {
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final String name : checkBoxMap.keySet()) {

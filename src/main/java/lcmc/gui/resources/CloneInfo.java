@@ -51,7 +51,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.SwingUtilities;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -86,7 +85,7 @@ final class CloneInfo extends ServiceInfo {
         final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        SwingUtilities.invokeLater(new Runnable() {
+        Tools.invokeLater(new Runnable() {
             public void run() {
                 final DefaultMutableTreeNode node = getNode();
                 if (node != null) {
@@ -795,7 +794,7 @@ final class CloneInfo extends ServiceInfo {
             }
 
             private void updateThread() {
-                SwingUtilities.invokeLater(new Runnable() {
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         setEnabled(false);
@@ -810,7 +809,7 @@ final class CloneInfo extends ServiceInfo {
                 final ServiceInfo cs0 = containedService;
                 if (cs0 != null) {
                     for (final UpdatableItem u : cs0.createPopup()) {
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 add((JMenuItem) u);

@@ -39,7 +39,6 @@ import lcmc.data.AccessMode;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 
@@ -142,7 +141,7 @@ public final class Start extends WizardDialog {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            SwingUtilities.invokeLater(new Runnable() {
+            Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     pressNextButton();
