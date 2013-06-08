@@ -138,13 +138,18 @@ final class Display extends VMConfig {
         vmsgi.savePreferredValues();
         vmsgi.getResource().setValue(GraphicsData.TYPE, "vnc");
         vmsgi.getResource().setValue(GraphicsData.PORT, "auto");
-        vmsgi.addWizardParams(
+
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                vmsgi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
+            }
+        });
 
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);

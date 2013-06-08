@@ -318,9 +318,9 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             public void run() {
                 getApplyButton().setEnabled(false);
                 getRevertButton().setEnabled(false);
+                getInfoPanel();
             }
         });
-        getInfoPanel();
         waitForInfoPanel();
         final Map<String, String> parameters =
                                        getHWParameters(getResource().isNew());

@@ -144,13 +144,17 @@ final class Network extends VMConfig {
         vmsii.getResource().setValue(InterfaceData.TYPE, "network");
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, "default");
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, "");
-        vmsii.addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                vmsii.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
+            }
+        });
         vmsii.getWidget(InterfaceData.MODEL_TYPE,
                         Widget.WIZARD_PREFIX).setValue("");
 

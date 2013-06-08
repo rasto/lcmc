@@ -162,13 +162,17 @@ final class Storage extends VMConfig {
                                      getVMSVirtualDomainInfo().getComboBoxValue(
                                                          VMSXML.VM_PARAM_NAME)
                                      + ".img");
-        vmsdi.addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
+            }
+        });
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

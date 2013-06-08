@@ -110,6 +110,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Returns info panel. */
     @Override
     public final JComponent getInfoPanel() {
+        Tools.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }

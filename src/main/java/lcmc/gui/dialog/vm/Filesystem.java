@@ -133,13 +133,17 @@ final class Filesystem extends VMConfig {
         vmsfi.waitForInfoPanel();
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE, "mount");
-        vmsfi.addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
+            }
+        });
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

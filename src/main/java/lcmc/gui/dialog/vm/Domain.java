@@ -142,7 +142,6 @@ public final class Domain extends VMConfig {
     @Override
     protected JComponent getInputPane() {
         final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
-        vdi.getInfoPanel();
         vdi.waitForInfoPanel();
         if (inputPane != null) {
             return inputPane;
@@ -156,13 +155,17 @@ public final class Domain extends VMConfig {
 
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
         vdi.savePreferredValues();
-        vdi.addWizardParams(
+        Tools.invokeAndWait(new Runnable() {
+            public void run() {
+                vdi.addWizardParams(
                           optionsPanel,
                           PARAMS,
                           buttonClass(nextButton()),
                           Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                           Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                           null);
+            }
+        });
         domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME,
                                      Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);

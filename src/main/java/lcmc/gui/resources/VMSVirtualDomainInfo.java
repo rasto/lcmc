@@ -2049,6 +2049,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
+        Tools.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -3720,9 +3721,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             public void run() {
                 getApplyButton().setEnabled(false);
                 getRevertButton().setEnabled(false);
+                getInfoPanel();
             }
         });
-        getInfoPanel();
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
