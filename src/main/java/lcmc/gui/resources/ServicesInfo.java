@@ -2102,30 +2102,24 @@ public final class ServicesInfo extends EditableInfo {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    @SuppressWarnings("unchecked")
-                    final Enumeration<DefaultMutableTreeNode> e =
-                                                    oldGi.getNode().children();
-                    while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode n = e.nextElement();
-                        final ServiceInfo oldChild =
-                                            (ServiceInfo) n.getUserObject();
-                        oldChild.getInfoPanel();
-                        oldChild.waitForInfoPanel();
-                        final ServiceInfo newChild =
-                                              newGi.addGroupServicePanel(
-                                                    oldChild.getResourceAgent(),
-                                                    false);
-                        newChild.getInfoPanel();
-                        newChild.waitForInfoPanel();
-                        Tools.waitForSwing();
-                        Tools.invokeLater(new Runnable() {
-                            public void run() {
-                                copyPasteFields(oldChild, newChild);
-                            }
-                        });
-                    }
                     Tools.invokeLater(new Runnable() {
                         public void run() {
+                            @SuppressWarnings("unchecked")
+                            final Enumeration<DefaultMutableTreeNode> e =
+                                                    oldGi.getNode().children();
+                            while (e.hasMoreElements()) {
+                                final DefaultMutableTreeNode n =
+                                                               e.nextElement();
+                                final ServiceInfo oldChild =
+                                               (ServiceInfo) n.getUserObject();
+                                oldChild.getInfoPanel();
+                                final ServiceInfo newChild =
+                                                newGi.addGroupServicePanel(
+                                                    oldChild.getResourceAgent(),
+                                                    false);
+                                newChild.getInfoPanel();
+                                        copyPasteFields(oldChild, newChild);
+                            }
                             getBrowser().reload(newGi.getNode(), false);
                         }
                     });
