@@ -1949,6 +1949,14 @@ public final class RoboTest {
             sleep(5000);
         } else {
             removeEverything();
+            /* remove placeholder */
+            moveTo(phX , phY);
+            rightClick();
+            sleep(1000);
+            moveTo("Remove");
+            leftClick();
+            confirmRemove();
+            sleep(5000);
         }
         if (!aborted) {
             sleepNoFactor(20000);
