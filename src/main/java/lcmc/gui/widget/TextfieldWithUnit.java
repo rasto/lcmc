@@ -367,7 +367,7 @@ public final class TextfieldWithUnit extends Widget {
     /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -160,7 +160,7 @@ public abstract class ConfigDialog {
 
     /** Sets text to the answer pane. */
     protected final void answerPaneSetText(final String text) {
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final int l = answerPaneText.length();

@@ -207,7 +207,7 @@ public final class DrbdGraph extends ResourceGraph {
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(
                                                                           dvi);
                     }
-                    Tools.invokeLater(new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
