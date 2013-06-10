@@ -79,7 +79,8 @@ our @VM_OPTIONS = ("",
 		   "-c vbox:///session",
 		   "-c uml:///system");
 
-our $LVM_CACHE;
+our $LV_CACHE;
+our $VG_CACHE;
 our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
 our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
 our $NO_LVM_CACHE = 0;
@@ -94,7 +95,7 @@ if ($action eq "all") {
 	print "disk-info\n";
 	print get_disk_info($NO_LVM_CACHE);
 	print "vg-info\n";
-	print get_vg_info();
+	print get_vg_info($NO_LVM_CACHE);
 	print "filesystems-info\n";
 	print get_filesystems_info();
 	print "crypto-info\n";
@@ -128,7 +129,7 @@ if ($action eq "all") {
 } elsif ($action eq "get-disk-info") {
 	print get_disk_info($NO_LVM_CACHE);
 } elsif ($action eq "get-vg-info") {
-	print get_vg_info();
+	print get_vg_info($NO_LVM_CACHE);
 } elsif ($action eq "get-filesystems-info") {
 	print get_filesystems_info();
 } elsif ($action eq "get-crypto-info") {
@@ -248,7 +249,7 @@ sub get_hw_info {
 	$out .= "disk-info\n";
 	$out .= get_disk_info($use_lvm_cache);
 	$out .= "vg-info\n";
-	$out .= get_vg_info();
+	$out .= get_vg_info($use_lvm_cache);
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
 	$out .= "crypto-info\n";
@@ -276,7 +277,7 @@ sub get_hw_info_lazy {
 	$out .= "disk-info\n";
 	$out .= get_disk_info($use_lvm_cache);
 	$out .= "vg-info\n";
-	$out .= get_vg_info();
+	$out .= get_vg_info($use_lvm_cache);
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
 	$out .= "mount-points-info\n";
@@ -494,8 +495,8 @@ sub get_swaps {
 # that have lvm on top of them.
 sub get_lvm {
 	my $use_cache = shift || 0;
-	if ($use_cache && $LVM_CACHE) {
-		return @$LVM_CACHE;
+	if ($use_cache && $LV_CACHE) {
+		return @$LV_CACHE;
 	}
 	my $path = "/usr/sbin/";
 	if (-e "/sbin/pvdisplay") {
@@ -535,14 +536,14 @@ sub get_lvm {
 		$lvm_devs{"$group/$name"}++;
 
 	}
-	$LVM_CACHE = [\%pv_to_group,
+	$LV_CACHE = [\%pv_to_group,
 		      \%group_to_pv,
 		      \%major_minor_to_dev,
 		      \%devs_with_lvm,
 		      \%lvm_devs,
 		      \%major_minor_to_group,
 		      \%major_minor_to_lv_name];
-	return @$LVM_CACHE;
+	return @$LV_CACHE;
 }
 
 # this is used if the devices is dm but not lvm
@@ -710,6 +711,10 @@ sub get_disk_info {
 
 # returns volume group info
 sub get_vg_info {
+	my $use_cache = shift || 0;
+	if ($use_cache && $VG_CACHE) {
+		return $VG_CACHE;
+	}
 	my $path = "/usr/sbin/";
 	if (-e "/sbin/pvdisplay") {
 		$path = "/sbin";
@@ -720,6 +725,7 @@ sub get_vg_info {
 		$free =~ s/B$//;
 		$out .= "$name $free\n";
 	}
+	$VG_CACHE = $out;
 	return $out;
 }
 
