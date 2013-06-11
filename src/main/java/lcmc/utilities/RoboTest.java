@@ -2049,11 +2049,6 @@ public final class RoboTest {
             addConstraint(1); /* with dummy 2 */
             checkTest("test4", 2);
 
-            /* TEST test */
-            if (i < count - 1) {
-                removePlaceHolder(ph1X, ph1Y, true);
-                removePlaceHolder(ph2X, ph2Y, true);
-            }
         }
         moveTo("Apply");
         sleep(2000);
@@ -2063,6 +2058,8 @@ public final class RoboTest {
         stopEverything();
         checkTest("test4", 4);
         removeEverything();
+        removePlaceHolder(ph1X, ph1Y, true);
+        removePlaceHolder(ph2X, ph2Y, true);
         sleep(40000);
     }
 

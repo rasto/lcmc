@@ -240,7 +240,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = timeout;
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -326,7 +326,7 @@ public final class ProgressBar implements ActionListener {
      * hold().
      */
     void cont() {
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);

@@ -389,7 +389,7 @@ public final class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                Tools.invokeLater(new Runnable() {
+                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         repaint();

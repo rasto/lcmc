@@ -623,7 +623,7 @@ public abstract class ConfigDialog {
     protected void enableComponents(final JComponent[] componentsToDisable) {
         final HashSet<JComponent> ctdHash =
                 new HashSet<JComponent>(Arrays.asList(componentsToDisable));
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 for (final JComponent dc : disabledComponents) {

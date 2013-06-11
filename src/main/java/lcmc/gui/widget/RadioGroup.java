@@ -145,7 +145,7 @@ public final class RadioGroup extends Widget {
         final JComponent c = componentsHash.get(s);
         mComponentsReadLock.unlock();
         if (c != null) {
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);

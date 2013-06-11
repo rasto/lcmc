@@ -6320,7 +6320,7 @@ public class ServiceInfo extends EditableInfo {
                 defaultOpIdRef = savedOpIdRef.toString();
             }
             final String idRef = defaultOpIdRef;
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     sameAsOperationsWi.reloadComboBox(
@@ -6336,7 +6336,7 @@ public class ServiceInfo extends EditableInfo {
                 defaultMAIdRef = savedMAIdRef.toString();
             }
             final String idRef = defaultMAIdRef;
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     sameAsMetaAttrsWi.reloadComboBox(

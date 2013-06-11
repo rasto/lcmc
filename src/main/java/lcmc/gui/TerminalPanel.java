@@ -529,7 +529,7 @@ public final class TerminalPanel extends JScrollPane {
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(output, outputColor);
