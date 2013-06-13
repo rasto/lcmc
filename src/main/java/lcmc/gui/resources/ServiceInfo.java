@@ -1472,6 +1472,9 @@ public class ServiceInfo extends EditableInfo {
         }
         while (drbdResources.hasMoreElements()) {
             final DefaultMutableTreeNode n = drbdResources.nextElement();
+            if (!(n.getUserObject() instanceof DrbdResourceInfo)) {
+                continue;
+            }
             final DrbdResourceInfo drbdRes =
                                         (DrbdResourceInfo) n.getUserObject();
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
