@@ -2222,18 +2222,6 @@ public final class Tools {
         cleanupVncViewer(host, localPort);
     }
 
-    /** Hides mouse pointer. */
-    public static void hideMousePointer(final Component c) {
-        final int[] pixels = new int[16 * 16];
-        final Image image = Toolkit.getDefaultToolkit().createImage(
-                                 new MemoryImageSource(16, 16, pixels, 0, 16));
-        final Cursor transparentCursor =
-             Toolkit.getDefaultToolkit().createCustomCursor(image,
-                                                            new Point(0, 0),
-                                                            "invisibleCursor");
-        c.setCursor(transparentCursor);
-    }
-
     /** Check whether the string is number. */
     public static boolean isNumber(final String s) {
         try {

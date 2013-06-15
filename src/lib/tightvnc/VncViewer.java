@@ -305,7 +305,7 @@ import java.net.*;
     // If we failed to create VncCanvas2D, use old VncCanvas.
     if (vc == null)
       vc = new VncCanvas(this, maxWidth, maxHeight);
-    lcmc.utilities.Tools.hideMousePointer(vc);
+    lcmc.Tools.hideMousePointer(vc);
   }
 
 

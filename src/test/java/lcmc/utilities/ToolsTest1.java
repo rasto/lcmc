@@ -1166,11 +1166,6 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testHideMousePointer() {
-        Tools.hideMousePointer(new JPanel());
-    }
-
-    @Test
     public void testIsNumber() {
         assertTrue(Tools.isNumber("1"));
         assertTrue(Tools.isNumber("-1"));

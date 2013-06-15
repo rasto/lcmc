@@ -198,7 +198,7 @@ import javax.swing.*;
       doProtocolInitialisation();
 
       vc = new VncCanvas(this);
-      lcmc.utilities.Tools.hideMousePointer(vc);
+      lcmc.Tools.hideMousePointer(vc);
       gbc.weightx = 1.0;
       gbc.weighty = 1.0;
 
