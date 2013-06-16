@@ -173,7 +173,7 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterWizard",
          "Cluster Wizard"},
 
-        {"ClusterViewPanel.OperatingMode",
+        {"MainMenu.OperatingMode.ToolTip",
          "Operating Mode"},
 
         /* Progress bar */

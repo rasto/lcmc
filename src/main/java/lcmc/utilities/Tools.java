@@ -2865,8 +2865,13 @@ public final class Tools {
      */
     public static void setMaxAccessType(
                                       final ConfigData.AccessType accessType) {
-        getConfigData().setAccessType(ConfigData.AccessType.RO);
-        getConfigData().setMaxAccessType(ConfigData.AccessType.RO);
+        getConfigData().setAccessType(accessType);
+        getConfigData().setMaxAccessType(accessType);
+        checkAccessOfEverything();
+    }
+
+    /** Check access of every cluster. */
+    public static void checkAccessOfEverything() {
         for (final Cluster c : getConfigData().getClusters().getClusterSet()) {
             final ClusterBrowser cb = c.getBrowser();
             if (cb != null) {

@@ -163,7 +163,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterWizard",
          "クラスター設定ウィザード"},
 
-        {"ClusterViewPanel.OperatingMode",
+        {"MainMenu.OperatingMode.ToolTip",
          "操作モード"},
 
         /* Progress bar */

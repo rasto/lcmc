@@ -61,10 +61,6 @@ public final class ClusterViewPanel extends ViewPanel
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Combo box with operating modes. */
-    private final JComboBox<String> operatingModesCB;
-    /** Advanced mode button. */
-    private final JCheckBox advancedModeCB;
 
     /** Prepares a new <code>ClusterViewPanel</code> object. */
     ClusterViewPanel(final Cluster cluster) {
@@ -109,17 +105,6 @@ public final class ClusterViewPanel extends ViewPanel
         clusterButtonsPanel.add(clusterWizardButton);
         buttonPanel.add(clusterButtonsPanel);
 
-        /* advanced mode button */
-        advancedModeCB = createAdvancedModeButton();
-        /* Operating mode */
-        operatingModesCB = createOperationModeCb();
-        final JPanel opModePanel = new JPanel(new BorderLayout());
-        opModePanel.setPreferredSize(new Dimension(350, 0));
-        opModePanel.setBackground(STATUS_BACKGROUND);
-        final TitledBorder vmBorder = Tools.getBorder(
-                          Tools.getString("ClusterViewPanel.OperatingMode"));
-        opModePanel.setBorder(vmBorder);
-
         /* upgrade field */
         buttonPanel.add(
             Tools.getGUIData().getClustersPanel().registerUpgradeTextField());
@@ -128,77 +113,10 @@ public final class ClusterViewPanel extends ViewPanel
         final JPanel buttonArea = new JPanel(new BorderLayout());
         buttonArea.setBackground(STATUS_BACKGROUND);
         buttonArea.add(buttonPanel, BorderLayout.WEST);
-        opModePanel.add(operatingModesCB, BorderLayout.WEST);
-        opModePanel.add(advancedModeCB, BorderLayout.EAST);
-        buttonArea.add(opModePanel, BorderLayout.EAST);
         add(buttonArea, BorderLayout.NORTH);
 
         allHostsUpdate();
         Tools.getGUIData().registerAllHostsUpdate(this);
-    }
-
-    /** Returns advanced mode check box. That hides advanced options. */
-    private JCheckBox createAdvancedModeButton() {
-        final JCheckBox emCB = new JCheckBox(Tools.getString(
-                                                      "Browser.AdvancedMode"));
-        emCB.setBackground(Tools.getDefaultColor(
-                                            "ViewPanel.Status.Background"));
-        emCB.setSelected(Tools.getConfigData().isAdvancedMode());
-        emCB.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final boolean selected =
-                                    e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != Tools.getConfigData().isAdvancedMode()) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Tools.getConfigData().setAdvancedMode(selected);
-                            Tools.getGUIData().setAdvancedModeGlobally(
-                                                                     cluster,
-                                                                     selected);
-                            cluster.getBrowser().checkAccessOfEverything();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        });
-        return emCB;
-    }
-
-    private JComboBox<String> createOperationModeCb() {
-        final String[] modes = Tools.getConfigData().getOperatingModes();
-        final JComboBox<String> opModeCB = new JComboBox<String>(modes);
-
-        final ConfigData.AccessType accessType =
-                                        Tools.getConfigData().getAccessType();
-        opModeCB.setSelectedItem(ConfigData.OP_MODES_MAP.get(accessType));
-        opModeCB.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                final String opMode = (String) e.getItem();
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    final Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ConfigData.AccessType type =
-                                        ConfigData.ACCESS_TYPE_MAP.get(opMode);
-                            if (type == null) {
-                                Tools.appError("unknown mode: " + opMode);
-                                type = ConfigData.AccessType.RO;
-                            }
-                            Tools.getConfigData().setAccessType(type);
-                            Tools.getGUIData().setOperatingModeGlobally(cluster,
-                                                                        opMode);
-                            cluster.getBrowser().checkAccessOfEverything();
-                        }
-                    });
-                    thread.start();
-                }
-            }
-        });
-        return opModeCB;
     }
 
     /** This is called when there was added a new host. */
@@ -218,40 +136,5 @@ public final class ClusterViewPanel extends ViewPanel
     /** Gets cluster object. */
     Cluster getCluster() {
         return cluster;
-    }
-
-    /** Modify the operating modes combo box according to the godmode. */
-    void resetOperatingModes(final boolean godMode) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (godMode) {
-                    operatingModesCB.addItem(ConfigData.OP_MODE_GOD);
-                    operatingModesCB.setSelectedItem(ConfigData.OP_MODE_GOD);
-                } else {
-                    operatingModesCB.removeItem(ConfigData.OP_MODE_GOD);
-                }
-            }
-        });
-    }
-
-    /** Sets operating mode. */
-    void setOperatingMode(final String opMode) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                operatingModesCB.setSelectedItem(opMode);
-            }
-        });
-    }
-
-    /** Sets advanced mode. */
-    void setAdvancedMode(final boolean advancedMode) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                advancedModeCB.setSelected(advancedMode);
-            }
-        });
     }
 }

@@ -23,6 +23,8 @@
 
 package lcmc.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import lcmc.utilities.Tools;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -41,7 +43,10 @@ import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.FlowLayout;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -52,6 +57,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.border.TitledBorder;
 
 /**
  * An implementation of a menu panel.
@@ -72,6 +81,11 @@ public final class MainMenu extends JPanel implements ActionListener {
      * because glassPane does not capture key events in my version of java,
      * the menu must turned off explicitly. */
     private boolean turnOff = false;
+    /** Combo box with operating modes. */
+    private final JComboBox<String> operatingModesCB;
+    /** Advanced mode button. */
+    private final JCheckBox advancedModeCB;
+
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
                 Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
@@ -206,6 +220,17 @@ public final class MainMenu extends JPanel implements ActionListener {
                     null);
 
         menuBar.add(submenu);
+
+        /* advanced mode button */
+        advancedModeCB = createAdvancedModeButton();
+        /* Operating mode */
+        operatingModesCB = createOperationModeCb();
+        final JPanel opModePanel =
+                            new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        opModePanel.add(operatingModesCB);
+        opModePanel.add(advancedModeCB);
+
+        menuBar.add(opModePanel);
 
     }
 
@@ -536,5 +561,100 @@ public final class MainMenu extends JPanel implements ActionListener {
         }
         parentMenu.add(item);
         return item;
+    }
+
+    /** Returns advanced mode check box. That hides advanced options. */
+    private JCheckBox createAdvancedModeButton() {
+        final JCheckBox emCb = new JCheckBox(Tools.getString(
+                                                      "Browser.AdvancedMode"));
+        emCb.setSelected(Tools.getConfigData().isAdvancedMode());
+        emCb.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                final boolean selected =
+                                    e.getStateChange() == ItemEvent.SELECTED;
+                if (selected != Tools.getConfigData().isAdvancedMode()) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Tools.getConfigData().setAdvancedMode(selected);
+                            Tools.checkAccessOfEverything();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        });
+        emCb.setToolTipText(Tools.getString("MainMenu.OperatingMode.ToolTip"));
+        return emCb;
+    }
+
+    private JComboBox<String> createOperationModeCb() {
+        final String[] modes = Tools.getConfigData().getOperatingModes();
+        final JComboBox<String> opModeCB = new JComboBox<String>(modes);
+
+        final ConfigData.AccessType accessType =
+                                        Tools.getConfigData().getAccessType();
+        opModeCB.setSelectedItem(ConfigData.OP_MODES_MAP.get(accessType));
+        opModeCB.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                final String opMode = (String) e.getItem();
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ConfigData.AccessType type =
+                                        ConfigData.ACCESS_TYPE_MAP.get(opMode);
+                            if (type == null) {
+                                Tools.appError("unknown mode: " + opMode);
+                                type = ConfigData.AccessType.RO;
+                            }
+                            Tools.getConfigData().setAccessType(type);
+                            Tools.checkAccessOfEverything();
+                        }
+                    });
+                    thread.start();
+                }
+            }
+        });
+        opModeCB.setToolTipText(
+                           Tools.getString("MainMenu.OperatingMode.ToolTip"));
+        return opModeCB;
+    }
+
+    /** Modify the operating modes combo box according to the godmode. */
+    void resetOperatingModes(final boolean godMode) {
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (godMode) {
+                    operatingModesCB.addItem(ConfigData.OP_MODE_GOD);
+                    operatingModesCB.setSelectedItem(ConfigData.OP_MODE_GOD);
+                } else {
+                    operatingModesCB.removeItem(ConfigData.OP_MODE_GOD);
+                }
+            }
+        });
+    }
+
+    /** Sets operating mode. */
+    void setOperatingMode(final String opMode) {
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                operatingModesCB.setSelectedItem(opMode);
+            }
+        });
+    }
+
+    /** Sets advanced mode. */
+    void setAdvancedMode(final boolean advancedMode) {
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                advancedModeCB.setSelected(advancedMode);
+            }
+        });
     }
 }

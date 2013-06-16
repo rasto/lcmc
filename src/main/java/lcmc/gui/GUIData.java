@@ -442,45 +442,8 @@ public final class GUIData  {
     void godModeChanged(final boolean godMode) {
         Tools.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
         Tools.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        for (final Cluster cluster
-                        : Tools.getConfigData().getClusters().getClusterSet()) {
-            final ClusterBrowser cb = cluster.getBrowser();
-            if (cb != null) {
-                cb.getClusterViewPanel().resetOperatingModes(godMode);
-            }
-        }
+        getMainMenu().resetOperatingModes(godMode);
         updateGlobalItems();
-    }
-
-    /** Sets operating mode in every cluster view. */
-    void setOperatingModeGlobally(final Cluster fromCluster,
-                                  final String opMode) {
-        for (final Cluster cluster
-                        : Tools.getConfigData().getClusters().getClusterSet()) {
-            if (cluster == fromCluster) {
-                continue;
-            }
-            final ClusterBrowser cb = cluster.getBrowser();
-            if (cb != null) {
-                cb.getClusterViewPanel().setOperatingMode(opMode);
-            }
-        }
-    }
-
-    /** Sets advanced mode in every cluster view. */
-    void setAdvancedModeGlobally(final Cluster fromCluster,
-                                 final boolean advancedMode) {
-        for (final Cluster cluster
-                        : Tools.getConfigData().getClusters().getClusterSet()) {
-            if (cluster == fromCluster) {
-                continue;
-            }
-            final ClusterBrowser cb = cluster.getBrowser();
-            if (cb != null) {
-                cb.getClusterViewPanel().setAdvancedMode(advancedMode);
-                cluster.getBrowser().checkAccessOfEverything();
-            }
-        }
     }
 
     /** Updates access of the item according of their access type. */
