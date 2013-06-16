@@ -71,6 +71,7 @@ import javax.swing.JDialog;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.EditClusterDialog;
 
 /**
  * This class holds info data for services view and global heartbeat
@@ -81,6 +82,9 @@ public final class ServicesInfo extends EditableInfo {
     private JComponent infoPanel = null;
     /** No clone parameter. */
     public static final CloneInfo NO_CLONE = null;
+    /** Icon of the cluster. */
+    static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
+                                Tools.getDefault("ClustersPanel.ClusterIcon"));
 
     /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
@@ -1849,6 +1853,31 @@ public final class ServicesInfo extends EditableInfo {
         };
         addMouseOverListener(removeMenuItem, removeItemCallback);
         items.add((UpdatableItem) removeMenuItem);
+
+        /* cluster wizard */
+        final MyMenuItem clusterWizardItem =
+            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
+                           CLUSTER_ICON,
+                           null,
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    final EditClusterDialog dialog =
+                              new EditClusterDialog(getBrowser().getCluster());
+                    dialog.showDialogs();
+                }
+            };
+        items.add((UpdatableItem) clusterWizardItem);
 
         /* view logs */
         final MyMenuItem viewLogsItem =

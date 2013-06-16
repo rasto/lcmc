@@ -74,37 +74,6 @@ public final class ClusterViewPanel extends ViewPanel
         final JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setBackground(STATUS_BACKGROUND);
 
-        /* cluster wizard */
-        final MyButton clusterWizardButton = new MyButton(
-                            Tools.getString("ClusterViewPanel.ClusterWizard"));
-        clusterWizardButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
-        clusterWizardButton.setPreferredSize(
-                             new Dimension(Tools.getConfigData().scaled(150),
-                                           Tools.getConfigData().scaled(20)));
-        clusterWizardButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final EditClusterDialog dialog =
-                                               new EditClusterDialog(cluster);
-                        dialog.showDialogs();
-                    }
-                });
-                t.start();
-            }
-        });
-
-        final JPanel clusterButtonsPanel = new JPanel();
-        clusterButtonsPanel.setBackground(STATUS_BACKGROUND);
-        final TitledBorder titledBorder = Tools.getBorder(
-                          Tools.getString("ClusterViewPanel.ClusterButtons"));
-        clusterButtonsPanel.setBorder(titledBorder);
-
-        clusterButtonsPanel.add(clusterWizardButton);
-        buttonPanel.add(clusterButtonsPanel);
-
         /* upgrade field */
         buttonPanel.add(
             Tools.getGUIData().getClustersPanel().registerUpgradeTextField());

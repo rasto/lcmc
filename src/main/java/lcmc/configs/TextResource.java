@@ -166,13 +166,6 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ClusterTab.AddNewHost",
          "Add Host / Wizard"},
 
-        /* Cluster view panel */
-        {"ClusterViewPanel.ClusterButtons",
-         "Cluster"},
-
-        {"ClusterViewPanel.ClusterWizard",
-         "Cluster Wizard"},
-
         {"MainMenu.OperatingMode.ToolTip",
          "Operating Mode"},
 
@@ -1582,6 +1575,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"ClusterBrowser.Hb.OrdOnlySubmenu",
          "Order Only"},
+
+        {"ClusterBrowser.Hb.ClusterWizard",
+         "Cluster Wizard"},
 
         {"ClusterBrowser.HbUpdateResources",
          "updating resource agents..."},

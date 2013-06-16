@@ -65,6 +65,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
+import lcmc.EditClusterDialog;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -84,6 +85,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
                              Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
     /** Device thath matches all drbd devices in the log. */
     private static final String ALL_LOGS_PATTERN = "/dev/drbd[0-9]*";
+    /** Icon of the cluster. */
+    static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
+                                Tools.getDefault("ClustersPanel.ClusterIcon"));
 
     /** Prepares a new <code>DrbdInfo</code> object. */
     public DrbdInfo(final String name, final Browser browser) {
@@ -1025,6 +1029,32 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
         };
         items.add(addProxyHostMenu);
+
+        /* cluster wizard */
+        final MyMenuItem clusterWizardItem =
+            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
+                           CLUSTER_ICON,
+                           null,
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.ADMIN,
+                                          !AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    final EditClusterDialog dialog =
+                              new EditClusterDialog(getBrowser().getCluster());
+                    dialog.showDialogs();
+                }
+            };
+        items.add((UpdatableItem) clusterWizardItem);
+
 
         /* view log */
         final MyMenuItem viewLogMenu = new MyMenuItem(

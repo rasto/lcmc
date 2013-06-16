@@ -160,9 +160,6 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"ClusterViewPanel.ClusterButtons",
          "クラスター"},
 
-        {"ClusterViewPanel.ClusterWizard",
-         "クラスター設定ウィザード"},
-
         {"MainMenu.OperatingMode.ToolTip",
          "操作モード"},
 
@@ -1392,6 +1389,10 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
 
         {"ClusterBrowser.Hb.OrdOnlySubmenu",
          "順序制約(order)のみ"},
+
+        {"ClusterBrowser.Hb.ClusterWizard",
+         "クラスター設定ウィザード"},
+
 
         {"ClusterBrowser.HbUpdateResources",
          "クラスター リソースを更新しています..."},
