@@ -23,8 +23,7 @@
 
 package lcmc.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Color;
 import lcmc.utilities.Tools;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -57,10 +56,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.border.TitledBorder;
+import javax.swing.JEditorPane;
+import javax.swing.border.LineBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import lcmc.Exceptions;
 
 /**
  * An implementation of a menu panel.
@@ -85,6 +91,11 @@ public final class MainMenu extends JPanel implements ActionListener {
     private final JComboBox<String> operatingModesCB;
     /** Advanced mode button. */
     private final JCheckBox advancedModeCB;
+    /** Upgrade check text field. */
+    private final JEditorPane upgradeTextField =
+                                new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
+    /** Upgrade check text. */
+    private String upgradeCheck;
 
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
@@ -94,7 +105,11 @@ public final class MainMenu extends JPanel implements ActionListener {
     public MainMenu() {
         super();
         JMenu submenu, menuNew, menuLookAndFeel;
-
+        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+            upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
+        } else {
+            upgradeCheck = Tools.getString("MainPanel.UpgradeCheckDisabled");
+        }
         menuBar = new JMenuBar();
 
         /* session */
@@ -227,11 +242,14 @@ public final class MainMenu extends JPanel implements ActionListener {
         operatingModesCB = createOperationModeCb();
         final JPanel opModePanel =
                             new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        opModePanel.add(getUpgradeTextField());
         opModePanel.add(operatingModesCB);
         opModePanel.add(advancedModeCB);
 
         menuBar.add(opModePanel);
-
+        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+            startUpgradeCheck();
+        }
     }
 
     /** Turn on menu. */
@@ -656,5 +674,66 @@ public final class MainMenu extends JPanel implements ActionListener {
                 advancedModeCB.setSelected(advancedMode);
             }
         });
+    }
+
+    /** Starts upgrade check. */
+    private void startUpgradeCheck() {
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String latestVersion = Tools.getLatestVersion();
+                if (latestVersion == null) {
+                    upgradeCheck = "";
+                } else {
+                    final String release = Tools.getRelease();
+                    try {
+                        if (Tools.compareVersions(release, latestVersion) < 0) {
+                            upgradeCheck =
+                                Tools.getString("MainPanel.UpgradeAvailable")
+                                        .replaceAll("@LATEST@", latestVersion);
+                        } else {
+                            upgradeCheck =
+                               Tools.getString("MainPanel.NoUpgradeAvailable");
+                        }
+                    } catch (Exceptions.IllegalVersionException e) {
+                        upgradeCheck =
+                             Tools.getString("MainPanel.UpgradeCheckFailed");
+                    }
+                }
+                final String text = upgradeCheck;
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        upgradeTextField.setText(text);
+                        upgradeTextField.setVisible(!"".equals(text));
+                    }
+                });
+            }
+        });
+        thread.start();
+    }
+
+    /**
+     * Return upgrade text field, that will be updated, when upgrade check is
+     * done.
+     */
+    private JEditorPane getUpgradeTextField() {
+        final LineBorder border = new LineBorder(Color.RED);
+        upgradeTextField.setBorder(border);
+        Tools.setEditorFont(upgradeTextField);
+        upgradeTextField.setEditable(false);
+        upgradeTextField.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Tools.openBrowser(e.getURL().toString());
+                }
+            }
+        });
+        upgradeTextField.setBackground(Color.WHITE);
+        final String text = upgradeCheck;
+        upgradeTextField.setText(text);
+        upgradeTextField.setVisible(!"".equals(text));
+        return upgradeTextField;
     }
 }

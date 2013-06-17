@@ -99,9 +99,6 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
                                    BoxLayout.Y_AXIS));
         buttonPanel.add(smallButtonPanel);
-        /* check for upgrade field. */
-        smallButtonPanel.add(
-            Tools.getGUIData().getClustersPanel().registerUpgradeTextField());
         /* add new host button */
         final MyButton addHostButton = new MyButton(
                                     Tools.getString("ClusterTab.AddNewHost"),

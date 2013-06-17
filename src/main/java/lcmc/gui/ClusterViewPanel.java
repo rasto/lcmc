@@ -23,27 +23,17 @@
 
 package lcmc.gui;
 import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
 import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
 import lcmc.utilities.AllHostsUpdatable;
-import lcmc.EditClusterDialog;
 
 import javax.swing.JPanel;
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
+import javax.swing.Box;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 
-import javax.swing.border.TitledBorder;
 
 /**
  * An implementation of a custer view with tree of services.
@@ -70,19 +60,7 @@ public final class ClusterViewPanel extends ViewPanel
         getTree(cluster.getBrowser());
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
-        /* wizard buttons */
-        final JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.setBackground(STATUS_BACKGROUND);
-
-        /* upgrade field */
-        buttonPanel.add(
-            Tools.getGUIData().getClustersPanel().registerUpgradeTextField());
-
-        /* button area */
-        final JPanel buttonArea = new JPanel(new BorderLayout());
-        buttonArea.setBackground(STATUS_BACKGROUND);
-        buttonArea.add(buttonPanel, BorderLayout.WEST);
-        add(buttonArea, BorderLayout.NORTH);
+        add(Box.createVerticalStrut(4), BorderLayout.NORTH);
 
         allHostsUpdate();
         Tools.getGUIData().registerAllHostsUpdate(this);

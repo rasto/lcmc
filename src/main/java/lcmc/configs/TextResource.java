@@ -115,10 +115,10 @@ public final class TextResource extends java.util.ListResourceBundle {
          "check for upgrade failed"},
 
         {"MainPanel.UpgradeAvailable",
-         "<font color=black>there&nbsp;is&nbsp;a&nbsp;new&nbsp;MC&nbsp;@LATEST@&nbsp;"
-         + "available</font><br>"
+         "<font color=black>new&nbsp;LCMC&nbsp;@LATEST@&nbsp;"
+         + "is&nbsp;available</font>&nbsp;"
          + "<a href=\"http://lcmc.sourceforge.net/"
-         + "?from-lcmc\">Get it here</a>!"},
+         + "?from-lcmc\">here</a>!"},
 
         {"MainPanel.NoUpgradeAvailable",
          ""},

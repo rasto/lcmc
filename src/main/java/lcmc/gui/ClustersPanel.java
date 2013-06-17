@@ -27,22 +27,15 @@ import lcmc.data.Clusters;
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
-import lcmc.Exceptions;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.UIManager;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.border.LineBorder;
 
-import java.util.List;
-import java.util.ArrayList;
 
 import java.awt.GridLayout;
 import java.awt.Component;
@@ -54,8 +47,6 @@ import java.awt.event.ActionEvent;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
@@ -86,27 +77,12 @@ public final class ClustersPanel extends JPanel {
     private ClusterTab prevSelected = null;
     /** Width of the tab border. */
     private static final int TAB_BORDER_WIDTH = 3;
-    /** Upgrade check text. */
-    private String upgradeCheck;
-    /** Upgrade check lock. */
-    private final Lock mUpgradeLock = new ReentrantLock();
-    /** Upgrade check text fields. */
-    private final List<JEditorPane> upgradeTextFields =
-                                               new ArrayList<JEditorPane>();
 
     /** Prepares a new <code>ClustersPanel</code> object. */
     ClustersPanel() {
         super(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
-        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
-            upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
-        } else {
-            upgradeCheck = Tools.getString("MainPanel.UpgradeCheckDisabled");
-        }
         newClusterTab = new ClusterTab(null);
-        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
-            startUpgradeCheck();
-        }
         setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
         showGUI();
     }
@@ -337,80 +313,4 @@ public final class ClustersPanel extends JPanel {
         }
     }
 
-    /** Starts upgrade check. */
-    private void startUpgradeCheck() {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final String latestVersion = Tools.getLatestVersion();
-                mUpgradeLock.lock();
-                if (latestVersion == null) {
-                    upgradeCheck = "";
-                } else {
-                    final String release = Tools.getRelease();
-                    try {
-                        if (Tools.compareVersions(release, latestVersion) < 0) {
-                            upgradeCheck =
-                                Tools.getString("MainPanel.UpgradeAvailable")
-                                        .replaceAll("@LATEST@", latestVersion);
-                        } else {
-                            upgradeCheck =
-                               Tools.getString("MainPanel.NoUpgradeAvailable");
-                        }
-                    } catch (Exceptions.IllegalVersionException e) {
-                        upgradeCheck =
-                             Tools.getString("MainPanel.UpgradeCheckFailed");
-                    }
-                }
-                final String text = upgradeCheck;
-                mUpgradeLock.unlock();
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final JEditorPane field : upgradeTextFields) {
-                            field.setText(text);
-                            field.setVisible(!"".equals(text));
-                        }
-                    }
-                });
-            }
-        });
-        thread.start();
-    }
-
-    /**
-     * Register upgrade text field, that will be updated, when upgrade check is
-     * done.
-     */
-    JEditorPane registerUpgradeTextField() {
-        final JEditorPane upgradeField =
-                                new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
-        final LineBorder border = new LineBorder(Color.RED);
-        upgradeField.setBorder(border);
-        Tools.setEditorFont(upgradeField);
-        upgradeField.setEditable(false);
-        upgradeField.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Tools.openBrowser(e.getURL().toString());
-                }
-            }
-        });
-        upgradeField.setBackground(Color.WHITE);
-        mUpgradeLock.lock();
-        upgradeTextFields.add(upgradeField);
-        final String text = upgradeCheck;
-        mUpgradeLock.unlock();
-        upgradeField.setText(text);
-        upgradeField.setVisible(!"".equals(text));
-        return upgradeField;
-    }
-
-    /** Unregister upgrade text field. */
-    void unregisterUpgradeTextField(final JEditorPane field) {
-        mUpgradeLock.lock();
-        upgradeTextFields.remove(field);
-        mUpgradeLock.unlock();
-    }
 }
