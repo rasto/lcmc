@@ -63,7 +63,7 @@ public final class Hosts {
     }
 
     /** Gets the host set. */
-    Set<Host> getHostSet() {
+    public Set<Host> getHostSet() {
         return hosts;
     }
 

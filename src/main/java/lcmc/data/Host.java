@@ -72,7 +72,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version $Id$
  *
  */
-public final class Host {
+public final class Host implements Comparable<Host> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the host. */
@@ -3113,6 +3113,12 @@ public final class Host {
         final String output = drbdXML.updateDrbdParameters(this);
         drbdXML.parseDrbdParameters(this, output, browser.getClusterHosts());
         browser.getDrbdParameters().put(this, output);
+    }
+
+    /** Compares ignoring case. */
+    @Override
+    public int compareTo(final Host h) {
+        return Tools.compareNames(getName(), h.getName());
     }
 }
 

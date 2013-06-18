@@ -22,6 +22,8 @@
 
 package lcmc.gui;
 
+import java.util.Set;
+import java.util.TreeSet;
 import lcmc.utilities.Tools;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
@@ -101,8 +103,8 @@ public final class EmptyBrowser extends Browser {
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
         /* all hosts */
-        final Host[] allHosts =
-                              Tools.getConfigData().getHosts().getHostsArray();
+        final Set<Host> allHosts =
+              new TreeSet<Host>(Tools.getConfigData().getHosts().getHostSet());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
