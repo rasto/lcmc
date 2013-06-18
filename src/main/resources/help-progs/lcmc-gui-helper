@@ -2521,7 +2521,7 @@ sub _execute {
 		if (wantarray) {
 			@out = `$cmd`;
 		} else {
-			$out = `$cmd`;
+			$out = `$cmd` || "";
 		}
 	} else {
 		$out = system($cmd);
