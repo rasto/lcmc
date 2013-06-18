@@ -2073,17 +2073,17 @@ public final class Tools {
     }
 
     /** Returns the latest version of this application. */
-    public static String getLatestVersion() {
+    public static String[] getLatestVersion() {
         String version = null;
-        //final Pattern vp = Pattern.compile(
-        //                      ".*<a\\s+href=\"drbd-mc-([0-9.]*?)\\.tar\\..*");
-        final Pattern vp = Pattern.compile(".*version:\\s+([0-9.]*)");
+        final Pattern vPattern = Pattern.compile(".*version:\\s+([0-9.]*)");
+        final Pattern iPattern = Pattern.compile(".*info:\\s+(\\d+)\\s+(.*)");
+        final int randomInfo = (int) (Math.random() * 100);
+        int rate = 0;
+        String info = null;
         try {
-            //final String url = "http://oss.linbit.com/drbd-mc/?drbd-mc-check-"
-            //                   + getRelease();
             final String url =
-                "http://lcmc.sourceforge.net/version.html?lcmc-check-"
-                + getRelease();
+                          "http://lcmc.sourceforge.net/version.html?lcmc-check-"
+                          + getRelease();
             final BufferedReader reader = new BufferedReader(
                              new InputStreamReader(new URL(url).openStream()));
             String line;
@@ -2092,9 +2092,9 @@ public final class Tools {
                 if (line == null) {
                     break;
                 }
-                final Matcher m = vp.matcher(line);
-                if (m.matches()) {
-                    final String v = m.group(1);
+                final Matcher vm = vPattern.matcher(line);
+                if (vm.matches()) {
+                    final String v = vm.group(1);
                     try {
                         if (version == null
                             || compareVersions(v, version) > 0) {
@@ -2103,14 +2103,22 @@ public final class Tools {
                     } catch (Exceptions.IllegalVersionException e) {
                         Tools.appWarning(e.getMessage(), e);
                     }
+                } else if (info == null) {
+                    final Matcher im = iPattern.matcher(line);
+                    if (im.matches()) {
+                        rate += Integer.parseInt(im.group(1)); 
+                        if (rate > randomInfo) {
+                            info = im.group(2);
+                        }
+                    }
                 }
             } while (true);
         } catch (MalformedURLException mue) {
-            return null;
+            return new String[]{null, null};
         } catch (IOException ioe) {
-            return version;
+            return new String[]{version, info};
         }
-        return version;
+        return new String[]{version, info};
     }
 
     /** Opens default browser. */

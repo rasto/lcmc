@@ -56,10 +56,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
@@ -94,8 +90,13 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Upgrade check text field. */
     private final JEditorPane upgradeTextField =
                                 new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
+    /** Info text field. */
+    private final JEditorPane infoTextField =
+                                new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
     /** Upgrade check text. */
-    private String upgradeCheck;
+    private String upgradeCheck = "";
+    /** Info text. */
+    private String infoText = null;
 
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
@@ -242,6 +243,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         operatingModesCB = createOperationModeCb();
         final JPanel opModePanel =
                             new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        menuBar.add(getInfoTextField());
         opModePanel.add(getUpgradeTextField());
         opModePanel.add(operatingModesCB);
         opModePanel.add(advancedModeCB);
@@ -681,7 +683,9 @@ public final class MainMenu extends JPanel implements ActionListener {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final String latestVersion = Tools.getLatestVersion();
+                final String[] serverCheck = Tools.getLatestVersion();
+                final String latestVersion = serverCheck[0];
+                infoText = serverCheck[1];
                 if (latestVersion == null) {
                     upgradeCheck = "";
                 } else {
@@ -706,6 +710,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                     public void run() {
                         upgradeTextField.setText(text);
                         upgradeTextField.setVisible(!"".equals(text));
+                        infoTextField.setText(infoText);
+                        infoTextField.setVisible(!"".equals(infoText));
                     }
                 });
             }
@@ -735,5 +741,31 @@ public final class MainMenu extends JPanel implements ActionListener {
         upgradeTextField.setText(text);
         upgradeTextField.setVisible(!"".equals(text));
         return upgradeTextField;
+    }
+
+    /**
+     * Return info text field, that will be updated, when info from the server
+     * is ready.
+     */
+    private JPanel getInfoTextField() {
+        final LineBorder border = new LineBorder(Color.RED);
+        infoTextField.setBorder(border);
+        Tools.setEditorFont(infoTextField);
+        infoTextField.setEditable(false);
+        infoTextField.addHyperlinkListener(new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    Tools.openBrowser(e.getURL().toString());
+                }
+            }
+        });
+        infoTextField.setBackground(Color.WHITE);
+        final String text = infoText;
+        infoTextField.setText(text);
+        infoTextField.setVisible(!"".equals(text));
+        final JPanel p = new JPanel();
+        p.add(infoTextField);
+        return p;
     }
 }
