@@ -639,19 +639,21 @@ public final class TerminalPanel extends JScrollPane {
         public void remove(final int offs,
                            final int len) throws BadLocationException {
             mPosLock.lock();
-            if (offs >= commandOffset) {
-
-                for (final String cheat : CHEATS_MAP.keySet()) {
-                    final int cheatPos = CHEATS_MAP.get(cheat);
-                    if (cheatPos > 0) {
-                        CHEATS_MAP.put(cheat, cheatPos - 1);
+            try {
+                if (offs >= commandOffset) {
+                    for (final String cheat : CHEATS_MAP.keySet()) {
+                        final int cheatPos = CHEATS_MAP.get(cheat);
+                        if (cheatPos > 0) {
+                            CHEATS_MAP.put(cheat, cheatPos - 1);
+                        }
+                    }
+                    if (editEnabled) {
+                        super.remove(offs, len);
                     }
                 }
-                if (editEnabled) {
-                    super.remove(offs, len);
-                }
+            } finally {
+                mPosLock.unlock();
             }
-            mPosLock.unlock();
         }
 
         /** Same as remove. */
@@ -740,11 +742,14 @@ public final class TerminalPanel extends JScrollPane {
                 final MyDocument doc =
                                 (MyDocument) terminalArea.getStyledDocument();
                 mPosLock.lock();
-                commandOffset = 0;
-                pos = 0;
-                maxPos = 0;
-                doc.removeForced(0, doc.getLength());
-                mPosLock.unlock();
+                try {
+                    commandOffset = 0;
+                    pos = 0;
+                    maxPos = 0;
+                    doc.removeForced(0, doc.getLength());
+                } finally {
+                    mPosLock.unlock();
+                }
                 return;
             } catch (BadLocationException e) {
                 continue;

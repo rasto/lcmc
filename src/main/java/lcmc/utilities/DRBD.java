@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
+import lcmc.utilities.SSH.SSHOutput;
 
 /**
  * This class provides drbd commands.
@@ -96,19 +97,22 @@ public final class DRBD {
                 cmd = cmd.replaceAll("@DRYRUNCONF@",
                                      "-c /var/lib/drbd/drbd.conf-lcmc-test");
             }
-            final SSH.SSHOutput output = Tools.execCommand(
+            final SSHOutput output = Tools.execCommand(
                                                 host,
                                                 cmd,
                                                 null,
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
             M_DRBD_TEST_WRITELOCK.lock();
-            if (drbdtestOutput == null) {
-                drbdtestOutput = output.getOutput();
-            } else {
-                drbdtestOutput += output.getOutput();
+            try {
+                if (drbdtestOutput == null) {
+                    drbdtestOutput = output.getOutput();
+                } else {
+                    drbdtestOutput += output.getOutput();
+                }
+            } finally {
+                M_DRBD_TEST_WRITELOCK.unlock();
             }
-            M_DRBD_TEST_WRITELOCK.unlock();
             return output;
         } else {
             String cmd;
@@ -134,10 +138,14 @@ public final class DRBD {
     /** Returns results of previous dry run. */
     public static String getDRBDtest() {
         M_DRBD_TEST_READLOCK.lock();
-        final String out = drbdtestOutput;
-        drbdtestOutput = null;
-        M_DRBD_TEST_READLOCK.unlock();
-        return out;
+        try {
+            final String out = drbdtestOutput;
+            drbdtestOutput = null;
+            return out;
+        } finally {
+            M_DRBD_TEST_READLOCK.unlock();
+        }
+
     }
 
     /** Executes the drbdadm attach on the specified host and resource. */

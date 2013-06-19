@@ -24,6 +24,7 @@ package lcmc.data;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.EnumMap;
 import lcmc.utilities.Tools;
 import lcmc.utilities.RoboTest;
 import ch.ethz.ssh2.KnownHosts;
@@ -64,7 +65,7 @@ public final class ConfigData {
                                        Tools.getString("ConfigData.OpMode.GOD");
     /** Map from access type to its string representation. */
     public static final Map<AccessType, String> OP_MODES_MAP =
-                                       new LinkedHashMap<AccessType, String>();
+                                    new EnumMap<AccessType, String>(AccessType.class);
     /** String representation to its access type. */
     public static final Map<String, AccessType> ACCESS_TYPE_MAP =
                                        new LinkedHashMap<String, AccessType>();
@@ -195,9 +196,9 @@ public final class ConfigData {
 
     /** Returns number of hosts that are not part of any cluster. */
     public int danglingHostsCount() {
-        final Hosts hosts = Tools.getConfigData().getHosts();
+        final Hosts hosts0 = Tools.getConfigData().getHosts();
         int c = 0;
-        for (final Host host : hosts.getHostSet()) {
+        for (final Host host : hosts0.getHostSet()) {
             if (!host.isInCluster()) {
                 c++;
             }

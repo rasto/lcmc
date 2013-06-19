@@ -73,27 +73,32 @@ public final class VGRemove extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
+    @Override
     protected void finishDialog() {
         /* disable finish dialog button. */
     }
 
     /** Returns the title of the dialog. */
+    @Override
     protected String getDialogTitle() {
         return "Remove VG";
     }
 
     /** Returns the description of the dialog. */
+    @Override
     protected String getDescription() {
         return VG_REMOVE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
+    @Override
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
+    @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocus(removeButton);
@@ -120,6 +125,7 @@ public final class VGRemove extends LV {
 
 
     /** Returns the input pane. */
+    @Override
     protected JComponent getInputPane() {
         removeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());

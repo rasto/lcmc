@@ -66,6 +66,7 @@ public final class MainPanel extends JPanel {
         splitPane.setOneTouchExpandable(true);
 
         splitPane.addHierarchyListener(new HierarchyListener() {
+            @Override
             public void hierarchyChanged(final HierarchyEvent e) {
                 mExpanding.lock();
                 if (!expandingDone

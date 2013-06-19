@@ -313,6 +313,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
                  final FileFilter filter = new FileFilter() {
+                    @Override
                      public boolean accept(final File f) {
                          if (f.isDirectory()) {
                             return true;
@@ -329,6 +330,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                          return false;
                      }
 
+                    @Override
                      public String getDescription() {
                          return Tools.getString("MainMenu.DrbdGuiFiles");
                      }
@@ -398,6 +400,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
                  final FileFilter filter = new FileFilter() {
+                    @Override
                      public boolean accept(final File f) {
                          if (f.isDirectory()) {
                             return true;
@@ -414,6 +417,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                          return false;
                      }
 
+                    @Override
                      public String getDescription() {
                          return "LCMC GUI Files";
                      }

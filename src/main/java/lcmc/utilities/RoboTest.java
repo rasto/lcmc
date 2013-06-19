@@ -3545,7 +3545,7 @@ public final class RoboTest {
         if (rbt == null) {
             return;
         }
-        final Robot robot = rbt;
+        final Robot robot0 = rbt;
         info("start register movement in 3 seconds");
         sleepNoFactor(3000);
         final Thread thread = new Thread(new Runnable() {

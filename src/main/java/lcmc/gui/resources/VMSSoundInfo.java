@@ -354,6 +354,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     }
 
     /** Removes this sound device without confirmation dialog. */
+    @Override
     protected void removeMyselfNoConfirm(final boolean testOnly) {
         if (testOnly) {
             return;

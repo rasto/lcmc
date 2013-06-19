@@ -89,33 +89,39 @@ public final class LVResize extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
+    @Override
     protected void finishDialog() {
         /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
+    @Override
     protected String getDialogTitle() {
         return "LVM Resize";
     }
 
     /** Returns the description of the dialog. */
+    @Override
     protected String getDescription() {
         return DESCRIPTION;
     }
 
     /** Close button. */
+    @Override
     public String cancelButton() {
         return "Close";
     }
 
 
     /** Inits the dialog. */
+    @Override
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
+    @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         if (checkDRBD()) {
@@ -214,6 +220,7 @@ public final class LVResize extends LV {
     }
 
     /** Returns the input pane. */
+    @Override
     protected JComponent getInputPane() {
         resizeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());

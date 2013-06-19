@@ -227,6 +227,7 @@ public final class HostBrowser extends Browser {
                                                         getNetInterfacesMap();
         final HostBrowser thisClass = this;
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 mNetInfosWriteLock.lock();
                 try {
@@ -276,6 +277,7 @@ public final class HostBrowser extends Browser {
         }
         if (changed) {
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     mBlockDevInfosWriteLock.lock();
                     try {
@@ -297,6 +299,7 @@ public final class HostBrowser extends Browser {
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 mFileSystemsWriteLock.lock();
                 try {

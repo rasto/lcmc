@@ -319,6 +319,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getInfoPanel();
             }
@@ -487,6 +488,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Updates parameters. */
+    @Override
     void updateParameters() {
         final Map<String, GraphicsData> graphicDisplays =
                               getVMSVirtualDomainInfo().getGraphicDisplays();

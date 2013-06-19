@@ -1323,6 +1323,7 @@ public final class BlockDevInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
+            @Override
             public boolean visiblePredicate() {
                 BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
@@ -1340,6 +1341,7 @@ public final class BlockDevInfo extends EditableInfo {
                        && !bd.isVolumeGroupOnPhysicalVolume();
             }
 
+            @Override
             public String enablePredicate() {
                 return null;
             }
@@ -1546,10 +1548,12 @@ public final class BlockDevInfo extends EditableInfo {
                               new AccessMode(ConfigData.AccessType.OP, false),
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+            @Override
             public boolean visiblePredicate() {
                 return isLVM();
             }
 
+            @Override
             public String enablePredicate() {
                 return null;
             }
@@ -2322,6 +2326,7 @@ public final class BlockDevInfo extends EditableInfo {
         return null;
     }
 
+    @Override
     public String getMainTextForGraph() {
         if (!isLVM()) {
             final String vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
@@ -2362,7 +2367,7 @@ public final class BlockDevInfo extends EditableInfo {
                  if (drbdVG != null && !"".equals(drbdVG)) {
                      s = s + " VG:" + drbdVG;
                  } else {
-                     s = s + " PV";
+                     s += " PV";
                  }
              }
              return new Subtext(s, Color.BLUE, Color.BLACK);

@@ -25,8 +25,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import lcmc.data.AccessMode;

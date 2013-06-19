@@ -114,6 +114,7 @@ public final class ClustersPanel extends JPanel {
            This causes terminal panel to show correct host, after clicking on
            the cluster tab. TODO: is this comment right? */
         tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(final ChangeEvent evt) {
                 final ClusterTab source = prevSelected;
                 final JTabbedPane prevSource = (JTabbedPane) evt.getSource();

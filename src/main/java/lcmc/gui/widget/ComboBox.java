@@ -59,7 +59,7 @@ public final class ComboBox extends Widget {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Scrollbar max rows. */
-    private static final int SCROLLBAR_MAX_ROWS = 10;
+    private static final int CB_SCROLLBAR_MAX_ROWS = 10;
 
     /** Prepares a new <code>ComboBox</code> object. */
     public ComboBox(final String selectedValue,
@@ -96,7 +96,7 @@ public final class ComboBox extends Widget {
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
-        cb.setMaximumRowCount(SCROLLBAR_MAX_ROWS);
+        cb.setMaximumRowCount(CB_SCROLLBAR_MAX_ROWS);
         if (selectedValueInfo != null) {
             cb.setSelectedItem(selectedValueInfo);
         }
@@ -439,6 +439,7 @@ public final class ComboBox extends Widget {
     }
 
     /** Select the text component. */
+    @Override
     public void select(final int selectionStart, final int selectionEnd) {
         getTextComponent().select(selectionStart, selectionEnd);
     }

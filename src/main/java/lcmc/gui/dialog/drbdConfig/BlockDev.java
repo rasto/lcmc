@@ -147,6 +147,7 @@ final class BlockDev extends DrbdConfig {
 
         final String[] params = blockDevInfo.getParametersFromXML();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(
                     blockDevInfo.checkResourceFieldsCorrect(null, params));
@@ -174,6 +175,7 @@ final class BlockDev extends DrbdConfig {
         blockDevInfo.selectMyself();
         blockDevInfo.waitForInfoPanel();
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 blockDevInfo.addWizardParams(
                  optionsPanel,

@@ -145,6 +145,7 @@ final class Network extends VMConfig {
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, "default");
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, "");
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vmsii.addWizardParams(
                       optionsPanel,

@@ -68,32 +68,38 @@ public final class PVCreate extends WizardDialog {
     }
 
     /** Finishes the dialog and sets the information. */
+    @Override
     protected void finishDialog() {
         /* disable finish dialog */
     }
 
     /** Returns the next dialog. */
+    @Override
     public WizardDialog nextDialog() {
         return null;
     }
 
     /** Returns the title of the dialog. */
+    @Override
     protected String getDialogTitle() {
         return "Create PV";
     }
 
     /** Returns the description of the dialog. */
+    @Override
     protected String getDescription() {
         return PV_CREATE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
+    @Override
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
+    @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocusLater(createButton);
@@ -122,6 +128,7 @@ public final class PVCreate extends WizardDialog {
 
 
     /** Returns the input pane. */
+    @Override
     protected JComponent getInputPane() {
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());

@@ -592,15 +592,15 @@ public final class CRMXML extends XML {
         addMetaAttribute(hbGroup, GROUP_ORDERED_META_ATTR, null, false);
         addMetaAttribute(hbGroup, GROUP_COLLOCATED_META_ATTR, null, false);
         /* groups */
-        final Map<String, String> metaAttrParams = getMetaAttrParameters();
-        for (final String metaAttr : metaAttrParams.keySet()) {
+        final Map<String, String> maParams = getMetaAttrParameters();
+        for (final String metaAttr : maParams.keySet()) {
             addMetaAttribute(pcmkClone,
                              metaAttr,
-                             metaAttrParams.get(metaAttr),
+                             maParams.get(metaAttr),
                              false);
             addMetaAttribute(hbGroup,
                              metaAttr,
-                             metaAttrParams.get(metaAttr),
+                             maParams.get(metaAttr),
                              false);
         }
 
@@ -904,6 +904,7 @@ public final class CRMXML extends XML {
         initOCFMetaDataConfigured();
         Tools.debug(this, "cluster loaded", 0);
         final Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 initOCFMetaDataAll();
                 final String hn = host.getName();
@@ -1873,9 +1874,9 @@ public final class CRMXML extends XML {
                             Tools.getString("CRMXML.pcmk_host_map.LongDesc"));
             ra.setParamType(PCMK_HOST_MAP_PARAM, PARAM_TYPE_STRING);
         }
-        final Map<String, String> metaAttrParams = getMetaAttrParameters();
-        for (final String metaAttr : metaAttrParams.keySet()) {
-            addMetaAttribute(ra, metaAttr, metaAttrParams.get(metaAttr), false);
+        final Map<String, String> maParams = getMetaAttrParameters();
+        for (final String metaAttr : maParams.keySet()) {
+            addMetaAttribute(ra, metaAttr, maParams.get(metaAttr), false);
         }
     }
 
@@ -2623,9 +2624,9 @@ public final class CRMXML extends XML {
         for (int i = 0; i < scores.getLength(); i++) {
             final Node scoreNode = scores.item(i);
             if (scoreNode.getNodeName().equals("score")) {
-                final String host = getAttribute(scoreNode, "host");
+                final String h = getAttribute(scoreNode, "host");
                 final String score = getAttribute(scoreNode, "score");
-                allocationScores.put(host, score);
+                allocationScores.put(h, score);
             }
         }
         return allocationScores;
@@ -2900,9 +2901,9 @@ public final class CRMXML extends XML {
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node hostNode = nodes.item(i);
                 if (hostNode.getNodeName().equals("node")) {
-                    final String host = getText(hostNode);
-                    if (host != null) {
-                        fencedNodes.add(host.toLowerCase(Locale.US));
+                    final String h = getText(hostNode);
+                    if (h != null) {
+                        fencedNodes.add(h.toLowerCase(Locale.US));
                     }
                 }
             }
@@ -4045,8 +4046,8 @@ public final class CRMXML extends XML {
             final List<String> copy = new ArrayList<String>();
             mRscIdsReadLock.lock();
             try {
-                for (final String id : rscIds) {
-                    copy.add(id);
+                for (final String rscId : rscIds) {
+                    copy.add(rscId);
                 }
             } finally {
                 mRscIdsReadLock.unlock();
@@ -4095,17 +4096,18 @@ public final class CRMXML extends XML {
             }
             final List<String> oRscIds = oRscSet.getRscIds();
             mRscIdsReadLock.lock();
-            if (oRscIds.size() != rscIds.size()) {
-                mRscIdsReadLock.unlock();
-                return false;
-            }
-            for (final String rscId : rscIds) {
-                if (!oRscIds.contains(rscId)) {
-                    mRscIdsReadLock.unlock();
+            try {
+                if (oRscIds.size() != rscIds.size()) {
                     return false;
                 }
+                for (final String rscId : rscIds) {
+                    if (!oRscIds.contains(rscId)) {
+                        return false;
+                    }
+                }
+            } finally {
+                mRscIdsReadLock.unlock();
             }
-            mRscIdsReadLock.unlock();
             return true;
         }
 
@@ -4122,9 +4124,11 @@ public final class CRMXML extends XML {
         /** Return whether rsc ids are empty. */
         boolean isRscIdsEmpty() {
             mRscIdsReadLock.lock();
-            final boolean empty = rscIds.isEmpty();
-            mRscIdsReadLock.unlock();
-            return empty;
+            try {
+                return rscIds.isEmpty();
+            } finally {
+                mRscIdsReadLock.unlock();
+            }
         }
 
         /** String represantation of the resources set. */

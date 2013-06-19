@@ -437,7 +437,7 @@ final class HbConfig extends DialogCluster {
         final Pattern mgmtdP =
                           Pattern.compile("^\\s*respawn root .*\\/mgmtd -v$");
         castAddresses.clear();
-        final Map<String, String> optionValues = new HashMap<String, String>();
+        final Map<String, String> opValues = new HashMap<String, String>();
         for (String line : config) {
             final Matcher bcastM  = bcastP.matcher(line);
             final Matcher mcastM  = mcastP.matcher(line);
@@ -473,7 +473,7 @@ final class HbConfig extends DialogCluster {
                 for (final String option : OPTIONS) {
                     final Matcher m = optionPatterns.get(option).matcher(line);
                     if (m.matches()) {
-                        optionValues.put(option, m.group(1).trim());
+                        opValues.put(option, m.group(1).trim());
                         continue;
                     }
                 }
@@ -487,8 +487,8 @@ final class HbConfig extends DialogCluster {
             }
         }
         for (final String option : OPTIONS) {
-            if (optionValues.containsKey(option)) {
-                optionsW.get(option).setValue(optionValues.get(option));
+            if (opValues.containsKey(option)) {
+                optionsW.get(option).setValue(opValues.get(option));
             } else {
                 optionsW.get(option).setValue("");
             }

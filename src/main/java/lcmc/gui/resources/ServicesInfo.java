@@ -586,6 +586,7 @@ public final class ServicesInfo extends EditableInfo {
         }
         if (newService) {
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     getBrowser().reloadAndWait(
                                         getBrowser().getServicesNode(), false);
@@ -901,6 +902,7 @@ public final class ServicesInfo extends EditableInfo {
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 hg.killRemovedEdges();
                 final Map<String, ServiceInfo> idToInfoHash =
@@ -1811,6 +1813,7 @@ public final class ServicesInfo extends EditableInfo {
                      Tools.getString(
                          "ClusterBrowser.confirmRemoveAllServices.No"))) {
                     final Thread t = new Thread() {
+                        @Override
                         public void run() {
                             final Host dcHost = getBrowser().getDCHost();
                             List<ServiceInfo> services =
@@ -2006,6 +2009,7 @@ public final class ServicesInfo extends EditableInfo {
         }
         final String oldValue = oldWi.getStringValue();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
             public void run() {
                 if ("".equals(oldValue)) {
                     newWi.setValueNoListeners(null);
@@ -2080,6 +2084,7 @@ public final class ServicesInfo extends EditableInfo {
                                     null,
                                     CRM.LIVE);
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         if (!(newSi instanceof CloneInfo)) {
                             oldSi.getInfoPanel();
@@ -2120,6 +2125,7 @@ public final class ServicesInfo extends EditableInfo {
                             }
                         }
                         Tools.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 copyPasteField(oldCi0.getWidget(param, null),
                                                newCi.getWidget(param, null));
@@ -2132,6 +2138,7 @@ public final class ServicesInfo extends EditableInfo {
                     final GroupInfo newGi = (GroupInfo) newSi;
 
                     Tools.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             @SuppressWarnings("unchecked")
                             final Enumeration<DefaultMutableTreeNode> e =

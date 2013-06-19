@@ -82,6 +82,7 @@ public class Devices extends DialogHost {
     @Override
     protected final void initDialogAfterVisible() {
         final Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 getHost().getSSH().installGuiHelper();
                 getAllInfo();

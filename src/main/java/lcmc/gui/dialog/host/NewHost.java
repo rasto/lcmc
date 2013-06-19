@@ -194,14 +194,14 @@ public class NewHost extends DialogHost {
             sshPortField.wrongValue();
         }
 
-        final boolean hostField = hf;
-        final boolean userField = hf;
-        final boolean sshPortField = pf;
+        final boolean hostF = hf;
+        final boolean userF = hf;
+        final boolean sshPortF = pf;
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent btn : nextButtons()) {
-                    btn.setEnabled(hostField && userField && sshPortField);
+                    btn.setEnabled(hostF && userF && sshPortF);
                 }
             }
         });

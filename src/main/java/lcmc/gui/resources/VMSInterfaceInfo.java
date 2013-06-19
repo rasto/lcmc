@@ -313,6 +313,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getInfoPanel();
             }

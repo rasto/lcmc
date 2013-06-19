@@ -1777,17 +1777,26 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (vmsxml.isSuspended(getDomainName())) {
                         suspendedOnHosts.add(hostName);
                         mTransitionWriteLock.lock();
-                        suspending.remove(hostName);
-                        mTransitionWriteLock.unlock();
+                        try {
+                            suspending.remove(hostName);
+                        } finally {
+                            mTransitionWriteLock.unlock();
+                        }
                     } else {
                         mTransitionWriteLock.lock();
-                        resuming.remove(hostName);
-                        mTransitionWriteLock.unlock();
+                        try {
+                            resuming.remove(hostName);
+                        } finally {
+                            mTransitionWriteLock.unlock();
+                        }
                     }
                     runningOnHosts.add(hostName);
                     mTransitionWriteLock.lock();
-                    starting.remove(hostName);
-                    mTransitionWriteLock.unlock();
+                    try {
+                        starting.remove(hostName);
+                    } finally {
+                        mTransitionWriteLock.unlock();
+                    }
                 }
                 definedhosts.add(hostName);
             } else {
@@ -1910,6 +1919,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final boolean interfaceNodeChanged = updateInterfaceNodes();
                 final boolean diskNodeChanged = updateDiskNodes();
@@ -2448,6 +2458,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return vmsdi;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2481,6 +2492,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return vmsii;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2517,6 +2529,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2553,6 +2566,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return vmsgi;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2590,6 +2604,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2627,6 +2642,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2666,6 +2682,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -2703,6 +2720,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         /* all the way till the end */
         final DefaultMutableTreeNode thisNode = getNode();
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 thisNode.add(resource);
             }
@@ -4134,8 +4152,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mDiskToInfoLock.lock();
-        diskKeyToInfo = dkti;
-        mDiskToInfoLock.unlock();
+        try {
+            diskKeyToInfo = dkti;
+        } finally {
+            mDiskToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4213,8 +4234,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mFilesystemToInfoLock.lock();
-        filesystemKeyToInfo = dkti;
-        mFilesystemToInfoLock.unlock();
+        try {
+            filesystemKeyToInfo = dkti;
+        } finally {
+            mFilesystemToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4463,8 +4487,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mInputDevToInfoLock.lock();
-        inputDevKeyToInfo = iToInfo;
-        mInputDevToInfoLock.unlock();
+        try {
+            inputDevKeyToInfo = iToInfo;
+        } finally {
+            mInputDevToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4484,8 +4511,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mGraphicsToInfoLock.lock();
-        graphicsKeyToInfo = iToInfo;
-        mGraphicsToInfoLock.unlock();
+        try {
+            graphicsKeyToInfo = iToInfo;
+        } finally {
+            mGraphicsToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4505,8 +4535,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mSoundToInfoLock.lock();
-        soundKeyToInfo = iToInfo;
-        mSoundToInfoLock.unlock();
+        try {
+            soundKeyToInfo = iToInfo;
+        } finally {
+            mSoundToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4526,8 +4559,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mSerialToInfoLock.lock();
-        serialKeyToInfo = iToInfo;
-        mSerialToInfoLock.unlock();
+        try {
+            serialKeyToInfo = iToInfo;
+        } finally {
+            mSerialToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4547,8 +4583,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mParallelToInfoLock.lock();
-        parallelKeyToInfo = iToInfo;
-        mParallelToInfoLock.unlock();
+        try {
+            parallelKeyToInfo = iToInfo;
+        } finally {
+            mParallelToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4568,8 +4607,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mVideoToInfoLock.lock();
-        videoKeyToInfo = iToInfo;
-        mVideoToInfoLock.unlock();
+        try {
+            videoKeyToInfo = iToInfo;
+        } finally {
+            mVideoToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4667,8 +4709,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         mInterfaceToInfoLock.lock();
-        interfaceKeyToInfo = iToInfo;
-        mInterfaceToInfoLock.unlock();
+        try {
+            interfaceKeyToInfo = iToInfo;
+        } finally {
+            mInterfaceToInfoLock.unlock();
+        }
         return rows.toArray(new Object[rows.size()][]);
     }
 
@@ -4901,9 +4946,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns whether the devices exists. */
     protected boolean isDevice(final String dev) {
         mDiskToInfoLock.lock();
-        final boolean is = diskToInfo.containsKey(dev);
-        mDiskToInfoLock.unlock();
-        return is;
+        try {
+            return diskToInfo.containsKey(dev);
+        } finally {
+            mDiskToInfoLock.unlock();
+        }
     }
 
     /** Returns whether this parameter is advanced. */

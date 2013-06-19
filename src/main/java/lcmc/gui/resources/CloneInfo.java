@@ -86,6 +86,7 @@ final class CloneInfo extends ServiceInfo {
                                 new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 final DefaultMutableTreeNode node = getNode();
                 if (node != null) {
@@ -416,6 +417,7 @@ final class CloneInfo extends ServiceInfo {
     }
 
     /** Removes the service without confirmation dialog. */
+    @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);
@@ -777,6 +779,7 @@ final class CloneInfo extends ServiceInfo {
                 return null;
             }
 
+            @Override
             public void update() {
                 final Thread t = new Thread(new Runnable() {
                     @Override

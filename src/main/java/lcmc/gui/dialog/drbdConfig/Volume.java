@@ -106,6 +106,7 @@ public final class Volume extends DrbdConfig {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
@@ -134,6 +135,7 @@ public final class Volume extends DrbdConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getDrbdVolumeInfo().addWizardParams(
                   optionsPanel,

@@ -891,6 +891,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Returns true if all fields are correct. */
+    @Override
     boolean checkResourceFieldsCorrect(final String param,
                                        final String[] params) {
         if (getBrowser().getDrbdResHash().isEmpty()) {

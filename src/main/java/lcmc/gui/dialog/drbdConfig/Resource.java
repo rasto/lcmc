@@ -184,6 +184,7 @@ public final class Resource extends DrbdConfig {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
@@ -262,6 +263,7 @@ public final class Resource extends DrbdConfig {
                              true,
                              buttonClass(nextButton()));
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 dri.addWizardParams(
                   optionsPanel,

@@ -331,14 +331,14 @@ public final class AllHostsInfo extends Info {
         label.setBackground(Browser.PANEL_BACKGROUND);
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
         label.add(new JLabel(cluster.getName()));
-        for (final Host host : cluster.getHosts()) {
+        for (final Host h : cluster.getHosts()) {
             final StringBuilder hostLabel = new StringBuilder();
-            if (!host.isRoot()) {
-                hostLabel.append(host.getUsername());
+            if (!h.isRoot()) {
+                hostLabel.append(h.getUsername());
                 hostLabel.append('@');
             }
-            hostLabel.append(host.getName());
-            final String port = host.getSSHPort();
+            hostLabel.append(h.getName());
+            final String port = h.getSSHPort();
             if (port != null && !"22".equals(port)) {
                 hostLabel.append(':');
                 hostLabel.append(port);
@@ -548,6 +548,7 @@ public final class AllHostsInfo extends Info {
         textfield.getDocument().addDocumentListener(new DocumentListener() {
                     private void check() {
                         Tools.invokeLater(new Runnable() {
+                    @Override
                             public void run() {
                                 button.setEnabled(true);
                             }

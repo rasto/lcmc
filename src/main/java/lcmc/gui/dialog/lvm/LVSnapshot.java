@@ -148,6 +148,7 @@ public final class LVSnapshot extends LV {
     }
 
     /** Returns the input pane. */
+    @Override
     protected JComponent getInputPane() {
         snapshotButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());

@@ -1124,6 +1124,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Cleanup. */
+    @Override
     final void cleanup() {
         super.cleanup();
         clearPanelLists();

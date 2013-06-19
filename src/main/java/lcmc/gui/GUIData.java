@@ -545,6 +545,7 @@ public final class GUIData  {
             return;
         }
         final Thread t = new Thread(new Runnable() {
+            @Override
             public void run() {
                 ssi.pasteServices(scs);
             }

@@ -1292,11 +1292,11 @@ public final class Host implements Comparable<Host> {
         if (ip == null) {
             return null;
         }
-        final String[] ips = ip.split(",");
-        if (ips.length < hop + 1) {
+        final String[] ipsA = ip.split(",");
+        if (ipsA.length < hop + 1) {
             return null;
         }
-        return ips[hop];
+        return ipsA[hop];
     }
 
     /** Return first hop ip. */
@@ -1304,8 +1304,8 @@ public final class Host implements Comparable<Host> {
         if (ip == null) {
             return null;
         }
-        final String[] ips = ip.split(",");
-        return ips[0];
+        final String[] ipsA = ip.split(",");
+        return ipsA[0];
     }
     /** Returns username. */
     public String getUsername() {
@@ -1356,17 +1356,17 @@ public final class Host implements Comparable<Host> {
     public String getHoppedCommand(final String command) {
         final int hops = Tools.charCount(ip, ',') + 1;
         final String[] usernames = username.split(",");
-        final String[] ips = ip.split(",");
+        final String[] ipsA = ip.split(",");
         final StringBuilder s = new StringBuilder(200);
         if (hops > 1) {
             String sshAgentPid = "";
             String sshAgentSock = "";
             final Map<String, String> variables = System.getenv();
-            for (final String name : variables.keySet()) {
-                final String value = variables.get(name);
-                if ("SSH_AGENT_PID".equals(name)) {
+            for (final String var : variables.keySet()) {
+                final String value = variables.get(var);
+                if ("SSH_AGENT_PID".equals(var)) {
                     sshAgentPid = value;
-                } else if ("SSH_AUTH_SOCK".equals(name)) {
+                } else if ("SSH_AUTH_SOCK".equals(var)) {
                     sshAgentSock = value;
                 }
             }
@@ -1386,7 +1386,7 @@ public final class Host implements Comparable<Host> {
                 s.append(ROOT_USER);
             }
             s.append(' ');
-            s.append(ips[i]);
+            s.append(ipsA[i]);
             s.append(' ');
             s.append(Tools.escapeQuotes("\"", i - 1));
         }
@@ -1857,6 +1857,7 @@ public final class Host implements Comparable<Host> {
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXML(dxml);
                                      Tools.invokeLater(new Runnable() {
+                                         @Override
                                          public void run() {
                                              cb.getDrbdGraph().getDrbdInfo().setParameters();
                                              cb.updateDrbdResources();
@@ -2088,28 +2089,28 @@ public final class Host implements Comparable<Host> {
                 newNetInterfaces.put(netInterface.getName(), netInterface);
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
-                final String name = blockDevice.getName();
-                if (name != null) {
-                    final Matcher drbdM = DRBDP.matcher(name);
+                final String bdName = blockDevice.getName();
+                if (bdName != null) {
+                    final Matcher drbdM = DRBDP.matcher(bdName);
                     if (drbdM.matches()) {
-                        if (drbdBlockDevices.containsKey(name)) {
+                        if (drbdBlockDevices.containsKey(bdName)) {
                             /* get the existing block device object,
                                forget the new one. */
-                            blockDevice = drbdBlockDevices.get(name);
+                            blockDevice = drbdBlockDevices.get(bdName);
                             blockDevice.update(line);
                         }
-                        newDrbdBlockDevices.put(name, blockDevice);
+                        newDrbdBlockDevices.put(bdName, blockDevice);
                     } else {
-                        if (blockDevices.containsKey(name)) {
+                        if (blockDevices.containsKey(bdName)) {
                             /* get the existing block device object,
                                forget the new one. */
-                            blockDevice = blockDevices.get(name);
+                            blockDevice = blockDevices.get(bdName);
                             blockDevice.update(line);
                         }
-                        newBlockDevices.put(name, blockDevice);
+                        newBlockDevices.put(bdName, blockDevice);
                         if (blockDevice.getVolumeGroup() == null
-                            && name.length() > 5 && name.indexOf('/', 5) < 0) {
-                            final Matcher m = BDP.matcher(name);
+                            && bdName.length() > 5 && bdName.indexOf('/', 5) < 0) {
+                            final Matcher m = BDP.matcher(bdName);
                             if (m.matches()) {
                                 newBlockDevices.remove(m.group(1));
                             }
@@ -2163,8 +2164,8 @@ public final class Host implements Comparable<Host> {
             } else if ("drbd-proxy-info".equals(type)) {
                 /* res-other.host-this.host */
                 String res = null;
-                final Cluster cluster = getCluster();
-                if (cluster != null) {
+                final Cluster cl = getCluster();
+                if (cl != null) {
                     if (line.startsWith("up:")) {
                         for (final Host otherHost
                                               : getCluster().getProxyHosts()) {
@@ -2275,9 +2276,9 @@ public final class Host implements Comparable<Host> {
                                     final String guiOptionName,
                                     final Map<String, List<String>> goptions) {
         if (line.length() > 2 && line.substring(0, 2).equals("o:")) {
-            final String name = line.substring(2);
-            goptions.put(name, new ArrayList<String>());
-            return name;
+            final String op = line.substring(2);
+            goptions.put(op, new ArrayList<String>());
+            return op;
         }
         if (guiOptionName != null) {
             final List<String> options = goptions.get(guiOptionName);
@@ -3108,11 +3109,11 @@ public final class Host implements Comparable<Host> {
 
     /** Update drbd parameters. */
     public void updateDrbdParameters() {
-        final ClusterBrowser browser = getBrowser().getClusterBrowser();
-        final DrbdXML drbdXML = browser.getDrbdXML();
+        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+        final DrbdXML drbdXML = cb.getDrbdXML();
         final String output = drbdXML.updateDrbdParameters(this);
-        drbdXML.parseDrbdParameters(this, output, browser.getClusterHosts());
-        browser.getDrbdParameters().put(this, output);
+        drbdXML.parseDrbdParameters(this, output, cb.getClusterHosts());
+        cb.getDrbdParameters().put(this, output);
     }
 
     /** Compares ignoring case. */

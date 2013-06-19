@@ -213,6 +213,7 @@ public final class EditConfig extends ConfigDialog {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
                     Tools.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             setConfigArea(
                                      results[index],
@@ -238,6 +239,7 @@ public final class EditConfig extends ConfigDialog {
             });
         }
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 setConfigArea(results[0], errors[0], true);
             }
@@ -250,14 +252,17 @@ public final class EditConfig extends ConfigDialog {
                 }
             }
 
+            @Override
             public void changedUpdate(final DocumentEvent documentEvent) {
                 update();
             }
 
+            @Override
             public void insertUpdate(final DocumentEvent documentEvent) {
                 update();
             }
 
+            @Override
             public void removeUpdate(final DocumentEvent documentEvent) {
                 update();
             }

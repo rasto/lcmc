@@ -640,6 +640,7 @@ public final class ClusterBrowser extends Browser {
 
         /* cluster hosts */
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 clusterHostsNode.removeAllChildren();
             }
@@ -703,6 +704,7 @@ public final class ClusterBrowser extends Browser {
                 Host firstHost = null;
                 final Host[] hosts = cluster.getHostsArray();
                 Tools.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         for (final Host host : hosts) {
                             final HostBrowser hostBrowser = host.getBrowser();
@@ -829,11 +831,13 @@ public final class ClusterBrowser extends Browser {
     public void updateServerStatus(final Host host) {
         final String hostName = host.getName();
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 drbdGraph.scale();
             }
@@ -954,6 +958,7 @@ public final class ClusterBrowser extends Browser {
                     Thread.currentThread().interrupt();
                 }
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         drbdGraph.scale();
                     }
@@ -1073,6 +1078,7 @@ public final class ClusterBrowser extends Browser {
                            Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
                                Tools.invokeLater(new Runnable() {
+                            @Override
                                    public void run() {
                                        getDrbdGraph().getDrbdInfo().setParameters();
                                        updateDrbdResources();
@@ -1385,6 +1391,7 @@ public final class ClusterBrowser extends Browser {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
                     @SuppressWarnings("unchecked")
@@ -1436,6 +1443,7 @@ public final class ClusterBrowser extends Browser {
         DefaultMutableTreeNode resource;
         Tools.debug(this, "update available services");
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 availableServicesNode.removeAllChildren();
             }
@@ -1501,6 +1509,7 @@ public final class ClusterBrowser extends Browser {
 
         /* remove nodes */
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 for (final DefaultMutableTreeNode node : nodesToRemove) {
                     node.removeFromParent();
@@ -1538,6 +1547,7 @@ public final class ClusterBrowser extends Browser {
             vmsvdi.updateParameters();
             final int index = i;
             Tools.invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     vmsNode.insert(resource, index);
                 }
@@ -1696,6 +1706,7 @@ public final class ClusterBrowser extends Browser {
             DefaultMutableTreeNode resource;
             final Network[] networks = cluster.getCommonNetworks();
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     networksNode.removeAllChildren();
                 }

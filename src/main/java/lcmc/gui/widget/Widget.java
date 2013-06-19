@@ -307,9 +307,11 @@ public abstract class Widget extends JPanel {
 
     public final Object getValue() {
         mValueReadLock.lock();
-        final Object value = getValueInternal();
-        mValueReadLock.unlock();
-        return value;
+        try {
+            return getValueInternal();
+        } finally {
+            mValueReadLock.unlock();
+        }
     }
 
     /** Return value, that user have chosen in the field or typed in. */
@@ -394,8 +396,11 @@ public abstract class Widget extends JPanel {
             return;
         }
         mValueWriteLock.lock();
-        setValueAndWait0(item);
-        mValueWriteLock.unlock();
+        try {
+            setValueAndWait0(item);
+        } finally {
+            mValueWriteLock.unlock();
+        }
     }
 
     /** Sets item/value in the component and waits till it is set. */
@@ -411,8 +416,11 @@ public abstract class Widget extends JPanel {
             wl.setEnabled(false);
         }
         mValueWriteLock.lock();
-        setValueAndWait0(item);
-        mValueWriteLock.unlock();
+        try {
+            setValueAndWait0(item);
+        } finally {
+            mValueWriteLock.unlock();
+        }
         for (final WidgetListener wl : widgetListeners) {
             wl.setEnabled(true);
         }
@@ -428,8 +436,11 @@ public abstract class Widget extends JPanel {
             @Override
             public void run() {
                 mValueWriteLock.lock();
-                setValueAndWait0(item);
-                mValueWriteLock.unlock();
+                try {
+                    setValueAndWait0(item);
+                } finally {
+                    mValueWriteLock.unlock();
+                }
             }
         });
     }
@@ -860,7 +871,7 @@ public abstract class Widget extends JPanel {
             super(items);
         }
 
-        public MComboBox(final java.util.Vector<E> items) {
+        public MComboBox(@SuppressWarnings("UseOfObsoleteCollectionType") final java.util.Vector<E> items) {
             super(items);
         }
 
@@ -870,6 +881,7 @@ public abstract class Widget extends JPanel {
 
         private boolean layingOut = false;
 
+        @Override
         public void doLayout() {
             try {
                 layingOut = true;
@@ -880,6 +892,7 @@ public abstract class Widget extends JPanel {
         }
 
         /** Get new size if popup items are wider than the item. */
+        @Override
         public Dimension getSize() {
             final Dimension dim = super.getSize();
             if (!layingOut) {

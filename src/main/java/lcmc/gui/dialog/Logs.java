@@ -31,7 +31,6 @@ import lcmc.gui.ProgressBar;
 import lcmc.gui.resources.Info;
 
 import javax.swing.JPanel;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -232,6 +231,7 @@ class Logs extends ConfigDialog {
         }
         Arrays.sort(output,
                     new Comparator<String>() {
+                        @Override
                         public int compare(final String o1, final String o2) {
                             final Matcher m1 = p.matcher(o1);
                             final Matcher m2 = p.matcher(o2);

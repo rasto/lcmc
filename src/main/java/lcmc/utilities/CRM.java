@@ -36,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.UUID;
+import lcmc.utilities.SSH.SSHOutput;
 
 /**
  * This class provides cib commands. There are commands that use cibadmin and
@@ -93,15 +94,18 @@ public final class CRM {
                                              final boolean outputVisible,
                                              final boolean testOnly) {
         M_PTEST_WRITELOCK.lock();
-        ptestOutput = null;
-        M_PTEST_WRITELOCK.unlock();
+        try {
+            ptestOutput = null;
+        } finally {
+            M_PTEST_WRITELOCK.unlock();
+        }
         if (testOnly) {
             final String testCmd =
              "if [ ! -e " + LCMC_TEST_FILE + " ]; "
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
              + LCMC_TEST_FILE + ";fi;"
              + "export CIB_file=" + LCMC_TEST_FILE + ";";
-            final SSH.SSHOutput out = Tools.execCommand(
+            final SSHOutput out = Tools.execCommand(
                                                  host,
                                                  testCmd + command,
                                                  null,
@@ -123,12 +127,14 @@ public final class CRM {
     /** Executes the ptest command and returns results. */
     public static String getPtest(final Host host) {
         M_PTEST_READLOCK.lock();
-        if (ptestOutput != null) {
-            final String po = ptestOutput;
+        try {
+            if (ptestOutput != null) {
+                final String po = ptestOutput;
+                return po;
+            }
+        } finally {
             M_PTEST_READLOCK.unlock();
-            return po;
         }
-        M_PTEST_READLOCK.unlock();
         final String command =
                 "export PROG=/usr/sbin/crm_simulate;"
                 + "if [ -e /usr/sbin/ptest ];"
@@ -140,19 +146,22 @@ public final class CRM {
                 + PTEST_END_DELIM
                 + "';cat " + LCMC_TEST_FILE + " 2>/dev/null;"
                 + "mv -f " + LCMC_TEST_FILE + "{,.last} 2>/dev/null";
-        final SSH.SSHOutput output = Tools.execCommand(
+        final SSHOutput output = Tools.execCommand(
                                                 host,
                                                 command,
                                                 null,
                                                 false,
                                                 SSH.DEFAULT_COMMAND_TIMEOUT);
         M_PTEST_WRITELOCK.lock();
-        final String po = output.getOutput();
-        if (ptestOutput == null) {
-            ptestOutput = po;
+        try {
+            final String po = output.getOutput();
+            if (ptestOutput == null) {
+                ptestOutput = po;
+            }
+            return po; 
+        } finally {
+            M_PTEST_WRITELOCK.unlock();
         }
-        M_PTEST_WRITELOCK.unlock();
-        return po;
     }
 
     /** Returns xml of a primitive. */
@@ -558,7 +567,7 @@ public final class CRM {
             if ("".equals(value)) {
                 continue;
             }
-            xml.append("\" " + attr + "=\"");
+            xml.append("\" ").append(attr).append("=\"");
             xml.append(value);
         }
         xml.append("\">");
@@ -647,7 +656,7 @@ public final class CRM {
                 if (value == null || "".equals(value)) {
                     continue;
                 }
-                xml.append("\" " + attr + "=\"");
+                xml.append("\" ").append(attr).append("=\"");
                 xml.append(value);
             }
         }
@@ -1276,7 +1285,7 @@ public final class CRM {
             if (convertHash.containsKey(attr)) {
                 attr = convertHash.get(attr);
             }
-            xml.append("\" " + attr + "=\"");
+            xml.append("\" ").append(attr).append("=\"");
             xml.append(value);
         }
         xml.append("\"/>'");

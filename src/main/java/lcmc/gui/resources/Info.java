@@ -74,7 +74,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 
@@ -440,6 +439,7 @@ public class Info implements Comparable<Info> {
         final DefaultMutableTreeNode n = node;
         if (n != null) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                @Override
                 public void run() {
                     getBrowser().reloadAndWait(n, true);
                 }
@@ -591,6 +591,7 @@ public class Info implements Comparable<Info> {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    @Override
                     public void run() {
                         b.setSelected(false);
                     }
@@ -599,6 +600,7 @@ public class Info implements Comparable<Info> {
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    @Override
                     public void run() {
                         b.setSelected(false);
                     }
@@ -640,6 +642,7 @@ public class Info implements Comparable<Info> {
                                               (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
                         Tools.invokeLater(new Runnable() {
+                        @Override
                             public void run() {
                                 b.setSelected(true);
                             }
@@ -651,6 +654,7 @@ public class Info implements Comparable<Info> {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
                                     Tools.invokeLater(new Runnable() {
+                                    @Override
                                         public void run() {
                                             showPopup(pm, b);
                                         }
@@ -674,8 +678,11 @@ public class Info implements Comparable<Info> {
     /** Force popup to be recreated. */
     protected final void resetPopup() {
         mPopupLock.lock();
-        popup = null;
-        mPopupLock.unlock();
+        try {
+            popup = null;
+        } finally {
+            mPopupLock.unlock();
+        }
     }
 
     /** Update menus with positions and calles their update methods. */
@@ -703,8 +710,11 @@ public class Info implements Comparable<Info> {
     final void registerAllMenuItems(
                                final List<UpdatableItem> allItemsAndSubitems) {
         mMenuListLock.lock();
-        menuList = allItemsAndSubitems;
-        mMenuListLock.unlock();
+        try {
+            menuList = allItemsAndSubitems;
+        } finally {
+            mMenuListLock.unlock();
+        }
     }
 
     /** Returns units. */
@@ -819,6 +829,7 @@ public class Info implements Comparable<Info> {
                 new DefaultTableModel(data, colNames) {
                     /** Serial version uid. */
                     private static final long serialVersionUID = 1L;
+                @Override
                     public final boolean isCellEditable(final int r,
                                                         final int c) {
                         return false;
@@ -830,11 +841,13 @@ public class Info implements Comparable<Info> {
                          private static final long serialVersionUID = 1L;
 
                          /** Returns row color. */
+                         @Override
                          public final Color getRowColor(final String key) {
                              return getTableRowColor(tableName, key);
                          }
 
                          /** Returns alignment of the column. */
+                         @Override
                          public final int getColumnAlignment(final int column) {
                              return getTableColumnAlignment(tableName, column);
                          }
@@ -843,6 +856,7 @@ public class Info implements Comparable<Info> {
                 /** Serial version uid. */
                 private static final long serialVersionUID = 1L;
                 /** Overriding so that jlabels show up. */
+                @Override
                 public Class getColumnClass(final int c) {
                     final Object o = getValueAt(0, c);
                     if (o == null) {
@@ -851,6 +865,7 @@ public class Info implements Comparable<Info> {
                     return o.getClass();
                 }
 
+                @Override
                 public TableCellRenderer getCellRenderer(final int row,
                                                          final int column) {
                     if (column == 0 || isControlButton(tableName, column)) {
@@ -859,6 +874,7 @@ public class Info implements Comparable<Info> {
                     return super.getCellRenderer(row, column);
                 }
 
+                @Override
                 public String getToolTipText(final MouseEvent me) {
                     int row = rowAtPoint(me.getPoint());
                     int column = columnAtPoint(me.getPoint());
@@ -895,11 +911,13 @@ public class Info implements Comparable<Info> {
                          private static final long serialVersionUID = 1L;
 
                          /** Returns row color. */
+                         @Override
                          public final Color getRowColor(final String key) {
                              return getTableRowColor(tableName, key);
                          }
 
                          /** Returns alignment of the column. */
+                         @Override
                          public final int getColumnAlignment(final int column) {
                              return getTableColumnAlignment(tableName, column);
                          }
@@ -957,9 +975,9 @@ public class Info implements Comparable<Info> {
                     }
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
-                    final int row = table.rowAtPoint(p);
+                    final int row0 = table.rowAtPoint(p);
                     final int column = table.columnAtPoint(p);
-                    final MyButton keyB = (MyButton) table.getValueAt(row, 0);
+                    final MyButton keyB = (MyButton) table.getValueAt(row0, 0);
                     rowClicked(tableName, keyB.getText(), column);
                 }
 
@@ -1006,13 +1024,13 @@ public class Info implements Comparable<Info> {
                 public final void mouseEntered(final MouseEvent e) {
                     final JTable table = (JTable) e.getSource();
                     final Point p = e.getPoint();
-                    final int row = table.rowAtPoint(p);
+                    final int row0 = table.rowAtPoint(p);
                     try {
                         for (int c = 0; c < table.getColumnCount(); c++) {
-                            final Object v = table.getValueAt(row, c);
+                            final Object v = table.getValueAt(row0, c);
                             if (v instanceof MyButton) {
                                 ((MyButton) v).getModel().setRollover(true);
-                                table.setValueAt(v, row, c);
+                                table.setValueAt(v, row0, c);
                             }
                         }
                         paintItMouseOver = true;

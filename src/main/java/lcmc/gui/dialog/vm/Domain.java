@@ -127,11 +127,13 @@ public final class Domain extends VMConfig {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 domainNameWi.requestFocus();
             }
@@ -156,6 +158,7 @@ public final class Domain extends VMConfig {
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
         vdi.savePreferredValues();
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vdi.addWizardParams(
                           optionsPanel,

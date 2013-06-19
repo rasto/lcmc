@@ -667,11 +667,11 @@ public final class DrbdVolumeInfo extends EditableInfo
                                                getDevice(),
                                                getName());
         cb.getDrbdGraph().removeDrbdVolume(this);
-        final Set<Host> hosts = getHosts();
+        final Set<Host> hosts0 = getHosts();
         final boolean lastVolume =
                                 getDrbdResourceInfo().removeDrbdVolume(this);
         if (getDrbdVolume().isCommited()) {
-            for (final Host host : hosts) {
+            for (final Host host : hosts0) {
                 DRBD.setSecondary(host,
                                   getDrbdResourceInfo().getName(),
                                   getName(),
@@ -737,9 +737,9 @@ public final class DrbdVolumeInfo extends EditableInfo
         cb.getDrbdGraph().updatePopupMenus();
         cb.resetFilesystems();
 
-        final DrbdXML dxml = new DrbdXML(hosts.toArray(new Host[hosts.size()]),
+        final DrbdXML dxml = new DrbdXML(hosts0.toArray(new Host[hosts0.size()]),
                                          cb.getDrbdParameters());
-        for (final Host host : hosts) {
+        for (final Host host : hosts0) {
             final String conf = dxml.getConfig(host);
             if (conf != null) {
                 dxml.update(conf);
@@ -748,6 +748,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         cb.setDrbdXML(dxml);
         cb.drbdStatusUnlock();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 cb.updateDrbdResources();
                 if (!testOnly) {
@@ -1379,11 +1380,13 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Sets that this drbd resource is used by crm. */
+    @Override
     public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         getDrbdResourceInfo().setUsedByCRM(isUsedByCRM);
     }
 
     /** Returns whether this drbd resource is used by crm. */
+    @Override
     public boolean isUsedByCRM() {
         return getDrbdResourceInfo().isUsedByCRM();
     }

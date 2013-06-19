@@ -45,6 +45,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     public MyListModel() {
         super();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 filterField.selectAll();
             }
@@ -55,6 +56,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         return filterField;
     }
 
+    @Override
     public E getElementAt(final int index) {
         if (index < filteredItems.size()) {
             return filteredItems.get(index);
@@ -63,6 +65,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         }
     }
 
+    @Override
     public int getSize() {
         return filteredItems.size();
     }
@@ -77,6 +80,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         String filter = filterField.getText();
         if (START_TEXT.equals(filter)) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                @Override
                 public void run() {
                     filterField.selectAll();
                 }
@@ -100,14 +104,17 @@ public final class MyListModel<E> extends AbstractListModel<E> {
             getDocument().addDocumentListener(this);
         }
 
+        @Override
         public void changedUpdate(final DocumentEvent e) {
             refilter();
         }
 
+        @Override
         public void insertUpdate(final DocumentEvent e) {
             refilter();
         }
 
+        @Override
         public void removeUpdate(final DocumentEvent e) {
             refilter();
         }

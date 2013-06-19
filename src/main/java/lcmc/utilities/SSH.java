@@ -126,8 +126,11 @@ public final class SSH {
             host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
             final ConnectionThread ct = new ConnectionThread();
             mConnectionThreadLock.lock();
-            connectionThread = ct;
-            mConnectionThreadLock.unlock();
+            try {
+                connectionThread = ct;
+            } finally {
+                mConnectionThreadLock.unlock();
+            }
             ct.start();
         }
         return true;
@@ -152,8 +155,11 @@ public final class SSH {
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
         final ConnectionThread ct = new ConnectionThread();
         mConnectionThreadLock.lock();
-        connectionThread = ct;
-        mConnectionThreadLock.unlock();
+        try {
+            connectionThread = ct;
+        } finally {
+            mConnectionThreadLock.unlock();
+        }
         ct.start();
     }
 
@@ -306,9 +312,11 @@ public final class SSH {
     /** Returns true if connection is established. */
     public boolean isConnected() {
         mConnectionLock.lock();
-        final boolean ret = connection != null;
-        mConnectionLock.unlock();
-        return ret;
+        try {
+            return connection != null;
+        } finally {
+            mConnectionLock.unlock();
+        }
     }
 
     /** Returns true if connection is established. */
@@ -657,16 +665,22 @@ public final class SSH {
                      * interrupted after a timeout. */
                     final Session newSession = conn.openSession();
                     mSessionLock.lock();
-                    sess = newSession;
-                    mSessionLock.unlock();
+                    try {
+                        sess = newSession;
+                    } finally {
+                        mSessionLock.unlock();
+                    }
                     if (cancelTimeout[0]) {
-                        throw new java.io.IOException("open session failed");
+                        throw new IOException("open session failed");
                     }
                     cancelTimeout[0] = true;
                 } catch (java.io.IOException e) {
                     mConnectionLock.lock();
-                    connection = null;
-                    mConnectionLock.unlock();
+                    try {
+                        connection = null;
+                    } finally {
+                        mConnectionLock.unlock();
+                    }
                     if (execCallback != null) {
                         execCallback.doneError("could not open session", 45);
                     }
@@ -879,6 +893,7 @@ public final class SSH {
      */
     class AdvancedVerifier implements ServerHostKeyVerifier {
         /** Verifies the keys. */
+        @Override
         public boolean verifyServerHostKey(final String hostname,
                                            final int port,
                                            final String serverHostKeyAlgorithm,
@@ -1379,21 +1394,30 @@ public final class SSH {
                       this,
                       "closing established connection because it was canceled");
                 mConnectionThreadLock.lock();
-                connectionThread = null;
-                mConnectionThreadLock.unlock();
+                try {
+                    connectionThread = null;
+                } finally {
+                    mConnectionThreadLock.unlock();
+                }
                 host.setConnected();
                 if (callback != null) {
                     callback.doneError("");
                 }
                 mConnectionLock.lock();
-                connection = null;
-                mConnectionLock.unlock();
+                try {
+                    connection = null;
+                } finally {
+                    mConnectionLock.unlock();
+                }
                 host.setConnected();
             } else {
                 //  authentication ok.
                 mConnectionLock.lock();
-                connection = conn;
-                mConnectionLock.unlock();
+                try {
+                    connection = conn;
+                } finally {
+                    mConnectionLock.unlock();
+                }
                 host.setConnected();
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -1402,8 +1426,11 @@ public final class SSH {
                     }
                 });
                 mConnectionThreadLock.lock();
-                connectionThread = null;
-                mConnectionThreadLock.unlock();
+                try {
+                    connectionThread = null;
+                } finally {
+                    mConnectionThreadLock.unlock();
+                }
                 host.setConnected();
                 if (callback != null) {
                     callback.done(0);
@@ -1474,11 +1501,17 @@ public final class SSH {
                     }
                 }
                 mConnectionThreadLock.lock();
-                connectionThread = null;
-                mConnectionThreadLock.unlock();
+                try {
+                    connectionThread = null;
+                } finally {
+                    mConnectionThreadLock.unlock();
+                }
                 mConnectionLock.lock();
-                connection = null;
-                mConnectionLock.unlock();
+                try {
+                    connection = null;
+                } finally {
+                    mConnectionLock.unlock();
+                }
                 host.setConnected();
             }
         }

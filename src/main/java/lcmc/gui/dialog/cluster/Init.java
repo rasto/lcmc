@@ -688,19 +688,19 @@ public class Init extends DialogCluster {
             /* Heartbeat */
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingHb")));
-            MyButton button;
+            MyButton btn;
             if (host.isCsRunning()
                 || host.isAisRunning()
                 || host.isCsRc()
                 || host.isAisRc()) {
-                button = new MyButton(HB_BUTTON_SWITCH);
+                btn = new MyButton(HB_BUTTON_SWITCH);
             } else {
-                button = new MyButton(
+                btn = new MyButton(
                          Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
-            button.setBackgroundColor(
+            btn.setBackgroundColor(
                                Tools.getDefaultColor("ConfigDialog.Button"));
-            hbStartButtons.add(button);
+            hbStartButtons.add(btn);
             hbStartButtons.get(i).setVisible(false);
 
             hbStartButtons.get(i).addActionListener(

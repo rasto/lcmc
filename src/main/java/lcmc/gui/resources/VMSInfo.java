@@ -190,6 +190,7 @@ public final class VMSInfo extends CategoryInfo {
         if (col == 0) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
+                @Override
                 public int compare(final Object l1, final Object l2) {
                     return ((MyButton) l1).getText().compareToIgnoreCase(
                                                     ((MyButton) l2).getText());
@@ -199,6 +200,7 @@ public final class VMSInfo extends CategoryInfo {
         } else if (col == 3) {
             /* memory */
             final Comparator<Object> c = new Comparator<Object>() {
+                @Override
                 public int compare(final Object s1, final Object s2) {
                     final long i1 = Tools.convertToKilobytes((String) s1);
                     final long i2 = Tools.convertToKilobytes((String) s2);

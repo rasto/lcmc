@@ -22,6 +22,7 @@
 
 
 package lcmc.data.resources;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -128,9 +129,7 @@ public class Resource {
         if (values == null) {
             return possibleChoices;
         }
-        for (int i = 0; i < values.length; i++) {
-            possibleChoices.add(values[i]);
-        }
+        possibleChoices.addAll(Arrays.asList(values));
         return possibleChoices;
     }
 

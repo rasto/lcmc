@@ -432,6 +432,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         getBrowser().getCRMGraph().killRemovedVertices();
                         getService().doneRemoving();

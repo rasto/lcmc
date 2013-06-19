@@ -308,37 +308,36 @@ public final class CRMGraph extends ResourceGraph {
         final Vertex v = getVertex(si);
         if (v != null) {
             mHbConnectionReadLock.lock();
-            lockGraph();
-            for (final Vertex pV : getGraph().getPredecessors(v)) {
-                Edge edge = getGraph().findEdge(pV, v);
-
-                if (edge == null) {
-                    edge = getGraph().findEdge(v, pV);
-                }
-                if (edge != null) {
-                    final HbConnectionInfo hbci =
-                                              edgeToHbconnectionMap.get(edge);
-                    if (hbci != null) {
-                        infos.add(hbci);
+            try {
+                lockGraph();
+                for (final Vertex pV : getGraph().getPredecessors(v)) {
+                    Edge edge = getGraph().findEdge(pV, v);
+                    if (edge == null) {
+                        edge = getGraph().findEdge(v, pV);
+                    }
+                    if (edge != null) {
+                        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                        if (hbci != null) {
+                            infos.add(hbci);
+                        }
                     }
                 }
-            }
-            for (final Vertex sV : getGraph().getSuccessors(v)) {
-                Edge edge = getGraph().findEdge(v, sV);
-
-                if (edge == null) {
-                    edge = getGraph().findEdge(sV, v);
-                }
-                if (edge != null) {
-                    final HbConnectionInfo hbci =
-                                              edgeToHbconnectionMap.get(edge);
-                    if (hbci != null) {
-                        infos.add(hbci);
+                for (final Vertex sV : getGraph().getSuccessors(v)) {
+                    Edge edge = getGraph().findEdge(v, sV);
+                    if (edge == null) {
+                        edge = getGraph().findEdge(sV, v);
+                    }
+                    if (edge != null) {
+                        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                        if (hbci != null) {
+                            infos.add(hbci);
+                        }
                     }
                 }
+                unlockGraph();
+            } finally {
+                mHbConnectionReadLock.unlock();
             }
-            unlockGraph();
-            mHbConnectionReadLock.unlock();
         }
         return infos.toArray(new HbConnectionInfo[infos.size()]);
     }
@@ -468,6 +467,7 @@ public final class CRMGraph extends ResourceGraph {
         final Vertex v0 = v;
 
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
                 Edge edge = null;
@@ -608,6 +608,7 @@ public final class CRMGraph extends ResourceGraph {
         final Vertex vRsc0 = vRsc;
         final ServiceInfo withRsc0 = withRsc;
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
                 Edge edge = null;
@@ -1565,6 +1566,7 @@ public final class CRMGraph extends ResourceGraph {
         } else {
             if (hbci.isNew()) {
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         removeEdge(edge, testOnly);
                     }
@@ -1597,6 +1599,7 @@ public final class CRMGraph extends ResourceGraph {
         } else {
             if (hbci.isNew()) {
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         removeEdge(edge, testOnly);
                     }
@@ -1655,6 +1658,7 @@ public final class CRMGraph extends ResourceGraph {
         } else {
             if (hbci.isNew()) {
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         removeEdge(edge, testOnly);
                     }
@@ -1880,10 +1884,13 @@ public final class CRMGraph extends ResourceGraph {
         final List<HbConnectionInfo> allConnections =
                                             new ArrayList<HbConnectionInfo>();
         mHbConnectionReadLock.lock();
-        for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
-            allConnections.add(hbci);
+        try {
+            for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
+                allConnections.add(hbci);
+            }
+        } finally {
+            mHbConnectionReadLock.unlock();
         }
-        mHbConnectionReadLock.unlock();
         return allConnections;
     }
 

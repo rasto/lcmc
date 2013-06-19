@@ -163,6 +163,7 @@ final class Storage extends VMConfig {
                                                          VMSXML.VM_PARAM_NAME)
                                      + ".img");
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vmsdi.addWizardParams(
                       optionsPanel,

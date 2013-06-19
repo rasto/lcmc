@@ -26,11 +26,9 @@ import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import lcmc.utilities.AllHostsUpdatable;
 
-import javax.swing.JPanel;
 import javax.swing.Box;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Color;
 
 

@@ -83,6 +83,7 @@ public final class AddDrbdConfigDialog {
             drbdResourceInfo.addDrbdVolume(dvi);
             drbdInfo.addDrbdResource(drbdResourceInfo);
             Tools.invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     drbdInfo.addDrbdVolume(dvi);
                 }

@@ -207,10 +207,13 @@ public final class RadioGroup extends Widget {
                 }
                 comp.setVisible(visible);
                 mComponentsReadLock.lock();
-                for (final JComponent c : componentsHash.values()) {
-                    c.setVisible(visible);
+                try {
+                    for (final JComponent c : componentsHash.values()) {
+                        c.setVisible(visible);
+                    }
+                } finally {
+                    mComponentsReadLock.unlock();
                 }
-                mComponentsReadLock.unlock();
                 repaint();
             }
         });
@@ -252,11 +255,14 @@ public final class RadioGroup extends Widget {
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
         mComponentsReadLock.lock();
-        final ItemListener il = getItemListener(wl);
-        for (final JComponent c : componentsHash.values()) {
-            ((JRadioButton) c).addItemListener(il);
+        try {
+            final ItemListener il = getItemListener(wl);
+            for (final JComponent c : componentsHash.values()) {
+                ((JRadioButton) c).addItemListener(il);
+            }
+        } finally {
+            mComponentsReadLock.unlock();
         }
-        mComponentsReadLock.unlock();
     }
 
     @Override
@@ -264,10 +270,13 @@ public final class RadioGroup extends Widget {
                                           final Color compColor) {
         getComponent().setBackground(backgroundColor);
         mComponentsReadLock.lock();
-        for (final JComponent c : componentsHash.values()) {
-            c.setBackground(backgroundColor);
+        try {
+            for (final JComponent c : componentsHash.values()) {
+                c.setBackground(backgroundColor);
+            }
+        } finally {
+            mComponentsReadLock.unlock();
         }
-        mComponentsReadLock.unlock();
     }
 
     /** Sets background color. */
@@ -280,10 +289,13 @@ public final class RadioGroup extends Widget {
                 setBackground(bg);
                 comp.setBackground(bg);
                 mComponentsReadLock.lock();
-                for (final JComponent c : componentsHash.values()) {
-                    c.setBackground(bg);
+                try {
+                    for (final JComponent c : componentsHash.values()) {
+                        c.setBackground(bg);
+                    }
+                } finally {
+                    mComponentsReadLock.unlock();
                 }
-                mComponentsReadLock.unlock();
             }
         });
     }
@@ -299,22 +311,28 @@ public final class RadioGroup extends Widget {
     public void cleanup() {
         getWidgetListeners().clear();
         mComponentsReadLock.lock();
-        for (final JComponent c : componentsHash.values()) {
-            for (final ItemListener il
-                            : ((JRadioButton) c).getItemListeners()) {
-                ((JRadioButton) c).removeItemListener(il);
+        try {
+            for (final JComponent c : componentsHash.values()) {
+                for (final ItemListener il : ((JRadioButton) c).getItemListeners()) {
+                    ((JRadioButton) c).removeItemListener(il);
+                }
             }
+        } finally {
+            mComponentsReadLock.unlock();
         }
-        mComponentsReadLock.unlock();
     }
 
     /** Sets component enabled or disabled. */
+    @Override
     protected void setComponentsEnabled(final boolean enabled) {
         super.setComponentsEnabled(enabled);
         mComponentsReadLock.lock();
-        for (final JComponent c : componentsHash.values()) {
-            c.setEnabled(enabled);
+        try {
+            for (final JComponent c : componentsHash.values()) {
+                c.setEnabled(enabled);
+            }
+        } finally {
+            mComponentsReadLock.unlock();
         }
-        mComponentsReadLock.unlock();
     }
 }

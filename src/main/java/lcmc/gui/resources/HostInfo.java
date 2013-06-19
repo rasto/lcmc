@@ -206,6 +206,7 @@ public final class HostInfo extends Info {
                 public void done(final String ans) {
                     ta.setText(ans);
                     Tools.invokeLater(new Runnable() {
+                    @Override
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
                             hostInfoButton.setEnabled(true);
@@ -219,6 +220,7 @@ public final class HostInfo extends Info {
                     ta.setText(ans);
                     Tools.sshError(host, "", ans, "", exitCode);
                     Tools.invokeLater(new Runnable() {
+                    @Override
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);
                         }
@@ -277,14 +279,17 @@ public final class HostInfo extends Info {
                 }
             }
 
+            @Override
             public void changedUpdate(final DocumentEvent documentEvent) {
                 update();
             }
 
+            @Override
             public void insertUpdate(final DocumentEvent documentEvent) {
                 update();
             }
 
+            @Override
             public void removeUpdate(final DocumentEvent documentEvent) {
                 update();
             }

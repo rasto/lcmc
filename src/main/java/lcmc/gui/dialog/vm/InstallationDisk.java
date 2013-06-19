@@ -156,6 +156,7 @@ final class InstallationDisk extends VMConfig {
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
                                      VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vmsdi.addWizardParams(
                       optionsPanel,

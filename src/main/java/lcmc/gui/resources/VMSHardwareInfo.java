@@ -413,6 +413,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Returns device parameters. */
     protected Map<String, String> getHWParameters(final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getInfoPanel();
             }

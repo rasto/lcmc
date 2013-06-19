@@ -109,4 +109,13 @@ public final class HostLocation {
             return op.equals(otherHL.getOperation());
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.score != null ? this.score.hashCode() : 0);
+        hash = 97 * hash + (this.op != null ? this.op.hashCode() : 0);
+        hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
+        return hash;
+    }
 }

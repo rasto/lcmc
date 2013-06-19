@@ -315,6 +315,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     }
 
     /** Updates parameters. */
+    @Override
     void updateParameters() {
         final Map<String, InputDevData> inputDevs =
                                     getVMSVirtualDomainInfo().getInputDevs();

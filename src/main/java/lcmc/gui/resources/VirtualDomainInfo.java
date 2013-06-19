@@ -94,6 +94,7 @@ final class VirtualDomainInfo extends ServiceInfo {
     }
 
     /** Removes the service without confirmation dialog. */
+    @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         super.removeMyselfNoConfirm(dcHost, testOnly);

@@ -140,6 +140,7 @@ final class Display extends VMConfig {
         vmsgi.getResource().setValue(GraphicsData.PORT, "auto");
 
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vmsgi.addWizardParams(
                       optionsPanel,

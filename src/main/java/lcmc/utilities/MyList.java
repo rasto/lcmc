@@ -69,6 +69,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
     }
 
     /** Creates tooltip. */
+    @Override
     public JToolTip createToolTip() {
         if (toolTip != null) {
             toolTip.setComponent(null);

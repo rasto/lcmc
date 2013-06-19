@@ -1152,7 +1152,7 @@ public final class DrbdGraph extends ResourceGraph {
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 
-    public Map<DrbdVolumeInfo, Edge> getDrbdVolumeToEdgeMap() {
+    Map<DrbdVolumeInfo, Edge> getDrbdVolumeToEdgeMap() {
         return drbdVolumeToEdgeMap;
     }
 }

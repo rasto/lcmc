@@ -476,6 +476,7 @@ public abstract class ConfigDialog {
             final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
             Tools.invokeAndWait(new Runnable() {
+                @Override
                 public void run() {
                     optionPane = new JOptionPane(
                                         b,
@@ -539,6 +540,7 @@ public abstract class ConfigDialog {
         optionPane.addPropertyChangeListener(propertyChangeListener);
         initDialog();
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 dialogPanel.setPreferredSize(
                         new Dimension(dialogWidth(), dialogHeight()));
@@ -552,6 +554,7 @@ public abstract class ConfigDialog {
             }
         });
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 dialogPanel.setLocationRelativeTo(
                                Tools.getGUIData().getMainFrameContentPane());

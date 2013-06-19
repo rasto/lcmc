@@ -80,27 +80,32 @@ public final class VGCreate extends LV {
     }
 
     /** Finishes the dialog and sets the information. */
+    @Override
     protected void finishDialog() {
         /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
+    @Override
     protected String getDialogTitle() {
         return "Create VG";
     }
 
     /** Returns the description of the dialog. */
+    @Override
     protected String getDescription() {
         return VG_CREATE_DESCRIPTION;
     }
 
     /** Inits the dialog. */
+    @Override
     protected void initDialog() {
         super.initDialog();
         enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog after it becomes visible. */
+    @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocusLater(vgNameWi);

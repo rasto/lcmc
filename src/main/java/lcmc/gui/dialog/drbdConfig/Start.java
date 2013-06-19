@@ -103,6 +103,7 @@ public final class Start extends WizardDialog {
                                                               blockDevInfo1,
                                                               blockDevInfo2)));
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 drbdResourceInfo.addDrbdVolume(dvi);
                 drbdInfo.addDrbdVolume(dvi);

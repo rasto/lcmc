@@ -633,6 +633,7 @@ public class HbConnectionInfo extends EditableInfo {
 
         final ClusterBrowser.ClMenuItemCallback removeOrderCallback =
                  getBrowser().new ClMenuItemCallback(removeOrderItem, null) {
+            @Override
             public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
@@ -983,20 +984,22 @@ public class HbConnectionInfo extends EditableInfo {
     /** Returns whether this resource is resource 1 in colocation constraint. */
     public final boolean isWithRsc(final ServiceInfo si) {
         mConstraintsReadLock.lock();
-        for (final HbConstraintInterface c : constraints) {
-            if (!c.isOrder()) {
-                ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
-                final GroupInfo gi = rsc2.getGroupInfo();
-                if (gi != null) {
-                    rsc2 = gi;
-                }
-                if (rsc2.equals(si)) {
-                    mConstraintsReadLock.unlock();
-                    return true;
+        try {
+            for (final HbConstraintInterface c : constraints) {
+                if (!c.isOrder()) {
+                    ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
+                    final GroupInfo gi = rsc2.getGroupInfo();
+                    if (gi != null) {
+                        rsc2 = gi;
+                    }
+                    if (rsc2.equals(si)) {
+                        return true;
+                    }
                 }
             }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsReadLock.unlock();
         return true;
     }
 
@@ -1008,33 +1011,34 @@ public class HbConnectionInfo extends EditableInfo {
         ServiceInfo allRsc1 = null;
         ServiceInfo allRsc2 = null;
         mConstraintsReadLock.lock();
-        for (final HbConstraintInterface c : constraints) {
-            if (c.isOrder() == isOrder) {
-                ServiceInfo rsc1 = c.getRscInfo1();
-                ServiceInfo rsc2 = c.getRscInfo2();
-                final GroupInfo gi1 = rsc1.getGroupInfo();
-                if (gi1 != null) {
-                    rsc1 = gi1;
-                }
-                final GroupInfo gi2 = rsc2.getGroupInfo();
-                if (gi2 != null) {
-                    rsc2 = gi2;
-                }
-                if (allRsc1 == null) {
-                    allRsc1 = rsc1;
-                } else if (!rsc1.equals(allRsc1)) {
-                    mConstraintsReadLock.unlock();
-                    return true;
-                }
-                if (allRsc2 == null) {
-                    allRsc2 = rsc2;
-                } else if (!rsc2.equals(allRsc2)) {
-                    mConstraintsReadLock.unlock();
-                    return true;
+        try {
+            for (final HbConstraintInterface c : constraints) {
+                if (c.isOrder() == isOrder) {
+                    ServiceInfo rsc1 = c.getRscInfo1();
+                    ServiceInfo rsc2 = c.getRscInfo2();
+                    final GroupInfo gi1 = rsc1.getGroupInfo();
+                    if (gi1 != null) {
+                        rsc1 = gi1;
+                    }
+                    final GroupInfo gi2 = rsc2.getGroupInfo();
+                    if (gi2 != null) {
+                        rsc2 = gi2;
+                    }
+                    if (allRsc1 == null) {
+                        allRsc1 = rsc1;
+                    } else if (!rsc1.equals(allRsc1)) {
+                        return true;
+                    }
+                    if (allRsc2 == null) {
+                        allRsc2 = rsc2;
+                    } else if (!rsc2.equals(allRsc2)) {
+                        return true;
+                    }
                 }
             }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsReadLock.unlock();
         return false;
     }
 
@@ -1051,15 +1055,17 @@ public class HbConnectionInfo extends EditableInfo {
     /** Returns whether this service has a colocation or order. */
     final boolean hasColocationOrOrder(final ServiceInfo si) {
         mConstraintsReadLock.lock();
-        for (final HbConstraintInterface c : constraints) {
-            final ServiceInfo rsc1 = c.getRscInfo1();
-            final ServiceInfo rsc2 = c.getRscInfo2();
-            if (si.equals(rsc1) || si.equals(rsc2)) {
-                mConstraintsReadLock.unlock();
-                return true;
+        try {
+            for (final HbConstraintInterface c : constraints) {
+                final ServiceInfo rsc1 = c.getRscInfo1();
+                final ServiceInfo rsc2 = c.getRscInfo2();
+                if (si.equals(rsc1) || si.equals(rsc2)) {
+                    return true;
+                }
             }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsReadLock.unlock();
         return false;
     }
 
@@ -1088,10 +1094,13 @@ public class HbConnectionInfo extends EditableInfo {
         final List<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
-        for (final HbConstraintInterface c : constraints) {
-            constraintsCopy.add(c);
+        try {
+            for (final HbConstraintInterface c : constraints) {
+                constraintsCopy.add(c);
+            }
+        } finally {
+            mConstraintsReadLock.unlock();
         }
-        mConstraintsReadLock.unlock();
         for (final HbConstraintInterface c : constraintsCopy) {
             c.revert();
         }

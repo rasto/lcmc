@@ -88,6 +88,7 @@ final class DrbddiskInfo extends ServiceInfo {
     }
 
     /** Sets service parameters with values from resourceNode hash. */
+    @Override
     void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final DrbdResourceInfo dri =

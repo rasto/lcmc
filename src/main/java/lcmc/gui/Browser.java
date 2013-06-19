@@ -269,7 +269,7 @@ public class Browser {
     }
 
     /** Renders the cells for the menu. */
-    static class CellRenderer extends DefaultTreeCellRenderer {
+    private static class CellRenderer extends DefaultTreeCellRenderer {
         /** Serial version UUID. */
         private static final long serialVersionUID = 1L;
 
@@ -289,6 +289,7 @@ public class Browser {
          * Returns the CellRenderer component, setting up the icons and
          * tooltips.
          */
+        @Override
         public Component getTreeCellRendererComponent(final JTree tree,
                                                       final Object value,
                                                       final boolean sel,
@@ -351,6 +352,7 @@ public class Browser {
     public final void addNode(final DefaultMutableTreeNode node,
                               final DefaultMutableTreeNode child) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
             public void run() {
               node.add(child);
             }

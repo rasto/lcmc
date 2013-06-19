@@ -1993,6 +1993,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         /* select the IP part */
                         comboBox.setAlwaysEditable(true);
                         Tools.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 comboBox.select(
                                        s, s + NetInfo.IP_PLACEHOLDER.length());
@@ -2083,6 +2084,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Stores values in the combo boxes in the component c. */
+    @Override
     protected void storeComboBoxValues(final String[] params) {
         super.storeComboBoxValues(params);
         storeHostAddresses();
@@ -2109,11 +2111,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Removes this object. */
+    @Override
     public void removeMyself(final boolean testOnly) {
         super.removeMyself(testOnly);
         getBrowser().getDrbdXML().removeResource(getName());
-        final Set<Host> hosts = getHosts();
-        for (final Host host : hosts) {
+        final Set<Host> hosts0 = getHosts();
+        for (final Host host : hosts0) {
             host.getBrowser().getUsedPorts().remove(
                                                 portComboBox.getStringValue());
             host.getBrowser().getUsedPorts().remove(

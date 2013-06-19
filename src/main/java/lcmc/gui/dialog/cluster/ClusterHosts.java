@@ -203,7 +203,7 @@ final class ClusterHosts extends DialogCluster {
             };
         Host lastHost1 = null;
         Host lastHost2 = null;
-        if (getCluster().getHosts().size() == 0) {
+        if (getCluster().getHosts().isEmpty()) {
             /* mark last two available hosts */
             for (final Host host : hosts.getHostsArray()) {
                 if (!getCluster().getHosts().contains(host)

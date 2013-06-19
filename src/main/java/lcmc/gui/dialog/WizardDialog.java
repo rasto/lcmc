@@ -255,6 +255,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Requests focus in the swing thread. */
     protected final void makeDefaultAndRequestFocusLater(final JComponent b) {
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 makeDefaultAndRequestFocus(b);
             }

@@ -88,7 +88,7 @@ public class LinbitLogin extends DialogHost {
             public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
-                v = v & (downloadPasswordField.getStringValue().trim().length()
+                v = v && (downloadPasswordField.getStringValue().trim().length()
                          > 0);
                 buttonClass(nextButton()).setEnabled(v);
             }
@@ -103,7 +103,7 @@ public class LinbitLogin extends DialogHost {
             public void run() {
                 boolean v =
                     (downloadUserField.getStringValue().trim().length() > 0);
-                v = v & (downloadPasswordField.getStringValue().trim().length()
+                v = v && (downloadPasswordField.getStringValue().trim().length()
                          > 0);
                 buttonClass(nextButton()).setEnabled(v);
             }

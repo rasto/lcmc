@@ -74,9 +74,11 @@ public final class Clusters {
     /** Returns true if cluster is in the clusters or false if it is not. */
     boolean existsCluster(final Cluster cluster) {
         mClustersReadLock.lock();
-        final boolean ret = clusters.contains(cluster);
-        mClustersReadLock.unlock();
-        return ret;
+        try {
+            return clusters.contains(cluster);
+        } finally {
+            mClustersReadLock.unlock();
+        }
     }
 
     /** Gets set of clusters. */

@@ -85,7 +85,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.SpringLayout;
 import javax.swing.AbstractButton;
-import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -2144,6 +2143,7 @@ public class ServiceInfo extends EditableInfo {
                          rightWidth,
                          0);
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    @Override
                     public void run() {
                         wiLabel.setToolTipText(labelText);
                     }
@@ -3723,6 +3723,7 @@ public class ServiceInfo extends EditableInfo {
             }
 
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     setApplyButtons(null, params);
                     final DefaultMutableTreeNode node = getNode();
@@ -4232,6 +4233,7 @@ public class ServiceInfo extends EditableInfo {
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     final DefaultMutableTreeNode newServiceNode =
                                        new DefaultMutableTreeNode(serviceInfo);
@@ -4700,8 +4702,7 @@ public class ServiceInfo extends EditableInfo {
                 } else if (!enableForNew && getService().isNew()) {
                     return IS_NEW_STRING;
                 }
-                if (getBrowser().getExistingServiceList(thisClass).size()
-                    == 0) {
+                if (getBrowser().getExistingServiceList(thisClass).isEmpty()) {
                     return "&lt;&lt;empty;&gt;&gt;";
                 }
                 return null;
@@ -5659,6 +5660,7 @@ public class ServiceInfo extends EditableInfo {
                 super.update();
                 final MyMenu self = this;
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    @Override
                     public void run() {
                         removeAll();
                         addFilesMenuItems(self);
@@ -6315,6 +6317,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Reload combo boxes. */
+    @Override
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             String defaultOpIdRef = null;

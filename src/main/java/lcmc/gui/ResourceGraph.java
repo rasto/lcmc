@@ -278,6 +278,7 @@ public abstract class ResourceGraph {
         testOnlyFlag = false;
         mTestOnlyFlag.unlock();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 Tools.setMenuOpaque(component, false);
             }
@@ -353,6 +354,7 @@ public abstract class ResourceGraph {
         removeExistingTestEdge();
         removeTestEdge();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 Tools.setMenuOpaque(component, true);
             }
@@ -450,6 +452,7 @@ public abstract class ResourceGraph {
         /* overwriting loadPlugins method only to set scaler */
         final DefaultModalGraphMouse<Vertex, Edge> graphMouse =
             new DefaultModalGraphMouse<Vertex, Edge>() {
+            @Override
                 protected void loadPlugins() {
                     super.loadPlugins();
                     ((ScalingGraphMousePlugin) scalingPlugin).setScaler(
@@ -628,7 +631,7 @@ public abstract class ResourceGraph {
     }
 
     /** This class allows to change direction of the edge. */
-    static class Vertex {
+    protected static class Vertex {
         /** Create vertex. */
         Vertex() {
             super();
@@ -641,7 +644,7 @@ public abstract class ResourceGraph {
     }
 
     /** This class allows to change direction of the edge. */
-    class Edge {
+    protected class Edge {
         /** From. */
         private Vertex mFrom;
         /** To. */
@@ -920,6 +923,7 @@ public abstract class ResourceGraph {
         @Override
         public void mouseReleased(final MouseEvent e) {
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     final PickedState<Vertex> ps =
                             vv.getRenderContext().getPickedVertexState();
@@ -930,6 +934,7 @@ public abstract class ResourceGraph {
             });
             if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         handlePopup0(e);
                     }
@@ -953,13 +958,14 @@ public abstract class ResourceGraph {
             if (psEdge.getPicked().size() == 1) {
                 final Edge edge = (Edge) psEdge.getPicked().toArray()[0];
                 oneEdgePressed(edge);
-            } else if (psVertex.getPicked().size() == 0
-                       && psEdge.getPicked().size() == 0) {
+            } else if (psVertex.getPicked().isEmpty()
+                       && psEdge.getPicked().isEmpty()) {
                 backgroundClicked();
             }
         }
 
         /** Creates and displays popup menus for vertices and edges. */
+        @Override
         protected void handlePopup(final MouseEvent me) {
             /* doesn't work on Windows along the mouseReleased handler. */
         }
@@ -1156,6 +1162,7 @@ public abstract class ResourceGraph {
                 vertexReleased(vertex, p);
             }
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     scale();
                 }
@@ -1166,6 +1173,7 @@ public abstract class ResourceGraph {
         @Override
         public void graphPressed(final V v, final MouseEvent me) {
             final Thread t = new Thread(new Runnable() {
+                @Override
                 public void run() {
                     final PickedState<Vertex> psVertex =
                                   vv.getRenderContext().getPickedVertexState();
@@ -1531,6 +1539,7 @@ public abstract class ResourceGraph {
                     pos.setLocation(x, y);
                     Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
                                       new Runnable() {
+                        @Override
                         public void run() {
                             scale();
                         }
@@ -1769,23 +1778,28 @@ public abstract class ResourceGraph {
     /** Returns if it is testOnly. */
     protected final boolean isTestOnly() {
         mTestOnlyFlag.lock();
-        final boolean tof = testOnlyFlag;
-        mTestOnlyFlag.unlock();
-        return tof;
+        try {
+            return testOnlyFlag;
+        } finally {
+            mTestOnlyFlag.unlock();
+        }
     }
 
     /** Returns if it test animation is running. */
     protected final boolean isTestOnlyAnimation() {
         mTestAnimationListLock.lock();
-        final boolean empty = testAnimationList.isEmpty();
-        mTestAnimationListLock.unlock();
-        return !empty;
+        try {
+            return !testAnimationList.isEmpty();
+        } finally {
+            mTestAnimationListLock.unlock();
+        }
     }
 
     /** Removes test edges. */
     protected final void removeTestEdge() {
         if (testEdge != null) {
             Tools.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     mTestEdgeLock.lock();
                     mGraphLock.lock();
@@ -1804,6 +1818,7 @@ public abstract class ResourceGraph {
     /** Creates a test edge. */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 if (!mTestEdgeLock.tryLock()) {
                     return;
@@ -1850,16 +1865,21 @@ public abstract class ResourceGraph {
     /** Removes existing test edges. */
     protected final void removeExistingTestEdge() {
         mTestEdgeLock.lock();
-        existingTestEdge = null;
-        mTestEdgeLock.unlock();
+        try {
+            existingTestEdge = null;
+        } finally {
+            mTestEdgeLock.unlock();
+        }
     }
 
     /** Returns whether the edge is a test edge. */
     protected final boolean isTestEdge(final Edge e) {
         mTestEdgeLock.lock();
-        final boolean is = testEdge == e || existingTestEdge == e;
-        mTestEdgeLock.unlock();
-        return is;
+        try {
+            return testEdge == e || existingTestEdge == e;
+        } finally {
+            mTestEdgeLock.unlock();
+        }
     }
 
     /**

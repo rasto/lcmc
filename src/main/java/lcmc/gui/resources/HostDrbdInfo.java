@@ -913,10 +913,12 @@ public final class HostDrbdInfo extends Info {
                             new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
+            @Override
             public boolean visiblePredicate() {
                 return true;
             }
 
+            @Override
             public String enablePredicate() {
                 return null;
             }

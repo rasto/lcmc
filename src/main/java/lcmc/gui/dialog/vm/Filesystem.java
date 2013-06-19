@@ -134,6 +134,7 @@ final class Filesystem extends VMConfig {
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE, "mount");
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 vmsfi.addWizardParams(
                       optionsPanel,

@@ -544,6 +544,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getInfoPanel();
             }
@@ -866,6 +867,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Updates parameters. */
+    @Override
     void updateParameters() {
         final Map<String, DiskData> disks =
                                         getVMSVirtualDomainInfo().getDisks();

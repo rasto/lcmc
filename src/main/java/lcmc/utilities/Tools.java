@@ -96,9 +96,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.JApplet;
-import java.awt.Cursor;
-import java.awt.image.MemoryImageSource;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -1828,6 +1825,7 @@ public final class Tools {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
                     Tools.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             typeToSearchField.requestFocus();
                         }
@@ -1874,6 +1872,7 @@ public final class Tools {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_DOWN) {
                     Tools.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             list.requestFocus();
                             /* don't need to press down arrow twice */
@@ -1905,9 +1904,11 @@ public final class Tools {
             menu.removeMenuListener(ml);
         }
         menu.addMenuListener(new MenuListener() {
+            @Override
             public void menuCanceled(final MenuEvent e) {
             }
 
+            @Override
             public void menuDeselected(final MenuEvent e) {
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     @Override
@@ -1932,9 +1933,11 @@ public final class Tools {
                 });
             }
 
+            @Override
             public void menuSelected(final MenuEvent e) {
                 final Point l = menu.getLocationOnScreen();
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         for (final JDialog otherP : popups) {
                             otherP.dispose();
@@ -2431,7 +2434,7 @@ public final class Tools {
             } else if ("G".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024;
             } else if ("M".equalsIgnoreCase(unit)) {
-                num = num * 1024;
+                num *= 1024;
             } else if ("K".equalsIgnoreCase(unit)) {
             } else {
                 return -1;
@@ -2456,7 +2459,7 @@ public final class Tools {
             } else if ("M".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024;
             } else if ("K".equalsIgnoreCase(unit)) {
-                num = num * 1024;
+                num *= 1024;
             } else if ("".equalsIgnoreCase(unit)) {
             } else {
                 return -1;

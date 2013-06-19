@@ -149,6 +149,7 @@ public final class ConfirmDialog extends ConfigDialog {
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 buttonClass(noButton()).setEnabled(true);
             }
@@ -160,6 +161,7 @@ public final class ConfirmDialog extends ConfigDialog {
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 buttonClass(noButton()).requestFocus();
             }

@@ -360,6 +360,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 getInfoPanel();
             }

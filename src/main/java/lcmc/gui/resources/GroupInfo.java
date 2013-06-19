@@ -826,6 +826,7 @@ public final class GroupInfo extends ServiceInfo {
         getService().doneRemoving();
     }
 
+    @Override
     public void removeInfo() {
         @SuppressWarnings("unchecked")
         final DefaultMutableTreeNode node = getNode();

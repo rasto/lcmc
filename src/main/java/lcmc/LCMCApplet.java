@@ -43,6 +43,7 @@ public final class LCMCApplet extends JApplet {
     }
 
     /** Start the applet. */
+    @Override
     public void init() {
         Tools.init();
         String[] params;
