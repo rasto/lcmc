@@ -234,6 +234,9 @@ public class ServiceInfo extends EditableInfo {
     /** Migrated subtext. */
     private static final Subtext MIGRATED_SUBTEXT =
                                     new Subtext("(migrated)", null, Color.RED);
+    /** Fenced subtext. */
+    private static final Subtext FENCED_SUBTEXT =
+                                      new Subtext("(FENCED)", null, Color.RED);
     /** Clone type string. */
     protected static final String CLONE_TYPE_STRING = "Clone";
     /** Primitive type string. */
@@ -1028,6 +1031,36 @@ public class ServiceInfo extends EditableInfo {
             if ((CRMXML.INFINITY_STRING.equals(score)
                  || CRMXML.PLUS_INFINITY_STRING.equals(score))
                 && "eq".equals(op)) {
+                final List<Host> hosts = new ArrayList<Host>();
+                hosts.add(host);
+                return hosts;
+            }
+        }
+        return null;
+    }
+
+    /** Returns whether the service was fenced. */
+    public List<Host> isFenced(final boolean testOnly) {
+        final ClusterStatus cs = getBrowser().getClusterStatus();
+        for (Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+                                                       host.getName(),
+                                                       testOnly);
+            if (locationId == null || !locationId.contains("fence")) {
+                continue;
+            }
+            final HostInfo hi = host.getBrowser().getHostInfo();
+            final HostLocation hostLocation = cs.getScore(
+                                                      getHeartbeatId(testOnly),
+                                                      hi.getName(),
+                                                      testOnly);
+            String score = null;
+            String op = null;
+            if (hostLocation != null) {
+                score = hostLocation.getScore();
+                op = hostLocation.getOperation();
+            }
+            if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
                 return hosts;
@@ -6122,6 +6155,8 @@ public class ServiceInfo extends EditableInfo {
             }
         } else if (!isManaged(testOnly)) {
             return UNMANAGED_SUBTEXT;
+        } else if (isFenced(testOnly) != null) {
+            return FENCED_SUBTEXT;
         } else if (getMigratedTo(testOnly) != null
                    || getMigratedFrom(testOnly) != null) {
             return MIGRATED_SUBTEXT;
