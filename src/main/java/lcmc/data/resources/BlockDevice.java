@@ -71,6 +71,10 @@ public final class BlockDevice extends Resource {
     private String nodeState = null;
     /** The disk state. */
     private String diskState = null;
+    /** The node state of the other bd. */
+    private String nodeStateOther = null;
+    /** The disk state of the other bd. */
+    private String diskStateOther = null;
     /** The sync progress in percent as String. */
     private String syncedProgress = null;
     /** Drbd flags. */
@@ -303,9 +307,20 @@ public final class BlockDevice extends Resource {
         this.nodeState = nodeState;
     }
 
+    /** Sets drbd node state of the other bd as it is in /proc/drbd. */
+    public void setNodeStateOther(final String nodeStateOther) {
+        this.nodeStateOther = nodeStateOther;
+    }
+
     /** Sets disk node state as it is in /proc/drbd. */
     public void setDiskState(final String diskState) {
         this.diskState = diskState;
+    }
+
+    /** Sets disk node state of the other block device as it is in /proc/drbd.
+     */
+    public void setDiskStateOther(final String diskStateOther) {
+        this.diskStateOther = diskStateOther;
     }
 
     /** Returns connection state. */
@@ -318,9 +333,20 @@ public final class BlockDevice extends Resource {
         return nodeState;
     }
 
+    /** Returns node state of the other bd. */
+    public String getNodeStateOther() {
+        return nodeStateOther;
+    }
+
     /** Returns disk state. */
     public String getDiskState() {
         return diskState;
+    }
+
+
+    /** Returns disk state of the other bd. */
+    public String getDiskStateOther() {
+        return diskStateOther;
     }
 
     /** Sets the synced progress in percents. */

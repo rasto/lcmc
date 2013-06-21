@@ -484,8 +484,16 @@ public final class DrbdGraph extends ResourceGraph {
                 && bdi.getBlockDevice().getConnectionState() != null
                 && bdi.getBlockDevice().getDiskState() != null) {
                 final String connState =
-                                  bdi.getBlockDevice().getConnectionState();
-                final String diskState = bdi.getBlockDevice().getDiskState();
+                                     bdi.getBlockDevice().getConnectionState();
+                String diskState = bdi.getBlockDevice().getDiskState();
+                String diskStateOther = null;
+                final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
+                if (oBdi != null
+                    && !diskState.equals(
+                                  oBdi.getBlockDevice().getDiskStateOther())) {
+                    diskStateOther = oBdi.getBlockDevice().getDiskStateOther();
+                }
+
                 Color color = null;
                 Color textColor = Color.BLACK;
                 final String proxyState = bdi.getProxyStateForGraph(testOnly);
@@ -497,9 +505,9 @@ public final class DrbdGraph extends ResourceGraph {
                     textColor = Color.WHITE;
                 }
                 return new Subtext[]{
-                    new Subtext(
-                                Tools.join(" / ", new String[]{connState,
+                    new Subtext(Tools.join(" / ", new String[]{connState,
                                                                diskState,
+                                                               diskStateOther,
                                                                proxyState}),
                                 color,
                                 textColor)};

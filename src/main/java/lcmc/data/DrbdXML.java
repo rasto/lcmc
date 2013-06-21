@@ -1363,6 +1363,8 @@ public final class DrbdXML extends XML {
                     bdi.getBlockDevice().setConnectionState(cs);
                     bdi.getBlockDevice().setNodeState(ro1);
                     bdi.getBlockDevice().setDiskState(ds1);
+                    bdi.getBlockDevice().setNodeStateOther(ro2);
+                    bdi.getBlockDevice().setDiskStateOther(ds2);
                     bdi.getBlockDevice().setDrbdFlags(flags);
                     bdi.updateInfo();
                     return true;
