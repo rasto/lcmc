@@ -700,4 +700,9 @@ public final class ClusterStatus {
                 "<pcmk>" + ptestData.getShadowCib() + "</pcmk>");
         }
     }
+
+    /** Return last known raw cib. */
+    public String getCibXml() {
+        return oldCib;
+    }
 }

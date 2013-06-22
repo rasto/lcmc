@@ -35,6 +35,7 @@ import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
+import lcmc.gui.dialog.BugReport;
 import lcmc.Exceptions;
 
 import java.util.regex.Pattern;
@@ -631,10 +632,6 @@ public final class Tools {
         Tools.setMaxAccessType(ConfigData.AccessType.RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
-        errorString.append("Application Error: Switching to read-only mode\n");
-        errorString.append("CTRL-A, CTRL-C, CTRL-V to: lcmcgui@gmail.com\n");
-        errorString.append("please...\n\n");
-
         errorString.append(msg);
         errorString.append('\n');
         errorString.append("\nrelease: ");
@@ -645,15 +642,7 @@ public final class Tools {
         errorString.append(System.getProperty("java.version"));
         errorString.append("\n\n");
         errorString.append(msg2);
-        if (e != null) {
-            errorString.append('\n');
-            errorString.append(e.getMessage());
-            final StackTraceElement[] st = e.getStackTrace();
-            for (int i = 0; i < st.length; i++) {
-                errorString.append('\n');
-                errorString.append(e.getStackTrace()[i].toString());
-            }
-        }
+        errorString.append(getStackTrace(e));
 
         if (e == null) {
             /* stack trace */
@@ -667,20 +656,29 @@ public final class Tools {
             return;
         }
 
-        final JEditorPane errorPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
-                                                      errorString.toString());
-        errorPane.setMinimumSize(DIALOG_PANEL_SIZE);
-        errorPane.setMaximumSize(DIALOG_PANEL_SIZE);
-        errorPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        Tools.invokeLater(new Runnable() {
+        final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(guiData.getMainFrame(),
-                                              new JScrollPane(errorPane),
-                                              getString("AppError.Title"),
-                                              JOptionPane.ERROR_MESSAGE);
+                final BugReport br = new BugReport(BugReport.UNKNOWN_CLUSTER,
+                                                   errorString.toString());
+                br.showDialog();
             }
         });
+        t.start();
+    }
+
+    public static String getStackTrace(final Throwable e) {
+        final StringBuilder strace = new StringBuilder("");
+        if (e != null) {
+            strace.append('\n');
+            strace.append(e.getMessage());
+            final StackTraceElement[] st = e.getStackTrace();
+            for (int i = 0; i < st.length; i++) {
+                strace.append('\n');
+                strace.append(e.getStackTrace()[i].toString());
+            }
+        }
+        return strace.toString();
     }
 
     /** Dialog that informs a user about something with ok button. */

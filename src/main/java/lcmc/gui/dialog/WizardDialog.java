@@ -55,10 +55,10 @@ public abstract class WizardDialog extends ConfigDialog {
      * clicking on the back button */
     private WizardDialog previousDialog;
     /** Cancel icon. */
-    private static final ImageIcon CANCEL_ICON =
+    static final ImageIcon CANCEL_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.CancelIcon"));
     /** Finish icon. */
-    private static final ImageIcon FINISH_ICON =
+    static final ImageIcon FINISH_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.FinishIcon"));
     /** Next icon. */
     private static final ImageIcon NEXT_ICON =

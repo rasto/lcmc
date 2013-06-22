@@ -30,6 +30,7 @@ import lcmc.data.AccessMode;
 import lcmc.AddHostDialog;
 import lcmc.AddClusterDialog;
 import lcmc.gui.dialog.About;
+import lcmc.gui.dialog.BugReport;
 import lcmc.data.Host;
 
 import javax.swing.ImageIcon;
@@ -233,6 +234,16 @@ public final class MainMenu extends JPanel implements ActionListener {
                     KeyEvent.VK_A,
                     0,
                     aboutActionListener(),
+                    null);
+
+        menuBar.add(submenu);
+
+        /* Bug Report */
+        addMenuItem(Tools.getString("MainMenu.BugReport"),
+                    submenu,
+                    KeyEvent.VK_B,
+                    0,
+                    bugReportActionListener(),
                     null);
 
         menuBar.add(submenu);
@@ -531,6 +542,25 @@ public final class MainMenu extends JPanel implements ActionListener {
                      public void run() {
                          final About a = new About();
                          a.showDialog();
+                     }
+                 });
+                 t.start();
+             }
+        };
+    }
+
+    /** Bug report action listener. */
+    private ActionListener bugReportActionListener() {
+        return new ActionListener() {
+             @Override
+             public void actionPerformed(final ActionEvent e) {
+                 final Thread t = new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                         final BugReport br =
+                                       new BugReport(BugReport.UNKNOWN_CLUSTER,
+                                                     BugReport.NO_ERROR_TEXT);
+                         br.showDialog();
                      }
                  });
                  t.start();

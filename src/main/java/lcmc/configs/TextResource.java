@@ -89,6 +89,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"MainMenu.About",
          "About"},
 
+        {"MainMenu.BugReport",
+         "Bug Report"},
+
         {"MainMenu.DrbdGuiFiles",
          "DRBD Management Console files"},
 
@@ -200,6 +203,9 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"Dialog.Host.NewHost.Title",
          "Host Wizard"},
+
+        {"Dialog.Dialog.SendReport",
+         "Send Report"},
 
         {"Dialog.Host.NewHost.Description",
          "Enter the <b>hostname/IP</b> and <b>username</b> of the server. "
@@ -892,6 +898,13 @@ public final class TextResource extends java.util.ListResourceBundle {
          + "Please visit the website:<br><br>"
          + "http://lcmc.sourceforge.net<br>"
          + "http://github.com/rasto/lcmc<br>" },
+
+        {"Dialog.BugReport.Title",
+         "Bug Report"},
+
+        {"Dialog.BugReport.Description",
+         "Select configs you would like to send. You can edit the text"
+         + " bellow if you want. You can also send it to lcmcgui@gmail.com." },
 
         {"Dialog.About.Licences",
 "Linux Cluster Management Console is free software; you can redistribute it and/or\n"

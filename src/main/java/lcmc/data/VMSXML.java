@@ -413,6 +413,8 @@ public final class VMSXML extends XML {
     private final Lock mXMLDocumentWriteLock = mXMLDocumentLock.writeLock();
     /** XML document. */
     private Document xmlDocument = null;
+    /** Old config. */
+    private String oldConfig = null;
 
     /** Prepares a new <code>VMSXML</code> object. */
     public VMSXML(final Host host) {
@@ -1355,6 +1357,7 @@ public final class VMSXML extends XML {
     }
 
     public boolean update(final String output) {
+        oldConfig = output;
         final Document document = getXMLDocument(output);
         mXMLDocumentWriteLock.lock();
         xmlDocument = document;
@@ -3193,5 +3196,9 @@ public final class VMSXML extends XML {
     /** Return set of mac addresses. */
     public Set<String> getMacAddresses() {
         return macAddresses;
+    }
+
+    public String getConfig() {
+        return oldConfig;
     }
 }

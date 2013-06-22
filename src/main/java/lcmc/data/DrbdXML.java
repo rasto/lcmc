@@ -156,6 +156,8 @@ public final class DrbdXML extends XML {
                                                 new HashMap<String, Boolean>();
     /** Whether there are unknown sections in the config. */
     private boolean unknownSections = false;
+    /** Old config */
+    private String oldConfig = null;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol A. */
@@ -330,6 +332,7 @@ public final class DrbdXML extends XML {
      */
     public void update(final String configString) {
         if (configString != null && !configString.equals("")) {
+            oldConfig = configString;
             parseConfig(configString);
         }
     }
@@ -1502,5 +1505,9 @@ public final class DrbdXML extends XML {
         public String getOutsidePort() {
             return outsidePort;
         }
+    }
+
+    public String getOldConfig() {
+        return oldConfig;
     }
 }
