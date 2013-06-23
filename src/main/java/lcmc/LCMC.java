@@ -70,6 +70,8 @@ import org.apache.commons.cli.HelpFormatter;
 public final class LCMC extends JPanel {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
+    /** Uncaught exception flag. */
+    volatile private static boolean uncaughtException = false;
 
     /** Initial delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_INITIAL_DELAY = 200;
@@ -330,10 +332,11 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    if (Tools.getGUIData().getMainFrame() == null) {
-                        System.out.println(ex.toString());
-                        System.out.println(Tools.getStackTrace(ex));
-                    } else {
+                    uncaughtException = true;
+                    System.out.println(ex.toString());
+                    System.out.println(Tools.getStackTrace(ex));
+                    if (!uncaughtException
+                        && Tools.getGUIData().getMainFrame() != null) {
                         Tools.appError("", ex.toString(), ex);
                     }
                 }
