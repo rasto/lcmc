@@ -149,9 +149,7 @@ public final class BugReport extends ConfigDialog {
     }
 
     /** Returns panel with checkboxes. */
-    private JComponent getClustersPane() {
-        final Set<Cluster> clusters =
-                          Tools.getConfigData().getClusters().getClusterSet();
+    private JComponent getClustersPane(final Set<Cluster> clusters) {
         final JPanel clusterPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
         clusterPane.setBorder(Tools.getBorder("Clusters"));
         clusterPane.setBackground(
@@ -188,7 +186,12 @@ public final class BugReport extends ConfigDialog {
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         textArea.setEditable(true);
         textArea.setText("loading...");
-        pane.add(getClustersPane());
+        final Set<Cluster> clusters =
+                          Tools.getConfigData().getClusters().getClusterSet();
+        final JComponent clPane = getClustersPane(clusters);
+        if (clusters.size() > 1) {
+            pane.add(clPane);
+        }
         pane.add(getConfigPane());
 
         final JScrollPane sp = new JScrollPane(textArea);
