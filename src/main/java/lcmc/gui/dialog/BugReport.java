@@ -188,8 +188,9 @@ public final class BugReport extends ConfigDialog {
         textArea.setText("loading...");
         final Set<Cluster> clusters =
                           Tools.getConfigData().getClusters().getClusterSet();
+        final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
-            pane.add(getClustersPane(clusters));
+            pane.add(clPane);
         }
         if (clusters.size() > 0) {
             pane.add(getConfigPane());
