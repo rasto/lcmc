@@ -188,11 +188,12 @@ public final class BugReport extends ConfigDialog {
         textArea.setText("loading...");
         final Set<Cluster> clusters =
                           Tools.getConfigData().getClusters().getClusterSet();
-        final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
-            pane.add(clPane);
+            pane.add(getClustersPane(clusters));
         }
-        pane.add(getConfigPane());
+        if (clusters.size() > 0) {
+            pane.add(getConfigPane());
+        }
 
         final JScrollPane sp = new JScrollPane(textArea);
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
@@ -285,14 +286,14 @@ public final class BugReport extends ConfigDialog {
                     }
                 }
             }
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    textArea.setText(text.toString());
-                    textArea.setCaretPosition(0);
-                }
-            });
         }
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                textArea.setText(text.toString());
+                textArea.setCaretPosition(0);
+            }
+        });
         enableAllComponents(true);
     }
 
