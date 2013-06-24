@@ -332,11 +332,11 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
-                    uncaughtException = true;
                     System.out.println(ex.toString());
                     System.out.println(Tools.getStackTrace(ex));
                     if (!uncaughtException
                         && Tools.getGUIData().getMainFrame() != null) {
+                        uncaughtException = true;
                         Tools.appError("", ex.toString(), ex);
                     }
                 }
