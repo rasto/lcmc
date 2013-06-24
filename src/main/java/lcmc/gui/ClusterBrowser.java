@@ -2187,6 +2187,9 @@ public final class ClusterBrowser extends Browser {
         /** Can be overwritten to disable the whole thing. */
         @Override
         public boolean isEnabled() {
+            if (clusterStatus == null) {
+                return false;
+            }
             Host h;
             if (menuHost == null) {
                 h = getDCHost();
