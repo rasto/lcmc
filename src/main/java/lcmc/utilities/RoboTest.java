@@ -65,6 +65,10 @@ public final class RoboTest {
     private static final boolean MOVE_MOUSE_FAST = false;
     /** Confirm remove variable. */
     private static final boolean CONFIRM_REMOVE = true;
+    /** Y position of Primitive/Clone/MS radio buttons. */
+    private static final int CLONE_RADIO_Y = 140;
+    /** Host y position. */
+    private static final int HOST_Y = 100;
     /** Previous position of the mouse. */
     private static volatile Point2D prevP = null;
     /** Whether the test was aborted. */
@@ -962,11 +966,11 @@ public final class RoboTest {
                     continue;
                 }
                 for (int i = 0; i < 70; i++) {
-                    moveTo(pos1, 200);
+                    moveTo(pos1, CLONE_RADIO_Y);
                     robot.mousePress(InputEvent.BUTTON1_MASK);
                     Tools.sleep(20);
                     robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                    moveTo(pos2, 200);
+                    moveTo(pos2, CLONE_RADIO_Y);
                     robot.mousePress(InputEvent.BUTTON1_MASK);
                     Tools.sleep(20);
                     robot.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -1573,7 +1577,7 @@ public final class RoboTest {
         sleep(10000);
         checkTest(testName, 23);
         startResource(gx, gy - 30);
-        sleep(8000);
+        sleep(20000);
         checkTest(testName, 24);
         unmanageResource(gx, gy - 30);
         sleep(5000);
@@ -1593,12 +1597,12 @@ public final class RoboTest {
         moveTo("Remove Migration Constraint");
         sleep(12000); /* ptest */
         leftClick(); /* stop */
-        sleep(5000);
+        sleep(20000);
         checkTest(testName, 28);
 
         moveTo(700, 450); /* rectangle */
         leftPress();
-        moveTo(220, 115);
+        moveTo(220, 65);
         leftRelease();
 
         moveTo(ipX, ipY);
@@ -1615,7 +1619,7 @@ public final class RoboTest {
 
         moveTo(700, 450);
         leftPress();
-        moveTo(220, 115);
+        moveTo(220, 65);
         leftRelease();
         moveTo(ipX, ipY);
         rightClick();
@@ -1627,7 +1631,7 @@ public final class RoboTest {
 
         moveTo(700, 450);
         leftPress();
-        moveTo(220, 115);
+        moveTo(220, 65);
         leftRelease();
         moveTo(ipX, ipY);
         rightClick();
@@ -1638,7 +1642,7 @@ public final class RoboTest {
 
         moveTo(700, 450);
         leftPress();
-        moveTo(220, 115);
+        moveTo(220, 65);
         leftRelease();
         moveTo(ipX, ipY);
         rightClick();
@@ -2058,8 +2062,8 @@ public final class RoboTest {
         stopEverything();
         checkTest("test4", 4);
         removeEverything();
-        removePlaceHolder(ph1X, ph1Y, true);
-        removePlaceHolder(ph2X, ph2Y, true);
+        removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
+        removePlaceHolder(ph2X, ph2Y, !CONFIRM_REMOVE);
         sleep(40000);
     }
 
@@ -2443,21 +2447,21 @@ public final class RoboTest {
                     continue;
                 }
                 pos = 1;
-                moveTo(796, 199);
+                moveTo(796, CLONE_RADIO_Y);
                 leftClick();
             } else if (rand < 0.66) {
                 if (pos == 2) {
                     continue;
                 }
                 pos = 2;
-                moveTo(894, 200);
+                moveTo(894, CLONE_RADIO_Y);
                 leftClick();
             } else {
                 if (pos == 3) {
                     continue;
                 }
                 pos = 3;
-                moveTo(994, 200);
+                moveTo(994, CLONE_RADIO_Y);
                 leftClick();
             }
         }
@@ -2472,7 +2476,7 @@ public final class RoboTest {
             if (i % 10 == 0) {
                 info("testE I: " + i);
             }
-            moveTo(300 , 152); /* host */
+            moveTo(300 , HOST_Y); /* host */
             sleep(2000);
             rightClick();
             sleep(9000);
@@ -2517,6 +2521,7 @@ public final class RoboTest {
             rightClick(); /* group popup */
             sleep(2000);
             moveTo("Add Group Service");
+            sleep(2000);
             moveTo("OCF Resource Agents");
             sleep(1000);
             typeDummy();
@@ -2852,7 +2857,7 @@ public final class RoboTest {
             sleep(2000);
             setTimeouts(true);
             if (clone) {
-                moveTo(893, 202);
+                moveTo(893, CLONE_RADIO_Y);
                 leftClick(); /* clone */
             }
             moveTo("Apply");
@@ -3582,8 +3587,8 @@ public final class RoboTest {
         final Point2D pos = getAppPosition();
         final int x = (int) pos.getX();
         final int y = (int) pos.getY();
-        if (y > 532 || x < 200) {
-            return 210;
+        if (y > 532 || x < 150) {
+            return 160;
         }
         return y;
     }
@@ -3697,7 +3702,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick(); /* remove */
         moveTo("Remove DRBD Volume"); /* remove */
         leftClick();
@@ -3759,6 +3764,7 @@ public final class RoboTest {
         leftClick();
         moveTo("Create"); /* button */
         leftClick();
+        sleep(3000);
         moveTo("Close");
         leftClick();
     }
@@ -3777,6 +3783,7 @@ public final class RoboTest {
 
         moveTo("Resize");
         leftClick();
+        sleep(3000);
         moveTo("Close");
         leftClick();
     }
@@ -3980,7 +3987,7 @@ public final class RoboTest {
 
         moveTo(730, 475); /* rectangle */
         leftPress();
-        moveTo(225, 115);
+        moveTo(225, 65);
         leftRelease();
 
         moveTo(334, blockDevY);
@@ -4015,7 +4022,7 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER); /* attach */
         checkDRBDTest(drbdTest, 2.02);
 
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
 
         moveTo("Protocol", Widget.MComboBox.class);
@@ -4120,7 +4127,7 @@ public final class RoboTest {
         leftClick();
 
         /* resource */
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
         sleep(2000);
         leftClick();
@@ -4210,13 +4217,13 @@ public final class RoboTest {
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 3);
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
@@ -4281,7 +4288,7 @@ public final class RoboTest {
         }
         checkDRBDTest(drbdTest, 2);
 
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
         sleep(2000);
         leftClick();
@@ -4352,7 +4359,7 @@ public final class RoboTest {
         leftClick();
 
         /* resource */
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
         sleep(2000);
         leftClick();
@@ -4400,13 +4407,13 @@ public final class RoboTest {
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 3);
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
@@ -4513,7 +4520,7 @@ public final class RoboTest {
 
         moveTo(730, 475); /* rectangle */
         leftPress();
-        moveTo(225, 115);
+        moveTo(225, 65);
         leftRelease();
 
         moveTo(334, blockDevY);
@@ -4550,7 +4557,7 @@ public final class RoboTest {
         press(KeyEvent.VK_ENTER); /* attach */
         checkDRBDTest(drbdTest, 2.02);
 
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
 
         moveTo(900, 300);
@@ -4659,7 +4666,7 @@ public final class RoboTest {
         leftClick();
 
         /* resource */
-        moveTo(480, 202); /* select r0 */
+        moveTo(480, 152); /* select r0 */
         leftClick();
         sleep(2000);
         leftClick();
@@ -4752,13 +4759,13 @@ public final class RoboTest {
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 3);
-        moveTo(480, 202); /* rsc popup */
+        moveTo(480, 152); /* rsc popup */
         rightClick();
         moveTo("Remove DRBD Volume");
         leftClick();
