@@ -1906,7 +1906,9 @@ public final class Host implements Comparable<Host> {
                        setConnected();
                     }
                     Tools.sleep(PING_TIMEOUT);
-                    if (getBrowser().getClusterBrowser().isCancelServerStatus()) {
+                    final ClusterBrowser cb = getBrowser().getClusterBrowser();
+                    /* cluster could be removed */
+                    if (cb == null || cb.isCancelServerStatus()) {
                         break;
                     }
                 }
