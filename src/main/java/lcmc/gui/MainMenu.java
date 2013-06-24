@@ -98,6 +98,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String upgradeCheck = "";
     /** Info text. */
     private String infoText = null;
+    /** Info text panel. */
+    private final JPanel infoTextPanel = new JPanel();
 
     /** Host icon. */
     private static final ImageIcon HOST_ICON =
@@ -745,7 +747,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                         upgradeTextField.setText(text);
                         upgradeTextField.setVisible(!"".equals(text));
                         infoTextField.setText(infoText);
-                        infoTextField.setVisible(!"".equals(infoText));
+                        infoTextPanel.setVisible(infoText != null);
                     }
                 });
             }
@@ -797,9 +799,8 @@ public final class MainMenu extends JPanel implements ActionListener {
         infoTextField.setBackground(Color.WHITE);
         final String text = infoText;
         infoTextField.setText(text);
-        infoTextField.setVisible(!"".equals(text));
-        final JPanel p = new JPanel();
-        p.add(infoTextField);
-        return p;
+        infoTextPanel.add(infoTextField);
+        infoTextPanel.setVisible(text != null);
+        return infoTextPanel;
     }
 }
