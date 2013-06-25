@@ -190,8 +190,8 @@ public class Browser {
                     treeModel.nodeChanged(node);
                 } catch (Exception e) {
                     Tools.appError(node.getUserObject()
-                                   + " node changed error: ", e);
-                    Tools.appWarning("stacktrace: " + stacktrace);
+                                   + " node changed error:\n"
+                                   + stacktrace + "\n\n", e);
                 }
             }
         });
