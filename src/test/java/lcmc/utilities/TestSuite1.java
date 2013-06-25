@@ -210,6 +210,7 @@ public final class TestSuite1 {
                 for (final Host host : HOSTS) {
                     final boolean r = waitForCondition(
                                             new Condition() {
+                                                @Override
                                                 public boolean passed() {
                                                     return host.isConnected();
                                                 }
@@ -254,8 +255,8 @@ public final class TestSuite1 {
             Tools.getGUIData().setTerminalPanel(new TerminalPanel(host));
 
         }
-        String ip = null;
-        InetAddress[] addresses = null;
+        String ip;
+        InetAddress[] addresses;
         try {
             addresses = InetAddress.getAllByName(hostName);
             ip = addresses[0].getHostAddress();

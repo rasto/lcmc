@@ -13,11 +13,13 @@ import mockit.Deencapsulation;
 public final class VMSDiskInfoTest1 extends TestCase {
     //final VMSDiskInfo vmsdi = new VMSDiskInfo("", null, null);
     @Before
+    @Override
     protected void setUp() {
         TestSuite1.initTest();
     }
 
     @After
+    @Override
     protected void tearDown() {
         assertEquals("", TestSuite1.getStdout());
     }

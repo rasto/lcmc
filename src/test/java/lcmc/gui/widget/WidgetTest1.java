@@ -11,6 +11,7 @@ import lcmc.data.AccessMode;
 public final class WidgetTest1 extends TestCase {
     private Widget widget;
     @Before
+    @Override
     protected void setUp() {
         TestSuite1.initTest();
         for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
@@ -28,6 +29,7 @@ public final class WidgetTest1 extends TestCase {
     }
 
     @After
+    @Override
     protected void tearDown() {
         assertEquals("", TestSuite1.getStdout());
     }

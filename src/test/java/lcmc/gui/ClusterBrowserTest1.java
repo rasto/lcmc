@@ -17,11 +17,13 @@ import lcmc.data.Host;
 
 public final class ClusterBrowserTest1 extends TestCase {
     @Before
+    @Override
     protected void setUp() {
         TestSuite1.initTest();
     }
 
     @After
+    @Override
     protected void tearDown() {
         assertEquals("", TestSuite1.getStdout());
     }
