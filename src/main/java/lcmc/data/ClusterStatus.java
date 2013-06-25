@@ -96,17 +96,6 @@ public final class ClusterStatus {
         return cibQueryMap.getCrmConfig().get(param);
     }
 
-    /** Returns global parameters. */
-    String[] getGlobalParameters() {
-        final Map<String, String> globalConfigMap =
-                                                new HashMap<String, String>();
-        if (globalConfigMap != null) {
-            return globalConfigMap.keySet().toArray(
-                                        new String[globalConfigMap.size()]);
-        }
-        return null;
-    }
-
     /** Returns value of meta attribute  parameter. */
     public String getRscDefaultsParameter(final String param,
                                           final boolean testOnly) {
