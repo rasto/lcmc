@@ -633,17 +633,18 @@ public final class Tools {
                                                         ConfigData.OP_MODE_RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
-        errorString.append(msg);
-        errorString.append('\n');
-        errorString.append("\nrelease: ");
-        errorString.append(getRelease());
-        errorString.append("\njava: ");
-        errorString.append(System.getProperty("java.vendor"));
-        errorString.append(' ');
-        errorString.append(System.getProperty("java.version"));
-        errorString.append("\n\n");
-        errorString.append(msg2);
-        errorString.append(getStackTrace(e));
+        errorString.append("\nApplication error, ")
+                   .append("switching to read-only mode.\n")
+                   .append(msg)
+                   .append("\nLCMC release: ")
+                   .append(getRelease())
+                   .append("\nJava: ")
+                   .append(System.getProperty("java.vendor"))
+                   .append(' ')
+                   .append(System.getProperty("java.version"))
+                   .append("\n\n=== error ===\n")
+                   .append(msg2)
+                   .append(getStackTrace(e));
 
         if (e == null) {
             /* stack trace */
