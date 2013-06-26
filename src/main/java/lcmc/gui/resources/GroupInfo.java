@@ -934,8 +934,12 @@ public final class GroupInfo extends ServiceInfo {
         }
         sb.append("</b>");
 
+        final DefaultMutableTreeNode node = getNode();
+        if (node == null) {
+            return sb.toString();
+        }
         @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
+        final Enumeration<DefaultMutableTreeNode> e = node.children();
         try {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n = e.nextElement();
