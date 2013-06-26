@@ -629,7 +629,8 @@ public final class Tools {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
-        Tools.setMaxAccessType(ConfigData.AccessType.RO);
+        Tools.getGUIData().getMainMenu().setOperatingMode(
+                                                        ConfigData.OP_MODE_RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
         errorString.append(msg);

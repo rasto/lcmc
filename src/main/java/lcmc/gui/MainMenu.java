@@ -695,7 +695,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     /** Sets operating mode. */
-    void setOperatingMode(final String opMode) {
+    public void setOperatingMode(final String opMode) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {

@@ -49,7 +49,7 @@ public final class ConfigData {
     /** access type. */
     public static enum AccessType { RO, OP, ADMIN, GOD, NEVER };
     /** Read only operating mode. */
-    private static final String OP_MODE_RO =
+    public static final String OP_MODE_RO =
                                         Tools.getString("ConfigData.OpMode.RO");
 
     /** Operator Level 1 operating mode. */
