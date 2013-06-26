@@ -91,8 +91,10 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Readonly combo box. */
     private final Map<String, Widget> readonlyWi =
                                             new HashMap<String, Widget>();
-    /** Previous target bus value. */
-    private String prevTargetBus = null;
+    /** Previous target device value. */
+    private String prevTargetDevice = null;
+    /** Previous target bus type (disk type) value. */
+    private String previousTargetBusType = null;
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_BUS_TYPE,
@@ -800,22 +802,19 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             } else if (devices.size() > 1) {
                 selected = devices.toArray(new String[devices.size()])[1];
             }
-            if (prevTargetBus == null
-                || !prevTargetBus.equals(selected)) {
+            if (prevTargetDevice == null
+                || !prevTargetDevice.equals(selected)) {
                 final String sel = selected;
                 for (final String p : targetDeviceWi.keySet()) {
-                    //Tools.invokeLater(new Runnable() {
-                    //    @Override
-                    //    public void run() {
-                            targetDeviceWi.get(p).reloadComboBox(
+                    targetDeviceWi.get(p).reloadComboBox(
                                 sel,
                                 devices.toArray(new String[devices.size()]));
-                    //    }
-                    //});
                 }
-                prevTargetBus = selected;
+                prevTargetDevice = selected;
             }
-            if (getParamSaved(DiskData.DRIVER_NAME) == null) {
+            final String tbs = getComboBoxValue(DiskData.TARGET_BUS_TYPE);
+            if (getParamSaved(DiskData.DRIVER_NAME) == null
+                && !tbs.equals(previousTargetBusType)) {
                 if ("ide/cdrom".equals(newValue)) {
                     for (final String p : readonlyWi.keySet()) {
                         readonlyWi.get(p).setValue("True");
@@ -839,12 +838,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 } else {
                     for (final String p : readonlyWi.keySet()) {
                         readonlyWi.get(p).setValue("False");
-                        if (getResource().isNew()) {
-                            driverTypeWi.get(p).setValue("raw");
-                        }
+                        driverTypeWi.get(p).setValue("raw");
                     }
                 }
             }
+            previousTargetBusType = tbs;
             checkOneParam(DiskData.SOURCE_FILE);
             checkOneParam(DiskData.SOURCE_DEVICE);
         }
