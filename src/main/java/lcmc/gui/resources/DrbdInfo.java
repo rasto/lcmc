@@ -1056,6 +1056,29 @@ public final class DrbdInfo extends DrbdGuiInfo {
             };
         items.add((UpdatableItem) clusterWizardItem);
 
+        /* Rescan LVM */
+        final MyMenuItem rescanLvmItem =
+            new MyMenuItem(Tools.getString("DrbdInfo.RescanLvm"),
+                           null, /* icon */
+                           null,
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          !AccessMode.ADVANCED),
+                           new AccessMode(ConfigData.AccessType.OP,
+                                          AccessMode.ADVANCED)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    getBrowser().updateHWInfo();
+                }
+            };
+        items.add((UpdatableItem) rescanLvmItem);
+
 
         /* view log */
         final MyMenuItem viewLogMenu = new MyMenuItem(

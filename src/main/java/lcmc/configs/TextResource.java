@@ -2616,6 +2616,9 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdInfo.AddProxyHost",
          "Add Proxy Host"},
 
+        {"DrbdInfo.RescanLvm",
+         "Rescan LVM"},
+
         {"DrbdResourceInfo.HostAddresses",
          "Net Interface"},
 

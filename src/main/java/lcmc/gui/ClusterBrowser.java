@@ -2644,6 +2644,13 @@ public final class ClusterBrowser extends Browser {
         return false;
     }
 
+    /** Updates host hardware info on all cluster hosts immediatly. */
+    public void updateHWInfo() {
+        for (final Host h : getClusterHosts()) {
+            updateHWInfo(h);
+        }
+    }
+
     /** Updates host hardware info immediatly. */
     public void updateHWInfo(final Host host) {
         host.setIsLoading();
