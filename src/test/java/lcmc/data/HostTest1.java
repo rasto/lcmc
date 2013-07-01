@@ -314,11 +314,21 @@ public final class HostTest1 extends TestCase {
         }
     }
 
+    private String stripVersion(final String v) {
+        final int i = v.lastIndexOf('.');
+        if ( i < 0) {
+            return v;
+        } else {
+            return v.substring(0, i);
+        }
+    }
+
     @Test
     public void testGetDrbdVersion() {
         for (final Host host : TestSuite1.getHosts()) {
             assertNotNull(host.getDrbdVersion());
-            assertEquals(host.getDrbdVersion(), host.getDrbdModuleVersion());
+            assertEquals(stripVersion(host.getDrbdVersion()),
+                         stripVersion(host.getDrbdModuleVersion()));
         }
     }
 
@@ -421,13 +431,17 @@ public final class HostTest1 extends TestCase {
                               "wheezy/sid/12.04",
                               "wheezy/sid/11.10",
                               "wheezy/sid/testing",
+                              "wheezy/sid/13.04",
                               "openSUSE 12.1 (x86_64)/12.1",
                               "squeeze/sid/11.04",
                               "Fedora release 17 (Beefy Miracle)/17",
+                              "Fedora release 18 (Spherical Cow)/18",
                               "OPENSUSE11_4",
+                              "openSUSE 12.3 (x86_64)/12.3",
                               "5",
                               "6",
                               "7",
+                              "7.1/7.1",
                               "16",
                               "17"));
         for (final Host host : TestSuite1.getHosts()) {

@@ -35,6 +35,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         final CountDownLatch nolatch = new CountDownLatch(0);
         for (final Host host : TestSuite1.getHosts()) {
             final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
+            assertNotNull("cb is null", cb);
 
             StringBuffer buffer = new StringBuffer("cd");
             cb.processClusterOutput("a---reset---\r\nb",
@@ -122,7 +123,7 @@ public final class ClusterBrowserTest1 extends TestCase {
 
         Collections.sort(files);
         for (String file : files) {
-            System.out.println(i + " file: " + file);
+            //System.out.println(i + " file: " + file);
             i++;
             Tools.startProgressIndicator(i + ": " + file);
             String xml = Tools.loadFile(file, true);
