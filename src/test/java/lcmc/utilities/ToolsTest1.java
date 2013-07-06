@@ -1489,5 +1489,6 @@ public final class ToolsTest1 extends TestCase {
         assertTrue(Tools.compareNames("1", "") > 0);
         assertTrue(Tools.compareNames("1", null) > 0);
         assertTrue(Tools.compareNames(null, "1") < 0);
+        assertTrue(Tools.compareNames("1x", "Node001") < 0);
     }
 }

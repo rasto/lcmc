@@ -2944,7 +2944,8 @@ public final class Tools {
             }
             final String p2 = parts2.get(i);
             int res;
-            if (Character.isDigit(p1.charAt(0))) {
+            if (Character.isDigit(p1.charAt(0))
+                && Character.isDigit(p2.charAt(0))) {
                 res = Integer.parseInt(p1) - Integer.parseInt(p2);
             } else {
                 res = p1.compareToIgnoreCase(p2);
