@@ -2483,30 +2483,32 @@ public class ServiceInfo extends EditableInfo {
 
     /** Change type to Master, Clone or Primitive. */
     protected final void changeType(final String value) {
-        boolean masterSlave = false;
-        boolean clone = false;
+        boolean masterSlave0 = false;
+        boolean clone0 = false;
         if (MASTER_SLAVE_TYPE_STRING.equals(value)) {
-            masterSlave = true;
-            clone = true;
+            masterSlave0 = true;
+            clone0 = true;
         } else if (CLONE_TYPE_STRING.equals(value)) {
-            clone = true;
+            clone0 = true;
         }
+        final boolean clone = clone0;
+        final boolean masterSlave = masterSlave0;
 
         final ServiceInfo thisClass = this;
-        if (clone) {
-            final CRMXML crmXML = getBrowser().getCRMXML();
-            final CloneInfo oldCI = getCloneInfo();
-            String title = ConfigData.PM_CLONE_SET_NAME;
-            if (masterSlave) {
-                title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
-            }
-            final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
-                                               title,
-                                               masterSlave,
-                                               getBrowser());
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (clone) {
+                    final CRMXML crmXML = getBrowser().getCRMXML();
+                    final CloneInfo oldCI = getCloneInfo();
+                    String title = ConfigData.PM_CLONE_SET_NAME;
+                    if (masterSlave) {
+                        title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+                    }
+                    final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
+                                                       title,
+                                                       masterSlave,
+                                                       getBrowser());
                     setCloneInfo(ci);
                     if (oldCI == null) {
                         getBrowser().getCRMGraph()
@@ -2552,12 +2554,7 @@ public class ServiceInfo extends EditableInfo {
                     resetInfoPanel();
                     infoPanel = null;
                     getInfoPanel();
-                }
-            });
-        } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
+                } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
                     final CloneInfo ci = getCloneInfo();
                     if (ci == null) {
                         return;
@@ -2592,8 +2589,8 @@ public class ServiceInfo extends EditableInfo {
                     getBrowser().nodeChangedAndWait(node);
                     ciNode.setUserObject(null); /* would leak without it */
                 }
-            });
-        }
+            }
+        });
     }
 
     /** Adds host score listeners. */
