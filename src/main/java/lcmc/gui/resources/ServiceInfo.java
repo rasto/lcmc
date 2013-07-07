@@ -2481,6 +2481,91 @@ public class ServiceInfo extends EditableInfo {
         /* Override to add resource before this one. */
     }
 
+    /** Change type to clone or master/slave resource. */
+    private void changeTypeToClone(final boolean masterSlave) {
+        final CRMXML crmXML = getBrowser().getCRMXML();
+        final CloneInfo oldCI = getCloneInfo();
+        String title = ConfigData.PM_CLONE_SET_NAME;
+        if (masterSlave) {
+            title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+        }
+        final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
+                                           title,
+                                           masterSlave,
+                                           getBrowser());
+        setCloneInfo(ci);
+        if (oldCI == null) {
+            getBrowser().getCRMGraph().exchangeObjectInTheVertex(ci, this);
+            ci.setPingComboBox(pingComboBox);
+            for (final HostInfo hi : scoreComboBoxHash.keySet()) {
+                ci.getScoreComboBoxHash().put(hi, scoreComboBoxHash.get(hi));
+            }
+            final Widget prevWi = getWidget(GUI_ID, null);
+            if (prevWi != null) {
+                ci.getService().setId(
+                                    getName() + "_" + prevWi.getStringValue());
+            }
+        } else {
+            oldCI.removeNodeAndWait();
+            getBrowser().getCRMGraph().exchangeObjectInTheVertex(ci, oldCI);
+            cleanup();
+            oldCI.cleanup();
+            ci.setPingComboBox(oldCI.getPingComboBox());
+            for (final HostInfo hi : oldCI.getScoreComboBoxHash().keySet()) {
+                ci.getScoreComboBoxHash().put(
+                                    hi, oldCI.getScoreComboBoxHash().get(hi));
+            }
+            getBrowser().removeFromServiceInfoHash(oldCI);
+            getBrowser().mHeartbeatIdToServiceLock();
+            getBrowser().getHeartbeatIdToServiceInfo().remove(
+                                          oldCI.getService().getHeartbeatId());
+            getBrowser().mHeartbeatIdToServiceUnlock();
+            final DefaultMutableTreeNode oldCINode = oldCI.getNode();
+            if (oldCINode != null) {
+                oldCINode.setUserObject(null); /* would leak without it*/
+            }
+            ci.getService().setId(
+                               oldCI.getWidget(GUI_ID, null).getStringValue());
+        }
+        ci.setCloneServicePanel(this);
+        resetInfoPanel();
+        infoPanel = null;
+        getInfoPanel();
+    }
+
+    /** Change type to clone or master/slave resource. */
+    private void changeTypeToPrimitive() {
+        final CloneInfo ci = getCloneInfo();
+        if (ci == null) {
+            return;
+        }
+        setCloneInfo(null);
+        setPingComboBox(ci.getPingComboBox());
+        for (final HostInfo hi : ci.getScoreComboBoxHash().keySet()) {
+            scoreComboBoxHash.put(hi, ci.getScoreComboBoxHash().get(hi));
+        }
+        final DefaultMutableTreeNode node = getNode();
+        final DefaultMutableTreeNode ciNode = ci.getNode();
+        removeNodeAndWait();
+        ci.removeNodeAndWait();
+        cleanup();
+        ci.cleanup();
+        setNode(node);
+        getBrowser().getServicesNode().add(node);
+        getBrowser().getCRMGraph().exchangeObjectInTheVertex(this, ci);
+        getBrowser().mHeartbeatIdToServiceLock();
+        getBrowser().getHeartbeatIdToServiceInfo().remove(
+                                            ci.getService().getHeartbeatId());
+        getBrowser().mHeartbeatIdToServiceUnlock();
+        getBrowser().removeFromServiceInfoHash(ci);
+        resetInfoPanel();
+        infoPanel = null;
+        getInfoPanel();
+        getBrowser().reloadAndWait(node, true);
+        getBrowser().nodeChangedAndWait(node);
+        ciNode.setUserObject(null); /* would leak without it */
+    }
+
     /** Change type to Master, Clone or Primitive. */
     protected final void changeType(final String value) {
         boolean masterSlave0 = false;
@@ -2494,100 +2579,13 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = clone0;
         final boolean masterSlave = masterSlave0;
 
-        final ServiceInfo thisClass = this;
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (clone) {
-                    final CRMXML crmXML = getBrowser().getCRMXML();
-                    final CloneInfo oldCI = getCloneInfo();
-                    String title = ConfigData.PM_CLONE_SET_NAME;
-                    if (masterSlave) {
-                        title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
-                    }
-                    final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
-                                                       title,
-                                                       masterSlave,
-                                                       getBrowser());
-                    setCloneInfo(ci);
-                    if (oldCI == null) {
-                        getBrowser().getCRMGraph()
-                                    .exchangeObjectInTheVertex(ci, thisClass);
-                        ci.setPingComboBox(pingComboBox);
-                        for (final HostInfo hi : scoreComboBoxHash.keySet()) {
-                            ci.getScoreComboBoxHash().put(
-                                                    hi,
-                                                    scoreComboBoxHash.get(hi));
-                        }
-                        final Widget prevWi = getWidget(GUI_ID, null);
-                        if (prevWi != null) {
-                            ci.getService().setId(
-                                    getName() + "_" + prevWi.getStringValue());
-                        }
-                    } else {
-                        oldCI.removeNodeAndWait();
-                        getBrowser().getCRMGraph()
-                                    .exchangeObjectInTheVertex(ci, oldCI);
-                        cleanup();
-                        oldCI.cleanup();
-                        ci.setPingComboBox(oldCI.getPingComboBox());
-                        for (final HostInfo hi
-                                    : oldCI.getScoreComboBoxHash().keySet()) {
-                            ci.getScoreComboBoxHash().put(
-                                    hi, oldCI.getScoreComboBoxHash().get(hi));
-                        }
-                        getBrowser().removeFromServiceInfoHash(oldCI);
-                        getBrowser().mHeartbeatIdToServiceLock();
-                        getBrowser().getHeartbeatIdToServiceInfo().remove(
-                                          oldCI.getService().getHeartbeatId());
-                        getBrowser().mHeartbeatIdToServiceUnlock();
-                        final DefaultMutableTreeNode oldCINode =
-                                                               oldCI.getNode();
-                        if (oldCINode != null) {
-                            oldCINode.setUserObject(null); /* would leak
-                                                              without it*/
-                        }
-                        ci.getService().setId(oldCI.getWidget(
-                                               GUI_ID, null).getStringValue());
-                    }
-                    ci.setCloneServicePanel(thisClass);
-                    resetInfoPanel();
-                    infoPanel = null;
-                    getInfoPanel();
+                    changeTypeToClone(masterSlave);
                 } else if (PRIMITIVE_TYPE_STRING.equals(value)) {
-                    final CloneInfo ci = getCloneInfo();
-                    if (ci == null) {
-                        return;
-                    }
-                    setCloneInfo(null);
-                    setPingComboBox(ci.getPingComboBox());
-                    for (final HostInfo hi
-                                        : ci.getScoreComboBoxHash().keySet()) {
-                        scoreComboBoxHash.put(
-                                        hi, ci.getScoreComboBoxHash().get(hi));
-                    }
-                    final DefaultMutableTreeNode node = getNode();
-                    final DefaultMutableTreeNode ciNode = ci.getNode();
-                    removeNodeAndWait();
-                    ci.removeNodeAndWait();
-                    cleanup();
-                    ci.cleanup();
-                    setNode(node);
-                    getBrowser().getServicesNode().add(node);
-                    getBrowser().getCRMGraph().exchangeObjectInTheVertex(
-                                                                     thisClass,
-                                                                     ci);
-                    getBrowser().mHeartbeatIdToServiceLock();
-                    getBrowser().getHeartbeatIdToServiceInfo().remove(
-                                            ci.getService().getHeartbeatId());
-                    getBrowser().mHeartbeatIdToServiceUnlock();
-                    getBrowser().removeFromServiceInfoHash(ci);
-                    resetInfoPanel();
-                    infoPanel = null;
-                    getInfoPanel();
-                    getBrowser().reloadAndWait(node, true);
-                    getBrowser().nodeChangedAndWait(node);
-                    ciNode.setUserObject(null); /* would leak without it */
+                    changeTypeToPrimitive();
                 }
             }
         });
