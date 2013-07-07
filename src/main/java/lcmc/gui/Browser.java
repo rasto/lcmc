@@ -199,7 +199,11 @@ public class Browser {
 
     /** Adds the node to the top level. */
     protected final void topAdd(final DefaultMutableTreeNode node) {
-        treeTop.add(node);
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                treeTop.add(node);
+            }
+        });
     }
 
     /** Repaints the split pane. */

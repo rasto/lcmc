@@ -847,6 +847,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -938,6 +939,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1028,6 +1030,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1126,6 +1129,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1251,6 +1255,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1350,6 +1355,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1445,6 +1451,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1550,6 +1557,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1658,6 +1666,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
+        Tools.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }

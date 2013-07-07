@@ -262,11 +262,11 @@ public final class VMSInfo extends CategoryInfo {
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsdi);
         getBrowser().setNode(resource);
-        getNode().add(resource);
-        getBrowser().reload(getNode(), true);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
+                getNode().add(resource);
+                getBrowser().reloadAndWait(getNode(), true);
                 vmsdi.getInfoPanel();
                 vmsdi.selectMyself();
                 final Thread t = new Thread(new Runnable() {

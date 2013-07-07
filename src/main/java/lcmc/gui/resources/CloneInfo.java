@@ -109,6 +109,7 @@ final class CloneInfo extends ServiceInfo {
         newServiceInfo.setCloneInfo(this);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
         setNode(node);
+        Tools.isSwingThread();
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
         getBrowser().reloadAndWait(node, true);

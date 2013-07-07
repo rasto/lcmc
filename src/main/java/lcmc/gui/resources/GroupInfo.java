@@ -413,11 +413,16 @@ public final class GroupInfo extends ServiceInfo {
         final DefaultMutableTreeNode newServiceNode =
                                    new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        gn.add(newServiceNode);
-        if (reloadNode) {
-            getBrowser().reload(gn, false);
-            getBrowser().reload(newServiceNode, true);
-        }
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                gn.add(newServiceNode);
+                if (reloadNode) {
+                    getBrowser().reloadAndWait(gn, false);
+                    getBrowser().reloadAndWait(newServiceNode, true);
+                }
+            }
+        });
     }
 
     /** Adds service to this group and creates new service info object. */

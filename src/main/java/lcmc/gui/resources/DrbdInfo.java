@@ -769,8 +769,13 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                            new DefaultMutableTreeNode(dri);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-        getBrowser().getDrbdNode().add(drbdResourceNode);
-        getBrowser().reload(drbdResourceNode, true);
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                getBrowser().getDrbdNode().add(drbdResourceNode);
+                getBrowser().reloadAndWait(drbdResourceNode, true);
+            }
+        });
     }
 
     /** Add DRBD volume. */
@@ -808,6 +813,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                            new DefaultMutableTreeNode(dvi);
         dvi.setNode(drbdVolumeNode);
 
+        Tools.isSwingThread();
         dvi.getDrbdResourceInfo().getNode().add(drbdVolumeNode);
 
         final DefaultMutableTreeNode drbdBDNode1 =
@@ -1001,6 +1007,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                    new DefaultMutableTreeNode(proxyHostInfo);
         getBrowser().reload(getBrowser().getDrbdNode(), true);
         proxyHostInfo.setNode(proxyHostNode);
+        Tools.isSwingThread();
         getBrowser().getDrbdNode().add(proxyHostNode);
         getBrowser().reload(proxyHostNode, true);
     }

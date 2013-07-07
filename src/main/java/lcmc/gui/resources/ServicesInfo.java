@@ -1209,7 +1209,12 @@ public final class ServicesInfo extends EditableInfo {
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
-            getBrowser().getServicesNode().add(newServiceNode);
+            Tools.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    getBrowser().getServicesNode().add(newServiceNode);
+                }
+            });
             if (interactive) {
                 if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
                     /* only if it was added manually. */

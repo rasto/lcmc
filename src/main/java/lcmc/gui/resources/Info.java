@@ -1154,6 +1154,7 @@ public class Info implements Comparable<Info> {
 
     /** Remove node in tree menu. Call it from swing thread. */
     final void removeNodeAndWait() {
+        Tools.isSwingThread();
         final DefaultMutableTreeNode n = node;
         node = null;
         if (n == null) {
