@@ -557,11 +557,23 @@ public class ServiceInfo extends EditableInfo {
                 if (savedMetaAttrInfoRef == null
                     && defaultValues != allMetaAttrsAreDefaultValues) {
                     if (allMetaAttrsAreDefaultValues) {
-                        sameAsMetaAttrsWi.setValueNoListeners(
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
+                            @Override
+                            public void run() {
+                                sameAsMetaAttrsWi.setValueNoListeners(
                                                META_ATTRS_DEFAULT_VALUES_TEXT);
+                            }
+                        });
                     } else {
-                        sameAsMetaAttrsWi.setValueNoListeners(
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                          new Runnable() {
+                            @Override
+                            public void run() {
+                                sameAsMetaAttrsWi.setValueNoListeners(
                                              Widget.NOTHING_SELECTED_INTERNAL);
+                            }
+                        });
                     }
                 }
             }
