@@ -2129,8 +2129,8 @@ sub gui_test_compare {
 	my $testfile;
 	my $test = "";
 	my $try = 1;
-	$realconf =~ s/^\s+//;
-	$realconf =~ s/\s+$//;
+	$realconf =~ s/^\s+//mg;
+	$realconf =~ s/\s+$//mg;
 	my $diff = "";
 	do {
 
@@ -2151,8 +2151,8 @@ sub gui_test_compare {
 			{
 				local $/;
 				$test = <TEST>;
-				$test =~ s/^\s+//;
-				$test =~ s/\s+$//;
+				$test =~ s/^\s+//mg;
+				$test =~ s/\s+$//mg;
 			}
 			close TEST;
 		}
@@ -2260,13 +2260,10 @@ sub gui_test {
 			exit $ret;
 		}
 	}
-	for ($status) {
-		s/\\$//mg;
-		s/^\s+//;
-		s/\s+$//;
-		for my $host (@hosts) {
-			s/$host\b/host/gi;
-		}
+
+	$status =~ s/\\$//mg;
+	for my $host (@hosts) {
+		$status =~ s/$host\b/host/gi;
 	}
 	$status =~ s/(Master\/Slave Set:.*?)\s+\[.*/$1/g;
 	$status =~ s/unknown( expected votes)/2$1/;
