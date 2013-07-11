@@ -405,15 +405,20 @@ final class CloneInfo extends ServiceInfo {
      */
     @Override
     public void removeMyself(final boolean testOnly) {
+        final ServiceInfo cs = containedService;
         if (getService().isNew()) {
             removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
             getService().setNew(false);
-            containedService.removeInfo();
+            if (cs != null) {
+                cs.removeInfo();
+            }
             removeInfo();
             getService().doneRemoving();
             return;
         }
-        containedService.removeMyself(testOnly);
+        if (cs != null) {
+            cs.removeMyself(testOnly);
+        }
         getBrowser().selectServices();
     }
 
