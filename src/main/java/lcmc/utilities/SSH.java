@@ -1456,6 +1456,9 @@ public final class SSH {
             disconnectForGood = false;
 
             try {
+                if (hostname == null) {
+                    throw new IOException("hostname is not set");
+                }
                 /* connect and verify server host key (with callback) */
                 Tools.debug(this, "verify host keys: " + hostname, 1);
                 final String[] hostkeyAlgos =
@@ -1490,7 +1493,7 @@ public final class SSH {
                 /* authentication phase */
                 authenticate(conn);
             } catch (IOException e) {
-                Tools.debug(this, "connecting: " + e.getMessage(), 1);
+                Tools.appWarning("connecting failed: " + e.getMessage());
                 connectionFailed = true;
                 if (!cancelIt) {
                     host.getTerminalPanel().addCommandOutput(e.getMessage()
