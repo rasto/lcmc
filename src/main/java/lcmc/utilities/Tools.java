@@ -121,6 +121,9 @@ import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.plaf.FontUIResource;
+import org.apache.commons.collections15.Buffer;
+import org.apache.commons.collections15.BufferUtils;
+import org.apache.commons.collections15.buffer.CircularFifoBuffer;
 
 /**
  * This class provides tools, that are not classified.
@@ -176,6 +179,11 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
+    /** Size of circular log buffer. */
+    private static final int CIRCULAR_LOG_SIZE = 10;
+    /** Synchronized, Cirular log. */
+    private static final Buffer<String> LOG_BUFFER =
+              BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>());
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
     /** Text/html mime type. */
@@ -188,6 +196,7 @@ public final class Tools {
     private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Do not check the swing thread. */
     public static final boolean CHECK_SWING_THREAD = true;
+
     /** Private constructor. */
     private Tools() {
         /* no instantiation possible. */
@@ -256,7 +265,9 @@ public final class Tools {
 
     /** Prints info message to the stdout. */
     public static void info(final String msg) {
-        System.out.println(INFO_STRING + msg);
+        final String msg0 = INFO_STRING + msg;
+        System.out.println(msg0);
+        LOG_BUFFER.add(msg0);
     }
 
     /** Sets defaults from AppDefaults bundle. */
@@ -299,10 +310,13 @@ public final class Tools {
      *          debug message
      */
     private static void debug(final String msg) {
-        if (debugLevel > 0) {
-            System.out.println(DEBUG_STRING
-                               + "[" + seconds() + "s] "
-                               + msg + " (lcmc.utilities.Tools)");
+        if (debugLevel > -1) {
+            final String msg0 = DEBUG_STRING + "[" + seconds() + "s] " + msg
+                                + " (lcmc.utilities.Tools)";
+            if (debugLevel > 0) {
+                System.out.println(msg0);
+            }
+            LOG_BUFFER.add(msg0);
         }
     }
 
@@ -317,11 +331,15 @@ public final class Tools {
      *          level of this message.
      */
     private static void debug(final String msg, final int level) {
-        if (level <= debugLevel) {
-            System.out.println(DEBUG_STRING
-                               + "(" + level + ") "
-                               + "[" + seconds() + "s] "
-                               + msg + " (lcmc.utilities.Tools)");
+        if (level <= debugLevel + 1) {
+            final String msg0 = DEBUG_STRING
+                                + "(" + level + ") "
+                                + "[" + seconds() + "s] "
+                                + msg + " (lcmc.utilities.Tools)";
+            if (level <= debugLevel) {
+                System.out.println(msg0);
+            }
+            LOG_BUFFER.add(msg0);
         }
     }
 
@@ -335,17 +353,20 @@ public final class Tools {
      *          debug message
      */
     public static void debug(final Object object, final String msg) {
-        if (debugLevel > -1) {
+        if (debugLevel > -2) {
+            String msg0;
             if (object == null) {
-                System.out.println(DEBUG_STRING
-                                   + "[" + seconds() + "s] "
-                                   + msg);
+                msg0 = DEBUG_STRING + "[" + seconds() + "s] " + msg;
             } else {
-                System.out.println(DEBUG_STRING
-                                   + "[" + seconds() + "s] "
-                                   + msg
-                                   + " (" + object.getClass().getName() + ")");
+                msg0 = DEBUG_STRING
+                       + "[" + seconds() + "s] "
+                       + msg
+                       + " (" + object.getClass().getName() + ")";
             }
+            if (debugLevel > -1) {
+                System.out.println(msg0);
+            }
+            LOG_BUFFER.add(msg0);
         }
     }
 
@@ -364,16 +385,20 @@ public final class Tools {
     public static void debug(final Object object,
                              final String msg,
                              final int level) {
-        if (level <= debugLevel) {
+        if (level <= debugLevel + 1) {
             String from = "";
             if (object != null) {
                 from = " (" + object.getClass().getName() + ")";
             }
-            System.out.println(DEBUG_STRING
-                               + "(" + level + ") "
-                               + "[" + seconds() + "s] "
-                               + msg
-                               + from);
+            final String msg0 = DEBUG_STRING
+                                + "(" + level + ") "
+                                + "[" + seconds() + "s] "
+                                + msg
+                                + from;
+            if (level <= debugLevel) {
+                System.out.println(msg0);
+            }
+            LOG_BUFFER.add(msg0);
         }
     }
 
@@ -384,7 +409,9 @@ public final class Tools {
      *          error message
      */
     public static void error(final String msg) {
-        System.out.println(ERROR_STRING + msg);
+        final String msg0 = ERROR_STRING + msg;
+        System.out.println(msg0);
+        LOG_BUFFER.add(msg0);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -561,10 +588,12 @@ public final class Tools {
     public static void appWarning(final String msg) {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
+            final String msg0 = APPWARNING_STRING + msg;
             if (appWarning) {
-                System.out.println(APPWARNING_STRING + msg);
+                System.out.println(msg0);
+                LOG_BUFFER.add(msg0);
             } else {
-                debug(APPWARNING_STRING + msg, 2);
+                debug(msg0);
             }
         }
     }
@@ -573,11 +602,13 @@ public final class Tools {
     public static void appWarning(final String msg, final Exception e) {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
+            final String msg0 = APPWARNING_STRING + msg + ": "
+                                + e.getMessage();
             if (appWarning) {
-                System.out.println(APPWARNING_STRING + msg + ": "
-                                   + e.getMessage());
+                System.out.println(msg0);
+                LOG_BUFFER.add(msg0);
             } else {
-                debug(APPWARNING_STRING + msg, 2);
+                debug(msg0);
             }
         }
     }
