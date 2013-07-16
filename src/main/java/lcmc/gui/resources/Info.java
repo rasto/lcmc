@@ -1096,7 +1096,7 @@ public class Info implements Comparable<Info> {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
-                        Tools.debug(this, "update table in: " + getName(), 1);
+                        Tools.debug(this, "update table in: " + getName(), 2);
                         tableModel.setDataVector(data, colNames);
                         tableModel.fireTableDataChanged();
                         Tools.resizeTable(table, getDefaultWidths(tableName));

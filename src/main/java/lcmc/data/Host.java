@@ -838,11 +838,11 @@ public final class Host implements Comparable<Host> {
         dist = detectedDist;
         distVersion = detectedDistVersion;
         initDistInfo();
-        Tools.debug(this, "kernel name: " + detectedKernelName, 1);
-        Tools.debug(this, "kernel version: " + detectedKernelVersion, 1);
-        Tools.debug(this, "arch: " + detectedArch, 1);
-        Tools.debug(this, "dist version: " + detectedDistVersion, 1);
-        Tools.debug(this, "dist: " + detectedDist, 1);
+        Tools.debug(this, "kernel name: " + detectedKernelName, 2);
+        Tools.debug(this, "kernel version: " + detectedKernelVersion, 2);
+        Tools.debug(this, "arch: " + detectedArch, 2);
+        Tools.debug(this, "dist version: " + detectedDistVersion, 2);
+        Tools.debug(this, "dist: " + detectedDist, 2);
     }
 
     /** Initializes dist info. Must be called after setDistInfo. */

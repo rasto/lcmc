@@ -573,9 +573,8 @@ public abstract class Widget extends JPanel {
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
                 Tools.debug(this, "changed label: " + labelText + " != "
-                                   + savedLabel, 1);
-                Tools.debug(this, "changed: " + value + " != "
-                                         + savedValue, 1);
+                                   + savedLabel, 2);
+                Tools.debug(this, "changed: " + value + " != " + savedValue, 2);
                 /*
                    Tools.printStackTrace("changed: " + value + " != "
                                          + savedValue);

@@ -595,7 +595,7 @@ public final class SSH {
         throws java.io.IOException {
             super();
             this.command = command;
-            Tools.debug(this, "command: " + command, 1);
+            Tools.debug(this, "command: " + command, 2);
             this.execCallback = execCallback;
             this.newOutputCallback = newOutputCallback;
             this.outputVisible = outputVisible;
