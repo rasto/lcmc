@@ -180,10 +180,11 @@ public final class Tools {
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
     /** Size of circular log buffer. */
-    private static final int CIRCULAR_LOG_SIZE = 10;
+    private static final int CIRCULAR_LOG_SIZE = 200;
     /** Synchronized, Cirular log. */
-    private static final Buffer<String> LOG_BUFFER =
-              BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>());
+    public static final Buffer<String> LOG_BUFFER =
+              BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>(
+                                                        CIRCULAR_LOG_SIZE));
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
     /** Text/html mime type. */
@@ -3016,5 +3017,16 @@ public final class Tools {
         if (st.indexOf("java.awt.event.InvocationEvent.dispatch") >= 0) {
             System.out.println("swing thread: " + st);
         }
+    }
+
+    /** Return the whole log buffer. */
+    public static String getLogBuffer() {
+        final StringBuilder lb = new StringBuilder();
+        synchronized (LOG_BUFFER) {
+            for (final String l : LOG_BUFFER) {
+                lb.append(l).append('\n');
+            }
+        }
+        return lb.toString();
     }
 }

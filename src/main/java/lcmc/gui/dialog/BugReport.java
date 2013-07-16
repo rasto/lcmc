@@ -68,10 +68,14 @@ public final class BugReport extends ConfigDialog {
                                             new HashMap<String, JCheckBox>();
     private final Map<Cluster, JCheckBox> clusterCbMap =
                                             new HashMap<Cluster, JCheckBox>();
+    /** The whole log buffer. */
+    private final String logs;
+
     private static final String CONFIG_CIB = "pcmk configs";
     private static final String CONFIG_DRBD = "DRBD configs";
     private static final String CONFIG_LIBVIRT = "libvirt configs";
     private static final String GENERATED_DELIM = "=== configs ===";
+    private static final String LOG_BUFFER_DELIM = "=== logs ===";
     public static final Cluster UNKNOWN_CLUSTER = null;
     public static final String NO_ERROR_TEXT = null;
 
@@ -80,6 +84,7 @@ public final class BugReport extends ConfigDialog {
         super();
         this.cluster = cluster;
         this.errorText = errorText;
+        logs = Tools.getLogBuffer();
     }
 
     /** Inits the dialog and enables all the components. */
@@ -288,6 +293,8 @@ public final class BugReport extends ConfigDialog {
                 }
             }
         }
+        /** logs */
+        text.append('\n').append(LOG_BUFFER_DELIM).append('\n').append(logs);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
