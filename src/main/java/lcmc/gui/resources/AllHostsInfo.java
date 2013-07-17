@@ -461,6 +461,11 @@ public final class AllHostsInfo extends Info {
             c.gridy++;
         }
         mainPanel.add(startPanel, c);
+        c.gridx++;
+        if (c.gridx > 2) {
+            c.gridx = 0;
+            c.gridy++;
+        }
     }
 
     /** Return quick connect button. */
