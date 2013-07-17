@@ -1,4 +1,5 @@
 Linux Cluster Management Console (LCMC)
+http://lcmc.sf.net
 =======================================
 LCMC is a Java GUI application that configures, manages and visualizes Linux
 clusters. Specifically it helps administrators to create and manage clusters
