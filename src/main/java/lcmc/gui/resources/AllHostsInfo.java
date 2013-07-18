@@ -26,6 +26,7 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.TerminalPanel;
 import lcmc.data.Cluster;
+import lcmc.data.Clusters;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -485,12 +486,23 @@ public final class AllHostsInfo extends Info {
                         final String clusterName = clusterTF.getText();
                         final List<String> hostNames = new ArrayList<String>();
                         final Cluster cluster = new Cluster();
+                        String newClusterName;
                         if (CLUSTER_NAME_PH.equals(clusterName)) {
-                            cluster.setName(DEFAULT_CLUSTER_NAME);
+                            newClusterName = DEFAULT_CLUSTER_NAME;
                         } else {
-                            cluster.setName(clusterName);
+                            newClusterName = clusterName;
+                        }
+                        final Clusters clusters =
+                                           Tools.getConfigData().getClusters();
+                        if (clusters.isClusterName(newClusterName)) {
+                            cluster.setName(clusters.getNextClusterName(
+                                                       newClusterName + " "));
+                        } else {
+                            cluster.setName(newClusterName);
                         }
                         Tools.getConfigData().addClusterToClusters(cluster);
+                        addClusterBox(cluster);
+                        addCheckboxListener(cluster);
                         for (final JTextField hostTF : hostsTF) {
                             final String entered = hostTF.getText();
                             String hostName = null;

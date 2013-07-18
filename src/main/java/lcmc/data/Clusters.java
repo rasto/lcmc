@@ -91,10 +91,31 @@ public final class Clusters {
         }
     }
 
+    /** Return whether cluster with this name already exists. */
+    public boolean isClusterName(final String name) {
+        mClustersReadLock.lock();
+        try {
+            if (clusters != null) {
+                for (final Cluster cluster : clusters) {
+                    if (name.equals(cluster.getName())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } finally {
+            mClustersReadLock.unlock();
+        }
+    }
+
     /** Return default name with incremented index. */
     public String getDefaultClusterName() {
+        return getNextClusterName(Tools.getString("Clusters.DefaultName"));
+    }
+
+    /** Return default name with incremented index. */
+    public String getNextClusterName(final String defaultName) {
         int index = 0;
-        final String defaultName = Tools.getString("Clusters.DefaultName");
         mClustersReadLock.lock();
         try {
             if (clusters != null) {
