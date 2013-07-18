@@ -254,7 +254,7 @@ public final class AllHostsInfo extends Info {
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            loadMarkedClusters(clusters);
+                            loadMarkedClusters();
                         }
                     });
                     t.start();
@@ -617,10 +617,7 @@ public final class AllHostsInfo extends Info {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final Set<Cluster> clusters =
-                           Tools.getConfigData().getClusters().getClusterSet();
-
-                        allCheckboxesListener(clusters, wi);
+                        allCheckboxesListener(wi);
                     }
                 });
                 thread.start();
@@ -630,7 +627,7 @@ public final class AllHostsInfo extends Info {
     }
 
     /** Starts marked clusters. */
-    private void loadMarkedClusters(final Set<Cluster> clusters) {
+    private void loadMarkedClusters() {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -638,7 +635,7 @@ public final class AllHostsInfo extends Info {
             }
         });
         final List<Cluster> selectedClusters = new ArrayList<Cluster>();
-        for (final Cluster cluster : clusters) {
+        for (final Cluster cluster : allCheckboxes.keySet()) {
             if (cluster.getClusterTab() == null) {
                 final JCheckBox wi = allCheckboxes.get(cluster);
                 if (wi.isSelected()) {
@@ -661,7 +658,7 @@ public final class AllHostsInfo extends Info {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final Cluster cluster : clusters) {
+                for (final Cluster cluster : allCheckboxes.keySet()) {
                     if (selectedClusters.contains(cluster)) {
                         allCheckboxes.get(cluster).setSelected(false);
                     }
@@ -699,12 +696,11 @@ public final class AllHostsInfo extends Info {
     }
 
     /** Listener for checkboxes that is called from thread. */
-    private void allCheckboxesListener(final Set<Cluster> clusters,
-                                       final JCheckBox wi) {
+    private void allCheckboxesListener(final JCheckBox wi) {
         int rc = 0;
         int nrc = 0;
         int ac = 0;
-        for (final Cluster cluster : clusters) {
+        for (final Cluster cluster : allCheckboxes.keySet()) {
             ac++;
             if (allCheckboxes.get(cluster).isSelected()) {
                 if (cluster.getClusterTab() == null) {
@@ -724,7 +720,7 @@ public final class AllHostsInfo extends Info {
                 @Override
                 public void run() {
                     if (notRunningCount >= 1) {
-                        for (final Cluster cluster : clusters) {
+                        for (final Cluster cluster : allCheckboxes.keySet()) {
                             final MyButton loadButton =
                                                   allLoadButtons.get(cluster);
                             if (loadButton != null) {
@@ -748,7 +744,7 @@ public final class AllHostsInfo extends Info {
                 @Override
                 public void run() {
                     if (notRunningCount == 0) {
-                        for (final Cluster cluster : clusters) {
+                        for (final Cluster cluster : allCheckboxes.keySet()) {
                             final MyButton loadButton =
                                                   allLoadButtons.get(cluster);
                             if (loadButton != null) {

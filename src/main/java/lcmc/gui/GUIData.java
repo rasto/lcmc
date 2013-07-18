@@ -274,12 +274,7 @@ public final class GUIData  {
 
     /** Adds tab with new cluster to the clusters panel. */
     public void addClusterTab(final Cluster cluster) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                clustersPanel.addTab(cluster);
-            }
-        });
+        clustersPanel.addTab(cluster);
     }
 
     /** changes name of the selected cluster tab. */

@@ -25,6 +25,7 @@ package lcmc.data;
 
 import lcmc.utilities.Tools;
 import lcmc.gui.TerminalPanel;
+import lcmc.gui.ClusterTab;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -182,13 +183,21 @@ public final class UserConfig extends XML {
                     && !selectedClusters.contains(cluster)) {
                     continue;
                 }
-                Tools.getGUIData().addClusterTab(cluster);
+                Tools.invokeLater(new Runnable() {
+                    public void run() {
+                        Tools.getGUIData().addClusterTab(cluster);
+                    }
+                });
                 if (cluster.getHosts().isEmpty()) {
                     continue;
                 }
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
-                    Tools.getGUIData().getClustersPanel().removeTab(cluster);
+                    Tools.invokeLater(new Runnable() {
+                        public void run() {
+                            Tools.getGUIData().getClustersPanel().removeTab(                                                                          cluster);
+                        }
+                    });
                     continue;
                 }
                 final Runnable runnable = new Runnable() {
@@ -197,10 +206,13 @@ public final class UserConfig extends XML {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
-                        cluster.getClusterTab().addClusterView();
                         Tools.invokeLater(new Runnable() {
                             public void run() {
-                                cluster.getClusterTab().requestFocus();
+                                final ClusterTab ct = cluster.getClusterTab();
+                                if (ct != null) {
+                                    ct.addClusterView();
+                                    ct.requestFocus();
+                                }
                             }
                         });
                     }

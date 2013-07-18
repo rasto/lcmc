@@ -861,7 +861,11 @@ public final class Tools {
             // TODO: can be run concurrently.
             host.disconnect();
         }
-        getGUIData().getClustersPanel().removeTab(cluster);
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                getGUIData().getClustersPanel().removeTab(cluster);
+            }
+        });
     }
 
     /** Removes the specified clusters from the gui. */

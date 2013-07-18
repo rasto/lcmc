@@ -106,7 +106,12 @@ public final class Name extends DialogCluster {
         enableComponents();
         if (!Tools.getConfigData().existsCluster(getCluster())) {
             Tools.getConfigData().addClusterToClusters(getCluster());
-            Tools.getGUIData().addClusterTab(getCluster());
+            Tools.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Tools.getGUIData().addClusterTab(getCluster());
+                }
+            });
         }
     }
 
