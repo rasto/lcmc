@@ -501,7 +501,7 @@ public abstract class WizardDialog extends ConfigDialog {
     public final void pressNextButton() {
         final MyButton nb = buttonClass(nextButton());
         if (nb != null) {
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (nb.isVisible() && nb.isEnabled()) {

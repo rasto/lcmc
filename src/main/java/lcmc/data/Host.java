@@ -355,7 +355,11 @@ public final class Host implements Comparable<Host> {
             hostnameEntered = Tools.getDefault("SSH.SecHost");
         }
         browser = new HostBrowser(this);
-        browser.initHostResources();
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                browser.initHostResources();
+            }
+        });
         mountPoints.add("/mnt/");
     }
 

@@ -469,31 +469,16 @@ final class CheckInstallation extends DialogHost {
         }
         if (!drbdOk
             && Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.sleep(1000);
-                    drbdButton.pressButton();
-                }
-            });
+            Tools.sleep(1000);
+            drbdButton.pressButton();
         } else if (!hbPmOk
             && Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.sleep(1000);
-                    hbPmButton.pressButton();
-                }
-            });
+            Tools.sleep(1000);
+            hbPmButton.pressButton();
         } else if (!pmOk
             && Tools.getConfigData().getAutoOptionHost("pminst") != null) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.sleep(1000);
-                    pmButton.pressButton();
-                }
-            });
+            Tools.sleep(1000);
+            pmButton.pressButton();
         }
     }
 

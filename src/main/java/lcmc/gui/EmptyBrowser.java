@@ -97,7 +97,11 @@ public final class EmptyBrowser extends Browser {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
         setNode(allHostsNode);
-        topAdd(allHostsNode);
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                topAdd(allHostsNode);
+            }
+        });
     }
 
     /** Updates resources of a cluster in the tree. */

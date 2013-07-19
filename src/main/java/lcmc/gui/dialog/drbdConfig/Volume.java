@@ -112,12 +112,7 @@ public final class Volume extends DrbdConfig {
             }
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    pressNextButton();
-                }
-            });
+            pressNextButton();
         }
     }
 

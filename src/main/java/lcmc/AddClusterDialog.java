@@ -74,8 +74,12 @@ public final class AddClusterDialog {
             }
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
-        cluster.getClusterTab().addClusterView();
-        cluster.getClusterTab().requestFocus();
+        Tools.invokeLater(new Runnable() {
+            public void run() {
+                cluster.getClusterTab().addClusterView();
+                cluster.getClusterTab().requestFocus();
+            }
+        });
         Tools.getGUIData().checkAddClusterButtons();
     }
 

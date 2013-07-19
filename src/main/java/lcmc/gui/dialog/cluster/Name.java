@@ -134,12 +134,7 @@ public final class Name extends DialogCluster {
                     }
                 });
             }
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    pressNextButton();
-                }
-            });
+            pressNextButton();
         }
     }
 

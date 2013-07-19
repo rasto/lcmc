@@ -146,12 +146,7 @@ public final class Start extends WizardDialog {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    pressNextButton();
-                }
-            });
+            pressNextButton();
         }
     }
 

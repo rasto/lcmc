@@ -639,7 +639,7 @@ public final class ClusterBrowser extends Browser {
         DefaultMutableTreeNode resource;
 
         /* cluster hosts */
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 clusterHostsNode.removeAllChildren();
@@ -660,7 +660,7 @@ public final class ClusterBrowser extends Browser {
 
         /* networks */
         updateNetworks();
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 crmGraph.scale();
@@ -1390,7 +1390,7 @@ public final class ClusterBrowser extends Browser {
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
@@ -1705,7 +1705,7 @@ public final class ClusterBrowser extends Browser {
         if (networksNode != null) {
             DefaultMutableTreeNode resource;
             final Network[] networks = cluster.getCommonNetworks();
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     networksNode.removeAllChildren();
