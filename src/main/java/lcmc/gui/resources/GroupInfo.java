@@ -134,7 +134,14 @@ public final class GroupInfo extends ServiceInfo {
                 continue;
             }
             gsi.getInfoPanel();
-            gsi.waitForInfoPanel();
+        }
+        Tools.waitForSwing();
+        for (final String resId : newOrder) {
+            final ServiceInfo gsi =
+                               getBrowser().getServiceInfoFromCRMId(resId);
+            if (gsi == null)  {
+                continue;
+            }
             pacemakerResAttrs.put(resId,
                                   gsi.getPacemakerResAttrs(testOnly));
             pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
