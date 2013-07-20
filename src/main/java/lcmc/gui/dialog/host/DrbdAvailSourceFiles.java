@@ -110,9 +110,11 @@ final class DrbdAvailSourceFiles extends DialogHost {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            drbdTarballCombo.reloadComboBox(
-                                   items.get(0).toString(),
-                                   items.toArray(new ComboInfo[items.size()]));
+                            if (items.size() > 0) {
+                                drbdTarballCombo.reloadComboBox(
+                                       items.get(0).toString(),
+                                       items.toArray(new ComboInfo[items.size()]));
+                            }
                             final ComboInfo selectedItem =
                                    (ComboInfo) drbdTarballCombo.getValue();
                             drbdTarballCombo.setEnabled(true);
