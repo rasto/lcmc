@@ -2746,7 +2746,7 @@ public final class Tools {
         } catch (final InterruptedException ix) {
             Thread.currentThread().interrupt();
         } catch (final InvocationTargetException x) {
-            Tools.printStackTrace();
+            Tools.appError("invokeAndWait: exception", x);
         }
     }
 

@@ -58,6 +58,7 @@ import java.awt.geom.Point2D;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.utilities.MyButton;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
@@ -79,10 +80,15 @@ public final class GroupInfo extends ServiceInfo {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    getApplyButton().setEnabled(false);
+                    final MyButton ab = getApplyButton();
+                    if (ab != null) {
+                        ab.setEnabled(false);
+                    }
                 }
             });
         }
+        getInfoPanel();
+        waitForInfoPanel();
 
         final Map<String, String> groupMetaArgs =
                                         new LinkedHashMap<String, String>();
@@ -130,16 +136,21 @@ public final class GroupInfo extends ServiceInfo {
         for (final String resId : newOrder) {
             final ServiceInfo gsi =
                                getBrowser().getServiceInfoFromCRMId(resId);
-            if (gsi == null)  {
+            if (gsi == null) {
                 continue;
             }
-            gsi.getInfoPanel();
+            Tools.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    gsi.getInfoPanel();
+                }
+            });
         }
         Tools.waitForSwing();
         for (final String resId : newOrder) {
             final ServiceInfo gsi =
                                getBrowser().getServiceInfoFromCRMId(resId);
-            if (gsi == null)  {
+            if (gsi == null) {
                 continue;
             }
             pacemakerResAttrs.put(resId,
