@@ -267,6 +267,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         getApplyButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this, "BUTTON: apply", 1);
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -300,6 +301,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    Tools.debug(this, "BUTTON: revert", 1);
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {

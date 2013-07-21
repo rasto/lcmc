@@ -553,6 +553,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Initializes cluster resources for cluster view. */
     void initClusterBrowser() {
+        Tools.debug(this, "start: init cluster browser", 1);
         /* hosts */
         clusterHostsInfo =
            new ClusterHostsInfo(Tools.getString("ClusterBrowser.ClusterHosts"),
@@ -610,6 +611,7 @@ public final class ClusterBrowser extends Browser {
         addVMSNode();
         selectPath(new Object[]{getTreeTop(), crmNode});
         addDrbdProxyNodes();
+        Tools.debug(this, "end: init cluster browser", 1);
     }
 
     void addDrbdProxyNodes() {
@@ -634,6 +636,7 @@ public final class ClusterBrowser extends Browser {
     void updateClusterResources(final Host[] clusterHosts,
                                 final String[] commonFileSystems,
                                 final String[] commonMountPoints) {
+        Tools.debug(this, "start: update cluster resources", 1);
         this.commonFileSystems = commonFileSystems.clone();
         this.commonMountPoints = commonMountPoints.clone();
         DefaultMutableTreeNode resource;
@@ -667,6 +670,7 @@ public final class ClusterBrowser extends Browser {
             }
         });
         updateHeartbeatDrbdThread();
+        Tools.debug(this, "end: update cluster resources", 1);
     }
 
     /** Returns mountpoints that exist on all servers. */

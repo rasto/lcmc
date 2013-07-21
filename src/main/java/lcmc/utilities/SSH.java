@@ -1460,7 +1460,7 @@ public final class SSH {
                     throw new IOException("hostname is not set");
                 }
                 /* connect and verify server host key (with callback) */
-                Tools.debug(this, "verify host keys: " + hostname, 1);
+                Tools.debug(this, "verify host keys: " + hostname, 2);
                 final String[] hostkeyAlgos =
                     Tools.getConfigData().getKnownHosts().
                         getPreferredServerHostkeyAlgorithmOrder(hostname);

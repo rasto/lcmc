@@ -282,6 +282,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                 Tools.debug(this, "MENU ACTION: exit", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -302,6 +303,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
+                 Tools.debug(this, "MENU ACTION: new host", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -322,6 +324,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
+                 Tools.debug(this, "MENU ACTION: load", 1);
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
@@ -366,6 +369,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                 Tools.debug(this, "MENU ACTION: remove everything", 1);
                  final Thread thread = new Thread(
                     new Runnable() {
                         @Override
@@ -387,6 +391,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
+                 Tools.debug(this, "MENU ACTION: save", 1);
                  final Thread thread = new Thread(
                     new Runnable() {
                         @Override
@@ -409,6 +414,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
+                 Tools.debug(this, "MENU ACTION: save as", 1);
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
@@ -457,6 +463,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
+                 Tools.debug(this, "MENU ACTION: new cluster", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -477,6 +484,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 if (turnOff) {
                      return;
                 }
+                Tools.debug(this, "MENU ACTION: look and feel", 1);
                 try {
                     final String lookAndFeel =
                             LOOK_AND_FEEL_MAP.get(
@@ -507,6 +515,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this, "MENU ACTION: copy", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -523,6 +532,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                 Tools.debug(this, "MENU ACTION: paste", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -539,6 +549,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                 Tools.debug(this, "MENU ACTION: about", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -556,6 +567,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
+                 Tools.debug(this, "MENU ACTION: bug report", 1);
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {

@@ -2568,6 +2568,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Change type to Master, Clone or Primitive. */
     protected final void changeType(final String value) {
+        Tools.debug(this, "change type: " + value, 1);
         boolean masterSlave0 = false;
         boolean clone0 = false;
         if (MASTER_SLAVE_TYPE_STRING.equals(value)) {
@@ -2787,6 +2788,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
+                        Tools.debug(this, "BUTTON: apply", 1);
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2804,6 +2806,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
+                        Tools.debug(this, "BUTTON: revert", 1);
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {

@@ -252,6 +252,7 @@ public final class AllHostsInfo extends Info {
             loadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    Tools.debug(this, "BUTTON: load marked", 1);
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -266,6 +267,7 @@ public final class AllHostsInfo extends Info {
             unloadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    Tools.debug(this, "BUTTON: unload marked", 1);
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -281,6 +283,7 @@ public final class AllHostsInfo extends Info {
                                                 new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    Tools.debug(this, "BUTTON: remove marked", 1);
                     removeMarkedClusters();
                 }
             });
@@ -387,6 +390,8 @@ public final class AllHostsInfo extends Info {
         loadClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this,
+                            "BUTTON: load cluster: " + cluster.getName(), 1);
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -480,6 +485,7 @@ public final class AllHostsInfo extends Info {
         quickClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this, "BUTTON: quick cluster", 1);
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {

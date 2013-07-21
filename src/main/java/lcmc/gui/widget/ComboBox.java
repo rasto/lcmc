@@ -325,6 +325,7 @@ public final class ComboBox extends Widget {
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Object item) {
+        Tools.isSwingThread();
         final MComboBox cb = (MComboBox) getComponent();
         cb.setSelectedItem(item);
         if (Tools.isStringClass(item)) {

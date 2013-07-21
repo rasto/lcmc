@@ -871,6 +871,7 @@ public final class Tools {
     /** Removes the specified clusters from the gui. */
     public static void removeClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
+            Tools.debug("remove hosts from cluster: " + cluster.getName(), 1);
             getConfigData().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
                 host.setCluster(null);

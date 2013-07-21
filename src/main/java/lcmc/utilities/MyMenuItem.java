@@ -356,6 +356,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     @Override
     public void actionPerformed(final ActionEvent e) {
+        Tools.debug(this, "ACTION: " + e.getSource().toString(), 1);
         final Thread thread = new Thread(
             new Runnable() {
                 @Override

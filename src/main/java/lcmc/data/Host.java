@@ -381,6 +381,13 @@ public final class Host implements Comparable<Host> {
      */
     public void setCluster(final Cluster cluster) {
         this.cluster = cluster;
+        if (cluster == null) {
+            Tools.debug(this, getName() + " set cluster: null", 1);
+        } else {
+            Tools.debug(this,
+                        getName() + " set cluster name: " + cluster.getName(),
+                        1);
+        }
     }
 
     /** Returns the cluster data object. */

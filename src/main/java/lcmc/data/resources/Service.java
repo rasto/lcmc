@@ -24,6 +24,7 @@
 package lcmc.data.resources;
 
 import lcmc.data.ConfigData;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds data of a service.
@@ -99,6 +100,7 @@ public class Service extends Resource {
     /** Sets heartbeat id and gui id without the service name part. */
     public final void setHeartbeatId(final String crmId) {
         this.crmId = crmId;
+        Tools.debug(this, "set crm id: " + crmId, 1);
         if (GROUP_NAME.equals(getName())) {
             if (crmId.equals(GRP_ID_PREFIX)) {
                 id = "";
@@ -134,12 +136,14 @@ public class Service extends Resource {
                 id = crmId;
             }
         }
+        Tools.debug(this, "set crm id: " + crmId + ", id: " + id, 1);
         setValue("id", id);
     }
 
     /** Sets the id. */
     public final void setId(final String id) {
         this.id = id;
+        Tools.debug(this, "set id: " + id, 1);
     }
 
     /** Returns crm id from entered id. */

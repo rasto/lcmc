@@ -1732,6 +1732,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         hostBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this, "BUTTON: host: " + host.getName(), 1);
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -2104,6 +2105,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
+                        Tools.debug(this, "BUTTON: apply", 1);
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2120,6 +2122,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
+                        Tools.debug(this, "BUTTON: revert", 1);
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2146,6 +2149,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                Tools.debug(this, "BUTTON: overview", 1);
                 getBrowser().getVMSInfo().selectMyself();
             }
         });

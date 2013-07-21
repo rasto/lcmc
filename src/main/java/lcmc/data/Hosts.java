@@ -25,6 +25,7 @@ package lcmc.data;
 
 import java.util.Set;
 import java.util.LinkedHashSet;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds a set of all hosts.
@@ -81,6 +82,7 @@ public final class Hosts {
 
     /** Removes references to the cluster from all hosts. */
     public void removeHostsFromCluster(final Cluster cluster) {
+        Tools.debug(this, "remove hosts from cluster: " + cluster.getName(), 1);
         for (final Host host : hosts) {
             if (host.getCluster() == cluster) {
                 host.setCluster(null);
