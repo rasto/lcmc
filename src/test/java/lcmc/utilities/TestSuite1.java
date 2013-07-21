@@ -223,7 +223,11 @@ public final class TestSuite1 {
             }
             if (!Tools.getConfigData().existsCluster(cluster)) {
                 Tools.getConfigData().addClusterToClusters(cluster);
-                Tools.getGUIData().addClusterTab(cluster);
+                Tools.invokeAndWait(new Runnable() {
+                    public void run() {
+                        Tools.getGUIData().addClusterTab(cluster);
+                    }
+                });
             }
 
             Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
