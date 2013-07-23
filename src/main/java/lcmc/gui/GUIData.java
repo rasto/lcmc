@@ -467,7 +467,7 @@ public final class GUIData  {
      * Adds a component from the list of components that have allHostsUpdate
      * method that must be called when a host is added.
      */
-    void unregisterAllHostsUpdate(final AllHostsUpdatable component) {
+    public void unregisterAllHostsUpdate(final AllHostsUpdatable component) {
         allHostsUpdateList.remove(component);
     }
 

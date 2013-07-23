@@ -989,6 +989,11 @@ public final class HostInfo extends Info {
                 @Override
                 public void action() {
                     getHost().disconnect();
+                    final ClusterBrowser b = getBrowser().getClusterBrowser();
+                    if (b != null) {
+                        Tools.getGUIData().unregisterAllHostsUpdate(
+                                                      b.getClusterViewPanel());
+                    }
                     Tools.getConfigData().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
                 }
