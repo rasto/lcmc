@@ -362,7 +362,7 @@ public final class UserConfig extends XML {
         }
         final Host host = hostList.get(0);
         hostList.remove(0);
-        if (host != null && host.getCluster() == null) {
+        if (host != null && !host.isInCluster()) {
             host.setCluster(cluster);
             if (proxy) {
                 cluster.addProxyHost(host);

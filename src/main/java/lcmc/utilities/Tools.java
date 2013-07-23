@@ -874,7 +874,7 @@ public final class Tools {
             Tools.debug("remove hosts from cluster: " + cluster.getName(), 1);
             getConfigData().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
-                host.setCluster(null);
+                host.removeFromCluster();
             }
         }
     }

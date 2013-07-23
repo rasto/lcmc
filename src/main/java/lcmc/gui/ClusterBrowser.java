@@ -750,6 +750,9 @@ public final class ClusterBrowser extends Browser {
                 if (firstHost == null) {
                     return;
                 }
+                if (!firstHost.isInCluster()) {
+                    return;
+                }
 
                 crmXML = new CRMXML(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXML);

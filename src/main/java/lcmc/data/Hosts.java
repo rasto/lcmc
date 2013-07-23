@@ -85,7 +85,7 @@ public final class Hosts {
         Tools.debug(this, "remove hosts from cluster: " + cluster.getName(), 1);
         for (final Host host : hosts) {
             if (host.getCluster() == cluster) {
-                host.setCluster(null);
+                host.removeFromCluster();
             }
         }
     }

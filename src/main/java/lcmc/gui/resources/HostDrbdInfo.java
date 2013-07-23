@@ -825,7 +825,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public String enablePredicate() {
-                    if (getHost().getCluster() != null) {
+                    if (!getHost().isInCluster()) {
                         return "it is a member of a cluster";
                     }
                     return null;

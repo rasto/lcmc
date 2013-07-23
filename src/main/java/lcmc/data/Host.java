@@ -297,6 +297,8 @@ public final class Host implements Comparable<Host> {
     /** Time stamp hash. */
     private final Map<String, Double> infoTimestamp =
                                                 new HashMap<String, Double>();
+    /** Whether the host is member of the cluster. */
+    private boolean inCluster = false;
     /** Timeout after which the connection is considered to be dead. */
     private static final int PING_TIMEOUT           = 40000;
     private static final int DRBD_EVENTS_TIMEOUT    = 40000;
@@ -384,10 +386,16 @@ public final class Host implements Comparable<Host> {
         if (cluster == null) {
             Tools.debug(this, getName() + " set cluster: null", 1);
         } else {
+            inCluster = true;
             Tools.debug(this,
                         getName() + " set cluster name: " + cluster.getName(),
                         1);
         }
+    }
+
+    /** Remove host from the cluster. */
+    public void removeFromCluster() {
+        inCluster = false;
     }
 
     /** Returns the cluster data object. */
@@ -490,7 +498,7 @@ public final class Host implements Comparable<Host> {
 
     /** Returns true when this host is in a cluster. */
     public boolean isInCluster() {
-        return cluster != null;
+        return inCluster;
     }
 
     /**
@@ -498,7 +506,7 @@ public final class Host implements Comparable<Host> {
      * specified cluster.
      */
     public boolean isInCluster(final Cluster otherCluster) {
-        return cluster != null && !cluster.equals(otherCluster);
+        return isInCluster() && !cluster.equals(otherCluster);
     }
 
     /**
