@@ -28,7 +28,6 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.DrbdGraph;
 
-import lcmc.gui.dialog.lvm.PVCreate;
 import lcmc.gui.dialog.lvm.PVRemove;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
@@ -1244,16 +1243,9 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                final PVCreate pvCreate = new PVCreate(thisBDI);
-                while (true) {
-                    pvCreate.showDialog();
-                    if (pvCreate.isPressedCancelButton()) {
-                        pvCreate.cancelDialog();
-                        return;
-                    } else if (pvCreate.isPressedFinishButton()) {
-                        break;
-                    }
-                }
+                thisBDI.pvCreate(DRBD.LIVE);
+                getBrowser().getClusterBrowser().updateHWInfo(
+                                                           thisBDI.getHost());
             }
         };
     }
@@ -2732,5 +2724,13 @@ public final class BlockDevInfo extends EditableInfo {
         } else {
             return null;
         }
+    }
+
+    /** Whether PV can be created on this BD. */
+    public boolean canCreatePV() {
+        return (!isLVM()
+                 && !getBlockDevice().isPhysicalVolume()
+                 && !getBlockDevice().isDrbdPhysicalVolume())
+                || (getBlockDevice().isDrbd() && !getBlockDevice().isPrimary());
     }
 }

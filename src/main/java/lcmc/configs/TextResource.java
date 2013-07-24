@@ -2807,6 +2807,13 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdMultiSelectionInfo.HostStartProxy",
          "Start Proxy Daemon on selected hosts"},
 
+        {"DrbdMultiSelectionInfo.PVCreate",
+         "Create PV on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.PVCreate.ToolTip",
+         "Create PV on selected block devices"},
+
+
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},
 

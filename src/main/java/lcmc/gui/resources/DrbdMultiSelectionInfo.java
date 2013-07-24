@@ -315,6 +315,48 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(changeHostColorItem);
     }
 
+    /** Returns 'PV create' menu item. */
+    private MyMenuItem getPVCreateItem(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        return new MyMenuItem(
+                    Tools.getString("DrbdMultiSelectionInfo.PVCreate"),
+                    null,
+                    Tools.getString("DrbdMultiSelectionInfo.PVCreate.ToolTip"),
+                    new AccessMode(ConfigData.AccessType.OP, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean visiblePredicate() {
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canCreatePV()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final Set<Host> hosts = new HashSet<Host>();
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canCreatePV()) {
+                        bdi.pvCreate(DRBD.LIVE);
+                        hosts.add(bdi.getHost());
+                    }
+                }
+                for (final Host h : hosts) {
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                }
+            }
+        };
+    }
+
     /** Create menu items for selected block devices. */
     private void createSelectedBlockDevPopup(
                                  final List<BlockDevInfo> selectedBlockDevInfos,
@@ -1290,6 +1332,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         items.add(proxyUpItem);
+        /* PV Create */
+        items.add(getPVCreateItem(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */
