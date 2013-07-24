@@ -1097,6 +1097,32 @@ public final class Tools {
 
     /**
      * Returns localized string from TextResource resource bundle.
+     * Replace {}s, with replace array in the order as they come.
+     */
+    public static String getString(final String text, final String[] replace) {
+        String s = getString(text);
+        if (s != null) {
+            for (final String r : replace) {
+                return s = s.replaceFirst("\\{\\}", r);
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Returns localized string from TextResource resource bundle.
+     * Replace {}, with the replace string.
+     */
+    public static String getString(final String text, final String replace) {
+        final String s = getString(text);
+        if (s != null) {
+            return s.replaceFirst("\\{\\}", replace);
+        }
+        return s;
+    }
+
+    /**
+     * Returns localized string from TextResource resource bundle.
      *
      * @param text
      *          String that holds text.
