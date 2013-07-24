@@ -28,7 +28,6 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.DrbdGraph;
 
-import lcmc.gui.dialog.lvm.PVRemove;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
 import lcmc.gui.dialog.lvm.LVCreate;
@@ -1227,9 +1226,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public boolean visiblePredicate() {
-                return !isLVM()
-                       && !getBlockDevice().isPhysicalVolume()
-                       && !getBlockDevice().isDrbdPhysicalVolume();
+                return canCreatePV();
             }
 
             @Override
@@ -1243,7 +1240,12 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                thisBDI.pvCreate(DRBD.LIVE);
+                final boolean ret = thisBDI.pvCreate(DRBD.LIVE);
+                if (!ret) {
+                    Tools.progressIndicatorFailed(
+                                Tools.getString("BlockDevInfo.PVCreate.Failed",
+                                                thisBDI.getName()));
+                }
                 getBrowser().getClusterBrowser().updateHWInfo(
                                                            thisBDI.getHost());
             }
@@ -1262,21 +1264,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public boolean visiblePredicate() {
-                BlockDevice bd;
-                if (getBlockDevice().isDrbd()) {
-                    if (!getBlockDevice().isPrimary()) {
-                        return false;
-                    }
-                    bd = getBlockDevice().getDrbdBlockDevice();
-                    if (bd == null) {
-                        return false;
-                    }
-                } else {
-                    bd = getBlockDevice();
-                }
-                return bd.isPhysicalVolume()
-                       && !bd.isVolumeGroupOnPhysicalVolume();
-
+                return canRemovePV();
             }
 
             @Override
@@ -1290,16 +1278,14 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                final PVRemove pvRemove = new PVRemove(thisBDI);
-                while (true) {
-                    pvRemove.showDialog();
-                    if (pvRemove.isPressedCancelButton()) {
-                        pvRemove.cancelDialog();
-                        return;
-                    } else if (pvRemove.isPressedFinishButton()) {
-                        break;
-                    }
+                final boolean ret = thisBDI.pvRemove(false);
+                if (!ret) {
+                    Tools.progressIndicatorFailed(
+                                Tools.getString("BlockDevInfo.PVRemove.Failed",
+                                                thisBDI.getName()));
                 }
+                getBrowser().getClusterBrowser().updateHWInfo(
+                                                            thisBDI.getHost());
             }
         };
     }
@@ -2728,9 +2714,26 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Whether PV can be created on this BD. */
     public boolean canCreatePV() {
-        return (!isLVM()
-                 && !getBlockDevice().isPhysicalVolume()
-                 && !getBlockDevice().isDrbdPhysicalVolume())
-                || (getBlockDevice().isDrbd() && !getBlockDevice().isPrimary());
+        return !isLVM()
+                && !getBlockDevice().isPhysicalVolume()
+                && !getBlockDevice().isDrbdPhysicalVolume();
     }
+
+    /** Whether PV can be removed from this BD. */
+    final boolean canRemovePV() {
+        BlockDevice bd;
+        if (getBlockDevice().isDrbd()) {
+            if (!getBlockDevice().isPrimary()) {
+                return false;
+            }
+            bd = getBlockDevice().getDrbdBlockDevice();
+            if (bd == null) {
+                return false;
+            }
+        } else {
+            bd = getBlockDevice();
+        }
+        return bd.isPhysicalVolume() && !bd.isVolumeGroupOnPhysicalVolume();
+    }
+
 }

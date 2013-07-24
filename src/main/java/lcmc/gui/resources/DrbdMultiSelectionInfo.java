@@ -329,7 +329,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean visiblePredicate() {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canCreatePV()) {
+                    if (bdi.canCreatePV()
+                        && (!bdi.getBlockDevice().isDrbd()
+                            || bdi.getBlockDevice().isPrimary())) {
                         return true;
                     }
                 }
@@ -345,8 +347,66 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             public void action() {
                 final Set<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canCreatePV()) {
-                        bdi.pvCreate(DRBD.LIVE);
+                    if (bdi.canCreatePV()
+                        && (!bdi.getBlockDevice().isDrbd()
+                            || bdi.getBlockDevice().isPrimary())) {
+                        final boolean ret = bdi.pvCreate(DRBD.LIVE);
+                        if (!ret) {
+                            Tools.progressIndicatorFailed(
+                                Tools.getString("BlockDevInfo.PVCreate.Failed",
+                                                bdi.getName()));
+                        }
+                        hosts.add(bdi.getHost());
+                    }
+                }
+                for (final Host h : hosts) {
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                }
+            }
+        };
+    }
+
+    /** Returns 'PV remove' menu item. */
+    private MyMenuItem getPVRemoveItem(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        return new MyMenuItem(
+                    Tools.getString("DrbdMultiSelectionInfo.PVRemove"),
+                    null,
+                    Tools.getString("DrbdMultiSelectionInfo.PVRemove.ToolTip"),
+                    new AccessMode(ConfigData.AccessType.OP, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean visiblePredicate() {
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canRemovePV()
+                        && (!bdi.getBlockDevice().isDrbd()
+                            || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final Set<Host> hosts = new HashSet<Host>();
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canRemovePV()
+                        && (!bdi.getBlockDevice().isDrbd()
+                            || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
+                        final boolean ret = bdi.pvRemove(DRBD.LIVE);
+                        if (!ret) {
+                            Tools.progressIndicatorFailed(
+                                Tools.getString("BlockDevInfo.PVRemove.Failed",
+                                                bdi.getName()));
+                        }
                         hosts.add(bdi.getHost());
                     }
                 }
@@ -1334,6 +1394,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(proxyUpItem);
         /* PV Create */
         items.add(getPVCreateItem(selectedBlockDevInfos));
+        /* PV Remove */
+        items.add(getPVRemoveItem(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */

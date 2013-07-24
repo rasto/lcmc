@@ -1853,6 +1853,12 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"BlockDevInfo.Drbd.ProxyDown",
          "Stop Proxy Connection"},
 
+        {"BlockDevInfo.PVRemove.Failed",
+         "Removing of PV:{} failed."},
+
+        {"BlockDevInfo.PVCreate.Failed",
+         "Creating of PV:{} failed."},
+
         {"HostInfo.CRM.AllMigrateFrom",
          "Migrate All Resources Away"},
 
@@ -2812,6 +2818,12 @@ public final class TextResource extends java.util.ListResourceBundle {
 
         {"DrbdMultiSelectionInfo.PVCreate.ToolTip",
          "Create PV on selected block devices"},
+
+        {"DrbdMultiSelectionInfo.PVRemove",
+         "Remove PV on selected BDs"},
+
+        {"DrbdMultiSelectionInfo.PVRemove.ToolTip",
+         "Remove PV on selected block devices"},
 
 
         {"AllHostsInfo.QuickCluster",
