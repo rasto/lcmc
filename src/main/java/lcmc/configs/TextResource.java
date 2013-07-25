@@ -2814,16 +2814,28 @@ public final class TextResource extends java.util.ListResourceBundle {
          "Start Proxy Daemon on selected hosts"},
 
         {"DrbdMultiSelectionInfo.PVCreate",
-         "Create PV on selected BDs"},
+         "Create PVs on selected BDs"},
 
         {"DrbdMultiSelectionInfo.PVCreate.ToolTip",
-         "Create PV on selected block devices"},
+         "Create physical volumes on selected block devices"},
 
         {"DrbdMultiSelectionInfo.PVRemove",
-         "Remove PV on selected BDs"},
+         "Remove selected PVs"},
 
         {"DrbdMultiSelectionInfo.PVRemove.ToolTip",
-         "Remove PV on selected block devices"},
+         "Remove selected physical volumes"},
+
+        {"DrbdMultiSelectionInfo.VGCreate",
+         "Create VG on selected PVs"},
+
+        {"DrbdMultiSelectionInfo.VGCreate.ToolTip",
+         "Create volume group on selected physical volumes"},
+
+        {"DrbdMultiSelectionInfo.VGRemove",
+         "Remove selected VGs"},
+
+        {"DrbdMultiSelectionInfo.VGRemove.ToolTip",
+         "Remove selected volume groups"},
 
 
         {"AllHostsInfo.QuickCluster",

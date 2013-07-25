@@ -1290,7 +1290,7 @@ public final class BlockDevInfo extends EditableInfo {
         };
     }
 
-    /** Returns 'lv create' menu item. */
+    /** Returns 'vg create' menu item. */
     private MyMenuItem getVGCreateItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(

@@ -27,6 +27,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Host;
 import lcmc.data.ClusterStatus;
 import lcmc.data.PtestData;
+import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
+import lcmc.gui.dialog.lvm.VGCreate;
 
 /**
  * This class provides menus for block device and host multi selection.
@@ -345,6 +347,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
             @Override
             public void action() {
+                /* at least one must be true */
                 final Set<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canCreatePV()
@@ -379,6 +382,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
             @Override
             public boolean visiblePredicate() {
+                /* at least one must be true */
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canRemovePV()
                         && (!bdi.getBlockDevice().isDrbd()
@@ -412,6 +416,69 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
                 for (final Host h : hosts) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                }
+            }
+        };
+    }
+
+    /** Returns 'vg create' menu item. */
+    private MyMenuItem getVGCreateItem(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        return new MyMenuItem(
+                  Tools.getString("DrbdMultiSelectionInfo.VGCreate"),
+                  null,
+                  Tools.getString("DrbdMultiSelectionInfo.VGCreate.ToolTip"),
+                  new AccessMode(ConfigData.AccessType.OP, false),
+                  new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean visiblePredicate() {
+                /* all of them must be true */
+                BlockDevice bd;
+
+                if (selectedBlockDevInfos.isEmpty()) {
+                    return false;
+                }
+
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.getBlockDevice().isDrbd()) {
+                        if (!bdi.getBlockDevice().isPrimary()) {
+                            return false;
+                        }
+                        bd = bdi.getBlockDevice().getDrbdBlockDevice();
+                        if (bd == null) {
+                            return false;
+                        }
+                    } else {
+                        bd = bdi.getBlockDevice();
+                    }
+                    if (!bd.isPhysicalVolume()
+                        || bd.isVolumeGroupOnPhysicalVolume()) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final VGCreate vgCreate = new VGCreate(
+                                        selectedBlockDevInfos.get(0).getHost(),
+                                        selectedBlockDevInfos);
+                while (true) {
+                    vgCreate.showDialog();
+                    if (vgCreate.isPressedCancelButton()) {
+                        vgCreate.cancelDialog();
+                        return;
+                    } else if (vgCreate.isPressedFinishButton()) {
+                        break;
+                    }
                 }
             }
         };
@@ -1396,6 +1463,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(getPVCreateItem(selectedBlockDevInfos));
         /* PV Remove */
         items.add(getPVRemoveItem(selectedBlockDevInfos));
+        /* VG Create */
+        items.add(getVGCreateItem(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */

@@ -925,7 +925,7 @@ public final class HostDrbdInfo extends Info {
 
             @Override
             public void action() {
-                final VGCreate vgCreate = new VGCreate(getHost(), null);
+                final VGCreate vgCreate = new VGCreate(getHost());
                 while (true) {
                     vgCreate.showDialog();
                     if (vgCreate.isPressedCancelButton()) {
