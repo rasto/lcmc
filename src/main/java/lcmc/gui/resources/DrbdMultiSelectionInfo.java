@@ -54,6 +54,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import lcmc.gui.dialog.lvm.VGCreate;
+import lcmc.gui.dialog.lvm.VGRemove;
 
 /**
  * This class provides menus for block device and host multi selection.
@@ -477,6 +478,62 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         vgCreate.cancelDialog();
                         return;
                     } else if (vgCreate.isPressedFinishButton()) {
+                        break;
+                    }
+                }
+            }
+        };
+    }
+
+    /** Returns 'vg remove' menu item. */
+    private MyMenuItem getVGRemoveItem(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        return new MyMenuItem(
+                  Tools.getString("DrbdMultiSelectionInfo.VGRemove"),
+                  null,
+                  Tools.getString("DrbdMultiSelectionInfo.VGRemove.ToolTip"),
+                  new AccessMode(ConfigData.AccessType.OP, false),
+                  new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean visiblePredicate() {
+                /* all of them must be true */
+                BlockDevice bd;
+
+                if (selectedBlockDevInfos.isEmpty()) {
+                    return false;
+                }
+                /* at least one can be removed */
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canRemoveVG()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final List<BlockDevInfo> canRemove =
+                                                 new ArrayList<BlockDevInfo>();
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.canRemoveVG()) {
+                        canRemove.add(bdi);
+                    }
+                }
+                final VGRemove vgRemove = new VGRemove(canRemove);
+                while (true) {
+                    vgRemove.showDialog();
+                    if (vgRemove.isPressedCancelButton()) {
+                        vgRemove.cancelDialog();
+                        return;
+                    } else if (vgRemove.isPressedFinishButton()) {
                         break;
                     }
                 }
@@ -1465,6 +1522,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(getPVRemoveItem(selectedBlockDevInfos));
         /* VG Create */
         items.add(getVGCreateItem(selectedBlockDevInfos));
+        /* VG Remove */
+        items.add(getVGRemoveItem(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */

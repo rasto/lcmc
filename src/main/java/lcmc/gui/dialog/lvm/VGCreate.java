@@ -219,15 +219,6 @@ public final class VGCreate extends LV {
         return selected > 0;
     }
 
-    private boolean isOneDrbd(final List<BlockDevInfo> bdis) {
-        for (final BlockDevInfo bdi : bdis) {
-            if (bdi.getBlockDevice().isDrbd()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** Returns the input pane. */
     @Override
     protected JComponent getInputPane() {

@@ -2736,4 +2736,27 @@ public final class BlockDevInfo extends EditableInfo {
         return bd.isPhysicalVolume() && !bd.isVolumeGroupOnPhysicalVolume();
     }
 
+    /** Whether VG can be removed. */
+    final boolean canRemoveVG() {
+        BlockDevice bd;
+        if (getBlockDevice().isDrbd()) {
+            if (!getBlockDevice().isPrimary()) {
+                return false;
+            }
+            bd = getBlockDevice().getDrbdBlockDevice();
+            if (bd == null) {
+                return false;
+            }
+        } else {
+            bd = getBlockDevice();
+        }
+        if (!bd.isVolumeGroupOnPhysicalVolume()) {
+            return false;
+        }
+        final String vg = bd.getVolumeGroupOnPhysicalVolume();
+        if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
+            return false;
+        }
+        return true;
+    }
 }
