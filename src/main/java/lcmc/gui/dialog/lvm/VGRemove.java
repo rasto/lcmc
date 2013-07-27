@@ -223,7 +223,6 @@ public final class VGRemove extends LV {
         for (final Host h : hostCheckBoxes.keySet()) {
             hostCheckBoxes.get(h).addItemListener(
                                             new ItemChangeListener(true));
-            final Set<String> vgs = h.getVolumeGroupNames();
             if (host == h) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);

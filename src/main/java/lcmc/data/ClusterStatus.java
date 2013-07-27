@@ -29,7 +29,6 @@ import lcmc.utilities.SSH;
 import lcmc.data.CRMXML.ResStatus;
 
 import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
