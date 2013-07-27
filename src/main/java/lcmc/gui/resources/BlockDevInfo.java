@@ -1399,10 +1399,30 @@ public final class BlockDevInfo extends EditableInfo {
         };
     }
 
+    public String getVGName() {
+        BlockDevice bd;
+        if (getBlockDevice().isDrbd()) {
+            bd = getBlockDevice().getDrbdBlockDevice();
+            if (bd == null) {
+                return null;
+            }
+        } else {
+            bd = getBlockDevice();
+        }
+        final String vg = bd.getVolumeGroup();
+        if (vg == null) {
+            /* vg on pv */
+            return bd.getVolumeGroupOnPhysicalVolume();
+        } else {
+            /* lv on vg */
+            return vg;
+        }
+    }
+
     /** Returns 'lv create' menu item. */
     private MyMenuItem getLVCreateItem() {
         String name = LV_CREATE_MENU_ITEM;
-        final String vgName = getBlockDevice().getVolumeGroup();
+        final String vgName = getVGName();
         if (vgName != null) {
             name += vgName;
         }
@@ -1415,29 +1435,10 @@ public final class BlockDevInfo extends EditableInfo {
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private String getVolumeGroup() {
-                BlockDevice bd;
-                if (getBlockDevice().isDrbd()) {
-                    bd = getBlockDevice().getDrbdBlockDevice();
-                    if (bd == null) {
-                        return null;
-                    }
-                } else {
-                    bd = getBlockDevice();
-                }
-                final String vg = bd.getVolumeGroup();
-                if (vg == null) {
-                    /* vg on pv */
-                    return bd.getVolumeGroupOnPhysicalVolume();
-                } else {
-                    /* lv on vg */
-                    return vg;
-                }
-            }
 
             @Override
             public boolean visiblePredicate() {
-                final String vg = getVolumeGroup();
+                final String vg = getVGName();
                 return vg != null
                        && !"".equals(vg)
                        && getHost().getVolumeGroupNames().contains(vg);
@@ -1452,7 +1453,7 @@ public final class BlockDevInfo extends EditableInfo {
             public void action() {
                 final LVCreate lvCreate = new LVCreate(
                                                    getHost(),
-                                                   getVolumeGroup(),
+                                                   thisClass.getVGName(),
                                                    thisClass.getBlockDevice());
                 while (true) {
                     lvCreate.showDialog();
@@ -1467,7 +1468,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void update() {
-                setText1(LV_CREATE_MENU_ITEM + getVolumeGroup());
+                setText1(LV_CREATE_MENU_ITEM + thisClass.getVGName());
                 super.update();
             }
         };

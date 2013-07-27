@@ -27,6 +27,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.SpringUtilities;
+import lcmc.gui.resources.BlockDevInfo;
 import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -39,6 +40,8 @@ import lcmc.data.ConfigData;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
@@ -55,7 +58,7 @@ import javax.swing.SpringLayout;
 /** Create LV dialog. */
 public final class LVCreate extends LV {
     /** Block device info object. */
-    private final Host host;
+    private final Set<Host> selectedHosts = new LinkedHashSet<Host>();
     /** Create button. */
     private final MyButton createButton = new MyButton("Create");
     /** Name of the logical volume. */
@@ -69,7 +72,8 @@ public final class LVCreate extends LV {
     /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Selected block device. */
-    private final BlockDevice selectedBlockDevice;
+    private final Set<BlockDevice> selectedBlockDevices =
+                                             new LinkedHashSet<BlockDevice>();
 
     /** Description create LV. */
     private static final String LV_CREATE_DESCRIPTION =
@@ -81,9 +85,19 @@ public final class LVCreate extends LV {
                     final String volumeGroup,
                     final BlockDevice selectedBlockDevice) {
         super(null);
-        this.host = host;
+        selectedHosts.add(host);
         this.volumeGroup = volumeGroup;
-        this.selectedBlockDevice = selectedBlockDevice;
+        selectedBlockDevices.add(selectedBlockDevice);
+    }
+
+    /** Create new LVCreate object. */
+    public LVCreate(final Set<BlockDevInfo> sbdis, final String volumeGroup) {
+        super(null);
+        this.volumeGroup = volumeGroup;
+        for (final BlockDevInfo bdi : sbdis) {
+            selectedHosts.add(bdi.getHost());
+            selectedBlockDevices.add(bdi.getBlockDevice());
+        }
     }
 
     /** Finishes the dialog and sets the information. */
@@ -141,7 +155,8 @@ public final class LVCreate extends LV {
         public void run() {
             boolean e = enable;
             if (enable) {
-                final String maxBlockSize = getMaxBlockSize();
+                final String maxBlockSize = getMaxBlockSize(
+                                                     getSelectedHostCbs());
                 final long maxSize = Long.parseLong(maxBlockSize);
                 maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
                 final long size = Tools.convertToKilobytes(
@@ -195,13 +210,17 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel());
         /* find next free logical volume name */
         String defaultName;
-        final Set<String> logicalVolumes =
-                            host.getLogicalVolumesFromVolumeGroup(volumeGroup);
+        final Set<String> logicalVolumes = new LinkedHashSet<String>();
+        for (final Host h : selectedHosts) {
+            Set<String> hvgs = h.getLogicalVolumesFromVolumeGroup(volumeGroup);
+            if (hvgs != null) {
+                logicalVolumes.addAll(hvgs);
+            }
+        }
         int i = 0;
         while (true) {
             defaultName = "lvol" + i;
-            if (logicalVolumes == null
-                || !logicalVolumes.contains(defaultName)) {
+            if (!logicalVolumes.contains(defaultName)) {
                 break;
             }
             i++;
@@ -226,10 +245,10 @@ public final class LVCreate extends LV {
                                 }
                             });
 
-        final String maxBlockSize = getMaxBlockSize();
+        final String maxBlockSize = getMaxBlockSize(selectedHosts);
         /* size */
         final String newBlockSize = Long.toString(
-                                      Long.parseLong(maxBlockSize) / 2);
+                                             Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi = new TextfieldWithUnit(Tools.convertKilobytes(newBlockSize),
@@ -267,7 +286,8 @@ public final class LVCreate extends LV {
                         for (final Host h : hostCheckBoxes.keySet()) {
                             h.getBrowser().getClusterBrowser().updateHWInfo(h);
                         }
-                        final String maxBlockSize = getMaxBlockSize();
+                        final String maxBlockSize = getMaxBlockSize(
+                                                      getSelectedHostCbs());
                         final long maxSize = Long.parseLong(maxBlockSize);
                         maxSizeWi.setValue(Tools.convertKilobytes(
                                                                 maxBlockSize));
@@ -312,7 +332,7 @@ public final class LVCreate extends LV {
 
         pane.add(inputPane);
         final JPanel hostsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        final Cluster cluster = host.getCluster();
+        final Cluster cluster = selectedHosts.iterator().next().getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         for (final Host h : hostCheckBoxes.keySet()) {
@@ -323,11 +343,10 @@ public final class LVCreate extends LV {
                                 checkButtons();
                             }
                         });
-            if (host == h) {
+            if (selectedHosts.contains(h)) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(true);
-            } else if (selectedBlockDevice != null
-                       && selectedBlockDevice.isDrbd()) {
+            } else if (isOneBdDrbd(selectedBlockDevices)) {
                 hostCheckBoxes.get(h).setEnabled(false);
                 hostCheckBoxes.get(h).setSelected(false);
             } else if (!h.getVolumeGroupNames().contains(volumeGroup)) {
@@ -375,17 +394,41 @@ public final class LVCreate extends LV {
     }
 
     /** Returns maximum block size available in the group. */
-    private String getMaxBlockSize() {
-        long free = host.getFreeInVolumeGroup(volumeGroup) / 1024;
-        if (hostCheckBoxes != null) {
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()
-                    && h.getFreeInVolumeGroup(volumeGroup) / 1024 < free) {
-                    free = h.getFreeInVolumeGroup(volumeGroup) / 1024;
+    private String getMaxBlockSize(final Set<Host> hosts) {
+        long free = -1;
+        if (hosts != null) {
+            for (final Host h : hosts) {
+                final long hostFree =
+                                    h.getFreeInVolumeGroup(volumeGroup) / 1024;
+                if (free == -1 || hostFree < free) {
+                    free = hostFree;
                 }
             }
         }
         return Long.toString(free);
+    }
+
+    protected boolean isOneBdDrbd(final Set<BlockDevice> bds) {
+        for (final BlockDevice bd : bds) {
+            if (bd.isDrbd()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<Host> getSelectedHostCbs() {
+        final Set<Host> hosts = new HashSet<Host>();
+        if (hostCheckBoxes == null) {
+            return hosts;
+        }
+        for (final Map.Entry<Host, JCheckBox> e : hostCheckBoxes.entrySet()) {
+            final Host h = e.getKey();
+            if (e.getValue().isSelected()) {
+                hosts.add(h);
+            }
+        }
+        return hosts;
     }
 }
 

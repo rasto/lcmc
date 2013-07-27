@@ -2837,6 +2837,11 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdMultiSelectionInfo.VGRemove.ToolTip",
          "Remove selected volume groups"},
 
+        {"DrbdMultiSelectionInfo.LVCreate",
+         "Create LV in VG "},
+
+        {"DrbdMultiSelectionInfo.LVCreate.ToolTip",
+         "Create a logical volume."},
 
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},

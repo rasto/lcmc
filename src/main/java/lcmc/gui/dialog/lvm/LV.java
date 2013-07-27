@@ -26,6 +26,7 @@ package lcmc.gui.dialog.lvm;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.utilities.Unit;
+import lcmc.data.resources.BlockDevice;
 import javax.swing.JComponent;
 import java.util.List;
 import java.util.Set;

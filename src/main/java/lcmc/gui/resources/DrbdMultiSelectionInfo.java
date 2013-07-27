@@ -52,7 +52,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
 
@@ -62,6 +66,9 @@ import lcmc.gui.dialog.lvm.VGRemove;
 public final class DrbdMultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private final List<Info> selectedInfos;
+
+    private static final String LV_CREATE_MENU_ITEM =
+                            Tools.getString("DrbdMultiSelectionInfo.LVCreate");
 
     /** Prepares a new <code>DrbdMultiSelectionInfo</code> object. */
     public DrbdMultiSelectionInfo(final List<Info> selectedInfos,
@@ -539,6 +546,85 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             }
         };
+    }
+
+    /** Returns 'lv create' menu item. */
+    private List<MyMenuItem> getLVCreateItems(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        final Map<String, Set<BlockDevInfo>> vgs =
+                                new LinkedHashMap<String, Set<BlockDevInfo>>();
+        final List<MyMenuItem> mis = new ArrayList<MyMenuItem>();
+        for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+            final String vgName = bdi.getVGName();
+            Set<BlockDevInfo> bdis = vgs.get(vgName);
+            if (bdis == null) {
+                bdis = new LinkedHashSet<BlockDevInfo>();
+                vgs.put(vgName, bdis);
+            }
+            bdis.add(bdi);
+        }
+        for (final Map.Entry<String, Set<BlockDevInfo>> entry
+                                                            : vgs.entrySet()) {
+            final String vgName = entry.getKey();
+            final Set<BlockDevInfo> bdis = entry.getValue();
+            String name = LV_CREATE_MENU_ITEM;
+            if (vgName != null) {
+                name += vgName;
+            }
+
+            final MyMenuItem mi = new MyMenuItem(
+                    name,
+                    null,
+                    Tools.getString("DrbdMultiSelectionInfo.LVCreate.ToolTip"),
+                    new AccessMode(ConfigData.AccessType.OP, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public boolean visiblePredicate() {
+                    for (final BlockDevInfo bdi : bdis) {
+                        final String vg = bdi.getVGName();
+                        if (vg != null
+                            && !"".equals(vg)
+                            && bdi.getHost().getVolumeGroupNames()
+                                            .contains(vg)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public String enablePredicate() {
+                    return null;
+                }
+
+                @Override
+                public void action() {
+                    final LVCreate lvCreate = new LVCreate(
+                                           bdis,
+                                           bdis.iterator().next().getVGName());
+                    while (true) {
+                        lvCreate.showDialog();
+                        if (lvCreate.isPressedCancelButton()) {
+                            lvCreate.cancelDialog();
+                            return;
+                        } else if (lvCreate.isPressedFinishButton()) {
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void update() {
+                    setText1(LV_CREATE_MENU_ITEM
+                             + bdis.iterator().next().getVGName());
+                    super.update();
+                }
+            };
+            mis.add(mi);
+        }
+        return mis;
     }
 
     /** Create menu items for selected block devices. */
@@ -1524,6 +1610,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(getVGCreateItem(selectedBlockDevInfos));
         /* VG Remove */
         items.add(getVGRemoveItem(selectedBlockDevInfos));
+        /* LV Create */
+        items.addAll(getLVCreateItems(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */
