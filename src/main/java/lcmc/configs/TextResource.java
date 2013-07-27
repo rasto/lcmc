@@ -2843,6 +2843,25 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"DrbdMultiSelectionInfo.LVCreate.ToolTip",
          "Create a logical volume."},
 
+        {"DrbdMultiSelectionInfo.LVRemove",
+         "Remove selected LVs"},
+
+        {"DrbdMultiSelectionInfo.LVRemove.ToolTip",
+         "Remove selected logical volumes."},
+
+        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Title",
+         "Remove selected LVs"},
+
+        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Desc",
+         "Remove selected logical volumes and DESTROY all the data on "
+         + "them?<br>{}"},
+
+        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Remove",
+         "Remove"},
+
+        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel",
+         "Cancel"},
+
         {"AllHostsInfo.QuickCluster",
          "add configured pacemaker cluster"},
 

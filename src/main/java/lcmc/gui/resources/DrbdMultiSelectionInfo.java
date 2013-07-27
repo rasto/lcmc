@@ -506,7 +506,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean visiblePredicate() {
                 /* all of them must be true */
-                BlockDevice bd;
 
                 if (selectedBlockDevInfos.isEmpty()) {
                     return false;
@@ -625,6 +624,67 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             mis.add(mi);
         }
         return mis;
+    }
+
+    /** Returns 'LV remove' menu item. */
+    private MyMenuItem getLVRemoveItem(
+                              final List<BlockDevInfo> selectedBlockDevInfos) {
+        return new MyMenuItem(
+                    Tools.getString("DrbdMultiSelectionInfo.LVRemove"),
+                    null,
+                    Tools.getString("DrbdMultiSelectionInfo.LVRemove.ToolTip"),
+                    new AccessMode(ConfigData.AccessType.OP, false),
+                    new AccessMode(ConfigData.AccessType.OP, false)) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean predicate() {
+                return true;
+            }
+
+            @Override
+            public boolean visiblePredicate() {
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    if (bdi.isLVM() && !bdi.getBlockDevice().isDrbd()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String enablePredicate() {
+                return null;
+            }
+
+            @Override
+            public void action() {
+                final Set<Host> selectedHosts = new HashSet<Host>();
+                final List<String> bdNames = new ArrayList<String>();
+                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    bdNames.add(bdi.getName());
+                    selectedHosts.add(bdi.getHost());
+                }
+                if (Tools.confirmDialog(
+                        Tools.getString(
+                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Title"),
+                        Tools.getString(
+                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Desc",
+                            Tools.join(", ", bdNames)),
+                        Tools.getString(
+                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Remove"),
+                        Tools.getString(
+                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel")
+                        )) {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        bdi.lvRemove(CRM.LIVE);
+                    }
+                    for (final Host h : selectedHosts) {
+                        getBrowser().updateHWInfo(h);
+                    }
+                }
+            }
+        };
     }
 
     /** Create menu items for selected block devices. */
@@ -1612,6 +1672,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(getVGRemoveItem(selectedBlockDevInfos));
         /* LV Create */
         items.addAll(getLVCreateItems(selectedBlockDevInfos));
+        /* LV Remove */
+        items.add(getLVRemoveItem(selectedBlockDevInfos));
     }
 
     /** @see EditableInfo#createPopup() */
