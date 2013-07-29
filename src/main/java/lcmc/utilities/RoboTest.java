@@ -731,26 +731,6 @@ public final class RoboTest {
                             }
                         }
                     } else if (index == '5') {
-                        /* pv create */
-                        final int blockDevY = getBlockDevY();
-                        final long startTime = System.currentTimeMillis();
-                        info("test" + index);
-                        startDRBDTest5(blockDevY);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        info("test" + index + ", secs: " + secs);
-                        resetTerminalAreas();
-                    } else if (index == '6') {
-                        /* pv create */
-                        final int blockDevY = getBlockDevY();
-                        final long startTime = System.currentTimeMillis();
-                        info("test" + index);
-                        startDRBDTest6(blockDevY);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                 - startTime) / 1000;
-                        info("test" + index + ", secs: " + secs);
-                        resetTerminalAreas();
-                    } else if (index == '7') {
                         int i = 1;
                         final int blockDevY = getBlockDevY();
                         while (!aborted) {
@@ -760,7 +740,6 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
-                            startDRBDTest6(blockDevY);
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -3203,6 +3182,13 @@ public final class RoboTest {
         sleepNoFactor(200);
     }
 
+    /** Control left click. */
+    private static void controlLeftClick()  {
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        leftClick();
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+    }
+
     /** Left click. */
     private static void leftClick()  {
         if (aborted) {
@@ -3309,6 +3295,20 @@ public final class RoboTest {
         final int endX = (int) endP.getX() + toX;
         final int endY = (int) endP.getY() + toY;
         moveToAbs(endX, endY);
+    }
+
+    private static int getY() {
+        final Point2D origP = MouseInfo.getPointerInfo().getLocation();
+        final Point2D endP =
+            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+        return (int) origP.getY() - (int) endP.getY();
+    }
+
+    private static int getX() {
+        final Point2D origP = MouseInfo.getPointerInfo().getLocation();
+        final Point2D endP =
+            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+        return (int) origP.getX() - (int) endP.getX();
     }
 
     private static void moveTo(final String text) {
@@ -3715,29 +3715,20 @@ public final class RoboTest {
         }
     }
 
-    private static void createPV(final int blockDevY) {
-        moveTo(334, blockDevY);
+    private static void createPV(final int blockDevX, final int blockDevY) {
+        moveTo(blockDevX, blockDevY);
         rightClick();
         sleep(1000);
         moveTo("Create PV");
         leftClick();
-        sleep(2000);
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
-        moveTo("Create PV"); /* button */
-        leftClick();
+        sleep(5000);
     }
 
-    private static void pvRemove(final int blockDevY) {
-        moveTo(334, blockDevY);
+    private static void pvRemove(final int blockDevX, final int blockDevY) {
+        moveTo(blockDevX, blockDevY);
         rightClick();
         sleep(3000);
         moveTo("Remove PV");
-        leftClick();
-        sleep(2000);
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
-        moveTo("Remove PV"); /* button */
         leftClick();
     }
 
@@ -3754,6 +3745,17 @@ public final class RoboTest {
         leftClick();
     }
 
+    private static void createVGMulti(final int blockDevY) {
+        moveTo(334, blockDevY);
+        rightClick();
+        sleep(1000);
+        moveTo("Create VG");
+        leftClick();
+        sleep(2000);
+        moveTo("Create VG"); /* button */
+        leftClick();
+    }
+
     private static void createLV() {
         rightClick();
         sleep(1000);
@@ -3762,6 +3764,18 @@ public final class RoboTest {
         sleep(2000);
         moveTo(cluster.getHostsArray()[1].getName());
         leftClick();
+        moveTo("Create"); /* button */
+        leftClick();
+        sleep(3000);
+        moveTo("Close");
+        leftClick();
+    }
+
+    private static void createLVMulti() {
+        rightClick();
+        moveTo("Create LV in VG");
+        leftClick();
+        sleep(2000);
         moveTo("Create"); /* button */
         leftClick();
         sleep(3000);
@@ -3801,9 +3815,21 @@ public final class RoboTest {
     }
 
     private static void lvRemove() {
+        sleep(5000);
         rightClick();
-        sleep(1000);
+        sleep(5000);
         moveTo("Remove LV");
+        leftClick();
+        sleep(2000);
+        moveTo("Remove"); /* button */
+        leftClick();
+    }
+
+    private static void lvRemoveMulti() {
+        sleep(5000);
+        rightClick();
+        sleep(5000);
+        moveTo("Remove selected LV");
         leftClick();
         sleep(2000);
         moveTo("Remove"); /* button */
@@ -4426,32 +4452,95 @@ public final class RoboTest {
         /* Two bds. */
         slowFactor = 0.6f;
         aborted = false;
+        /* multi */
+        Tools.info("create pvs");
+        moveTo(334, blockDevY);
+        leftClick();
+
+        moveTo(534, getY());
+        controlLeftClick();
+
+        moveTo(334, blockDevY + 40);
+        controlLeftClick();
+
+        moveTo(534, blockDevY + 40);
+        controlLeftClick();
+
+        createPV(334, blockDevY);
+        Tools.info("create vgs");
+        createVGMulti(blockDevY);
+        sleepNoFactor(5000);
+        Tools.info("create lvs");
+        moveToGraph("VG vg00");
+        sleepNoFactor(5000);
+        createLVMulti();
+        Tools.info("remove lvs");
+        moveTo(334, blockDevY);
+        leftClick();
+        moveTo(534, blockDevY);
+        controlLeftClick();
+        lvRemoveMulti();
+        Tools.info("remove vgs");
+        sleepNoFactor(5000);
+        moveToGraph("VG vg00");
+        leftClick();
+        moveTo(534, getY());
+        controlLeftClick();
+        rightClick();
+        sleep(1000);
+        moveTo("Remove selected VGs");
+        leftClick();
+        sleep(1000);
+        moveTo("Remove VG"); /* button */
+        leftClick();
+        Tools.info("remove pvs");
+        moveTo(334, blockDevY);
+        leftClick();
+        moveTo(534, blockDevY);
+        controlLeftClick();
+        moveTo(334, blockDevY + 40);
+        controlLeftClick();
+        moveTo(534, blockDevY + 40);
+        controlLeftClick();
+        rightClick();
+        sleep(3000);
+        moveTo("Remove selected PVs");
+        sleep(2000);
+        leftClick();
+
+        moveTo(430, 90);
+        leftClick(); // reset selection
+
+        /* single */
         for (int i = 0; i < 2; i++) {
-            createPV(blockDevY);
+            Tools.info("create pv 1 " + i);
+            createPV(334, blockDevY);
+            Tools.info("create pv 2 " + i);
+            createPV(534, blockDevY);
+            Tools.info("create vg " + i);
             createVG(blockDevY);
-            sleepNoFactor(60000);
+            sleepNoFactor(10000);
+            Tools.info("create lv" + i);
             moveToGraph("VG vg0" + i);
             createLV();
+            Tools.info("resize lv" + i);
             moveToGraph("vg0" + i + "/lvol0");
             resizeLV();
         }
-    }
-    /** Remove LV. */
-    private static void startDRBDTest6(final int blockDevY) {
-        /* Two bds. */
-        slowFactor = 0.6f;
-        aborted = false;
         int offset = 0;
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 moveToGraph("vg0" + i + "/lvol0");
+                Tools.info("remove lv " + i + " " + j);
                 lvRemove();
                 sleepNoFactor(10000);
             }
+            Tools.info("remove vg " + i);
             moveToGraph("VG vg0" + i);
             vgRemove();
-            sleepNoFactor(60000);
-            pvRemove(blockDevY + offset);
+            sleepNoFactor(10000);
+            pvRemove(334, blockDevY + offset);
+            pvRemove(534, blockDevY + offset);
             offset += 40;
         }
     }
