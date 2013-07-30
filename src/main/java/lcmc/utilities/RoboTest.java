@@ -929,6 +929,16 @@ public final class RoboTest {
         checkTest(testName, 1.1);
         disableStonith();
         checkTest(testName, 1);
+
+        moveTo(ipX, ipY + 200);
+        rightClick(); /* popup */
+        sleep(1000);
+        moveTo("Add Service");
+        sleep(1000);
+        moveTo("Filesystem + Linbit:DRBD");
+        moveTo("IPaddr2");
+        leftClick();
+
         moveTo(ipX, ipY);
         rightClick(); /* popup */
         sleep(1000);
@@ -937,6 +947,7 @@ public final class RoboTest {
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
         leftClick();
+
         final float savedSlowFactor = slowFactor;
         slowFactor = 0.00001f;
         for (final Integer pos1 : new Integer[]{850, 900, 1000}) {
@@ -957,6 +968,7 @@ public final class RoboTest {
             }
         }
         slowFactor = savedSlowFactor;
+        removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
         removeResource(ipX, ipY, !CONFIRM_REMOVE);
         /* again */
         moveTo(ipX, ipY);
