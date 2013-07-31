@@ -2552,6 +2552,7 @@ public class ServiceInfo extends EditableInfo {
         ci.cleanup();
         setNode(node);
         getBrowser().getServicesNode().add(node);
+        getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
         getBrowser().getCRMGraph().exchangeObjectInTheVertex(this, ci);
         getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(

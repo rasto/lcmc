@@ -112,6 +112,7 @@ final class CloneInfo extends ServiceInfo {
         Tools.isSwingThread();
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
+        getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
         getBrowser().reloadAndWait(node, true);
     }
 
