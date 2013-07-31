@@ -120,6 +120,8 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collections;
 import javax.swing.plaf.FontUIResource;
 import org.apache.commons.collections15.Buffer;
 import org.apache.commons.collections15.BufferUtils;
@@ -197,6 +199,12 @@ public final class Tools {
     private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Do not check the swing thread. */
     public static final boolean CHECK_SWING_THREAD = true;
+
+    /** Patterns that match exceptions that can be ignored. */
+    public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
+        Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
+            Pattern.compile(".*:1.6.0_27:.*ToolTipManager.java:256.*",
+                            Pattern.DOTALL))));
 
     /** Private constructor. */
     private Tools() {
@@ -661,8 +669,6 @@ public final class Tools {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
-        Tools.getGUIData().getMainMenu().setOperatingMode(
-                                                        ConfigData.OP_MODE_RO);
         appErrorHash.add(msg + msg2);
         final StringBuilder errorString = new StringBuilder(300);
         errorString.append("\nApplication error, ")
@@ -689,6 +695,13 @@ public final class Tools {
         if (!appError) {
             return;
         }
+        if (ignoreException(e)) {
+            System.out.println("ignoring: " + APPERROR_STRING + errorString);
+            return;
+        }
+
+        Tools.getGUIData().getMainMenu().setOperatingMode(
+                                                        ConfigData.OP_MODE_RO);
 
         final Thread t = new Thread(new Runnable() {
             @Override
@@ -3059,5 +3072,26 @@ public final class Tools {
             }
         }
         return lb.toString();
+    }
+
+    /** Return whether to ignore some exception. */
+    private static boolean ignoreException(final Throwable e) {
+        final String vendor = System.getProperty("java.vendor");
+        final String version = System.getProperty("java.version");
+        final String stackTrace = getStackTrace(e);
+        final String exception = new StringBuilder(vendor)
+                                        .append(':')
+                                        .append(version)
+                                        .append(':')
+                                        .append(e.getMessage())
+                                        .append('\n')
+                                        .append(stackTrace)
+                                        .toString();
+        for (final Pattern p : IGNORE_EXCEPTION_PATTERNS) {
+            if (p.matcher(exception).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
