@@ -995,6 +995,10 @@ public abstract class ResourceGraph {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
+                                        if (!vv.isShowing()
+                                            || !vv.isDisplayable()) {
+                                            return;
+                                        }
                                         backgroundPopup.show(vv, posX, posY);
                                     }
                                 });
@@ -1006,6 +1010,10 @@ public abstract class ResourceGraph {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
+                                        if (!vv.isShowing()
+                                            || !vv.isDisplayable()) {
+                                            return;
+                                        }
                                         edgePopup.show(vv, posX, posY);
                                     }
                                 });
@@ -1023,6 +1031,10 @@ public abstract class ResourceGraph {
                             Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (!vv.isShowing()
+                                        || !vv.isDisplayable()) {
+                                        return;
+                                    }
                                     vertexPopup.show(vv, posX, posY);
                                     //Tools.invokeLater(new Runnable() {
                                     //    @Override

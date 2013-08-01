@@ -484,6 +484,9 @@ public class Info implements Comparable<Info> {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            if (!c.isShowing() || !c.isDisplayable()) {
+                                return;
+                            }
                             pm.show(c, x, y);
                         }
                     });
@@ -614,6 +617,9 @@ public class Info implements Comparable<Info> {
 
     /** Show popup underneath the button. */
     private void showPopup(final JPopupMenu pm, final AbstractButton b) {
+        if (!b.isShowing() || !b.isDisplayable()) {
+            return;
+        }
         int w = (int) pm.getBounds().getWidth();
         if (w == 0) {
             pm.show(b,
