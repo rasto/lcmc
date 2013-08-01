@@ -2203,11 +2203,16 @@ public final class Tools {
     /** Opens default browser. */
     public static void openBrowser(final String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
+            if (Desktop.isDesktopSupported()) {
+                final Desktop desktop = Desktop.getDesktop();
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    Desktop.getDesktop().browse(new URI(url));
+                }
+            }
         } catch (final IOException e) {
-            Tools.appError("wrong uri", e);
+            Tools.error("can't open: " + url + "; " + e.getMessage());
         } catch (final URISyntaxException e) {
-            Tools.error("error opening browser: " + e.getMessage());
+            Tools.error("can't open: " + url + "; " + e.getMessage());
         }
     }
 
