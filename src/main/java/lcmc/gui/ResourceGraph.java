@@ -933,12 +933,7 @@ public abstract class ResourceGraph {
                 }
             });
             if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        handlePopup0(e);
-                    }
-                });
+                handlePopup0(e);
             }
         }
 
