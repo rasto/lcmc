@@ -32,6 +32,7 @@ import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.VisualizationServer.Paintable;
 import edu.uci.ics.jung.visualization.picking.PickedState;
+import java.util.ConcurrentModificationException;
 
 /** 
  * PickingGraphMousePlugin supports the picking of graph elements
@@ -281,13 +282,15 @@ public class PickingGraphMousePlugin<V, E> extends AbstractGraphMousePlugin
                 double dy = graphPoint.getY()-graphDown.getY();
                 PickedState<V> ps = vv.getPickedVertexState();
                 
-                for(V v : ps.getPicked()) {
-                    Point2D vp = layout.transform(v);
-                    if (vp != null) {
-                        vp.setLocation(vp.getX()+dx, vp.getY()+dy);
-                        layout.setLocation(v, vp);
+                try {
+                    for(V v : ps.getPicked()) {
+                        Point2D vp = layout.transform(v);
+                        if (vp != null) {
+                            vp.setLocation(vp.getX()+dx, vp.getY()+dy);
+                            layout.setLocation(v, vp);
+                        }
                     }
-                }
+                } catch(ConcurrentModificationException cme) {}
                 down = p;
 
             } else {
