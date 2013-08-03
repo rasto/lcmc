@@ -4032,16 +4032,10 @@ public final class RoboTest {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
+        for (int i = 0; i < 8; i++) {
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+        }
         press(KeyEvent.VK_ENTER); /* detach */
         checkDRBDTest(drbdTest, 2.01);
 
@@ -4628,18 +4622,10 @@ public final class RoboTest {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
+        for (int i = 0; i < 9; i++) {
+            press(KeyEvent.VK_DOWN);
+            sleep(500);
+        }
         press(KeyEvent.VK_ENTER); /* detach */
         checkDRBDTest(drbdTest, 2.01);
 
