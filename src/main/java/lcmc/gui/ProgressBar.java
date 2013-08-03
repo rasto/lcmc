@@ -157,7 +157,7 @@ public final class ProgressBar implements ActionListener {
                 public void run() {
                     Tools.debug(this,
                                 "running postgresbar timeout: " + timeout,
-                                1);
+                                2);
                     int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
                     int progressBarDelay =
                                     Tools.getDefaultInt("ProgressBar.Delay");
