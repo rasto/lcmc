@@ -84,6 +84,7 @@ our $VG_CACHE;
 our $LVM_CACHE_FILE = "/tmp/lcmc.lvm.$$";
 our $LVM_ALL_CACHE_FILES = "/tmp/lcmc.lvm.*";
 our $NO_LVM_CACHE = 0;
+our $ERRNO; # is set in _exec function
 
 our %DISABLE_VM_OPTIONS; # it'll be populated for options that give an error
 
@@ -1520,7 +1521,10 @@ sub get_drbd_xml {
 		     # we parse them out of the man page.
 	my @missing;
 	my $manpage = _exec("zcat /usr/share/man/man5/drbd.conf.5.gz || cat /usr/share/man/man5/drbd.conf.5 || cat /usr/man/man5/drbd.conf.5 || bzcat /usr/share/man/man5/drbd.conf.5.bz2");
-	#my $from = "on-io-error";
+	if (!$manpage) {
+		print "ERROR: drbd xml\n";
+		exit 1;
+	}
 	my $from = "";
 
 	for my $section ("global", "handlers", "startup") {
@@ -1653,6 +1657,10 @@ sub get_drbd_xml {
 	    
 	for (@sections) {
 		my $xml = _exec("/sbin/drbdsetup $help_option $_");
+		if ($ERRNO) {
+			print "ERROR: can't exec drbdsetup: $ERRNO\n";
+			exit 1;
+		}
 		$xml =~ s/(option name="(.*?)".*?)(<\/option>)/$1.($descs{$2} || "not documented").$3/egs;
 		print $xml;
 	}
@@ -2523,6 +2531,7 @@ sub _execute {
 	} else {
 		$out = system($cmd);
 	}
+	$ERRNO=$?;
 	my $end_time = _log_time();
 	_log($end_time . " done  $cmd_code: $cmd_log", $level);
 	if ($wantoutput) {

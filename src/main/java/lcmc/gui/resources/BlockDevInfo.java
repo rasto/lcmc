@@ -1196,6 +1196,7 @@ public final class BlockDevInfo extends EditableInfo {
                                              false),
                               new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
+
             @Override
             public void action() {
                 final DrbdInfo drbdInfo =
@@ -1619,6 +1620,12 @@ public final class BlockDevInfo extends EditableInfo {
                     return "not available";
                 } else if (dxml.isDrbdDisabled()) {
                     return "disabled because of config";
+                } else {
+                    final String noavail = getBrowser().getClusterBrowser()
+                                                   .isDrbdAvailable(getHost());
+                    if (noavail != null) {
+                        return "DRBD installation problem: " + noavail;
+                    }
                 }
                 return null;
             }
@@ -1651,6 +1658,13 @@ public final class BlockDevInfo extends EditableInfo {
                             } else if (!oHost.isDrbdLoaded()) {
                                 return "drbd is not loaded";
                             } else {
+                                final String noavail =
+                                        getBrowser().getClusterBrowser()
+                                                    .isDrbdAvailable(getHost());
+                                if (noavail != null) {
+                                    return "DRBD installation problem: "
+                                           + noavail;
+                                }
                                 return null;
                             }
                             //return oHost.isConnected()

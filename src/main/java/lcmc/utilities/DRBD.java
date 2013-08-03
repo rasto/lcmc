@@ -25,6 +25,8 @@ package lcmc.utilities;
 import lcmc.data.Host;
 import lcmc.configs.DistResource;
 import lcmc.Exceptions;
+import lcmc.Exceptions.IllegalVersionException;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Map;
@@ -67,6 +69,9 @@ public final class DRBD {
     public static final boolean TESTONLY = true;
     /** Live boolean variable. */
     public static final boolean LIVE = false;
+    /** To compare versions like 8.3 and 8.4 */
+    private static final Pattern DRBD_VERSION_MAJ =
+                                      Pattern.compile("^(\\d+\\.\\d+)\\..*");
 
     /** Private constructor, cannot be instantiated. */
     private DRBD() {
@@ -1028,5 +1033,33 @@ public final class DRBD {
                                    getResVolReplaceHash(host,
                                                         resource,
                                                         volume));
+    }
+
+    /** Return whether DRBD util and module versions are compatible. */
+    public static boolean compatibleVersions(final String utilV,
+                                             final String moduleV) {
+        if (utilV == null || moduleV == null) {
+            return false;
+        }
+        String uV;
+        final Matcher matcherU = DRBD_VERSION_MAJ.matcher(utilV);
+        if (matcherU.matches()) {
+            uV = matcherU.group(1);
+        } else {
+            return false;
+        }
+
+        String mV;
+        final Matcher matcherM = DRBD_VERSION_MAJ.matcher(moduleV);
+        if (matcherM.matches()) {
+            mV = matcherM.group(1);
+        } else {
+            return false;
+        }
+        try {
+            return Tools.compareVersions(mV, uV) == 0;
+        } catch (IllegalVersionException e) {
+            return false;
+        }
     }
 }

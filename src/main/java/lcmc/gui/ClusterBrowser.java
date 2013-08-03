@@ -2705,4 +2705,17 @@ public final class ClusterBrowser extends Browser {
         return name;
     }
 
+    /** Return null if DRBD info is availble, or the reason why not. */
+    public String isDrbdAvailable(final Host host) {
+        if (drbdParameters.get(host) == null) {
+            return "no suitable man pages";
+        }
+        if (!DRBD.compatibleVersions(host.getDrbdVersion(),
+                                     host.getDrbdModuleVersion())) {
+            return "DRBD util and module versions are not compatible: "
+                   + host.getDrbdVersion() + " / "
+                   + host.getDrbdModuleVersion();
+        }
+        return null;
+    }
 }

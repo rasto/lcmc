@@ -398,9 +398,7 @@ public abstract class EditableInfo extends Info {
             if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
-                    Tools.appError("unknown param: " + param
-                                   + ". Could not find man pages for "
-                                   + "your DRBD versions.");
+                    Tools.error("unknown param: " + param);
                     continue;
                 }
                 int height = 0;
