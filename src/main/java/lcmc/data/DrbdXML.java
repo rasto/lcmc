@@ -198,6 +198,8 @@ public final class DrbdXML extends XML {
     static final Set<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
     static {
         IGNORE_CONFIG_ERRORS.add("no resources defined!");
+        IGNORE_CONFIG_ERRORS.add(
+                  "Can not open '/etc/drbd.conf': No such file or directory");
     }
     /** Access types of some parameters. */
     static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
