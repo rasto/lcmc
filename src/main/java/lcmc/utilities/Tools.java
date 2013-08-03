@@ -203,7 +203,7 @@ public final class Tools {
     /** Patterns that match exceptions that can be ignored. */
     public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
         Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
-            Pattern.compile(".*:1.6.0_27:.*ToolTipManager.java:256.*",
+            Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*",
                             Pattern.DOTALL))));
 
     /** Private constructor. */
