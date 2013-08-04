@@ -2704,6 +2704,7 @@ public class ServiceInfo extends EditableInfo {
     /** Returns info panel with comboboxes for service parameters. */
     @Override
     public JComponent getInfoPanel() {
+        LOG.debug1("getInfoPanel: " + getName() + ": start");
         if (!getResourceAgent().isMetaDataLoaded()) {
             final JPanel p = new JPanel();
             p.add(new JLabel(Tools.getString("ServiceInfo.LoadingMetaData")));
@@ -2716,6 +2717,7 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().getCRMGraph().pickInfo(ci);
         }
         if (infoPanel != null) {
+            LOG.debug1("getInfoPanel: " + getName() + ": cached end");
             return infoPanel;
         }
         /* init save button */
@@ -2968,6 +2970,7 @@ public class ServiceInfo extends EditableInfo {
          * enable apply button */
         infoPanel = newPanel;
         infoPanelDone();
+        LOG.debug1("getInfoPanel: " + getName() + ": end");
         return infoPanel;
     }
 
@@ -3180,6 +3183,12 @@ public class ServiceInfo extends EditableInfo {
         final String type = getName();
         final String provider = resourceAgent.getProvider();
         final String heartbeatId = getHeartbeatId(testOnly);
+        LOG.debug1("getPacemakerResAttrs: raClass: "
+                        + raClass
+                        + ", type: " + type
+                        + ", provider: " + provider
+                        + ", crm id: " + heartbeatId
+                        + ", test: " + testOnly);
 
         pacemakerResAttrs.put("id", heartbeatId);
         pacemakerResAttrs.put("class", raClass);
@@ -3431,6 +3440,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Applies the changes to the service parameters. */
     void apply(final Host dcHost, final boolean testOnly) {
+        LOG.debug1("apply: start: test: " + testOnly);
         if (!testOnly) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -3789,6 +3799,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             });
         }
+        LOG.debug1("apply: end: test: " + testOnly);
     }
 
     /** Removes order(s). */

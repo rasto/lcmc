@@ -1037,7 +1037,7 @@ public final class BlockDevInfo extends EditableInfo {
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
-                    LOG.appError("config failed");
+                    LOG.appError("config failed", dce);
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
                 getApplyButton().setToolTipText(dtd.getToolTip());
@@ -1101,7 +1101,7 @@ public final class BlockDevInfo extends EditableInfo {
                                 getBrowser()
                                         .getClusterBrowser()
                                                 .drbdStatusUnlock();
-                                LOG.appError("config failed");
+                                LOG.appError("config failed", e);
                                 return;
                             }
                             apply(false);

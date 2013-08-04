@@ -556,12 +556,13 @@ public abstract class ResourceGraph {
 
     /** Removes the specified vertex from the hash. */
     protected final void removeInfo(final Vertex v) {
+        LOG.debug1("vertex remove: " + vertexToInfoMap.get(v));
         vertexToInfoMap.remove(v);
     }
 
     /** Puts the vertex to resource info object map to the hash. */
     protected final void putVertexToInfo(final Vertex v, final Info i) {
-        vertexToInfoMap.remove(v);
+        LOG.debug1("vertex put: " + i);
         vertexToInfoMap.put(v, i);
     }
 

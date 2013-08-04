@@ -245,6 +245,7 @@ public final class ServicesInfo extends EditableInfo {
 
     /** Applies changes that user has entered. */
     void apply(final Host dcHost, final boolean testOnly) {
+        LOG.debug1("apply: start: test: " + testOnly);
         final String[] params = getParametersFromXML();
         if (!testOnly) {
             Tools.invokeAndWait(new Runnable() {
@@ -313,6 +314,7 @@ public final class ServicesInfo extends EditableInfo {
         if (!testOnly) {
             setApplyButtons(null, params);
         }
+        LOG.debug1("apply: end: test: " + testOnly);
     }
 
     /** Sets heartbeat global parameters after they were obtained. */

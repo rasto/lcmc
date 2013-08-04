@@ -133,18 +133,22 @@ public final class AllHostsInfo extends Info {
 
     /** Remove marked clusters. */
     private void removeMarkedClusters() {
+        LOG.debug1("removeMarkedClusters: start");
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 final List<Cluster> selectedRunningClusters =
                                               new ArrayList<Cluster>();
-                final List<Cluster> selectedClusters =
-                                              new ArrayList<Cluster>();
+                final List<Cluster> selectedClusters = new ArrayList<Cluster>();
                 final List<String> clusterNames = new ArrayList<String>();
                 final Set<Cluster> clusters =
-                     Tools.getConfigData().getClusters().getClusterSet();
+                           Tools.getConfigData().getClusters().getClusterSet();
                 for (final Cluster cluster : clusters) {
                     final JCheckBox wi = allCheckboxes.get(cluster);
+                    LOG.debug1("removeMarkedClusters: cluster: "
+                               + cluster.getName()
+                               + ": wi: "
+                               + (wi != null));
                     if (wi.isSelected()) {
                         selectedClusters.add(cluster);
                         clusterNames.add(cluster.getName());
@@ -154,7 +158,7 @@ public final class AllHostsInfo extends Info {
                     }
                 }
                 final String clustersString =
-                  Tools.join(", ", clusterNames.toArray(
+                      Tools.join(", ", clusterNames.toArray(
                                      new String[clusterNames.size()]));
                 if (!Tools.confirmDialog(
                      Tools.getString(

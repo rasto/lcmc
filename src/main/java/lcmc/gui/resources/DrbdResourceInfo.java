@@ -623,7 +623,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
-                            LOG.appError("config failed");
+                            LOG.appError("config failed", dce);
                             return;
                         }
                         apply(false);

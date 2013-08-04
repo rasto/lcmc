@@ -484,7 +484,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
                     getBrowser().drbdtestLockRelease();
-                    LOG.appError("config failed");
+                    LOG.appError("config failed", dce);
                     return;
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -546,7 +546,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                             } catch (
                                 final Exceptions.DrbdConfigException dce) {
                                 getBrowser().drbdStatusUnlock();
-                                LOG.appError("config failed");
+                                LOG.appError("config failed", dce);
                                 return;
                             }
                             apply(false);
