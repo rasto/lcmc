@@ -1991,7 +1991,10 @@ public final class CRMGraph extends ResourceGraph {
                 getVisualizationViewer().getRenderContext()
                                                     .getPickedVertexState();
         for (final Vertex v : ps.getPicked()) {
-            selectedInfos.add(getInfo(v));
+            final Info i = getInfo(v);
+            if (i != null) {
+                selectedInfos.add(i);
+            }
         }
         multiSelectionInfo = new PcmkMultiSelectionInfo(selectedInfos,
                                                         getClusterBrowser());
