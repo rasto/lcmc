@@ -51,6 +51,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * GUIData
  *
@@ -61,6 +64,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id$
  */
 public final class GUIData  {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(GUIData.class);
     /** Main frame of the whole application. */
     private Container mainFrame;
     /** Main panel of the whole application. */
@@ -240,7 +245,7 @@ public final class GUIData  {
                                                           .getHeight();
                 if ((buttonNo == 0 && height == 0)
                     || (buttonNo == 1 && height > 0)) {
-                    Tools.debug(this, "expand terminal split pane", 2);
+                    LOG.debug2("expand terminal split pane");
                     final BasicSplitPaneUI ui =
                                    (BasicSplitPaneUI) terminalSplitPane.getUI();
                     final BasicSplitPaneDivider divider = ui.getDivider();

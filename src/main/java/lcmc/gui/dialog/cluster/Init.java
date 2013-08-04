@@ -58,6 +58,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
  *
@@ -65,6 +68,8 @@ import javax.swing.BoxLayout;
  * @version $Id$
  */
 public class Init extends DialogCluster {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Init.class);
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** List with texts if drbd is loaded per host. */
@@ -254,8 +259,7 @@ public class Init extends DialogCluster {
                                  @Override
                                  public void doneError(final String ans,
                                                        final int exitCode) {
-                                     Tools.appWarning(
-                                                "could not get install info");
+                                     LOG.appWarning("could not get install info");
                                  }
                              },
                              null,   /* ConvertCmdCallback */

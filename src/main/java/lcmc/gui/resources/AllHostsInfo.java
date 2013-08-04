@@ -67,11 +67,17 @@ import java.awt.event.ItemEvent;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
  * hosts in a cluster.
  */
 public final class AllHostsInfo extends Info {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(AllHostsInfo.class);
     /** Possibly selected host or null. */
     private final Host host;
     /** infoPanel cache. */
@@ -252,7 +258,7 @@ public final class AllHostsInfo extends Info {
             loadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: load marked", 1);
+                    LOG.debug1("BUTTON: load marked");
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -267,7 +273,7 @@ public final class AllHostsInfo extends Info {
             unloadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: unload marked", 1);
+                    LOG.debug1("BUTTON: unload marked");
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -283,7 +289,7 @@ public final class AllHostsInfo extends Info {
                                                 new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: remove marked", 1);
+                    LOG.debug1("BUTTON: remove marked");
                     removeMarkedClusters();
                 }
             });
@@ -390,8 +396,7 @@ public final class AllHostsInfo extends Info {
         loadClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this,
-                            "BUTTON: load cluster: " + cluster.getName(), 1);
+                LOG.debug1("BUTTON: load cluster: " + cluster.getName());
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -485,7 +490,7 @@ public final class AllHostsInfo extends Info {
         quickClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this, "BUTTON: quick cluster", 1);
+                LOG.debug1("BUTTON: quick cluster");
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {

@@ -41,6 +41,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
@@ -50,6 +53,9 @@ import java.awt.Color;
  *
  */
 final class CheckInstallation extends DialogHost {
+    /** Logger. */
+    private static final Logger LOG =
+                            LoggerFactory.getLogger(CheckInstallation.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
@@ -313,7 +319,7 @@ final class CheckInstallation extends DialogHost {
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
-                                 Tools.debug(this, "ans: " + ans, 2);
+                                 LOG.debug2("ans: " + ans);
                                  checkAisHbPm(ans);
                              }
                              @Override
@@ -461,9 +467,7 @@ final class CheckInstallation extends DialogHost {
             }
         } else {
             progressBarDoneError();
-            Tools.debug(this, "drbd: " + drbdOk
-                              + ", ais/pm: " + pmOk
-                              + ", hb/pm: " + hbPmOk, 2);
+            LOG.debug2("drbd: " + drbdOk + ", ais/pm: " + pmOk + ", hb/pm: " + hbPmOk);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         }

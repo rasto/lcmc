@@ -36,11 +36,17 @@ import java.awt.Dimension;
 import lcmc.utilities.Tools;
 import lcmc.utilities.CancelCallback;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class creates titled pane with progress bar and functions that update
  * the progress bar.
  */
 public final class ProgressBar implements ActionListener {
+    /** Logger. */
+    private static final Logger LOG =
+                                   LoggerFactory.getLogger(ProgressBar.class);
     /** The progress bar. */
     private JProgressBar progressBar;
     /** Progress bar panel. */
@@ -155,9 +161,7 @@ public final class ProgressBar implements ActionListener {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    Tools.debug(this,
-                                "running postgresbar timeout: " + timeout,
-                                2);
+                    LOG.debug2("running postgresbar timeout: " + timeout);
                     int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
                     int progressBarDelay =
                                     Tools.getDefaultInt("ProgressBar.Delay");
@@ -195,9 +199,7 @@ public final class ProgressBar implements ActionListener {
 
                         time += sleepTime;
                         if (time > threshold) {
-                            Tools.appWarning("Thread with timeout: "
-                                             + timeout
-                                             + " is running way too long");
+                            LOG.appWarning("Thread with timeout: " + timeout + " is running way too long");
                             threshold += DEBUG_THRESHOLD;
                         }
                         if (progress >= timeout) {
@@ -341,7 +343,7 @@ public final class ProgressBar implements ActionListener {
         final String command = e.getActionCommand();
 
         if (command.equals(Tools.getString("ProgressBar.Cancel"))) {
-            Tools.debug(this, "cancel button pressed", 1);
+            LOG.debug1("cancel button pressed");
             cancelCallback.cancel();
         }
     }

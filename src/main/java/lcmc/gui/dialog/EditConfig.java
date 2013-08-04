@@ -44,6 +44,9 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of an edit config dialog.
  *
@@ -51,6 +54,9 @@ import java.util.HashMap;
  * @version $Id$
  */
 public final class EditConfig extends ConfigDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                                    LoggerFactory.getLogger(EditConfig.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** File to edit. */
@@ -175,7 +181,7 @@ public final class EditConfig extends ConfigDialog {
                                           final int exitCode) {
                         results[index] = ans;
                         errors[index] = exitCode;
-                        Tools.sshError(host, "", ans, "", exitCode);
+                        LOG.sshError(host, "", ans, "", exitCode);
                     }
 
                 };

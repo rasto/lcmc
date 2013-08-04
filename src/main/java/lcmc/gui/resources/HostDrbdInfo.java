@@ -64,11 +64,17 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JColorChooser;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
 public final class HostDrbdInfo extends Info {
+    /** Logger. */
+    private static final Logger LOG =
+                                  LoggerFactory.getLogger(HostDrbdInfo.class);
     /** Host data. */
     private final Host host;
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -147,7 +153,7 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void doneError(final String ans, final int exitCode) {
                     ta.setText("error");
-                    Tools.sshError(host, "", ans, stacktrace, exitCode);
+                    LOG.sshError(host, "", ans, stacktrace, exitCode);
                 }
 
             };

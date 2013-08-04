@@ -33,6 +33,9 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where ssh connection will be established.
  *
@@ -41,6 +44,8 @@ import javax.swing.BoxLayout;
  *
  */
 public class SSH extends DialogHost {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -62,8 +67,7 @@ public class SSH extends DialogHost {
                          public void done(final int flag) {
                              /* flag 0 now connected
                               * flag 1 already connected. */
-                             Tools.debug(this,
-                                         "callback done flag: " + flag, 1);
+                             LOG.debug1("callback done flag: " + flag);
                              getHost().setConnected();
                              progressBarDone();
                              answerPaneSetText(
@@ -149,7 +153,7 @@ public class SSH extends DialogHost {
                     new CancelCallback() {
                         @Override
                         public void cancel() {
-                            Tools.debug(this, "cancel callback");
+                            LOG.debug("cancel callback");
                             getHost().getSSH().cancelConnection();
                         }
                     }

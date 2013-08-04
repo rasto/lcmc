@@ -36,6 +36,9 @@ import java.util.Collections;
 import java.util.Locale;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
@@ -44,6 +47,9 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  * @version $Id$
  */
 public final class ClusterStatus {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(ClusterStatus.class);
     /** Data from cib query. */
     private volatile CibQuery cibQueryMap = new CibQuery();
     /** Data from shadow cib. */
@@ -590,7 +596,7 @@ public final class ClusterStatus {
                 final String status = Tools.join("\n", data.toArray(
                                                      new String[data.size()]));
                 if (!status.equals(oldStatus)) {
-                    Tools.debug(this, "status update: " + host.getName(), 1);
+                    LOG.debug1("status update: " + host.getName());
                     oldStatus = status;
                     parseResStatus(status);
                     return true;
@@ -601,7 +607,7 @@ public final class ClusterStatus {
                 final boolean advancedMode =
                                         Tools.getConfigData().isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
-                    Tools.debug(this, "cib update: " + host.getName(), 1);
+                    LOG.debug1("cib update: " + host.getName());
                     oldCib = cib;
                     oldAdvancedMode = advancedMode;
                     parseCibQuery(cib);
@@ -609,7 +615,7 @@ public final class ClusterStatus {
                 }
             }
         } else {
-            Tools.appError("unknown command: " + command);
+            LOG.appError("unknown command: " + command);
         }
         return false;
     }
@@ -659,10 +665,7 @@ public final class ClusterStatus {
                     data.add(line);
                 }
             } else {
-                Tools.appWarning("Error parsing heartbeat status, line not ok: "
-                                 + line
-                                 + "\n"
-                                 + status);
+                LOG.appWarning("Error parsing heartbeat status, line not ok: " + line + "\n" + status);
             }
         }
         return updated;

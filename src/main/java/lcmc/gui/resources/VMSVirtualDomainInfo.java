@@ -89,11 +89,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info about VirtualDomain service in the VMs category,
  * but not in the cluster view.
  */
 public final class VMSVirtualDomainInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                          LoggerFactory.getLogger(VMSVirtualDomainInfo.class);
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** UUID. */
@@ -1732,7 +1738,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         hostBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this, "BUTTON: host: " + host.getName(), 1);
+                LOG.debug1("BUTTON: host: " + host.getName());
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -2105,7 +2111,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: apply", 1);
+                        LOG.debug1("BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2122,7 +2128,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: revert", 1);
+                        LOG.debug1("BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2149,7 +2155,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this, "BUTTON: overview", 1);
+                LOG.debug1("BUTTON: overview");
                 getBrowser().getVMSInfo().selectMyself();
             }
         });
@@ -2258,7 +2264,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                Tools.appWarning("could not start on " + host.getName());
+                LOG.appWarning("could not start on " + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     starting.clear();
@@ -2297,7 +2303,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mTransitionReadLock.unlock();
         }
         if (i >= ACTION_TIMEOUT) {
-            Tools.appWarning("could not shut down on " + host.getName());
+            LOG.appWarning("could not shut down on " + host.getName());
             mTransitionWriteLock.lock();
             try {
                 shuttingdown.clear();
@@ -2369,7 +2375,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                Tools.appWarning("could not suspend on " + host.getName());
+                LOG.appWarning("could not suspend on " + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     suspending.clear();
@@ -2412,7 +2418,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                Tools.appWarning("could not resume on " + host.getName());
+                LOG.appWarning("could not resume on " + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     resuming.clear();
@@ -4992,7 +4998,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                         .replace("@VERSION@", rv);
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
+                LOG.appWarning(e.getMessage(), e);
                 return Tools.getString(
                                 "VMSVirtualDomainInfo.AvailableInVersion")
                                     .replace("@VERSION@", rv);

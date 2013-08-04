@@ -36,6 +36,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.utilities.SSH.SSHOutput;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides drbd commands.
  *
@@ -44,6 +47,8 @@ import lcmc.utilities.SSH.SSHOutput;
  *
  */
 public final class DRBD {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(DRBD.class);
     /** Device placeholder. */
     private static final String DEVICE_PH     = "@DEVICE@";
     /** Drbd resource placeholder. */
@@ -94,7 +99,7 @@ public final class DRBD {
         if (testOnly) {
             if (command.indexOf("@DRYRUN@") < 0) {
                 /* it would be very bad */
-                Tools.appError("dry run not available");
+                LOG.appError("dry run not available");
                 return null;
             }
             String cmd = command.replaceAll("@DRYRUN@", "-d");
@@ -549,7 +554,7 @@ public final class DRBD {
                       execCommand(host, command, execCallback, true, testOnly);
             return ret.getExitCode() == 0;
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
             return false;
         }
     }
@@ -599,7 +604,7 @@ public final class DRBD {
                       execCommand(host, command, execCallback, true, testOnly);
             return ret.getExitCode() == 0;
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
             return false;
         }
     }

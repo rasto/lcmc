@@ -25,6 +25,9 @@ package lcmc.data.resources;
 
 import lcmc.utilities.Tools;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds data of one network interface.
  *
@@ -33,6 +36,9 @@ import lcmc.utilities.Tools;
  *
  */
 public final class NetInterface extends Resource {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(NetInterface.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Ip address. */
@@ -55,7 +61,7 @@ public final class NetInterface extends Resource {
         super();
         final String[] cols = line.split(" ");
         if (cols.length < 4) {
-            Tools.appWarning("cannot parse: " + line);
+            LOG.appWarning("cannot parse: " + line);
         }
         String iface = "unknown";
         if (cols.length > 0) {
@@ -173,7 +179,7 @@ public final class NetInterface extends Resource {
         if ("String".equals(parameter)) {
             return ip;
         } else {
-            Tools.appError("Unknown parameter: " + parameter, "");
+            LOG.appError("Unknown parameter: " + parameter, "");
             return "";
         }
     }

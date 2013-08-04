@@ -39,6 +39,9 @@ import java.util.Map;
 import java.awt.Color;
 import java.awt.Window;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds cluster data and implementation of cluster related
  * methods.
@@ -48,6 +51,8 @@ import java.awt.Window;
  *
  */
 public final class Cluster implements Comparable<Cluster> {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the cluster. */
@@ -346,7 +351,7 @@ public final class Cluster implements Comparable<Cluster> {
                     minVersion = version;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
+                LOG.appWarning(e.getMessage(), e);
             }
         }
         return minVersion;

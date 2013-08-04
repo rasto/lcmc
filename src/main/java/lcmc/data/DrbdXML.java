@@ -53,6 +53,9 @@ import org.apache.commons.collections15.map.MultiKeyMap;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.keyvalue.MultiKey;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
  * information in the hashes and provides methods to get this
@@ -64,6 +67,8 @@ import org.apache.commons.collections15.keyvalue.MultiKey;
  *
  */
 public final class DrbdXML extends XML {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(DrbdXML.class);
     // TODO: should that not be per host?
     /** Drbd config filename. */
     private String configFile = "unknown";
@@ -1120,8 +1125,8 @@ public final class DrbdXML extends XML {
                             continue;
                         }
                     } catch (Exceptions.DrbdConfigException e) {
-                        Tools.appWarning(e.getMessage());
-                        Tools.appWarning(n.getNodeValue());
+                        LOG.appWarning(e.getMessage());
+                        LOG.appWarning(n.getNodeValue());
                         continue;
                     }
                     optionsMap.put(resName + "." + secName, nameValueMap);
@@ -1142,7 +1147,7 @@ public final class DrbdXML extends XML {
                 }
                 if (!sectionParamsMap.containsKey(secName)
                     && !sectionParamsMap.containsKey(secName + "-options")) {
-                    Tools.appWarning("DRBD: unknown section: " + secName);
+                    LOG.appWarning("DRBD: unknown section: " + secName);
                     if (!unknownSections) {
                         /* unknown section, so it's not removed. */
                         Tools.progressIndicatorFailed(
@@ -1160,7 +1165,7 @@ public final class DrbdXML extends XML {
         if (start < 0) {
             final String c = configXML.trim();
             if (c.length() != 0 && !IGNORE_CONFIG_ERRORS.contains(c)) {
-                Tools.error("drbd config error: " + c);
+                LOG.error("drbd config error: " + c);
             }
             return;
         }
@@ -1426,7 +1431,7 @@ public final class DrbdXML extends XML {
                 res = mDev.group(2);
                 volumeNr = mDev.group(3);
             }
-            Tools.debug(this, "drbd event: " + devNr + " - " + what);
+            LOG.debug("drbd event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
                 final BlockDevInfo bdi = getBlockDevInfo(devNr,
                                                        hostName,

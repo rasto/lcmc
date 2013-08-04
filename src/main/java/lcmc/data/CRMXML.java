@@ -55,6 +55,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class parses ocf crm xml, stores information like
  * short and long description, data types etc. for defined types
@@ -66,6 +69,8 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  */
 public final class CRMXML extends XML {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(CRMXML.class);
     /** Host. */
     private final Host host;
     /** List of global parameters. */
@@ -801,7 +806,7 @@ public final class CRMXML extends XML {
                                                booleanValues);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
 
         /* Hardcoding colocation params */
@@ -902,7 +907,7 @@ public final class CRMXML extends XML {
 
         initOCFMetaDataQuick();
         initOCFMetaDataConfigured();
-        Tools.debug(this, "cluster loaded", 0);
+        LOG.debug("cluster loaded");
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -920,7 +925,7 @@ public final class CRMXML extends XML {
                                                     .reloadRightComponent();
                 }
                 Tools.stopProgressIndicator(hn, text);
-                Tools.debug(this, "RAs loaded", 0);
+                LOG.debug("RAs loaded");
                 final RoboTest.Test autoTest =
                                           Tools.getConfigData().getAutoTest();
                 if (autoTest != null) {
@@ -1114,7 +1119,7 @@ public final class CRMXML extends XML {
             }
         }
         if (!drbddiskPresent) {
-            Tools.appWarning("drbddisk heartbeat script is not present");
+            LOG.appWarning("drbddisk heartbeat script is not present");
         }
     }
 
@@ -1702,7 +1707,7 @@ public final class CRMXML extends XML {
                 metaAttrParams.put(FAILURE_TIMEOUT_META_ATTR, null);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         return metaAttrParams;
     }
@@ -1954,9 +1959,7 @@ public final class CRMXML extends XML {
                                                                provider,
                                                                resourceClass);
         if (ra == null) {
-            Tools.appWarning("cannot save meta-data for: "
-                             + resourceClass + ":" + provider + ":"
-                             + serviceName);
+            LOG.appWarning("cannot save meta-data for: " + resourceClass + ":" + provider + ":" + serviceName);
             return;
         }
         if (ra.isMetaDataLoaded()) {
@@ -2153,8 +2156,7 @@ public final class CRMXML extends XML {
                 || ResourceAgent.HEARTBEAT_CLASS.equals(raClass)) {
                 setLSBResourceAgent(serviceName, raClass, notInstalledRA);
             } else {
-                Tools.appWarning(raClass + ":" + provider + ":" + serviceName
-                                 + " RA does not exist");
+                LOG.appWarning(raClass + ":" + provider + ":" + serviceName + " RA does not exist");
             }
             serviceToResourceAgentMap.put(serviceName,
                                           provider,
@@ -2409,8 +2411,7 @@ public final class CRMXML extends XML {
         if (PAR_CHECK_LEVEL.equals(name)) {
             return value;
         } else {
-            Tools.appWarning(
-                        "unexpected instance attribute: " + name + " " + value);
+            LOG.appWarning("unexpected instance attribute: " + name + " " + value);
             return "";
         }
     }
@@ -2530,10 +2531,7 @@ public final class CRMXML extends XML {
         final String templateId = getAttribute(primitiveNode, "template");
         final String crmId = getAttribute(primitiveNode, "id");
         if (templateId != null) {
-            Tools.info("templates not implemented, ignoring: "
-                       + crmId
-                       + "/"
-                       + templateId);
+            LOG.info("templates not implemented, ignoring: " + crmId + "/" + templateId);
             return;
         }
         final String raClass = getAttribute(primitiveNode, "class");
@@ -2883,13 +2881,13 @@ public final class CRMXML extends XML {
         final Document document = getXMLDocument(query);
         final CibQuery cibQueryData = new CibQuery();
         if (document == null) {
-            Tools.appWarning("cib error: " + query);
+            LOG.appWarning("cib error: " + query);
             return cibQueryData;
         }
         /* get root <pacemaker> */
         final Node pcmkNode = getChildNode(document, "pcmk");
         if (pcmkNode == null) {
-            Tools.appWarning("there is no pcmk node");
+            LOG.appWarning("there is no pcmk node");
             return cibQueryData;
         }
 
@@ -2912,7 +2910,7 @@ public final class CRMXML extends XML {
         /* get <cib> */
         final Node cibNode = getChildNode(pcmkNode, "cib");
         if (cibNode == null) {
-            Tools.appWarning("there is no cib node");
+            LOG.appWarning("there is no cib node");
             return cibQueryData;
         }
         /* Designated Co-ordinator */
@@ -2922,7 +2920,7 @@ public final class CRMXML extends XML {
         /* <configuration> */
         final Node confNode = getChildNode(cibNode, "configuration");
         if (confNode == null) {
-            Tools.appWarning("there is no configuration node");
+            LOG.appWarning("there is no configuration node");
             return cibQueryData;
         }
 
@@ -2951,14 +2949,14 @@ public final class CRMXML extends XML {
         /* <crm_config> */
         final Node crmConfNode = getChildNode(confNode, "crm_config");
         if (crmConfNode == null) {
-            Tools.appWarning("there is no crm_config node");
+            LOG.appWarning("there is no crm_config node");
             return cibQueryData;
         }
 
         /*      <cluster_property_set> */
         final Node cpsNode = getChildNode(crmConfNode, "cluster_property_set");
         if (cpsNode == null) {
-            Tools.appWarning("there is no cluster_property_set node");
+            LOG.appWarning("there is no cluster_property_set node");
         } else {
             NodeList nvpairs;
             if (Tools.versionBeforePacemaker(host)) {
@@ -3018,7 +3016,7 @@ public final class CRMXML extends XML {
         /* <resources> */
         final Node resourcesNode = getChildNode(confNode, "resources");
         if (resourcesNode == null) {
-            Tools.appWarning("there is no resources node");
+            LOG.appWarning("there is no resources node");
             return cibQueryData;
         }
         /*      <primitive> */
@@ -3393,8 +3391,7 @@ public final class CRMXML extends XML {
                                                                      null));
                                 resPingToLocIdMap.put(rsc, locId);
                             } else {
-                                Tools.appWarning(
-                                    "could not parse rsc_location: " + locId);
+                                LOG.appWarning("could not parse rsc_location: " + locId);
                             }
                         }
                     }
@@ -3415,7 +3412,7 @@ public final class CRMXML extends XML {
                     final String uname = getAttribute(nodeStateNode, "uname");
                     final String id = getAttribute(nodeStateNode, "id");
                     if (!id.equals(nodeID.get(uname))) {
-                        Tools.appWarning("skipping " + uname + " " + id);
+                        LOG.appWarning("skipping " + uname + " " + id);
                     }
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");

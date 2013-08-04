@@ -75,10 +75,16 @@ import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for a block device.
  */
 public final class BlockDevInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(BlockDevInfo.class);
     /** DRBD resource in which this block device is member. */
     private DrbdVolumeInfo drbdVolumeInfo;
     /** Map from paremeters to the fact if the last entered value was
@@ -1031,7 +1037,7 @@ public final class BlockDevInfo extends EditableInfo {
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
-                    Tools.appError("config failed");
+                    LOG.appError("config failed");
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
                 getApplyButton().setToolTipText(dtd.getToolTip());
@@ -1095,7 +1101,7 @@ public final class BlockDevInfo extends EditableInfo {
                                 getBrowser()
                                         .getClusterBrowser()
                                                 .drbdStatusUnlock();
-                                Tools.appError("config failed");
+                                LOG.appError("config failed");
                                 return;
                             }
                             apply(false);

@@ -46,6 +46,9 @@ import javax.swing.JComponent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
@@ -55,6 +58,8 @@ import java.awt.event.ActionEvent;
  *
  */
 final class CreateFS extends DrbdConfig {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Pull down menu with hosts (or no host). */
@@ -127,7 +132,7 @@ final class CreateFS extends DrbdConfig {
         } else if (h.equals(bdi2.getHost().getName())) {
             return bdi1;
         } else {
-            Tools.appError("unknown host: " + h);
+            LOG.appError("unknown host: " + h);
             return null;
         }
     }
@@ -409,7 +414,7 @@ final class CreateFS extends DrbdConfig {
                    && Tools.compareVersions(
                                 bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
             return false;
         }
     }

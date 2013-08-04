@@ -25,6 +25,9 @@ package lcmc.data.resources;
 
 import lcmc.utilities.Tools;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds data of one block device, that is the same
  * on all hosts. Unless it is used by drbd.
@@ -34,6 +37,9 @@ import lcmc.utilities.Tools;
  *
  */
 public final class CommonBlockDevice extends Resource {
+    /** Logger. */
+    private static final Logger LOG =
+                            LoggerFactory.getLogger(CommonBlockDevice.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -58,7 +64,7 @@ public final class CommonBlockDevice extends Resource {
         if ("device".equals(parameter)) {
             return getName();
         } else {
-            Tools.appError("Unknown parameter: " + parameter, "");
+            LOG.appError("Unknown parameter: " + parameter, "");
             return "";
         }
     }
@@ -74,7 +80,7 @@ public final class CommonBlockDevice extends Resource {
      */
     @Override
     public String[] getPossibleChoices(final String param) {
-        Tools.appError("Wrong call to getPossibleValues");
+        LOG.appError("Wrong call to getPossibleValues");
         return new String[]{};
     }
 

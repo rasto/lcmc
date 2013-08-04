@@ -42,10 +42,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * Object that holds an order constraint information.
  */
 public final class ConstraintPHInfo extends ServiceInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                             LoggerFactory.getLogger(ConstraintPHInfo.class);
     /** Name of this object. */
     static final String NAME = "Placeholder";
     /** Resource set connection data for colocation. */
@@ -146,11 +152,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
             if (reverseOrd) {
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null) {
-                    Tools.debug(this, "force reverse ord", 3);
-                    Tools.debug(this,
-                                " data rscset1: "
-                                + rscSetConnectionData.getRscSet1().getRscIds(),
-                                3);
+                    LOG.trace("force reverse ord");
+                    LOG.trace(" data rscset1: " + rscSetConnectionData.getRscSet1().getRscIds());
                     reversedOrd = true;
                     rscSetConnectionData.reverse();
                     reverseOrd = false;
@@ -163,50 +166,26 @@ public final class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataOrd.getRscSet2())
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    Tools.debug(this, "data rscset1: "
-                                      + rscSetConnectionData.getRscSet1(), 3);
+                    LOG.trace("data rscset1: " + rscSetConnectionData.getRscSet1());
                     if (rscSetConnectionData.getRscSet1() != null) {
-                        Tools.debug(
-                            this,
-                            "data rscset1 ids: "
-                            + rscSetConnectionData.getRscSet1().getRscIds(),
-                            3);
+                        LOG.trace("data rscset1 ids: " + rscSetConnectionData.getRscSet1().getRscIds());
                     }
 
-                    Tools.debug(this, "data rscset2: "
-                                      + rscSetConnectionData.getRscSet2(), 3);
+                    LOG.trace("data rscset2: " + rscSetConnectionData.getRscSet2());
                     if (rscSetConnectionData.getRscSet2() != null) {
-                        Tools.debug(
-                              this,
-                              "data rscset2 ids: "
-                              + rscSetConnectionData.getRscSet2().getRscIds(),
-                              3);
+                        LOG.trace("data rscset2 ids: " + rscSetConnectionData.getRscSet2().getRscIds());
                     }
 
-                    Tools.debug(this,
-                                "ord rscset1: "
-                                + rscSetConnectionDataOrd.getRscSet1(),
-                                3);
+                    LOG.trace("ord rscset1: " + rscSetConnectionDataOrd.getRscSet1());
                     if (rscSetConnectionDataOrd.getRscSet1() != null) {
-                        Tools.debug(
-                           this,
-                           "ord rscset1 ids: "
-                           + rscSetConnectionDataOrd.getRscSet1().getRscIds(),
-                           3);
+                        LOG.trace("ord rscset1 ids: " + rscSetConnectionDataOrd.getRscSet1().getRscIds());
                     }
 
-                    Tools.debug(this,
-                                "ord rscset2: "
-                                + rscSetConnectionDataOrd.getRscSet2(),
-                                3);
+                    LOG.trace("ord rscset2: " + rscSetConnectionDataOrd.getRscSet2());
                     if (rscSetConnectionDataOrd.getRscSet2() != null) {
-                        Tools.debug(
-                           this,
-                           "ord rscset2 ids: "
-                           + rscSetConnectionDataOrd.getRscSet2().getRscIds(),
-                           3);
+                        LOG.trace("ord rscset2 ids: " + rscSetConnectionDataOrd.getRscSet2().getRscIds());
                     }
-                    Tools.debug(this, "reverse ord", 3);
+                    LOG.trace("reverse ord");
                     reversedOrd = true;
                     /* upside down */
                     rscSetConnectionData.reverse();

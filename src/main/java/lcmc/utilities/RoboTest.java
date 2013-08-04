@@ -50,6 +50,9 @@ import javax.swing.AbstractButton;
 import java.util.List;
 import java.util.ArrayList;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class is used to test the GUI.
  *
@@ -58,6 +61,8 @@ import java.util.ArrayList;
  *
  */
 public final class RoboTest {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -164,7 +169,7 @@ public final class RoboTest {
             robot = new Robot(SCREEN_DEVICE);
         } catch (final java.awt.AWTException e) {
             robot = null;
-            Tools.appWarning("Robot error");
+            LOG.appWarning("Robot error");
         }
         if (robot == null) {
             return;
@@ -211,7 +216,7 @@ public final class RoboTest {
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
-                    Tools.appWarning("Robot error");
+                    LOG.appWarning("Robot error");
                 }
                 if (rbt == null) {
                     return;
@@ -264,7 +269,7 @@ public final class RoboTest {
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
-                    Tools.appWarning("Robot error");
+                    LOG.appWarning("Robot error");
                 }
                 if (rbt == null) {
                     return;
@@ -358,7 +363,7 @@ public final class RoboTest {
                     robot = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
                     robot = null;
-                    Tools.appWarning("Robot error");
+                    LOG.appWarning("Robot error");
                 }
                 if (robot == null) {
                     return;
@@ -920,7 +925,7 @@ public final class RoboTest {
                 testName = "test1-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
 
         disableStonith();
@@ -1184,7 +1189,7 @@ public final class RoboTest {
                 }
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
 
         moveToMenu("Dummy (3)");
@@ -3438,7 +3443,7 @@ public final class RoboTest {
                 return;
             }
         }
-        Tools.info("can't find " + text + " the tree");
+        LOG.info("can't find " + text + " the tree");
     }
 
     private static void moveToGraph(final String text) {
@@ -3459,7 +3464,7 @@ public final class RoboTest {
                 return;
             }
         }
-        Tools.info("can't find " + text + " in the graph");
+        LOG.info("can't find " + text + " in the graph");
     }
 
     private static void moveTo(final String text, final Class<?> clazz) {
@@ -3477,7 +3482,7 @@ public final class RoboTest {
         while (c == null && i < 30 && !aborted) {
             c = (Component) findComponent(text, number);
             if (i > 0) {
-                Tools.info("can't find: " + text);
+                LOG.info("can't find: " + text);
             }
             sleepNoFactor(1000);
             i++;
@@ -3557,7 +3562,7 @@ public final class RoboTest {
         try {
             rbt = new Robot(SCREEN_DEVICE);
         } catch (final java.awt.AWTException e) {
-            Tools.appWarning("Robot error");
+            LOG.appWarning("Robot error");
         }
         if (rbt == null) {
             return;
@@ -4105,7 +4110,7 @@ public final class RoboTest {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         leftClick();
         sleep(1000);
@@ -4219,7 +4224,7 @@ public final class RoboTest {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         leftClick();
         sleep(1000);
@@ -4459,7 +4464,7 @@ public final class RoboTest {
         slowFactor = 0.6f;
         aborted = false;
         /* multi */
-        Tools.info("create pvs");
+        LOG.info("create pvs");
         moveTo(334, blockDevY);
         leftClick();
 
@@ -4473,20 +4478,20 @@ public final class RoboTest {
         controlLeftClick();
 
         createPV(334, blockDevY);
-        Tools.info("create vgs");
+        LOG.info("create vgs");
         createVGMulti(blockDevY);
         sleepNoFactor(5000);
-        Tools.info("create lvs");
+        LOG.info("create lvs");
         moveToGraph("VG vg00");
         sleepNoFactor(5000);
         createLVMulti();
-        Tools.info("remove lvs");
+        LOG.info("remove lvs");
         moveTo(334, blockDevY);
         leftClick();
         moveTo(534, blockDevY);
         controlLeftClick();
         lvRemoveMulti();
-        Tools.info("remove vgs");
+        LOG.info("remove vgs");
         sleepNoFactor(5000);
         moveToGraph("VG vg00");
         leftClick();
@@ -4499,7 +4504,7 @@ public final class RoboTest {
         sleep(1000);
         moveTo("Remove VG"); /* button */
         leftClick();
-        Tools.info("remove pvs");
+        LOG.info("remove pvs");
         moveTo(334, blockDevY);
         leftClick();
         moveTo(534, blockDevY);
@@ -4519,17 +4524,17 @@ public final class RoboTest {
 
         /* single */
         for (int i = 0; i < 2; i++) {
-            Tools.info("create pv 1 " + i);
+            LOG.info("create pv 1 " + i);
             createPV(334, blockDevY);
-            Tools.info("create pv 2 " + i);
+            LOG.info("create pv 2 " + i);
             createPV(534, blockDevY);
-            Tools.info("create vg " + i);
+            LOG.info("create vg " + i);
             createVG(blockDevY);
             sleepNoFactor(10000);
-            Tools.info("create lv" + i);
+            LOG.info("create lv" + i);
             moveToGraph("VG vg0" + i);
             createLV();
-            Tools.info("resize lv" + i);
+            LOG.info("resize lv" + i);
             moveToGraph("vg0" + i + "/lvol0");
             resizeLV();
         }
@@ -4537,11 +4542,11 @@ public final class RoboTest {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 moveToGraph("vg0" + i + "/lvol0");
-                Tools.info("remove lv " + i + " " + j);
+                LOG.info("remove lv " + i + " " + j);
                 lvRemove();
                 sleepNoFactor(10000);
             }
-            Tools.info("remove vg " + i);
+            LOG.info("remove vg " + i);
             moveToGraph("VG vg0" + i);
             vgRemove();
             sleepNoFactor(10000);
@@ -4699,7 +4704,7 @@ public final class RoboTest {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         leftClick();
         sleep(1000);
@@ -4816,7 +4821,7 @@ public final class RoboTest {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         leftClick();
         sleep(1000);
@@ -5286,7 +5291,7 @@ public final class RoboTest {
                 h.getTerminalPanel().addCommandOutput(text + "\n");
             }
         }
-        Tools.info(text);
+        LOG.info(text);
     }
 
     public static Component findInside(final Component component,
@@ -5364,7 +5369,7 @@ public final class RoboTest {
             }
         }
         if (component == null) {
-            Tools.info("can't find " + text);
+            LOG.info("can't find " + text);
             return null;
         }
         for (final Component c : component.getComponents()) {
@@ -5421,7 +5426,7 @@ public final class RoboTest {
         final CRMGraph graph = cluster.getBrowser().getCRMGraph();
         int i = 0;
         while (i < 10 && should != graph.getNumberOfVertices()) {
-            Tools.info(name
+            LOG.info(name
                        + " number of vertices: "
                        + should + " -> "
                        + graph.getNumberOfVertices());

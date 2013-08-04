@@ -49,10 +49,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import org.w3c.dom.Node;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info about Virtual Disks.
  */
 public final class VMSDiskInfo extends VMSHardwareInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                                  LoggerFactory.getLogger(VMSDiskInfo.class);
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceFileWi =
                                             new HashMap<String, Widget>();
@@ -568,10 +574,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                         parameters.put(DiskData.TARGET_BUS, values[0]);
                         parameters.put(DiskData.TARGET_TYPE, values[1]);
                     } else {
-                        Tools.appWarning("cannot parse: "
-                                         + param
-                                         + " = "
-                                         + value);
+                        LOG.appWarning("cannot parse: " + param + " = " + value);
                     }
                 }
             } else if (allParams) {

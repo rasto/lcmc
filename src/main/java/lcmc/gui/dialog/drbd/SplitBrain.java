@@ -46,6 +46,9 @@ import java.awt.event.ActionEvent;
 
 import java.util.Set;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
@@ -55,6 +58,9 @@ import java.util.Set;
  *
  */
 public final class SplitBrain extends DrbdConfig {
+    /** Logger. */
+    private static final Logger LOG =
+                                   LoggerFactory.getLogger(SplitBrain.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Combo box with host that has more recent data. */
@@ -89,7 +95,7 @@ public final class SplitBrain extends DrbdConfig {
                     hostPri = h2;
                     hostSec = h1;
                 } else {
-                    Tools.appError("unknown host: " + h);
+                    LOG.appError("unknown host: " + h);
                     return;
                 }
                 buttonClass(finishButton()).setEnabled(false);

@@ -54,10 +54,16 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides menus for service and host multi selection.
  */
 public final class PcmkMultiSelectionInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                        LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     /** All selected objects. */
     private final List<Info> selectedInfos;
 
@@ -1469,7 +1475,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: apply", 1);
+                        LOG.debug1("BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -1487,7 +1493,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: revert", 1);
+                        LOG.debug1("BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {

@@ -35,10 +35,16 @@ import java.util.Collection;
 import java.util.Map;
 import javax.swing.JPanel;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class is for resource defaults or rsc_defaults.
  */
 public final class RscDefaultsInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                              LoggerFactory.getLogger(RscDefaultsInfo.class);
     /**
      * Prepares a new <code>RscDefaultsInfo</code> object and creates
      * new rsc defaults object.
@@ -62,7 +68,7 @@ public final class RscDefaultsInfo extends EditableInfo {
         }
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
-            Tools.appError("crmXML is null");
+            LOG.appError("crmXML is null");
             return;
         }
         /* Attributes */

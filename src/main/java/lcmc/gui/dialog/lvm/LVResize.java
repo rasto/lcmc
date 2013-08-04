@@ -51,6 +51,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class implements LVM resize dialog.
  *
@@ -58,6 +61,8 @@ import java.awt.event.ActionEvent;
  * @version $Id$
  */
 public final class LVResize extends LV {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Description LVM resize. */
@@ -476,7 +481,7 @@ public final class LVResize extends LV {
             }
             maxBlockSize = Long.toString(max);
         } catch (final Exception e) {
-            Tools.appWarning("could not get max size");
+            LOG.appWarning("could not get max size");
             /* ignore */
         }
         return maxBlockSize;

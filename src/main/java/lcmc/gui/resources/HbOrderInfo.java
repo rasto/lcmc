@@ -39,11 +39,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * Object that holds an order constraint information.
  */
 final class HbOrderInfo extends EditableInfo
                          implements HbConstraintInterface {
+    /** Logger. */
+    private static final Logger LOG =
+                                  LoggerFactory.getLogger(HbOrderInfo.class);
     /** Parent resource in order constraint. */
     private ServiceInfo serviceInfoParent;
     /** Child resource in order constraint. */
@@ -448,7 +454,7 @@ final class HbOrderInfo extends EditableInfo
                     return NOT_AVAIL_FOR_PCMK_VERSION;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning("unkonwn version: " + pmV);
+                LOG.appWarning("unkonwn version: " + pmV);
                 /* enable it, if version check doesn't work */
             }
         }

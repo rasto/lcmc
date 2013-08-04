@@ -92,11 +92,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for one hearteat service and allows to enter
  * its arguments and execute operations on it.
  */
 public class ServiceInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                                  LoggerFactory.getLogger(ServiceInfo.class);
     /** A map from host to the combobox with scores. */
     private final Map<HostInfo, Widget> scoreComboBoxHash =
                                           new HashMap<HostInfo, Widget>();
@@ -605,7 +611,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean infoPanelOk = isInfoPanelOk();
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
-            Tools.appError("crmXML is null");
+            LOG.appError("crmXML is null");
             return;
         }
         /* Attributes */
@@ -2569,7 +2575,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Change type to Master, Clone or Primitive. */
     protected final void changeType(final String value) {
-        Tools.debug(this, "change type: " + value, 1);
+        LOG.debug1("change type: " + value);
         boolean masterSlave0 = false;
         boolean clone0 = false;
         if (MASTER_SLAVE_TYPE_STRING.equals(value)) {
@@ -2789,7 +2795,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: apply", 1);
+                        LOG.debug1("BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2807,7 +2813,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        Tools.debug(this, "BUTTON: revert", 1);
+                        LOG.debug1("BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {

@@ -64,6 +64,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -73,6 +76,8 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public final class Host implements Comparable<Host> {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the host. */
@@ -384,12 +389,10 @@ public final class Host implements Comparable<Host> {
     public void setCluster(final Cluster cluster) {
         this.cluster = cluster;
         if (cluster == null) {
-            Tools.debug(this, getName() + " set cluster: null", 1);
+            LOG.debug1(getName() + " set cluster: null");
         } else {
             inCluster = true;
-            Tools.debug(this,
-                        getName() + " set cluster name: " + cluster.getName(),
-                        1);
+            LOG.debug1(getName() + " set cluster name: " + cluster.getName());
         }
     }
 
@@ -741,7 +744,7 @@ public final class Host implements Comparable<Host> {
                     return true;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
+                LOG.appWarning(e.getMessage(), e);
             }
         }
         return false;
@@ -850,30 +853,29 @@ public final class Host implements Comparable<Host> {
             case 0:
                 break;
             default:
-                Tools.appError("Error.SetDistInfo.CannotSetInfo",
-                               java.util.Arrays.asList(info).toString());
+                LOG.appError("Error.SetDistInfo.CannotSetInfo", java.util.Arrays.asList(info).toString());
                 break;
         }
         dist = detectedDist;
         distVersion = detectedDistVersion;
         initDistInfo();
-        Tools.debug(this, "kernel name: " + detectedKernelName, 2);
-        Tools.debug(this, "kernel version: " + detectedKernelVersion, 2);
-        Tools.debug(this, "arch: " + detectedArch, 2);
-        Tools.debug(this, "dist version: " + detectedDistVersion, 2);
-        Tools.debug(this, "dist: " + detectedDist, 2);
+        LOG.debug2("kernel name: " + detectedKernelName);
+        LOG.debug2("kernel version: " + detectedKernelVersion);
+        LOG.debug2("arch: " + detectedArch);
+        LOG.debug2("dist version: " + detectedDistVersion);
+        LOG.debug2("dist: " + detectedDist);
     }
 
     /** Initializes dist info. Must be called after setDistInfo. */
     void initDistInfo() {
         if (!"Linux".equals(detectedKernelName)) {
-            Tools.appWarning("detected kernel not linux: "
+            LOG.appWarning("detected kernel not linux: "
                              + detectedKernelName);
         }
         setKernelName("Linux");
 
         if (!dist.equals(detectedDist)) {
-            Tools.appError("dist: " + dist + " does not match " + detectedDist);
+            LOG.appError("dist: " + dist + " does not match " + detectedDist);
         }
         distVersionString = Tools.getDistVersionString(dist, distVersion);
         distVersion = Tools.getDistString("distributiondir",
@@ -908,8 +910,7 @@ public final class Host implements Comparable<Host> {
         if ("No Match".equals(dV)) {
             return null;
         }
-        Tools.debug(this, "getDistVersionString dist:"
-                          + dV.replaceFirst("\\d.*", ""), 0);
+        LOG.debug("getDistVersionString dist:" + dV.replaceFirst("\\d.*", ""));
         return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""),
                                    "",
                                    "",
@@ -973,8 +974,7 @@ public final class Host implements Comparable<Host> {
             return hbLibPath;
         }
         if ("".equals(arch)) {
-            Tools.appWarning(
-                        "getHeartbeatLibPath() called to soon: unknown arch");
+            LOG.appWarning("getHeartbeatLibPath() called to soon: unknown arch");
         } else if ("x86_64".equals(arch) || "amd64".equals(arch)) {
             return "/usr/lib64/heartbeat";
         }
@@ -1223,14 +1223,14 @@ public final class Host implements Comparable<Host> {
                                     false,
                                     DRBD_EVENTS_TIMEOUT);
         } else {
-            Tools.appWarning("trying to start started drbd status");
+            LOG.appWarning("trying to start started drbd status");
         }
     }
 
     /** Stops server (hw) status background process. */
     public void stopServerStatus() {
         if (serverStatusThread == null) {
-            Tools.appWarning("trying to stop stopped server status");
+            LOG.appWarning("trying to stop stopped server status");
             return;
         }
         serverStatusThread.cancel();
@@ -1240,7 +1240,7 @@ public final class Host implements Comparable<Host> {
     /** Stops drbd status background process. */
     public void stopDrbdStatus() {
         if (drbdStatusThread == null) {
-            Tools.appWarning("trying to stop stopped drbd status");
+            LOG.appWarning("trying to stop stopped drbd status");
             return;
         }
         drbdStatusThread.cancel();
@@ -1278,7 +1278,7 @@ public final class Host implements Comparable<Host> {
                                 false,
                                 CLUSTER_EVENTS_TIMEOUT);
         } else {
-            Tools.appWarning("trying to start started hb status");
+            LOG.appWarning("trying to start started hb status");
         }
     }
 
@@ -1295,7 +1295,7 @@ public final class Host implements Comparable<Host> {
     /** Stops hb status background process. */
     public void stopClStatus() {
         if (clStatusThread == null) {
-            Tools.appWarning("trying to stop stopped hb status");
+            LOG.appWarning("trying to stop stopped hb status");
             return;
         }
         clStatusThread.cancel();
@@ -1532,7 +1532,7 @@ public final class Host implements Comparable<Host> {
     public void connect(final SSHGui sshGui,
                         final ProgressBar progressBar,
                         final ConnectionCallback callback) {
-        Tools.debug(this, "host connect: " + sshGui, 1);
+        LOG.debug1("host connect: " + sshGui);
         ssh.connect(sshGui, progressBar, callback, this);
     }
 
@@ -1570,9 +1570,9 @@ public final class Host implements Comparable<Host> {
         if (lastConnected != con) {
             lastConnected = con;
             if (con) {
-               Tools.info(getName() + ": connection established");
+               LOG.info(getName() + ": connection established");
             } else {
-               Tools.info(getName() + ": connection lost");
+               LOG.info(getName() + ": connection lost");
             }
             final ClusterBrowser cb = getBrowser().getClusterBrowser();
             if (cb != null) {
@@ -1720,7 +1720,7 @@ public final class Host implements Comparable<Host> {
             try {
                 timestamp = Double.parseDouble(ts);
             }  catch (final NumberFormatException nfe) {
-                Tools.debug(this, "could not parse: " + ts + " " + nfe);
+                LOG.debug("could not parse: " + ts + " " + nfe);
             }
             mInfoTimestampLock.lock();
             if (timestamp != null
@@ -1913,14 +1913,11 @@ public final class Host implements Comparable<Host> {
             public void run() {
                 while (true) {
                     if (ping.get()) {
-                       Tools.debug(this, "connection ok on " + getName(),
-                                   2);
+                       LOG.debug2("connection ok on " + getName());
                        setConnected();
                        ping.set(false);
                     } else {
-                       Tools.debug(this, "connection lost on "
-                                         + getName(),
-                                   2);
+                       LOG.debug2("connection lost on " + getName());
                        getSSH().forceReconnect();
                        setConnected();
                     }
@@ -2059,7 +2056,7 @@ public final class Host implements Comparable<Host> {
 
     /** Parses the host info. */
     public void parseHostInfo(final String ans) {
-        Tools.debug(this, "updating host info: " + getName(), 1);
+        LOG.debug1("updating host info: " + getName());
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
         final List<String> versionLines = new ArrayList<String>();
@@ -2158,7 +2155,7 @@ public final class Host implements Comparable<Host> {
                 if (vgi.length == 2) {
                     newVolumeGroups.put(vgi[0], Long.parseLong(vgi[1]));
                 } else {
-                    Tools.appWarning("could not parse volume info: " + line);
+                    LOG.appWarning("could not parse volume info: " + line);
                 }
             } else if ("filesystems-info".equals(type)) {
                 newFileSystems.add(line);
@@ -2203,7 +2200,7 @@ public final class Host implements Comparable<Host> {
                         }
                     }
                     if (res == null) {
-                        Tools.appWarning("could not parse proxy line: " + line);
+                        LOG.appWarning("could not parse proxy line: " + line);
                     } else {
                         newDrbdResProxy.add(res);
                     }
@@ -2851,7 +2848,7 @@ public final class Host implements Comparable<Host> {
         }
         int h = 1;
         for (final Host host : getCluster().getHosts()) {
-            Tools.debug(this, "host" + h + " = " + host.getName(), 1);
+            LOG.debug1("host" + h + " = " + host.getName());
             command.append(' ');
             command.append(host.getName());
             if (maxHosts > 0 && h >= maxHosts) {
@@ -2925,7 +2922,7 @@ public final class Host implements Comparable<Host> {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
         } catch (java.lang.NumberFormatException e) {
-            Tools.appWarning("could not parse: " + colorString);
+            LOG.appWarning("could not parse: " + colorString);
             /* ignore it */
         }
     }
@@ -3035,7 +3032,7 @@ public final class Host implements Comparable<Host> {
         try {
             return Tools.compareVersions(getDrbdVersion(), "8.4") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
         }
         return true;
     }

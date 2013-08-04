@@ -33,6 +33,9 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where connection to every host will be checked
  * and established if there isn't one.
@@ -42,6 +45,8 @@ import javax.swing.JComponent;
  *
  */
 final class Connect extends DialogCluster {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +92,7 @@ final class Connect extends DialogCluster {
             }
             text.append(host.getName() + " " + status + "\n");
         }
-        Tools.debug(this, "pending: " + pending + ", one failed: " + oneFailed);
+        LOG.debug("pending: " + pending + ", one failed: " + oneFailed);
         if (pending) {
              answerPaneSetText(text.toString());
         } else if (oneFailed) {

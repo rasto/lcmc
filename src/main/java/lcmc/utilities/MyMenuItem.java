@@ -43,12 +43,18 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.PointerInfo;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
 public abstract class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
+    /** Logger. */
+    private static final Logger LOG =
+                                   LoggerFactory.getLogger(MyMenuItem.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Text of the item. */
@@ -112,7 +118,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
     }
@@ -158,7 +164,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
     }
@@ -356,7 +362,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     @Override
     public void actionPerformed(final ActionEvent e) {
-        Tools.debug(this, "ACTION: " + e.getSource().toString(), 1);
+        LOG.debug1("ACTION: " + e.getSource().toString());
         final Thread thread = new Thread(
             new Runnable() {
                 @Override

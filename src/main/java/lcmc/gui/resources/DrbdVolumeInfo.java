@@ -63,12 +63,17 @@ import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * This class holds info data of a DRBD volume.
  */
 public final class DrbdVolumeInfo extends EditableInfo
                                   implements CommonDeviceInterface {
+    /** Logger. */
+    private static final Logger LOG =
+                               LoggerFactory.getLogger(DrbdVolumeInfo.class);
     /** Drbd resource in which is this volume defined. */
     private final DrbdResourceInfo drbdResourceInfo;
     /** Block devices that are in this DRBD volume. */
@@ -267,7 +272,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         getApplyButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this, "BUTTON: apply", 1);
+                LOG.debug1("BUTTON: apply");
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -286,7 +291,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
-                            Tools.appError("config failed");
+                            LOG.appError("config failed");
                             return;
                         }
                         apply(false);
@@ -301,7 +306,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: revert", 1);
+                    LOG.debug1("BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -731,7 +736,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             getDrbdInfo().createDrbdConfig(testOnly);
         } catch (Exceptions.DrbdConfigException dce) {
             cb.drbdStatusUnlock();
-            Tools.appError("config failed", dce);
+            LOG.appError("config failed", dce);
             return;
         }
         getDrbdInfo().setSelectedNode(null);

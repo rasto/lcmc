@@ -36,6 +36,9 @@ import java.util.HashSet;
 import java.util.Arrays;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class describes a resource agent with its name and class.
  * This is important in otder to distinguish services that have the same name
@@ -46,6 +49,9 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  */
 public final class ResourceAgent {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(ResourceAgent.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Name of the service. */
@@ -300,7 +306,7 @@ public final class ResourceAgent {
      * exist. This should never happen.
      */
     private void wrongParameterError(final String param) {
-        Tools.appError("Wrong parameter: " + param);
+        LOG.appError("Wrong parameter: " + param);
     }
 
     /** Sets whether the supplied parameter is required. */

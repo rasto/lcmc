@@ -77,12 +77,17 @@ import java.util.Collections;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for resources, services, hosts, clusters
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
 public class Info implements Comparable<Info> {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Menu node of this object. */
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
@@ -707,7 +712,7 @@ public class Info implements Comparable<Info> {
             final int size = menuListCopy.size();
             if (size > maxMenuList) {
                 maxMenuList = size;
-                Tools.debug(this, "menu list size: " + maxMenuList, 2);
+                LOG.debug2("menu list size: " + maxMenuList);
             }
         }
     }
@@ -1092,7 +1097,7 @@ public class Info implements Comparable<Info> {
 
     /** Updates data in the table. */
     public final void updateTable(final String tableName) {
-        Tools.debug(this, "update table: " + tableName, 2);
+        LOG.debug2("update table: " + tableName);
         final JTable table = tables.get(tableName);
         final DefaultTableModel tableModel = tableModels.get(tableName);
         if (tableModel != null) {
@@ -1102,7 +1107,7 @@ public class Info implements Comparable<Info> {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
-                        Tools.debug(this, "update table in: " + getName(), 2);
+                        LOG.debug2("update table in: " + getName());
                         tableModel.setDataVector(data, colNames);
                         tableModel.fireTableDataChanged();
                         Tools.resizeTable(table, getDefaultWidths(tableName));

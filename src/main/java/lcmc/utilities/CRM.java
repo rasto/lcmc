@@ -38,6 +38,9 @@ import java.util.regex.Matcher;
 import java.util.UUID;
 import lcmc.utilities.SSH.SSHOutput;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -47,6 +50,8 @@ import lcmc.utilities.SSH.SSHOutput;
  *
  */
 public final class CRM {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(CRM.class);
     /** Output of the ptest. */
     private static volatile String ptestOutput = null;
     /** Ptest lock. */
@@ -113,7 +118,7 @@ public final class CRM {
                                                  SSH.DEFAULT_COMMAND_TIMEOUT);
             return out;
         } else {
-            Tools.debug(null, "CRM.java: crm command: " + command, 1);
+            LOG.debug1("crm command: " + command);
             return Tools.execCommandProgressIndicator(
                                     host,
                                     command,

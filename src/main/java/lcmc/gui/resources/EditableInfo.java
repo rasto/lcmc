@@ -60,11 +60,17 @@ import java.awt.FlowLayout;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides textfields, combo boxes etc. for editable info
  * objects.
  */
 public abstract class EditableInfo extends Info {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(EditableInfo.class);
     /** Hash from parameter to boolean value if the last entered value was
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
@@ -398,7 +404,7 @@ public abstract class EditableInfo extends Info {
             if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
-                    Tools.error("unknown param: " + param);
+                    LOG.error("unknown param: " + param);
                     continue;
                 }
                 int height = 0;

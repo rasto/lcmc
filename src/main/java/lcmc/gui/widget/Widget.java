@@ -67,6 +67,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
@@ -77,6 +80,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  */
 public abstract class Widget extends JPanel {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Widget.class);
     /** Widget type. */
     public enum Type { LABELFIELD, TEXTFIELD, PASSWDFIELD, COMBOBOX,
                        RADIOGROUP, CHECKBOX, TEXTFIELDWITHUNIT };
@@ -474,7 +479,7 @@ public abstract class Widget extends JPanel {
                                 });
                                 t.start();
                             } catch (BadLocationException ble) {
-                                Tools.appWarning("document listener error");
+                                LOG.appWarning("document listener error");
                             }
                         }
                     }
@@ -572,9 +577,8 @@ public abstract class Widget extends JPanel {
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
-                Tools.debug(this, "changed label: " + labelText + " != "
-                                   + savedLabel, 2);
-                Tools.debug(this, "changed: " + value + " != " + savedValue, 2);
+                LOG.debug2("changed label: " + labelText + " != " + savedLabel);
+                LOG.debug2("changed: " + value + " != " + savedValue);
                 /*
                    Tools.printStackTrace("changed: " + value + " != "
                                          + savedValue);
@@ -917,6 +921,6 @@ public abstract class Widget extends JPanel {
 
     /** Select the text component. */
     public void select(final int selectionStart, final int selectionEnd) {
-        Tools.appWarning("select not implemented");
+        LOG.appWarning("select not implemented");
     }
 }

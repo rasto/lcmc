@@ -47,6 +47,9 @@ import javax.swing.JTextPane;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a bug report dialog.
  *
@@ -54,6 +57,9 @@ import lcmc.data.Host;
  * @version $Id$
  */
 public final class BugReport extends ConfigDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                                    LoggerFactory.getLogger(BugReport.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -84,7 +90,7 @@ public final class BugReport extends ConfigDialog {
         super();
         this.cluster = cluster;
         this.errorText = errorText;
-        logs = Tools.getLogBuffer();
+        logs = LoggerFactory.getLogBuffer();
     }
 
     /** Inits the dialog and enables all the components. */
@@ -318,7 +324,7 @@ public final class BugReport extends ConfigDialog {
     @Override
     protected ConfigDialog checkAnswer() {
         if (isPressedButton(sendReportButton())) {
-            Tools.info("send report");
+            LOG.info("send report");
             Http.post("lcmc", textArea.getText());
         }
         return null;

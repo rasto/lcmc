@@ -47,6 +47,9 @@ import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where user can choose a distribution of the
  * host.
@@ -56,6 +59,9 @@ import javax.swing.Box;
  *
  */
 public class DrbdLinbitAvailPackages extends DialogHost {
+    /** Logger. */
+    private static final Logger LOG =
+                      LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Combo box with distributions. */
@@ -205,7 +211,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                Tools.debug(this, "doneError");
+                                LOG.debug("doneError");
                                 printErrorAndRetry(
                Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
                                    ans,

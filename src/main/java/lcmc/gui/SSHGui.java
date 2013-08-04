@@ -47,6 +47,9 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of dialogs that are needed for establishing of a ssh
  * connection.
@@ -56,6 +59,8 @@ import java.util.List;
  *
  */
 public final class SSHGui {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(SSHGui.class);
     /** Root pane on which the dialogs are comming to. */
     private final Container rootPane;
     /** Host data object. */
@@ -76,7 +81,7 @@ public final class SSHGui {
 
     /** Displays Confirm Dialog whith Yes, No, Cancel options. */
     public int getConfirmDialogChoice(final String message) {
-        Tools.debug(this, "get confirm dialog");
+        LOG.debug("get confirm dialog");
         return JOptionPane.showConfirmDialog(rootPane, message);
     }
 

@@ -74,6 +74,9 @@ import javax.swing.JTextArea;
 import javax.swing.JComponent;
 import java.awt.Component;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
  *
@@ -82,6 +85,8 @@ import java.awt.Component;
  *
  */
 final class HbConfig extends DialogCluster {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Keepalive option. */
@@ -327,7 +332,7 @@ final class HbConfig extends DialogCluster {
                                             }
                                         } catch (
                                          Exceptions.IllegalVersionException e) {
-                                            Tools.appWarning(e.getMessage(), e);
+                                            LOG.appWarning(e.getMessage(), e);
                                         }
                                         Heartbeat.enableDopd(h, wa);
                                     }

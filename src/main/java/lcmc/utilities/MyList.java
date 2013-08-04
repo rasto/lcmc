@@ -37,11 +37,16 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 
 /**
  * A Jlist with updatable tooltips.
  */
 public final class MyList<E> extends JList<E> implements ComponentWithTest {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(MyList.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Tools tip object. */
@@ -62,7 +67,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appWarning("Robot error");
+            LOG.appWarning("Robot error");
         }
         robot = r;
         setBackground(bg);

@@ -62,10 +62,15 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import org.w3c.dom.Node;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info about Virtual Hardware.
  */
 public abstract class VMSHardwareInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(VMSHardwareInfo.class);
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** VMS virtual domain info object. */
@@ -555,7 +560,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                             }
                             files.add(lf);
                         } else {
-                            Tools.appWarning("could not match: " + line);
+                            LOG.appWarning("could not match: " + line);
                         }
                     }
                 }
@@ -573,7 +578,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                     final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
-            Tools.error("Connection to host lost.");
+            LOG.error("Connection to host lost.");
             return;
         }
         final VMSHardwareInfo thisClass = this;

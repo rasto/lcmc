@@ -60,11 +60,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.utilities.MyButton;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
 public final class GroupInfo extends ServiceInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                                    LoggerFactory.getLogger(GroupInfo.class);
     /** Creates new GroupInfo object. */
     GroupInfo(final ResourceAgent ra, final Browser browser) {
         super(ConfigData.PM_GROUP_NAME, ra, browser);
@@ -460,7 +466,7 @@ public final class GroupInfo extends ServiceInfo {
         } else if (newRA.isVirtualDomain()) {
             newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
         } else if (newRA.isGroup()) {
-            Tools.appError("No groups in group allowed");
+            LOG.appError("No groups in group allowed");
             return null;
         } else {
             newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
@@ -825,7 +831,7 @@ public final class GroupInfo extends ServiceInfo {
                 }
             }
         } catch (java.util.NoSuchElementException ele) {
-            Tools.info("removing aborted");
+            LOG.info("removing aborted");
             return;
         }
 
@@ -864,7 +870,7 @@ public final class GroupInfo extends ServiceInfo {
                 child.removeInfo();
             }
         } catch (java.util.NoSuchElementException ele) {
-            Tools.info("removing aborted");
+            LOG.info("removing aborted");
             return;
         }
         super.removeInfo();
@@ -886,7 +892,7 @@ public final class GroupInfo extends ServiceInfo {
                     children.add(child);
                 }
             } catch (java.util.NoSuchElementException ele) {
-                Tools.info("removing aborted");
+                LOG.info("removing aborted");
                 return;
             }
         }

@@ -43,6 +43,9 @@ import javax.swing.JPanel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
  * be Corosync or Heartbeat.
@@ -52,6 +55,9 @@ import javax.swing.BoxLayout;
  *
  */
 final class CommStack extends DialogCluster {
+    /** Logger. */
+    private static final Logger LOG =
+                                    LoggerFactory.getLogger(CommStack.class);
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
@@ -119,8 +125,7 @@ final class CommStack extends DialogCluster {
                                  @Override
                                  public void doneError(final String ans,
                                                        final int exitCode) {
-                                     Tools.appWarning(
-                                                "could not get install info");
+                                     LOG.appWarning("could not get install info");
                                  }
                              },
                              null,   /* ConvertCmdCallback */

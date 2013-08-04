@@ -37,6 +37,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class parses xml.
  *
@@ -45,6 +48,8 @@ import org.w3c.dom.Node;
  *
  */
 abstract class XML {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(XML.class);
     /** Returns child node of the node identified by the tag. */
     protected final Node getChildNode(final Node node, final String tag) {
         final NodeList nodeList = node.getChildNodes();
@@ -126,7 +131,7 @@ abstract class XML {
             if (sxe.getException() != null) {
                 x = sxe.getException();
             }
-            Tools.appWarning("could not parse: " + xml);
+            LOG.appWarning("could not parse: " + xml);
             return null;
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built

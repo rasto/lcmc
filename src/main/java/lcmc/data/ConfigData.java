@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * ConfigData
  *
@@ -44,6 +47,9 @@ import java.util.LinkedHashMap;
  * @version $Id$
  */
 public final class ConfigData {
+    /** Logger. */
+    private static final Logger LOG =
+                                   LoggerFactory.getLogger(ConfigData.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** access type. */
@@ -327,7 +333,7 @@ public final class ConfigData {
             try {
                 knownHosts.addHostkeys(knownHostFile);
             } catch (IOException e) {
-                Tools.appError("SSH.knowHostFile.NotExists", "", e);
+                LOG.appError("SSH.knowHostFile.NotExists", "", e);
             }
         }
     }

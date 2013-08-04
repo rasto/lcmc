@@ -59,6 +59,9 @@ import javax.swing.ImageIcon;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An infinite progress panel displays a rotating figure and
  * a message to notice the user of a long, duration unknown
@@ -91,6 +94,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public final class ProgressIndicatorPanel extends JComponent
                                         implements MouseListener, KeyListener {
+    /** Logger. */
+    private static final Logger LOG =
+                        LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Notifies whether the animation is running or not. */
@@ -196,7 +202,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure. */
     public void failure(final String text) {
-        Tools.appWarning(text);
+        LOG.appWarning(text);
         if (text == null) {
             return;
         }
@@ -208,7 +214,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure and shows it for n seconds. */
     public void failure(final String text, final int n) {
-        Tools.appWarning(text);
+        LOG.appWarning(text);
         if (text == null || n < 0) {
             return;
         }
@@ -273,8 +279,7 @@ public final class ProgressIndicatorPanel extends JComponent
         mAnimatorLock.lock();
         mTextsLock.lock();
         if (!texts.containsKey(text)) {
-            Tools.appWarning("progress indicator already stopped for: --"
-                             + text + "--");
+            LOG.appWarning("progress indicator already stopped for: --" + text + "--");
             mTextsLock.unlock();
             mAnimatorLock.unlock();
             Tools.printStackTrace();

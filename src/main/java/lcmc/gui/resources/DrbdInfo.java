@@ -67,12 +67,17 @@ import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 import lcmc.EditClusterDialog;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides drbd info. For one it shows the editable global
  * drbd config, but if a drbd block device is selected it forwards to the
  * block device info, which is defined in HostBrowser.java.
  */
 public final class DrbdInfo extends DrbdGuiInfo {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(DrbdInfo.class);
     /** Selected block device. */
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
@@ -258,7 +263,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                   Tools.getConfigData().getBigDRBDConf()
                   || Tools.compareVersions(host.getDrbdVersion(), "8.3.7") < 0;
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
+                LOG.appWarning(e.getMessage(), e);
             }
             if (testOnly) {
                 dir = "/var/lib/drbd/";
@@ -479,7 +484,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     }
                 } catch (Exceptions.DrbdConfigException dce) {
                     getBrowser().drbdtestLockRelease();
-                    Tools.appError("config failed");
+                    LOG.appError("config failed");
                     return;
                 }
                 final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -521,7 +526,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: apply", 1);
+                    LOG.debug1("BUTTON: apply");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -541,7 +546,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                             } catch (
                                 final Exceptions.DrbdConfigException dce) {
                                 getBrowser().drbdStatusUnlock();
-                                Tools.appError("config failed");
+                                LOG.appError("config failed");
                                 return;
                             }
                             apply(false);
@@ -556,7 +561,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: revert", 1);
+                    LOG.debug1("BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -961,7 +966,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     return false;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                Tools.appWarning(e.getMessage(), e);
+                LOG.appWarning(e.getMessage(), e);
             }
         }
         return true;

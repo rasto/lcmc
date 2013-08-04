@@ -44,6 +44,9 @@ import java.awt.Dimension;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds host and cluster resource data in a tree. It shows
  * panels that allow to edit the data of resources, services etc., hosts and
@@ -55,6 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public class Browser {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
     /** Tree model of the menu tree. */
     private DefaultTreeModel treeModel;
     /** Top of the menu tree. */
@@ -189,9 +194,7 @@ public class Browser {
                 try {
                     treeModel.nodeChanged(node);
                 } catch (Exception e) {
-                    Tools.appError(node.getUserObject()
-                                   + " node changed error:\n"
-                                   + stacktrace + "\n\n", e);
+                    LOG.appError(node.getUserObject() + " node changed error:\n" + stacktrace + "\n\n", e);
                 }
             }
         });

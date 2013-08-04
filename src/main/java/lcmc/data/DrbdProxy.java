@@ -26,10 +26,16 @@ import lcmc.utilities.Tools;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * DRBD Proxy functions.
  */
 public final class DrbdProxy {
+    /** Logger. */
+    private static final Logger LOG =
+                                    LoggerFactory.getLogger(DrbdProxy.class);
     public static final boolean PROXY = true;
     private static final boolean DONE = true;
 
@@ -59,7 +65,7 @@ public final class DrbdProxy {
         final StringTokenizer st = new StringTokenizer(text);
         while (st.hasMoreTokens()) {
             if ("proxy".equals(st.nextToken())) {
-                Tools.debug(null, "proxy: " + text, 1);
+                LOG.debug1("proxy: " + text);
                 final String nextToken = st.nextToken();
                 if (!"{".equals(nextToken)) {
                     throw new Exceptions.DrbdConfigException(

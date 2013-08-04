@@ -27,6 +27,9 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import lcmc.utilities.Tools;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds a set of all hosts.
  *
@@ -35,6 +38,8 @@ import lcmc.utilities.Tools;
  *
  */
 public final class Hosts {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Hosts set. */
@@ -82,7 +87,7 @@ public final class Hosts {
 
     /** Removes references to the cluster from all hosts. */
     public void removeHostsFromCluster(final Cluster cluster) {
-        Tools.debug(this, "remove hosts from cluster: " + cluster.getName(), 1);
+        LOG.debug1("remove hosts from cluster: " + cluster.getName());
         for (final Host host : hosts) {
             if (host.getCluster() == cluster) {
                 host.removeFromCluster();

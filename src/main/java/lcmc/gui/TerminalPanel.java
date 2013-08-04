@@ -58,6 +58,9 @@ import java.util.regex.Matcher;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a terminal panel that show commands and output from
  * remote host. It is also possible to write commands and execute them.
@@ -67,6 +70,9 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public final class TerminalPanel extends JScrollPane {
+    /** Logger. */
+    private static final Logger LOG =
+                                LoggerFactory.getLogger(TerminalPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Host data object. */
@@ -257,7 +263,7 @@ public final class TerminalPanel extends JScrollPane {
                                    r.height);
                     }
                 } catch (BadLocationException e) {
-                    Tools.appError("Drawing of cursor failed", e);
+                    LOG.appError("Drawing of cursor failed", e);
                 }
             }
         };
@@ -399,8 +405,7 @@ public final class TerminalPanel extends JScrollPane {
                                                  colorAS);
                                 maxPos++;
                             } catch (javax.swing.text.BadLocationException e1) {
-                                Tools.appError("TerminalPanel pos: " + pos,
-                                               e1);
+                                LOG.appError("TerminalPanel pos: " + pos, e1);
                             }
                         }
                     }
@@ -416,8 +421,7 @@ public final class TerminalPanel extends JScrollPane {
                         commandOffset = pos - 1;
                         doc.removeForced(pos, 1);
                     } catch (javax.swing.text.BadLocationException e) {
-                        Tools.appError("TerminalPanel pos: " + pos,
-                                       e);
+                        LOG.appError("TerminalPanel pos: " + pos, e);
                     }
                 }
                 try {
@@ -425,8 +429,7 @@ public final class TerminalPanel extends JScrollPane {
                                      s,
                                      colorAS);
                 } catch (javax.swing.text.BadLocationException e1) {
-                    Tools.appError("TerminalPanel pos: " + pos,
-                                   e1);
+                    LOG.appError("TerminalPanel pos: " + pos, e1);
                 }
                 pos++;
                 if (maxPos < pos) {
@@ -683,19 +686,19 @@ public final class TerminalPanel extends JScrollPane {
             addCommandOutput(list.toString());
         } else if (RUN_GC.equals(cheat)) {
             System.gc();
-            Tools.info("run gc");
+            LOG.info("run gc");
         } else if (ALLOCATE_10.equals(cheat)) {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Tools.info("allocate mem");
+                    LOG.info("allocate mem");
                     Byte[] b = new Byte[1024000];
-                    Tools.info("allocate mem done.");
+                    LOG.info("allocate mem done.");
 
                     System.gc();
-                    Tools.info("run gc");
+                    LOG.info("run gc");
                     Tools.sleep(60000);
-                    Tools.info("free mem.");
+                    LOG.info("free mem.");
                 }
             });
             t.start();
@@ -724,9 +727,9 @@ public final class TerminalPanel extends JScrollPane {
         } else if (MOVETEST_LAZY_LONG.equals(cheat)) {
             RoboTest.startMover(8 * 60, true);
         } else if (DEBUG_INC.equals(cheat)) {
-            Tools.incrementDebugLevel();
+            LoggerFactory.incrementDebugLevel();
         } else if (DEBUG_DEC.equals(cheat)) {
-            Tools.decrementDebugLevel();
+            LoggerFactory.decrementDebugLevel();
         } else if (TESTS.containsKey(cheat)) {
             RoboTest.startTest(TESTS.get(cheat), host.getCluster());
         } else if (REGISTER_MOVEMENT.equals(cheat)) {

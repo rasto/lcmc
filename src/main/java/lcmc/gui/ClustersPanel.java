@@ -47,6 +47,8 @@ import java.awt.event.ActionEvent;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
@@ -58,6 +60,9 @@ import java.awt.GridBagConstraints;
  *
  */
 public final class ClustersPanel extends JPanel {
+    /** Logger. */
+    private static final Logger LOG =
+                                LoggerFactory.getLogger(ClustersPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** The tabbed pane where the tabs are painted. */
@@ -143,7 +148,7 @@ public final class ClustersPanel extends JPanel {
 
     /** Adds a new cluster tab. */
     void addTab(final Cluster cluster) {
-        Tools.debug(this, "cluster add tab " + cluster.getName(), 2);
+        LOG.debug2("cluster add tab " + cluster.getName());
         final ClusterTab ct = new ClusterTab(cluster);
         cluster.setClusterTab(ct);
         if (tabbedPane.getTabCount() == 1) {

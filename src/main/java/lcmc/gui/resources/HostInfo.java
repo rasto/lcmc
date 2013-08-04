@@ -71,11 +71,16 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
 public final class HostInfo extends Info {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
     /** Host data. */
     private final Host host;
     /** Host standby icon. */
@@ -218,7 +223,7 @@ public final class HostInfo extends Info {
                 @Override
                 public void doneError(final String ans, final int exitCode) {
                     ta.setText(ans);
-                    Tools.sshError(host, "", ans, "", exitCode);
+                    LOG.sshError(host, "", ans, "", exitCode);
                     Tools.invokeLater(new Runnable() {
                     @Override
                         public void run() {

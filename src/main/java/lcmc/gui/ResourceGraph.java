@@ -100,6 +100,9 @@ import org.apache.commons.collections15.TransformerUtils;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class creates graph and provides methods for scaling etc.,
  * that are used in all graphs.
@@ -109,6 +112,9 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public abstract class ResourceGraph {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(ResourceGraph.class);
     /** Cluster browser object. */
     private final ClusterBrowser clusterBrowser;
     /** Pluggable renderer. */
@@ -1913,11 +1919,11 @@ public abstract class ResourceGraph {
                 final boolean isLoop = endpoints.getFirst().equals(
                                                         endpoints.getSecond());
                 if (isLoop) {
-                    Tools.appWarning(
-                                 "an ilegal loop: "
-                                 + vertexToInfoMap.get(endpoints.getFirst())
-                                 + " " + e + " "
-                                 + vertexToInfoMap.get(endpoints.getSecond()));
+                    LOG.appWarning(
+                                "an ilegal loop: "
+                                + vertexToInfoMap.get(endpoints.getFirst())
+                                + " " + e + " "
+                                + vertexToInfoMap.get(endpoints.getSecond()));
                     return EMPTY_SHAPE;
                 }
             }

@@ -76,12 +76,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
 public final class DrbdResourceInfo extends DrbdGuiInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                             LoggerFactory.getLogger(DrbdResourceInfo.class);
     /** List of volumes. */
     private final Set<DrbdVolumeInfo> drbdVolumes =
                                         new LinkedHashSet<DrbdVolumeInfo>();
@@ -599,7 +604,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         getApplyButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                Tools.debug(this, "BUTTON: apply", 1);
+                LOG.debug1("BUTTON: apply");
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -618,7 +623,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             }
                         } catch (Exceptions.DrbdConfigException dce) {
                             getBrowser().drbdStatusUnlock();
-                            Tools.appError("config failed");
+                            LOG.appError("config failed");
                             return;
                         }
                         apply(false);
@@ -633,7 +638,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: revert", 1);
+                    LOG.debug1("BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -758,8 +763,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String hp =
                        dxml.getVirtualInterfacePort(host.getName(), getName());
             if (hostPort != null && !hostPort.equals(hp)) {
-                Tools.appWarning("more ports in " + getName() + " "
-                                 + hp + " " + hostPort);
+                LOG.appWarning("more ports in " + getName() + " " + hp + " " + hostPort);
             }
             hostPort = hp;
             final String savedAddress = savedHostAddresses.get(host);
@@ -825,16 +829,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (insidePort != null
                 && hostInsidePort != null
                 && !insidePort.equals(hostInsidePort)) {
-                Tools.appWarning("multiple proxy inside ports in " + getName()
-                                 + " " + insidePort + " " + hostInsidePort);
+                LOG.appWarning("multiple proxy inside ports in " + getName() + " " + insidePort + " " + hostInsidePort);
             }
             hostInsidePort = insidePort;
 
             if (outsidePort != null
                 && hostOutsidePort != null
                 && !outsidePort.equals(hostOutsidePort)) {
-                Tools.appWarning("multiple proxy outside ports in " + getName()
-                                 + " " + outsidePort + " " + hostOutsidePort);
+                LOG.appWarning("multiple proxy outside ports in " + getName() + " " + outsidePort + " " + hostOutsidePort);
             }
             hostOutsidePort = outsidePort;
 
@@ -1302,7 +1304,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
-        Tools.appWarning("could not get volume nr for: " + thisBDI.getName());
+        LOG.appWarning("could not get volume nr for: " + thisBDI.getName());
         return null;
     }
 

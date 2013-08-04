@@ -53,10 +53,16 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for a host.
  */
 public final class ProxyHostInfo extends Info {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(ProxyHostInfo.class);
     /** Host data. */
     private final Host host;
     /** Name prefix that appears in the menu. */
@@ -115,7 +121,7 @@ public final class ProxyHostInfo extends Info {
                 @Override
                 public void doneError(final String ans, final int exitCode) {
                     ta.setText("error");
-                    Tools.sshError(host, "", ans, stacktrace, exitCode);
+                    LOG.sshError(host, "", ans, stacktrace, exitCode);
                 }
 
             };

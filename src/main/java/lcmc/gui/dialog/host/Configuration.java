@@ -41,6 +41,9 @@ import java.awt.Component;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
@@ -50,6 +53,9 @@ import java.net.InetAddress;
  *
  */
 public class Configuration extends DialogHost {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(Configuration.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Maximum hops. */
@@ -149,10 +155,9 @@ public class Configuration extends DialogHost {
         }
         String hostname = null;
         String ip = null;
-        Tools.debug(this, "addresses.length: " + addresses.length + " a: "
-                          + addresses[0].getHostAddress(), 2);
+        LOG.debug2("addresses.length: " + addresses.length + " a: " + addresses[0].getHostAddress());
         if (addresses.length == 0) {
-            Tools.debug(this, "lookup failed");
+            LOG.debug("lookup failed");
             // lookup failed;
             return false;
         } else if (addresses.length == 1) {
@@ -164,7 +169,7 @@ public class Configuration extends DialogHost {
             try {
                 hostname = InetAddress.getByName(ip).getHostName();
             } catch (UnknownHostException e) {
-                Tools.appError("Host.Configuration.Unknown.Host", "", e);
+                LOG.appError("Host.Configuration.Unknown.Host", "", e);
                 return false;
             }
         } else {
@@ -184,7 +189,7 @@ public class Configuration extends DialogHost {
         hostnames[hop] = hostname;
 
         hostnameField[hop].setValue(hostname);
-        Tools.debug(this, "got " + hostname + " (" + ip + ")", 1);
+        LOG.debug1("got " + hostname + " (" + ip + ")");
         return true;
     }
 

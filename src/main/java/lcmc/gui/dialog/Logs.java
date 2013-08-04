@@ -64,6 +64,9 @@ import javax.swing.JCheckBox;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of an dialog with log files from many hosts.
  *
@@ -71,6 +74,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @version $Id$
  */
 class Logs extends ConfigDialog {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Text area for the log. */
@@ -197,11 +202,11 @@ class Logs extends ConfigDialog {
                                  texts[index] = host.getName()
                                                 + ": "
                                                 + ans + "\n";
-                                 Tools.sshError(host,
-                                                command,
-                                                ans,
-                                                stacktrace,
-                                                exitCode);
+                                 LOG.sshError(host,
+                                              command,
+                                              ans,
+                                              stacktrace,
+                                              exitCode);
                              }
                          }, false, false, 30000);
             i++;
@@ -302,7 +307,7 @@ class Logs extends ConfigDialog {
             try {
                 doc.insertString(start0, line + "\n", color0);
             } catch (Exception e) {
-                Tools.appError("Could not insert line", e);
+                LOG.appError("Could not insert line", e);
             }
 
             logTextArea.setCaretPosition(logTextArea.getDocument().getLength());

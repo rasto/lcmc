@@ -33,6 +33,9 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides Http functions.
  *
@@ -40,6 +43,8 @@ import java.util.Map;
  *
  */
 public final class Http {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Http.class);
     final static String URL_STRING = "http://lcmc.sourceforge.net/cgi-bin/exc";
     //final static String URL_STRING = "http://localhost/cgi-bin/exc";
     final static String ENCODING = "UTF-8";
@@ -55,7 +60,7 @@ public final class Http {
         try {
             url = new URL(URL_STRING);
         } catch (MalformedURLException ex) {
-            Tools.appWarning("malformed URL: " + ex.getMessage());
+            LOG.appWarning("malformed URL: " + ex.getMessage());
             return;
         }
 
@@ -63,7 +68,7 @@ public final class Http {
         try {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException ex) {
-            Tools.appWarning("could not connect: " + ex.getMessage());
+            LOG.appWarning("could not connect: " + ex.getMessage());
             return;
         }
 
@@ -74,14 +79,14 @@ public final class Http {
         try {
             conn.setRequestMethod("POST");
         } catch (ProtocolException ex) {
-            Tools.appWarning("protocol error: " + ex.getMessage());
+            LOG.appWarning("protocol error: " + ex.getMessage());
             return;
         }
 
         try {
             conn.connect();
         } catch (IOException ex) {
-            Tools.appWarning("connection error: " + ex.getMessage());
+            LOG.appWarning("connection error: " + ex.getMessage());
             return;
         }
 
@@ -90,7 +95,7 @@ public final class Http {
         try {
             output = new DataOutputStream(conn.getOutputStream());
         } catch (IOException ex) {
-            Tools.appWarning("error opening for writing: " + ex.getMessage());
+            LOG.appWarning("error opening for writing: " + ex.getMessage());
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         Map<String, String> params = new HashMap<String, String>();
@@ -103,7 +108,7 @@ public final class Http {
             output.flush();
             output.close();
         } catch (IOException ex) {
-            Tools.appWarning("error writing: " + ex.getMessage());
+            LOG.appWarning("error writing: " + ex.getMessage());
             return;
         }
 
@@ -113,11 +118,11 @@ public final class Http {
             BufferedReader input = new BufferedReader(
                                   new InputStreamReader(conn.getInputStream()));
             while (null != ((str = input.readLine()))) {
-                Tools.info(str);
+                LOG.info(str);
             }
             input.close();
         } catch (IOException ex) {
-            Tools.appWarning("error reading: " + ex.getMessage());
+            LOG.appWarning("error reading: " + ex.getMessage());
             return;
         }
     }

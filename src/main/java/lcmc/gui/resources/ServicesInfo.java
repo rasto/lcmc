@@ -73,11 +73,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.EditClusterDialog;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds info data for services view and global heartbeat
  * config.
  */
 public final class ServicesInfo extends EditableInfo {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(ServicesInfo.class);
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** No clone parameter. */
@@ -458,7 +464,7 @@ public final class ServicesInfo extends EditableInfo {
             ServiceInfo newSi;
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {
-                    Tools.appWarning("group in group not implemented");
+                    LOG.appWarning("group in group not implemented");
                     continue;
                 }
                 /* clone group */
@@ -482,7 +488,7 @@ public final class ServicesInfo extends EditableInfo {
                      * the heartbeat script of this service or the we look
                      * in the wrong places.
                      */
-                    Tools.appWarning(hbId + ": could not find resource agent");
+                    LOG.appWarning(hbId + ": could not find resource agent");
                 }
                 /* continue of creating/updating of the
                  * service in the gui.
@@ -1072,7 +1078,7 @@ public final class ServicesInfo extends EditableInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: apply", 1);
+                    LOG.debug1("BUTTON: apply");
                     final Thread thread = new Thread(
                         new Runnable() {
                             @Override
@@ -1091,7 +1097,7 @@ public final class ServicesInfo extends EditableInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    Tools.debug(this, "BUTTON: revert", 1);
+                    LOG.debug1("BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1624,7 +1630,7 @@ public final class ServicesInfo extends EditableInfo {
                             return HbOrderInfo.NOT_AVAIL_FOR_PCMK_VERSION;
                         }
                     } catch (Exceptions.IllegalVersionException e) {
-                        Tools.appWarning("unkonwn version: " + pmV);
+                        LOG.appWarning("unkonwn version: " + pmV);
                         /* enable it, if version check doesn't work */
                     }
                     if (getBrowser().clStatusFailed()) {

@@ -69,6 +69,9 @@ import javax.swing.JTextArea;
 import javax.swing.JComponent;
 import java.awt.Component;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
  * hosts.
@@ -78,6 +81,9 @@ import java.awt.Component;
  *
  */
 final class CoroConfig extends DialogCluster {
+    /** Logger. */
+    private static final Logger LOG =
+                                   LoggerFactory.getLogger(CoroConfig.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Panel for mcast addresses. */
@@ -789,8 +795,7 @@ final class CoroConfig extends DialogCluster {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
         } catch (IllegalVersionException e) {
-            Tools.appWarning("cannot compare corosync version: "
-                             + hosts[0].getCorosyncVersion());
+            LOG.appWarning("cannot compare corosync version: " + hosts[0].getCorosyncVersion());
         }
         if (!corosync2) {
             config.append(plugins(fake));
@@ -873,8 +878,7 @@ final class CoroConfig extends DialogCluster {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
         } catch (IllegalVersionException e) {
-            Tools.appWarning("cannot compare corosync version: "
-                             + hosts[0].getCorosyncVersion());
+            LOG.appWarning("cannot compare corosync version: " + hosts[0].getCorosyncVersion());
         }
         if (corosync2) {
             config.append("\nquorum {\n");

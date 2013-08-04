@@ -127,6 +127,9 @@ import org.apache.commons.collections15.Buffer;
 import org.apache.commons.collections15.BufferUtils;
 import org.apache.commons.collections15.buffer.CircularFifoBuffer;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class provides tools, that are not classified.
  *
@@ -135,20 +138,12 @@ import org.apache.commons.collections15.buffer.CircularFifoBuffer;
  *
  */
 public final class Tools {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Tools.class);
     /** Singleton. */
     private static Tools instance = null;
     /** Release version. */
     private static String release = null;
-    /** Debug level. */
-    private static int debugLevel = -1;
-    /** Whether the warnings should be shown. */
-    private static boolean appWarning;
-    /** Whether application errors should show a dialog. */
-    private static boolean appError;
-    /** Map with all warnings, so that they don't appear more than once. */
-    private static Set<String> appWarningHash = new HashSet<String>();
-    /** Map with all errors, so that they don't appear more than once. */
-    private static Set<String> appErrorHash = new HashSet<String>();
     /** Image icon cache. */
     private static Map<String, ImageIcon> imageIcons =
                                               new HashMap<String, ImageIcon>();
@@ -163,16 +158,6 @@ public final class Tools {
     private static GUIData guiData;
     /** Drbd gui xml object. */
     private static UserConfig userConfig = new UserConfig();
-    /** String that starts error messages. */
-    private static final String ERROR_STRING = "ERROR: ";
-    /** String that starts info messages. */
-    private static final String INFO_STRING = "INFO: ";
-    /** String that starts debug messages. */
-    private static final String DEBUG_STRING = "DEBUG: ";
-    /** string that starts application warnings. */
-    private static final String APPWARNING_STRING = "APPWARNING: ";
-    /** String that starts application errors. */
-    private static final String APPERROR_STRING = "APPERROR: ";
     /** Default dialog panel width. */
     private static final int DIALOG_PANEL_WIDTH = 400;
     /** Default dialog panel height. */
@@ -181,12 +166,6 @@ public final class Tools {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(
                                                           DIALOG_PANEL_WIDTH,
                                                           DIALOG_PANEL_HEIGHT);
-    /** Size of circular log buffer. */
-    private static final int CIRCULAR_LOG_SIZE = 200;
-    /** Synchronized, Cirular log. */
-    public static final Buffer<String> LOG_BUFFER =
-              BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>(
-                                                        CIRCULAR_LOG_SIZE));
     /** Previous index in the scrolling menu. */
     private static volatile int prevScrollingMenuIndex = -1;
     /** Text/html mime type. */
@@ -195,16 +174,8 @@ public final class Tools {
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     /** Pattern that matches a number and unit. */
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
-    /** Time when the application started in seconds. */
-    private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Do not check the swing thread. */
     public static final boolean CHECK_SWING_THREAD = true;
-
-    /** Patterns that match exceptions that can be ignored. */
-    public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
-        Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
-            Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*",
-                            Pattern.DOTALL))));
 
     /** Private constructor. */
     private Tools() {
@@ -228,12 +199,6 @@ public final class Tools {
         guiData = new GUIData();
     }
 
-    /** Returns seconds since start. */
-    private static long seconds() {
-        return System.currentTimeMillis() / 1000 - START_TIME;
-    }
-
-
     /**
      * Returns an ImageIcon, or null if the path was invalid.
      *
@@ -247,7 +212,7 @@ public final class Tools {
         final java.net.URL imgURL =
                         Tools.class.getResource("/images/" + imageFilename);
         if (imgURL == null) {
-            Tools.appWarning("Couldn't find image: " + imageFilename);
+            LOG.appWarning("Couldn't find image: " + imageFilename);
             return null;
         } else {
             final ImageIcon newIcon = new ImageIcon(imgURL);
@@ -267,195 +232,20 @@ public final class Tools {
             release = p.getProperty("release");
             return release;
         } catch (IOException e) {
-            appError("cannot open release file", "", e);
+            LOG.appError("cannot open release file", "", e);
             return "unknown";
         }
     }
 
-    /** Prints info message to the stdout. */
-    public static void info(final String msg) {
-        final String msg0 = INFO_STRING + msg;
-        System.out.println(msg0);
-        LOG_BUFFER.add(msg0);
-    }
-
     /** Sets defaults from AppDefaults bundle. */
     public static void setDefaults() {
-        debugLevel = getDefaultInt("DebugLevel");
+        LoggerFactory.setDebugLevel(getDefaultInt("DebugLevel"));
         if (getDefault("AppWarning").equals("y")) {
-            appWarning = true;
+            LoggerFactory.setAppWarning(true);
         }
         if (getDefault("AppError").equals("y")) {
-            appError = true;
+            LoggerFactory.setAppError(true);
         }
-    }
-
-    /** Increments the debug level. */
-    public static void incrementDebugLevel() {
-        debugLevel++;
-        info("debug level: " + debugLevel);
-    }
-
-    /** Decrements the debug level. */
-    public static void decrementDebugLevel() {
-        debugLevel--;
-        info("debug level: " + debugLevel);
-    }
-
-    /**
-     * Sets debug level.
-     *
-     * @param level
-     *          debug level usually from 0 to 2. 0 means no debug output.
-     */
-    public static void setDebugLevel(final int level) {
-        debugLevel = level;
-    }
-
-    /**
-     * Prints debug message to the stdout.
-     *
-     * @param msg
-     *          debug message
-     */
-    private static void debug(final String msg) {
-        if (debugLevel > -1) {
-            final String msg0 = DEBUG_STRING + "[" + seconds() + "s] " + msg
-                                + " (lcmc.utilities.Tools)";
-            if (debugLevel > 0) {
-                System.out.println(msg0);
-            }
-            LOG_BUFFER.add(msg0);
-        }
-    }
-
-    /**
-     * Prints debug message to the stdout. Only messages with level smaller
-     * or equal than debug level will be printed.
-     *
-     * @param msg
-     *          debug message
-     *
-     * @param level
-     *          level of this message.
-     */
-    private static void debug(final String msg, final int level) {
-        if (level <= debugLevel + 1) {
-            final String msg0 = DEBUG_STRING
-                                + "(" + level + ") "
-                                + "[" + seconds() + "s] "
-                                + msg + " (lcmc.utilities.Tools)";
-            if (level <= debugLevel) {
-                System.out.println(msg0);
-            }
-            LOG_BUFFER.add(msg0);
-        }
-    }
-
-    /**
-     * Prints debug message to the stdout.
-     *
-     * @param object
-     *          object from which this message originated. Use "this" by
-     *          caller for this.
-     * @param msg
-     *          debug message
-     */
-    public static void debug(final Object object, final String msg) {
-        if (debugLevel > -2) {
-            String msg0;
-            if (object == null) {
-                msg0 = DEBUG_STRING + "[" + seconds() + "s] " + msg;
-            } else {
-                msg0 = DEBUG_STRING
-                       + "[" + seconds() + "s] "
-                       + msg
-                       + " (" + object.getClass().getName() + ")";
-            }
-            if (debugLevel > -1) {
-                System.out.println(msg0);
-            }
-            LOG_BUFFER.add(msg0);
-        }
-    }
-
-    /**
-     * Prints debug message to the stdout. Only messages with level smaller
-     * or equal than debug level will be printed.
-     *
-     * @param object
-     *          object from which this message originated. Use "this" by
-     *          caller for this.
-     * @param msg
-     *          debug message
-     * @param level
-     *          level of this message.
-     */
-    public static void debug(final Object object,
-                             final String msg,
-                             final int level) {
-        if (level <= debugLevel + 1) {
-            String from = "";
-            if (object != null) {
-                from = " (" + object.getClass().getName() + ")";
-            }
-            final String msg0 = DEBUG_STRING
-                                + "(" + level + ") "
-                                + "[" + seconds() + "s] "
-                                + msg
-                                + from;
-            if (level <= debugLevel) {
-                System.out.println(msg0);
-            }
-            LOG_BUFFER.add(msg0);
-        }
-    }
-
-    /**
-     * Shows error message dialog and prints error to the stdout.
-     *
-     * @param msg
-     *          error message
-     */
-    public static void error(final String msg) {
-        final String msg0 = ERROR_STRING + msg;
-        System.out.println(msg0);
-        LOG_BUFFER.add(msg0);
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(
-                            guiData.getMainFrame(),
-                            new JScrollPane(new JTextArea(msg, 20, 60)),
-                            Tools.getString("Error.Title"),
-                            JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-    }
-
-    /** Show an ssh error message. */
-    public static void sshError(final Host host,
-                                final String command,
-                                final String ans,
-                                final String stacktrace,
-                                final int exitCode) {
-        final StringBuilder onHost = new StringBuilder("");
-        if (host != null) {
-            onHost.append(" on host ");
-            final Cluster cluster = host.getCluster();
-            if (cluster != null) {
-                onHost.append(cluster.getName());
-                onHost.append(" / ");
-            }
-            onHost.append(host.getName());
-        }
-        Tools.appWarning(Tools.getString("Tools.sshError.command")
-                         + " '" + command + "'" + onHost.toString() + "\n"
-                         + Tools.getString("Tools.sshError.returned")
-                         + " " + exitCode + "\n"
-                         + ans + "\n"
-                         + stacktrace);
     }
 
     /**
@@ -498,17 +288,13 @@ public final class Tools {
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 Tools.appWarning(ERROR_STRING
-                                                  + command
-                                                  + " "
-                                                  + ans + " rc: "
-                                                  + exitCode);
+                                 LOG.appWarning(command + " " + ans + " rc: " + exitCode);
                                  if (outputVisible) {
-                                    Tools.sshError(host,
-                                                   command,
-                                                   ans,
-                                                   stacktrace,
-                                                   exitCode);
+                                    LOG.sshError(host,
+                                                 command,
+                                                 ans,
+                                                 stacktrace,
+                                                 exitCode);
                                  }
                                  exitCodeHolder[0] = exitCode;
                                  output.append(ans);
@@ -556,11 +342,11 @@ public final class Tools {
                              public void doneError(final String ans,
                                                    final int exitCode) {
                                  if (outputVisible) {
-                                    Tools.sshError(host,
-                                                   command,
-                                                   ans,
-                                                   stacktrace,
-                                                   exitCode);
+                                    LOG.sshError(host,
+                                                 command,
+                                                 ans,
+                                                 stacktrace,
+                                                 exitCode);
                                  }
                                  exitCodeHolder[0] = exitCode;
                                  output.append(ans);
@@ -585,133 +371,6 @@ public final class Tools {
             Thread.currentThread().interrupt();
         }
         return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
-    }
-
-    /**
-     * Shows application warning message dialog if application warning messages
-     * are enabled.
-     *
-     * @param msg
-     *          warning message
-     */
-    public static void appWarning(final String msg) {
-        if (!appWarningHash.contains(msg)) {
-            appWarningHash.add(msg);
-            final String msg0 = APPWARNING_STRING + msg;
-            if (appWarning) {
-                System.out.println(msg0);
-                LOG_BUFFER.add(msg0);
-            } else {
-                debug(msg0);
-            }
-        }
-    }
-
-    /** Warning with exception error message. */
-    public static void appWarning(final String msg, final Exception e) {
-        if (!appWarningHash.contains(msg)) {
-            appWarningHash.add(msg);
-            final String msg0 = APPWARNING_STRING + msg + ": "
-                                + e.getMessage();
-            if (appWarning) {
-                System.out.println(msg0);
-                LOG_BUFFER.add(msg0);
-            } else {
-                debug(msg0);
-            }
-        }
-    }
-
-    /**
-     * Shows application error message dialog if application error messages
-     * are enabled.
-     *
-     * @param msg
-     *          error message
-     */
-    public static void appError(final String msg) {
-        appError(msg, "", null);
-    }
-
-    /**
-     * Shows application error message dialog if application error messages
-     * are enabled.
-     *
-     * @param msg
-     *          error message
-     * @param msg2
-     *          second error message in a new line.
-     */
-    public static void appError(final String msg, final String msg2) {
-        appError(msg, msg2, null);
-    }
-
-    /** Shows application error message dialog, with a stacktrace. */
-    public static void appError(final String msg, final Throwable e) {
-        appError(msg, "", e);
-    }
-
-    /**
-     * Shows application error message dialog with stack trace if
-     * application error messages are enabled.
-     *
-     * @param msg
-     *          error message
-     * @param msg2
-     *          second error message in a new line.
-     *
-     * @param e
-     *          Exception object.
-     */
-    public static void appError(final String msg,
-                                final String msg2,
-                                final Throwable e) {
-        if (appErrorHash.contains(msg + msg2)) {
-            return;
-        }
-        appErrorHash.add(msg + msg2);
-        final StringBuilder errorString = new StringBuilder(300);
-        errorString.append("\nApplication error, ")
-                   .append("switching to read-only mode.\n")
-                   .append(msg)
-                   .append("\nLCMC release: ")
-                   .append(getRelease())
-                   .append("\nJava: ")
-                   .append(System.getProperty("java.vendor"))
-                   .append(' ')
-                   .append(System.getProperty("java.version"))
-                   .append("\n\n=== error ===\n")
-                   .append(msg2)
-                   .append(getStackTrace(e));
-
-        if (e == null) {
-            /* stack trace */
-            errorString.append('\n');
-            errorString.append(getStackTrace());
-        }
-
-
-        System.out.println(APPERROR_STRING + errorString);
-        if (!appError) {
-            return;
-        }
-        if (ignoreException(e)) {
-            System.out.println("ignoring: " + APPERROR_STRING + errorString);
-            return;
-        }
-
-        Tools.getGUIData().getMainMenu().setOperatingMode(
-                                                        ConfigData.OP_MODE_RO);
-
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final BugReport br = new BugReport(BugReport.UNKNOWN_CLUSTER,
-                                                   errorString.toString());
-                br.showDialog();
-            }
-        });
-        t.start();
     }
 
     public static String getStackTrace(final Throwable e) {
@@ -835,7 +494,7 @@ public final class Tools {
             try {
                 in.close();
             } catch (IOException ex) {
-                Tools.appError("Could not close: " + filename, ex);
+                LOG.appError("Could not close: " + filename, ex);
             }
         }
         return content.toString();
@@ -843,7 +502,7 @@ public final class Tools {
 
     /** Loads config data from the specified file. */
     public static void loadConfigData(final String filename) {
-        debug("load", 0);
+        LOG.debug("load");
         final String xml = loadFile(filename, true);
         if (xml == null) {
             return;
@@ -884,7 +543,7 @@ public final class Tools {
     /** Removes the specified clusters from the gui. */
     public static void removeClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
-            Tools.debug("remove hosts from cluster: " + cluster.getName(), 1);
+            LOG.debug1("remove hosts from cluster: " + cluster.getName());
             getConfigData().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
                 host.removeFromCluster();
@@ -915,7 +574,7 @@ public final class Tools {
                 String ip = null;
                 if (addresses != null) {
                     if (addresses.length == 0) {
-                        Tools.debug("lookup failed");
+                        LOG.debug("lookup failed");
                         /* lookup failed */
                     } else {
                         ip = addresses[0].getHostAddress();
@@ -967,7 +626,7 @@ public final class Tools {
                 whether to save clusters specified from the command line
      */
     public static void save(final String filename, final boolean saveAll) {
-        debug("save");
+        LOG.debug("save");
         final String text =
             Tools.getString("Tools.Saving").replaceAll(
                                            "@FILENAME@",
@@ -976,9 +635,9 @@ public final class Tools {
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             userConfig.saveXML(fileOut, saveAll);
-            debug("saved: " + filename, 0);
+            LOG.debug("saved: " + filename);
         } catch (IOException e) {
-            appError("error saving: " + filename, "", e);
+            LOG.appError("error saving: " + filename, "", e);
         } finally {
             try {
                 Thread.sleep(1000);
@@ -1036,7 +695,7 @@ public final class Tools {
         try {
             return resourceAppDefaults.getString(option);
         } catch (Exception e) {
-            appError("unresolved config resource", option, e);
+            LOG.appError("unresolved config resource", option, e);
             return option;
         }
     }
@@ -1059,7 +718,7 @@ public final class Tools {
         try {
             return (Color) resourceAppDefaults.getObject(option);
         } catch (Exception e) {
-            appError("unresolved config resource", option, e);
+            LOG.appError("unresolved config resource", option, e);
             return Color.WHITE;
         }
     }
@@ -1091,9 +750,7 @@ public final class Tools {
         try {
             return (Integer) resourceAppDefaults.getObject(option);
         } catch (Exception e) {
-            appError("AppError.getInt.Exception",
-                     option + ": " + getDefault(option),
-                     e);
+            LOG.appError("AppError.getInt.Exception", option + ": " + getDefault(option), e);
             return 0;
         }
         /*
@@ -1155,7 +812,7 @@ public final class Tools {
         try {
             return resource.getString(text);
         } catch (Exception e) {
-            appError("unresolved resource: " + text);
+            LOG.appError("unresolved resource: " + text);
             return text;
         }
     }
@@ -1172,12 +829,7 @@ public final class Tools {
             version = "";
         }
         final Locale locale = new Locale(dist, version);
-        debug("getDistString text: "
-              + text
-              + " dist: "
-              + dist
-              + " version: "
-              + version, 2);
+        LOG.debug2("getDistString text: " + text + " dist: " + dist + " version: " + version);
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
         String ret;
@@ -1191,7 +843,7 @@ public final class Tools {
                 if (ret == null) {
                     ret = resourceString.getString(text);
                 }
-                debug("ret: " + ret, 2);
+                LOG.debug2("ret: " + ret);
                 return ret;
             } catch (Exception e) {
                 return null;
@@ -1213,12 +865,7 @@ public final class Tools {
             version = "";
         }
         final Locale locale = new Locale(dist, version);
-        debug("getDistStrings text: "
-              + text
-              + " dist: "
-              + dist
-              + " version: "
-              + version, 2);
+        LOG.debug2("getDistStrings text: " + text + " dist: " + dist + " version: " + version);
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
         List<String> ret;
@@ -1259,7 +906,7 @@ public final class Tools {
         for (final String t : texts) {
             String distString = getDistString(t, dist, version, arch);
             if (distString == null) {
-                Tools.appWarning("unknown command: " + t);
+                LOG.appWarning("unknown command: " + t);
                 distString = t;
             }
             if (inBash && i == 0) {
@@ -1298,8 +945,7 @@ public final class Tools {
         try {
             return resourceSD.getStringArray(service);
         } catch (Exception e) {
-            Tools.appWarning("cannot get service definition for service: "
-                             + service, e);
+            LOG.appWarning("cannot get service definition for service: " + service, e);
             return new String[]{};
         }
     }
@@ -1339,7 +985,7 @@ public final class Tools {
         if (dist == null) {
             dist = "";
         }
-        debug("dist: " + dist + ", version: " + version, 2);
+        LOG.debug2("dist: " + dist + ", version: " + version);
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
@@ -1366,7 +1012,7 @@ public final class Tools {
                 distVersion = version;
             }
         }
-        debug("dist version: " + distVersion, 2);
+        LOG.debug2("dist version: " + distVersion);
         return distVersion;
     }
     /**
@@ -2080,7 +1726,7 @@ public final class Tools {
             }
             return content.toString();
         } catch (IOException e) {
-            Tools.appError("could not read: " + fileName, "", e);
+            LOG.appError("could not read: " + fileName, "", e);
             return null;
         }
     }
@@ -2103,7 +1749,7 @@ public final class Tools {
         for (final String arg : args) {
             final String[] pair = arg.split(":");
             if (pair == null || pair.length != 2) {
-                appWarning("cannot parse: " + line);
+                LOG.appWarning("cannot parse: " + line);
                 return;
             }
             final String option = pair[0];
@@ -2131,7 +1777,7 @@ public final class Tools {
             } else if (global) {
                 Tools.getConfigData().addAutoOption("global", option, value);
             } else {
-                appWarning("cannot parse: " + line);
+                LOG.appWarning("cannot parse: " + line);
                 return;
             }
         }
@@ -2180,7 +1826,7 @@ public final class Tools {
                             version = v;
                         }
                     } catch (Exceptions.IllegalVersionException e) {
-                        Tools.appWarning(e.getMessage(), e);
+                        LOG.appWarning(e.getMessage(), e);
                     }
                 } else if (info == null) {
                     final Matcher im = iPattern.matcher(line);
@@ -2210,9 +1856,9 @@ public final class Tools {
                 }
             }
         } catch (final IOException e) {
-            Tools.error("can't open: " + url + "; " + e.getMessage());
+            LOG.error("can't open: " + url + "; " + e.getMessage());
         } catch (final URISyntaxException e) {
-            Tools.error("can't open: " + url + "; " + e.getMessage());
+            LOG.error("can't open: " + url + "; " + e.getMessage());
         }
     }
 
@@ -2229,14 +1875,14 @@ public final class Tools {
             return remotePort;
         }
         final int localPort = remotePort + getConfigData().getVncPortOffset();
-        debug("start port forwarding " + remotePort + " -> " + localPort);
+        LOG.debug("start port forwarding " + remotePort + " -> " + localPort);
         try {
             host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
         } catch (final java.io.IOException e) {
-            Tools.error("unable to create the tunnel "
-                        + remotePort + " -> " + localPort
-                        + ": " + e.getMessage()
-                        + "\ntry the --vnc-port-offset option");
+            LOG.error("unable to create the tunnel "
+                      + remotePort + " -> " + localPort
+                      + ": " + e.getMessage()
+                      + "\ntry the --vnc-port-offset option");
             return -1;
         }
         return localPort;
@@ -2249,11 +1895,11 @@ public final class Tools {
             return;
         }
         final int remotePort = localPort - getConfigData().getVncPortOffset();
-        debug("stop port forwarding " + remotePort);
+        LOG.debug("stop port forwarding " + remotePort);
         try {
             host.getSSH().stopVncPortForwarding(remotePort);
         } catch (final java.io.IOException e) {
-            Tools.appError("unable to close tunnel", e);
+            LOG.appError("unable to close tunnel", e);
         }
     }
 
@@ -2791,7 +2437,7 @@ public final class Tools {
         } catch (final InterruptedException ix) {
             Thread.currentThread().interrupt();
         } catch (final InvocationTargetException x) {
-            Tools.appError("invokeAndWait: exception", x);
+            LOG.appError("invokeAndWait: exception", x);
         }
     }
 
@@ -2894,7 +2540,7 @@ public final class Tools {
                    && hbV != null
                    && Tools.compareVersions(hbV, "2.99.0") < 0;
         } catch (Exceptions.IllegalVersionException e) {
-            Tools.appWarning(e.getMessage(), e);
+            LOG.appWarning(e.getMessage(), e);
             return false;
         }
     }
@@ -3066,37 +2712,5 @@ public final class Tools {
         if (st.indexOf("java.awt.event.InvocationEvent.dispatch") >= 0) {
             System.out.println("swing thread: " + st);
         }
-    }
-
-    /** Return the whole log buffer. */
-    public static String getLogBuffer() {
-        final StringBuilder lb = new StringBuilder();
-        synchronized (LOG_BUFFER) {
-            for (final String l : LOG_BUFFER) {
-                lb.append(l).append('\n');
-            }
-        }
-        return lb.toString();
-    }
-
-    /** Return whether to ignore some exception. */
-    private static boolean ignoreException(final Throwable e) {
-        final String vendor = System.getProperty("java.vendor");
-        final String version = System.getProperty("java.version");
-        final String stackTrace = getStackTrace(e);
-        final String exception = new StringBuilder(vendor)
-                                        .append(':')
-                                        .append(version)
-                                        .append(':')
-                                        .append(e.getMessage())
-                                        .append('\n')
-                                        .append(stackTrace)
-                                        .toString();
-        for (final Pattern p : IGNORE_EXCEPTION_PATTERNS) {
-            if (p.matcher(exception).matches()) {
-                return true;
-            }
-        }
-        return false;
     }
 }

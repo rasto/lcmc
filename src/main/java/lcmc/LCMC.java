@@ -64,10 +64,15 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This is the central class with main function. It starts the LCMC GUI.
  */
 public final class LCMC extends JPanel {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Uncaught exception flag. */
@@ -337,7 +342,7 @@ public final class LCMC extends JPanel {
                     if (!uncaughtException
                         && Tools.getGUIData().getMainFrame() != null) {
                         uncaughtException = true;
-                        Tools.appError("", ex.toString(), ex);
+                        LOG.appError("", ex.toString(), ex);
                     }
                 }
             });
@@ -502,7 +507,7 @@ public final class LCMC extends JPanel {
             if (cmd.hasOption(DEBUG_OP)) {
                 final String level = cmd.getOptionValue(DEBUG_OP);
                 if (level != null && Tools.isNumber(level)) {
-                    Tools.setDebugLevel(Integer.parseInt(level));
+                    LoggerFactory.setDebugLevel(Integer.parseInt(level));
                 } else {
                     throw new ParseException(
                                         "cannot parse debug level: " + level);
@@ -558,7 +563,7 @@ public final class LCMC extends JPanel {
                 Tools.getConfigData().setScale(scale);
                 Tools.resizeFonts(scale);
             } catch (java.lang.NumberFormatException e) {
-                Tools.appWarning("cannot parse scale: " + scaleOp);
+                LOG.appWarning("cannot parse scale: " + scaleOp);
             }
 
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
@@ -600,7 +605,7 @@ public final class LCMC extends JPanel {
                 Tools.getConfigData().setMaxAccessType(
                                           ConfigData.AccessType.ADMIN);
             } else if (opMode != null) {
-                Tools.appWarning("unknown operating mode: " + opMode);
+                LOG.appWarning("unknown operating mode: " + opMode);
             }
             if (cmd.hasOption(SLOW_OP)) {
                 fps = fps / 2;
@@ -625,9 +630,7 @@ public final class LCMC extends JPanel {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
         }
-        Tools.debug(null, "max mem: "
-                          + Runtime.getRuntime().maxMemory() / 1024 / 1024
-                          + "m", 1);
+        LOG.debug1("max mem: " + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "m");
         return autoArgs;
     }
 
@@ -752,8 +755,7 @@ public final class LCMC extends JPanel {
         }
         final String failedHost = Tools.setUserConfigFromOptions(clusters);
         if (failedHost != null) {
-            Tools.appWarning("could not resolve host \"" + failedHost
-                             + "\" skipping");
+            LOG.appWarning("could not resolve host \"" + failedHost + "\" skipping");
         }
     }
 

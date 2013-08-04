@@ -25,6 +25,9 @@ package lcmc.data.resources;
 
 import lcmc.utilities.Tools;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds data of one cluster network.
  *
@@ -33,6 +36,8 @@ import lcmc.utilities.Tools;
  *
  */
 public final class Network extends Resource {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Network.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** List of all ips in the network. */
@@ -69,7 +74,7 @@ public final class Network extends Resource {
     /** Returns value of the parameter. */
     @Override
     public String getValue(final String parameter) {
-        Tools.appError("Wrong call to getValue");
+        LOG.appError("Wrong call to getValue");
         return "???";
     }
 }

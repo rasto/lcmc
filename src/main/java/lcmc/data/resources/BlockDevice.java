@@ -35,6 +35,9 @@ import java.util.Collections;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * This class holds data of one block device.
  *
@@ -43,6 +46,9 @@ import java.util.regex.Matcher;
  *
  */
 public final class BlockDevice extends Resource {
+    /** Logger. */
+    private static final Logger LOG =
+                                  LoggerFactory.getLogger(BlockDevice.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Block size in blocks. */
@@ -129,7 +135,7 @@ public final class BlockDevice extends Resource {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
-            Tools.appWarning("cannot parse line: " + line);
+            LOG.appWarning("cannot parse line: " + line);
         } else {
             final String device = cols[0];
             setName(device);
@@ -139,7 +145,7 @@ public final class BlockDevice extends Resource {
                 if (m.matches()) {
                     tokens.put(m.group(1), m.group(2));
                 } else {
-                    Tools.appWarning("could not parse: " + line);
+                    LOG.appWarning("could not parse: " + line);
                 }
             }
             this.readlink  = tokens.get("rl");

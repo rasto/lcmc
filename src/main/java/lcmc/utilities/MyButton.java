@@ -39,11 +39,16 @@ import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 
 /**
  * This class creates a button with any gradient colors.
  */
 public class MyButton extends JButton implements ComponentWithTest {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(MyButton.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Default background color. */
@@ -70,7 +75,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -88,7 +93,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -108,7 +113,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -144,7 +149,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            Tools.appError("Robot error");
+            LOG.appError("Robot error");
         }
         robot = r;
 

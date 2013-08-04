@@ -40,6 +40,9 @@ import javax.swing.BoxLayout;
 
 import java.awt.Component;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
@@ -49,6 +52,8 @@ import java.awt.Component;
  *
  */
 final class BlockDev extends DrbdConfig {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** This block device. */
@@ -113,7 +118,7 @@ final class BlockDev extends DrbdConfig {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 Tools.getGUIData().getMainFrame().requestFocus();
             } catch (Exceptions.DrbdConfigException dce) {
-                Tools.appError("config failed", dce);
+                LOG.appError("config failed", dce);
             }
             return new CreateMD(this, getDrbdVolumeInfo());
         }

@@ -26,10 +26,16 @@ import lcmc.utilities.Unit;
 import lcmc.data.AccessMode;
 import java.util.Map;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * @author Rasto Levrinc
  */
 public final class WidgetFactory {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(WidgetFactory.class);
     private WidgetFactory() {
     }
 
@@ -65,7 +71,7 @@ public final class WidgetFactory {
         if (type != null
             && type != Widget.Type.TEXTFIELDWITHUNIT
             && units != null) {
-            Tools.appError("wrong type with units: " + type);
+            LOG.appError("wrong type with units: " + type);
         }
         if (type == null) {
             /* type detection */
@@ -138,7 +144,7 @@ public final class WidgetFactory {
                                     enableAccessMode,
                                     fieldButton);
             default:
-                Tools.appError("unknown type: " + type);
+                LOG.appError("unknown type: " + type);
                 return null;
         }
     }
