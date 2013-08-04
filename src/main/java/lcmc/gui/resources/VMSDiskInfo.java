@@ -363,6 +363,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
     /** Default source port if none is specified (and it is needed). */
     public static final String DEFAULT_SOURCE_HOST_PORT = "6789";
+    private final List<Map<String, Widget>> checkFieldList =
+                                          new ArrayList<Map<String, Widget>>();
 
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -371,6 +373,14 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     VMSDiskInfo(final String name, final Browser browser,
                        final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
+
+        checkFieldList.add(sourceNameWi);
+        checkFieldList.add(sourceProtocolWi);
+        checkFieldList.add(sourceHostNameWi);
+        checkFieldList.add(sourceHostPortWi);
+        checkFieldList.add(authUsernameWi);
+        checkFieldList.add(authSecretTypeWi);
+        checkFieldList.add(authSecretUuidWi);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -765,20 +775,11 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                     for (final String p : sourceDeviceWi.keySet()) {
                         sourceDeviceWi.get(p).setVisible(block);
                     }
-                    for (final Map<String, Widget> w
-                                : new ArrayList<Map<String, Widget>>(
-                                            Arrays.asList(sourceNameWi,
-                                                          sourceProtocolWi,
-                                                          sourceHostNameWi,
-                                                          sourceHostPortWi,
-                                                          authUsernameWi,
-                                                          authSecretTypeWi,
-                                                          authSecretUuidWi))) {
+                    for (final Map<String, Widget> w : checkFieldList) {
                         for (String p : w.keySet()) {
                             w.get(p).setVisible(network);
                         }
                     }
-
                 }
             });
             checkOneParam(DiskData.SOURCE_FILE);

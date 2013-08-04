@@ -857,11 +857,11 @@ public final class GroupInfo extends ServiceInfo {
 
     @Override
     public void removeInfo() {
-        @SuppressWarnings("unchecked")
         final DefaultMutableTreeNode node = getNode();
         if (node == null) {
             return;
         }
+        @SuppressWarnings("unchecked")
         final Enumeration<DefaultMutableTreeNode> e = node.children();
         try {
             while (e.hasMoreElements()) {
