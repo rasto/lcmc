@@ -613,6 +613,9 @@ public final class DrbdGraph extends ResourceGraph {
     /** Returns the source block device in a drbd connection. */
     public BlockDevInfo getSource(final DrbdVolumeInfo dvi) {
         final Edge edge = drbdVolumeToEdgeMap.get(dvi);
+        if (edge == null) {
+            return null;
+        }
         final Vertex source = edge.getSource();
         return (BlockDevInfo) getInfo(source);
     }
