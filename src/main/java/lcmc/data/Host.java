@@ -1229,31 +1229,34 @@ public final class Host implements Comparable<Host> {
 
     /** Stops server (hw) status background process. */
     public void stopServerStatus() {
-        if (serverStatusThread == null) {
+        final ExecCommandThread sst = serverStatusThread;
+        if (sst == null) {
             LOG.appWarning("trying to stop stopped server status");
             return;
         }
-        serverStatusThread.cancel();
+        sst.cancel();
         serverStatusThread = null;
     }
 
     /** Stops drbd status background process. */
     public void stopDrbdStatus() {
-        if (drbdStatusThread == null) {
+        final ExecCommandThread dst = drbdStatusThread;
+        if (dst == null) {
             LOG.appWarning("trying to stop stopped drbd status");
             return;
         }
-        drbdStatusThread.cancel();
+        dst.cancel();
         drbdStatusThread = null;
     }
 
     /** Waits till the drbd status command finishes. */
     public void waitOnDrbdStatus() {
-        if (drbdStatusThread != null) {
+        final ExecCommandThread dst = drbdStatusThread;
+        if (dst != null) {
             try {
                 /* it probably hangs after this timeout, so it will be
                  * killed. */
-                drbdStatusThread.join();
+                dst.join();
             } catch (java.lang.InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -1294,11 +1297,12 @@ public final class Host implements Comparable<Host> {
 
     /** Stops hb status background process. */
     public void stopClStatus() {
-        if (clStatusThread == null) {
+        final ExecCommandThread cst = clStatusThread;
+        if (cst == null) {
             LOG.appWarning("trying to stop stopped hb status");
             return;
         }
-        clStatusThread.cancel();
+        cst.cancel();
     }
 
     /** Gets ip. There can be more ips, delimited with "," */
@@ -1900,7 +1904,10 @@ public final class Host implements Comparable<Host> {
                          false,
                          HW_INFO_TIMEOUT);
         try {
-            serverStatusThread.join();
+            final ExecCommandThread sst = serverStatusThread;
+            if (sst != null) {
+                sst.join();
+            }
         } catch (java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
