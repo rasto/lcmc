@@ -175,7 +175,7 @@ public final class TestSuite1 {
             return;
         }
 
-        Tools.setDebugLevel(-1);
+        LoggerFactory.setDebugLevel(-1);
         if (CLUSTER) {
             String username;
             boolean useSudo;

@@ -263,7 +263,7 @@ public final class HostTest1 extends TestCase {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                Tools.info("error");
+                                //Tools.info("error");
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -287,7 +287,7 @@ public final class HostTest1 extends TestCase {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                Tools.info("error");
+                                //Tools.info("error");
                             }
                           },
                           null,   /* ConvertCmdCallback */
