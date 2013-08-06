@@ -20,9 +20,14 @@ import javax.swing.JCheckBox;
 import java.net.InetAddress;
 import lcmc.Exceptions;
 import lcmc.data.Host;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 import mockit.Deencapsulation;
 
+
 public final class ToolsTest1 extends TestCase {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(ToolsTest1.class);
     @Before
     @Override
     protected void setUp() {
@@ -54,70 +59,71 @@ public final class ToolsTest1 extends TestCase {
         TestSuite1.realPrintln("release: " + release);
     }
 
-    //@Test
-    //public void testInfo() {
-    //    Tools.info("info a");
-    //    assertEquals(TestSuite1.INFO_STRING + "info a\n",
-    //                 TestSuite1.getStdout());
-    //    TestSuite1.clearStdout();
-    //}
+    @Test
+    public void testInfo() {
+        LOG.info("info a");
+        assertEquals(TestSuite1.INFO_STRING + "info a\n",
+                     TestSuite1.getStdout());
+        TestSuite1.clearStdout();
+    }
 
     @Test
     public void testSetDefaults() {
         Tools.setDefaults();
     }
 
-    //@Test
-    //public void testDebug() {
-    //    Tools.setDebugLevel(1);
-    //    Tools.debug(null, "test a");
-    //    assertTrue(TestSuite1.getStdout().indexOf("test a\n") > 0);
-    //    TestSuite1.clearStdout();
-    //    Tools.setDebugLevel(0);
-    //    Tools.decrementDebugLevel(); /* -1 */
-    //    TestSuite1.clearStdout();
-    //    Tools.debug(null, "test b");
-    //    assertEquals("", TestSuite1.getStdout());
-    //    Tools.incrementDebugLevel(); /* 0 */
-    //    TestSuite1.clearStdout();
-    //    Tools.debug(null, "test c");
-    //    assertTrue(TestSuite1.getStdout().indexOf("test c\n") > 0);
-    //    TestSuite1.clearStdout();
-    //    Tools.setDebugLevel(1); /* 1 */
-    //    TestSuite1.clearStdout();
-    //    Tools.debug(new Object(), "test d2", 2);
-    //    Tools.debug(new Object(), "test d1", 1);
-    //    Tools.debug(new Object(), "test d0", 0);
-    //    final Pattern p = Pattern.compile("^" + TestSuite1.DEBUG_STRING
-    //            + "\\(1\\) \\[\\d+s\\] test d1 \\(java\\.lang\\.Object\\)\\s+"
-    //            + TestSuite1.DEBUG_STRING + ".*"
-    //            + "\\(0\\) \\[\\d+s\\] test d0 \\(java\\.lang\\.Object\\)\\s+");
-    //    final Matcher m = p.matcher(TestSuite1.getStdout());
-    //    assertTrue(m.matches());
-    //    TestSuite1.clearStdout();
-    //    Tools.setDebugLevel(-1);
-    //}
+    @Test
+    public void testDebug() {
+        LoggerFactory.setDebugLevel(1);
+        LOG.debug("test a");
+        assertTrue(TestSuite1.getStdout().indexOf("test a") > 0);
+        TestSuite1.clearStdout();
+        LoggerFactory.setDebugLevel(0);
+        LoggerFactory.decrementDebugLevel(); /* -1 */
+        TestSuite1.clearStdout();
+        LOG.debug("test b");
+        assertEquals("", TestSuite1.getStdout());
+        LoggerFactory.incrementDebugLevel(); /* 0 */
+        TestSuite1.clearStdout();
+        LOG.debug("test c");
+        assertTrue(TestSuite1.getStdout().indexOf("test c") > 0);
+        TestSuite1.clearStdout();
+        LoggerFactory.setDebugLevel(1); /* 1 */
+        TestSuite1.clearStdout();
+        LOG.debug2("test d2");
+        LOG.debug1("test d1");
+        LOG.debug("test d0");
+        final Pattern p = Pattern.compile("^" + TestSuite1.DEBUG_STRING
+                + "\\(1\\): \\[\\d+s\\] test d1 \\(.*\\).*"
+                + TestSuite1.DEBUG_STRING + ":.*"
+                + " \\[\\d+s\\] test d0 \\(.*\\).*",
+                Pattern.DOTALL);
+        final Matcher m = p.matcher(TestSuite1.getStdout());
+        assertTrue(m.matches());
+        TestSuite1.clearStdout();
+        LoggerFactory.setDebugLevel(-1);
+    }
 
-    //@Test
-    //public void testError() {
-    //    if (TestSuite1.INTERACTIVE) {
-    //        Tools.error("test error a / just click ok");
-    //        assertEquals(TestSuite1.ERROR_STRING
-    //                     + "test error a / just click ok\n",
-    //                     TestSuite1.getStdout());
-    //        TestSuite1.clearStdout();
-    //    }
-    //}
+    @Test
+    public void testError() {
+        if (TestSuite1.INTERACTIVE) {
+            LOG.error("test error a / just click ok");
+            assertEquals(TestSuite1.ERROR_STRING
+                         + "test error a / just click ok\n",
+                         TestSuite1.getStdout());
+            TestSuite1.clearStdout();
+        }
+    }
 
-    //@Test
-    //public void testSSHError() {
-    //    for (final Host host : TestSuite1.getHosts()) {
-    //        Tools.sshError(host, "cmd a", "ans a", "stack trace a", 2);
-    //        assertTrue(
-    //            TestSuite1.getStdout().indexOf("returned exit code 2") >= 0);
-    //        TestSuite1.clearStdout();
-    //    }
-    //}
+    @Test
+    public void testSSHError() {
+        for (final Host host : TestSuite1.getHosts()) {
+            LOG.sshError(host, "cmd a", "ans a", "stack trace a", 2);
+            assertTrue(
+                TestSuite1.getStdout().indexOf("returned exit code 2") >= 0);
+            TestSuite1.clearStdout();
+        }
+    }
 
     @Test
     public void testConfirmDialog() {
@@ -144,15 +150,15 @@ public final class ToolsTest1 extends TestCase {
         TestSuite1.clearStdout();
     }
 
-    //@Test
-    //public void testAppWarning() {
-    //    Tools.appWarning("warning a");
-    //    if (Tools.getDefault("AppWarning").equals("y")) {
-    //        assertEquals(TestSuite1.APPWARNING_STRING + "warning a\n",
-    //                     TestSuite1.getStdout());
-    //    }
-    //    TestSuite1.clearStdout();
-    //}
+    @Test
+    public void testAppWarning() {
+        LOG.appWarning("warning a");
+        if (Tools.getDefault("AppWarning").equals("y")) {
+            assertEquals(TestSuite1.APPWARNING_STRING + "warning a\n",
+                         TestSuite1.getStdout());
+        }
+        TestSuite1.clearStdout();
+    }
 
     @Test
     public void testInfoDialog() {

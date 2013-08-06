@@ -71,7 +71,7 @@ public final class TestSuite1 {
                                             System.getProperty("test.quick"));
 
     public static final String INFO_STRING = "INFO: ";
-    public static final String DEBUG_STRING = "DEBUG: ";
+    public static final String DEBUG_STRING = "DEBUG";
     public static final String ERROR_STRING = "ERROR: ";
     public static final String APPWARNING_STRING = "APPWARNING: ";
     public static final String APPERROR_STRING = "APPERROR: ";

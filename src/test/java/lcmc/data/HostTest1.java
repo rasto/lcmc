@@ -16,7 +16,12 @@ import lcmc.utilities.SSH;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 public final class HostTest1 extends TestCase {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(HostTest1.class);
     @Before
     @Override
     protected void setUp() {
@@ -263,7 +268,7 @@ public final class HostTest1 extends TestCase {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                //Tools.info("error");
+                                LOG.info("error");
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -287,7 +292,7 @@ public final class HostTest1 extends TestCase {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                //Tools.info("error");
+                                LOG.info("error");
                             }
                           },
                           null,   /* ConvertCmdCallback */
