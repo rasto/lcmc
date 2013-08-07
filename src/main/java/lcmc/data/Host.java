@@ -304,6 +304,8 @@ public final class Host implements Comparable<Host> {
                                                 new HashMap<String, Double>();
     /** Whether the host is member of the cluster. */
     private boolean inCluster = false;
+    /** Whether dist info was already logged. */
+    private boolean distInfoLogged = false;
     /** Timeout after which the connection is considered to be dead. */
     private static final int PING_TIMEOUT           = 40000;
     private static final int DRBD_EVENTS_TIMEOUT    = 40000;
@@ -818,8 +820,15 @@ public final class Host implements Comparable<Host> {
     @SuppressWarnings("fallthrough")
     void setDistInfo(final String[] info) {
         if (info == null) {
+            LOG.debug("setDistInfo: " + getName() + " dist info is null");
             return;
         }
+        if (!distInfoLogged) {
+            for (final String di : info) {
+                LOG.debug1("setDistInfo: dist info: " + di);
+            }
+        }
+
         /* no breaks in the switch statement are intentional */
         String lsbVersion = null;
         String lsbDist = null;
@@ -859,11 +868,14 @@ public final class Host implements Comparable<Host> {
         dist = detectedDist;
         distVersion = detectedDistVersion;
         initDistInfo();
-        LOG.debug2("kernel name: " + detectedKernelName);
-        LOG.debug2("kernel version: " + detectedKernelVersion);
-        LOG.debug2("arch: " + detectedArch);
-        LOG.debug2("dist version: " + detectedDistVersion);
-        LOG.debug2("dist: " + detectedDist);
+        if (!distInfoLogged) {
+            LOG.debug1("kernel name: " + detectedKernelName);
+            LOG.debug1("kernel version: " + detectedKernelVersion);
+            LOG.debug1("arch: " + detectedArch);
+            LOG.debug1("dist version: " + detectedDistVersion);
+            LOG.debug1("dist: " + detectedDist);
+        }
+        distInfoLogged = true;
     }
 
     /** Initializes dist info. Must be called after setDistInfo. */
