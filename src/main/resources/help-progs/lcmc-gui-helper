@@ -1324,6 +1324,9 @@ sub get_ocf_resource {
 		$s =~ s/\.sh$//;
 		print "ra:$s\n";
 	} else {
+		my $ra_name = $s;
+		$ra_name =~ s/\.sh$//;
+		print "ra-name:$ra_name\n";
 		print "master:";
 		print _exec("grep -wl crm_master $OCF_RESOURCE_DIR/$prov/$s;echo;")."\n";
 		print _exec("OCF_RESKEY_vmxpath=a OCF_ROOT=$OCF_DIR $OCF_RESOURCE_DIR/$prov/$s meta-data 2>/dev/null");

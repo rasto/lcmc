@@ -1075,10 +1075,12 @@ public final class CRMXML extends XML {
         final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
         final Pattern bp =
                        Pattern.compile("<resource-agent.*\\s+name=\"(.*?)\".*");
+        final Pattern sp = Pattern.compile("^ra-name:\\s*(.*?)\\s*$");
         final Pattern ep = Pattern.compile("</resource-agent>");
         final StringBuilder xml = new StringBuilder("");
         String provider = null;
         String serviceName = null;
+        boolean nextRA = false;
         boolean masterSlave = false; /* is probably m/s ...*/
         for (int i = 0; i < lines.length; i++) {
             /*
@@ -1100,11 +1102,16 @@ public final class CRMXML extends XML {
                 }
                 continue;
             }
+            final Matcher sm = sp.matcher(lines[i]);
+            if (sm.matches()) {
+                serviceName = sm.group(1);
+                continue;
+            }
             final Matcher m = bp.matcher(lines[i]);
             if (m.matches()) {
-                serviceName = m.group(1);
+                nextRA = true;
             }
-            if (serviceName != null) {
+            if (nextRA) {
                 xml.append(lines[i]);
                 xml.append('\n');
                 final Matcher m2 = ep.matcher(lines[i]);
@@ -1114,6 +1121,7 @@ public final class CRMXML extends XML {
                                   xml.toString(),
                                   masterSlave);
                     serviceName = null;
+                    nextRA = false;
                     xml.delete(0, xml.length());
                 }
             }
