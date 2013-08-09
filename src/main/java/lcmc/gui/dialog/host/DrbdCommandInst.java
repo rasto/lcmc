@@ -33,6 +33,8 @@ import lcmc.utilities.ConvertCmdCallback;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * An implementation of a dialog where drbd is installed.
@@ -42,6 +44,9 @@ import javax.swing.JComponent;
  *
  */
 final class DrbdCommandInst extends DialogHost {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(DrbdCommandInst.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Next dialog object. */
@@ -103,17 +108,25 @@ final class DrbdCommandInst extends DialogHost {
                               getHost().getDrbdVersionUrlStringToInstall();
         Tools.getConfigData().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
+        LOG.debug("installDrbd: cmd: " + installCommand
+                    + " arch: " + archString
+                    + " version: " + drbdVersionUrlString
+                    + "/" + drbdVersion);
         getHost().execCommandInBash(
                          installCommand + ";;;DRBD.load",
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
+                                 LOG.debug("installDrbd: done: " + ans);
                                  checkAnswer(ans);
                              }
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
+                                 LOG.debug("installDrbd: done error: "
+                                           + exitCode + " / "
+                                           + ans);
                                  printErrorAndRetry(
                                     Tools.getString(
                                       "Dialog.Host.DrbdCommandInst.InstError"),
