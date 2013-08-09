@@ -910,6 +910,10 @@ final class CoroConfig extends DialogCluster {
         String port        = "";
         if (MCAST_TYPE.equals(type)) {
             final NetInterface iface  = (NetInterface) ifaceW.getValue();
+            if (iface == null) {
+                LOG.appWarning("can't add null interface");
+                return;
+            }
             bindnetaddr = iface.getBindnetaddr();
             addr = addrW.getStringValue();
             port = portW.getStringValue();
@@ -944,17 +948,20 @@ final class CoroConfig extends DialogCluster {
         typeW.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        NetInterface defaultNi = null;
+        String defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
             if (!n.isLocalHost()) {
-                defaultNi = n;
+                defaultNi = n.toString();
                 break;
             }
         }
+        if (defaultNi == null) {
+            LOG.appError(hosts[0].getName() + ": missing network interfaces");
+        }
         ifaceW = WidgetFactory.createInstance(
-                                    Widget.GUESS_TYPE,
-                                    defaultNi.toString(),
+                                    Widget.Type.COMBOBOX,
+                                    defaultNi,
                                     ni,
                                     Widget.NO_REGEXP,
                                     INTF_COMBOBOX_WIDTH,

@@ -1026,17 +1026,20 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_BUTTON);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        NetInterface defaultNi = null;
+        String defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
             if (!n.isLocalHost()) {
-                defaultNi = n;
+                defaultNi = n.toString();
                 break;
             }
         }
+        if (defaultNi == null) {
+            LOG.appError(hosts[0].getName() + ": missing network interfaces");
+        }
         ifaceW = WidgetFactory.createInstance(
-                                      Widget.GUESS_TYPE,
-                                      defaultNi.toString(),
+                                      Widget.Type.COMBOBOX,
+                                      defaultNi,
                                       ni,
                                       Widget.NO_REGEXP,
                                       INTF_COMBOBOX_WIDTH,
