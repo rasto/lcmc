@@ -4037,26 +4037,14 @@ public final class RoboTest {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        for (int i = 0; i < 8; i++) {
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-        }
-        press(KeyEvent.VK_ENTER); /* detach */
+        moveTo("Detach Selected");
+        leftClick();
         checkDRBDTest(drbdTest, 2.01);
 
         moveTo(400, blockDevY);
         rightClick();
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_ENTER); /* attach */
+        moveTo("Attach Selected");
+        leftClick();
         checkDRBDTest(drbdTest, 2.02);
 
         moveTo(480, 152); /* select r0 */
@@ -4627,26 +4615,14 @@ public final class RoboTest {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        for (int i = 0; i < 9; i++) {
-            press(KeyEvent.VK_DOWN);
-            sleep(500);
-        }
-        press(KeyEvent.VK_ENTER); /* detach */
+        moveTo("Detach Selected");
+        leftClick();
         checkDRBDTest(drbdTest, 2.01);
 
         moveTo(400, blockDevY);
         rightClick();
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_DOWN);
-        sleep(500);
-        press(KeyEvent.VK_ENTER); /* attach */
+        moveTo("Attach Selected");
+        leftClick();
         checkDRBDTest(drbdTest, 2.02);
 
         moveTo(480, 152); /* select r0 */
