@@ -289,7 +289,7 @@ public final class Logger {
         if (!LoggerFactory.getAppError()) {
             return;
         }
-        if (ignoreException(e)) {
+        if (e != null && ignoreException(e)) {
             System.out.println("ignoring: " + APPERROR_STRING + errorString);
             return;
         }
