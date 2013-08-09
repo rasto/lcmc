@@ -792,8 +792,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
         final String device = dvi.getDevice();
-        getBrowser().getDrbdDevHash().put(device, dvi);
-        getBrowser().putDrbdDevHash();
 
         if (bdi1 != null) {
             bdi1.setDrbd(true);

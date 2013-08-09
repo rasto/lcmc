@@ -1189,6 +1189,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
             getDrbdInfo().setAllApplyButtons();
+            getResource().setNew(false);
         }
     }
 
@@ -1247,6 +1248,13 @@ public final class DrbdVolumeInfo extends EditableInfo
      */
     @Override
     protected boolean checkParam(final String param, final String newValue) {
+        if (getResource().isNew() && DRBD_VOL_PARAM_DEV.equals(param)) {
+            if (getBrowser().getDrbdDevHash().containsKey(newValue)) {
+                getBrowser().putDrbdDevHash();
+                return false;
+            }
+            getBrowser().putDrbdDevHash();
+        }
         return getBrowser().getDrbdXML().checkParam(param, newValue);
     }
 
