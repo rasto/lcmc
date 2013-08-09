@@ -125,7 +125,11 @@ final class CommStack extends DialogCluster {
                                  @Override
                                  public void doneError(final String ans,
                                                        final int exitCode) {
-                                     LOG.appWarning("could not get install info");
+                                     skipButtonSetEnabled(false);
+                                     LOG.error(
+                                             host.getName()
+                                             + ": could not get install info: "
+                                             + ans);
                                  }
                              },
                              null,   /* ConvertCmdCallback */
