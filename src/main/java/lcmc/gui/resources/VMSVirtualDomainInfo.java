@@ -393,7 +393,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Not defined on host string value. */
     private static final String DEFINED_ON_HOST_FALSE = "False";
     /** Wizard prefix string. */
-    private static final String WIZARD_PREFIX = "wizard:";
+    private static final String WIZARD_HOST_PREFIX = Widget.WIZARD_PREFIX + ':';
     /** Virtual System header. */
     private static final String VIRTUAL_SYSTEM_STRING =
                 Tools.getString("VMSVirtualDomainInfo.Section.VirtualSystem");
@@ -3786,7 +3786,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 public void run() {
                     final Widget wizardHostWi =
                                           definedOnHostComboBoxHash.get(
-                                               WIZARD_PREFIX + host.getName());
+                                           WIZARD_HOST_PREFIX + host.getName());
                     if (wizardHostWi != null) {
                         wizardHostWi.setEnabled(false);
                     }
@@ -3921,7 +3921,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     final Widget hostWi = definedOnHostComboBoxHash.get(
                                                                host.getName());
                     final Widget wizardHostWi = definedOnHostComboBoxHash.get(
-                                               WIZARD_PREFIX + host.getName());
+                                           WIZARD_HOST_PREFIX + host.getName());
                     if (wizardHostWi != null) {
                         wizardHostWi.setEnabled(true);
                     }
@@ -5096,7 +5096,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
             final Widget wizardHostWi = definedOnHostComboBoxHash.get(
-                                               WIZARD_PREFIX + host.getName());
+                                           WIZARD_HOST_PREFIX + host.getName());
             final String value = hostWi.getStringValue();
             String savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
@@ -5354,10 +5354,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final MyButton hostBtn = hostButtons.get(h.getName());
             final MyButton wizardHostBtn =
-                                 hostButtons.get(WIZARD_PREFIX + h.getName());
+                             hostButtons.get(WIZARD_HOST_PREFIX + h.getName());
             final Widget hostWi = definedOnHostComboBoxHash.get(h.getName());
             final Widget wizardHostWi =
-                    definedOnHostComboBoxHash.get(WIZARD_PREFIX + h.getName());
+                definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + h.getName());
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
                 if (vmsxml.isRunning(getDomainName())) {
