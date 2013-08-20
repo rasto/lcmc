@@ -412,7 +412,8 @@ public abstract class EditableInfo extends Info {
                     height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
                 if (paramWi.getValue() == null
-                    || paramWi.getValue() == Widget.NOTHING_SELECTED_DISPLAY) {
+                    || Widget.NOTHING_SELECTED_DISPLAY.equals(
+                                                      paramWi.getValue())) {
                     rpwi.setValueAndWait(null);
                 } else {
                     final Object value = paramWi.getStringValue();
@@ -558,8 +559,8 @@ public abstract class EditableInfo extends Info {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null
-                                || paramWi.getValue()
-                                   == Widget.NOTHING_SELECTED_DISPLAY) {
+                                || Widget.NOTHING_SELECTED_DISPLAY.equals(
+                                                         paramWi.getValue())) {
                                 realParamWi.setValueAndWait(null);
                             } else {
                                 final Object value = paramWi.getStringValue();
