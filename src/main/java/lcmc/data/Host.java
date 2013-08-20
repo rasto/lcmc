@@ -1851,12 +1851,13 @@ public final class Host implements Comparable<Host> {
                                      if (hw != null) {
                                          hwUpdate = hw;
                                      }
-                                     vmStatusLock();
                                      vm = getOutput("vm", outputBuffer);
-                                     if (vm != null) {
-                                         vmUpdate = vm;
+                                     if (vmStatusTryLock()) {
+                                         if (vm != null) {
+                                             vmUpdate = vm;
+                                         }
+                                         vmStatusUnlock();
                                      }
-                                     vmStatusUnlock();
                                      drbdStatusLock();
                                      drbdConfig = getOutput("drbd",
                                                             outputBuffer);
