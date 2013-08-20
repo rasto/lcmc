@@ -3149,8 +3149,10 @@ public final class Host implements Comparable<Host> {
         final ClusterBrowser cb = getBrowser().getClusterBrowser();
         final DrbdXML drbdXML = cb.getDrbdXML();
         final String output = drbdXML.updateDrbdParameters(this);
-        drbdXML.parseDrbdParameters(this, output, cb.getClusterHosts());
-        cb.getDrbdParameters().put(this, output);
+        if (output != null) {
+            drbdXML.parseDrbdParameters(this, output, cb.getClusterHosts());
+            cb.getDrbdParameters().put(this, output);
+        }
     }
 
     /** Compares ignoring case. */
