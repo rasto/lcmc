@@ -1312,6 +1312,9 @@ public final class ServicesInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
+                if (getBrowser().getCRMXML() == null) {
+                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                }
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -1349,6 +1352,9 @@ public final class ServicesInfo extends EditableInfo {
                 });
                 Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
+                if (crmXML == null) {
+                    return;
+                }
                 final ResourceAgent fsService = crmXML.getResourceAgent(
                                         "Filesystem",
                                         ResourceAgent.HEARTBEAT_PROVIDER,
