@@ -1389,7 +1389,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* Port */
         String defaultPort = savedPort;
         int defaultPortInt;
-        if (defaultPort == null) {
+        if (defaultPort == null || "".equals(defaultPort)) {
             defaultPortInt = getLowestUnusedPort();
             defaultPort = Integer.toString(defaultPortInt);
         } else {
@@ -1528,7 +1528,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* outside port */
         String outsideDefaultPort = savedOutsidePort;
         int outsideDefaultPortInt;
-        if (outsideDefaultPort == null) {
+        if (outsideDefaultPort == null || "".equals(outsideDefaultPort)) {
             outsideDefaultPortInt = getLowestUnusedProxyPort();
             if (outsideDefaultPortInt < insideDefaultPortInt - 1) {
                 outsideDefaultPortInt = insideDefaultPortInt - 1;
