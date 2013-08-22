@@ -934,6 +934,27 @@ public final class RoboTest {
         checkTest(testName, 1.1);
         disableStonith();
         checkTest(testName, 1);
+        moveTo(ipX, ipY + 200);
+        rightClick(); /* popup */
+        sleep(1000);
+        moveTo("Add Service");
+        sleep(1000);
+        moveTo("Filesystem + Linbit:DRBD");
+        moveTo("OCF Resource Agents");
+        press(KeyEvent.VK_D);
+        sleep(200);
+        press(KeyEvent.VK_R);
+        sleep(200);
+        press(KeyEvent.VK_B);
+        sleep(200);
+        press(KeyEvent.VK_D);
+        sleep(200);
+        press(KeyEvent.VK_ENTER);
+        sleep(2000);
+        moveTo("Yes");
+        sleep(2000);
+        leftClick();
+        removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
 
         moveTo(ipX, ipY + 200);
         rightClick(); /* popup */

@@ -1592,26 +1592,34 @@ public final class Tools {
             @Override
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
-                if (ch == KeyEvent.VK_DOWN) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            list.requestFocus();
-                            /* don't need to press down arrow twice */
-                            list.setSelectedIndex(0);
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ch == KeyEvent.VK_DOWN) {
+                            Tools.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    list.requestFocus();
+                                    /* don't need to press down arrow twice */
+                                    list.setSelectedIndex(0);
+                                }
+                            });
+                        } else if (ch == KeyEvent.VK_ESCAPE) {
+                            for (final JDialog otherP : popups) {
+                                otherP.dispose();
+                            }
+                            infoObject.hidePopup();
+                        } else if (ch == KeyEvent.VK_SPACE
+                                   || ch == KeyEvent.VK_ENTER) {
+                            final MyMenuItem item =
+                                                list.getModel().getElementAt(0);
+                            if (item != null) {
+                                item.action();
+                            }
                         }
-                    });
-                } else if (ch == KeyEvent.VK_ESCAPE) {
-                    for (final JDialog otherP : popups) {
-                        otherP.dispose();
                     }
-                    infoObject.hidePopup();
-                } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                    final MyMenuItem item = list.getModel().getElementAt(0);
-                    if (item != null) {
-                        item.action();
-                    }
-                }
+                });
+                thread.start();
             }
             @Override
             public void keyReleased(final KeyEvent e) {
