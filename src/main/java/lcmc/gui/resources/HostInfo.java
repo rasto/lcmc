@@ -346,14 +346,19 @@ public final class HostInfo extends Info {
                 final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
                 getBrowser().getClusterBrowser().ptestLockAcquire();
-                final ClusterStatus clStatus =
+                try {
+                    final ClusterStatus clStatus =
                             getBrowser().getClusterBrowser().getClusterStatus();
-                clStatus.setPtestData(null);
-                CRM.crmConfigureCommit(host, ta.getText(), true);
-                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                crmConfigureCommitButton.setToolTipText(ptestData.getToolTip());
-                clStatus.setPtestData(ptestData);
-                getBrowser().getClusterBrowser().ptestLockRelease();
+                    clStatus.setPtestData(null);
+                    CRM.crmConfigureCommit(host, ta.getText(), true);
+                    final PtestData ptestData =
+                                           new PtestData(CRM.getPtest(dcHost));
+                    crmConfigureCommitButton.setToolTipText(
+                                                        ptestData.getToolTip());
+                    clStatus.setPtestData(ptestData);
+                } finally {
+                    getBrowser().getClusterBrowser().ptestLockRelease();
+                }
                 startTestLatch.countDown();
             }
         };
@@ -367,9 +372,14 @@ public final class HostInfo extends Info {
                         @Override
                         public void run() {
                             getBrowser().getClusterBrowser().clStatusLock();
-                            final String ret =
-                             CRM.crmConfigureCommit(host, ta.getText(), false);
-                            getBrowser().getClusterBrowser().clStatusUnlock();
+                            try {
+                                CRM.crmConfigureCommit(host,
+                                                       ta.getText(),
+                                                       false);
+                            } finally {
+                                getBrowser().getClusterBrowser()
+                                                    .clStatusUnlock();
+                            }
                         }
                     }
                 );
