@@ -3194,7 +3194,7 @@ public class ServiceInfo extends EditableInfo {
         pacemakerResAttrs.put("class", raClass);
         if (!ResourceAgent.HEARTBEAT_CLASS.equals(raClass)
             && !ResourceAgent.SERVICE_CLASSES.contains(raClass)
-            && !raClass.equals(ResourceAgent.STONITH_CLASS)) {
+            && !ResourceAgent.STONITH_CLASS.equals(raClass)) {
             pacemakerResAttrs.put("provider", provider);
         }
         pacemakerResAttrs.put("type", type);
