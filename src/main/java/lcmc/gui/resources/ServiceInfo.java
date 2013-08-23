@@ -353,7 +353,8 @@ public class ServiceInfo extends EditableInfo {
                                        final boolean fromServicesInfo,
                                        final boolean fromCloneInfo,
                                        final boolean fromGroupInfo) {
-        if (getComboBoxValue(GUI_ID) == null) {
+        final String id = getComboBoxValue(GUI_ID);
+        if (id == null) {
             return true;
         }
         final CloneInfo ci = getCloneInfo();
@@ -380,7 +381,6 @@ public class ServiceInfo extends EditableInfo {
             return false;
         }
         /* Allow it only for resources that are in LRM. */
-        final String id = getComboBoxValue(GUI_ID);
         final ServiceInfo si =
                 getBrowser().getServiceInfoFromId(getService().getName(), id);
         if (si != null && si != this && !si.getService().isOrphaned()) {
@@ -3500,9 +3500,15 @@ public class ServiceInfo extends EditableInfo {
             }
             if (getService().isNew()) {
                 final String id = getComboBoxValue(GUI_ID);
+                if (id == null) {
+                    LOG.appWarning("apply: id is null: " + getName());
+                }
                 getService().setIdAndCrmId(id);
                 if (clInfo != null) {
                     final String clid = clInfo.getComboBoxValue(GUI_ID);
+                    if (clid == null) {
+                        LOG.appWarning("apply: clone id is null: " + getName());
+                    }
                     clInfo.getService().setIdAndCrmId(clid);
                 }
                 if (typeRadioGroup != null) {
@@ -3915,7 +3921,13 @@ public class ServiceInfo extends EditableInfo {
     final String getHeartbeatId(final boolean testOnly) {
         String heartbeatId = getService().getHeartbeatId();
         if (testOnly && heartbeatId == null) {
-            heartbeatId = getService().getCrmIdFromId(getComboBoxValue(GUI_ID));
+            final String guiId = getComboBoxValue(GUI_ID);
+            if (guiId == null) {
+                LOG.appWarning("getHearbeatId: RA meta-data not loaded: "
+                               + getName());
+                return null;
+            }
+            heartbeatId = getService().getCrmIdFromId(guiId);
         }
         return heartbeatId;
     }
