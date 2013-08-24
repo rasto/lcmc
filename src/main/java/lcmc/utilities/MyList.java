@@ -94,9 +94,12 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
-    public void setToolTipText(final String toolTipText) {
+    public void setToolTipText(String toolTipText) {
         if (toolTipText == null) {
             return;
+        }
+        if ("".equals(toolTipText)) {
+            toolTipText = " "; /* can't be "" */
         }
         super.setToolTipText(toolTipText);
         toolTip.setTipText(toolTipText);
