@@ -1152,10 +1152,7 @@ public final class DrbdGraph extends ResourceGraph {
     @Override
     protected void multiSelection() {
         final List<Info> selectedInfos = new ArrayList<Info>();
-        final PickedState<Vertex> ps =
-                getVisualizationViewer().getRenderContext()
-                                                    .getPickedVertexState();
-        for (final Vertex v : ps.getPicked()) {
+        for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             if (i != null) {
                 selectedInfos.add(i);

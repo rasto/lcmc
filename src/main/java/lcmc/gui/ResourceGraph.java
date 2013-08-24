@@ -76,6 +76,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.ConcurrentModificationException;
 import java.awt.Dimension;
 
 import javax.swing.JPanel;
@@ -932,9 +933,7 @@ public abstract class ResourceGraph {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    final PickedState<Vertex> ps =
-                            vv.getRenderContext().getPickedVertexState();
-                    if (ps.getPicked().size() > 1) {
+                    if (getPickedVertices().size() > 1) {
                         multiSelection();
                     }
                 }
@@ -955,12 +954,10 @@ public abstract class ResourceGraph {
             super.mouseClicked(e);
             final PickedState<Edge> psEdge =
                                     vv.getRenderContext().getPickedEdgeState();
-            final PickedState<Vertex> psVertex =
-                                  vv.getRenderContext().getPickedVertexState();
             if (psEdge.getPicked().size() == 1) {
                 final Edge edge = (Edge) psEdge.getPicked().toArray()[0];
                 oneEdgePressed(edge);
-            } else if (psVertex.getPicked().isEmpty()
+            } else if (getPickedVertices().isEmpty()
                        && psEdge.getPicked().isEmpty()) {
                 backgroundClicked();
             }
@@ -1023,10 +1020,7 @@ public abstract class ResourceGraph {
                             oneEdgePressed(edge);
                         }
                     } else {
-                        final PickedState<Vertex> ps =
-                                vv.getRenderContext().getPickedVertexState();
-                        final List<Vertex> pickedV =
-                                        new ArrayList<Vertex>(ps.getPicked());
+                        final List<Vertex> pickedV = getPickedVertices();
                         final JPopupMenu vertexPopup =
                                            handlePopupVertex(v, pickedV, popP);
                         if (vertexPopup != null) {
@@ -1163,9 +1157,7 @@ public abstract class ResourceGraph {
         /** Graph was released. */
         @Override
         public void graphReleased(final V v, final MouseEvent me) {
-            final PickedState<Vertex> ps =
-                                vv.getRenderContext().getPickedVertexState();
-            for (final Vertex vertex : ps.getPicked()) {
+            for (final Vertex vertex : getPickedVertices()) {
                 // TODO: if vertex is removed a race condition can be here
                 if (vertex == null) {
                     continue;
@@ -1194,9 +1186,11 @@ public abstract class ResourceGraph {
                     if ((me.getModifiers() & MouseEvent.CTRL_MASK) != 0) {
                             /* ctrl-click */
                         psVertex.pick((Vertex) v, true);
-                    } else if (psVertex.getPicked().size() == 1
-                               || !psVertex.getPicked().contains(v)) {
-                        oneVertexPressed((Vertex) v);
+                    } else {
+                        final List<Vertex> picked = getPickedVertices();
+                        if (picked.size() == 1 || !picked.contains(v)) {
+                            oneVertexPressed((Vertex) v);
+                        }
                     }
                 }
             });
@@ -2056,10 +2050,7 @@ public abstract class ResourceGraph {
         final String cn = getClusterBrowser().getCluster().getName();
         Tools.startProgressIndicator(cn, "copy");
         final List<Info> selected = new ArrayList<Info>();
-        final PickedState<Vertex> ps =
-                getVisualizationViewer().getRenderContext()
-                                                    .getPickedVertexState();
-        for (final Vertex v : ps.getPicked()) {
+        for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             selected.add(i);
         }
@@ -2074,5 +2065,22 @@ public abstract class ResourceGraph {
     /** Number of vertices. It is used to check in tests. */
     public int getNumberOfVertices() {
         return getGraph().getVertices().size();
+    }
+
+    /** Return picked vertices. */
+    protected List<Vertex> getPickedVertices() {
+        final PickedState<Vertex> ps =
+                                   vv.getRenderContext().getPickedVertexState();
+        /* workaround for ConcurrentModificationException */
+        for (int i = 0; i < 3; i++) {
+            try {
+                return new ArrayList<Vertex>(ps.getPicked());
+            } catch (ConcurrentModificationException cme) {
+                /* try it again */
+                LOG.appWarning("getPickedVertices: ignoring "
+                               + "ConcurrentModificationException");
+            }
+        }
+        return new ArrayList<Vertex>();
     }
 }

@@ -1990,7 +1990,7 @@ public final class CRMGraph extends ResourceGraph {
         final PickedState<Vertex> ps =
                 getVisualizationViewer().getRenderContext()
                                                     .getPickedVertexState();
-        for (final Vertex v : ps.getPicked()) {
+        for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             if (i != null) {
                 selectedInfos.add(i);
