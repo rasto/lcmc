@@ -233,10 +233,22 @@ public final class BugReport extends ConfigDialog {
             if (clusterCbMap.get(cl).isSelected()) {
                 text.append("\n== ")
                     .append(cl.getName())
+                    .append(", br: " + (cl.getBrowser() != null))
                     .append(" ==\n");
                 for (final Host host : cl.getHosts()) {
-                    text.append(host.getName())
-                        .append("\n");
+                    if (host == null) {
+                        text.append("host == null");
+                    } else {
+                        text.append(host.getName())
+                            .append(" c: " + (host.getCluster() != null))
+                            .append(" br: " + (host.getBrowser() != null));
+                        if (host.getBrowser() != null) {
+                            text.append(
+                             " cbr: "
+                             + (host.getBrowser().getClusterBrowser() != null));
+                        }
+                    }
+                    text.append('\n');
                 }
                 /* cib */
                 text.append("= ").append(CONFIG_CIB).append(" =\n");
