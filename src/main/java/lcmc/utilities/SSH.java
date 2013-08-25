@@ -44,9 +44,6 @@ import ch.ethz.ssh2.channel.ChannelManager;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * Verifying server hostkeys with an existing known_hosts file
  * Displaying fingerprints of server hostkeys.

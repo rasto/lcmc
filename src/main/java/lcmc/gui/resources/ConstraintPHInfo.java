@@ -153,7 +153,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 if (rscSetConnectionData.getRscSet2() == null
                     && rscSetConnectionData.getRscSet1() != null) {
                     LOG.trace("force reverse ord");
-                    LOG.trace(" data rscset1: " + rscSetConnectionData.getRscSet1().getRscIds());
+                    LOG.trace(" data rscset1: "
+                              + rscSetConnectionData.getRscSet1().getRscIds());
                     reversedOrd = true;
                     rscSetConnectionData.reverse();
                     reverseOrd = false;
@@ -166,24 +167,36 @@ public final class ConstraintPHInfo extends ServiceInfo {
                                      rscSetConnectionDataOrd.getRscSet2())
                         || rscSetConnectionDataOrd.getRscSet2().isSubsetOf(
                                      rscSetConnectionData.getRscSet1()))) {
-                    LOG.trace("data rscset1: " + rscSetConnectionData.getRscSet1());
+                    LOG.trace("data rscset1: "
+                              + rscSetConnectionData.getRscSet1());
                     if (rscSetConnectionData.getRscSet1() != null) {
-                        LOG.trace("data rscset1 ids: " + rscSetConnectionData.getRscSet1().getRscIds());
+                        LOG.trace(
+                               "data rscset1 ids: "
+                               + rscSetConnectionData.getRscSet1().getRscIds());
                     }
 
-                    LOG.trace("data rscset2: " + rscSetConnectionData.getRscSet2());
+                    LOG.trace("data rscset2: "
+                              + rscSetConnectionData.getRscSet2());
                     if (rscSetConnectionData.getRscSet2() != null) {
-                        LOG.trace("data rscset2 ids: " + rscSetConnectionData.getRscSet2().getRscIds());
+                        LOG.trace(
+                               "data rscset2 ids: "
+                               + rscSetConnectionData.getRscSet2().getRscIds());
                     }
 
-                    LOG.trace("ord rscset1: " + rscSetConnectionDataOrd.getRscSet1());
+                    LOG.trace("ord rscset1: "
+                              + rscSetConnectionDataOrd.getRscSet1());
                     if (rscSetConnectionDataOrd.getRscSet1() != null) {
-                        LOG.trace("ord rscset1 ids: " + rscSetConnectionDataOrd.getRscSet1().getRscIds());
+                        LOG.trace(
+                            "ord rscset1 ids: "
+                            + rscSetConnectionDataOrd.getRscSet1().getRscIds());
                     }
 
-                    LOG.trace("ord rscset2: " + rscSetConnectionDataOrd.getRscSet2());
+                    LOG.trace("ord rscset2: "
+                              + rscSetConnectionDataOrd.getRscSet2());
                     if (rscSetConnectionDataOrd.getRscSet2() != null) {
-                        LOG.trace("ord rscset2 ids: " + rscSetConnectionDataOrd.getRscSet2().getRscIds());
+                        LOG.trace(
+                            "ord rscset2 ids: "
+                            + rscSetConnectionDataOrd.getRscSet2().getRscIds());
                     }
                     LOG.trace("reverse ord");
                     reversedOrd = true;

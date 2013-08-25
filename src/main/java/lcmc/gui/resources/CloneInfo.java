@@ -120,14 +120,14 @@ final class CloneInfo extends ServiceInfo {
     @Override
     public JComponent getInfoPanel() {
         final ServiceInfo cs = containedService;
-	JComponent panel;
+        JComponent panel;
         if (cs == null) {
             panel = new JPanel();
         } else {
             panel = cs.getInfoPanel();
         }
-	infoPanelDone();
-	return panel;
+        infoPanelDone();
+        return panel;
     }
 
     /** Returns whether the resource has failed to start. */

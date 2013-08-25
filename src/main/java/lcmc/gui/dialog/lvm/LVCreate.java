@@ -212,7 +212,8 @@ public final class LVCreate extends LV {
         String defaultName;
         final Set<String> logicalVolumes = new LinkedHashSet<String>();
         for (final Host h : selectedHosts) {
-            Set<String> hvgs = h.getLogicalVolumesFromVolumeGroup(volumeGroup);
+            final Set<String> hvgs =
+                                h.getLogicalVolumesFromVolumeGroup(volumeGroup);
             if (hvgs != null) {
                 logicalVolumes.addAll(hvgs);
             }

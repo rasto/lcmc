@@ -50,9 +50,6 @@ import javax.swing.AbstractButton;
 import java.util.List;
 import java.util.ArrayList;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * This class is used to test the GUI.
  *

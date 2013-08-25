@@ -147,7 +147,7 @@ public final class VGRemove extends LV {
 
     private Map<Host, Set<String>> getVGNames() {
         final Map<Host, Set<String>> vgNames =
-                                         new LinkedHashMap<Host,Set<String>>();
+                                        new LinkedHashMap<Host, Set<String>>();
         for (final BlockDevInfo bdi : blockDevInfos) {
             final Host h = bdi.getHost();
             Set<String> vgs = vgNames.get(h);

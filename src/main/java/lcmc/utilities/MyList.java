@@ -37,10 +37,6 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
-
 /**
  * A Jlist with updatable tooltips.
  */

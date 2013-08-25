@@ -2623,8 +2623,7 @@ public final class CRMXML extends XML {
     }
 
     /** Parse allocation scores. */
-    private Map<String, String> parseAllocationScores(final String res,
-                                                      final NodeList scores) {
+    private Map<String, String> parseAllocationScores(final NodeList scores) {
         final Map<String, String> allocationScores =
                                            new LinkedHashMap<String, String>();
         for (int i = 0; i < scores.getLength(); i++) {
@@ -2694,7 +2693,7 @@ public final class CRMXML extends XML {
                         slaveOnList.add(node);
                     } else if ("scores".equals(setNode.getNodeName())) {
                         allocationScores =
-                            parseAllocationScores(id, setNode.getChildNodes());
+                                parseAllocationScores(setNode.getChildNodes());
                     }
                 }
                 resStatusMap.put(id, new ResStatus(runningOnList,

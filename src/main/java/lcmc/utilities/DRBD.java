@@ -36,9 +36,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.utilities.SSH.SSHOutput;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * This class provides drbd commands.
  *
@@ -74,7 +71,7 @@ public final class DRBD {
     public static final boolean TESTONLY = true;
     /** Live boolean variable. */
     public static final boolean LIVE = false;
-    /** To compare versions like 8.3 and 8.4 */
+    /** To compare versions like 8.3 and 8.4. */
     private static final Pattern DRBD_VERSION_MAJ =
                                       Pattern.compile("^(\\d+\\.\\d+)\\..*");
 

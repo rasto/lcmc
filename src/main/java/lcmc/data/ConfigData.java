@@ -734,12 +734,12 @@ public final class ConfigData {
     }
 
     /** Return whether to check swing threads. Testing only. */
-    public final boolean isCheckSwing() {
+    public boolean isCheckSwing() {
         return checkSwing;
     }
 
     /** Set whether to check swing threads. Testing only. */
-    public final void setCheckSwing(final boolean checkSwing) {
+    public void setCheckSwing(final boolean checkSwing) {
         this.checkSwing = checkSwing;
     }
 }

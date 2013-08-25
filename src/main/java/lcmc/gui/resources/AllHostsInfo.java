@@ -78,8 +78,6 @@ public final class AllHostsInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(AllHostsInfo.class);
-    /** Possibly selected host or null. */
-    private final Host host;
     /** infoPanel cache. */
     private JPanel infoPanel = null;
     /** Checkboxes in the cluster boxes. */
@@ -128,7 +126,6 @@ public final class AllHostsInfo extends Info {
     /** Creates a new AllHostsInfo instance. */
     public AllHostsInfo(final Browser browser) {
         super(Tools.getString("ClusterBrowser.AllHosts"), browser);
-        host = null;
     }
 
     /** Remove marked clusters. */

@@ -184,7 +184,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         final Map<String, InterfaceData> interfaces =
                                     getVMSVirtualDomainInfo().getInterfaces();
         String mac;
-        LOOP: while(true) {
+        LOOP: while (true) {
             mac = Tools.generateVMMacAddress();
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);

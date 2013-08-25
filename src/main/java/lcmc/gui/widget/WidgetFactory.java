@@ -20,7 +20,6 @@
 
 package lcmc.gui.widget;
 
-import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Unit;
 import lcmc.data.AccessMode;

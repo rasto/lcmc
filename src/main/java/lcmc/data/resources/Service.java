@@ -24,7 +24,6 @@
 package lcmc.data.resources;
 
 import lcmc.data.ConfigData;
-import lcmc.utilities.Tools;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

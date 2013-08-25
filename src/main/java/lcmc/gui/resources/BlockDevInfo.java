@@ -2741,7 +2741,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Whether PV can be removed from this BD. */
-    final boolean canRemovePV() {
+    boolean canRemovePV() {
         BlockDevice bd;
         if (getBlockDevice().isDrbd()) {
             if (!getBlockDevice().isPrimary()) {
@@ -2758,7 +2758,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Whether VG can be removed. */
-    final boolean canRemoveVG() {
+    boolean canRemoveVG() {
         BlockDevice bd;
         if (getBlockDevice().isDrbd()) {
             if (!getBlockDevice().isPrimary()) {

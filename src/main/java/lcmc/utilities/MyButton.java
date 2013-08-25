@@ -39,10 +39,6 @@ import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
-
 /**
  * This class creates a button with any gradient colors.
  */

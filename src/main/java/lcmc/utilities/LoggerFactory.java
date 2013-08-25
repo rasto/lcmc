@@ -30,7 +30,7 @@ import org.apache.commons.collections15.buffer.CircularFifoBuffer;
  * @author Rasto Levrinc
  */
 public final class LoggerFactory {
-    private final static Map<String, Logger> loggerMap =
+    private static final Map<String, Logger> LOGGER_MAP =
                                               new HashMap<String, Logger>();
     /** Debug level. */
     private static int debugLevel = -1;
@@ -94,10 +94,10 @@ public final class LoggerFactory {
         Logger logger;
         final String name = clazz.getName();
         synchronized (LoggerFactory.class) {
-            logger = loggerMap.get(name);
+            logger = LOGGER_MAP.get(name);
             if (logger == null) {
                 logger = new Logger(name);
-                loggerMap.put(name, logger);
+                LOGGER_MAP.put(name, logger);
             }
         }
         return logger;

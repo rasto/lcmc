@@ -195,7 +195,8 @@ public final class UserConfig extends XML {
                 if (!ok) {
                     Tools.invokeLater(new Runnable() {
                         public void run() {
-                            Tools.getGUIData().getClustersPanel().removeTab(                                                                          cluster);
+                            Tools.getGUIData().getClustersPanel().removeTab(
+                                                                       cluster);
                         }
                     });
                     continue;

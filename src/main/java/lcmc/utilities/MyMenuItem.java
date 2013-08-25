@@ -43,9 +43,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.PointerInfo;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.

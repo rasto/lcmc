@@ -128,7 +128,7 @@ public final class CmdLog extends HostLogs {
     }
 
     @Override
-    protected final String getDescription() {
+    protected String getDescription() {
         return Tools.getString("CmdLog.Description");
     }
 }

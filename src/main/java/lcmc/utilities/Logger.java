@@ -47,9 +47,9 @@ public final class Logger {
     /** Name of the class. */
     private final String className;
     /** Map with all warnings, so that they don't appear more than once. */
-    private Set<String> appWarningHash = new HashSet<String>();
+    private final Set<String> appWarningHash = new HashSet<String>();
     /** Map with all errors, so that they don't appear more than once. */
-    private Set<String> appErrorHash = new HashSet<String>();
+    private final Set<String> appErrorHash = new HashSet<String>();
     /** String that starts error messages. */
     private static final String ERROR_STRING = "ERROR: ";
     /** String that starts info messages. */

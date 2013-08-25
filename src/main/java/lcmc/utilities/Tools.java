@@ -35,7 +35,6 @@ import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
-import lcmc.gui.dialog.BugReport;
 import lcmc.Exceptions;
 
 import java.util.regex.Pattern;
@@ -53,7 +52,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import javax.swing.JFrame;
@@ -66,7 +64,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
-import javax.swing.JTextArea;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.UIManager;
 import javax.swing.JTable;
@@ -120,15 +117,7 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collections;
 import javax.swing.plaf.FontUIResource;
-import org.apache.commons.collections15.Buffer;
-import org.apache.commons.collections15.BufferUtils;
-import org.apache.commons.collections15.buffer.CircularFifoBuffer;
-
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class provides tools, that are not classified.
@@ -773,7 +762,7 @@ public final class Tools {
         String s = getString(text);
         if (s != null) {
             for (final String r : replace) {
-                return s = s.replaceFirst("\\{\\}", r);
+                s = s.replaceFirst("\\{\\}", r);
             }
         }
         return s;
@@ -1839,7 +1828,7 @@ public final class Tools {
                 } else if (info == null) {
                     final Matcher im = iPattern.matcher(line);
                     if (im.matches()) {
-                        rate += Integer.parseInt(im.group(1)); 
+                        rate += Integer.parseInt(im.group(1));
                         if (rate > randomInfo) {
                             info = im.group(2);
                         }
@@ -2644,7 +2633,7 @@ public final class Tools {
     }
 
     public static String generateVMMacAddress() {
-        StringBuilder mac = new StringBuilder("52:54:00");
+        final StringBuilder mac = new StringBuilder("52:54:00");
         for (int i = 0; i < 3; i++) {
             mac.append(':');
             mac.append(String.format("%02x", (int) (Math.random() * 256)));

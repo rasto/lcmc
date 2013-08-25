@@ -110,7 +110,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (items.size() > 0) {
+                            if (!items.isEmpty()) {
                                 drbdTarballCombo.reloadComboBox(
                                        items.get(0).toString(),
                                        items.toArray(new ComboInfo[items.size()]));

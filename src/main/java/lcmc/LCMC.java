@@ -76,7 +76,7 @@ public final class LCMC extends JPanel {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Uncaught exception flag. */
-    volatile private static boolean uncaughtException = false;
+    private static volatile boolean uncaughtException = false;
 
     /** Initial delay for showing any tool tip in milliseconds. */
     private static final int TOOLTIP_INITIAL_DELAY = 200;

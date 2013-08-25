@@ -71,6 +71,5 @@ public class HostLogs extends Logs {
     protected final String getDialogTitle() {
         return Tools.getString("Dialog.HostLogs.Title") + " ("
                + host.getName() + ")";
-                
     }
 }

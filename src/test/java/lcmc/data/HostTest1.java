@@ -321,7 +321,7 @@ public final class HostTest1 extends TestCase {
 
     private String stripVersion(final String v) {
         final int i = v.lastIndexOf('.');
-        if ( i < 0) {
+        if (i < 0) {
             return v;
         } else {
             return v.substring(0, i);

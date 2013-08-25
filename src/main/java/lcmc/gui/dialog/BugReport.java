@@ -203,7 +203,7 @@ public final class BugReport extends ConfigDialog {
         if (clusters.size() > 1) {
             pane.add(clPane);
         }
-        if (clusters.size() > 0) {
+        if (!clusters.isEmpty()) {
             pane.add(getConfigPane());
         }
 
@@ -215,7 +215,7 @@ public final class BugReport extends ConfigDialog {
         return pane;
     }
 
-    protected final void refresh() {
+    protected void refresh() {
         enableAllComponents(false);
         final Set<Cluster> clusters =
                           Tools.getConfigData().getClusters().getClusterSet();
@@ -311,12 +311,12 @@ public final class BugReport extends ConfigDialog {
         enableAllComponents(true);
     }
 
-    final String sendReportButton() {
+    String sendReportButton() {
         return buttonString("SendReport");
     }
 
     @Override
-    protected final String[] buttons() {
+    protected String[] buttons() {
         return new String[]{cancelButton(), sendReportButton()};
     }
 

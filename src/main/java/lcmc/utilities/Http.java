@@ -33,9 +33,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * This class provides Http functions.
  *
@@ -45,15 +42,12 @@ import lcmc.utilities.LoggerFactory;
 public final class Http {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Http.class);
-    final static String URL_STRING = "http://lcmc.sourceforge.net/cgi-bin/exc";
-    //final static String URL_STRING = "http://localhost/cgi-bin/exc";
-    final static String ENCODING = "UTF-8";
+    static final String URL_STRING = "http://lcmc.sourceforge.net/cgi-bin/exc";
+    static final String ENCODING = "UTF-8";
     /** Private constructor, cannot be instantiated. */
     private Http() {
         /* Cannot be instantiated. */
     }
-
-    
 
     public static void post(final String from, final String exception) {
         URL url;
@@ -72,9 +66,9 @@ public final class Http {
             return;
         }
 
-        conn.setUseCaches (false);
-        conn.setDoInput (true);
-        conn.setDoOutput (true);
+        conn.setUseCaches(false);
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
 
         try {
             conn.setRequestMethod("POST");
@@ -98,7 +92,7 @@ public final class Http {
             LOG.appWarning("error opening for writing: " + ex.getMessage());
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<String, String>();
         params.put("f", from);
         params.put("e", exception);
 
@@ -115,7 +109,7 @@ public final class Http {
         /* Response */
         String str = null;
         try {
-            BufferedReader input = new BufferedReader(
+            final BufferedReader input = new BufferedReader(
                                   new InputStreamReader(conn.getInputStream()));
             while (null != ((str = input.readLine()))) {
                 LOG.info(str);
@@ -126,7 +120,7 @@ public final class Http {
             return;
         }
     }
-    
+
     private static String getPostParams(final Map<String, String> params)
         throws UnsupportedEncodingException {
         String postParams = "";
@@ -136,6 +130,6 @@ public final class Http {
                         + URLEncoder.encode(entry.getValue(), ENCODING);
             delim = "&";
         }
-        return postParams; 
+        return postParams;
     }
 }

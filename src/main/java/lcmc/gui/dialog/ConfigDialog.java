@@ -513,7 +513,7 @@ public abstract class ConfigDialog {
                     }
                     dialogPanel.addWindowListener(new WindowAdapter() {
                         @Override
-                        public void windowClosing(WindowEvent e) {
+                        public void windowClosing(final WindowEvent e) {
                             disposeDialog();
                         }
                     });

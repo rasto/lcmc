@@ -46,9 +46,6 @@ public final class ClusterViewPanel extends ViewPanel
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
     private final Cluster cluster;
-    /** Background color of the status panel. */
-    private static final Color STATUS_BACKGROUND =
-                          Tools.getDefaultColor("ViewPanel.Status.Background");
 
     /** Prepares a new <code>ClusterViewPanel</code> object. */
     ClusterViewPanel(final Cluster cluster) {

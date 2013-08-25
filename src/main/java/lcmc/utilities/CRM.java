@@ -38,9 +38,6 @@ import java.util.regex.Matcher;
 import java.util.UUID;
 import lcmc.utilities.SSH.SSHOutput;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-
 /**
  * This class provides cib commands. There are commands that use cibadmin and
  * crm_resource commands to manipulate the cib, crm, etc.
@@ -134,8 +131,7 @@ public final class CRM {
         M_PTEST_READLOCK.lock();
         try {
             if (ptestOutput != null) {
-                final String po = ptestOutput;
-                return po;
+                return ptestOutput;
             }
         } finally {
             M_PTEST_READLOCK.unlock();
@@ -163,7 +159,7 @@ public final class CRM {
             if (ptestOutput == null) {
                 ptestOutput = po;
             }
-            return po; 
+            return po;
         } finally {
             M_PTEST_WRITELOCK.unlock();
         }

@@ -43,7 +43,6 @@ import java.awt.BasicStroke;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-import edu.uci.ics.jung.visualization.picking.PickedState;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -485,7 +484,7 @@ public final class DrbdGraph extends ResourceGraph {
                 && bdi.getBlockDevice().getDiskState() != null) {
                 final String connState =
                                      bdi.getBlockDevice().getConnectionState();
-                String diskState = bdi.getBlockDevice().getDiskState();
+                final String diskState = bdi.getBlockDevice().getDiskState();
                 String diskStateOther = null;
                 final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                 if (oBdi != null

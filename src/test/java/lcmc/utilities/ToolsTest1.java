@@ -20,8 +20,6 @@ import javax.swing.JCheckBox;
 import java.net.InetAddress;
 import lcmc.Exceptions;
 import lcmc.data.Host;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import mockit.Deencapsulation;
 
 

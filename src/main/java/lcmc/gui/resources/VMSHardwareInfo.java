@@ -449,11 +449,11 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Returns tool tip text in the table. */
     @Override
-    protected String getTableToolTip(final String tableName,
-                                     final String key,
-                                     final Object object,
-                                     final int raw,
-                                     final int column) {
+    protected final String getTableToolTip(final String tableName,
+                                           final String key,
+                                           final Object object,
+                                           final int raw,
+                                           final int column) {
         return vmsVirtualDomainInfo.getTableToolTip(tableName,
                                                     key,
                                                     object,
@@ -573,9 +573,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * Starts file chooser.
      * @param dir whether it needs dir or file
      */
-    protected void startFileChooser(final Widget paramWi,
-                                    final String directory,
-                                    final boolean dirOnly) {
+    protected final void startFileChooser(final Widget paramWi,
+                                          final String directory,
+                                          final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
             LOG.error("Connection to host lost.");
@@ -625,7 +625,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * have changed. Don't check the invisible for the type parameters.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
+    public final boolean checkResourceFieldsChanged(final String param,
                                               final String[] params) {
         return checkResourceFieldsChanged(param, params, false);
     }
@@ -634,7 +634,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * Returns whether the specified parameter or any of the parameters
      * have changed. Don't check the invisible for the type parameters.
      */
-    boolean checkResourceFieldsChanged(final String param,
+    final boolean checkResourceFieldsChanged(final String param,
                                        final String[] params,
                                        final boolean fromDomain) {
         final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
@@ -653,7 +653,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Returns whether all the parameters are correct. */
     @Override
-    public boolean checkResourceFieldsCorrect(final String param,
+    public final boolean checkResourceFieldsCorrect(final String param,
                                               final String[] params) {
         return checkResourceFieldsCorrect(param, params, false);
     }

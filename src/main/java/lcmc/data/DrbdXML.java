@@ -161,7 +161,7 @@ public final class DrbdXML extends XML {
                                                 new HashMap<String, Boolean>();
     /** Whether there are unknown sections in the config. */
     private boolean unknownSections = false;
-    /** Old config */
+    /** Old config. */
     private String oldConfig = null;
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";

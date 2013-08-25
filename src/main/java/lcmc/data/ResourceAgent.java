@@ -22,7 +22,6 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.ServiceInfo;
