@@ -46,10 +46,13 @@ import java.awt.event.ItemEvent;
 public class Checkbox extends Widget {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    
+    final static String CHECKBOX_TRUE = "True";
+    final static String CHECKBOX_FALSE = "False";
     /** Name for the 'true' value. */
-    private String checkBoxTrue = Tools.getString("Boolean.True");
+    private String checkBoxTrue = CHECKBOX_TRUE;
     /** Name for the 'false' value. */
-    private String checkBoxFalse = Tools.getString("Boolean.False");
+    private String checkBoxFalse = CHECKBOX_FALSE;
 
     /** Prepares a new <code>Checkbox</code> object. */
     public Checkbox(final String selectedValue,

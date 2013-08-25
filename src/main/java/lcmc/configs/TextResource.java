@@ -2179,12 +2179,6 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"SSH.SudoAuthentication",
          "Sudo Authentication"},
 
-        {"Boolean.True",
-         "True"},
-
-        {"Boolean.False",
-         "False"},
-
         {"Heartbeat.getClusterMetadata",
          "getting metadata"},
 

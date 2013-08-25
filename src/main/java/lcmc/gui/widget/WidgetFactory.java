@@ -80,11 +80,12 @@ public final class WidgetFactory {
             } else if (items == null || items.length == 0) {
                 type = Widget.Type.TEXTFIELD;
             } else if (items.length == 2) {
-                if (items[0] != null && items[0].toString().equalsIgnoreCase(
-                                        Tools.getString("Boolean.True"))
+                if (items[0] != null
+                    && items[0].toString().equalsIgnoreCase(
+                                                        Checkbox.CHECKBOX_TRUE)
                     && items[1] != null
                     && items[1].toString().equalsIgnoreCase(
-                                        Tools.getString("Boolean.False"))) {
+                                                    Checkbox.CHECKBOX_FALSE)) {
                     type = Widget.Type.CHECKBOX;
                 } else {
                     type = Widget.Type.COMBOBOX;
