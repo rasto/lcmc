@@ -39,6 +39,12 @@ import lcmc.gui.dialog.cluster.Name;
 public final class EditClusterDialog {
     /** Cluster object. */
     private final Cluster cluster;
+    /** Cancel button. */
+    private static final String CANCEL_BTN =
+                                       Tools.getString("Dialog.Dialog.Cancel");
+    /** Finish button. */
+    private static final String FINISH_BTN =
+                                       Tools.getString("Dialog.Dialog.Finish");
 
     /** Prepares new <code>EditClusterDialog</code> object. */
     public EditClusterDialog(final Cluster cluster) {
@@ -51,12 +57,12 @@ public final class EditClusterDialog {
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
-            if (dialog.isPressedButton("Cancel")) {
+            if (dialog.isPressedButton(CANCEL_BTN)) {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     return;
                 }
-            } else if (dialog.isPressedButton("Finish")) {
+            } else if (dialog.isPressedButton(FINISH_BTN)) {
                 break;
             }
             dialog = newdialog;
