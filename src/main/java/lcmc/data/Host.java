@@ -29,7 +29,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.NewOutputCallback;
-import lcmc.utilities.RoboTest;
+import lcmc.robotest.RoboTest;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.TerminalPanel;
 import lcmc.gui.SSHGui;

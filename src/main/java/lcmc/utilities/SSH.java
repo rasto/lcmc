@@ -1549,7 +1549,7 @@ public final class SSH {
     }
 
     /** Installs test suite on the remote host. */
-    void installTestFiles() {
+    public void installTestFiles() {
         final String fileName = "lcmc-test.tar";
         final Connection conn = connection;
         if (conn == null) {

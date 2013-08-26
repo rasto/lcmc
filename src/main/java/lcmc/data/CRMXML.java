@@ -26,7 +26,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.CRM;
-import lcmc.utilities.RoboTest;
+import lcmc.robotest.RoboTest;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.resources.ServicesInfo;

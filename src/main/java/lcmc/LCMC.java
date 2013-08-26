@@ -33,7 +33,7 @@ import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.data.ConfigData;
 import lcmc.data.HostOptions;
 import lcmc.utilities.Tools;
-import lcmc.utilities.RoboTest;
+import lcmc.robotest.RoboTest;
 import lcmc.configs.AppDefaults;
 
 import javax.swing.JFrame;

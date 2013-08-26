@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.File;
 import java.util.EnumMap;
 import lcmc.utilities.Tools;
-import lcmc.utilities.RoboTest;
+import lcmc.robotest.RoboTest;
 import ch.ethz.ssh2.KnownHosts;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.List;

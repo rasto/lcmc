@@ -26,7 +26,7 @@ package lcmc.gui;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.RoboTest;
+import lcmc.robotest.RoboTest;
 import lcmc.utilities.SSH;
 
 import java.util.Map;
