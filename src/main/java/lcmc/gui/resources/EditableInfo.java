@@ -475,7 +475,8 @@ public abstract class EditableInfo extends Info {
                     if (sameAsCombo != null) {
                         final JPanel saPanel = new JPanel(new SpringLayout());
                         saPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
-                        final JLabel label = new JLabel("Same As");
+                        final JLabel label = new JLabel(
+                                     Tools.getString("ClusterBrowser.SameAs"));
                         sameAsCombo.setLabel(label, "");
                         addField(saPanel,
                                  label,

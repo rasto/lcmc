@@ -1465,7 +1465,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
          "<html><b>適応時の情報:</b><br>"
          + "drbdadm --dry-run の確認を開始しています...</html>"},
 
-        {"ClusterBrowser.OperationsSameAs",
+        {"ClusterBrowser.SameAs",
          "右の値と同じ"},
 
         {"ClusterBrowser.AddServiceToCluster",

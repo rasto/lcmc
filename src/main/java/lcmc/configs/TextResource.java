@@ -1663,7 +1663,7 @@ public final class TextResource extends java.util.ListResourceBundle {
          "<html><b>Look what happens when you apply it:</b><br>"
          + "Starting drbdadm --dry-run test...</html>"},
 
-        {"ClusterBrowser.OperationsSameAs",
+        {"ClusterBrowser.SameAs",
          "Same As"},
 
         {"ClusterBrowser.AddServiceToCluster",

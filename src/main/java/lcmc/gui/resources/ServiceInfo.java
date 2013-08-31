@@ -2074,7 +2074,7 @@ public class ServiceInfo extends EditableInfo {
                                           Widget.NO_BUTTON);
         sameAsOperationsWi.setToolTipText(defaultOpIdRef);
         final JLabel label = new JLabel(Tools.getString(
-                                           "ClusterBrowser.OperationsSameAs"));
+                                                     "ClusterBrowser.SameAs"));
         sameAsOperationsWi.setLabel(label, "");
         final JPanel saPanel = new JPanel(new SpringLayout());
         saPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
@@ -2668,7 +2668,8 @@ public class ServiceInfo extends EditableInfo {
                                          Widget.NO_BUTTON);
         sameAsMetaAttrsWi.setToolTipText(defaultMAIdRef);
         final Map<String, Widget> sameAsFields = new HashMap<String, Widget>();
-        sameAsFields.put("Meta Attributes", sameAsMetaAttrsWi);
+        sameAsFields.put(Tools.getString("CRMXML.MetaAttrOptions"),
+                         sameAsMetaAttrsWi);
         sameAsMetaAttrsWi.addListeners(new WidgetListener() {
                             @Override
                             public void check(final Object value) {
