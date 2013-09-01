@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -54,7 +55,7 @@ final class PcmkTestC {
             moveTo(statefulX, statefulY);
             rightClick(); /* popup */
             sleep(1000);
-            moveTo("Add Service");
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
             sleep(1000);
             moveTo("Filesystem + Linbit:DRBD");
             sleep(1000);
@@ -76,7 +77,7 @@ final class PcmkTestC {
             press(KeyEvent.VK_ENTER); /* choose Stateful */
             sleep(1000);
 
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(1000);
             leftClick();
             sleep(4000);
@@ -92,7 +93,7 @@ final class PcmkTestC {
             robot.keyRelease(KeyEvent.VK_CONTROL);
             moveTo(245, statefulY + 90);
             leftClick();
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(4000);
             leftClick();
             checkTest(testName, 4);

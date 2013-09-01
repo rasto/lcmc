@@ -21,6 +21,7 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -123,7 +124,7 @@ final class PcmkTest4 {
             checkTest("test4", 2);
 
         }
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(2000);
         leftClick();
 

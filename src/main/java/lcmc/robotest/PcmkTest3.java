@@ -23,6 +23,7 @@ package lcmc.robotest;
 import static lcmc.robotest.RoboTest.*;
 import lcmc.gui.widget.Widget;
 import java.awt.event.KeyEvent;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -54,7 +55,7 @@ final class PcmkTest3 {
             moveTo(577, 205);
             rightClick(); /* popup */
             sleep(1000);
-            moveTo("Add Service");
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
             sleep(1000);
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
@@ -86,7 +87,7 @@ final class PcmkTest3 {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             leftClick();
             sleep(2000);
             checkTest(testName, 2);

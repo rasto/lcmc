@@ -21,6 +21,7 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -50,11 +51,11 @@ final class PcmkTestE {
             sleep(2000);
             rightClick();
             sleep(9000);
-            moveTo("Host Wizard");
+            moveTo(Tools.getString("HostBrowser.HostWizard"));
             sleep(2000);
             leftClick();
             sleep(30000);
-            moveTo("Cancel");
+            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             sleep(2000);
             leftClick();
             sleep(2000);

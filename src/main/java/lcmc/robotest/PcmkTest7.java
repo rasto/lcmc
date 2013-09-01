@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
 import java.awt.event.KeyEvent;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -67,7 +68,7 @@ final class PcmkTest7 {
             robot.keyRelease(KeyEvent.VK_CONTROL);
             moveTo(dummy1X + 10 , dummy1Y + 90);
             leftClick();
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(4000);
             leftClick();
             checkTest("test7", 4);

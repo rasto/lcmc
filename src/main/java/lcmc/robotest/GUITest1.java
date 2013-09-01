@@ -23,6 +23,7 @@ package lcmc.robotest;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -48,11 +49,11 @@ final class GUITest1 {
             if (i % 10 == 0) {
                 info("gui-test1 I: " + i);
             }
-            moveTo("Add Host / Wizard");
+            moveTo(Tools.getString("ClusterTab.AddNewHost"));
             sleep(500);
             leftClick();
             sleep(1000);
-            if (!isColor(360, 462, new Color(255, 100, 100), true)) {
+            if (!isColor(360, 472, new Color(255, 100, 100), true)) {
                 info("gui-test1 1: error");
                 break;
             }
@@ -60,7 +61,7 @@ final class GUITest1 {
             for (int error = 0; error < 5; error++) {
                 sleep(100);
                 press(KeyEvent.VK_X);
-                if (!isColor(360, 462, new Color(255, 100, 100), false)) {
+                if (!isColor(360, 472, new Color(255, 100, 100), false)) {
                     sleepNoFactor(1000);
                     ok = true;
                     break;
@@ -70,7 +71,7 @@ final class GUITest1 {
                 info("gui-test1 2: failed");
                 break;
             }
-            moveTo("Cancel"); /* cancel */
+            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             sleep(500);
             leftClick();
             sleep(1000);

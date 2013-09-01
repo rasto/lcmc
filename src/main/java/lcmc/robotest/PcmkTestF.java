@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.Widget;
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -56,7 +57,7 @@ final class PcmkTestF {
         sleep(1000);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick(); /* choose group */
         sleep(1000);
         moveTo("Clone");
@@ -70,7 +71,7 @@ final class PcmkTestF {
             moveToMenu("Group (1)");
             rightClick(); /* group popup */
             sleep(2000);
-            moveTo("Add Group Service");
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
             sleep(2000);
             moveTo("OCF Resource Agents");
             sleep(1000);
@@ -78,14 +79,14 @@ final class PcmkTestF {
             sleep(300);
             setTimeouts(true);
             if (type == 1) {
-                moveTo("Apply");
+                moveTo(Tools.getString("Browser.ApplyResource"));
                 sleep(6000);
                 leftClick();
                 sleep(6000);
             }
         }
         if (type != 1) {
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(6000);
             leftClick();
             sleep(6000);
@@ -99,7 +100,7 @@ final class PcmkTestF {
         sleep(200);
         press(KeyEvent.VK_2);
         sleep(1000);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(6000);
         leftClick();
         sleep(6000);

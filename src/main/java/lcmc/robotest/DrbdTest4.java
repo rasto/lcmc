@@ -25,6 +25,7 @@ import lcmc.data.Cluster;
 import lcmc.gui.widget.Widget;
 import static lcmc.robotest.RoboTest.*;
 import static lcmc.robotest.DrbdTest1.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -87,7 +88,7 @@ final class DrbdTest4 {
             addMetaData();
             addFileSystem();
             sleep(20000);
-            moveTo("Finish"); /* fs */
+            moveTo(Tools.getString("Dialog.Dialog.Finish")); /* fs */
             leftClick();
             sleep(10000);
 
@@ -127,7 +128,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_9);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -148,7 +149,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_3);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -162,7 +163,7 @@ final class DrbdTest4 {
         sleep(1000);
         press(KeyEvent.VK_0);
         sleep(2000);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -198,7 +199,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_5);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -212,7 +213,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_0);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */

@@ -599,10 +599,12 @@ public final class Tools {
 
     /** Removes all the hosts and clusters from all the panels and data. */
     public static void removeEverything() {
-        Tools.startProgressIndicator("Removing Everything");
+        Tools.startProgressIndicator(
+                                 Tools.getString("MainMenu.RemoveEverything"));
         Tools.getConfigData().disconnectAllHosts();
         getGUIData().getClustersPanel().removeAllTabs();
-        Tools.stopProgressIndicator("Removing Everything");
+        Tools.stopProgressIndicator(
+                                 Tools.getString("MainMenu.RemoveEverything"));
     }
 
 

@@ -21,6 +21,7 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -73,7 +74,7 @@ final class PcmkTest2 {
         moveTo(phX, phY);
         addConstraint(1); /* with dummy 1 */
         sleep(2000);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(2000);
         leftClick();
         sleep(5000);
@@ -193,8 +194,6 @@ final class PcmkTest2 {
         sleep(10000);
         stopResource(dummy3X, dummy3Y);
         sleep(10000);
-        stopResource(dummy3X, dummy3Y);
-        sleep(10000);
         stopResource(dummy4X, dummy4Y);
         stopEverything();
         sleep(10000);
@@ -204,7 +203,7 @@ final class PcmkTest2 {
             moveTo(phX , phY);
             rightClick();
             sleep(1000);
-            moveTo("Remove");
+            moveTo(Tools.getString("ConstraintPHInfo.Remove"));
             leftClick();
             confirmRemove();
             sleep(5000);
@@ -224,7 +223,7 @@ final class PcmkTest2 {
             moveTo(phX , phY);
             rightClick();
             sleep(1000);
-            moveTo("Remove");
+            moveTo(Tools.getString("ConstraintPHInfo.Remove"));
             leftClick();
             confirmRemove();
             sleep(5000);

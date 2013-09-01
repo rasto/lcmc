@@ -75,7 +75,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY + 200);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
         sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("OCF Resource Agents");
@@ -89,7 +89,7 @@ final class PcmkTest1 {
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
-        moveTo("Yes");
+        moveTo(Tools.getString("ConfirmDialog.Yes"));
         sleep(2000);
         leftClick();
         removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
@@ -97,7 +97,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY + 200);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
         sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
@@ -106,7 +106,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
         sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
@@ -137,7 +137,7 @@ final class PcmkTest1 {
         /* again */
         moveTo(ipX, ipY);
         rightClick(); /* popup */
-        moveTo("Add Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
         sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("IPaddr2");
@@ -155,7 +155,7 @@ final class PcmkTest1 {
         press(KeyEvent.VK_0);
         sleep(1000);
         setTimeouts(false);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(6000); /* ptest */
         leftClick(); /* apply */
         /* CIDR netmask 24 */
@@ -170,7 +170,7 @@ final class PcmkTest1 {
         press(KeyEvent.VK_4);
         sleep(1000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(6000); /* ptest */
         leftClick(); /* apply */
 
@@ -187,7 +187,7 @@ final class PcmkTest1 {
         sleep(200);
         press(KeyEvent.VK_ENTER); /* no ping */
         sleep(200);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(2000);
         leftClick();
         sleep(2000);
@@ -202,7 +202,7 @@ final class PcmkTest1 {
         sleep(200);
         press(KeyEvent.VK_ENTER); /* no ping */
         sleep(200);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(2000);
         leftClick();
 
@@ -222,13 +222,13 @@ final class PcmkTest1 {
         moveTo(gx, gy);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick();
         sleep(3000);
 
         rightClick(); /* group popup */
         sleep(1000);
-        moveTo("Add Group Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
         sleep(1000);
         moveTo("OCF Resource Agents");
         sleep(1000);
@@ -242,12 +242,12 @@ final class PcmkTest1 {
         moveTo(gx, gy);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick();
         sleep(3000);
         rightClick(); /* group popup */
         sleep(1000);
-        moveTo("Add Group Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
         sleep(1000);
         moveTo("OCF Resource Agents");
         sleep(1000);
@@ -258,7 +258,7 @@ final class PcmkTest1 {
         rightClick();
         sleep(1000);
 
-        moveTo("Remove Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
         leftClick(); /* menu remove service */
         removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
 
@@ -266,12 +266,12 @@ final class PcmkTest1 {
         moveTo(gx, gy);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick();
         sleep(3000);
         rightClick(); /* group popup */
         sleep(1000);
-        moveTo("Add Group Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
         sleep(1000);
         moveTo("OCF Resource Agents");
         sleep(1000);
@@ -284,7 +284,7 @@ final class PcmkTest1 {
         moveTo(gx, gy);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick();
         sleep(3000);
 
@@ -292,7 +292,7 @@ final class PcmkTest1 {
 
         rightClick(); /* group popup */
         sleep(1000);
-        moveTo("Add Group Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
         sleep(1000);
         moveTo("OCF Resource Agents");
         sleep(1000);
@@ -300,7 +300,7 @@ final class PcmkTest1 {
         sleep(1000);
 
         setTimeouts(true);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(2000);
         leftClick();
         for (int i = 0; i < 2; i++) {
@@ -308,14 +308,14 @@ final class PcmkTest1 {
             moveTo(gx + 10, gy - 25);
             rightClick(); /* popup */
             sleep(10000);
-            moveTo("Add Group Service");
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
             sleep(1000);
             moveTo("OCF Resource Agents");
             sleep(1000);
             typeDummy();
             sleep(i * 300);
             setTimeouts(true);
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(6000);
             leftClick();
             sleep(1000);
@@ -335,13 +335,13 @@ final class PcmkTest1 {
                     moveToMenu("Dummy (3)");
                     rightClick();
                     sleep(1000);
-                    moveTo("Move Up");
+                    moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveUp"));
                     leftClick(); /* move res 3 up */
                     sleepNoFactor(2000);
                     checkTest(testName, 3.11); /* 3.11 */
                     moveToMenu("Dummy (3)");
                     rightClick();
-                    moveTo("Move Down");
+                    moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveDown"));
                     leftClick();
                     sleepNoFactor(2000);
                     checkTest(testName, 3.12); /* 3.12 */
@@ -359,7 +359,9 @@ final class PcmkTest1 {
 
         for (int i = 0; i < 2; i++) {
             sleep(1000);
-            moveTo("Same As", 2, Widget.MComboBox.class);
+            moveTo(Tools.getString("ClusterBrowser.SameAs"),
+                   2,
+                   Widget.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -369,13 +371,15 @@ final class PcmkTest1 {
             sleep(20000);
             press(KeyEvent.VK_ENTER);
             sleep(10000);
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(4000);
             leftClick();
             sleep(4000);
             checkTest(testName, 3.2); /* 3.2 */
 
-            moveTo("Same As", 2, Widget.MComboBox.class);
+            moveTo(Tools.getString("ClusterBrowser.SameAs"),
+                   2,
+                   Widget.MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -385,7 +389,7 @@ final class PcmkTest1 {
             press(KeyEvent.VK_ENTER);
             sleep(10000);
 
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(4000);
             leftClick();
             sleep(9000);
@@ -572,10 +576,10 @@ final class PcmkTest1 {
         moveTo(ipX + 20, ipY + 10);
         leftClick(); /* choose ip */
         sleep(3000);
-        moveTo("Menu"); /* actions menu stop */
+        moveTo(Tools.getString("Browser.ActionsMenu"));
         sleep(2000);
         rightClick();
-        moveTo("Stop");
+        moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
         sleep(6000);
         leftClick();
         sleep(5000);
@@ -584,11 +588,12 @@ final class PcmkTest1 {
         moveTo(ipX + 20, ipY + 10);
         leftClick(); /* choose ip */
         sleep(10000);
-        moveTo("Menu"); /* actions menu start */
+        moveTo(Tools.getString("Browser.ActionsMenu"));
         sleep(1000);
         rightClick(); /* popup */
         sleep(2000);
-        moveTo("tart"); /* (Start) */
+        moveTo(Tools.getString("ClusterBrowser.Hb.StartResource").substring(1));
+        /* actions menu start */
         sleep(6000);
         leftClick();
         sleep(5000);
@@ -650,7 +655,7 @@ final class PcmkTest1 {
         moveTo(statefulX, statefulY);
         rightClick();
         sleep(1000);
-        moveTo("Add Service");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
         sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("OCF Resource Agents");
@@ -671,7 +676,7 @@ final class PcmkTest1 {
         press(KeyEvent.VK_ENTER); /* choose Stateful */
         sleep(1000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(5000);
         leftClick();
         checkTest(testName, 11.9);
@@ -688,7 +693,7 @@ final class PcmkTest1 {
         press(KeyEvent.VK_1);
         sleep(3000);
         setTimeouts(false);
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyResource"));
         sleep(3000);
         leftClick();
         sleep(3000);
@@ -745,11 +750,11 @@ final class PcmkTest1 {
         moveTo(gx, gy);
         leftClick();
         checkTest(testName, 27);
-        moveTo("Menu");
+        moveTo(Tools.getString("Browser.ActionsMenu"));
         sleep(6000);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Remove Migration Constraint");
+        moveTo(Tools.getString("ClusterBrowser.Hb.UnmigrateResource"));
         sleep(12000); /* ptest */
         leftClick(); /* stop */
         sleep(20000);
@@ -791,7 +796,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY);
         rightClick();
         sleep(1000);
-        moveTo("Stop Selected Services");
+        moveTo(Tools.getString("PcmkMultiSelectionInfo.StopSelectedResources"));
         leftClick();
         checkTest(testName, 28.3);
 
@@ -802,7 +807,8 @@ final class PcmkTest1 {
         moveTo(ipX, ipY);
         rightClick();
         sleep(1000);
-        moveTo("Start Selected Services");
+        moveTo(
+             Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
         leftClick();
         checkTest(testName, 28.4);
         sleep(10000);
@@ -813,7 +819,7 @@ final class PcmkTest1 {
         sleep(5000);
         moveTo(gx, gy);
         leftClick();
-        moveTo("Menu");
+        moveTo(Tools.getString("Browser.ActionsMenu"));
         stopGroup();
         sleep(5000);
         moveTo(statefulX, statefulY);

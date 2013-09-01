@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -51,7 +52,7 @@ final class PcmkTestG {
         sleep(1000);
         rightClick(); /* popup */
         sleep(1000);
-        moveTo("Add Group");
+        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick();
         sleep(3000);
         /* create dummy */
@@ -64,14 +65,14 @@ final class PcmkTestG {
             moveTo(gx + 10, gy - 25);
             rightClick(); /* popup */
             sleep(10000);
-            moveTo("Add Group Service");
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
             sleep(1000);
             moveTo("OCF Resource Agents");
             sleep(1000);
             typeDummy();
             sleep(i * 300);
             setTimeouts(true);
-            moveTo("Apply");
+            moveTo(Tools.getString("Browser.ApplyResource"));
             sleep(6000);
             leftClick();
             sleep(1000);
@@ -91,7 +92,7 @@ final class PcmkTestG {
         robot.keyRelease(KeyEvent.VK_CONTROL);
         moveTo(gx + 10 , gy + 90);
         leftClick();
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyGroup"));
         sleep(4000);
         leftClick();
         checkTest("testG", 4);

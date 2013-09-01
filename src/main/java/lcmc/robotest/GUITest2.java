@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import java.awt.Color;
 import static lcmc.robotest.RoboTest.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -48,15 +49,15 @@ final class GUITest2 {
                 info("gui-test2 " + i);
             }
 
-            moveTo("Add Cluster / Wizard");
+            moveTo(Tools.getString("ClusterTab.AddNewCluster"));
             sleep(500);
             leftClick();
             sleep(2000);
-            if (!isColor(336, 472, new Color(184, 207, 229), true)) {
+            if (!isColor(326, 512, new Color(184, 207, 229), true)) {
                 info("gui-test2: error");
                 break;
             }
-            moveTo("Cancel"); /* cancel */
+            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             sleep(500);
             leftClick();
             sleep(1000);

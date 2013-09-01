@@ -23,6 +23,7 @@ package lcmc.robotest;
 import lcmc.data.Cluster;
 import static lcmc.robotest.RoboTest.*;
 import static lcmc.robotest.DrbdTest1.*;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -48,7 +49,7 @@ final class DrbdTest2 {
             info(drbdTest + "/1");
             addDrbdResource(cluster, blockDevY);
 
-            moveTo("Cancel");
+            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             leftClick();
             sleep(2000);
         }
@@ -57,7 +58,7 @@ final class DrbdTest2 {
         addDrbdResource(cluster, blockDevY);
         chooseDrbdResource(cluster);
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         sleep(20000);
 
@@ -66,7 +67,7 @@ final class DrbdTest2 {
         chooseDrbdResource(cluster);
         addDrbdVolume();
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         sleep(10000);
 
@@ -77,7 +78,7 @@ final class DrbdTest2 {
         addBlockDevice();
         sleep(20000);
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         sleep(10000);
 
@@ -90,7 +91,7 @@ final class DrbdTest2 {
         sleep(20000);
         checkDRBDTest(drbdTest, 1);
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         confirmRemove();
         sleep(60000);
@@ -104,7 +105,7 @@ final class DrbdTest2 {
         sleep(20000);
         addMetaData();
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         confirmRemove();
         sleep(20000);
@@ -121,7 +122,7 @@ final class DrbdTest2 {
         checkDRBDTest(drbdTest, 1.1);
         sleep(10000);
 
-        moveTo("Cancel");
+        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         sleep(2000);
         leftClick();
         sleep(20000);
@@ -137,7 +138,7 @@ final class DrbdTest2 {
         sleep(20000);
         addMetaData();
         addFileSystem();
-        moveTo("Finish");
+        moveTo(Tools.getString("Dialog.Dialog.Finish"));
         leftClick();
         sleep(10000);
         checkDRBDTest(drbdTest, 1.1);

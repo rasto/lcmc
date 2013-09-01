@@ -57,7 +57,7 @@ final class DrbdTest1 {
         addMetaData();
         addFileSystem();
         sleep(5000);
-        moveTo("Finish");
+        moveTo(Tools.getString("Dialog.Dialog.Finish"));
         leftClick();
         sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
@@ -74,7 +74,7 @@ final class DrbdTest1 {
         moveTo(334, blockDevY); /* add drbd resource */
         rightClick();
         sleep(1000);
-        moveTo("Add Mirrored Disk");
+        moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
         sleep(1000);
         moveTo(cluster.getHostsArray()[1].getName());
         sleep(2000);
@@ -151,7 +151,7 @@ final class DrbdTest1 {
         }
         moveTo(480, 152); /* rsc popup */
         rightClick(); /* remove */
-        moveTo("Remove DRBD Volume"); /* remove */
+        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
         leftClick();
         Tools.sleep(10000);
         dialogColorTest("removeDrbdVolume");

@@ -71,7 +71,7 @@ final class DrbdTest3 {
             addMetaData();
             addFileSystem();
             sleep(10000);
-            moveTo("Finish");
+            moveTo(Tools.getString("Dialog.Dialog.Finish"));
             leftClick();
             sleep(10000);
 
@@ -160,7 +160,7 @@ final class DrbdTest3 {
 
         moveScrollBar(false);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -181,7 +181,7 @@ final class DrbdTest3 {
         press(KeyEvent.VK_3);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -196,7 +196,7 @@ final class DrbdTest3 {
         press(KeyEvent.VK_0);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -274,7 +274,7 @@ final class DrbdTest3 {
 
         moveScrollBar(false);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
         sleep(2000); /* test */
@@ -288,20 +288,20 @@ final class DrbdTest3 {
         press(KeyEvent.VK_0);
         sleep(2000);
 
-        moveTo("Apply");
+        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
         sleep(6000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
         moveTo(480, 152); /* rsc popup */
         rightClick();
-        moveTo("Remove DRBD Volume");
+        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 3);
         moveTo(480, 152); /* rsc popup */
         rightClick();
-        moveTo("Remove DRBD Volume");
+        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 4);
