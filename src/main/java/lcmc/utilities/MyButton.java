@@ -173,6 +173,9 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
     public final void setToolTipText(final String toolTipText) {
+        if ("".equals(toolTipText)) {
+            toolTipText = " "; /* can't be "" */
+        }
         if (toolTip != null && robot != null && toolTip.isShowing()) {
             super.setToolTipText(toolTipText);
             final GraphicsDevice[] devices =
@@ -199,7 +202,7 @@ public class MyButton extends JButton implements ComponentWithTest {
                             (int) p.getY());
         } else {
             if (toolTipText == null) {
-                super.setToolTipText("");
+                super.setToolTipText(" ");
             } else {
                 super.setToolTipText(toolTipText);
             }
