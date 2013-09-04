@@ -1400,6 +1400,7 @@ sub get_stonith_devices {
 		if (!$metadata) {
 			next;
 		}
+		print "ra-name:$name\n";
 		print $metadata;
 	}
 }
