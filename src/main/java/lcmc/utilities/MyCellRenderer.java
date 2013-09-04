@@ -78,7 +78,11 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
         }
         ret.setBorder(EMPTY_BORDER);
         if (value != null) {
-            ret.setToolTipText(value.toString());
+            if ("".equals(value.toString())) {
+                ret.setToolTipText(" ");
+            } else {
+                ret.setToolTipText(value.toString());
+            }
         }
         return ret;
     }
