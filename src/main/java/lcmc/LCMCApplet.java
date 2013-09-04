@@ -29,6 +29,8 @@ package lcmc;
 import lcmc.utilities.Tools;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 
 /**
@@ -37,6 +39,8 @@ import javax.swing.JFrame;
 public final class LCMCApplet extends JApplet {
     /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(LCMCApplet.class);
 
     /** Public applet constructor. */
     public LCMCApplet() {
@@ -46,6 +50,7 @@ public final class LCMCApplet extends JApplet {
     @Override
     public void init() {
         Tools.init();
+        LOG.debug1("init applet");
         String[] params;
         final String paramsLine = getParameter("params");
         if (paramsLine == null) {
