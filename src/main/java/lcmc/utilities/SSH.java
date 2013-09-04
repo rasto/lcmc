@@ -1039,6 +1039,10 @@ public final class SSH {
                                         null,
                                         null,
                                         !echo[i]);
+
+                    if (ans == null) {
+                        throw new IOException("cancelled");
+                    }
                     lastPassword = ans;
                     host.setSudoPassword(lastPassword);
                 } else {
