@@ -5,7 +5,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/ant.mk
 -include /usr/share/topgit/tg2quilt.mk
 
-JAVA_HOME 		:= /usr/lib/jvm/java-6-openjdk
+JAVA_HOME 		:= /usr/lib/jvm/java-7-openjdk-amd64
 DEB_ANT_BUILDFILE 	:= debian/build.xml
 DEB_ANT_BUILD_TARGET 	:= jar
 DEB_JARS 		:= vecmath j3dcore jd3utils jai_core xalan2
