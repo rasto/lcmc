@@ -463,6 +463,10 @@ public final class RoboTest {
                             if (aborted) {
                                 break;
                             }
+                            PcmkTestH.start(5);
+                            if (aborted) {
+                                break;
+                            }
                             final int secs = (int) (System.currentTimeMillis()
                                                      - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -619,6 +623,14 @@ public final class RoboTest {
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
                         PcmkTestG.start(15);
+                        final int secs = (int) (System.currentTimeMillis()
+                                                 - startTime) / 1000;
+                        info("test" + index + ", secs: " + secs);
+                    } else if (index == 'h') {
+                        /* ipmi */
+                        final long startTime = System.currentTimeMillis();
+                        info("test" + index);
+                        PcmkTestH.start(15);
                         final int secs = (int) (System.currentTimeMillis()
                                                  - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
