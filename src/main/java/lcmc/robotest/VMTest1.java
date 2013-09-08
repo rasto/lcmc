@@ -56,7 +56,7 @@ final class VMTest1 {
                             final String vmTest,
                             final String type,
                             final int count) {
-        slowFactor = 0.6f;
+        slowFactor = 0.1f;
         aborted = false;
         String name = "dmc";
         final int count2 = 3;
