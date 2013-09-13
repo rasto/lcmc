@@ -777,10 +777,10 @@ public final class LCMC extends JPanel {
         if (autoArgs != null) {
             Tools.parseAutoArgs(autoArgs);
         }
-        createMainFrame(mainFrame);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
+                createMainFrame(mainFrame);
                 createAndShowGUI((Container) mainFrame);
             }
         });
