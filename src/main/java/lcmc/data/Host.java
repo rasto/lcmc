@@ -131,9 +131,11 @@ public final class Host implements Comparable<Host> {
     private String drbdVersion = null;
     /** Drbd version of drbd module. */
     private String drbdModuleVersion = null;
-    /** Map of network interfaces of this host. */
+    /** Map of network interfaces of this host with bridges. */
     private Map<String, NetInterface> netInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
+    /** Bridges. */
+    private List<String> bridges = new ArrayList<String>();
     /** Available file systems. */
     private Set<String> fileSystems = new TreeSet<String>();
     /** Available crypto modules. */
@@ -574,13 +576,7 @@ public final class Host implements Comparable<Host> {
 
     /** Get net interfaces that are bridges. */
     public List<String> getBridges() {
-        final List<String> bridges = new ArrayList<String>();
-        for (final NetInterface ni : netInterfaces.values()) {
-            if (ni.isBridge()) {
-                bridges.add(ni.getName());
-            }
-        }
-        return bridges;
+        return new ArrayList<String>(bridges);
     }
 
     /** Returns blockDevices. */
@@ -2086,6 +2082,7 @@ public final class Host implements Comparable<Host> {
                                      new LinkedHashMap<String, BlockDevice>();
         final Map<String, NetInterface> newNetInterfaces =
                                      new LinkedHashMap<String, NetInterface>();
+        final List<String> newBridges = new ArrayList<String>();
         final Map<String, Long> newVolumeGroups =
                                      new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS =
@@ -2124,7 +2121,13 @@ public final class Host implements Comparable<Host> {
                 if (netInterfaces.containsKey(netInterface.getName())) {
                     netInterface = netInterfaces.get(netInterface.getName());
                 }
-                newNetInterfaces.put(netInterface.getName(), netInterface);
+                if (netInterface.getIp() != null
+                    && !"".equals(netInterface.getIp())) {
+                    newNetInterfaces.put(netInterface.getName(), netInterface);
+                }
+                if (netInterface.isBridge()) {
+                    newBridges.add(netInterface.getName());
+                }
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String bdName = blockDevice.getName();
@@ -2230,6 +2233,7 @@ public final class Host implements Comparable<Host> {
 
         if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
+            bridges = newBridges;
         }
 
         if (changedTypes.contains(DISK_INFO)) {
