@@ -360,7 +360,7 @@ sub get_net_info {
 			}
 		}
 		if (/^$/) {
-			if ($dev && $ip && $mac ne "no" && $mask) {
+			if (($dev && $ip && $mac ne "no" && $mask) || $$bridges{$dev}) {
 				$out .= "$dev $ip $mac $mask";
 				if ($$bridges{$dev}) {
 					$out .= " bridge\n";
