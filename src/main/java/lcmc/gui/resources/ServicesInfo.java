@@ -985,7 +985,8 @@ public final class ServicesInfo extends EditableInfo {
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
-        if (getBrowser().getCRMXML() == null) {
+        if (getBrowser().getCRMXML() == null
+            || getBrowser().getClusterStatus() == null) {
             return newPanel;
         }
         final ButtonCallback buttonCallback = new ButtonCallback() {

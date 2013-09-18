@@ -760,6 +760,7 @@ public final class ClusterBrowser extends Browser {
                     return;
                 }
 
+                LOG.debug1("first host: " + firstHost);
                 crmXML = new CRMXML(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
@@ -782,6 +783,7 @@ public final class ClusterBrowser extends Browser {
                 cluster.getBrowser().startServerStatus();
                 cluster.getBrowser().startDrbdStatus();
                 cluster.getBrowser().startClStatus();
+                LOG.debug1("cluster loading done");
             }
         };
         final Thread thread = new Thread(runnable);

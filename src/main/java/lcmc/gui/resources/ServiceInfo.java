@@ -2711,6 +2711,10 @@ public class ServiceInfo extends EditableInfo {
             p.add(new JLabel(Tools.getString("ServiceInfo.LoadingMetaData")));
             return p;
         }
+        if (getBrowser().getCRMXML() == null
+            || getBrowser().getClusterStatus() == null) {
+            return new JPanel();
+        }
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
             getBrowser().getCRMGraph().pickInfo(this);
