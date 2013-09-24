@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.regex.Matcher;
+import java.net.UnknownHostException;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
@@ -223,15 +224,19 @@ public final class DrbdVolumeInfo extends EditableInfo
                         DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    getBrowser().drbdtestLockRelease();
+                    LOG.appError("config failed", dce);
                     return;
+                } catch (UnknownHostException e) {
+                    LOG.appError("config failed", e);
+                    return;
+                } finally {
+                    getBrowser().drbdtestLockRelease();
+                    startTestLatch.countDown();
                 }
-                final DRBDtestData dtd = new DRBDtestData(testOutput);
-                getApplyButton().setToolTipText(dtd.getToolTip());
-                getBrowser().setDRBDtestData(dtd);
-                getBrowser().drbdtestLockRelease();
-                startTestLatch.countDown();
             }
         };
         initApplyButton(buttonCallback,
@@ -289,13 +294,16 @@ public final class DrbdVolumeInfo extends EditableInfo
                             for (final Host h : getHosts()) {
                                 DRBD.adjustApply(h, DRBD.ALL, null, false);
                             }
+                            apply(false);
                         } catch (Exceptions.DrbdConfigException dce) {
-                            getBrowser().drbdStatusUnlock();
                             LOG.appError("config failed", dce);
                             return;
+                        } catch (UnknownHostException e) {
+                            LOG.appError("config failed", e);
+                            return;
+                        } finally {
+                            getBrowser().drbdStatusUnlock();
                         }
-                        apply(false);
-                        getBrowser().drbdStatusUnlock();
                     }
                 });
                 thread.start();
@@ -311,8 +319,11 @@ public final class DrbdVolumeInfo extends EditableInfo
                         @Override
                         public void run() {
                             getBrowser().drbdStatusLock();
-                            revert();
-                            getBrowser().drbdStatusUnlock();
+                            try {
+                                revert();
+                            } finally {
+                                getBrowser().drbdStatusUnlock();
+                            }
                         }
                     });
                     thread.start();
@@ -734,26 +745,29 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         try {
             getDrbdInfo().createDrbdConfig(testOnly);
+            getDrbdInfo().setSelectedNode(null);
+            getDrbdInfo().selectMyself();
+            cb.getDrbdGraph().updatePopupMenus();
+            cb.resetFilesystems();
+
+            final DrbdXML dxml = new DrbdXML(hosts0.toArray(new Host[hosts0.size()]),
+                                             cb.getDrbdParameters());
+            for (final Host host : hosts0) {
+                final String conf = dxml.getConfig(host);
+                if (conf != null) {
+                    dxml.update(conf);
+                }
+            }
+            cb.setDrbdXML(dxml);
         } catch (Exceptions.DrbdConfigException dce) {
-            cb.drbdStatusUnlock();
             LOG.appError("config failed", dce);
             return;
+        } catch (UnknownHostException e) {
+            LOG.appError("config failed", e);
+            return;
+        } finally {
+            cb.drbdStatusUnlock();
         }
-        getDrbdInfo().setSelectedNode(null);
-        getDrbdInfo().selectMyself();
-        cb.getDrbdGraph().updatePopupMenus();
-        cb.resetFilesystems();
-
-        final DrbdXML dxml = new DrbdXML(hosts0.toArray(new Host[hosts0.size()]),
-                                         cb.getDrbdParameters());
-        for (final Host host : hosts0) {
-            final String conf = dxml.getConfig(host);
-            if (conf != null) {
-                dxml.update(conf);
-            }
-        }
-        cb.setDrbdXML(dxml);
-        cb.drbdStatusUnlock();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {

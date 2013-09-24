@@ -214,7 +214,7 @@ public final class Cluster implements Comparable<Cluster> {
 
     /** Gets networks that are common on all hosts in the cluster. */
     public Network[] getCommonNetworks() {
-        Map<String, String> networksIntersection = null;
+        Map<String, Integer> networksIntersection = null;
         for (final Host host : hosts) {
             networksIntersection =
                             host.getNetworksIntersection(networksIntersection);
@@ -226,11 +226,11 @@ public final class Cluster implements Comparable<Cluster> {
             for (final Host host : hosts) {
                 ips.addAll(host.getIpsFromNetwork(netIp));
             }
-            final String netMask = networksIntersection.get(netIp);
+            final Integer cidr = networksIntersection.get(netIp);
             final Network network =
                             new Network(netIp,
                                         ips.toArray(new String[ips.size()]),
-                                        netMask);
+                                        cidr);
             commonNetworks.add(network);
         }
 

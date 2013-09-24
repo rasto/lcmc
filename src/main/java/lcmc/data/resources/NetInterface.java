@@ -23,7 +23,9 @@
 
 package lcmc.data.resources;
 
-import lcmc.utilities.Tools;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -42,13 +44,21 @@ public final class NetInterface extends Resource {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Ip address. */
-    private String ip = null;
-    /** Mac address. */
-    private String macAddr = null;
-    /** Net mask. */
-    private String netMask = null;
+    private final String ip;
+    /** Cidr. */
+    private final Integer cidr;
+    /** Network ip. */
+    private final String networkIp;
     /** Whether it is a bridge. */
     private final boolean bridge;
+    /** Address family. */
+    public enum AF {IPV4, IPV6, SSOCKS, SDP};
+    /** Address family. */
+    private final AF af;
+    private final String IPV6_STRING = "ipv6";
+    private final String IPV4_STRING = "ipv4";
+    private final String SSOCKS_STRING = "ssocks";
+    private final String SDP_STRING = "sdp";
 
     /**
      * Prepares a new <code>NetInterface</code> object.
@@ -57,7 +67,7 @@ public final class NetInterface extends Resource {
      *          line with interface, ip, mac addr and net mask  delimited
      *          with space
      */
-    public NetInterface(final String line) {
+    public NetInterface(final String line) throws UnknownHostException {
         super();
         final String[] cols = line.split(" ");
         if (cols.length < 4) {
@@ -67,14 +77,31 @@ public final class NetInterface extends Resource {
         if (cols.length > 0) {
             iface = cols[0];
         }
-        if (cols.length > 1) {
-            this.ip = cols[1];
-        }
+        String ip0 = null;
+        AF af0 = null;
+        int size = 4;
         if (cols.length > 2) {
-            this.macAddr = cols[2];
+            final String af_string = cols[1];
+            ip0 = cols[2];
+            if (IPV6_STRING.equals(af_string)) {
+                af0 = AF.IPV6;
+                size = 16;
+            } else if (SSOCKS_STRING.equals(af_string)) {
+                af0 = AF.SSOCKS;
+            } else if (SDP_STRING.equals(af_string)) {
+                af0 = AF.SDP;
+            } else {
+                af0 = AF.IPV4;
+            }
         }
+        this.ip = ip0;
+        this.af = af0;
         if (cols.length > 3) {
-            this.netMask = cols[3];
+            this.cidr = new Integer(cols[3]);
+            this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
+        } else {
+            this.cidr = null;
+            this.networkIp = null;
         }
         if (cols.length > 4 && "bridge".equals(cols[4])) {
             this.bridge = true;
@@ -91,26 +118,69 @@ public final class NetInterface extends Resource {
      *          network interface
      * @param ip
      *          ip address
-     * @param macAddr
-     *          mac address
-     * @param netMask
-     *          network mask
+     * @param cidr
+     *          cidr
      */
     public NetInterface(final String iface,
                         final String ip,
-                        final String macAddr,
-                        final String netMask,
-                        final boolean bridge) {
+                        final Integer cidr,
+                        final boolean bridge,
+                        final AF af) throws UnknownHostException {
         super(iface);
-        this.ip      = ip;
-        this.macAddr = macAddr;
-        this.netMask = netMask;
+        this.ip = ip;
+        this.cidr = cidr;
         this.bridge = bridge;
+        this.af = af;
+        int size = 4;
+        if (af == AF.IPV6) {
+            size = 16;
+        }
+        this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
     }
 
-    /** Returns mac address. */
-    String getMacAddr() {
-        return macAddr;
+    private String calcNetworkIp(final BigInteger numericIp,
+                                 final Integer cidr,
+                                 final int size) {
+        return getSymbolicIp(
+                 numericIp.and(new BigInteger("2").pow(8 * size)
+                                                  .subtract(new BigInteger("1"))
+                                                  .shiftLeft(8 * size - cidr)),
+                 size);
+    }
+ 
+    private BigInteger getNumericIp(final String ip) throws UnknownHostException {
+        final byte[] bytes = InetAddress.getByName(ip).getAddress();
+        BigInteger numericIp = new BigInteger("0");
+        for (final byte b : bytes) {
+            numericIp = numericIp.shiftLeft(8).add(new BigInteger(Long.toString(b & 0xff)));
+        }
+        return numericIp;
+    }
+
+    //private int getNumericIp(final String ip) {
+    //    final String[] ipParts = ip.split("\\.");
+    //    int numericIp = 0;
+    //    for (final String ipPart : ipParts) {
+    //        numericIp = (numericIp << 8) + new Integer(ipPart);
+    //    }
+    //    return numericIp;
+    //}
+
+    private static String getSymbolicIp(BigInteger numericIp,
+                                        final int size) {
+        byte[] addr = new byte[size];
+        for (int i = size - 1; i >= 0; i--) {
+            final byte a = (byte) numericIp.and(
+                                new BigInteger(Long.toString(0xff))).intValue();
+            numericIp = numericIp.shiftRight(8);
+            addr[i] = a;
+        }
+        try {
+            return InetAddress.getByAddress(addr).getHostAddress();
+        } catch (UnknownHostException e) {
+            LOG.appWarning("unkonwn host: " + addr);
+            return null;
+        }
     }
 
     /** Returns ip. */
@@ -118,9 +188,9 @@ public final class NetInterface extends Resource {
         return ip;
     }
 
-    /** Returns network mask. */
-    public String getNetmask() {
-        return netMask;
+    /** Returns CIDR. */
+    public Integer getCidr() {
+        return cidr;
     }
 
     ///**
@@ -150,24 +220,10 @@ public final class NetInterface extends Resource {
 
     /**
      * Returns first ip in the network.
-     * e.g. 192.168.1.1 and mask 255.255.255.0 gives * 192.168.1.0.
+     * e.g. 192.168.1.1 and mask 255.255.255.0 gives 192.168.1.0.
      */
     public String getNetworkIp() {
-        if (netMask == null) {
-            return null;
-        }
-        final String[] ipParts = ip.split("\\.");
-        final String[] netMaskParts = netMask.split("\\.");
-        String[] networkIpParts = new String[4];
-        if (ipParts.length != 4 && netMaskParts.length != 4) {
-            return "";
-        }
-        for (int i = 0; i < 4; i++) {
-            networkIpParts[i] = Integer.toString(
-                                         Integer.parseInt(ipParts[i])
-                                         & Integer.parseInt(netMaskParts[i]));
-        }
-        return Tools.join(".", networkIpParts);
+        return networkIp;
     }
 
     /** Returns value for parameter. */
@@ -186,22 +242,26 @@ public final class NetInterface extends Resource {
 
     /** Returns bindnetaddr. */
     public String getBindnetaddr() {
-        final String[] ipParts = ip.split("\\.");
-        if (netMask == null) {
-            return null;
-        }
-        final String[] netMaskParts = netMask.split("\\.");
-        String[] networkIpParts = new String[4];
-        if (ipParts.length != 4 && netMaskParts.length != 4) {
-            return "";
-        }
-        for (int i = 0; i < 4; i++) {
-            networkIpParts[i] =
-                         Integer.toString(Integer.parseInt(ipParts[i])
-                                          & Integer.parseInt(netMaskParts[i]));
-        }
-        return Tools.join(".", networkIpParts);
+        return networkIp;
     }
+    ///** Returns bindnetaddr. */
+    //public String getBindnetaddr() {
+    //    final String[] ipParts = ip.split("\\.");
+    //    if (netMask == null) {
+    //        return null;
+    //    }
+    //    final String[] netMaskParts = netMask.split("\\.");
+    //    String[] networkIpParts = new String[4];
+    //    if (ipParts.length != 4 && netMaskParts.length != 4) {
+    //        return "";
+    //    }
+    //    for (int i = 0; i < 4; i++) {
+    //        networkIpParts[i] =
+    //                     Integer.toString(Integer.parseInt(ipParts[i])
+    //                                      & Integer.parseInt(netMaskParts[i]));
+    //    }
+    //    return Tools.join(".", networkIpParts);
+    //}
 
     /** Returns whether it is a bridge. */
     public boolean isBridge() {

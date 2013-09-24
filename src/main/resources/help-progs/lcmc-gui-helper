@@ -335,45 +335,29 @@ sub get_bridges {
 # parses ifconfig output and prints out interface, ip and mac address one
 # interface per line.
 sub get_net_info {
-	my $dev  = "";
-	my $mac  = "no";
-	my $ip   = "";
-	my $mask = "";
 	my $bridges = get_bridges();
 	my $out = "";
-	for (_exec("ifconfig")) {
-		if (!$dev) {
-			($dev) = /^(.*?)(:?\s|:)/ or net_info_error("no dev");
-			if (/\sHWaddr\s+(\S+)/) {
-				$mac = $1;
-			}
+	for (_exec("ip -o -f inet a; ip -o -f inet6 a")) {
+		next if /scope link/;
+		my ($dev, $type, $addr, $mask) =
+							/^\d+:\s*(\S+)\s+(\S+)\s+(\S+)\/(\S+)/;
+		my $af;
+		if ("inet" eq $type) {
+			$af = "ipv4";
+		} elsif ("inet6" eq $type) {
+			$af = "ipv6";
 		} else {
-			if (/^\s+inet addr:(\S+).*?\s+Mask:(\S+)/) {
-				$ip = $1;
-				$mask = $2;
-			} elsif (/^\s+inet\s+(\S+).*?\s+netmask\s+(\S+)/) {
-				# from fedora 17
-				$ip = $1;
-				$mask = $2;
-			} elsif (/^\s+ether\s+(\S+)/) {
-				$mac = $1;
-			}
+			next;
 		}
-		if (/^$/) {
-			if (($dev && $ip && $mac ne "no" && $mask) || $$bridges{$dev}) {
-				$out .= "$dev $ip $mac $mask";
-				if ($$bridges{$dev}) {
-					$out .= " bridge\n";
-				} else {
-					$out .= "\n";
-				}
-			} elsif ("lo" eq $dev) {
-				$out = "$dev $ip $mac $mask\n".$out;
+		if ("lo" eq $dev) {
+			$out = "$dev $af $addr $mask\n".$out;
+		} else {
+			$out .= "$dev $af $addr $mask";
+			if ($$bridges{$dev}) {
+				$out .= " bridge\n";
+			} else {
+				$out .= "\n";
 			}
-			$dev = "";
-			$mac  = "no";
-			$ip   = "";
-			$mask = "";
 		}
 	}
 	return $out;

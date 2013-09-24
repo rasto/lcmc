@@ -39,6 +39,7 @@ import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
 
 import java.awt.Component;
+import java.net.UnknownHostException;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -119,6 +120,8 @@ final class BlockDev extends DrbdConfig {
                 Tools.getGUIData().getMainFrame().requestFocus();
             } catch (Exceptions.DrbdConfigException dce) {
                 LOG.appError("config failed", dce);
+            } catch (UnknownHostException e) {
+                LOG.appError("config failed", e);
             }
             return new CreateMD(this, getDrbdVolumeInfo());
         }
