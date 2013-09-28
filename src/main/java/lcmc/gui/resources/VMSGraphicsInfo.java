@@ -200,7 +200,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     @Override
     protected Object[] getParamPossibleChoices(final String param) {
         if (GraphicsData.LISTEN.equals(param)) {
-            Map<String, String> networksIntersection = null;
+            Map<String, Integer> networksIntersection = null;
 
             final List<Host> definedOnHosts =
                                 getVMSVirtualDomainInfo().getDefinedOnHosts();

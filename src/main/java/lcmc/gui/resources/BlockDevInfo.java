@@ -69,6 +69,7 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
+import java.net.UnknownHostException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -1036,14 +1037,17 @@ public final class BlockDevInfo extends EditableInfo {
                         DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    thisClass.setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
                     LOG.appError("config failed", dce);
+                } catch (UnknownHostException e) {
+                    LOG.appError("config failed", e);
+                } finally {
+                    getBrowser().drbdtestLockRelease();
+                    startTestLatch.countDown();
                 }
-                final DRBDtestData dtd = new DRBDtestData(testOutput);
-                getApplyButton().setToolTipText(dtd.getToolTip());
-                thisClass.setDRBDtestData(dtd);
-                getBrowser().drbdtestLockRelease();
-                startTestLatch.countDown();
             }
         };
         initApplyButton(buttonCallback);
@@ -1097,15 +1101,17 @@ public final class BlockDevInfo extends EditableInfo {
                                     : getHost().getCluster().getHostsArray()) {
                                     DRBD.adjustApply(h, DRBD.ALL, null, false);
                                 }
+                                apply(false);
                             } catch (Exceptions.DrbdConfigException e) {
-                                getBrowser()
-                                        .getClusterBrowser()
-                                                .drbdStatusUnlock();
                                 LOG.appError("config failed", e);
                                 return;
+                            } catch (UnknownHostException e) {
+                                LOG.appError("config failed", e);
+                                return;
+                            } finally {
+                                getBrowser().getClusterBrowser()
+                                                           .drbdStatusUnlock();
                             }
-                            apply(false);
-                            getBrowser().getClusterBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();

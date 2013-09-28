@@ -43,7 +43,7 @@ public final class Network extends Resource {
     /** List of all ips in the network. */
     private final String[] ips;
     /** Net mask. */
-    private final String netMask;
+    private final Integer cidr;
 
     /**
      * Prepares a new <code>Network</code> object.
@@ -55,10 +55,10 @@ public final class Network extends Resource {
      */
     public Network(final String name,
                    final String[] ips,
-                   final String netMask) {
+                   final Integer cidr) {
         super(name);
         this.ips = ips;
-        this.netMask = netMask;
+        this.cidr = cidr;
     }
 
     /** Returns list of ips delimited with comma. */
@@ -67,8 +67,8 @@ public final class Network extends Resource {
     }
 
     /** Returns net mask of this network. */
-    public String getNetMask() {
-        return netMask;
+    public Integer getCidr() {
+        return cidr;
     }
 
     /** Returns value of the parameter. */

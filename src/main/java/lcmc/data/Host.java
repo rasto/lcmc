@@ -44,6 +44,7 @@ import lcmc.Exceptions;
 import java.awt.geom.Point2D;
 
 import java.awt.Color;
+import java.net.UnknownHostException;
 
 import java.util.Collection;
 import java.util.List;
@@ -132,8 +133,7 @@ public final class Host implements Comparable<Host> {
     /** Drbd version of drbd module. */
     private String drbdModuleVersion = null;
     /** Map of network interfaces of this host with bridges. */
-    private Map<String, NetInterface> netInterfaces =
-                                     new LinkedHashMap<String, NetInterface>();
+    private List<NetInterface> netInterfaces = new ArrayList<NetInterface>();
     /** Bridges. */
     private List<String> bridges = new ArrayList<String>();
     /** Available file systems. */
@@ -570,8 +570,7 @@ public final class Host implements Comparable<Host> {
 
     /** Returns net interfaces. */
     public NetInterface[] getNetInterfaces() {
-        return netInterfaces.values().toArray(
-                                    new NetInterface[netInterfaces.size()]);
+        return netInterfaces.toArray(new NetInterface[netInterfaces.size()]);
     }
 
     /** Get net interfaces that are bridges. */
@@ -624,32 +623,32 @@ public final class Host implements Comparable<Host> {
     }
 
     /** Returns network ips as array list. */
-    Map<String, String> getNetworkIps() {
-        final Map<String, String> networkIps =
-                                         new LinkedHashMap<String, String>();
-        for (final NetInterface ni : netInterfaces.values()) {
+    Map<String, Integer> getNetworkIps() {
+        final Map<String, Integer> networkIps =
+                                         new LinkedHashMap<String, Integer>();
+        for (final NetInterface ni : netInterfaces) {
             final String netIp = ni.getNetworkIp();
-            networkIps.put(netIp, ni.getNetmask());
+            networkIps.put(netIp, ni.getCidr());
         }
         return networkIps;
     }
 
     /** Returns list of networks that exist on all hosts. */
-    public Map<String, String> getNetworksIntersection(
-                                   final Map<String, String> otherNetworkIps) {
+    public Map<String, Integer> getNetworksIntersection(
+                                final Map<String, Integer> otherNetworkIps) {
         if (otherNetworkIps == null) {
             return getNetworkIps();
         }
-        final Map<String, String> networksIntersection =
-                                           new LinkedHashMap<String, String>();
-        for (final NetInterface ni : netInterfaces.values()) {
+        final Map<String, Integer> networksIntersection =
+                                         new LinkedHashMap<String, Integer>();
+        for (final NetInterface ni : netInterfaces) {
             if (ni.isLocalHost()) {
                 continue;
             }
             final String networkIp = ni.getNetworkIp();
             if (otherNetworkIps.containsKey(networkIp)
                 && !networksIntersection.containsKey(networkIp)) {
-                networksIntersection.put(networkIp, ni.getNetmask());
+                networksIntersection.put(networkIp, ni.getCidr());
             }
         }
         return networksIntersection;
@@ -658,7 +657,7 @@ public final class Host implements Comparable<Host> {
     /** Returns ips that belong the the network. */
     List<String> getIpsFromNetwork(final String netIp) {
         final List<String> networkIps = new ArrayList<String>();
-        for (final NetInterface ni : netInterfaces.values()) {
+        for (final NetInterface ni : netInterfaces) {
             if (netIp.equals(ni.getNetworkIp())) {
                 networkIps.add(ni.getIp());
             }
@@ -2080,8 +2079,8 @@ public final class Host implements Comparable<Host> {
                                      new LinkedHashMap<String, BlockDevice>();
         final Map<String, BlockDevice> newDrbdBlockDevices =
                                      new LinkedHashMap<String, BlockDevice>();
-        final Map<String, NetInterface> newNetInterfaces =
-                                     new LinkedHashMap<String, NetInterface>();
+        final List<NetInterface> newNetInterfaces =
+                                                new ArrayList<NetInterface>();
         final List<String> newBridges = new ArrayList<String>();
         final Map<String, Long> newVolumeGroups =
                                      new LinkedHashMap<String, Long>();
@@ -2117,16 +2116,17 @@ public final class Host implements Comparable<Host> {
                 continue;
             }
             if ("net-info".equals(type)) {
-                NetInterface netInterface = new NetInterface(line);
-                if (netInterfaces.containsKey(netInterface.getName())) {
-                    netInterface = netInterfaces.get(netInterface.getName());
-                }
-                if (netInterface.getIp() != null
-                    && !"".equals(netInterface.getIp())) {
-                    newNetInterfaces.put(netInterface.getName(), netInterface);
-                }
-                if (netInterface.isBridge()) {
-                    newBridges.add(netInterface.getName());
+                try {
+                    NetInterface netInterface = new NetInterface(line);
+                    if (netInterface.getIp() != null
+                        && !"".equals(netInterface.getIp())) {
+                        newNetInterfaces.add(netInterface);
+                    }
+                    if (netInterface.isBridge()) {
+                        newBridges.add(netInterface.getName());
+                    }
+                } catch (UnknownHostException e) {
+                    LOG.appWarning("cannot parse: net-info: " + line);
                 }
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);

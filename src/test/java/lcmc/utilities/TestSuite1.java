@@ -297,7 +297,7 @@ public final class TestSuite1 {
         }
         final File dir = new File(path);
         if (!dir.isDirectory()) {
-            if (path.endsWith("Test1.class")) {
+            if (path.endsWith("Test1.class") && !path.contains("robotest")) {
                 fileList.add(path);
             }
             return fileList;
@@ -353,7 +353,7 @@ public final class TestSuite1 {
     }
 
     /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final Map<T, T> map) {
+    public static <T, K> boolean noValueIsNull(final Map<T, K> map) {
         for (final T key : map.keySet()) {
             if (key == null) {
                 return false;

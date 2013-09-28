@@ -168,7 +168,7 @@ public final class HostTest1 extends TestCase {
 
     @Test
     public void testGetNetworksIntersection() {
-        Map<String, String> otherNetworks = null;
+        Map<String, Integer> otherNetworks = null;
         for (final Host host : TestSuite1.getHosts()) {
             otherNetworks = host.getNetworksIntersection(otherNetworks);
             assertTrue(TestSuite1.noValueIsNull(otherNetworks));

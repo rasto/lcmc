@@ -61,6 +61,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.net.UnknownHostException;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -214,7 +215,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Creates and returns drbd config for resources. */
     String drbdResourceConfig(final Host configOnHost)
-    throws Exceptions.DrbdConfigException {
+    throws Exceptions.DrbdConfigException, UnknownHostException {
         final StringBuilder config = new StringBuilder(50);
         config.append("resource " + getName() + " {\n");
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
@@ -306,7 +307,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                               proxyConfig(
                                   new ProxyNetInfo(
                                    "",
-                                   new NetInterface("", proxyIp, "", "", false),
+                                   new NetInterface("", proxyIp, null, false, NetInterface.AF.IPV4),
                                    getBrowser(),
                                    proxyHost)));
                         }
@@ -551,15 +552,19 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    getBrowser().drbdtestLockRelease();
+                    LOG.appError("config failed", dce);
                     return;
+                } catch (UnknownHostException e) {
+                    LOG.appError("config failed", e);
+                    return;
+                } finally {
+                    getBrowser().drbdtestLockRelease();
+                    startTestLatch.countDown();
                 }
-                final DRBDtestData dtd = new DRBDtestData(testOutput);
-                getApplyButton().setToolTipText(dtd.getToolTip());
-                getBrowser().setDRBDtestData(dtd);
-                getBrowser().drbdtestLockRelease();
-                startTestLatch.countDown();
             }
         };
         initApplyButton(buttonCallback,
@@ -621,13 +626,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             for (final Host h : getHosts()) {
                                 DRBD.adjustApply(h, DRBD.ALL, null, false);
                             }
+                            apply(false);
                         } catch (Exceptions.DrbdConfigException dce) {
-                            getBrowser().drbdStatusUnlock();
                             LOG.appError("config failed", dce);
                             return;
+                        } catch (UnknownHostException e) {
+                            LOG.appError("config failed", e);
+                            return;
+                        } finally {
+                            getBrowser().drbdStatusUnlock();
                         }
-                        apply(false);
-                        getBrowser().drbdStatusUnlock();
                     }
                 });
                 thread.start();
@@ -643,8 +651,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         @Override
                         public void run() {
                             getBrowser().drbdStatusLock();
-                            revert();
-                            getBrowser().drbdStatusUnlock();
+                            try {
+                                revert();
+                            } finally {
+                                getBrowser().drbdStatusUnlock();
+                            }
                         }
                     });
                     thread.start();
@@ -1889,7 +1900,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Return net interface with port as they appear in the drbd config. */
     private String getNetInterfaceWithPort(final String address,
                                            final String port) {
-        return address + ":" + port;
+        if (address.contains(":")) {
+            return "ipv6 [" + address + "]:" + port;
+        } else {
+            return address + ":" + port;
+        }
     }
 
     /** Hide/show proxy panels for selected hosts. */

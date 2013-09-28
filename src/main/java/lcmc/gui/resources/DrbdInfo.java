@@ -58,6 +58,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.Iterator;
+import java.net.UnknownHostException;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -181,7 +182,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
     /** Creates drbd config. */
     public void createDrbdConfig(final boolean testOnly)
-               throws Exceptions.DrbdConfigException {
+               throws Exceptions.DrbdConfigException, UnknownHostException {
         /* resources */
         final Set<Host> hosts = new LinkedHashSet<Host>(
                                                     getCluster().getHosts());
@@ -482,16 +483,19 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         DRBD.adjustApply(h, DRBD.ALL, null, true);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
+                    final DRBDtestData dtd = new DRBDtestData(testOutput);
+                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    getBrowser().drbdtestLockRelease();
                     LOG.appError("config failed", dce);
                     return;
+                } catch (UnknownHostException e) {
+                    LOG.appError("config failed", e);
+                    return;
+                } finally {
+                    getBrowser().drbdtestLockRelease();
+                    startTestLatch.countDown();
                 }
-                final DRBDtestData dtd = new DRBDtestData(testOutput);
-                getApplyButton().setToolTipText(dtd.getToolTip());
-                getBrowser().setDRBDtestData(dtd);
-                getBrowser().drbdtestLockRelease();
-                startTestLatch.countDown();
             }
         };
         initApplyButton(buttonCallback);
@@ -543,14 +547,16 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                 for (final Host h : getCluster().getHosts()) {
                                     DRBD.adjustApply(h, DRBD.ALL, null, false);
                                 }
-                            } catch (
-                                final Exceptions.DrbdConfigException dce) {
-                                getBrowser().drbdStatusUnlock();
+                                apply(false);
+                            } catch (final Exceptions.DrbdConfigException dce) {
                                 LOG.appError("config failed", dce);
                                 return;
+                            } catch (final UnknownHostException e) {
+                                LOG.appError("config failed", e);
+                                return;
+                            } finally {
+                                getBrowser().drbdStatusUnlock();
                             }
-                            apply(false);
-                            getBrowser().drbdStatusUnlock();
                         }
                     });
                     thread.start();
