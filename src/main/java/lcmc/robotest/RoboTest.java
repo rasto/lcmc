@@ -1862,12 +1862,13 @@ public final class RoboTest {
         if (aborted) {
             return false;
         }
-        sleepNoFactor(2000);
-        final Component dialog = getFocusedWindow();
+        sleepNoFactor(1000);
+        Component dialog = getFocusedWindow();
         for (int i = 0; i < 60; i++) {
             if (dialog instanceof JDialog || aborted) {
                 break;
             }
+            dialog = getFocusedWindow();
             sleepNoFactor(1000);
         }
         if (!(dialog instanceof JDialog) || aborted) {

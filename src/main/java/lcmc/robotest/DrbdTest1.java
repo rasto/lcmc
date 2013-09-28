@@ -81,7 +81,9 @@ final class DrbdTest1 {
         press(KeyEvent.VK_DOWN);
         sleep(500);
         press(KeyEvent.VK_ENTER);
-        sleep(20000);
+        sleep(10000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("addDrbdResource");
     }
 
@@ -92,6 +94,8 @@ final class DrbdTest1 {
     static void newDrbdResource() {
         drbdNext();
         sleep(10000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("newDrbdResource");
     }
 
@@ -108,6 +112,8 @@ final class DrbdTest1 {
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(1000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("chooseDrbdResourceInterface");
     }
 
@@ -119,29 +125,39 @@ final class DrbdTest1 {
 
         drbdNext();
         sleep(10000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("chooseDrbdResource");
     }
 
     static void addDrbdVolume() {
         drbdNext();
         sleep(10000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("addDrbdVolume");
     }
 
     static void addBlockDevice() {
         drbdNext();
         sleep(10000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("addBlockDevice");
     }
 
     static void addMetaData() {
         drbdNext();
         sleep(30000);
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("addMetaData");
     }
 
     static void addFileSystem() {
         /* do nothing. */
+        moveTo(500, 300);
+        rightClick();
         dialogColorTest("addFileSystem");
     }
 
