@@ -168,6 +168,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public static final Pattern DRBDP_ADDRESS =
        Pattern.compile("^" + ProxyNetInfo.PROXY_PREFIX
                        + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
+    
+    public static final String FAMILY_SDP = "sdp";
+    public static final String FAMILY_SSOCKS = "ssocks";
     /**
      * Prepares a new <code>DrbdResourceInfo</code> object.
      */
@@ -769,8 +772,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         String hostPort = null;
         final boolean infoPanelOk = infoPanel != null;
         for (final Host host : getHosts()) {
-            final String hostAddress =
+            String hostAddress =
                             dxml.getVirtualInterface(host.getName(), getName());
+            final String family =
+                     dxml.getVirtualInterfaceFamily(host.getName(), getName());
+            if (FAMILY_SDP.equals(family) || FAMILY_SSOCKS.equals(family)) {
+                hostAddress = family + " " + hostAddress;
+            }
             final String hp =
                        dxml.getVirtualInterfacePort(host.getName(), getName());
             if (hostPort != null && !hostPort.equals(hp)) {

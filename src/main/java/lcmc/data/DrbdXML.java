@@ -143,6 +143,9 @@ public final class DrbdXML extends XML {
     /** Map from drbd resource name and the host to the port. */
     private final Map<String, Map<String, String>> resourceHostPortMap =
                                     new HashMap<String, Map<String, String>>();
+    /** Map from drbd resource name and the host to the family. */
+    private final Map<String, Map<String, String>> resourceHostFamilyMap =
+                                    new HashMap<String, Map<String, String>>();
     /** Map from drbd resource name and the host to the meta disk. */
     private final MultiKeyMap<String, Map<String, String>>
                         resourceHostMetaDiskMap =
@@ -864,6 +867,7 @@ public final class DrbdXML extends XML {
             } else if (option.getNodeName().equals("address")) {
                 final String ip = getText(option);
                 final String port = getAttribute(option, "port");
+                final String family = getAttribute(option, "family");
                 /* ip */
                 Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
                 if (hostIpMap == null) {
@@ -879,6 +883,14 @@ public final class DrbdXML extends XML {
                     resourceHostPortMap.put(resName, hostPortMap);
                 }
                 hostPortMap.put(hostName, port);
+                /* family */
+                Map<String, String> hostFamilyMap =
+                                            resourceHostFamilyMap.get(resName);
+                if (hostFamilyMap == null) {
+                    hostFamilyMap = new HashMap<String, String>();
+                    resourceHostFamilyMap.put(resName, hostFamilyMap);
+                }
+                hostFamilyMap.put(hostName, family);
             } else if (option.getNodeName().equals("proxy")) {
                 parseProxyHostConfig(hostName, resName, option);
             }
@@ -953,6 +965,7 @@ public final class DrbdXML extends XML {
                 /* since 8.4, it's outside of volume */
                 final String ip = getText(option);
                 final String port = getAttribute(option, "port");
+                final String family = getAttribute(option, "family");
                 /* ip */
                 Map<String, String> hostIpMap = resourceHostIpMap.get(resName);
                 if (hostIpMap == null) {
@@ -968,6 +981,14 @@ public final class DrbdXML extends XML {
                     resourceHostPortMap.put(resName, hostPortMap);
                 }
                 hostPortMap.put(hostName, port);
+                /* family */
+                Map<String, String> hostFamilyMap =
+                                            resourceHostFamilyMap.get(resName);
+                if (hostFamilyMap == null) {
+                    hostFamilyMap = new HashMap<String, String>();
+                    resourceHostFamilyMap.put(resName, hostFamilyMap);
+                }
+                hostFamilyMap.put(hostName, family);
             } else if (option.getNodeName().equals("proxy")) {
                 parseProxyHostConfig(hostName, resName, option);
             }
@@ -1018,6 +1039,15 @@ public final class DrbdXML extends XML {
                                                     final String resName) {
         if (resourceHostPortMap.containsKey(resName)) {
             return resourceHostPortMap.get(resName).get(hostName);
+        }
+        return null;
+    }
+
+    /** Gets virtual net interface family for a host and a resource. */
+    public String getVirtualInterfaceFamily(final String hostName,
+                                            final String resName) {
+        if (resourceHostFamilyMap.containsKey(resName)) {
+            return resourceHostFamilyMap.get(resName).get(hostName);
         }
         return null;
     }
