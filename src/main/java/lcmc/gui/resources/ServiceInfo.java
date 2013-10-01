@@ -2273,7 +2273,7 @@ public class ServiceInfo extends EditableInfo {
         if (isMetaAttr(param)) {
             final String paramDefault = getBrowser().getRscDefaultsInfo()
                                                  .getResource().getValue(param);
-            if (paramDefault != null) {
+            if (paramDefault != null && !"".equals(paramDefault)) {
                 return paramDefault;
             }
         }
