@@ -90,9 +90,13 @@ final class DrbdAvailSourceFiles extends DialogHost {
               new ExecCallback() {
                 @Override
                 public void done(final String ans) {
+                    if ("".equals(ans)) {
+                        doneError(null, 1);
+                        return;
+                    }
                     final String[] versions = ans.split("\\r?\\n");
                     if (versions.length == 0) {
-                        allDone(null);
+                        doneError(null, 1);
                         return;
                     }
                     final List<ComboInfo> items = new ArrayList<ComboInfo>();
