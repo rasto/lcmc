@@ -282,6 +282,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget pwi = portComboBox;
                 if (awi != null && pwi != null) {
                     final Object o = awi.getValue();
+                    LOG.debug1("drbdResourceConfig: host: "
+                               + host.getName() + " ni: " + o);
+                    for (final NetInterface ni : host.getNetInterfaces()) {
+                        LOG.debug1("drbdResourceConfig: host: "
+                                   + host.getName()
+                                   + " nis: "
+                                   + ni.getIp());
+                    }
                     if (o == null) {
                         throw new Exceptions.DrbdConfigException(
                                     "Address not defined in "

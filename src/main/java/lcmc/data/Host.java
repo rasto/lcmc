@@ -2231,6 +2231,14 @@ public final class Host implements Comparable<Host> {
             }
         }
 
+        LOG.debug1("parseHostInfo: "
+                   + getName()
+                   + ", pacemaker: "   + pacemakerVersion
+                   + ", corosync: "    + corosyncVersion
+                   + ", heartbeat: "   + heartbeatVersion
+                   + ", drbd: "        + drbdVersion
+                   + ", drbd module: " + drbdModuleVersion);
+
         if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
             bridges = newBridges;
