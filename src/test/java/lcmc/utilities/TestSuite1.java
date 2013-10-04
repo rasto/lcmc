@@ -174,6 +174,7 @@ public final class TestSuite1 {
         } else {
             return;
         }
+        Tools.waitForSwing();
 
         LoggerFactory.setDebugLevel(-1);
         if (CLUSTER) {
