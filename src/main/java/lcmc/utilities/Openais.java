@@ -89,6 +89,17 @@ public final class Openais {
         execCommand(host, command, true);
     }
 
+    /**
+     * Stops openais with pacemaker on host.
+     * /etc/init.d/openais stop && /etc/init.d/pacemaker stop
+     */
+    public static void stopOpenaisWithPcmk(final Host host) {
+        final String command = host.getDistCommand(
+                                              "Openais.stopOpenaisWithPcmk",
+                                              (ConvertCmdCallback) null);
+        execCommand(host, command, true);
+    }
+
     /** Starts openais on host and adds it to the rc. */
     public static void startOpenaisRc(final Host host) {
         final String command = host.getDistCommand("Openais.startOpenais"

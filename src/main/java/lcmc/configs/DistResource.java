@@ -240,6 +240,10 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"Openais.stopOpenais",
          SUDO + "/etc/init.d/openais stop"},
 
+        {"Openais.stopOpenaisWithPcmk",
+         SUDO + "/etc/init.d/pacemaker stop && "
+         + SUDO + "/etc/init.d/openais stop"},
+
         {"Openais.reloadOpenais",
          "if ! " + SUDO + "/etc/init.d/openais status >/dev/null 2>&1; then "
          + SUDO + "/etc/init.d/openais start; fi"},

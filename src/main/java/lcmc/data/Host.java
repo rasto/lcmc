@@ -3026,7 +3026,7 @@ public final class Host implements Comparable<Host> {
 
     /** Returns whether pacemaker is started by corosync. */
     public boolean isPcmkStartedByCorosync() {
-        if (pcmkServiceVersion == 0) {
+        if (pcmkServiceVersion < 1) {
             return true;
         }
         return false;

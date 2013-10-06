@@ -655,9 +655,19 @@ public final class HostInfo extends Info {
                         if (!host.isPcmkStartedByCorosync()
                             && host.isPcmkInit()
                             && host.isPcmkRunning()) {
-                            Corosync.stopCorosyncWithPcmk(host);
+                            if (getHost().isCsRunning()
+                                && !getHost().isAisRunning()) {
+                                Corosync.stopCorosyncWithPcmk(host);
+                            } else {
+                                Openais.stopOpenaisWithPcmk(host);
+                            }
                         } else {
-                            Corosync.stopCorosync(host);
+                            if (getHost().isCsRunning()
+                                && !getHost().isAisRunning()) {
+                                Corosync.stopCorosync(host);
+                            } else {
+                                Openais.stopOpenais(host);
+                            }
                         }
 
                         getBrowser().getClusterBrowser().updateHWInfo(host);

@@ -273,9 +273,19 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             if (!host.isPcmkStartedByCorosync()
                                 && host.isPcmkInit()
                                 && host.isPcmkRunning()) {
-                                Corosync.stopCorosyncWithPcmk(host);
+                                if (host.isCsRunning()
+                                    && !host.isAisRunning()) {
+                                    Corosync.stopCorosyncWithPcmk(host);
+                                } else {
+                                    Openais.stopOpenaisWithPcmk(host);
+                                }
                             } else {
-                                Corosync.stopCorosync(host);
+                                if (host.isCsRunning()
+                                    && !host.isAisRunning()) {
+                                    Corosync.stopCorosync(host);
+                                } else {
+                                    Openais.stopOpenais(host);
+                                }
                             }
                         }
 
