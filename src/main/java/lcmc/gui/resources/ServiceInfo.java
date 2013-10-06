@@ -1032,7 +1032,8 @@ public class ServiceInfo extends EditableInfo {
                                                        testOnly);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
-                    && !locationId.startsWith("cli-standby-"))) {
+                    && !locationId.startsWith("cli-standby-")
+                    && !locationId.startsWith("cli-ban-"))) {
                 continue;
             }
             final HostInfo hi = host.getBrowser().getHostInfo();
@@ -1096,7 +1097,8 @@ public class ServiceInfo extends EditableInfo {
                                                        testOnly);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
-                    && !locationId.startsWith("cli-standby-"))) {
+                    && !locationId.startsWith("cli-standby-")
+                    && !locationId.startsWith("cli-ban-"))) {
                 continue;
             }
             final HostInfo hi = host.getBrowser().getHostInfo();
