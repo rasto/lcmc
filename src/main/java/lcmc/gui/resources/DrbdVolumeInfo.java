@@ -1405,6 +1405,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Sets stored parameters. */
     public void setParameters() {
         Tools.isSwingThread();
+        getBrowser().getDrbdDevHash().put(device, this);
+        getBrowser().putDrbdDevHash();
         getDrbdVolume().setCommited(true);
     }
 
