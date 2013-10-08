@@ -1935,12 +1935,10 @@ sub get_cluster_versions {
 	chomp $cs_running;
 	chomp $pcmk_running;
 	chomp $drbdp_running;
-	my $service = _exec("/usr/sbin/corosync-objctl service 2>/dev/null");
+	my $service = _exec("(/usr/sbin/corosync-cmapctl service || /usr/sbin/corosync-objctl|grep '^service\.') 2>/dev/null");
 	my $pcmk_svc_ver = "no";
-	if ($service) {
-		if ($service =~ /^service.ver=(\d*)/) {
-			$pcmk_svc_ver = $1;
-		}
+	if ($service && $service =~ /^service\.ver=(\d+)/m) {
+		$pcmk_svc_ver = $1;
 	}
 	# drbd version
 	my ($drbd_version) =
