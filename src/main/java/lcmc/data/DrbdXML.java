@@ -84,36 +84,36 @@ public final class DrbdXML extends XML {
     /** Map from section to this section's parameters. */
     private final Map<String, List<String>> sectionParamsMap =
                                       new LinkedHashMap<String, List<String>>();
-    /** Map from perameter name to its unit name (long). */
+    /** Map from parameter name to its unit name (long). */
     private final Map<String, String> paramUnitLongMap =
                                            new LinkedHashMap<String, String>();
 
-    /** Map from perameter name to its unit name. */
+    /** Map from parameter name to its unit name. */
     private final Map<String, String> paramDefaultUnitMap =
                                            new LinkedHashMap<String, String>();
 
-    /** Map from perameter name to its long description. */
+    /** Map from parameter name to its long description. */
     private final Map<String, String> paramLongDescMap =
                                                 new HashMap<String, String>();
 
-    /** Map from perameter name to its minimum value. */
+    /** Map from parameter name to its minimum value. */
     private final Map<String, BigInteger> paramMinMap =
                                     new LinkedHashMap<String, BigInteger>();
 
-    /** Map from perameter name to its maximum value. */
+    /** Map from parameter name to its maximum value. */
     private final Map<String, BigInteger> paramMaxMap =
                                         new LinkedHashMap<String, BigInteger>();
 
-    /** Map from perameter name to its correct value. */
+    /** Map from parameter name to its correct value. */
     private final Map<String, Boolean> paramCorrectValueMap =
                                                 new HashMap<String, Boolean>();
 
-    /** Map from perameter name to its items if there is a choice list. */
+    /** Map from parameter name to its items if there is a choice list. */
     private final Map<String, List<Object>> paramItemsMap =
                                     new LinkedHashMap<String, List<Object>>();
     /** List of all parameters. */
     private final List<String> parametersList = new ArrayList<String>();
-    /** List of all gloval parameters. */
+    /** List of all global parameters. */
     private final List<String> globalParametersList = new ArrayList<String>();
     /** List of all required parameters. */
     private final List<String> requiredParametersList =
@@ -154,7 +154,7 @@ public final class DrbdXML extends XML {
     private final MultiKeyMap<String, Map<String, String>>
                         resourceHostMetaDiskIndexMap =
                                 new MultiKeyMap<String, Map<String, String>>();
-    /** Map from resoure and host to the proxy information. */
+    /** Map from resource and host to the proxy information. */
     private final MultiKeyMap<String, HostProxy> resourceHostProxyMap =
                                          new MultiKeyMap<String, HostProxy>();
     /** Set of all proxy hosts. */
@@ -543,7 +543,7 @@ public final class DrbdXML extends XML {
         }
     }
 
-    /** Add paremeter with choice combo box. */
+    /** Add parameter with choice combo box. */
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
