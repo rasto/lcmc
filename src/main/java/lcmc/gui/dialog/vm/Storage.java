@@ -65,7 +65,8 @@ final class Storage extends VMConfig {
                                             DiskData.AUTH_SECRET_UUID,
 
                                             DiskData.DRIVER_NAME,
-                                            DiskData.DRIVER_TYPE};
+                                            DiskData.DRIVER_TYPE,
+                                            DiskData.DRIVER_CACHE};
     /** VMS disk info object. */
     private VMSDiskInfo vmsdi = null;
     /** Next dialog object. */
@@ -150,6 +151,7 @@ final class Storage extends VMConfig {
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE Disk");
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hda");
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
+        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, "default");
         if ("xen".equals(getVMSVirtualDomainInfo().getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
             vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "file");
