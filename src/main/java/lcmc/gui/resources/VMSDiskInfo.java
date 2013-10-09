@@ -98,7 +98,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     private final Map<String, Widget> readonlyWi =
                                             new HashMap<String, Widget>();
     /** Previous target device value. */
-    private String prevTargetDevice = null;
+    private String prevTargetBusType = null;
     /** Previous target bus type (disk type) value. */
     private String previousTargetBusType = null;
     /** Parameters. */
@@ -801,20 +801,22 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             final String saved = getParamSaved(DiskData.TARGET_DEVICE);
             String selected = null;
             devices.add(saved);
-            if (saved != null) {
+            if (saved == null || getResource().isNew()) {
+                if (devices.size() > 1) {
+                    selected = devices.toArray(new String[devices.size()])[1];
+                }
+            } else {
                 selected = saved;
-            } else if (devices.size() > 1) {
-                selected = devices.toArray(new String[devices.size()])[1];
             }
-            if (prevTargetDevice == null
-                || !prevTargetDevice.equals(selected)) {
+            if (prevTargetBusType == null
+                || !prevTargetBusType.equals(newValue)) {
                 final String sel = selected;
                 for (final String p : targetDeviceWi.keySet()) {
                     targetDeviceWi.get(p).reloadComboBox(
                                 sel,
                                 devices.toArray(new String[devices.size()]));
                 }
-                prevTargetDevice = selected;
+                prevTargetBusType = newValue;
             }
             final String tbs = getComboBoxValue(DiskData.TARGET_BUS_TYPE);
             if (getParamSaved(DiskData.DRIVER_NAME) == null
