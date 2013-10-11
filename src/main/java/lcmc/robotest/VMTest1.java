@@ -339,9 +339,53 @@ final class VMTest1 {
                 moveTo("Apply");
                 leftClick();
                 checkVMTest(vmTest, 3.01, name);
-
                 /* remove disk */
                 moveToMenu("hdb (IDE");
+                rightClick();
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_ENTER); /* remove */
+                confirmRemove();
+                checkVMTest(vmTest, 3, name);
+
+                /* add disk /virtio */
+                moveToMenu("dmc");
+                rightClick();
+                sleep(2000);
+                moveTo("Add Hardware");
+                sleep(1000);
+                moveTo("New Disk");
+                leftClick();
+                sleep(2000);
+                moveTo("Disk/block device");
+                leftClick();
+                sleep(2000);
+                moveTo("Device", Widget.MComboBox.class);
+                leftClick();
+                press(KeyEvent.VK_SLASH);
+                press(KeyEvent.VK_D);
+                press(KeyEvent.VK_E);
+                press(KeyEvent.VK_V);
+
+                press(KeyEvent.VK_SLASH);
+                press(KeyEvent.VK_S);
+                press(KeyEvent.VK_D);
+                press(KeyEvent.VK_A);
+                press(KeyEvent.VK_2);
+                press(KeyEvent.VK_ENTER);
+                moveTo("Disk Type", Widget.MComboBox.class);
+                leftClick();
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_DOWN);
+                press(KeyEvent.VK_ENTER); /* virtio */
+                moveTo("Apply");
+                leftClick();
+                checkVMTest(vmTest, 3.02, name);
+
+                /* remove disk */
+                moveToMenu("vda (Virtio");
                 rightClick();
                 press(KeyEvent.VK_DOWN);
                 press(KeyEvent.VK_ENTER); /* remove */
