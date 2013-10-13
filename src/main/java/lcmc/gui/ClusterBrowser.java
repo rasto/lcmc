@@ -79,7 +79,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Enumeration;
 import java.util.TreeMap;
 import java.util.Set;
@@ -2048,6 +2047,31 @@ public final class ClusterBrowser extends Browser {
         mHeartbeatIdToServiceUnlock();
     }
 
+    /** Check if the id exists for the service already, if so add _$index
+     * to it.
+     * @param id can be null. */
+    public String getFreeId(final String serviceName, final String id) {
+        if (id == null) {
+            return id;
+        }
+        String newId = id;
+        lockNameToServiceInfo();
+        try {
+            final Map<String, ServiceInfo> idToInfoHash =
+                                     nameToServiceInfoHash.get(serviceName);
+            int index = 2;
+            if (idToInfoHash != null) {
+                while (idToInfoHash.containsKey(newId)) {
+                    newId = id + "_" + index;
+                    index++;
+                }
+            }
+        } finally {
+            unlockNameToServiceInfo();
+        }
+        return newId;
+    }
+
     /**
      * Adds ServiceInfo in the name to ServiceInfo hash. Id and name
      * are taken from serviceInfo object. nameToServiceInfoHash
@@ -2076,15 +2100,13 @@ public final class ClusterBrowser extends Browser {
             }
         } else {
             if (service.getId() == null) {
-                final Iterator<String> it = idToInfoHash.keySet().iterator();
                 int index = 0;
-                while (it.hasNext()) {
-                    final String id =
-                      idToInfoHash.get(it.next()).getService().getId();
+                for (final String id : idToInfoHash.keySet()) {
                     Pattern p;
                     if (csPmId == null) {
                         p = Pattern.compile("^(\\d+)$");
                     } else {
+                        /* ms */
                         p = Pattern.compile("^" + csPmId + "_(\\d+)$");
                         if (csPmId.equals(id)) {
                             index++;
@@ -2103,9 +2125,11 @@ public final class ClusterBrowser extends Browser {
                         }
                     }
                 }
+
                 if (csPmId == null) {
                     service.setId(Integer.toString(index + 1));
                 } else {
+                    /* ms */
                     if (index == 0) {
                         service.setIdAndCrmId(csPmId);
                     } else {

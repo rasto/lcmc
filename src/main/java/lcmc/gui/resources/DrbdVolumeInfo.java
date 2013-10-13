@@ -969,6 +969,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Adds old style drbddisk service in the heartbeat and graph. */
     void addDrbdDisk(final FilesystemInfo fi,
                             final Host dcHost,
+                            final String drbdId,
                             final boolean testOnly) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
@@ -977,7 +978,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                     getBrowser().getCRMXML().getHbDrbddisk(),
                                     p,
                                     true,
-                                    null,
+                                    drbdId,
                                     null,
                                     testOnly);
         di.setGroupInfo(fi.getGroupInfo());
@@ -1000,6 +1001,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Adds linbit::drbd service in the pacemaker graph. */
     void addLinbitDrbd(final FilesystemInfo fi,
                        final Host dcHost,
+                       final String drbdId,
                        final boolean testOnly) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
@@ -1008,7 +1010,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                      getBrowser().getCRMXML().getHbLinbitDrbd(),
                                      p,
                                      true,
-                                     null,
+                                     drbdId,
                                      null,
                                      testOnly);
         Tools.waitForSwing();

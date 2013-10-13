@@ -433,10 +433,17 @@ final class FilesystemInfo extends ServiceInfo {
             //    }
             //});
             //t.start();
+            final String fsId = getService().getId();
             if (oldDrbddisk) {
-                newDvi.addDrbdDisk(this, dcHost, testOnly);
+                final String drbdId = getBrowser().getFreeId(
+                         getBrowser().getCRMXML().getHbDrbddisk().getName(),
+                         fsId);
+                newDvi.addDrbdDisk(this, dcHost, drbdId, testOnly);
             } else {
-                newDvi.addLinbitDrbd(this, dcHost, testOnly);
+                final String drbdId = getBrowser().getFreeId(
+                         getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
+                         fsId);
+                newDvi.addLinbitDrbd(this, dcHost, drbdId, testOnly);
             }
         }
     }

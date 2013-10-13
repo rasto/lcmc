@@ -96,6 +96,60 @@ final class PcmkTest3 {
             checkTest(testName, 3);
             removeEverything();
             resetTerminalAreas();
+
+            /* filesystem/drbd - with name */
+            moveTo(577, 205);
+            rightClick(); /* popup */
+            sleep(1000);
+            moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+            sleep(1000);
+            moveTo("Filesystem + Linbit:DRBD");
+            leftClick(); /* choose fs */
+
+            checkTest(testName, 4);
+            moveTo("Name", Widget.MTextField.class);
+            leftClick();
+            press(KeyEvent.VK_X);
+            sleep(200);
+            press(KeyEvent.VK_Y);
+            sleep(200);
+
+            moveTo("block device", Widget.MComboBox.class); /* choose drbd */
+            leftClick();
+            sleep(2000);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
+            press(KeyEvent.VK_ENTER);
+
+            moveTo("mount point", Widget.MComboBox.class);
+            leftClick();
+            sleep(2000);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
+            press(KeyEvent.VK_DOWN);
+            sleep(200);
+            press(KeyEvent.VK_ENTER);
+
+            moveTo("filesystem type", Widget.MComboBox.class);
+            leftClick();
+            sleep(2000);
+            press(KeyEvent.VK_E);
+            sleep(200);
+            press(KeyEvent.VK_E);
+            sleep(200);
+            press(KeyEvent.VK_ENTER);
+
+            moveTo(Tools.getString("Browser.ApplyResource"));
+            leftClick();
+            sleep(2000);
+            checkTest(testName, 5);
+            checkNumberOfVertices(testName, 4);
+            stopEverything();
+            checkTest(testName, 6);
+            removeEverything();
+            resetTerminalAreas();
         }
         System.gc();
     }
