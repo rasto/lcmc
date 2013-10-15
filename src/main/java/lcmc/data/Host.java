@@ -1032,7 +1032,8 @@ public final class Host implements Comparable<Host> {
                                     distVersionString,
                                     arch,
                                     convertCmdCallback,
-                                    false); /* in bash */
+                                    false,  /* in bash */
+                                    false); /* sudo */
     }
 
     /** Converts a string that is specific to the distribution distribution. */
@@ -1080,7 +1081,8 @@ public final class Host implements Comparable<Host> {
                             return command;
                         }
                     },
-                    false); /* in bash */
+                    false,  /* in bash */
+                    false); /* sudo */
     }
 
     /**
@@ -1102,7 +1104,8 @@ public final class Host implements Comparable<Host> {
                                                     distVersionString,
                                                     arch,
                                                     convertCmdCallback,
-                                                    false), /* in bash */
+                                                    false,  /* in bash */
+                                                    false), /* sudo */
                                execCallback,
                                outputVisible,
                                true,
@@ -1149,7 +1152,8 @@ public final class Host implements Comparable<Host> {
                                                     distVersionString,
                                                     arch,
                                                     convertCmdCallback,
-                                                    false), /* in bash */
+                                                    false,  /* in bash */
+                                                    false), /* sudo */
                                progressBar,
                                callback,
                                outputVisible,
@@ -1177,7 +1181,8 @@ public final class Host implements Comparable<Host> {
                                                     distVersionString,
                                                     arch,
                                                     convertCmdCallback,
-                                                    true), /* in bash */
+                                                    true,  /* in bash */
+                                                    true), /* sudo */
                                progressBar,
                                callback,
                                outputVisible,
@@ -1223,7 +1228,8 @@ public final class Host implements Comparable<Host> {
                                                 distVersionString,
                                                 arch,
                                                 null, /* ConvertCmdCallback */
-                                                false), /* in bash */
+                                                false,  /* in bash */
+                                                false), /* sudo */
                                     execCallback,
                                     outputCallback,
                                     false,
@@ -1281,7 +1287,8 @@ public final class Host implements Comparable<Host> {
                                                  distVersionString,
                                                  arch,
                                                  null, /* ConvertCmdCallback */
-                                                 false), /* in bash */
+                                                 false,  /* in bash */
+                                                 false), /* sudo */
                                 execCallback,
                                 outputCallback,
                                 false,
@@ -1756,7 +1763,8 @@ public final class Host implements Comparable<Host> {
                                                 distVersionString,
                                                 arch,
                                                 null, /* ConvertCmdCallback */
-                                                true), /* in bash */
+                                                true,   /* in bash */
+                                                false), /* sudo */
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
@@ -1794,7 +1802,8 @@ public final class Host implements Comparable<Host> {
                                                 distVersionString,
                                                 arch,
                                                 null, /* ConvertCmdCallback */
-                                                false), /* in bash */
+                                                false,  /* in bash */
+                                                false), /* sudo */
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {

@@ -887,7 +887,8 @@ public final class Tools {
                                  final String version,
                                  final String arch,
                                  final ConvertCmdCallback convertCmdCallback,
-                                 final boolean inBash) {
+                                 final boolean inBash,
+                                 final boolean inSudo) {
         if (text == null) {
             return null;
         }
@@ -901,7 +902,11 @@ public final class Tools {
                 distString = t;
             }
             if (inBash && i == 0) {
-                results.add(DistResource.SUDO + "bash -c \""
+                String sudoS = "";
+                if (inSudo) {
+                    sudoS = DistResource.SUDO;
+                }
+                results.add(sudoS + "bash -c \""
                             + Tools.escapeQuotes(distString, 1)
                             + "\"");
             } else {
