@@ -391,9 +391,9 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"DRBD.getProcDrbd",
          SUDO + "@GUI-HELPER@ proc-drbd;"
-         + SUDO + "/sbin/drbd-proxy-ctl -c 'show hconnections'"
+         + "if [ -f /sbin/drbd-proxy-ctl ]; then " + SUDO + " /sbin/drbd-proxy-ctl -c 'show hconnections'"
               + " -c 'show hsubconnections' -c 'show memusage'"
-              + " -c 'print statistics' 2>/dev/null;:"},
+              + " -c 'print statistics' 2>/dev/null;fi;:"},
         {"DRBD.getProcesses",  "ps aux|grep drbd"},
         {"DRBD.showProxyInfo",
          SUDO + "/sbin/drbd-proxy-ctl -c 'show hconnections'"
