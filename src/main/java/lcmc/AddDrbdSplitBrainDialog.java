@@ -28,6 +28,8 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.dialog.drbd.SplitBrain;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * AddDrbdSplitBrainDialog.
@@ -38,6 +40,9 @@ import lcmc.gui.resources.DrbdVolumeInfo;
  * @version $Id$
  */
 public final class AddDrbdSplitBrainDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                       LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
@@ -53,15 +58,20 @@ public final class AddDrbdSplitBrainDialog {
         DrbdConfig dialog = new SplitBrain(null, dvi);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

@@ -129,7 +129,7 @@ abstract class XML {
             if (sxe.getException() != null) {
                 x = sxe.getException();
             }
-            LOG.appWarning("could not parse: " + xml);
+            LOG.appWarning("getXMLDocument: could not parse: " + xml);
             return null;
         } catch (ParserConfigurationException pce) {
             // Parser with specified options can't be built

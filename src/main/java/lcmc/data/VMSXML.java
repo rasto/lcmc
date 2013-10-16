@@ -445,14 +445,14 @@ public final class VMSXML extends XML {
             if (domainNodes.getLength() == 1) {
                 domainNode = domainNodes.item(0);
             } else if (domainNodes.getLength() >= 1) {
-                LOG.appError(domainNodes.getLength() + " supposedly unique " + domainName + " configs.");
+                LOG.appError("getDomainNode: " + domainNodes.getLength() + " supposedly unique " + domainName + " configs.");
                 return null;
             } else {
-                LOG.appWarning("could not find xml for " + domainName);
+                LOG.appWarning("getDomainNode: could not find xml for " + domainName);
                 return null;
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
-            LOG.appError("could not evaluate: ", e);
+            LOG.appError("getDomainNode: could not evaluate: ", e);
             return null;
         }
         return domainNode;
@@ -494,12 +494,12 @@ public final class VMSXML extends XML {
                                                        domainNode,
                                                        XPathConstants.NODESET);
             if (devicesNodes.getLength() != 1) {
-                LOG.appWarning("devices nodes: " + devicesNodes.getLength());
+                LOG.appWarning("getDevicesNode: nodes: " + devicesNodes.getLength());
                 return null;
             }
             return devicesNodes.item(0);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
-            LOG.appError("could not evaluate: ", e);
+            LOG.appError("getDevicesNode: could not evaluate: ", e);
             return null;
         }
     }
@@ -880,7 +880,7 @@ public final class VMSXML extends XML {
             addFeatures(doc, domainNode, parametersMap);
             addClockOffset(doc, domainNode, parametersMap);
         } catch (final javax.xml.xpath.XPathExpressionException e) {
-            LOG.appError("could not evaluate: ", e);
+            LOG.appError("modifyDomainXML: could not evaluate: ", e);
             return null;
         }
         return domainNode;
@@ -1062,7 +1062,7 @@ public final class VMSXML extends XML {
                 hwNode.removeChild(hwAddressNode);
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
-            LOG.appError("could not evaluate: ", e);
+            LOG.appError("modifyXML: could not evaluate: ", e);
             return;
         }
     }
@@ -1092,7 +1092,7 @@ public final class VMSXML extends XML {
                 hwNode.getParentNode().removeChild(hwNode);
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
-            LOG.appError("could not evaluate: ", e);
+            LOG.appError("removeXML: could not evaluate: ", e);
             return;
         }
         saveAndDefine(domainNode, domainName, virshOptions);
@@ -1427,7 +1427,7 @@ public final class VMSXML extends XML {
             if (NET_PARAM_NAME.equals(nodeName)) {
                 name = getText(optionNode);
                 if (!name.equals(nameInFilename)) {
-                    LOG.appWarning("unexpected name: " + name + " != " + nameInFilename);
+                    LOG.appWarning("parseNetConfig: unexpected name: " + name + " != " + nameInFilename);
                     return;
                 }
             } else if (NET_PARAM_UUID.equals(nodeName)) {
@@ -1444,7 +1444,8 @@ public final class VMSXML extends XML {
             } else if ("ip".equals(nodeName)) {
                 /* skip */
             } else if (!"#text".equals(nodeName)) {
-                LOG.appWarning("unknown network option: " + nodeName);
+                LOG.appWarning("parseNetConfig: unknown network option: "
+                               + nodeName);
             }
         }
         if (name != null) {
@@ -1534,7 +1535,8 @@ public final class VMSXML extends XML {
             } else if (HW_ADDRESS.equals(nodeName)) {
                 /* it's generated, ignoring. */
             } else if (!"#text".equals(nodeName)) {
-                LOG.appWarning("unknown disk option: " + nodeName);
+                LOG.appWarning("parseDiskNode: unknown disk option: "
+                               + nodeName);
             }
         }
         if (targetDev != null) {
@@ -1584,7 +1586,8 @@ public final class VMSXML extends XML {
                 parameterValues.put(name, VM_PARAM_NAME, name);
                 parameterValues.put(name, VM_PARAM_DOMAIN_TYPE, domainType);
                 if (!name.equals(nameInFilename)) {
-                    LOG.appWarning("unexpected name: " + name + " != " + nameInFilename);
+                    LOG.appWarning("parseConfig: unexpected name: "
+                                   + name + " != " + nameInFilename);
                     return domainType;
                 }
             } else if (VM_PARAM_UUID.equals(option.getNodeName())) {
@@ -1771,9 +1774,9 @@ public final class VMSXML extends XML {
                         final String display = getAttribute(deviceNode,
                                                            "display");
                         final String xauth = getAttribute(deviceNode, "xauth");
-                        LOG.debug2("type: " + type);
-                        LOG.debug2("port: " + port);
-                        LOG.debug2("autoport: " + autoport);
+                        LOG.debug2("parseConfig: type: " + type);
+                        LOG.debug2("parseConfig: port: " + port);
+                        LOG.debug2("parseConfig: autoport: " + autoport);
                         if ("vnc".equals(type)) {
                             if (port != null && Tools.isNumber(port)) {
                                 remotePorts.put(name, Integer.parseInt(port));
@@ -1813,7 +1816,7 @@ public final class VMSXML extends XML {
                             } else if ("target".equals(nodeName)) {
                                 targetDir = getAttribute(optionNode, "dir");
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown fs option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown fs option: " + nodeName);
                             }
                         }
                         if (targetDir != null) {
@@ -1853,7 +1856,7 @@ public final class VMSXML extends XML {
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown interface option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown interface option: " + nodeName);
                             }
                         }
                         if (macAddress != null) {
@@ -1877,7 +1880,7 @@ public final class VMSXML extends XML {
                             if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown sound option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown sound option: " + nodeName);
                             }
                         }
                         if (model != null) {
@@ -1917,7 +1920,7 @@ public final class VMSXML extends XML {
                                                        getAttribute(optionNode,
                                                                     "service");
                                 } else {
-                                    LOG.appWarning("uknown source mode: " + sourceMode);
+                                    LOG.appWarning("parseConfig: uknown source mode: " + sourceMode);
                                 }
                             } else if ("protocol".equals(nodeName)) {
                                 protocolType = getAttribute(optionNode, "type");
@@ -1926,7 +1929,7 @@ public final class VMSXML extends XML {
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown serial option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown serial option: " + nodeName);
                             }
                         }
                         if (type != null) {
@@ -1979,7 +1982,7 @@ public final class VMSXML extends XML {
                                     connectSourceService =
                                            getAttribute(optionNode, "service");
                                 } else {
-                                    LOG.appWarning("uknown source mode: " + sourceMode);
+                                    LOG.appWarning("parseConfig: unknown source mode: " + sourceMode);
                                 }
                             } else if ("protocol".equals(nodeName)) {
                                 protocolType = getAttribute(optionNode, "type");
@@ -1988,7 +1991,7 @@ public final class VMSXML extends XML {
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown parallel option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown parallel option: " + nodeName);
                             }
                         }
                         if (type != null) {
@@ -2024,7 +2027,7 @@ public final class VMSXML extends XML {
                             } else if (HW_ADDRESS.equals(nodeName)) {
                                 /* it's generated, ignoring. */
                             } else if (!"#text".equals(nodeName)) {
-                                LOG.appWarning("unknown video option: " + nodeName);
+                                LOG.appWarning("parseConfig: unknown video option: " + nodeName);
                             }
                         }
                         if (modelType != null) {
@@ -2039,7 +2042,7 @@ public final class VMSXML extends XML {
                     } else if ("memballoon".equals(deviceNode.getNodeName())) {
                         /* it's generated, ignore */
                     } else if (!"#text".equals(deviceNode.getNodeName())) {
-                        LOG.appWarning("unknown device: " + deviceNode.getNodeName());
+                        LOG.appWarning("parseConfig: unknown device: " + deviceNode.getNodeName());
 
                     }
                 }
@@ -2055,7 +2058,7 @@ public final class VMSXML extends XML {
             }
         }
         if (!tabletOk) {
-            LOG.appWarning("you should enable input type tablet for " + name);
+            LOG.appWarning("parseConfig: you should enable input type tablet for " + name);
         }
         return domainType;
     }

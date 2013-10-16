@@ -393,10 +393,11 @@ public final class Host implements Comparable<Host> {
     public void setCluster(final Cluster cluster) {
         this.cluster = cluster;
         if (cluster == null) {
-            LOG.debug1(getName() + " set cluster: null");
+            LOG.debug1("setCluster: " + getName() + " set cluster: null");
         } else {
             inCluster = true;
-            LOG.debug1(getName() + " set cluster name: " + cluster.getName());
+            LOG.debug1("setCluster: " + getName() + " set cluster name: "
+                       + cluster.getName());
         }
     }
 
@@ -741,7 +742,7 @@ public final class Host implements Comparable<Host> {
                     return true;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning(e.getMessage(), e);
+                LOG.appWarning("isDrbdUpgradeAvailable: "+ e.getMessage(), e);
             }
         }
         return false;
@@ -857,18 +858,18 @@ public final class Host implements Comparable<Host> {
             case 0:
                 break;
             default:
-                LOG.appError("Error.SetDistInfo.CannotSetInfo", java.util.Arrays.asList(info).toString());
+                LOG.appError("setDistInfo: list: ", java.util.Arrays.asList(info).toString());
                 break;
         }
         dist = detectedDist;
         distVersion = detectedDistVersion;
         initDistInfo();
         if (!distInfoLogged) {
-            LOG.debug1("kernel name: " + detectedKernelName);
-            LOG.debug1("kernel version: " + detectedKernelVersion);
-            LOG.debug1("arch: " + detectedArch);
-            LOG.debug1("dist version: " + detectedDistVersion);
-            LOG.debug1("dist: " + detectedDist);
+            LOG.debug1("setDistInfo: kernel name: " + detectedKernelName);
+            LOG.debug1("setDistInfo: kernel version: " + detectedKernelVersion);
+            LOG.debug1("setDistInfo: arch: " + detectedArch);
+            LOG.debug1("setDistInfo: dist version: " + detectedDistVersion);
+            LOG.debug1("setDistInfo: dist: " + detectedDist);
         }
         distInfoLogged = true;
     }
@@ -876,13 +877,13 @@ public final class Host implements Comparable<Host> {
     /** Initializes dist info. Must be called after setDistInfo. */
     void initDistInfo() {
         if (!"Linux".equals(detectedKernelName)) {
-            LOG.appWarning("detected kernel not linux: "
+            LOG.appWarning("initDistInfo: detected kernel not linux: "
                              + detectedKernelName);
         }
         setKernelName("Linux");
 
         if (!dist.equals(detectedDist)) {
-            LOG.appError("dist: " + dist + " does not match " + detectedDist);
+            LOG.appError("initDistInfo: dist: " + dist + " does not match " + detectedDist);
         }
         distVersionString = Tools.getDistVersionString(dist, distVersion);
         distVersion = Tools.getDistString("distributiondir",
@@ -917,7 +918,7 @@ public final class Host implements Comparable<Host> {
         if ("No Match".equals(dV)) {
             return null;
         }
-        LOG.debug("getDistVersionString dist:" + dV.replaceFirst("\\d.*", ""));
+        LOG.debug("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
         return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""),
                                    "",
                                    "",
@@ -981,7 +982,7 @@ public final class Host implements Comparable<Host> {
             return hbLibPath;
         }
         if ("".equals(arch)) {
-            LOG.appWarning("getHeartbeatLibPath() called to soon: unknown arch");
+            LOG.appWarning("getHeartbeatLibPath: called to soon: unknown arch");
         } else if ("x86_64".equals(arch) || "amd64".equals(arch)) {
             return "/usr/lib64/heartbeat";
         }
@@ -1236,7 +1237,7 @@ public final class Host implements Comparable<Host> {
                                     false,
                                     DRBD_EVENTS_TIMEOUT);
         } else {
-            LOG.appWarning("trying to start started drbd status");
+            LOG.appWarning("execDrbdStatusCommand: trying to start started drbd status");
         }
     }
 
@@ -1255,7 +1256,7 @@ public final class Host implements Comparable<Host> {
     public void stopDrbdStatus() {
         final ExecCommandThread dst = drbdStatusThread;
         if (dst == null) {
-            LOG.appWarning("trying to stop stopped drbd status");
+            LOG.appWarning("execDrbdStatusCommand: trying to stop stopped drbd status");
             return;
         }
         dst.cancel();
@@ -1295,7 +1296,7 @@ public final class Host implements Comparable<Host> {
                                 false,
                                 CLUSTER_EVENTS_TIMEOUT);
         } else {
-            LOG.appWarning("trying to start started hb status");
+            LOG.appWarning("execClStatusCommand: trying to start started status");
         }
     }
 
@@ -1313,7 +1314,7 @@ public final class Host implements Comparable<Host> {
     public void stopClStatus() {
         final ExecCommandThread cst = clStatusThread;
         if (cst == null) {
-            LOG.appWarning("trying to stop stopped hb status");
+            LOG.appWarning("stopClStatus: trying to stop stopped status");
             return;
         }
         cst.cancel();
@@ -1550,7 +1551,7 @@ public final class Host implements Comparable<Host> {
     public void connect(final SSHGui sshGui,
                         final ProgressBar progressBar,
                         final ConnectionCallback callback) {
-        LOG.debug1("host connect: " + sshGui);
+        LOG.debug1("connect: host: " + sshGui);
         ssh.connect(sshGui, progressBar, callback, this);
     }
 
@@ -1588,9 +1589,9 @@ public final class Host implements Comparable<Host> {
         if (lastConnected != con) {
             lastConnected = con;
             if (con) {
-               LOG.info(getName() + ": connection established");
+               LOG.info("setConnected: " + getName() + ": connection established");
             } else {
-               LOG.info(getName() + ": connection lost");
+               LOG.info("setConnected: " + getName() + ": connection lost");
             }
             final ClusterBrowser cb = getBrowser().getClusterBrowser();
             if (cb != null) {
@@ -1738,7 +1739,7 @@ public final class Host implements Comparable<Host> {
             try {
                 timestamp = Double.parseDouble(ts);
             }  catch (final NumberFormatException nfe) {
-                LOG.debug("could not parse: " + ts + " " + nfe);
+                LOG.debug("getOutput: could not parse: " + ts + " " + nfe);
             }
             mInfoTimestampLock.lock();
             if (timestamp != null
@@ -1937,11 +1938,13 @@ public final class Host implements Comparable<Host> {
             public void run() {
                 while (true) {
                     if (ping.get()) {
-                       LOG.debug2("connection ok on " + getName());
+                       LOG.debug2("startConnectionStatus: connection ok on "
+                                  + getName());
                        setConnected();
                        ping.set(false);
                     } else {
-                       LOG.debug2("connection lost on " + getName());
+                       LOG.debug2("startConnectionStatus: connection lost on "
+                                  + getName());
                        getSSH().forceReconnect();
                        setConnected();
                     }
@@ -2080,7 +2083,7 @@ public final class Host implements Comparable<Host> {
 
     /** Parses the host info. */
     public void parseHostInfo(final String ans) {
-        LOG.debug1("updating host info: " + getName());
+        LOG.debug1("parseHostInfo: updating host info: " + getName());
         final String[] lines = ans.split("\\r?\\n");
         String type = "";
         final List<String> versionLines = new ArrayList<String>();
@@ -2135,7 +2138,8 @@ public final class Host implements Comparable<Host> {
                         newBridges.add(netInterface.getName());
                     }
                 } catch (UnknownHostException e) {
-                    LOG.appWarning("cannot parse: net-info: " + line);
+                    LOG.appWarning("parseHostInfo: cannot parse: net-info: "
+                                   + line);
                 }
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
@@ -2187,7 +2191,7 @@ public final class Host implements Comparable<Host> {
                 if (vgi.length == 2) {
                     newVolumeGroups.put(vgi[0], Long.parseLong(vgi[1]));
                 } else {
-                    LOG.appWarning("could not parse volume info: " + line);
+                    LOG.appWarning("parseHostInfo: could not parse volume info: " + line);
                 }
             } else if ("filesystems-info".equals(type)) {
                 newFileSystems.add(line);
@@ -2232,7 +2236,7 @@ public final class Host implements Comparable<Host> {
                         }
                     }
                     if (res == null) {
-                        LOG.appWarning("could not parse proxy line: " + line);
+                        LOG.appWarning("parseHostInfo: could not parse proxy line: " + line);
                     } else {
                         newDrbdResProxy.add(res);
                     }
@@ -2889,7 +2893,7 @@ public final class Host implements Comparable<Host> {
         }
         int h = 1;
         for (final Host host : getCluster().getHosts()) {
-            LOG.debug1("host" + h + " = " + host.getName());
+            LOG.debug1("checkTest: host" + h + " = " + host.getName());
             command.append(' ');
             command.append(host.getName());
             if (maxHosts > 0 && h >= maxHosts) {
@@ -2963,7 +2967,7 @@ public final class Host implements Comparable<Host> {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
         } catch (java.lang.NumberFormatException e) {
-            LOG.appWarning("could not parse: " + colorString);
+            LOG.appWarning("setSavedColor: could not parse: " + colorString);
             /* ignore it */
         }
     }
@@ -3073,7 +3077,7 @@ public final class Host implements Comparable<Host> {
         try {
             return Tools.compareVersions(getDrbdVersion(), "8.4") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("hasVolumes: " + e.getMessage(), e);
         }
         return true;
     }

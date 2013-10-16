@@ -1155,8 +1155,10 @@ public final class DrbdXML extends XML {
                             continue;
                         }
                     } catch (Exceptions.DrbdConfigException e) {
-                        LOG.appWarning(e.getMessage());
-                        LOG.appWarning(n.getNodeValue());
+                        LOG.appWarning("parseConfigResourceNode: "
+                                       + e.getMessage());
+                        LOG.appWarning("parseConfigResourceNode: "
+                                       + n.getNodeValue());
                         continue;
                     }
                     optionsMap.put(resName + "." + secName, nameValueMap);
@@ -1177,7 +1179,8 @@ public final class DrbdXML extends XML {
                 }
                 if (!sectionParamsMap.containsKey(secName)
                     && !sectionParamsMap.containsKey(secName + "-options")) {
-                    LOG.appWarning("DRBD: unknown section: " + secName);
+                    LOG.appWarning("parseConfigResourceNode: unknown section: "
+                                   + secName);
                     if (!unknownSections) {
                         /* unknown section, so it's not removed. */
                         Tools.progressIndicatorFailed(
@@ -1195,7 +1198,7 @@ public final class DrbdXML extends XML {
         if (start < 0) {
             final String c = configXML.trim();
             if (c.length() != 0 && !IGNORE_CONFIG_ERRORS.contains(c)) {
-                LOG.error("drbd config error: " + c);
+                LOG.error("parseConfig: error: " + c);
             }
             return;
         }
@@ -1461,7 +1464,7 @@ public final class DrbdXML extends XML {
                 res = mDev.group(2);
                 volumeNr = mDev.group(3);
             }
-            LOG.debug("drbd event: " + devNr + " - " + what);
+            LOG.debug("parseDrbdEvent: event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
                 final BlockDevInfo bdi = getBlockDevInfo(devNr,
                                                        hostName,

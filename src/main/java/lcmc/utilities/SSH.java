@@ -119,7 +119,7 @@ public final class SSH {
             return false;
         }
         if (!isConnected()) {
-            LOG.debug1("connecting: " + host.getName());
+            LOG.debug1("reconnect: connecting: " + host.getName());
             this.callback = null;
             this.progressBar = null;
             this.sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
@@ -230,9 +230,8 @@ public final class SSH {
         if (ct != null) {
             ct.cancel();
         }
-        LOG.debug1("SSH cancel");
         final String message = "canceled";
-        LOG.debug1(message);
+        LOG.debug1("cancelConnection: message: " + message);
         host.getTerminalPanel().addCommandOutput(message + "\n");
         host.getTerminalPanel().nextCommand();
         connectionFailed = true;
@@ -248,9 +247,8 @@ public final class SSH {
     /** Cancels the session (execution of command). */
     public void cancelSession(final ExecCommandThread execCommandThread) {
         execCommandThread.cancel();
-        LOG.debug1("session cancel");
         final String message = "canceled";
-        LOG.debug1(message);
+        LOG.debug1("cancelSession: message" + message);
         //sess.close();
         //sess = null;
         host.getTerminalPanel().addCommandOutput("\n");
@@ -267,7 +265,7 @@ public final class SSH {
             connection.close();
             connection = null;
             mConnectionLock.unlock();
-            LOG.debug("disconnecting: " + host.getName());
+            LOG.debug("disconnect: host: " + host.getName());
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
         }
@@ -290,7 +288,7 @@ public final class SSH {
         } else {
             connection = null;
             mConnectionLock.unlock();
-            LOG.debug("force reconnecting: " + host.getName());
+            LOG.debug("forceReconnect: host: " + host.getName());
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
         }
@@ -305,7 +303,7 @@ public final class SSH {
             disconnectForGood = true;
             connection = null;
             mConnectionLock.unlock();
-            LOG.debug("force disconnecting: " + host.getName());
+            LOG.debug("forceDisconnect: host: " + host.getName());
             host.getTerminalPanel().addCommand("logout");
             host.getTerminalPanel().nextCommand();
         }
@@ -358,8 +356,10 @@ public final class SSH {
         private SSHOutput execOneCommand(final String command,
                                          final boolean outputVisible) {
             if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
-                LOG.appWarning(sshCommandTimeout + " to small for timeout? "
-                                 + command);
+                LOG.appWarning("execOneCommand: timeout: "
+                               + sshCommandTimeout
+                               + " to small for timeout? "
+                               + command);
             }
             this.command = command;
             this.outputVisible = outputVisible;
@@ -389,7 +389,7 @@ public final class SSH {
                    to enter sudo password by every command.
                    (It would be exposed) */
                 thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
-                LOG.debug2("exec command: "
+                LOG.debug2("execOneCommand: command: "
                            + host.getName()
                            + ": "
                            + host.getSudoCommand(
@@ -428,14 +428,15 @@ public final class SSH {
                                             sshCommandTimeout);
                         }
                         if (cancelIt) {
-                            LOG.info("SSH cancel");
+                            LOG.info("execOneCommand: SSH cancel");
                             throw new IOException(
                                 "Canceled while waiting for data from peer.");
                         }
 
                         if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                                 /* A timeout occured. */
-                                LOG.appWarning("SSH timeout: " + command);
+                                LOG.appWarning("execOneCommand: SSH timeout: "
+                                               + command);
                                 Tools.progressIndicatorFailed(
                                    host.getName(),
                                    "SSH timeout: "
@@ -530,7 +531,7 @@ public final class SSH {
                     res.append(errOutput);
 
                     if (newOutputCallback != null && !cancelIt) {
-                        LOG.debug2("output" + exitCode + ": "
+                        LOG.debug2("execOneCommand: output: " + exitCode + ": "
                                    + host.getName()
                                    + ": "
                                    + output.toString());
@@ -555,17 +556,17 @@ public final class SSH {
                 if (ec != null) {
                     exitCode = ec;
                 }
-                //LOG.debug("exitCode: " + exitCode);
                 thisSession.close();
                 sess = null;
             } catch (IOException e) {
-                LOG.appWarning(host.getName() + ":" + e.getMessage()
+                LOG.appWarning("execOneCommand: "
+                               + host.getName() + ":" + e.getMessage()
                                + ":"  + command);
                 exitCode = ERROR_EXIT_CODE;
                 cancel();
             }
             final String outputString = res.toString();
-            LOG.debug2("output" + exitCode + ": "
+            LOG.debug2("execOneCommand: output: " + exitCode + ": "
                        + host.getName()
                        + ": "
                        + outputString);
@@ -594,7 +595,7 @@ public final class SSH {
         throws java.io.IOException {
             super();
             this.command = command;
-            LOG.debug2("command: " + command);
+            LOG.debug2("ExecCommandThread: command: " + command);
             this.execCallback = execCallback;
             this.newOutputCallback = newOutputCallback;
             this.outputVisible = outputVisible;
@@ -649,7 +650,8 @@ public final class SSH {
                     public void run() {
                         Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
                         if (!cancelTimeout[0]) {
-                            LOG.debug1(host.getName() + ": open ssh session: timeout.");
+                            LOG.debug1("exec: " + host.getName()
+                                       + ": open ssh session: timeout");
                             cancelTimeout[0] = true;
                             conn.dmcCancel();
                         }
@@ -749,7 +751,8 @@ public final class SSH {
                             commandVisible,
                             sshCommandTimeout);
         } catch (java.io.IOException e) {
-            LOG.appError("Can not execute command: " + command, "", e);
+            LOG.appError("execCommandThread: Can not execute command: "
+                         + command, "", e);
             return new SSHOutput("", 102);
         }
         execCommandThread.start();
@@ -784,7 +787,7 @@ public final class SSH {
             return null;
         }
         final String realCommand = host.replaceVars(command);
-        LOG.debug2("real command: " + realCommand);
+        LOG.debug2("execCommand: real command: " + realCommand);
         ExecCommandThread execCommandThread;
         try {
             execCommandThread = new ExecCommandThread(realCommand,
@@ -794,7 +797,8 @@ public final class SSH {
                                                       commandVisible,
                                                       sshCommandTimeout);
         } catch (java.io.IOException e) {
-            LOG.appError("Can not execute command: " + realCommand, "", e);
+            LOG.appError("execCommand: Can not execute command: "
+                         + realCommand, "", e);
             return null;
         }
         execCommandThread.setPriority(Thread.MIN_PRIORITY);
@@ -838,7 +842,8 @@ public final class SSH {
                                                       commandVisible,
                                                       sshCommandTimeout);
         } catch (java.io.IOException e) {
-            LOG.appError("Can not execute command: " + realCommand, "", e);
+            LOG.appError("execCommand: can not execute command: "
+                         + realCommand, "", e);
             return null;
         }
         execCommandThread.setPriority(Thread.MIN_PRIORITY);
@@ -870,7 +875,7 @@ public final class SSH {
                                          final boolean outputVisible,
                                          final boolean commandVisible,
                                          final int sshCommandTimeout) {
-        LOG.debug2("execCommand with progress bar");
+        LOG.debug2("execCommand: with progress bar");
         this.progressBar = progressBar;
         if (progressBar != null) {
             progressBar.start(0);
@@ -963,8 +968,8 @@ public final class SSH {
                  * known_hosts locations.
                  */
                 if (Tools.isWindows()) {
-                    LOG.debug("Not using known_hosts file, because"
-                              + " this is Windows.");
+                    LOG.debug("verifyServerHostKey: not using known_hosts"
+                              + " file, because this is Windows.");
                 } else {
                     try {
                         KnownHosts.addHostkeyToFile(
@@ -974,8 +979,9 @@ public final class SSH {
                               serverHostKeyAlgorithm,
                               serverHostKey);
                     } catch (IOException ignore) {
-                        LOG.appWarning("SSH addHostKeyToFile failed "
-                                         + ignore.getMessage());
+                        LOG.appWarning("verifyServerHostKey: SSH "
+                                       + "addHostKeyToFile failed "
+                                       + ignore.getMessage());
                     }
                 }
 
@@ -1172,11 +1178,10 @@ public final class SSH {
                                                                       key);
                                     } catch (Exception e) {
                                         lastDSAKey = null;
-                                        LOG.debug("dsa passwordless failed");
+                                        LOG.debug("authenticate: dsa passwordless failed");
                                     }
                                     if (res) {
-                                        LOG.debug(
-                                          "dsa passwordless auth successful");
+                                        LOG.debug("authenticate: dsa passwordless auth successful");
                                         lastDSAKey = key;
                                         lastRSAKey = null;
                                         lastPassword = null;
@@ -1198,11 +1203,10 @@ public final class SSH {
                                                                       key);
                                     } catch (Exception e) {
                                         lastRSAKey = null;
-                                        LOG.debug("rsa passwordless failed");
+                                        LOG.debug("authenticate: rsa passwordless failed");
                                     }
                                     if (res) {
-                                        LOG.debug(
-                                          "rsa passwordless auth successful");
+                                        LOG.debug("authenticate: rsa passwordless auth successful");
                                         lastRSAKey = key;
                                         lastDSAKey = null;
                                         lastPassword = null;
@@ -1232,10 +1236,10 @@ public final class SSH {
                                                                       key);
                                 } catch (Exception e) {
                                         lastDSAKey = null;
-                                        LOG.debug("dsa key auth failed");
+                                        LOG.debug("authenticate: dsa key auth failed");
                                 }
                                 if (res) {
-                                    LOG.debug("dsa key auth successful");
+                                    LOG.debug("authenticate: dsa key auth successful");
                                     lastRSAKey = null;
                                     lastDSAKey = key;
                                     lastPassword = null;
@@ -1255,10 +1259,10 @@ public final class SSH {
                                                                       key);
                                 } catch (Exception e) {
                                     lastRSAKey = null;
-                                    LOG.debug("rsa key auth failed");
+                                    LOG.debug("authenticate: rsa key auth failed");
                                 }
                                 if (res) {
-                                    LOG.debug("rsa key auth successful");
+                                    LOG.debug("authenticate: rsa key auth successful");
                                     lastRSAKey = key;
                                     lastDSAKey = null;
                                     lastPassword = null;
@@ -1383,8 +1387,7 @@ public final class SSH {
                 // here only after connection is esteblished or after
                 // timeout.
                 conn.close();
-                LOG.debug(
-                    "closing established connection because it was canceled");
+                LOG.debug( "authenticate: closing canceled connection");
                 mConnectionThreadLock.lock();
                 try {
                     connectionThread = null;
@@ -1427,7 +1430,8 @@ public final class SSH {
                 if (callback != null) {
                     callback.done(0);
                 }
-                LOG.debug1(host.getName() + ": authentication ok");
+                LOG.debug1("authenticate: " + host.getName()
+                           + ": authentication ok");
             }
         }
 
@@ -1452,7 +1456,7 @@ public final class SSH {
                     throw new IOException("hostname is not set");
                 }
                 /* connect and verify server host key (with callback) */
-                LOG.debug2("verify host keys: " + hostname);
+                LOG.debug2("run: verify host keys: " + hostname);
                 final String[] hostkeyAlgos =
                     Tools.getConfigData().getKnownHosts().
                         getPreferredServerHostkeyAlgorithmOrder(hostname);
@@ -1485,7 +1489,7 @@ public final class SSH {
                 /* authentication phase */
                 authenticate(conn);
             } catch (IOException e) {
-                LOG.appWarning("connecting failed: " + e.getMessage());
+                LOG.appWarning("run: connecting failed: " + e.getMessage());
                 connectionFailed = true;
                 if (!cancelIt) {
                     host.getTerminalPanel().addCommandOutput(e.getMessage()
@@ -1564,7 +1568,8 @@ public final class SSH {
         try {
             scpClient.put(file.getBytes(), fileName, "/tmp");
         } catch (IOException e) {
-            LOG.appError("could not copy: " + fileName, "", e);
+            LOG.appError("installTestFiles: could not copy: "
+                         + fileName, "", e);
             return;
         }
         final SSHOutput ret = execCommandAndWait(
@@ -1674,7 +1679,7 @@ public final class SSH {
 
                                    + postCommandString
                                    + backupString.toString();
-        LOG.debug1(commands.toString() + "echo \"..." + commandTail);
+        LOG.debug1("scp: " + commands.toString() + "echo \"..." + commandTail);
         final Thread t = execCommand(
                             DistResource.SUDO + "bash -c \""
                             + Tools.escapeQuotes(

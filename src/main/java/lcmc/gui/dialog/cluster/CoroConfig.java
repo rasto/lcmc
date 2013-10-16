@@ -795,7 +795,8 @@ final class CoroConfig extends DialogCluster {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
         } catch (IllegalVersionException e) {
-            LOG.appWarning("cannot compare corosync version: " + hosts[0].getCorosyncVersion());
+            LOG.appWarning("aisConfigHead: cannot compare corosync version: "
+                           + hosts[0].getCorosyncVersion());
         }
         if (!corosync2) {
             config.append(plugins(fake));
@@ -878,7 +879,8 @@ final class CoroConfig extends DialogCluster {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
         } catch (IllegalVersionException e) {
-            LOG.appWarning("cannot compare corosync version: " + hosts[0].getCorosyncVersion());
+            LOG.appWarning("aisConfigPacemaker: cannot compare corosync version: "
+                           + hosts[0].getCorosyncVersion());
         }
         if (corosync2) {
             config.append("\nquorum {\n");
@@ -911,7 +913,7 @@ final class CoroConfig extends DialogCluster {
         if (MCAST_TYPE.equals(type)) {
             final NetInterface iface  = (NetInterface) ifaceW.getValue();
             if (iface == null) {
-                LOG.appWarning("can't add null interface");
+                LOG.appWarning("addInterface: cannot add null interface");
                 return;
             }
             bindnetaddr = iface.getBindnetaddr();
@@ -957,7 +959,8 @@ final class CoroConfig extends DialogCluster {
             }
         }
         if (defaultNi == null) {
-            LOG.appError(hosts[0].getName() + ": missing network interfaces");
+            LOG.appError("getInputPane: " + hosts[0].getName()
+                         + ": missing network interfaces");
         }
         ifaceW = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,

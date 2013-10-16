@@ -86,7 +86,7 @@ public final class Hosts {
 
     /** Removes references to the cluster from all hosts. */
     public void removeHostsFromCluster(final Cluster cluster) {
-        LOG.debug1("remove hosts from cluster: " + cluster.getName());
+        LOG.debug1("removeHostsFromCluster: cluster: " + cluster.getName());
         for (final Host host : hosts) {
             if (host.getCluster() == cluster) {
                 host.removeFromCluster();

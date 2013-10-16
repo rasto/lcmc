@@ -201,7 +201,8 @@ public final class Tools {
         final java.net.URL imgURL =
                         Tools.class.getResource("/images/" + imageFilename);
         if (imgURL == null) {
-            LOG.appWarning("Couldn't find image: " + imageFilename);
+            LOG.appWarning("createImageIcon: couldn't find image: "
+                           + imageFilename);
             return null;
         } else {
             final ImageIcon newIcon = new ImageIcon(imgURL);
@@ -221,7 +222,7 @@ public final class Tools {
             release = p.getProperty("release");
             return release;
         } catch (IOException e) {
-            LOG.appError("cannot open release file", "", e);
+            LOG.appError("getRelease: cannot open release file", "", e);
             return "unknown";
         }
     }
@@ -277,7 +278,8 @@ public final class Tools {
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 LOG.appWarning(command + " " + ans + " rc: " + exitCode);
+                                 LOG.appWarning("doneError: " + command + " "
+                                                + ans + " rc: " + exitCode);
                                  if (outputVisible) {
                                     LOG.sshError(host,
                                                  command,
@@ -483,7 +485,7 @@ public final class Tools {
             try {
                 in.close();
             } catch (IOException ex) {
-                LOG.appError("Could not close: " + filename, ex);
+                LOG.appError("loadFile: could not close: " + filename, ex);
             }
         }
         return content.toString();
@@ -491,7 +493,7 @@ public final class Tools {
 
     /** Loads config data from the specified file. */
     public static void loadConfigData(final String filename) {
-        LOG.debug("load");
+        LOG.debug("loadConfigData: start");
         final String xml = loadFile(filename, true);
         if (xml == null) {
             return;
@@ -532,7 +534,8 @@ public final class Tools {
     /** Removes the specified clusters from the gui. */
     public static void removeClusters(final List<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
-            LOG.debug1("remove hosts from cluster: " + cluster.getName());
+            LOG.debug1("removeClusters: remove hosts from cluster: "
+                       + cluster.getName());
             getConfigData().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
                 host.removeFromCluster();
@@ -563,7 +566,7 @@ public final class Tools {
                 String ip = null;
                 if (addresses != null) {
                     if (addresses.length == 0) {
-                        LOG.debug("lookup failed");
+                        LOG.debug("setUserConfigFromOptions: lookup failed");
                         /* lookup failed */
                     } else {
                         ip = addresses[0].getHostAddress();
@@ -617,7 +620,7 @@ public final class Tools {
                 whether to save clusters specified from the command line
      */
     public static void save(final String filename, final boolean saveAll) {
-        LOG.debug("save");
+        LOG.debug("save: start");
         final String text =
             Tools.getString("Tools.Saving").replaceAll(
                                            "@FILENAME@",
@@ -626,9 +629,9 @@ public final class Tools {
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             userConfig.saveXML(fileOut, saveAll);
-            LOG.debug("saved: " + filename);
+            LOG.debug("save: filename: " + filename);
         } catch (IOException e) {
-            LOG.appError("error saving: " + filename, "", e);
+            LOG.appError("save: error saving: " + filename, "", e);
         } finally {
             try {
                 Thread.sleep(1000);
@@ -686,7 +689,7 @@ public final class Tools {
         try {
             return resourceAppDefaults.getString(option);
         } catch (Exception e) {
-            LOG.appError("unresolved config resource", option, e);
+            LOG.appError("getDefault: unresolved config resource", option, e);
             return option;
         }
     }
@@ -709,7 +712,8 @@ public final class Tools {
         try {
             return (Color) resourceAppDefaults.getObject(option);
         } catch (Exception e) {
-            LOG.appError("unresolved config resource", option, e);
+            LOG.appError("getDefaultColor: unresolved config resource",
+                         option, e);
             return Color.WHITE;
         }
     }
@@ -741,7 +745,7 @@ public final class Tools {
         try {
             return (Integer) resourceAppDefaults.getObject(option);
         } catch (Exception e) {
-            LOG.appError("AppError.getInt.Exception", option + ": " + getDefault(option), e);
+            LOG.appError("getDefaultInt: exception", option + ": " + getDefault(option), e);
             return 0;
         }
         /*
@@ -803,7 +807,7 @@ public final class Tools {
         try {
             return resource.getString(text);
         } catch (Exception e) {
-            LOG.appError("unresolved resource: " + text);
+            LOG.appError("getString: unresolved resource: " + text);
             return text;
         }
     }
@@ -820,7 +824,7 @@ public final class Tools {
             version = "";
         }
         final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistString text: " + text + " dist: " + dist + " version: " + version);
+        LOG.debug2("getDistString: text: " + text + " dist: " + dist + " version: " + version);
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
         String ret;
@@ -834,7 +838,7 @@ public final class Tools {
                 if (ret == null) {
                     ret = resourceString.getString(text);
                 }
-                LOG.debug2("ret: " + ret);
+                LOG.debug2("getDistString: ret: " + ret);
                 return ret;
             } catch (Exception e) {
                 return null;
@@ -856,7 +860,7 @@ public final class Tools {
             version = "";
         }
         final Locale locale = new Locale(dist, version);
-        LOG.debug2("getDistStrings text: " + text + " dist: " + dist + " version: " + version);
+        LOG.debug2("getDistStrings: text: " + text + " dist: " + dist + " version: " + version);
         final ResourceBundle resourceString =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
         List<String> ret;
@@ -898,7 +902,7 @@ public final class Tools {
         for (final String t : texts) {
             String distString = getDistString(t, dist, version, arch);
             if (distString == null) {
-                LOG.appWarning("unknown command: " + t);
+                LOG.appWarning("getDistCommand: unknown command: " + t);
                 distString = t;
             }
             if (inBash && i == 0) {
@@ -941,7 +945,7 @@ public final class Tools {
         try {
             return resourceSD.getStringArray(service);
         } catch (Exception e) {
-            LOG.appWarning("cannot get service definition for service: " + service, e);
+            LOG.appWarning("getServiceDefinition: cannot get service definition for service: " + service, e);
             return new String[]{};
         }
     }
@@ -981,7 +985,8 @@ public final class Tools {
         if (dist == null) {
             dist = "";
         }
-        LOG.debug2("dist: " + dist + ", version: " + version);
+        LOG.debug2("getDistVersionString: dist: " + dist + ", version: "
+                   + version);
         final Locale locale = new Locale(dist, "");
         final ResourceBundle resourceCommand =
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
@@ -1008,7 +1013,7 @@ public final class Tools {
                 distVersion = version;
             }
         }
-        LOG.debug2("dist version: " + distVersion);
+        LOG.debug2("getDistVersionString: dist version: " + distVersion);
         return distVersion;
     }
     /**
@@ -1730,7 +1735,7 @@ public final class Tools {
             }
             return content.toString();
         } catch (IOException e) {
-            LOG.appError("could not read: " + fileName, "", e);
+            LOG.appError("getFile: could not read: " + fileName, "", e);
             return null;
         }
     }
@@ -1753,7 +1758,7 @@ public final class Tools {
         for (final String arg : args) {
             final String[] pair = arg.split(":");
             if (pair == null || pair.length != 2) {
-                LOG.appWarning("cannot parse: " + line);
+                LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
             }
             final String option = pair[0];
@@ -1781,7 +1786,7 @@ public final class Tools {
             } else if (global) {
                 Tools.getConfigData().addAutoOption("global", option, value);
             } else {
-                LOG.appWarning("cannot parse: " + line);
+                LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
             }
         }
@@ -1830,7 +1835,8 @@ public final class Tools {
                             version = v;
                         }
                     } catch (Exceptions.IllegalVersionException e) {
-                        LOG.appWarning(e.getMessage(), e);
+                        LOG.appWarning("getLatestVersion: "
+                                       + e.getMessage(), e);
                     }
                 } else if (info == null) {
                     final Matcher im = iPattern.matcher(line);
@@ -1860,9 +1866,11 @@ public final class Tools {
                 }
             }
         } catch (final IOException e) {
-            LOG.error("can't open: " + url + "; " + e.getMessage());
+            LOG.error("openBrowser: can't open: " + url + "; "
+                      + e.getMessage());
         } catch (final URISyntaxException e) {
-            LOG.error("can't open: " + url + "; " + e.getMessage());
+            LOG.error("openBrowser: can't open: " + url + "; "
+                      + e.getMessage());
         }
     }
 
@@ -1879,11 +1887,12 @@ public final class Tools {
             return remotePort;
         }
         final int localPort = remotePort + getConfigData().getVncPortOffset();
-        LOG.debug("start port forwarding " + remotePort + " -> " + localPort);
+        LOG.debug("prepareVncViewer: start port forwarding "
+                  + remotePort + " -> " + localPort);
         try {
             host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
         } catch (final java.io.IOException e) {
-            LOG.error("unable to create the tunnel "
+            LOG.error("prepareVncViewer: unable to create the tunnel "
                       + remotePort + " -> " + localPort
                       + ": " + e.getMessage()
                       + "\ntry the --vnc-port-offset option");
@@ -1899,11 +1908,11 @@ public final class Tools {
             return;
         }
         final int remotePort = localPort - getConfigData().getVncPortOffset();
-        LOG.debug("stop port forwarding " + remotePort);
+        LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
         try {
             host.getSSH().stopVncPortForwarding(remotePort);
         } catch (final java.io.IOException e) {
-            LOG.appError("unable to close tunnel", e);
+            LOG.appError("cleanupVncViewer: unable to close tunnel", e);
         }
     }
 
@@ -2544,7 +2553,7 @@ public final class Tools {
                    && hbV != null
                    && Tools.compareVersions(hbV, "2.99.0") < 0;
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("versionBeforePacemaker: " + e.getMessage(), e);
             return false;
         }
     }

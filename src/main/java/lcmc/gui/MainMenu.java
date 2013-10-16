@@ -287,7 +287,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("MENU ACTION: exit");
+                 LOG.debug1("actionPerformed: MENU ACTION: exit");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -308,7 +308,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
-                 LOG.debug1("MENU ACTION: new host");
+                 LOG.debug1("actionPerformed: MENU ACTION: new host");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -329,7 +329,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
-                 LOG.debug1("MENU ACTION: load");
+                 LOG.debug1("actionPerformed: MENU ACTION: load");
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
@@ -374,7 +374,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("MENU ACTION: remove everything");
+                 LOG.debug1("actionPerformed: MENU ACTION: remove everything");
                  final Thread thread = new Thread(
                     new Runnable() {
                         @Override
@@ -396,7 +396,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
-                 LOG.debug1("MENU ACTION: save");
+                 LOG.debug1("actionPerformed: MENU ACTION: save");
                  final Thread thread = new Thread(
                     new Runnable() {
                         @Override
@@ -419,7 +419,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
-                 LOG.debug1("MENU ACTION: save as");
+                 LOG.debug1("actionPerformed: MENU ACTION: save as");
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
                                     Tools.getConfigData().getSaveFile()));
@@ -468,7 +468,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (turnOff) {
                      return;
                  }
-                 LOG.debug1("MENU ACTION: new cluster");
+                 LOG.debug1("actionPerformed: MENU ACTION: new cluster");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -489,7 +489,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 if (turnOff) {
                      return;
                 }
-                LOG.debug1("MENU ACTION: look and feel");
+                LOG.debug1("actionPerformed: MENU ACTION: look and feel");
                 try {
                     final String lookAndFeel =
                             LOOK_AND_FEEL_MAP.get(
@@ -520,7 +520,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("MENU ACTION: copy");
+                LOG.debug1("actionPerformed: MENU ACTION: copy");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -537,7 +537,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("MENU ACTION: paste");
+                 LOG.debug1("actionPerformed: MENU ACTION: paste");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -554,7 +554,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("MENU ACTION: about");
+                 LOG.debug1("actionPerformed: MENU ACTION: about");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -572,7 +572,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         return new ActionListener() {
              @Override
              public void actionPerformed(final ActionEvent e) {
-                 LOG.debug1("MENU ACTION: bug report");
+                 LOG.debug1("actionPerformed: MENU ACTION: bug report");
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
@@ -596,7 +596,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(final ActionEvent e) {
         final JMenuItem source = (JMenuItem) (e.getSource());
-        LOG.appError("action \"" + source.getText() + "\" not implemented");
+        LOG.appError("actionPerformed: action \"" + source.getText() + "\" not implemented");
     }
 
     /** Adds sub menu. */
@@ -680,7 +680,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                             ConfigData.AccessType type =
                                         ConfigData.ACCESS_TYPE_MAP.get(opMode);
                             if (type == null) {
-                                LOG.appError("unknown mode: " + opMode);
+                                LOG.appError("run: unknown mode: " + opMode);
                                 type = ConfigData.AccessType.RO;
                             }
                             Tools.getConfigData().setAccessType(type);

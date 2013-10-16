@@ -62,7 +62,7 @@ public final class CommonBlockDevice extends Resource {
         if ("device".equals(parameter)) {
             return getName();
         } else {
-            LOG.appError("Unknown parameter: " + parameter, "");
+            LOG.appError("getValue: unknown parameter: " + parameter, "");
             return "";
         }
     }
@@ -78,7 +78,7 @@ public final class CommonBlockDevice extends Resource {
      */
     @Override
     public String[] getPossibleChoices(final String param) {
-        LOG.appError("Wrong call to getPossibleValues");
+        LOG.appError("getPossibleChoices: wrong call");
         return new String[]{};
     }
 

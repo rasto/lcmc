@@ -557,13 +557,13 @@ public abstract class ResourceGraph {
 
     /** Removes the specified vertex from the hash. */
     protected final void removeInfo(final Vertex v) {
-        LOG.debug1("vertex remove: " + vertexToInfoMap.get(v));
+        LOG.debug1("removeInfo: vertex: " + vertexToInfoMap.get(v));
         vertexToInfoMap.remove(v);
     }
 
     /** Puts the vertex to resource info object map to the hash. */
     protected final void putVertexToInfo(final Vertex v, final Info i) {
-        LOG.debug1("vertex put: " + i);
+        LOG.debug1("putVertexToInfo: vertex: " + i);
         vertexToInfoMap.put(v, i);
     }
 
@@ -1914,8 +1914,7 @@ public abstract class ResourceGraph {
                 final boolean isLoop = endpoints.getFirst().equals(
                                                         endpoints.getSecond());
                 if (isLoop) {
-                    LOG.appWarning(
-                                "an ilegal loop: "
+                    LOG.appWarning("transform: an illegal loop: "
                                 + vertexToInfoMap.get(endpoints.getFirst())
                                 + " " + e + " "
                                 + vertexToInfoMap.get(endpoints.getSecond()));

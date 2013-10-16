@@ -50,7 +50,7 @@ public final class LCMCApplet extends JApplet {
     @Override
     public void init() {
         Tools.init();
-        LOG.debug1("init applet");
+        LOG.debug1("init: start");
         String[] params;
         final String paramsLine = getParameter("params");
         if (paramsLine == null) {

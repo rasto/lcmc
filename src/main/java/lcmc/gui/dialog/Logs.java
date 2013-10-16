@@ -307,7 +307,7 @@ class Logs extends ConfigDialog {
             try {
                 doc.insertString(start0, line + "\n", color0);
             } catch (Exception e) {
-                LOG.appError("Could not insert line", e);
+                LOG.appError("refreshLogs: could not insert line", e);
             }
 
             logTextArea.setCaretPosition(logTextArea.getDocument().getLength());

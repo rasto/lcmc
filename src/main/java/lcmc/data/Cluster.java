@@ -351,7 +351,7 @@ public final class Cluster implements Comparable<Cluster> {
                     minVersion = version;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning(e.getMessage(), e);
+                LOG.appWarning("getMinLibvirtVersion: " + e.getMessage(), e);
             }
         }
         return minVersion;

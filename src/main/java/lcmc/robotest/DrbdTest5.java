@@ -45,7 +45,7 @@ final class DrbdTest5 {
         slowFactor = 0.6f;
         aborted = false;
         /* multi */
-        LOG.info("create pvs");
+        LOG.info("start: create pvs");
         moveTo(334, blockDevY);
         leftClick();
 
@@ -59,20 +59,20 @@ final class DrbdTest5 {
         controlLeftClick();
 
         createPV(334, blockDevY);
-        LOG.info("create vgs");
+        LOG.info("start: create vgs");
         createVGMulti(blockDevY);
         sleepNoFactor(5000);
-        LOG.info("create lvs");
+        LOG.info("start: create lvs");
         moveToGraph("VG vg00");
         sleepNoFactor(5000);
         createLVMulti();
-        LOG.info("remove lvs");
+        LOG.info("start: remove lvs");
         moveTo(334, blockDevY);
         leftClick();
         moveTo(534, blockDevY);
         controlLeftClick();
         lvRemoveMulti();
-        LOG.info("remove vgs");
+        LOG.info("start: remove vgs");
         sleepNoFactor(5000);
         moveToGraph("VG vg00");
         leftClick();
@@ -85,7 +85,7 @@ final class DrbdTest5 {
         sleep(1000);
         moveTo("Remove VG"); /* button */
         leftClick();
-        LOG.info("remove pvs");
+        LOG.info("start: remove pvs");
         moveTo(334, blockDevY);
         leftClick();
         moveTo(534, blockDevY);
@@ -105,17 +105,17 @@ final class DrbdTest5 {
 
         /* single */
         for (int i = 0; i < 2; i++) {
-            LOG.info("create pv 1 " + i);
+            LOG.info("start: create pv 1 " + i);
             createPV(334, blockDevY);
-            LOG.info("create pv 2 " + i);
+            LOG.info("start: create pv 2 " + i);
             createPV(534, blockDevY);
-            LOG.info("create vg " + i);
+            LOG.info("start: create vg " + i);
             createVG(cluster, blockDevY);
             sleepNoFactor(10000);
-            LOG.info("create lv" + i);
+            LOG.info("start: create lv" + i);
             moveToGraph("VG vg0" + i);
             createLV(cluster);
-            LOG.info("resize lv" + i);
+            LOG.info("start: resize lv" + i);
             moveToGraph("vg0" + i + "/lvol0");
             resizeLV(cluster);
         }
@@ -123,11 +123,11 @@ final class DrbdTest5 {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 moveToGraph("vg0" + i + "/lvol0");
-                LOG.info("remove lv " + i + " " + j);
+                LOG.info("start: remove lv " + i + " " + j);
                 lvRemove();
                 sleepNoFactor(10000);
             }
-            LOG.info("remove vg " + i);
+            LOG.info("start: remove vg " + i);
             moveToGraph("VG vg0" + i);
             vgRemove(cluster);
             sleepNoFactor(10000);

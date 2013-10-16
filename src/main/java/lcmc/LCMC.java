@@ -563,7 +563,7 @@ public final class LCMC extends JPanel {
                 Tools.getConfigData().setScale(scale);
                 Tools.resizeFonts(scale);
             } catch (java.lang.NumberFormatException e) {
-                LOG.appWarning("cannot parse scale: " + scaleOp);
+                LOG.appWarning("initApp: cannot parse scale: " + scaleOp);
             }
 
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP,
@@ -605,7 +605,7 @@ public final class LCMC extends JPanel {
                 Tools.getConfigData().setMaxAccessType(
                                           ConfigData.AccessType.ADMIN);
             } else if (opMode != null) {
-                LOG.appWarning("unknown operating mode: " + opMode);
+                LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
             if (cmd.hasOption(SLOW_OP)) {
                 fps = fps / 2;
@@ -630,7 +630,8 @@ public final class LCMC extends JPanel {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
         }
-        LOG.debug1("max mem: " + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "m");
+        LOG.debug1("initApp: max mem: "
+                   + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "m");
         return autoArgs;
     }
 
@@ -755,7 +756,8 @@ public final class LCMC extends JPanel {
         }
         final String failedHost = Tools.setUserConfigFromOptions(clusters);
         if (failedHost != null) {
-            LOG.appWarning("could not resolve host \"" + failedHost + "\" skipping");
+            LOG.appWarning("parseClusterOptions: could not resolve host \""
+                           + failedHost + "\" skipping");
         }
     }
 

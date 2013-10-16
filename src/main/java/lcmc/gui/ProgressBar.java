@@ -161,7 +161,8 @@ public final class ProgressBar implements ActionListener {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    LOG.debug2("running postgresbar timeout: " + timeout);
+                    LOG.debug2("start: running postgresbar timeout: "
+                               + timeout);
                     int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
                     int progressBarDelay =
                                     Tools.getDefaultInt("ProgressBar.Delay");
@@ -199,7 +200,7 @@ public final class ProgressBar implements ActionListener {
 
                         time += sleepTime;
                         if (time > threshold) {
-                            LOG.appWarning("Thread with timeout: " + timeout + " is running way too long");
+                            LOG.appWarning("start: thread with timeout: " + timeout + " is running way too long");
                             threshold += DEBUG_THRESHOLD;
                         }
                         if (progress >= timeout) {
@@ -343,7 +344,7 @@ public final class ProgressBar implements ActionListener {
         final String command = e.getActionCommand();
 
         if (command.equals(Tools.getString("ProgressBar.Cancel"))) {
-            LOG.debug1("cancel button pressed");
+            LOG.debug1("actionPerformed: cancel button pressed");
             cancelCallback.cancel();
         }
     }

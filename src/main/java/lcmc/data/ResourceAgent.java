@@ -305,7 +305,7 @@ public final class ResourceAgent {
      * exist. This should never happen.
      */
     private void wrongParameterError(final String param) {
-        LOG.appError("Wrong parameter: " + param);
+        LOG.appError("wrongParameterError: param: " + param);
     }
 
     /** Sets whether the supplied parameter is required. */

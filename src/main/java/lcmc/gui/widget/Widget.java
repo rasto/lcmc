@@ -479,7 +479,7 @@ public abstract class Widget extends JPanel {
                                 });
                                 t.start();
                             } catch (BadLocationException ble) {
-                                LOG.appWarning("document listener error");
+                                LOG.appWarning("check: document listener error");
                             }
                         }
                     }
@@ -577,8 +577,8 @@ public abstract class Widget extends JPanel {
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
-                LOG.debug2("changed label: " + labelText + " != " + savedLabel);
-                LOG.debug2("changed: " + value + " != " + savedValue);
+                LOG.debug2("setBackground: changed label: " + labelText + " != " + savedLabel);
+                LOG.debug2("setBackground: changed: " + value + " != " + savedValue);
                 /*
                    Tools.printStackTrace("changed: " + value + " != "
                                          + savedValue);
@@ -921,6 +921,6 @@ public abstract class Widget extends JPanel {
 
     /** Select the text component. */
     public void select(final int selectionStart, final int selectionEnd) {
-        LOG.appWarning("select not implemented");
+        LOG.appWarning("select: not implemented");
     }
 }

@@ -108,25 +108,25 @@ final class DrbdCommandInst extends DialogHost {
                               getHost().getDrbdVersionUrlStringToInstall();
         Tools.getConfigData().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
-        LOG.debug("installDrbd: cmd: " + installCommand
-                    + " arch: " + archString
-                    + " version: " + drbdVersionUrlString
-                    + "/" + drbdVersion);
+        LOG.debug1("installDrbd: cmd: " + installCommand
+                   + " arch: " + archString
+                   + " version: " + drbdVersionUrlString
+                   + "/" + drbdVersion);
         getHost().execCommandInBash(
                          installCommand + ";;;DRBD.load",
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
-                                 LOG.debug("installDrbd: done: " + ans);
+                                 LOG.debug1("installDrbd: done: " + ans);
                                  checkAnswer(ans);
                              }
                              @Override
                              public void doneError(final String ans,
                                                    final int exitCode) {
-                                 LOG.debug("installDrbd: done error: "
-                                           + exitCode + " / "
-                                           + ans);
+                                 LOG.debug1("installDrbd: done error: "
+                                            + exitCode + " / "
+                                            + ans);
                                  printErrorAndRetry(
                                     Tools.getString(
                                       "Dialog.Host.DrbdCommandInst.InstError"),

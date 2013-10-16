@@ -36,6 +36,9 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * AddDrbdConfigDialog.
  *
@@ -45,6 +48,9 @@ import java.util.List;
  * @version $Id$
  */
 public final class AddDrbdConfigDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                           LoggerFactory.getLogger(AddDrbdConfigDialog.class);
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
@@ -92,6 +98,7 @@ public final class AddDrbdConfigDialog {
         }
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
@@ -100,9 +107,13 @@ public final class AddDrbdConfigDialog {
                 //dri.getBrowser().reloadAllComboBoxes(null);
                 //dri.setDialogStarted(false);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

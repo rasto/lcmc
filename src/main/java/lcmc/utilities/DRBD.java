@@ -96,7 +96,7 @@ public final class DRBD {
         if (testOnly) {
             if (command.indexOf("@DRYRUN@") < 0) {
                 /* it would be very bad */
-                LOG.appError("dry run not available");
+                LOG.appError("execCommand: dry run not available");
                 return null;
             }
             String cmd = command.replaceAll("@DRYRUN@", "-d");
@@ -551,7 +551,7 @@ public final class DRBD {
                       execCommand(host, command, execCallback, true, testOnly);
             return ret.getExitCode() == 0;
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("skipInitialFullSync: " + e.getMessage(), e);
             return false;
         }
     }
@@ -601,7 +601,7 @@ public final class DRBD {
                       execCommand(host, command, execCallback, true, testOnly);
             return ret.getExitCode() == 0;
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("forcePrimary: " + e.getMessage(), e);
             return false;
         }
     }

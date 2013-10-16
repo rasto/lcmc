@@ -611,7 +611,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean infoPanelOk = isInfoPanelOk();
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
-            LOG.appError("crmXML is null");
+            LOG.appError("setParameters: crmXML is null");
             return;
         }
         /* Attributes */
@@ -2577,7 +2577,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Change type to Master, Clone or Primitive. */
     protected final void changeType(final String value) {
-        LOG.debug1("change type: " + value);
+        LOG.debug1("changeType: value: " + value);
         boolean masterSlave0 = false;
         boolean clone0 = false;
         if (MASTER_SLAVE_TYPE_STRING.equals(value)) {
@@ -2804,7 +2804,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: apply");
+                        LOG.debug1("getInfoPanel: BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2822,7 +2822,7 @@ public class ServiceInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: revert");
+                        LOG.debug1("getInfoPanel: BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {

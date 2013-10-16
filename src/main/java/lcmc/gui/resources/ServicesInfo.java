@@ -466,7 +466,7 @@ public final class ServicesInfo extends EditableInfo {
             ServiceInfo newSi;
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {
-                    LOG.appWarning("group in group not implemented");
+                    LOG.appWarning("setGroupResources: group in group not implemented");
                     continue;
                 }
                 /* clone group */
@@ -490,7 +490,8 @@ public final class ServicesInfo extends EditableInfo {
                      * the heartbeat script of this service or the we look
                      * in the wrong places.
                      */
-                    LOG.appWarning(hbId + ": could not find resource agent");
+                    LOG.appWarning("setGroupResources: " + hbId
+                                   + ": could not find resource agent");
                 }
                 /* continue of creating/updating of the
                  * service in the gui.
@@ -1081,7 +1082,7 @@ public final class ServicesInfo extends EditableInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: apply");
+                    LOG.debug1("actionPerformed: BUTTON: apply");
                     final Thread thread = new Thread(
                         new Runnable() {
                             @Override
@@ -1100,7 +1101,7 @@ public final class ServicesInfo extends EditableInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: revert");
+                    LOG.debug1("actionPerformed: BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1639,7 +1640,8 @@ public final class ServicesInfo extends EditableInfo {
                             return HbOrderInfo.NOT_AVAIL_FOR_PCMK_VERSION;
                         }
                     } catch (Exceptions.IllegalVersionException e) {
-                        LOG.appWarning("unkonwn version: " + pmV);
+                        LOG.appWarning("enablePredicate: unkonwn version: "
+                                       + pmV);
                         /* enable it, if version check doesn't work */
                     }
                     if (getBrowser().clStatusFailed()) {

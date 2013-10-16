@@ -29,6 +29,9 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHost;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * AddHostDialog.
  *
@@ -38,6 +41,9 @@ import lcmc.gui.dialog.host.NewHost;
  * @version $Id$
  */
 public final class AddHostDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                                 LoggerFactory.getLogger(AddHostDialog.class);
     /** The host object. */
     private final Host host;
 
@@ -52,6 +58,7 @@ public final class AddHostDialog {
         DialogHost dialog = new NewHost(null, host);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 /* remove host tab from main window */
@@ -61,9 +68,13 @@ public final class AddHostDialog {
                 Tools.getGUIData().enableAddHostButtons(true);
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 Tools.getGUIData().allHostsUpdate();
                 Tools.getGUIData().checkAddClusterButtons();
                 break;

@@ -169,7 +169,7 @@ public final class RoboTest {
             robot = new Robot(SCREEN_DEVICE);
         } catch (final java.awt.AWTException e) {
             robot = null;
-            LOG.appWarning("Robot error");
+            LOG.appWarning("restoreMouse: robot error");
         }
         if (robot == null) {
             return;
@@ -216,7 +216,7 @@ public final class RoboTest {
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
-                    LOG.appWarning("Robot error");
+                    LOG.appWarning("startClicker0: robot error");
                 }
                 if (rbt == null) {
                     return;
@@ -269,7 +269,7 @@ public final class RoboTest {
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
-                    LOG.appWarning("Robot error");
+                    LOG.appWarning("startMover: robot error");
                 }
                 if (rbt == null) {
                     return;
@@ -363,7 +363,7 @@ public final class RoboTest {
                     robot = new Robot(SCREEN_DEVICE);
                 } catch (final java.awt.AWTException e) {
                     robot = null;
-                    LOG.appWarning("Robot error");
+                    LOG.appWarning("startTest: robot error");
                 }
                 if (robot == null) {
                     return;
@@ -1704,7 +1704,7 @@ public final class RoboTest {
                 return;
             }
         }
-        LOG.info("can't find " + text + " the tree");
+        LOG.info("moveToMenu: cannot find " + text + " the tree");
     }
 
     static void moveToGraph(final String text) {
@@ -1725,7 +1725,7 @@ public final class RoboTest {
                 return;
             }
         }
-        LOG.info("can't find " + text + " in the graph");
+        LOG.info("moveToGraph: cannot find " + text + " in the graph");
     }
 
     static void moveTo(final String text, final Class<?> clazz) {
@@ -1743,7 +1743,7 @@ public final class RoboTest {
         while (c == null && i < 30 && !aborted) {
             c = (Component) findComponent(text, number);
             if (i > 0) {
-                LOG.info("can't find: " + text);
+                LOG.info("moveTo: cannot find: " + text);
             }
             sleepNoFactor(1000);
             i++;
@@ -1823,7 +1823,7 @@ public final class RoboTest {
         try {
             rbt = new Robot(SCREEN_DEVICE);
         } catch (final java.awt.AWTException e) {
-            LOG.appWarning("Robot error");
+            LOG.appWarning("registerMovement: robot error");
         }
         if (rbt == null) {
             return;
@@ -1995,7 +1995,7 @@ public final class RoboTest {
             }
         }
         if (component == null) {
-            LOG.info("can't find " + text);
+            LOG.info("findComponent: cannot find " + text);
             return null;
         }
         for (final Component c : component.getComponents()) {
@@ -2051,7 +2051,7 @@ public final class RoboTest {
         final CRMGraph graph = cluster.getBrowser().getCRMGraph();
         int i = 0;
         while (i < 10 && should != graph.getNumberOfVertices()) {
-            LOG.info(name
+            LOG.info("checkNumberOfVertices: " + name
                        + " number of vertices: "
                        + should + " -> "
                        + graph.getNumberOfVertices());

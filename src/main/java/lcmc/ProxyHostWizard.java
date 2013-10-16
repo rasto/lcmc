@@ -27,6 +27,9 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.NewProxyHost;
 import lcmc.gui.resources.DrbdVolumeInfo;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 
 /**
  * Show step by step dialogs that add and configure new proxy host.
@@ -35,6 +38,9 @@ import lcmc.gui.resources.DrbdVolumeInfo;
  * @version $Id$
  */
 public final class ProxyHostWizard {
+    /** Logger. */
+    private static final Logger LOG =
+                              LoggerFactory.getLogger(ProxyHostWizard.class);
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     private final DrbdVolumeInfo drbdVolumeInfo;
@@ -56,15 +62,20 @@ public final class ProxyHostWizard {
                                                null);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

@@ -104,7 +104,7 @@ public class Service extends Resource {
     /** Sets heartbeat id and gui id without the service name part. */
     public final void setHeartbeatId(final String crmId) {
         this.crmId = crmId;
-        LOG.debug1("set crm id: " + crmId);
+        LOG.debug1("setHeartbeatId: set crm id: " + crmId);
         if (GROUP_NAME.equals(getName())) {
             if (crmId.equals(GRP_ID_PREFIX)) {
                 id = "";
@@ -140,14 +140,14 @@ public class Service extends Resource {
                 id = crmId;
             }
         }
-        LOG.debug1("set crm id: " + crmId + ", id: " + id);
+        LOG.debug1("setHeartbeatId: set crm id: " + crmId + ", id: " + id);
         setValue("id", id);
     }
 
     /** Sets the id. */
     public final void setId(final String id) {
         this.id = id;
-        LOG.debug1("set id: " + id);
+        LOG.debug1("setId: id: " + id);
     }
 
     /** Returns crm id from entered id. */

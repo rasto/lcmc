@@ -336,7 +336,7 @@ public final class BugReport extends ConfigDialog {
     @Override
     protected ConfigDialog checkAnswer() {
         if (isPressedButton(sendReportButton())) {
-            LOG.info("send report");
+            LOG.info("checkAnswer: send report");
             Http.post("lcmc", textArea.getText());
         }
         return null;

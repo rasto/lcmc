@@ -126,8 +126,8 @@ final class CommStack extends DialogCluster {
                                  public void doneError(final String ans,
                                                        final int exitCode) {
                                      skipButtonSetEnabled(false);
-                                     LOG.error(
-                                             host.getName()
+                                     LOG.error("initDialogAfterVisible: "
+                                             + host.getName()
                                              + ": could not get install info: "
                                              + ans);
                                  }

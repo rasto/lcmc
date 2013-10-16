@@ -560,7 +560,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                             }
                             files.add(lf);
                         } else {
-                            LOG.appWarning("could not match: " + line);
+                            LOG.appWarning("getFileSystemView: could not match: " + line);
                         }
                     }
                 }
@@ -578,7 +578,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                                           final boolean dirOnly) {
         final Host host = getFirstConnectedHost();
         if (host == null) {
-            LOG.error("Connection to host lost.");
+            LOG.error("startFileChooser: connection to host lost.");
             return;
         }
         final VMSHardwareInfo thisClass = this;

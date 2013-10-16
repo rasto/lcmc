@@ -115,7 +115,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
     }
@@ -161,7 +161,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
     }
@@ -359,7 +359,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     @Override
     public void actionPerformed(final ActionEvent e) {
-        LOG.debug1("ACTION: " + e.getSource().toString());
+        LOG.debug1("actionPerformed: ACTION: " + e.getSource().toString());
         final Thread thread = new Thread(
             new Runnable() {
                 @Override

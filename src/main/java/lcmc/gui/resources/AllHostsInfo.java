@@ -259,7 +259,7 @@ public final class AllHostsInfo extends Info {
             loadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: load marked");
+                    LOG.debug1("getInfoPanel: BUTTON: load marked");
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -274,7 +274,7 @@ public final class AllHostsInfo extends Info {
             unloadMarkedClustersBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: unload marked");
+                    LOG.debug1("getInfoPanel: BUTTON: unload marked");
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -290,7 +290,7 @@ public final class AllHostsInfo extends Info {
                                                 new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: remove marked");
+                    LOG.debug1("getInfoPanel: BUTTON: remove marked");
                     removeMarkedClusters();
                 }
             });
@@ -397,7 +397,8 @@ public final class AllHostsInfo extends Info {
         loadClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("BUTTON: load cluster: " + cluster.getName());
+                LOG.debug1("LoadClusterButton: BUTTON: load cluster: "
+                           + cluster.getName());
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -491,7 +492,7 @@ public final class AllHostsInfo extends Info {
         quickClusterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("BUTTON: quick cluster");
+                LOG.debug1("quickClusterButton: BUTTON: quick cluster");
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {

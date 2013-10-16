@@ -122,10 +122,9 @@ public final class Logger {
                                 .append('[')
                                 .append(seconds())
                                 .append("s] ")
-                                .append(msg)
-                                .append(" (")
                                 .append(className)
-                                .append(')')
+                                .append(": ")
+                                .append(msg)
                                 .toString();
             if (level <= LoggerFactory.getDebugLevel()) {
                 System.out.println(msg0);

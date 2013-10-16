@@ -596,7 +596,8 @@ public final class ClusterStatus {
                 final String status = Tools.join("\n", data.toArray(
                                                      new String[data.size()]));
                 if (!status.equals(oldStatus)) {
-                    LOG.debug1("status update: " + host.getName());
+                    LOG.debug1("parseCommand: status update: "
+                               + host.getName());
                     oldStatus = status;
                     parseResStatus(status);
                     return true;
@@ -607,7 +608,7 @@ public final class ClusterStatus {
                 final boolean advancedMode =
                                         Tools.getConfigData().isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
-                    LOG.debug1("cib update: " + host.getName());
+                    LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;
                     oldAdvancedMode = advancedMode;
                     parseCibQuery(cib);
@@ -615,7 +616,7 @@ public final class ClusterStatus {
                 }
             }
         } else {
-            LOG.appError("unknown command: " + command);
+            LOG.appError("parseCommand: unknown command: " + command);
         }
         return false;
     }
@@ -665,7 +666,7 @@ public final class ClusterStatus {
                     data.add(line);
                 }
             } else {
-                LOG.appWarning("Error parsing heartbeat status, line not ok: " + line + "\n" + status);
+                LOG.appWarning("parseStatus: error parsing heartbeat status, line not ok: " + line + "\n" + status);
             }
         }
         return updated;

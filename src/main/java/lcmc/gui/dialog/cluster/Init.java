@@ -259,7 +259,7 @@ public class Init extends DialogCluster {
                                  @Override
                                  public void doneError(final String ans,
                                                        final int exitCode) {
-                                     LOG.appWarning("could not get install info");
+                                     LOG.appWarning("doneError: could not get install info");
                                  }
                              },
                              null,   /* ConvertCmdCallback */

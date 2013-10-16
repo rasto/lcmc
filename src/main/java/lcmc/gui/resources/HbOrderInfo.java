@@ -454,7 +454,7 @@ final class HbOrderInfo extends EditableInfo
                     return NOT_AVAIL_FOR_PCMK_VERSION;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning("unkonwn version: " + pmV);
+                LOG.appWarning("isEnabled: unkonwn version: " + pmV);
                 /* enable it, if version check doesn't work */
             }
         }

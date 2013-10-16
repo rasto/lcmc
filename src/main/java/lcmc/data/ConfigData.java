@@ -333,7 +333,7 @@ public final class ConfigData {
             try {
                 knownHosts.addHostkeys(knownHostFile);
             } catch (IOException e) {
-                LOG.appError("SSH.knowHostFile.NotExists", "", e);
+                LOG.appError("setKnownHostPath: known host file does not exist", "", e);
             }
         }
     }

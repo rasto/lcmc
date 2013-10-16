@@ -584,7 +584,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                         parameters.put(DiskData.TARGET_BUS, values[0]);
                         parameters.put(DiskData.TARGET_TYPE, values[1]);
                     } else {
-                        LOG.appWarning("cannot parse: " + param + " = " + value);
+                        LOG.appWarning("getHWParameters: cannot parse: " + param + " = " + value);
                     }
                 }
             } else if (allParams) {

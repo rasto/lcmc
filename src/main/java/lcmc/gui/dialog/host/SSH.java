@@ -67,7 +67,7 @@ public class SSH extends DialogHost {
                          public void done(final int flag) {
                              /* flag 0 now connected
                               * flag 1 already connected. */
-                             LOG.debug1("callback done flag: " + flag);
+                             LOG.debug1("done: callback done flag: " + flag);
                              getHost().setConnected();
                              progressBarDone();
                              answerPaneSetText(
@@ -153,7 +153,7 @@ public class SSH extends DialogHost {
                     new CancelCallback() {
                         @Override
                         public void cancel() {
-                            LOG.debug("cancel callback");
+                            LOG.debug("cancel: callback");
                             getHost().getSSH().cancelConnection();
                         }
                     }

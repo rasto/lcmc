@@ -70,7 +70,7 @@ public final class WidgetFactory {
         if (type != null
             && type != Widget.Type.TEXTFIELDWITHUNIT
             && units != null) {
-            LOG.appError("wrong type with units: " + type);
+            LOG.appError("createInstance: wrong type with units: " + type);
         }
         if (type == null) {
             /* type detection */
@@ -144,7 +144,7 @@ public final class WidgetFactory {
                                     enableAccessMode,
                                     fieldButton);
             default:
-                LOG.appError("unknown type: " + type);
+                LOG.appError("createInstance: unknown type: " + type);
                 return null;
         }
     }

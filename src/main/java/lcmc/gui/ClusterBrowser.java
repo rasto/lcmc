@@ -558,7 +558,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Initializes cluster resources for cluster view. */
     void initClusterBrowser() {
-        LOG.debug1("start: init cluster browser");
+        LOG.debug1("initClusterBrowser: start");
         /* hosts */
         clusterHostsInfo =
            new ClusterHostsInfo(Tools.getString("ClusterBrowser.ClusterHosts"),
@@ -616,7 +616,7 @@ public final class ClusterBrowser extends Browser {
         addVMSNode();
         selectPath(new Object[]{getTreeTop(), crmNode});
         addDrbdProxyNodes();
-        LOG.debug1("end: init cluster browser");
+        LOG.debug1("initClusterBrowser: end");
     }
 
     void addDrbdProxyNodes() {
@@ -685,7 +685,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Starts everything. */
     private void updateHeartbeatDrbdThread() {
-        LOG.debug("load cluster");
+        LOG.debug("updateHeartbeatDrbdThread: load cluster");
         final Thread tt = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -759,7 +759,7 @@ public final class ClusterBrowser extends Browser {
                     return;
                 }
 
-                LOG.debug1("first host: " + firstHost);
+                LOG.debug1("updateHeartbeatDrbdThread: first host: " + firstHost);
                 crmXML = new CRMXML(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
@@ -782,7 +782,7 @@ public final class ClusterBrowser extends Browser {
                 cluster.getBrowser().startServerStatus();
                 cluster.getBrowser().startDrbdStatus();
                 cluster.getBrowser().startClStatus();
-                LOG.debug1("cluster loading done");
+                LOG.debug1("updateHeartbeatDrbdThread: cluster loading done");
             }
         };
         final Thread thread = new Thread(runnable);
@@ -857,7 +857,8 @@ public final class ClusterBrowser extends Browser {
             }
         });
         if (host.isServerStatusLatch()) {
-            LOG.debug(host.getName() + " loading done");
+            LOG.debug("updateServerStatus: " + host.getName()
+                      + " loading done");
         }
         host.serverStatusLatchDone();
         clusterHostsInfo.updateTable(CategoryInfo.MAIN_TABLE);
@@ -994,7 +995,7 @@ public final class ClusterBrowser extends Browser {
                            if (!host.isDrbdStatus()) {
                                host.setDrbdStatus(true);
                                drbdGraph.repaint();
-                               LOG.debug1("drbd status update: " + host.getName());
+                               LOG.debug1("startDrbdStatus: host: " + host.getName());
                                clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
                            }
@@ -1004,14 +1005,15 @@ public final class ClusterBrowser extends Browser {
                        public void doneError(final String ans,
                                              final int exitCode) {
                            firstTime.countDown();
-                           LOG.debug1("drbd status failed: " + host.getName() + " exit code: " + exitCode);
+                           LOG.debug1("startDrbdStatus: failed: " + host.getName() + " exit code: " + exitCode);
                            if (exitCode != 143 && exitCode != 100) {
                                // TODO: exit code is null -> 100 all of the
                                // sudden
                                /* was killed intentionally */
                                if (host.isDrbdStatus()) {
                                    host.setDrbdStatus(false);
-                                   LOG.debug1("drbd status update: " + host.getName());
+                                   LOG.debug1("startDrbdStatus: host: "
+                                              + host.getName());
                                    drbdGraph.repaint();
                                    clusterHostsInfo.updateTable(
                                                 ClusterHostsInfo.MAIN_TABLE);
@@ -1036,7 +1038,8 @@ public final class ClusterBrowser extends Browser {
                        public void output(final String output) {
                            if ("--nm--".equals(output.trim())) {
                                if (host.isDrbdStatus()) {
-                                   LOG.debug1("drbd status update: " + host.getName());
+                                   LOG.debug1("startDrbdStatus: host: "
+                                              + host.getName());
                                    host.setDrbdStatus(false);
                                    drbdGraph.repaint();
                                    clusterHostsInfo.updateTable(
@@ -1047,7 +1050,7 @@ public final class ClusterBrowser extends Browser {
                            }
                            firstTime.countDown();
                            if (!host.isDrbdStatus()) {
-                               LOG.debug1("drbd status update: " + host.getName());
+                               LOG.debug1("startDrbdStatus: host: " + host.getName());
                                host.setDrbdStatus(true);
                                drbdGraph.repaint();
                                clusterHostsInfo.updateTable(
@@ -1249,7 +1252,8 @@ public final class ClusterBrowser extends Browser {
                                 }
                             } else {
                                 if (clStatus.parseStatus(status)) {
-                                    LOG.debug1("update cluster status: " + host.getName());
+                                    LOG.debug1("processClusterOutput: host: "
+                                               + host.getName());
                                     final ServicesInfo ssi = servicesInfo;
                                     rscDefaultsInfo.setParameters(
                                       clStatus.getRscDefaultsValuePairs());
@@ -1339,7 +1343,9 @@ public final class ClusterBrowser extends Browser {
                      public void doneError(final String ans,
                                            final int exitCode) {
                          if (firstTime.getCount() == 1) {
-                             LOG.debug2("hb status failed: " + host.getName() + ", ec: " + exitCode);
+                             LOG.debug2("startClStatus: status failed: "
+                                        + host.getName()
+                                        + ", ec: " + exitCode);
                          }
                          clStatusLock();
                          clusterStatus.setOnlineNode(host.getName(), "no");
@@ -1441,7 +1447,7 @@ public final class ClusterBrowser extends Browser {
     /** Updates available services. */
     private void updateAvailableServices() {
         DefaultMutableTreeNode resource;
-        LOG.debug("update available services");
+        LOG.debug("updateAvailableServices: start");
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -1469,7 +1475,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates VM nodes. */
     public void updateVMS() {
-        LOG.debug1("VM status update");
+        LOG.debug1("updateVMS: status update");
         final Set<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
             final VMSXML vxml = getVMSXML(host);
@@ -1617,7 +1623,7 @@ public final class ClusterBrowser extends Browser {
                         continue;
                     } else {
                         putDrbdDevHash();
-                        LOG.appWarning("could not find disk: " + disk + " on host: " + hostName);
+                        LOG.appWarning("updateDrbdResources: could not find disk: " + disk + " on host: " + hostName);
                         continue;
                     }
                 }
@@ -2121,7 +2127,7 @@ public final class ClusterBrowser extends Browser {
                                 index = i;
                             }
                         } catch (NumberFormatException nfe) {
-                            LOG.appWarning("could not parse: " + m.group(1));
+                            LOG.appWarning("addNameToServiceInfoHash: could not parse: " + m.group(1));
                         }
                     }
                 }

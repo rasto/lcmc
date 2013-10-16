@@ -71,7 +71,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyButton: robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -89,7 +89,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyButton: robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -109,7 +109,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyButton: robot error");
         }
         robot = r;
         setContentAreaFilled(false);  // *
@@ -145,7 +145,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appError("Robot error");
+            LOG.appError("MyButton: robot error");
         }
         robot = r;
 

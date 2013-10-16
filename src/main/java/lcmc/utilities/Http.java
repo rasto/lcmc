@@ -54,7 +54,7 @@ public final class Http {
         try {
             url = new URL(URL_STRING);
         } catch (MalformedURLException ex) {
-            LOG.appWarning("malformed URL: " + ex.getMessage());
+            LOG.appWarning("post: malformed URL: " + ex.getMessage());
             return;
         }
 
@@ -62,7 +62,7 @@ public final class Http {
         try {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException ex) {
-            LOG.appWarning("could not connect: " + ex.getMessage());
+            LOG.appWarning("post: could not connect: " + ex.getMessage());
             return;
         }
 
@@ -73,14 +73,14 @@ public final class Http {
         try {
             conn.setRequestMethod("POST");
         } catch (ProtocolException ex) {
-            LOG.appWarning("protocol error: " + ex.getMessage());
+            LOG.appWarning("post: protocol error: " + ex.getMessage());
             return;
         }
 
         try {
             conn.connect();
         } catch (IOException ex) {
-            LOG.appWarning("connection error: " + ex.getMessage());
+            LOG.appWarning("post: connection error: " + ex.getMessage());
             return;
         }
 
@@ -89,7 +89,7 @@ public final class Http {
         try {
             output = new DataOutputStream(conn.getOutputStream());
         } catch (IOException ex) {
-            LOG.appWarning("error opening for writing: " + ex.getMessage());
+            LOG.appWarning("post: error opening for writing: " + ex.getMessage());
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         final Map<String, String> params = new HashMap<String, String>();
@@ -102,7 +102,7 @@ public final class Http {
             output.flush();
             output.close();
         } catch (IOException ex) {
-            LOG.appWarning("error writing: " + ex.getMessage());
+            LOG.appWarning("post: error writing: " + ex.getMessage());
             return;
         }
 
@@ -112,11 +112,11 @@ public final class Http {
             final BufferedReader input = new BufferedReader(
                                   new InputStreamReader(conn.getInputStream()));
             while (null != ((str = input.readLine()))) {
-                LOG.info(str);
+                LOG.info("post: " + str);
             }
             input.close();
         } catch (IOException ex) {
-            LOG.appWarning("error reading: " + ex.getMessage());
+            LOG.appWarning("post: error reading: " + ex.getMessage());
             return;
         }
     }

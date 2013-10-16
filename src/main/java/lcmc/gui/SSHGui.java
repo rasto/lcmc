@@ -81,7 +81,7 @@ public final class SSHGui {
 
     /** Displays Confirm Dialog whith Yes, No, Cancel options. */
     public int getConfirmDialogChoice(final String message) {
-        LOG.debug("get confirm dialog");
+        LOG.debug("getConfirmDialogChoice: start");
         return JOptionPane.showConfirmDialog(rootPane, message);
     }
 

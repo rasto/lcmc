@@ -211,7 +211,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             @Override
                             public void doneError(final String ans,
                                                   final int exitCode) {
-                                LOG.debug("doneError");
+                                LOG.debug("doneError:");
                                 printErrorAndRetry(
                Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
                                    ans,

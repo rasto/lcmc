@@ -135,7 +135,7 @@ public final class BlockDevice extends Resource {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {
-            LOG.appWarning("cannot parse line: " + line);
+            LOG.appWarning("update: cannot parse line: " + line);
         } else {
             final String device = cols[0];
             setName(device);
@@ -145,7 +145,7 @@ public final class BlockDevice extends Resource {
                 if (m.matches()) {
                     tokens.put(m.group(1), m.group(2));
                 } else {
-                    LOG.appWarning("could not parse: " + line);
+                    LOG.appWarning("update: could not parse: " + line);
                 }
             }
             this.readlink  = tokens.get("rl");

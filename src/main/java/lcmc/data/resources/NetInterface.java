@@ -69,9 +69,10 @@ public final class NetInterface extends Resource {
      */
     public NetInterface(final String line) throws UnknownHostException {
         super();
+        LOG.debug1("NetInterface: " + line);
         final String[] cols = line.split(" ");
         if (cols.length < 4) {
-            LOG.appWarning("cannot parse: " + line);
+            LOG.appWarning("NetInterface: cannot parse: " + line);
         }
         String iface = "unknown";
         if (cols.length > 0) {
@@ -178,7 +179,7 @@ public final class NetInterface extends Resource {
         try {
             return InetAddress.getByAddress(addr).getHostAddress();
         } catch (UnknownHostException e) {
-            LOG.appWarning("unkonwn host: " + addr);
+            LOG.appWarning("getSymbolicIp: unkonwn host: " + addr);
             return null;
         }
     }
@@ -235,7 +236,7 @@ public final class NetInterface extends Resource {
         if ("String".equals(parameter)) {
             return ip;
         } else {
-            LOG.appError("Unknown parameter: " + parameter, "");
+            LOG.appError("getValue: Unknown parameter: " + parameter, "");
             return "";
         }
     }

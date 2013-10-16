@@ -64,7 +64,7 @@ public final class DrbdProxy {
         final StringTokenizer st = new StringTokenizer(text);
         while (st.hasMoreTokens()) {
             if ("proxy".equals(st.nextToken())) {
-                LOG.debug1("proxy: " + text);
+                LOG.debug1("parse: proxy: " + text);
                 final String nextToken = st.nextToken();
                 if (!"{".equals(nextToken)) {
                     throw new Exceptions.DrbdConfigException(

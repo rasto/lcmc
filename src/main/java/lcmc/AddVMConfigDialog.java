@@ -28,6 +28,9 @@ import lcmc.gui.dialog.vm.VMConfig;
 import lcmc.gui.dialog.vm.Domain;
 import lcmc.gui.resources.VMSVirtualDomainInfo;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * AddVMConfigDialog.
  *
@@ -37,6 +40,9 @@ import lcmc.gui.resources.VMSVirtualDomainInfo;
  * @version $Id$
  */
 public final class AddVMConfigDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                             LoggerFactory.getLogger(AddVMConfigDialog.class);
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** VMS virtual domain info object. */
@@ -53,6 +59,7 @@ public final class AddVMConfigDialog {
         VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final VMConfig newdialog = (VMConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
@@ -61,9 +68,13 @@ public final class AddVMConfigDialog {
                 vmsVirtualDomainInfo.removeMyself(false);
                 vmsVirtualDomainInfo.setDialogStarted(false);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

@@ -132,7 +132,7 @@ final class CreateFS extends DrbdConfig {
         } else if (h.equals(bdi2.getHost().getName())) {
             return bdi1;
         } else {
-            LOG.appError("unknown host: " + h);
+            LOG.appError("getSecondaryBD: unknown host: " + h);
             return null;
         }
     }
@@ -414,7 +414,7 @@ final class CreateFS extends DrbdConfig {
                    && Tools.compareVersions(
                                 bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("skipSyncAvailable: " + e.getMessage(), e);
             return false;
         }
     }

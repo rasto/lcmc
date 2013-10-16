@@ -404,7 +404,7 @@ public abstract class EditableInfo extends Info {
             if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {
-                    LOG.error("unknown param: " + param);
+                    LOG.error("addParams: unknown param: " + param);
                     continue;
                 }
                 int height = 0;

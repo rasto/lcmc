@@ -1041,9 +1041,9 @@ public final class BlockDevInfo extends EditableInfo {
                     getApplyButton().setToolTipText(dtd.getToolTip());
                     thisClass.setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    LOG.appError("config failed", dce);
+                    LOG.appError("getInfoPanelBD: config failed", dce);
                 } catch (UnknownHostException e) {
-                    LOG.appError("config failed", e);
+                    LOG.appError("getInfoPanelBD: config failed", e);
                 } finally {
                     getBrowser().drbdtestLockRelease();
                     startTestLatch.countDown();
@@ -1103,10 +1103,10 @@ public final class BlockDevInfo extends EditableInfo {
                                 }
                                 apply(false);
                             } catch (Exceptions.DrbdConfigException e) {
-                                LOG.appError("config failed", e);
+                                LOG.appError("getInfoPanelBD: config failed", e);
                                 return;
                             } catch (UnknownHostException e) {
-                                LOG.appError("config failed", e);
+                                LOG.appError("getInfoPanelBD: config failed", e);
                                 return;
                             } finally {
                                 getBrowser().getClusterBrowser()

@@ -74,7 +74,7 @@ public final class Network extends Resource {
     /** Returns value of the parameter. */
     @Override
     public String getValue(final String parameter) {
-        LOG.appError("Wrong call to getValue");
+        LOG.appError("getValue: wrong call to getValue");
         return "???";
     }
 }

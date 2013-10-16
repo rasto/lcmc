@@ -63,7 +63,7 @@ final class PcmkTest1 {
                 testName = "test1-1.0";
             }
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("start: " + e.getMessage(), e);
         }
 
         disableStonith();
@@ -348,7 +348,7 @@ final class PcmkTest1 {
                 }
             }
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("start: " + e.getMessage(), e);
         }
 
         moveToMenu("Dummy (3)");

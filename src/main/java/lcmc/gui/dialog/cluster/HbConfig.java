@@ -332,7 +332,8 @@ final class HbConfig extends DialogCluster {
                                             }
                                         } catch (
                                          Exceptions.IllegalVersionException e) {
-                                            LOG.appWarning(e.getMessage(), e);
+                                            LOG.appWarning("run: "
+                                                           + e.getMessage(), e);
                                         }
                                         Heartbeat.enableDopd(h, wa);
                                     }
@@ -1035,7 +1036,8 @@ final class HbConfig extends DialogCluster {
             }
         }
         if (defaultNi == null) {
-            LOG.appError(hosts[0].getName() + ": missing network interfaces");
+            LOG.appError("getInputPane: " + hosts[0].getName()
+                         + ": missing network interfaces");
         }
         ifaceW = WidgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,

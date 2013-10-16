@@ -68,7 +68,7 @@ public final class RscDefaultsInfo extends EditableInfo {
         }
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
-            LOG.appError("crmXML is null");
+            LOG.appError("setParameters: crmXML is null");
             return;
         }
         /* Attributes */

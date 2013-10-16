@@ -155,9 +155,9 @@ public class Configuration extends DialogHost {
         }
         String hostname = null;
         String ip = null;
-        LOG.debug2("addresses.length: " + addresses.length + " a: " + addresses[0].getHostAddress());
+        LOG.debug2("checkDNS: addresses.length: " + addresses.length + " a: " + addresses[0].getHostAddress());
         if (addresses.length == 0) {
-            LOG.debug("lookup failed");
+            LOG.debug("checkDNS: lookup failed");
             // lookup failed;
             return false;
         } else if (addresses.length == 1) {
@@ -169,7 +169,7 @@ public class Configuration extends DialogHost {
             try {
                 hostname = InetAddress.getByName(ip).getHostName();
             } catch (UnknownHostException e) {
-                LOG.appError("Host.Configuration.Unknown.Host", "", e);
+                LOG.appError("checkDNS: unknown host", "", e);
                 return false;
             }
         } else {
@@ -189,7 +189,7 @@ public class Configuration extends DialogHost {
         hostnames[hop] = hostname;
 
         hostnameField[hop].setValue(hostname);
-        LOG.debug1("got " + hostname + " (" + ip + ")");
+        LOG.debug1("checkDNS: got " + hostname + " (" + ip + ")");
         return true;
     }
 

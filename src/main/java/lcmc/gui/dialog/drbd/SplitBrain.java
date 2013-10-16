@@ -95,7 +95,7 @@ public final class SplitBrain extends DrbdConfig {
                     hostPri = h2;
                     hostSec = h1;
                 } else {
-                    LOG.appError("unknown host: " + h);
+                    LOG.appError("resolve: unknown host: " + h);
                     return;
                 }
                 buttonClass(finishButton()).setEnabled(false);

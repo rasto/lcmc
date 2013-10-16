@@ -712,7 +712,7 @@ public class Info implements Comparable<Info> {
             final int size = menuListCopy.size();
             if (size > maxMenuList) {
                 maxMenuList = size;
-                LOG.debug2("menu list size: " + maxMenuList);
+                LOG.debug2("updateMenus: menu list size: " + maxMenuList);
             }
         }
     }
@@ -1097,7 +1097,7 @@ public class Info implements Comparable<Info> {
 
     /** Updates data in the table. */
     public final void updateTable(final String tableName) {
-        LOG.debug2("update table: " + tableName);
+        LOG.debug2("updateTable: " + tableName);
         final JTable table = tables.get(tableName);
         final DefaultTableModel tableModel = tableModels.get(tableName);
         if (tableModel != null) {
@@ -1107,7 +1107,7 @@ public class Info implements Comparable<Info> {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
-                        LOG.debug2("update table in: " + getName());
+                        LOG.debug2("updateTable: in: " + getName());
                         tableModel.setDataVector(data, colNames);
                         tableModel.fireTableDataChanged();
                         Tools.resizeTable(table, getDefaultWidths(tableName));

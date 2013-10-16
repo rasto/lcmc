@@ -28,6 +28,9 @@ import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
 import lcmc.utilities.Tools;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * AddClusterDialog.
  *
@@ -38,6 +41,9 @@ import lcmc.utilities.Tools;
  */
 
 public final class AddClusterDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                              LoggerFactory.getLogger(AddClusterDialog.class);
     /** All clusters object. */
     private Clusters clusters;
     /** Whether the wizard was canceled. */
@@ -53,6 +59,7 @@ public final class AddClusterDialog {
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 Tools.getGUIData().removeSelectedClusterTab();
@@ -64,9 +71,13 @@ public final class AddClusterDialog {
                 Tools.getGUIData().checkAddClusterButtons();
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             if (newdialog != null) {

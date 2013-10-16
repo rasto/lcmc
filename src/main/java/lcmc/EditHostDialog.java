@@ -29,6 +29,9 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.SSH;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * EditHostDialog.
  *
@@ -38,6 +41,9 @@ import lcmc.gui.dialog.host.SSH;
  * @version $Id$
  */
 public final class EditHostDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                              LoggerFactory.getLogger(EditHostDialog.class);
     /** The host object. */
     private final Host host;
 
@@ -52,15 +58,20 @@ public final class EditHostDialog {
         final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 if (!expanded) {
                     Tools.getGUIData().expandTerminalSplitPane(1);
                 }
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

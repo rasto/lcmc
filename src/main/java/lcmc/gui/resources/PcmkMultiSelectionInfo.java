@@ -1485,7 +1485,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: apply");
+                        LOG.debug1("getInfoPanel: BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -1503,7 +1503,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: revert");
+                        LOG.debug1("getInfoPanel: BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {

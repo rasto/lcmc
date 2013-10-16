@@ -466,7 +466,7 @@ public final class GroupInfo extends ServiceInfo {
         } else if (newRA.isVirtualDomain()) {
             newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
         } else if (newRA.isGroup()) {
-            LOG.appError("No groups in group allowed");
+            LOG.appError("addGroupServicePanel: no groups in group allowed");
             return null;
         } else {
             newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
@@ -831,7 +831,7 @@ public final class GroupInfo extends ServiceInfo {
                 }
             }
         } catch (java.util.NoSuchElementException ele) {
-            LOG.info("removing aborted");
+            LOG.info("removeMyself: removing aborted");
             return;
         }
 
@@ -870,7 +870,7 @@ public final class GroupInfo extends ServiceInfo {
                 child.removeInfo();
             }
         } catch (java.util.NoSuchElementException ele) {
-            LOG.info("removing aborted");
+            LOG.info("removeInfo: removing aborted");
             return;
         }
         super.removeInfo();
@@ -892,7 +892,7 @@ public final class GroupInfo extends ServiceInfo {
                     children.add(child);
                 }
             } catch (java.util.NoSuchElementException ele) {
-                LOG.info("removing aborted");
+                LOG.info("removeMyselfNoConfirm: removing aborted");
                 return;
             }
         }

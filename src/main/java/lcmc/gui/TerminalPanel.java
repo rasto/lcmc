@@ -263,7 +263,7 @@ public final class TerminalPanel extends JScrollPane {
                                    r.height);
                     }
                 } catch (BadLocationException e) {
-                    LOG.appError("Drawing of cursor failed", e);
+                    LOG.appError("paint: drawing of cursor failed", e);
                 }
             }
         };
@@ -405,7 +405,8 @@ public final class TerminalPanel extends JScrollPane {
                                                  colorAS);
                                 maxPos++;
                             } catch (javax.swing.text.BadLocationException e1) {
-                                LOG.appError("TerminalPanel pos: " + pos, e1);
+                                LOG.appError("append: terminalPanel pos: "
+                                             + pos, e1);
                             }
                         }
                     }
@@ -421,7 +422,7 @@ public final class TerminalPanel extends JScrollPane {
                         commandOffset = pos - 1;
                         doc.removeForced(pos, 1);
                     } catch (javax.swing.text.BadLocationException e) {
-                        LOG.appError("TerminalPanel pos: " + pos, e);
+                        LOG.appError("append: terminalPanel pos: " + pos, e);
                     }
                 }
                 try {
@@ -429,7 +430,7 @@ public final class TerminalPanel extends JScrollPane {
                                      s,
                                      colorAS);
                 } catch (javax.swing.text.BadLocationException e1) {
-                    LOG.appError("TerminalPanel pos: " + pos, e1);
+                    LOG.appError("append: terminalPanel pos: " + pos, e1);
                 }
                 pos++;
                 if (maxPos < pos) {
@@ -686,19 +687,19 @@ public final class TerminalPanel extends JScrollPane {
             addCommandOutput(list.toString());
         } else if (RUN_GC.equals(cheat)) {
             System.gc();
-            LOG.info("run gc");
+            LOG.info("startCheat: run gc");
         } else if (ALLOCATE_10.equals(cheat)) {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    LOG.info("allocate mem");
+                    LOG.info("startCheat: allocate mem");
                     Byte[] b = new Byte[1024000];
-                    LOG.info("allocate mem done.");
+                    LOG.info("startCheat: allocate mem done");
 
                     System.gc();
-                    LOG.info("run gc");
+                    LOG.info("startCheat: run gc");
                     Tools.sleep(60000);
-                    LOG.info("free mem.");
+                    LOG.info("startCheat: free mem");
                 }
             });
             t.start();

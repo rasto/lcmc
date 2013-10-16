@@ -1738,7 +1738,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         hostBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("BUTTON: host: " + host.getName());
+                LOG.debug1("actionPerformed: BUTTON: host: " + host.getName());
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -2111,7 +2111,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: apply");
+                        LOG.debug1("actionPerformed: BUTTON: apply");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2128,7 +2128,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
-                        LOG.debug1("BUTTON: revert");
+                        LOG.debug1("actionPerformed: BUTTON: revert");
                         final Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -2155,7 +2155,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("BUTTON: overview");
+                LOG.debug1("actionPerformed: BUTTON: overview");
                 getBrowser().getVMSInfo().selectMyself();
             }
         });
@@ -2264,7 +2264,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                LOG.appWarning("could not start on " + host.getName());
+                LOG.appWarning("start: could not start on " + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     starting.clear();
@@ -2303,7 +2303,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             mTransitionReadLock.unlock();
         }
         if (i >= ACTION_TIMEOUT) {
-            LOG.appWarning("could not shut down on " + host.getName());
+            LOG.appWarning("startShuttingdownIndicator: could not shut down on "
+                           + host.getName());
             mTransitionWriteLock.lock();
             try {
                 shuttingdown.clear();
@@ -2375,7 +2376,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                LOG.appWarning("could not suspend on " + host.getName());
+                LOG.appWarning("suspend: could not suspend on "
+                               + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     suspending.clear();
@@ -2418,7 +2420,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.unlock();
             }
             if (i >= ACTION_TIMEOUT) {
-                LOG.appWarning("could not resume on " + host.getName());
+                LOG.appWarning("resume: could not resume on "
+                               + host.getName());
                 mTransitionWriteLock.lock();
                 try {
                     resuming.clear();
@@ -4998,7 +5001,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                         .replace("@VERSION@", rv);
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning(e.getMessage(), e);
+                LOG.appWarning("isEnabled: " + e.getMessage(), e);
                 return Tools.getString(
                                 "VMSVirtualDomainInfo.AvailableInVersion")
                                     .replace("@VERSION@", rv);

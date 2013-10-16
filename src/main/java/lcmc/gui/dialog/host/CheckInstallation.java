@@ -319,7 +319,7 @@ final class CheckInstallation extends DialogHost {
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
-                                 LOG.debug2("ans: " + ans);
+                                 LOG.debug2("done: ans: " + ans);
                                  checkAisHbPm(ans);
                              }
                              @Override
@@ -467,7 +467,7 @@ final class CheckInstallation extends DialogHost {
             }
         } else {
             progressBarDoneError();
-            LOG.debug2("drbd: " + drbdOk + ", ais/pm: " + pmOk + ", hb/pm: " + hbPmOk);
+            LOG.debug2("checkAisHbPm: drbd: " + drbdOk + ", ais/pm: " + pmOk + ", hb/pm: " + hbPmOk);
             printErrorAndRetry(Tools.getString(
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         }

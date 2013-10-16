@@ -63,7 +63,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         try {
             r = new Robot(SCREEN_DEVICE);
         } catch (java.awt.AWTException e) {
-            LOG.appWarning("Robot error");
+            LOG.appWarning("MyList: robot error");
         }
         robot = r;
         setBackground(bg);

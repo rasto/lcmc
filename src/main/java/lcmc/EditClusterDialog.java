@@ -28,6 +28,9 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * EditClusterDialog.
  *
@@ -37,6 +40,9 @@ import lcmc.gui.dialog.cluster.Name;
  * @version $Id$
  */
 public final class EditClusterDialog {
+    /** Logger. */
+    private static final Logger LOG =
+                             LoggerFactory.getLogger(EditClusterDialog.class);
     /** Cluster object. */
     private final Cluster cluster;
     /** Cancel button. */
@@ -56,13 +62,18 @@ public final class EditClusterDialog {
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
+            LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton(CANCEL_BTN)) {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
+                    LOG.debug1("showDialogs: dialog: "
+                               + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedButton(FINISH_BTN)) {
+                LOG.debug1("showDialogs: dialog: "
+                           + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

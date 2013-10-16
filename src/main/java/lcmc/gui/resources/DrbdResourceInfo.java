@@ -567,10 +567,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     getApplyButton().setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    LOG.appError("config failed", dce);
+                    LOG.appError("getInfoPanel: config failed", dce);
                     return;
                 } catch (UnknownHostException e) {
-                    LOG.appError("config failed", e);
+                    LOG.appError("getInfoPanel: config failed", e);
                     return;
                 } finally {
                     getBrowser().drbdtestLockRelease();
@@ -620,7 +620,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         getApplyButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                LOG.debug1("BUTTON: apply");
+                LOG.debug1("getInfoPanel: BUTTON: apply");
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -639,10 +639,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             }
                             apply(false);
                         } catch (Exceptions.DrbdConfigException dce) {
-                            LOG.appError("config failed", dce);
+                            LOG.appError("getInfoPanel: config failed", dce);
                             return;
                         } catch (UnknownHostException e) {
-                            LOG.appError("config failed", e);
+                            LOG.appError("getInfoPanel: config failed", e);
                             return;
                         } finally {
                             getBrowser().drbdStatusUnlock();
@@ -657,7 +657,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: revert");
+                    LOG.debug1("getInfoPanel: BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -790,7 +790,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final String hp =
                        dxml.getVirtualInterfacePort(host.getName(), getName());
             if (hostPort != null && !hostPort.equals(hp)) {
-                LOG.appWarning("more ports in " + getName() + " " + hp + " " + hostPort);
+                LOG.appWarning("setNetworkParameters: more ports in "
+                               + getName() + " " + hp + " " + hostPort);
             }
             hostPort = hp;
             final String savedAddress = savedHostAddresses.get(host);
@@ -856,14 +857,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (insidePort != null
                 && hostInsidePort != null
                 && !insidePort.equals(hostInsidePort)) {
-                LOG.appWarning("multiple proxy inside ports in " + getName() + " " + insidePort + " " + hostInsidePort);
+                LOG.appWarning("setProxyParameters: multiple proxy inside ports in " + getName() + " " + insidePort + " " + hostInsidePort);
             }
             hostInsidePort = insidePort;
 
             if (outsidePort != null
                 && hostOutsidePort != null
                 && !outsidePort.equals(hostOutsidePort)) {
-                LOG.appWarning("multiple proxy outside ports in " + getName() + " " + outsidePort + " " + hostOutsidePort);
+                LOG.appWarning("setProxyParameters: multiple proxy outside ports in " + getName() + " " + outsidePort + " " + hostOutsidePort);
             }
             hostOutsidePort = outsidePort;
 
@@ -1331,7 +1332,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
             }
         }
-        LOG.appWarning("could not get volume nr for: " + thisBDI.getName());
+        LOG.appWarning("getVolumeNr: could not get volume nr for: "
+                       + thisBDI.getName());
         return null;
     }
 

@@ -119,9 +119,9 @@ final class BlockDev extends DrbdConfig {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 Tools.getGUIData().getMainFrame().requestFocus();
             } catch (Exceptions.DrbdConfigException dce) {
-                LOG.appError("config failed", dce);
+                LOG.appError("nextDialog: config failed", dce);
             } catch (UnknownHostException e) {
-                LOG.appError("config failed", e);
+                LOG.appError("nextDialog: config failed", e);
             }
             return new CreateMD(this, getDrbdVolumeInfo());
         }

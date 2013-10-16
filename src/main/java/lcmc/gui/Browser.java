@@ -194,7 +194,9 @@ public class Browser {
                 try {
                     treeModel.nodeChanged(node);
                 } catch (Exception e) {
-                    LOG.appError(node.getUserObject() + " node changed error:\n" + stacktrace + "\n\n", e);
+                    LOG.appError("nodeChangedAndWait: " + node.getUserObject()
+                                 + " node changed error:\n"
+                                 + stacktrace + "\n\n", e);
                 }
             }
         });

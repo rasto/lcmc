@@ -481,7 +481,7 @@ public final class LVResize extends LV {
             }
             maxBlockSize = Long.toString(max);
         } catch (final Exception e) {
-            LOG.appWarning("could not get max size");
+            LOG.appWarning("getMaxBlockSize: could not get max size");
             /* ignore */
         }
         return maxBlockSize;

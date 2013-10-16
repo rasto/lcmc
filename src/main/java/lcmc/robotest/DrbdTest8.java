@@ -180,7 +180,7 @@ final class DrbdTest8 {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();
         sleep(1000);
@@ -297,7 +297,7 @@ final class DrbdTest8 {
                 moveTo("after", Widget.MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
-            LOG.appWarning(e.getMessage(), e);
+            LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();
         sleep(1000);

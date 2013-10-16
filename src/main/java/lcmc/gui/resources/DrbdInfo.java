@@ -264,7 +264,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                   Tools.getConfigData().getBigDRBDConf()
                   || Tools.compareVersions(host.getDrbdVersion(), "8.3.7") < 0;
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning(e.getMessage(), e);
+                LOG.appWarning("createDrbdConfig: " + e.getMessage(), e);
             }
             if (testOnly) {
                 dir = "/var/lib/drbd/";
@@ -487,10 +487,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     getApplyButton().setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
-                    LOG.appError("config failed", dce);
+                    LOG.appError("getInfoPanel: config failed", dce);
                     return;
                 } catch (UnknownHostException e) {
-                    LOG.appError("config failed", e);
+                    LOG.appError("getInfoPanel: config failed", e);
                     return;
                 } finally {
                     getBrowser().drbdtestLockRelease();
@@ -530,7 +530,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: apply");
+                    LOG.debug1("getInfoPanel: BUTTON: apply");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -549,10 +549,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                 }
                                 apply(false);
                             } catch (final Exceptions.DrbdConfigException dce) {
-                                LOG.appError("config failed", dce);
+                                LOG.appError("getInfoPanel: config failed", dce);
                                 return;
                             } catch (final UnknownHostException e) {
-                                LOG.appError("config failed", e);
+                                LOG.appError("getInfoPanel: config failed", e);
                                 return;
                             } finally {
                                 getBrowser().drbdStatusUnlock();
@@ -567,7 +567,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    LOG.debug1("BUTTON: revert");
+                    LOG.debug1("getInfoPanel: BUTTON: revert");
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -970,7 +970,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     return false;
                 }
             } catch (Exceptions.IllegalVersionException e) {
-                LOG.appWarning(e.getMessage(), e);
+                LOG.appWarning("atLeastVersion: " + e.getMessage(), e);
             }
         }
         return true;

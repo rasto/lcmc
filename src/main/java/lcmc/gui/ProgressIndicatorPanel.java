@@ -202,7 +202,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure. */
     public void failure(final String text) {
-        LOG.appWarning(text);
+        LOG.appWarning("failure: " + text);
         if (text == null) {
             return;
         }
@@ -214,7 +214,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
     /** Is called upan a failure and shows it for n seconds. */
     public void failure(final String text, final int n) {
-        LOG.appWarning(text);
+        LOG.appWarning("failure: " + text);
         if (text == null || n < 0) {
             return;
         }
@@ -279,7 +279,7 @@ public final class ProgressIndicatorPanel extends JComponent
         mAnimatorLock.lock();
         mTextsLock.lock();
         if (!texts.containsKey(text)) {
-            LOG.appWarning("progress indicator already stopped for: --" + text + "--");
+            LOG.appWarning("stop: progress indicator already stopped for: --" + text + "--");
             mTextsLock.unlock();
             mAnimatorLock.unlock();
             Tools.printStackTrace();
