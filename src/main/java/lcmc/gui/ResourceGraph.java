@@ -1825,6 +1825,10 @@ public abstract class ResourceGraph {
 
     /** Creates a test edge. */
     protected final void addTestEdge(final Vertex vP, final Vertex v) {
+        if (vP == null || v == null) {
+            throw new IllegalArgumentException("addTestEdge: vP: " + vP
+                                               + ", v: " + v);
+        }
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
