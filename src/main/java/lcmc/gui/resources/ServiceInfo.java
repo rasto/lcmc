@@ -2778,13 +2778,16 @@ public class ServiceInfo extends EditableInfo {
                                                                startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
-                final ClusterStatus cs = getBrowser().getClusterStatus();
-                cs.setPtestData(null);
-                apply(dcHost, true);
-                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                getApplyButton().setToolTipText(ptestData.getToolTip());
-                cs.setPtestData(ptestData);
-                getBrowser().ptestLockRelease();
+                try {
+                    final ClusterStatus cs = getBrowser().getClusterStatus();
+                    cs.setPtestData(null);
+                    apply(dcHost, true);
+                    final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
+                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    cs.setPtestData(ptestData);
+                } finally {
+                    getBrowser().ptestLockRelease();
+                }
                 startTestLatch.countDown();
             }
         };

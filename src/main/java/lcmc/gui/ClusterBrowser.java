@@ -2260,18 +2260,21 @@ public final class ClusterBrowser extends Browser {
                 crmGraph.startTestAnimation((JComponent) component,
                                             startTestLatch);
                 ptestLockAcquire();
-                clusterStatus.setPtestData(null);
-                Host h;
-                if (menuHost == null) {
-                    h = getDCHost();
-                } else {
-                    h = menuHost;
+                try {
+                    clusterStatus.setPtestData(null);
+                    Host h;
+                    if (menuHost == null) {
+                        h = getDCHost();
+                    } else {
+                        h = menuHost;
+                    }
+                    action(h);
+                    final PtestData ptestData = new PtestData(CRM.getPtest(h));
+                    component.setToolTipText(ptestData.getToolTip());
+                    clusterStatus.setPtestData(ptestData);
+                } finally {
+                    ptestLockRelease();
                 }
-                action(h);
-                final PtestData ptestData = new PtestData(CRM.getPtest(h));
-                component.setToolTipText(ptestData.getToolTip());
-                clusterStatus.setPtestData(ptestData);
-                ptestLockRelease();
                 startTestLatch.countDown();
             }
         }

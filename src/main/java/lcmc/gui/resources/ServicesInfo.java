@@ -1037,13 +1037,18 @@ public final class ServicesInfo extends EditableInfo {
                 hg.startTestAnimation(getApplyButton(), startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
-                final ClusterStatus clStatus = getBrowser().getClusterStatus();
-                clStatus.setPtestData(null);
-                apply(dcHost, true);
-                final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                getApplyButton().setToolTipText(ptestData.getToolTip());
-                clStatus.setPtestData(ptestData);
-                getBrowser().ptestLockRelease();
+                try {
+                    final ClusterStatus clStatus =
+                                              getBrowser().getClusterStatus();
+                    clStatus.setPtestData(null);
+                    apply(dcHost, true);
+                    final PtestData ptestData =
+                                          new PtestData(CRM.getPtest(dcHost));
+                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    clStatus.setPtestData(ptestData);
+                } finally {
+                    getBrowser().ptestLockRelease();
+                }
                 startTestLatch.countDown();
             }
         };
