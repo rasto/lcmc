@@ -314,10 +314,15 @@ public final class ProgressIndicatorPanel extends JComponent
             final Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHints(hints);
 
+            final int newAlphaLevel = (int) (alphaLevel * shield);
+            if (newAlphaLevel < 0 || newAlphaLevel > MAX_ALPHA_LEVEL) {
+                LOG.appWarning("paintComponent: alpha level out of range: "
+                               + newAlphaLevel);
+            }
             g2.setColor(new Color(VEIL_COLOR.getRed(),
                                   VEIL_COLOR.getGreen(),
                                   VEIL_COLOR.getBlue(),
-                                  (int) (alphaLevel * shield)));
+                                  newAlphaLevel));
             final int startAtHeight = 22;
             g2.fillRect(0,
                         startAtHeight,
@@ -433,6 +438,7 @@ public final class ProgressIndicatorPanel extends JComponent
         /** Runs the thread. */
         @Override
         public void run() {
+            LOG.debug1("run: animator start");
             long start = System.currentTimeMillis();
             if (rampDelay == 0) {
                 alphaLevel = rampUp ? MAX_ALPHA_LEVEL : 0;
@@ -507,6 +513,7 @@ public final class ProgressIndicatorPanel extends JComponent
             }
             started = false;
             barWidth = 10;
+            LOG.debug1("run: animator end");
         }
     }
 
