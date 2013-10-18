@@ -128,6 +128,8 @@ public final class HostInfo extends Info {
     /** Starting subtext. */
     private static final Subtext STARTING_SUBTEXT =
                                   new Subtext("starting...", null, Color.BLUE);
+
+    private static final String NOT_IN_CLUSTER = "not in cluster";
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
@@ -755,6 +757,9 @@ public final class HostInfo extends Info {
                 @Override
                 public String enablePredicate() {
                     final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
                     if (h.isAisRc() && !h.isCsRc()) {
                         return "Openais is in rc.d";
                     }
@@ -808,6 +813,9 @@ public final class HostInfo extends Info {
                 @Override
                 public String enablePredicate() {
                     final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
                     if (h.isCsRc() && !h.isAisRc()) {
                         return "Corosync is in rc.d";
                     }
@@ -856,6 +864,15 @@ public final class HostInfo extends Info {
                 }
 
                 @Override
+                public String enablePredicate() {
+                    final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
+                    return null;
+                }
+
+                @Override
                 public void action() {
                     getHost().setCommLayerStarting(true);
                     Heartbeat.startHeartbeat(getHost());
@@ -897,6 +914,10 @@ public final class HostInfo extends Info {
 
                 @Override
                 public String enablePredicate() {
+                    final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
                     return null;
                 }
 
