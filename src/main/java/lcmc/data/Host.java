@@ -918,7 +918,7 @@ public final class Host implements Comparable<Host> {
         if ("No Match".equals(dV)) {
             return null;
         }
-        LOG.debug("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
+        LOG.debug1("getDistFromDistVersion:" + dV.replaceFirst("\\d.*", ""));
         return Tools.getDistString("dist:" + dV.replaceFirst("\\d.*", ""),
                                    "",
                                    "",
