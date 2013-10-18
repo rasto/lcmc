@@ -447,6 +447,7 @@ public final class HostTest1 extends TestCase {
                               "6",
                               "7",
                               "7.1/7.1",
+                              "7.2/7.2",
                               "16",
                               "17"));
         for (final Host host : TestSuite1.getHosts()) {

@@ -91,13 +91,9 @@ public final class ToolsTest1 extends TestCase {
         LOG.debug2("test d2");
         LOG.debug1("test d1");
         LOG.debug("test d0");
-        final Pattern p = Pattern.compile("^" + TestSuite1.DEBUG_STRING
-                + "\\(1\\): \\[\\d+s\\] test d1 \\(.*\\).*"
-                + TestSuite1.DEBUG_STRING + ":.*"
-                + " \\[\\d+s\\] test d0 \\(.*\\).*",
-                Pattern.DOTALL);
-        final Matcher m = p.matcher(TestSuite1.getStdout());
-        assertTrue(m.matches());
+        assertFalse(TestSuite1.getStdout().contains("test d2"));
+        assertTrue(TestSuite1.getStdout().contains("test d1"));
+        assertTrue(TestSuite1.getStdout().contains("test d0"));
         TestSuite1.clearStdout();
         LoggerFactory.setDebugLevel(-1);
     }
@@ -332,9 +328,10 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           null,
+                                          false,
                                           false));
         assertEquals(TestSuite1.APPWARNING_STRING
-                     + "unknown command: undefined\n",
+                     + "getDistCommand: unknown command: undefined\n",
                      TestSuite1.getStdout());
         TestSuite1.clearStdout();
 
@@ -344,11 +341,12 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           null,
+                                          false,
                                           false));
         assertEquals(TestSuite1.APPWARNING_STRING
-                     + "unknown command: undefined2\n"
+                     + "getDistCommand: unknown command: undefined2\n"
                      + TestSuite1.APPWARNING_STRING
-                     + "unknown command: undefined3\n",
+                     + "getDistCommand: unknown command: undefined3\n",
                      TestSuite1.getStdout());
         TestSuite1.clearStdout();
         final lcmc.utilities.ConvertCmdCallback ccc =
@@ -365,6 +363,7 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           ccc,
+                                          false,
                                           false));
         assertEquals("sudo bash -c \"sudo /etc/init.d/corosync start\"",
                      Tools.getDistCommand("Corosync.startCorosync",
@@ -372,6 +371,7 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           ccc,
+                                          true,
                                           true));
         assertEquals("sudo /etc/init.d/corosync start"
                      + ";;;sudo /etc/init.d/corosync start",
@@ -381,6 +381,7 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           ccc,
+                                          false,
                                           false));
         assertEquals("undefined4"
                      + ";;;sudo /etc/init.d/corosync start",
@@ -390,9 +391,10 @@ public final class ToolsTest1 extends TestCase {
                                           "squeeze",
                                           "i386",
                                           ccc,
+                                          false,
                                           false));
         assertEquals(TestSuite1.APPWARNING_STRING
-                     + "unknown command: undefined4\n",
+                     + "getDistCommand: unknown command: undefined4\n",
                      TestSuite1.getStdout());
         TestSuite1.clearStdout();
         assertNull(Tools.getDistCommand(null,
@@ -400,14 +402,16 @@ public final class ToolsTest1 extends TestCase {
                                         "squeeze",
                                         "i386",
                                         ccc,
+                                        false,
                                         false));
         assertNull(Tools.getDistCommand(null,
                                         "debian",
                                         "squeeze",
                                         "i386",
                                         ccc,
+                                        true,
                                         true));
-        assertNull(Tools.getDistCommand(null, null, null, null, null, true));
+        assertNull(Tools.getDistCommand(null, null, null, null, null, true, true));
     }
 
     @Test
