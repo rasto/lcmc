@@ -1410,6 +1410,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         getBrowser().getDrbdDevHash().put(device, this);
         getBrowser().putDrbdDevHash();
         getDrbdVolume().setCommited(true);
+        getResource().setNew(false);
     }
 
     /** Sets that this drbd resource is used by crm. */
