@@ -55,6 +55,8 @@ public final class BlockDevice extends Resource {
     private String blockSize;
     /** Disk UUID. */
     private String diskUuid;
+    /** Disk ID. */
+    private Set<String> diskIds = new HashSet<String>();
     /** Where is this block device mounted if it is at all. */
     private String mountedOn;
     /** Filesytem type. */
@@ -120,6 +122,17 @@ public final class BlockDevice extends Resource {
                                                             "SyncSource",
                                                             "PausedSyncS",
                                                             "PausedSyncT")));
+
+    private static final String TOKEN_UUID    = "uuid";
+    private static final String TOKEN_SIZE    = "size";
+    private static final String TOKEN_MP      = "mp";
+    private static final String TOKEN_FS      = "fs";
+    private static final String TOKEN_VG      = "vg";
+    private static final String TOKEN_LV      = "lv";
+    private static final String TOKEN_PV      = "pv";
+    private static final String TOKEN_USED    = "used";
+    private static final String TOKEN_DISK_ID = "disk-id";
+
     /**
      * Creates a new <code>BlockDevice</code> object.
      *
@@ -145,21 +158,26 @@ public final class BlockDevice extends Resource {
             for (int i = 1; i < cols.length; i++) {
                 final Matcher m = p.matcher(cols[i]);
                 if (m.matches()) {
-                    tokens.put(m.group(1), m.group(2));
+                    if (TOKEN_DISK_ID.equals(m.group(1))) {
+                        diskIds.add(m.group(2));
+                    } else {
+                        tokens.put(m.group(1), m.group(2));
+                    }
                 } else {
                     LOG.appWarning("update: could not parse: " + line);
                 }
             }
-            this.diskUuid  = tokens.get("uuid");
-            this.blockSize = tokens.get("size");
-            this.mountedOn = tokens.get("mp");
-            this.fsType    = tokens.get("fs");
-            this.volumeGroup = tokens.get("vg");
-            this.logicalVolume = tokens.get("lv");
-            this.vgOnPhysicalVolume = tokens.get("pv");
-            final String usedStr = tokens.get("used");
+            this.diskUuid           = tokens.get(TOKEN_UUID);
+            this.blockSize          = tokens.get(TOKEN_SIZE);
+            this.mountedOn          = tokens.get(TOKEN_MP);
+            this.fsType             = tokens.get(TOKEN_FS);
+            this.volumeGroup        = tokens.get(TOKEN_VG);
+            this.logicalVolume      = tokens.get(TOKEN_LV);
+            this.vgOnPhysicalVolume = tokens.get(TOKEN_PV);
+            final String usedStr    = tokens.get(TOKEN_USED);
+
             if (usedStr != null) {
-                this.used      = Integer.parseInt(usedStr);
+                this.used = Integer.parseInt(usedStr);
             }
         }
     }
@@ -569,6 +587,11 @@ public final class BlockDevice extends Resource {
     /** Returns disk uuid. */
     public String getDiskUuid() {
         return diskUuid;
+    }
+
+    /** Returns whether the disk device is disk id. */
+    public Set<String> getDiskIds() {
+        return diskIds;
     }
 
     /** Returns lvm group or null. */

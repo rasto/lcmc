@@ -178,6 +178,8 @@ public final class BlockDevInfo extends EditableInfo {
     /** "Proxy down" text for graph. */
     private static final String PROXY_DOWN = "Proxy Down";
 
+    private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
+
     /**
      * Prepares a new <code>BlockDevInfo</code> object.
      *
@@ -378,9 +380,24 @@ public final class BlockDevInfo extends EditableInfo {
 
 
         final String uuid = bd.getDiskUuid();
-        if (uuid != null && uuid.length() > 18) {
-            tt.append("UUID: ").append(uuid.substring(18)).append('\n');
+        tt.append("\n<table>");
+        if (uuid != null && uuid.startsWith(BY_UUID_PATH)) {
+            tt.append("<tr><td><b>UUID:</b></td><td>")
+              .append(uuid.substring(18))
+              .append("</td></tr>");
         }
+        String label = "ID:";
+        for (final String diskId : bd.getDiskIds()) {
+            if (diskId.length() > 16) {
+                tt.append("<tr><td><b>")
+                  .append(label)
+                  .append("</b></td><td>")
+                  .append(diskId.substring(16))
+                  .append("</td></tr>");
+                label = "";
+            }
+        }
+        tt.append("\n</table>");
 
         if (bd.isDrbd()) {
             if (getHost().isDrbdStatus()) {

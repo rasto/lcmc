@@ -588,6 +588,34 @@ sub get_device_mapper_major {
 	close DM;
 }
 
+sub get_disk_uuid_map {
+	my $dir = shift;
+	my %ids;
+	if (opendir(DIR, $dir)) {
+		for (grep { $_ !~ /^\./ && -l "$dir/$_" } readdir(DIR)) {
+			my $dev = _exec("readlink -f \"$dir/$_\"", 2);
+			chomp $dev;
+			$ids{$dev} = "$dir/$_";
+		}
+		closedir DIR;
+	}
+	return \%ids;
+}
+
+sub get_disk_id_map {
+	my $dir = shift;
+	my %ids;
+	if (opendir(DIR, $dir)) {
+		for (grep { $_ !~ /^\./ && -l "$dir/$_" } readdir(DIR)) {
+			my $dev = _exec("readlink -f \"$dir/$_\"", 2);
+			chomp $dev;
+			push @{$ids{$dev}}, "$dir/$_";
+		}
+		closedir DIR;
+	}
+	return \%ids;
+}
+
 # get_disk_info()
 #
 # parses /proc/partitions and writes device and size of one block device per
@@ -617,16 +645,8 @@ sub get_disk_info {
 	my @partitions;
 	my $info;
 	my $device_mapper_major = get_device_mapper_major();
-	my $dir = "/dev/disk/by-uuid";
-	my %by_uuids;
-	if (opendir(DIR, $dir)) {
-		for (grep { $_ !~ /^\./ && -l "$dir/$_" } readdir(DIR)) {
-			my $dev = _exec("readlink -f \"$dir/$_\"", 2);
-			chomp $dev;
-			$by_uuids{$dev} = "$dir/$_";
-		}
-		closedir DIR;
-	}
+	my $by_uuids = get_disk_uuid_map("/dev/disk/by-uuid");
+	my $by_ids = get_disk_id_map("/dev/disk/by-id");
 	while (<PT>) {
 		next if /^major / || /^$/; # skip header
 		chomp;
@@ -676,13 +696,22 @@ sub get_disk_info {
 		}
 		my $readlink = _exec("readlink -f $device", 2);
 		chomp $readlink;
-		my $dev_sec = $by_uuids{$readlink} || $readlink || $device;
+		my $dev_sec = $$by_uuids{$readlink} || $readlink || $device;
 
 		my $mount = $$dev_to_mount{$device} || $$dev_to_mount{$dev_sec};
 		my $swap = $$dev_to_swap{$device} || $$dev_to_swap{$dev_sec};
 		my $used = $$dev_to_used{$device} || $$dev_to_used{$dev_sec};
 
-		$info.= "$device uuid:$dev_sec size:$blocks";
+		my $disk_ids_s = "";
+
+		my $disk_ids = $$by_ids{$readlink};
+		if ($disk_ids) {
+			for (@$disk_ids) {
+				$disk_ids_s .= " disk-id:" . $_;
+			}
+		}
+
+		$info.= "$device uuid:$dev_sec$disk_ids_s size:$blocks";
 		$info.= " mp:$mount" if $mount;
 		$info.= " fs:swap mp:swap" if $swap;
 		$info.= " used:$used" if defined $used;
