@@ -248,36 +248,36 @@ public final class BlockDevInfo extends EditableInfo {
     @Override
     String getInfo() {
         final StringBuilder ret = new StringBuilder(120);
-        ret.append("Host            : ");
-        ret.append(getHost().getName());
-        ret.append("\nDevice          : ");
-        ret.append(getBlockDevice().getName());
-        ret.append("\nMeta disk       : ");
-        ret.append(getBlockDevice().isDrbdMetaDisk());
-        ret.append("\nSize            : ");
-        ret.append(getBlockDevice().getBlockSize());
-        ret.append(" blocks");
+        ret.append("Host            : ")
+           .append(getHost().getName())
+           .append("\nDevice          : ")
+           .append(getBlockDevice().getName())
+           .append("\nMeta disk       : ")
+           .append(getBlockDevice().isDrbdMetaDisk())
+           .append("\nSize            : ")
+           .append(getBlockDevice().getBlockSize())
+           .append(" blocks");
         if (getBlockDevice().getMountedOn() == null) {
             ret.append("\nnot mounted");
         } else {
-            ret.append("\nMounted on      : ");
-            ret.append(getBlockDevice().getMountedOn());
-            ret.append("\nType            : ");
-            ret.append(getBlockDevice().getFsType());
+            ret.append("\nMounted on      : ")
+               .append(getBlockDevice().getMountedOn())
+               .append("\nType            : ")
+               .append(getBlockDevice().getFsType());
             if (getUsed() >= 0) {
-                ret.append("\nUsed:           : ");
-                ret.append(getUsed());
-                ret.append('%');
+                ret.append("\nUsed:           : ")
+                   .append(getUsed())
+                   .append('%');
             }
         }
         if (getBlockDevice().isDrbd()) {
-            ret.append("\nConnection state: ");
-            ret.append(getBlockDevice().getConnectionState());
-            ret.append("\nNode state      : ");
-            ret.append(getBlockDevice().getNodeState());
-            ret.append("\nDisk state      : ");
-            ret.append(getBlockDevice().getDiskState());
-            ret.append('\n');
+            ret.append("\nConnection state: ")
+               .append(getBlockDevice().getConnectionState())
+               .append("\nNode state      : ")
+               .append(getBlockDevice().getNodeState())
+               .append("\nDisk state      : ")
+               .append(getBlockDevice().getDiskState())
+               .append('\n');
         }
         return ret.toString();
     }
@@ -301,12 +301,10 @@ public final class BlockDevInfo extends EditableInfo {
         }
         if (vg != null) {
             for (final BlockDevice pv : getHost().getPhysicalVolumes(vg)) {
-                if (pv.equals(selectedPV)) {
-                    tt.append("<b>");
-                    tt.append(tab + pv);
-                    tt.append("</b>");
+                if (pv.getName().equals(selectedPV)) {
+                    tt.append("<b>").append(tab).append(pv).append("</b>");
                 } else {
-                    tt.append(tab + pv);
+                    tt.append(tab).append(pv);
                 }
                 tt.append('\n');
             }
@@ -315,25 +313,24 @@ public final class BlockDevInfo extends EditableInfo {
         String selectedLV = null;
         if (vg != null) {
             if (bd.isVolumeGroupOnPhysicalVolume()) {
-                tt.append("<b>");
-                tt.append("    " + tab + vg);
-                tt.append("</b>\n");
+                tt.append("<b>")
+                  .append("    ")
+                  .append(tab)
+                  .append(vg)
+                  .append("</b>\n");
             } else if (isLVM()) {
-                tt.append("    " + tab);
-                tt.append(vg);
-                tt.append('\n');
+                tt.append("    ").append(tab).append(vg).append('\n');
                 selectedLV = bd.getName();
             }
             final Set<String> lvs =
                              getHost().getLogicalVolumesFromVolumeGroup(vg);
             if (lvs != null) {
                 for (final String lv : lvs) {
-                    tt.append("        " + tab);
+                    tt.append("        ").append(tab);
                     final String lvName = "/dev/" + vg + "/" + lv;
                     if (lvName.equals(selectedLV)) {
                         if (bd.isDrbd()) {
-                            tt.append(lv);
-                            tt.append("\n");
+                            tt.append(lv).append('\n');
                             final BlockDevice drbdBD = bd.getDrbdBlockDevice();
                             if (drbdBD != null) {
                                 appendBlockDeviceHierarchy(drbdBD,
@@ -341,26 +338,23 @@ public final class BlockDevInfo extends EditableInfo {
                                                            shift + 3);
                             }
                         } else {
-                            tt.append("<b>");
-                            tt.append(lv);
-                            tt.append("</b>\n");
+                            tt.append("<b>").append(lv).append("</b>\n");
                         }
                     } else {
-                        tt.append(lv);
-                        tt.append('\n');
+                        tt.append(lv).append('\n');
                     }
                 }
             }
         } else {
             final BlockDevice drbdBD = bd.getDrbdBlockDevice();
             if (drbdBD != null) {
-                tt.append(tab + bd.getName());
-                tt.append('\n');
+                tt.append(tab).append(bd.getName()).append('\n');
                 appendBlockDeviceHierarchy(drbdBD, tt, shift + 1);
             } else {
-                tt.append("<b>");
-                tt.append(tab + bd.getName());
-                tt.append("</b>\n");
+                tt.append("<b>")
+                  .append(tab)
+                  .append(bd.getName())
+                  .append("</b>\n");
             }
         }
     }
@@ -378,9 +372,7 @@ public final class BlockDevInfo extends EditableInfo {
             tt.append(" (Meta Disk)\n");
             for (final BlockDevice mb
                          : getBlockDevice().getMetaDiskOfBlockDevices()) {
-                tt.append("&nbsp;&nbsp;of ");
-                tt.append(mb.getName());
-                tt.append('\n');
+                tt.append("&nbsp;&nbsp;of ").append(mb.getName()).append('\n');
             }
         }
 
@@ -405,16 +397,16 @@ public final class BlockDevInfo extends EditableInfo {
                     ds = "not available";
                 }
 
-                tt.append("\n<table><tr><td><b>cs:</b></td><td>");
-                tt.append(cs);
-                tt.append("</td></tr><tr><td><b>ro:</b></td><td>");
-                tt.append(st);
-                tt.append("</td></tr><tr><td><b>ds:</b></td><td>");
-                tt.append(ds);
-                tt.append("</td></tr></table>");
+                tt.append("\n<table><tr><td><b>cs:</b></td><td>")
+                  .append(cs)
+                  .append("</td></tr><tr><td><b>ro:</b></td><td>")
+                  .append(st)
+                  .append("</td></tr><tr><td><b>ds:</b></td><td>")
+                  .append(ds)
+                  .append("</td></tr></table>");
             } else {
-                tt.append('\n');
-                tt.append(Tools.getString("HostBrowser.Hb.NoInfoAvailable"));
+                tt.append('\n')
+                  .append(Tools.getString("HostBrowser.Hb.NoInfoAvailable"));
             }
         }
         return tt.toString();
@@ -446,20 +438,24 @@ public final class BlockDevInfo extends EditableInfo {
         } else {
             tabs = "\t\t";
         }
-        config.append(tabs + "device\t\t");
-        config.append(drbdDevice);
-        config.append(";\n" + tabs + "disk\t\t");
+        config.append(tabs)
+              .append("device\t\t")
+              .append(drbdDevice)
+              .append(";\n")
+              .append(tabs)
+              .append("disk\t\t");
         final String backingDisk = getBlockDevice().getDrbdBackingDisk();
         if (backingDisk == null) {
             config.append(getBlockDevice().getName());
         } else {
             config.append(backingDisk);
         }
-        config.append(";\n" + tabs);
-        config.append(getBlockDevice().getMetaDiskString(
+        config.append(";\n")
+              .append(tabs)
+              .append(getBlockDevice().getMetaDiskString(
                                        getComboBoxValue(DRBD_MD_PARAM),
-                                       getComboBoxValue(DRBD_MD_INDEX_PARAM)));
-        config.append(';');
+                                       getComboBoxValue(DRBD_MD_INDEX_PARAM)))
+              .append(';');
         return config.toString();
     }
 
@@ -1115,10 +1111,8 @@ public final class BlockDevInfo extends EditableInfo {
                                 apply(false);
                             } catch (Exceptions.DrbdConfigException e) {
                                 LOG.appError("getInfoPanelBD: config failed", e);
-                                return;
                             } catch (UnknownHostException e) {
                                 LOG.appError("getInfoPanelBD: config failed", e);
-                                return;
                             } finally {
                                 getBrowser().getClusterBrowser()
                                                            .drbdStatusUnlock();
@@ -2355,7 +2349,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
-         String vg = null;
+         String vg;
          if (isLVM()) {
              vg = getBlockDevice().getVolumeGroup();
          } else {
