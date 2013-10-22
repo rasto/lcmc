@@ -95,6 +95,8 @@ public final class BlockDevice extends Resource {
     private String logicalVolume = null;
     /** DRBD block device. */
     private BlockDevice drbdBlockDevice = null;
+    /* Backing disk that is used in drbd config. */
+    private String drbdBackingDisk = null;
     /** States that means that we are connected. */
     private static final Set<String> CONNECTED_STATES =
         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
@@ -620,5 +622,15 @@ public final class BlockDevice extends Resource {
     /** Sets DRBD block device. */
     public void setDrbdBlockDevice(final BlockDevice drbdBlockDevice) {
         this.drbdBlockDevice = drbdBlockDevice;
+    }
+
+    /** Return DRBD config disk. */
+    public final String getDrbdBackingDisk() {
+        return drbdBackingDisk;
+    }
+
+    /** Set DRBD backing disk. */
+    public final void setDrbdBackingDisk(final String drbdBackingDisk) {
+        this.drbdBackingDisk = drbdBackingDisk;
     }
 }

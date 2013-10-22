@@ -443,7 +443,12 @@ public final class BlockDevInfo extends EditableInfo {
         config.append(tabs + "device\t\t");
         config.append(drbdDevice);
         config.append(";\n" + tabs + "disk\t\t");
-        config.append(getBlockDevice().getName());
+        final String backingDisk = getBlockDevice().getDrbdBackingDisk();
+        if (backingDisk == null) {
+            config.append(getBlockDevice().getName());
+        } else {
+            config.append(backingDisk);
+        }
         config.append(";\n" + tabs);
         config.append(getBlockDevice().getMetaDiskString(
                                        getComboBoxValue(DRBD_MD_PARAM),
