@@ -384,6 +384,12 @@ public final class BlockDevInfo extends EditableInfo {
             }
         }
 
+
+        final String uuid = bd.getReadlink();
+        if (uuid != null && uuid.length() > 18) {
+            tt.append("UUID: ").append(uuid.substring(18)).append('\n');
+        }
+
         if (bd.isDrbd()) {
             if (getHost().isDrbdStatus()) {
                 String cs = bd.getConnectionState();
