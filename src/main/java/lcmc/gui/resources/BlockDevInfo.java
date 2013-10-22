@@ -377,7 +377,7 @@ public final class BlockDevInfo extends EditableInfo {
         }
 
 
-        final String uuid = bd.getReadlink();
+        final String uuid = bd.getDiskUuid();
         if (uuid != null && uuid.length() > 18) {
             tt.append("UUID: ").append(uuid.substring(18)).append('\n');
         }

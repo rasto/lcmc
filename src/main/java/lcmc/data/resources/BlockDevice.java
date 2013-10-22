@@ -53,8 +53,8 @@ public final class BlockDevice extends Resource {
     private static final long serialVersionUID = 1L;
     /** Block size in blocks. */
     private String blockSize;
-    /** absolute path from readlink. */
-    private String readlink;
+    /** Disk UUID. */
+    private String diskUuid;
     /** Where is this block device mounted if it is at all. */
     private String mountedOn;
     /** Filesytem type. */
@@ -150,7 +150,7 @@ public final class BlockDevice extends Resource {
                     LOG.appWarning("update: could not parse: " + line);
                 }
             }
-            this.readlink  = tokens.get("rl");
+            this.diskUuid  = tokens.get("uuid");
             this.blockSize = tokens.get("size");
             this.mountedOn = tokens.get("mp");
             this.fsType    = tokens.get("fs");
@@ -566,9 +566,9 @@ public final class BlockDevice extends Resource {
         return false;
     }
 
-    /** Returns absolute path obtained with readlink. */
-    public String getReadlink() {
-        return readlink;
+    /** Returns disk uuid. */
+    public String getDiskUuid() {
+        return diskUuid;
     }
 
     /** Returns lvm group or null. */

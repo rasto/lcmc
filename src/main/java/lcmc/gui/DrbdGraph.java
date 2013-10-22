@@ -915,7 +915,7 @@ public final class DrbdGraph extends ResourceGraph {
                 continue;
             }
             if (bdi.getName().equals(disk)
-                || bdi.getBlockDevice().getReadlink().equals(disk)) {
+                || bdi.getBlockDevice().getDiskUuid().equals(disk)) {
                 return bdi;
             }
         }
