@@ -227,7 +227,7 @@ final class CommStack extends DialogCluster {
             }
         }
         /* slight preference to corosync */
-        String defaultValue = null;
+        String defaultValue;
         if (hbImpossible) {
             defaultValue = ConfigData.COROSYNC_NAME;
         } else if (aisImpossible) {

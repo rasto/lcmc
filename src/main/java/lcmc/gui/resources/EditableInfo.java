@@ -400,7 +400,7 @@ public abstract class EditableInfo extends Info {
         final boolean wizard = Widget.WIZARD_PREFIX.equals(prefix);
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
-            Widget rpwi = null;
+            Widget rpwi;
             if (wizard) {
                 rpwi = getWidget(param, null);
                 if (rpwi == null) {

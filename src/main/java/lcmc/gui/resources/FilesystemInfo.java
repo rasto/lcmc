@@ -392,7 +392,7 @@ final class FilesystemInfo extends ServiceInfo {
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
-        boolean oldDrbddisk = false;
+        boolean oldDrbddisk;
         if (getDrbddiskInfo() == null) {
             oldDrbddisk = drbddiskIsPreferred;
         } else {
@@ -424,27 +424,26 @@ final class FilesystemInfo extends ServiceInfo {
                 setLinbitDrbdInfo(null);
             }
         }
-        if (newDvi != null) {
-            //newDvi.getDrbdResourceInfo().setUsedByCRM(true);
-            //final Thread t = new Thread(new Runnable() {
-            //    @Override
-            //    public void run() {
-            //        newDvi.updateMenus(null);
-            //    }
-            //});
-            //t.start();
-            final String fsId = getService().getId();
-            if (oldDrbddisk) {
-                final String drbdId = getBrowser().getFreeId(
-                         getBrowser().getCRMXML().getHbDrbddisk().getName(),
-                         fsId);
-                newDvi.addDrbdDisk(this, dcHost, drbdId, testOnly);
-            } else {
-                final String drbdId = getBrowser().getFreeId(
-                         getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
-                         fsId);
-                newDvi.addLinbitDrbd(this, dcHost, drbdId, testOnly);
-            }
+
+        //newDvi.getDrbdResourceInfo().setUsedByCRM(true);
+        //final Thread t = new Thread(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        newDvi.updateMenus(null);
+        //    }
+        //});
+        //t.start();
+        final String fsId = getService().getId();
+        if (oldDrbddisk) {
+            final String drbdId = getBrowser().getFreeId(
+                    getBrowser().getCRMXML().getHbDrbddisk().getName(),
+                    fsId);
+            newDvi.addDrbdDisk(this, dcHost, drbdId, testOnly);
+        } else {
+            final String drbdId = getBrowser().getFreeId(
+                    getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
+                    fsId);
+            newDvi.addLinbitDrbd(this, dcHost, drbdId, testOnly);
         }
     }
 
@@ -480,7 +479,7 @@ final class FilesystemInfo extends ServiceInfo {
         final DrbdVolumeInfo selectedInfo =
                                 getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV));
-        String selectedValue = null;
+        String selectedValue;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
         } else {

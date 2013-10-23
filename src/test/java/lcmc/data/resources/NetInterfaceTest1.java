@@ -4,18 +4,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
-import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.awt.Color;
 import java.net.UnknownHostException;
 import lcmc.utilities.TestSuite1;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH.ExecCommandThread;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

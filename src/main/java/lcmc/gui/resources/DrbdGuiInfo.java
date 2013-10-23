@@ -364,20 +364,18 @@ abstract class DrbdGuiInfo extends EditableInfo {
                                                         getParamType(param)))) {
                             if (value.equals(DrbdXML.CONFIG_YES)) {
                                 /* boolean parameter */
-                                sectionConfig.append("\t\t" + param + ";\n");
+                                sectionConfig.append("\t\t").append(param).append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
                             /* resync-after parameter > 8.4 */
                             if (!value.equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
-                                if (value != null) {
-                                    sectionConfig.append("\t\t");
-                                    sectionConfig.append(param);
-                                    sectionConfig.append('\t');
-                                    sectionConfig.append(
-                                                    Tools.escapeConfig(value));
-                                    sectionConfig.append(";\n");
-                                }
+                                sectionConfig.append("\t\t");
+                                sectionConfig.append(param);
+                                sectionConfig.append('\t');
+                                sectionConfig.append(
+                                        Tools.escapeConfig(value));
+                                sectionConfig.append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
                             /* after parameter < 8.4 */
@@ -417,7 +415,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 }
 
                 if (sectionConfig.length() > 0) {
-                    config.append("\t" + section + " {\n");
+                    config.append("\t").append(section).append(" {\n");
                     config.append(sectionConfig);
                     config.append("\t}\n\n");
                 }

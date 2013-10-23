@@ -215,7 +215,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                                        getParamType(param))))) {
                         if (value.equals(DrbdXML.CONFIG_YES)) {
                             /* boolean parameter */
-                            global.append("\t\t" + param + ";\n");
+                            global.append("\t\t").append(param).append(";\n");
                         }
                     } else {
                         /* also boolean parameter since 8.4 */
@@ -488,10 +488,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanel: config failed", dce);
-                    return;
                 } catch (UnknownHostException e) {
                     LOG.appError("getInfoPanel: config failed", e);
-                    return;
                 } finally {
                     getBrowser().drbdtestLockRelease();
                     startTestLatch.countDown();

@@ -98,6 +98,7 @@ public final class EmptyBrowser extends Browser {
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
         setNode(allHostsNode);
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 topAdd(allHostsNode);
             }

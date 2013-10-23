@@ -423,7 +423,6 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                 getInfoPanel();
             }
         });
-        final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : getParametersFromXML()) {
             final String value = getComboBoxValue(param);

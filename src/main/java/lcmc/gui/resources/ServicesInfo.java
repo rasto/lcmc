@@ -359,7 +359,7 @@ public final class ServicesInfo extends EditableInfo {
     private CloneInfo setCreateCloneInfo(final String cloneId,
                                          final ClusterStatus clStatus,
                                          final boolean testOnly) {
-        CloneInfo newCi = null;
+        CloneInfo newCi;
         newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newCi == null) {
@@ -396,7 +396,7 @@ public final class ServicesInfo extends EditableInfo {
                                          final CloneInfo newCi,
                                          final ClusterStatus clStatus,
                                          final boolean testOnly) {
-        GroupInfo newGi = null;
+        GroupInfo newGi;
         newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newGi == null) {
@@ -819,7 +819,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     }
                 }
-                if (!testOnly && cphi != null) {
+                if (!testOnly) {
                     cphi.setUpdated(false);
                     cphi.getService().setNew(false);
                 }

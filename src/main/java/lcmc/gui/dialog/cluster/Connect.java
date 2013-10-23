@@ -90,7 +90,7 @@ final class Connect extends DialogCluster {
                 pending = true;
                 status = "connecting...";
             }
-            text.append(host.getName() + " " + status + "\n");
+            text.append(host.getName()).append(" ").append(status).append("\n");
         }
         LOG.debug("checkHosts: pending: " + pending + ", one failed: "
                   + oneFailed);

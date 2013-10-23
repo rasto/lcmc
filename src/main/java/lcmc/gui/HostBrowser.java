@@ -498,14 +498,14 @@ public final class HostBrowser extends Browser {
         final StringBuilder tt = new StringBuilder(40);
         final String drbdV = host.getDrbdVersion();
         final String drbdModuleV = host.getDrbdModuleVersion();
-        String drbdS = null;
+        String drbdS;
         if (drbdV == null || "".equals(drbdV)) {
             drbdS = "not installed";
         } else {
             drbdS = drbdV;
         }
 
-        String drbdModuleS = null;
+        String drbdModuleS;
         if (drbdModuleV == null || "".equals(drbdModuleV)) {
             drbdModuleS = "not installed";
         } else {
@@ -610,7 +610,7 @@ public final class HostBrowser extends Browser {
     /** Returns tooltip for host. */
     public String getHostToolTip(final Host host) {
         final StringBuilder tt = new StringBuilder(80);
-        tt.append("<b>" + host.getName() + "</b>");
+        tt.append("<b>").append(host.getName()).append("</b>");
         final ClusterBrowser b = getClusterBrowser();
         if (b != null && b.isRealDcHost(host)) {
             tt.append(" (designated co-ordinator)");

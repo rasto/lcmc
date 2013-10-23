@@ -29,7 +29,6 @@ import lcmc.utilities.AllHostsUpdatable;
 import javax.swing.Box;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
 
 

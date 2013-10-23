@@ -1063,11 +1063,11 @@ public final class GroupInfo extends ServiceInfo {
                 }
                 final Subtext[] subtexts =
                                      si.getSubtextsForGraph(testOnly);
-                Subtext sSubtext = null;
+
                 if (subtexts == null || subtexts.length == 0) {
                     continue;
                 }
-                sSubtext = subtexts[0];
+                final Subtext sSubtext = subtexts[0];
                 if (prevSubtext == null
                     || !sSubtext.getSubtext().equals(
                                           prevSubtext.getSubtext())) {

@@ -1737,7 +1737,7 @@ public class ServiceInfo extends EditableInfo {
                              final int rightWidth) {
         int rows = 0;
         final JLabel pingLabel = new JLabel("pingd");
-        String savedPO = null;
+        String savedPO;
         final Widget prevWi = pingComboBox;
         if (prevWi == null) {
             savedPO = savedPingOperation;
@@ -1880,9 +1880,11 @@ public class ServiceInfo extends EditableInfo {
     /** Returns selected operations id reference. */
     private Info getSameServiceOpIdRef() {
         mSavedOperationsLock.lock();
-        final ServiceInfo savedOpIdRef = savedOperationIdRef;
-        mSavedOperationsLock.unlock();
-        return savedOpIdRef;
+        try {
+            return savedOperationIdRef;
+        } finally {
+            mSavedOperationsLock.unlock();
+        }
     }
 
     /**
@@ -3839,7 +3841,7 @@ public class ServiceInfo extends EditableInfo {
             rscId = getHeartbeatId(testOnly);
         }
         if (isConstraintPH() || parent.isConstraintPH()) {
-            ConstraintPHInfo cphi = null;
+            ConstraintPHInfo cphi;
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
@@ -4023,7 +4025,7 @@ public class ServiceInfo extends EditableInfo {
         if (isConstraintPH() || parent.isConstraintPH()) {
             final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
-            ConstraintPHInfo cphi = null;
+            ConstraintPHInfo cphi;
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
@@ -6127,7 +6129,6 @@ public class ServiceInfo extends EditableInfo {
             nodeString =
                      Tools.join(", ", nodes.toArray(new String[nodes.size()]));
         }
-        final Host[] hosts = getBrowser().getCluster().getHostsArray();
         if (getBrowser().allHostsDown()) {
             nodeString = "unknown";
         }
@@ -6148,9 +6149,9 @@ public class ServiceInfo extends EditableInfo {
             sb.append("</b> <b>Failed</b>");
         } else if (isStopped(testOnly)
                    || nodeString == null) {
-            sb.append("</b> " + textNotOn);
+            sb.append("</b> ").append(textNotOn);
         } else {
-            sb.append("</b> " + textOn + ": ");
+            sb.append("</b> ").append(textOn).append(": ");
             sb.append(nodeString);
         }
         if (!isManaged(testOnly)) {

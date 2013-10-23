@@ -859,8 +859,8 @@ final class HbConfig extends DialogCluster {
         String addr       = "";
         String iface      = "";
         String serial     = "";
-        UcastLink ucastLink1 = null;
-        UcastLink ucastLink2 = null;
+        UcastLink ucastLink1;
+        UcastLink ucastLink2;
 
         if (BCAST_TYPE.equals(type)) {
             iface = ifaceW.getStringValue();

@@ -262,6 +262,7 @@ public final class LCMC extends JPanel {
         /**
          * Called when window is closed.
          */
+        @Override
         public final void windowClosing(final WindowEvent event) {
             cleanupBeforeClosing();
             System.exit(0);
@@ -300,30 +301,36 @@ public final class LCMC extends JPanel {
             MetalLookAndFeel.setCurrentTheme(
                 new OceanTheme() {
                     /** e.g. arrows on split pane... */
+                    @Override
                     protected ColorUIResource getPrimary1() {
                         return new ColorUIResource(
                                             ClusterBrowser.STATUS_BACKGROUND);
                     }
 
                     /** unknown to me */
+                    @Override
                     protected ColorUIResource getPrimary2() {
                         return new ColorUIResource(
                                             ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** unknown to me */
+                    @Override
                     protected ColorUIResource getPrimary3() {
                         return new ColorUIResource(
                                             ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** Button and other borders. */
+                    @Override
                     protected ColorUIResource getSecondary1() {
                         return new ColorUIResource(AppDefaults.BACKGROUND_DARK);
                     }
+                    @Override
                     protected ColorUIResource getSecondary2() {
                         return new ColorUIResource(
                                             ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** Split pane divider. Line in the main menu. */
+                    @Override
                     protected ColorUIResource getSecondary3() {
                         return new ColorUIResource(
                                             ClusterBrowser.PANEL_BACKGROUND);
@@ -335,6 +342,7 @@ public final class LCMC extends JPanel {
         }
         Thread.setDefaultUncaughtExceptionHandler(
             new Thread.UncaughtExceptionHandler() {
+                @Override
                 public void uncaughtException(final Thread t,
                                               final Throwable ex) {
                     System.out.println(ex.toString());
@@ -608,7 +616,7 @@ public final class LCMC extends JPanel {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
             if (cmd.hasOption(SLOW_OP)) {
-                fps = fps / 2;
+                fps /= 2;
             }
             if (cmd.hasOption(RESTORE_MOUSE_OP)) {
                 /* restore mouse if it is stuck in pressed state, during

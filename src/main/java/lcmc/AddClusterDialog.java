@@ -86,6 +86,7 @@ public final class AddClusterDialog {
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 cluster.getClusterTab().addClusterView();
                 cluster.getClusterTab().requestFocus();

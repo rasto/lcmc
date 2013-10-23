@@ -309,7 +309,7 @@ public final class ProgressIndicatorPanel extends JComponent
         if (started) {
             final int width  = getWidth();
 
-            double maxY = 0.0;
+            double maxY;
 
             final Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHints(hints);

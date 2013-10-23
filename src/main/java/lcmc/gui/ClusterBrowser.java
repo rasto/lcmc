@@ -165,7 +165,7 @@ public final class ClusterBrowser extends Browser {
                                           new HashMap<String, ServiceInfo>();
     /** Heartbeat graph. */
     private final CRMGraph crmGraph;
-    /** Drbd graph. */
+    /** DRBD graph. */
     private final DrbdGraph drbdGraph;
     /** object that holds current heartbeat status. */
     private ClusterStatus clusterStatus;
@@ -1830,7 +1830,6 @@ public final class ClusterBrowser extends Browser {
 
     /** drbdStatusLock global lock. */
     public void drbdStatusLock() {
-        final Host[] hosts = getClusterHosts();
         for (final Host h : getClusterHosts()) {
             h.drbdStatusLock();
         }
@@ -2040,7 +2039,7 @@ public final class ClusterBrowser extends Browser {
 
     /**
      * Deletes caches of all Filesystem infoPanels.
-     * This is usefull if something have changed.
+     * This is useful if something have changed.
      */
     public void resetFilesystems() {
         mHeartbeatIdToServiceLock();
@@ -2660,7 +2659,7 @@ public final class ClusterBrowser extends Browser {
     }
 
 
-    /** Returns when at least one resource in the list of resouces can be
+    /** Returns when at least one resource in the list of resources can be
         promoted. */
     public boolean isOneMaster(final List<String> rscs) {
         for (final String id : rscs) {
@@ -2677,19 +2676,20 @@ public final class ClusterBrowser extends Browser {
         return false;
     }
 
-    /** Updates host hardware info on all cluster hosts immediatly. */
+    /** Updates host hardware info on all cluster hosts immediately. */
     public void updateHWInfo() {
         for (final Host h : getClusterHosts()) {
             updateHWInfo(h);
         }
     }
 
-    /** Updates host hardware info immediatly. */
+    /** Updates host hardware info immediately. */
     public void updateHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                        new ResourceGraph[]{drbdGraph, crmGraph});
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
@@ -2698,7 +2698,7 @@ public final class ClusterBrowser extends Browser {
         drbdGraph.repaint();
     }
 
-    /** Updates proxy host hardware info immediatly. */
+    /** Updates proxy host hardware info immediately. */
     public void updateProxyHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
@@ -2707,7 +2707,7 @@ public final class ClusterBrowser extends Browser {
         drbdGraph.repaint();
     }
 
-    /** Returns drbd parameter hash. */
+    /** Returns DRBD parameter hash. */
     public Map<Host, String> getDrbdParameters() {
         return drbdParameters;
     }

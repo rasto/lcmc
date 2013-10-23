@@ -324,7 +324,7 @@ public final class DrbdGraph extends ResourceGraph {
             if (bdi == null) {
                 return icons;
             }
-            if (bdi != null && bdi.getBlockDevice().isDrbd()) {
+            if (bdi.getBlockDevice().isDrbd()) {
                 icons.add(BlockDevInfo.HARDDISK_DRBD_ICON_LARGE);
             } else {
                 icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
@@ -396,44 +396,42 @@ public final class DrbdGraph extends ResourceGraph {
                 });
             }
             final StringBuilder l = new StringBuilder(dvi.getNameForGraph());
-            if (l != null) {
-                final Map<Vertex, Point2D> vl = getVertexLocations();
-                final Point2D sp = vl.get(source);
-                final Point2D dp = vl.get(dest);
-                putVertexLocations();
-                final int len = (int) Math.sqrt(Math.pow(sp.getX()
-                                                         - dp.getX(), 2)
-                                                + Math.pow(sp.getY()
-                                                           - dp.getY(), 2));
-                final int maxLen = (len - 200) / 7;
-                if (l.length() > maxLen) {
-                    l.delete(0, l.length() - maxLen + 3);
-                    l.insert(0, "...");
-                }
-                if (dvi.isSyncing()) {
-                    String syncedProgress = dvi.getSyncedProgress();
-                    if (syncedProgress == null) {
-                        syncedProgress = "?.?";
-                    }
-                    final double sourceX = getLayout().transform(source).getX();
-                    final double destX = getLayout().transform(dest).getX();
-                    if (sourceBD.isPausedSync() || destBD.isPausedSync()) {
-                        l.append(" (" + syncedProgress + "% paused)");
-                    } else if ((sourceBD.isSyncSource() && sourceX < destX)
-                               || (destBD.isSyncSource() && sourceX > destX)) {
-                        l.append(" (" + syncedProgress + "% \u2192)"); /* -> */
-                    } else {
-                        l.append(" (\u2190 " + syncedProgress + "%)"); /* <- */
-                    }
-                } else if (dvi.isSplitBrain()) {
-                    l.append(" (split-brain)");
-                } else if (!dvi.isConnected(tOnly)) {
-                    l.append(" (disconnected)");
-                } else if (dvi.isVerifying()) {
-                    l.append(" (verify)");
-                }
-                return l.toString();
+            final Map<Vertex, Point2D> vl = getVertexLocations();
+            final Point2D sp = vl.get(source);
+            final Point2D dp = vl.get(dest);
+            putVertexLocations();
+            final int len = (int) Math.sqrt(Math.pow(sp.getX()
+                    - dp.getX(), 2)
+                    + Math.pow(sp.getY()
+                    - dp.getY(), 2));
+            final int maxLen = (len - 200) / 7;
+            if (l.length() > maxLen) {
+                l.delete(0, l.length() - maxLen + 3);
+                l.insert(0, "...");
             }
+            if (dvi.isSyncing()) {
+                String syncedProgress = dvi.getSyncedProgress();
+                if (syncedProgress == null) {
+                    syncedProgress = "?.?";
+                }
+                final double sourceX = getLayout().transform(source).getX();
+                final double destX = getLayout().transform(dest).getX();
+                if (sourceBD.isPausedSync() || destBD.isPausedSync()) {
+                    l.append(" (").append(syncedProgress).append("% paused)");
+                } else if ((sourceBD.isSyncSource() && sourceX < destX)
+                        || (destBD.isSyncSource() && sourceX > destX)) {
+                    l.append(" (").append(syncedProgress).append("% \u2192)"); /* -> */
+                } else {
+                    l.append(" (\u2190 ").append(syncedProgress).append("%)"); /* <- */
+                }
+            } else if (dvi.isSplitBrain()) {
+                l.append(" (split-brain)");
+            } else if (!dvi.isConnected(tOnly)) {
+                l.append(" (disconnected)");
+            } else if (dvi.isVerifying()) {
+                l.append(" (verify)");
+            }
+            return l.toString();
         }
         return null;
     }

@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;

@@ -168,9 +168,7 @@ public abstract class WizardDialog extends ConfigDialog {
 
     /** Enable next button, with skip button logic. */
     protected final void nextButtonSetEnabled(final boolean enable) {
-        if (skipButtonIsSelected()) {
-            return;
-        } else {
+        if (!skipButtonIsSelected()) {
             if (enable) {
                 skipButtonSetEnabled(false);
             } else {

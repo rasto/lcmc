@@ -518,7 +518,7 @@ public final class AllHostsInfo extends Info {
                         addCheckboxListener(cluster);
                         for (final JTextField hostTF : hostsTF) {
                             final String entered = hostTF.getText();
-                            String hostName = null;
+                            String hostName;
                             String username = null;
                             String port = null;
                             final int a = entered.indexOf('@');

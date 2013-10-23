@@ -147,14 +147,14 @@ public class Configuration extends DialogHost {
      */
     protected final boolean checkDNS(final int hop,
                                      final String hostnameEntered) {
-        InetAddress[] addresses = null;
+        InetAddress[] addresses;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
         } catch (UnknownHostException e) {
             return false;
         }
-        String hostname = null;
-        String ip = null;
+        String hostname;
+        String ip;
         LOG.debug2("checkDNS: addresses.length: " + addresses.length + " a: " + addresses[0].getHostAddress());
         if (addresses.length == 0) {
             LOG.debug("checkDNS: lookup failed");

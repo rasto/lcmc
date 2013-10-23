@@ -229,10 +229,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                     getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanelVolume: config failed", dce);
-                    return;
                 } catch (UnknownHostException e) {
                     LOG.appError("getInfoPanelVolume: config failed", e);
-                    return;
                 } finally {
                     getBrowser().drbdtestLockRelease();
                     startTestLatch.countDown();
@@ -297,10 +295,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                             apply(false);
                         } catch (Exceptions.DrbdConfigException dce) {
                             LOG.appError("getInfoPanelVolume: config failed", dce);
-                            return;
                         } catch (UnknownHostException e) {
                             LOG.appError("getInfoPanelVolume: config failed", e);
-                            return;
                         } finally {
                             getBrowser().drbdStatusUnlock();
                         }
@@ -1352,7 +1348,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         for (final BlockDevInfo bdi : blockDevInfos) {
             if (bdi.getHost() == host) {
                 if (volumesAvailable) {
-                    config.append("volume " + getName() + " {\n");
+                    config.append("volume ").append(getName()).append(" {\n");
                 }
                 config.append(bdi.drbdBDConfig(getName(),
                               getDevice(),

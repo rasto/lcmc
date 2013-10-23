@@ -220,7 +220,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     String drbdResourceConfig(final Host configOnHost)
     throws Exceptions.DrbdConfigException, UnknownHostException {
         final StringBuilder config = new StringBuilder(50);
-        config.append("resource " + getName() + " {\n");
+        config.append("resource ").append(getName()).append(" {\n");
         final String[] params = getBrowser().getDrbdXML().getSectionParams(
                                                                    "resource");
         for (String param : params) {

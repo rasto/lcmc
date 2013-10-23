@@ -83,7 +83,7 @@ public class NetInfo extends Info {
         final StringBuilder s = new StringBuilder(getName());
         final String ip = getNetInterface().getIp();
         if (ip != null) {
-            s.append(" (" + ip + ")");
+            s.append(" (").append(ip).append(")");
         }
         return s.toString();
     }
@@ -141,4 +141,10 @@ public class NetInfo extends Info {
     //public int hashCode() {
     //    return toString().hashCode();
     //}
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
 }
