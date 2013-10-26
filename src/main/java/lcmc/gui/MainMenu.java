@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import java.util.Map;
@@ -265,6 +266,8 @@ public final class MainMenu extends JPanel implements ActionListener {
         opModePanel.add(getUpgradeTextField());
         opModePanel.add(operatingModesCB);
         opModePanel.add(advancedModeCB);
+        // workaround for menuBar invalidating throwing an exception
+        opModePanel.setPreferredSize(new Dimension(1, 1));
 
         menuBar.add(opModePanel);
         if (Tools.getConfigData().isUpgradeCheckEnabled()) {
