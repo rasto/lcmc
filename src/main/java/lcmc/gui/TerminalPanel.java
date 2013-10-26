@@ -518,7 +518,7 @@ public final class TerminalPanel extends JScrollPane {
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(lines[0], commandColor);

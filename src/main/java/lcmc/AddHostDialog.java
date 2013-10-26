@@ -76,7 +76,12 @@ public final class AddHostDialog {
                 LOG.debug1("showDialogs: dialog: "
                            + dialog.getClass().getName() + " finished");
                 Tools.getGUIData().allHostsUpdate();
-                Tools.getGUIData().checkAddClusterButtons();
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Tools.getGUIData().checkAddClusterButtons();
+                    }
+                });
                 break;
             }
             /* newdialog can be null, when we are out of memory I guess. */

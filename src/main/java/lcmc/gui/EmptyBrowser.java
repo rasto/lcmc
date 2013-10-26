@@ -97,12 +97,7 @@ public final class EmptyBrowser extends Browser {
         /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
         setNode(allHostsNode);
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                topAdd(allHostsNode);
-            }
-        });
+        topAdd(allHostsNode);
     }
 
     /** Updates resources of a cluster in the tree. */
@@ -110,7 +105,7 @@ public final class EmptyBrowser extends Browser {
         /* all hosts */
         final Set<Host> allHosts =
               new TreeSet<Host>(Tools.getConfigData().getHosts().getHostSet());
-        Tools.invokeLater(new Runnable() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 DefaultMutableTreeNode resource;

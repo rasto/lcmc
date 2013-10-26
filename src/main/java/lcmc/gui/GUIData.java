@@ -362,22 +362,17 @@ public final class GUIData  {
      * are enough hosts to make cluster.
      */
     public void checkAddClusterButtons() {
-        final boolean enabled =
-                            Tools.getConfigData().danglingHostsCount() >= 1;
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                mAddClusterButtonListReadLock.lock();
-                try {
-                    for (final JComponent addClusterButton
-                                                    : addClusterButtonList) {
-                        addClusterButton.setEnabled(enabled);
-                    }
-                } finally {
-                    mAddClusterButtonListReadLock.unlock();
-                }
+        Tools.isSwingThread();
+        final boolean enabled = Tools.getConfigData().danglingHostsCount() >= 1;
+        mAddClusterButtonListReadLock.lock();
+        try {
+            for (final JComponent addClusterButton
+                                            : addClusterButtonList) {
+                addClusterButton.setEnabled(enabled);
             }
-        });
+        } finally {
+            mAddClusterButtonListReadLock.unlock();
+        }
     }
 
     /** Enable/Disable all 'Add Cluster' buttons. */
@@ -481,7 +476,12 @@ public final class GUIData  {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
-        checkAddClusterButtons();
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                checkAddClusterButtons();
+            }
+        });
     }
 
     /** Enabled the component if it is accessible. */

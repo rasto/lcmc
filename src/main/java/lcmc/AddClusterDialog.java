@@ -68,7 +68,12 @@ public final class AddClusterDialog {
                 Tools.getConfigData().removeClusterFromClusters(cluster);
                 canceled = true;
                 dialog.cancelDialog();
-                Tools.getGUIData().checkAddClusterButtons();
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Tools.getGUIData().checkAddClusterButtons();
+                    }
+                });
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: "
@@ -92,7 +97,12 @@ public final class AddClusterDialog {
                 cluster.getClusterTab().requestFocus();
             }
         });
-        Tools.getGUIData().checkAddClusterButtons();
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Tools.getGUIData().checkAddClusterButtons();
+            }
+        });
     }
 
     /** Whether the wizard was canceled. */
