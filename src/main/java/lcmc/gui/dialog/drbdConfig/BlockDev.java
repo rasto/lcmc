@@ -143,8 +143,8 @@ final class BlockDev extends DrbdConfig {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -177,18 +177,13 @@ final class BlockDev extends DrbdConfig {
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();
         blockDevInfo.waitForInfoPanel();
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                blockDevInfo.addWizardParams(
+        blockDevInfo.addWizardParams(
                  optionsPanel,
                  params,
                  buttonClass(nextButton()),
                  Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
                  Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
                  null);
-            }
-        });
 
         final JPanel p = new JPanel();
         p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));

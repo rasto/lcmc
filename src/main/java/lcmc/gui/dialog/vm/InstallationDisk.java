@@ -107,10 +107,20 @@ final class InstallationDisk extends VMConfig {
         return Tools.getString("Dialog.vm.InstallationDisk.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        if (vmsdi == null) {
+            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
+            vmsdi.waitForInfoPanel();
+        } else {
+            vmsdi.selectMyself();
+        }
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -130,9 +140,6 @@ final class InstallationDisk extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        if (vmsdi != null) {
-            vmsdi.selectMyself();
-        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -142,10 +149,6 @@ final class InstallationDisk extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsdi == null) {
-            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-            vmsdi.waitForInfoPanel();
-        }
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE, "file");
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE CDROM");
@@ -155,18 +158,13 @@ final class InstallationDisk extends VMConfig {
         vmsdi.getResource().setValue(DiskData.READONLY, "True");
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
                                      VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vmsdi.addWizardParams(
+        vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-            }
-        });
         vmsdi.setApplyButtons(null, vmsdi.getParametersFromXML());
         panel.add(optionsPanel);
 

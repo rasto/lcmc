@@ -99,10 +99,20 @@ final class Network extends VMConfig {
         return Tools.getString("Dialog.vm.Network.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        if (vmsii == null) {
+            vmsii = getVMSVirtualDomainInfo().addInterfacePanel();
+            vmsii.waitForInfoPanel();
+        } else {
+            vmsii.selectMyself();
+        }
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -124,9 +134,6 @@ final class Network extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        if (vmsii != null) {
-            vmsii.selectMyself();
-        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -136,26 +143,17 @@ final class Network extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsii == null) {
-            vmsii = getVMSVirtualDomainInfo().addInterfacePanel();
-            vmsii.waitForInfoPanel();
-        }
         vmsii.savePreferredValues();
         vmsii.getResource().setValue(InterfaceData.TYPE, "network");
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, "default");
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, "");
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vmsii.addWizardParams(
+        vmsii.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-            }
-        });
         vmsii.getWidget(InterfaceData.MODEL_TYPE,
                         Widget.WIZARD_PREFIX).setValue("");
 

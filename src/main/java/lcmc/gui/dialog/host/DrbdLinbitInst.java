@@ -54,8 +54,8 @@ public class DrbdLinbitInst extends DialogHost {
 
     /** Inits dialog and starts the drbd install procedure. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 

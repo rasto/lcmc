@@ -99,8 +99,8 @@ public final class Name extends DialogCluster {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
         enableComponents();

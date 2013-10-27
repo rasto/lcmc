@@ -73,8 +73,8 @@ public class Devices extends DialogHost {
 
     /** Inits the dialog and starts the info collecting thread. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(nextButtons());
     }
 

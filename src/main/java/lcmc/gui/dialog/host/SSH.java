@@ -107,8 +107,8 @@ public class SSH extends DialogHost {
 
     /** Inits the dialog and start connecting to the hosts. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(nextButtons());
     }
 

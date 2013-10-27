@@ -85,10 +85,16 @@ public final class Volume extends DrbdConfig {
         return Tools.getString("Dialog.DrbdConfig.Volume.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        getDrbdVolumeInfo().waitForInfoPanel();
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -121,7 +127,6 @@ public final class Volume extends DrbdConfig {
     protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        getDrbdVolumeInfo().waitForInfoPanel();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 
@@ -129,18 +134,13 @@ public final class Volume extends DrbdConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                getDrbdVolumeInfo().addWizardParams(
+        getDrbdVolumeInfo().addWizardParams(
                   optionsPanel,
                   PARAMS,
                   buttonClass(nextButton()),
                   Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
                   Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
                   null);
-            }
-        });
 
         inputPane.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(inputPane);

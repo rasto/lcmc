@@ -164,10 +164,16 @@ public final class Resource extends DrbdConfig {
         return Tools.getString("Dialog.DrbdConfig.Resource.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        dri.waitForInfoPanel();
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -199,7 +205,6 @@ public final class Resource extends DrbdConfig {
     protected JComponent getInputPane() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        dri.waitForInfoPanel();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
 
@@ -257,10 +262,7 @@ public final class Resource extends DrbdConfig {
                              ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                              true,
                              buttonClass(nextButton()));
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                dri.addWizardParams(
+        dri.addWizardParams(
                   optionsPanel,
                   PARAMS,
                   buttonClass(nextButton()),
@@ -269,8 +271,6 @@ public final class Resource extends DrbdConfig {
                   Tools.getDefaultSize(
                                 "Dialog.DrbdConfig.Resource.FieldWidth") * 2,
                   null);
-            }
-        });
 
         inputPane.add(optionsPanel);
         final JPanel buttonPanel = new JPanel();

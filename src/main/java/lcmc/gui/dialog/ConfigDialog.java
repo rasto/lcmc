@@ -326,11 +326,15 @@ public abstract class ConfigDialog {
         return buttonToObjectMap.get(button);
     }
 
+    /** This method is called before the dialog is screated.  */
+    protected void initDialogBeforeCreated() {
+    }
+
     /**
-     * This method is called before the dialog is shown. It also disables
-     * buttons. They have to be enabled with enableComponents()
+     * This method is called before the dialog is shown but it was created.
+     * It also disables buttons. They have to be enabled with enableComponents()
      */
-    protected void initDialog() {
+    protected void initDialogBeforeVisible() {
     }
 
     /**
@@ -448,6 +452,7 @@ public abstract class ConfigDialog {
                                it would work with optionPane.createDialog...
                                but that causes lockups with old javas and
                                gnome. */
+        initDialogBeforeCreated();
         if (dialogPanel == null) {
             final ImageIcon[] icons = getIcons();
             MyButton defaultButtonClass = null;
@@ -475,11 +480,11 @@ public abstract class ConfigDialog {
                 }
             }
             /* create option pane */
-            final JPanel b = body();
             final MyButton dbc = defaultButtonClass;
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
+                    final JPanel b = body();
                     optionPane = new JOptionPane(
                                         b,
                                         getMessageType(),
@@ -546,7 +551,7 @@ public abstract class ConfigDialog {
                 }
             };
         optionPane.addPropertyChangeListener(propertyChangeListener);
-        initDialog();
+        initDialogBeforeVisible();
         Tools.invokeAndWait(new Runnable() {
             @Override
             public void run() {

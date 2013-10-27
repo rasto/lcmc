@@ -118,8 +118,8 @@ class Logs extends ConfigDialog {
 
     /** Inits the dialog. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableAllComponents(false);
         refreshLogsThread();
     }

@@ -105,10 +105,20 @@ final class Storage extends VMConfig {
         return Tools.getString("Dialog.vm.Storage.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        if (vmsdi == null) {
+            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
+            vmsdi.waitForInfoPanel();
+        } else {
+            vmsdi.selectMyself();
+        }
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -130,9 +140,6 @@ final class Storage extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        if (vmsdi != null) {
-            vmsdi.selectMyself();
-        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -142,10 +149,6 @@ final class Storage extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsdi == null) {
-            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-        }
-        vmsdi.waitForInfoPanel();
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE, "file");
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE Disk");
@@ -164,18 +167,13 @@ final class Storage extends VMConfig {
                                      getVMSVirtualDomainInfo().getComboBoxValue(
                                                          VMSXML.VM_PARAM_NAME)
                                      + ".img");
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vmsdi.addWizardParams(
+        vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-            }
-        });
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

@@ -74,8 +74,8 @@ final class HeartbeatInst extends DialogHost {
 
     /** Inits the dialog and starts the installation procedure. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 

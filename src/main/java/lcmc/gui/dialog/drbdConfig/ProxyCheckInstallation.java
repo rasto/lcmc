@@ -98,8 +98,8 @@ final class ProxyCheckInstallation extends DialogHost {
 
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 

@@ -240,7 +240,7 @@ public abstract class DialogHost extends WizardDialog {
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         if (Tools.getConfigData().getAutoOptionHost(autoOption) != null) {
-            Tools.invokeLater(new Runnable() {
+            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     instMethodWi.setSelectedIndex(

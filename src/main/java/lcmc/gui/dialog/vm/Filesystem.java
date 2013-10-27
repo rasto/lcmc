@@ -90,10 +90,20 @@ final class Filesystem extends VMConfig {
         return Tools.getString("Dialog.vm.Filesystem.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        if (vmsfi == null) {
+            vmsfi = getVMSVirtualDomainInfo().addFilesystemPanel();
+            vmsfi.waitForInfoPanel();
+        } else {
+            vmsfi.selectMyself();
+        }
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -115,9 +125,6 @@ final class Filesystem extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        if (vmsfi != null) {
-            vmsfi.selectMyself();
-        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -127,24 +134,15 @@ final class Filesystem extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsfi == null) {
-            vmsfi = getVMSVirtualDomainInfo().addFilesystemPanel();
-        }
-        vmsfi.waitForInfoPanel();
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE, "mount");
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vmsfi.addWizardParams(
+        vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-            }
-        });
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);
         sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));

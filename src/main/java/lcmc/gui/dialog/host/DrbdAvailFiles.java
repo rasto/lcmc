@@ -73,8 +73,8 @@ public class DrbdAvailFiles extends DialogHost {
      * files.
      */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         listenersAdded = false;
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 

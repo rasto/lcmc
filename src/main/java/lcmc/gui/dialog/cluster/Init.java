@@ -203,8 +203,8 @@ public class Init extends DialogCluster {
 
     /** Inits the dialog. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 

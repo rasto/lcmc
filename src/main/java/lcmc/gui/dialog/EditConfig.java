@@ -122,8 +122,8 @@ public final class EditConfig extends ConfigDialog {
 
     /** Inits the dialog and enables all the components. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();
         layout.setAlignment(FlowLayout.RIGHT);

@@ -144,8 +144,8 @@ public final class ConfirmDialog extends ConfigDialog {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
         Tools.invokeLater(new Runnable() {

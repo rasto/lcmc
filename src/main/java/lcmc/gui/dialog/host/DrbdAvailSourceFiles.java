@@ -69,8 +69,8 @@ final class DrbdAvailSourceFiles extends DialogHost {
      * tarballs.
      */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         disableComponents(new JComponent[]{drbdTarballCombo});
     }

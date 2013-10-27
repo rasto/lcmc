@@ -87,6 +87,7 @@ public final class ProgressBar implements ActionListener {
                 final int width,
                 final int height) {
         this.cancelCallback = cancelCallback;
+        Tools.isSwingThread();
         progressBar = new JProgressBar(0, MAX_PB_VALUE);
         progressBar.setPreferredSize(new Dimension(width, height));
         progressBar.setBackground(

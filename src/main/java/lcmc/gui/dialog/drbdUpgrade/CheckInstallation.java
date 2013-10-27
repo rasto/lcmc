@@ -88,8 +88,8 @@ final class CheckInstallation extends DialogHost {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         drbdOk = false;
         final CheckInstallation thisClass = this;
         DRBD_BUTTON.setEnabled(false);

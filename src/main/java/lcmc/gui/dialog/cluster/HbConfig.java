@@ -383,8 +383,8 @@ final class HbConfig extends DialogCluster {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
         configPanel.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background"));

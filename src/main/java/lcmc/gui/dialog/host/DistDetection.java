@@ -49,8 +49,8 @@ final class DistDetection extends DialogHost {
 
     /** Inits dialog and starts the distribution detection. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final String support =
                       Tools.getDistString("Support",

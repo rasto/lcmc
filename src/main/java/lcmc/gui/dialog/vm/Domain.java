@@ -108,8 +108,8 @@ public final class Domain extends VMConfig {
 
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -157,18 +157,13 @@ public final class Domain extends VMConfig {
 
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
         vdi.savePreferredValues();
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vdi.addWizardParams(
-                          optionsPanel,
-                          PARAMS,
-                          buttonClass(nextButton()),
-                          Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                          Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                          null);
-            }
-        });
+        vdi.addWizardParams(
+                      optionsPanel,
+                      PARAMS,
+                      buttonClass(nextButton()),
+                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                      null);
         domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME,
                                      Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);

@@ -273,7 +273,7 @@ public abstract class WizardDialog extends ConfigDialog {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
+    protected void initDialogBeforeVisible() {
         /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();
         layout.setAlignment(FlowLayout.RIGHT);

@@ -147,8 +147,8 @@ public final class SplitBrain extends DrbdConfig {
 
     /** Inits the dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         resolveButton.setBackgroundColor(
                                Tools.getDefaultColor("ConfigDialog.Button"));
     }

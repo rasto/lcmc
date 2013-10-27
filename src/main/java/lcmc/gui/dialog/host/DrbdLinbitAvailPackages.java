@@ -364,8 +364,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Inits dialog and starts the distribution detection. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 

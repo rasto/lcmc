@@ -94,10 +94,20 @@ final class Display extends VMConfig {
         return Tools.getString("Dialog.vm.Display.Description");
     }
 
+    @Override
+    protected void initDialogBeforeCreated() {
+        if (vmsgi == null) {
+            vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
+            vmsgi.waitForInfoPanel();
+        } else {
+            vmsgi.selectMyself();
+        }
+    }
+
     /** Inits dialog. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
@@ -119,9 +129,6 @@ final class Display extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        if (vmsgi != null) {
-            vmsgi.selectMyself();
-        }
         if (inputPane != null) {
             return inputPane;
         }
@@ -131,26 +138,17 @@ final class Display extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        if (vmsgi == null) {
-            vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
-            vmsgi.waitForInfoPanel();
-        }
         vmsgi.savePreferredValues();
         vmsgi.getResource().setValue(GraphicsData.TYPE, "vnc");
         vmsgi.getResource().setValue(GraphicsData.PORT, "auto");
 
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                vmsgi.addWizardParams(
+        vmsgi.addWizardParams(
                       optionsPanel,
                       PARAMS,
                       buttonClass(nextButton()),
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-            }
-        });
 
         panel.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(panel);

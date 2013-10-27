@@ -130,8 +130,8 @@ public class LinbitLogin extends DialogHost {
 
     /** Inits the dialog. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 

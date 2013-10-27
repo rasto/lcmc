@@ -95,8 +95,8 @@ public final class BugReport extends ConfigDialog {
 
     /** Inits the dialog and enables all the components. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         refresh();
         enableComponents();
     }

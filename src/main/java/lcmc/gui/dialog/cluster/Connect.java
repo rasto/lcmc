@@ -126,8 +126,8 @@ final class Connect extends DialogCluster {
 
     /** Inits the dialog and connects the hosts. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 

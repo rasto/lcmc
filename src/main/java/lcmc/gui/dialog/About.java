@@ -41,8 +41,8 @@ public final class About extends ConfigDialog {
 
     /** Inits the dialog and enables all the components. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponents();
     }
 

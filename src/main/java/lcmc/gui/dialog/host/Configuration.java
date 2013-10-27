@@ -250,8 +250,8 @@ public class Configuration extends DialogHost {
 
     /** Inits dialog and starts dns check for every host. */
     @Override
-    protected final void initDialog() {
-        super.initDialog();
+    protected final void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(nextButtons());
     }
 

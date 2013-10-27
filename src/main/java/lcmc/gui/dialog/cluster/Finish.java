@@ -69,8 +69,8 @@ final class Finish extends DialogCluster {
 
     /** Inits dialog and enables the finish button. */
     @Override
-    protected void initDialog() {
-        super.initDialog();
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
                                                buttonClass(finishButton())});
     }
