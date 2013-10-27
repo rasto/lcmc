@@ -375,6 +375,10 @@ public final class Tools {
                 strace.append(e.getStackTrace()[i].toString());
             }
         }
+        if (e.getCause() != null) {
+            strace.append("\n\ncaused by:");
+            strace.append(getStackTrace(e.getCause()));
+        }
         return strace.toString();
     }
 
