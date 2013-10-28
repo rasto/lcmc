@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import java.util.Collections;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
@@ -47,7 +48,6 @@ import java.util.HashMap;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
@@ -57,7 +57,9 @@ import javax.swing.JCheckBox;
 import java.awt.geom.Point2D;
 
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lcmc.utilities.MyButton;
 
 import lcmc.utilities.Logger;
@@ -71,6 +73,13 @@ public final class GroupInfo extends ServiceInfo {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(GroupInfo.class);
+    private final List<ServiceInfo> groupServices =
+                                                  new ArrayList<ServiceInfo>();
+
+    private final ReadWriteLock mGroupServiceLock =
+                                                  new ReentrantReadWriteLock();
+    private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
+    private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
     /** Creates new GroupInfo object. */
     GroupInfo(final ResourceAgent ra, final Browser browser) {
         super(ConfigData.PM_GROUP_NAME, ra, browser);
@@ -311,12 +320,8 @@ public final class GroupInfo extends ServiceInfo {
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = getNode().children();
             final List<String> newOrder = new ArrayList<String>();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+            for (final ServiceInfo child : getGroupServices()) {
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
             applyWhole(dcHost, true, newOrder, testOnly);
@@ -379,30 +384,19 @@ public final class GroupInfo extends ServiceInfo {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                       getHeartbeatId(testOnly),
-                                                       testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo gsi =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-
-                if (gsi != null
-                    && gsi.checkResourceFieldsCorrect(
-                                                    null,
-                                                    gsi.getParametersFromXML(),
-                                                    false,
-                                                    false,
-                                                    true)
-                    && gsi.checkResourceFieldsChanged(
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.checkResourceFieldsCorrect(null,
+                                                 child.getParametersFromXML(),
+                                                 false,
+                                                 false,
+                                                 true)
+                && child.checkResourceFieldsChanged(
                                                 null,
-                                                gsi.getParametersFromXML(),
+                                                child.getParametersFromXML(),
                                                 false,
                                                 false,
                                                 true)) {
-                    gsi.apply(dcHost, testOnly);
-                }
+                child.apply(dcHost, testOnly);
             }
         }
         if (!testOnly) {
@@ -437,6 +431,12 @@ public final class GroupInfo extends ServiceInfo {
         final DefaultMutableTreeNode newServiceNode =
                                    new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
+        mGroupServiceWriteLock.lock();
+        try {
+            groupServices.add(newServiceInfo);
+        } finally {
+            mGroupServiceWriteLock.unlock();
+        }
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
@@ -533,14 +533,8 @@ public final class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                     getHeartbeatId(testOnly),
-                                                     testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                CRM.startResource(dcHost, hbId, testOnly);
-            }
+        for (final ServiceInfo child : getGroupServices()) {
+            CRM.startResource(dcHost, child.getHeartbeatId(testOnly), testOnly);
         }
     }
 
@@ -550,14 +544,8 @@ public final class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                       getHeartbeatId(testOnly),
-                                                       testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                CRM.stopResource(dcHost, hbId, testOnly);
-            }
+        for (final ServiceInfo child : getGroupServices()) {
+            CRM.stopResource(dcHost, child.getHeartbeatId(testOnly), testOnly);
         }
     }
 
@@ -567,19 +555,8 @@ public final class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-
-                final ServiceInfo gsi =
-                                getBrowser().getServiceInfoFromCRMId(hbId);
-                if (gsi != null) {
-                    gsi.cleanupResource(dcHost, testOnly);
-                }
-            }
+        for (final ServiceInfo child : getGroupServices()) {
+            child.cleanupResource(dcHost, testOnly);
         }
     }
 
@@ -591,14 +568,11 @@ public final class GroupInfo extends ServiceInfo {
         if (!testOnly) {
             setUpdated(true);
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                CRM.setManaged(dcHost, hbId, isManaged, testOnly);
-            }
+        for (final ServiceInfo child : getGroupServices()) {
+            CRM.setManaged(dcHost,
+                           child.getHeartbeatId(testOnly),
+                           isManaged,
+                           testOnly);
         }
     }
 
@@ -726,79 +700,68 @@ public final class GroupInfo extends ServiceInfo {
 
         /* group services */
         if (!Tools.getConfigData().isSlow()) {
-            final ClusterStatus cs = getBrowser().getClusterStatus();
-            final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-            if (resources != null) {
-                for (final String hbId : resources) {
-                    final ServiceInfo gsi =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                    if (gsi == null) {
-                        continue;
+            for (final ServiceInfo child : getGroupServices()) {
+                final MyMenu groupServicesMenu = new MyMenu(
+                        child.toString(),
+                        new AccessMode(ConfigData.AccessType.RO, false),
+                        new AccessMode(ConfigData.AccessType.RO, false)) {
+                    private static final long serialVersionUID = 1L;
+                    private final Lock mUpdateLock = new ReentrantLock();
+
+                    @Override
+                    public String enablePredicate() {
+                        return null;
                     }
-                    final MyMenu groupServicesMenu = new MyMenu(
-                            gsi.toString(),
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
-                        private static final long serialVersionUID = 1L;
-                        private final Lock mUpdateLock = new ReentrantLock();
 
-                        @Override
-                        public String enablePredicate() {
-                            return null;
-                        }
-
-                        @Override
-                        public void update() {
-                            final Thread t = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mUpdateLock.tryLock()) {
-                                        try {
-                                            updateThread();
-                                        } finally {
-                                            mUpdateLock.unlock();
-                                        }
+                    @Override
+                    public void update() {
+                        final Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mUpdateLock.tryLock()) {
+                                    try {
+                                        updateThread();
+                                    } finally {
+                                        mUpdateLock.unlock();
                                     }
                                 }
-                            });
-                            t.start();
-                        }
-
-                        public void updateThread() {
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setEnabled(false);
-                                }
-                            });
-                            Tools.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    removeAll();
-                                }
-                            });
-                            final List<UpdatableItem> serviceMenus =
-                                            new ArrayList<UpdatableItem>();
-                            for (final UpdatableItem u : gsi.createPopup()) {
-                                serviceMenus.add(u);
-                                u.update();
                             }
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (final UpdatableItem u
-                                                         : serviceMenus) {
-                                        add((JMenuItem) u);
-                                    }
-                                }
-                            });
-                            super.update();
+                        });
+                        t.start();
+                    }
+
+                    public void updateThread() {
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                setEnabled(false);
+                            }
+                        });
+                        Tools.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                removeAll();
+                            }
+                        });
+                        final List<UpdatableItem> serviceMenus =
+                                        new ArrayList<UpdatableItem>();
+                        for (final UpdatableItem u : child.createPopup()) {
+                            serviceMenus.add(u);
+                            u.update();
                         }
-                    };
-                    items.add((UpdatableItem) groupServicesMenu);
-                }
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (final UpdatableItem u
+                                                     : serviceMenus) {
+                                    add((JMenuItem) u);
+                                }
+                            }
+                        });
+                        super.update();
+                    }
+                };
+                items.add((UpdatableItem) groupServicesMenu);
             }
         }
         return items;
@@ -819,20 +782,13 @@ public final class GroupInfo extends ServiceInfo {
 
         final StringBuilder services = new StringBuilder();
 
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
-        try {
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                services.append(child.toString());
-                if (e.hasMoreElements()) {
-                    services.append(", ");
-                }
+        boolean first = true;
+        for (final ServiceInfo child : getGroupServices()) {
+            if (!first) {
+                services.append(", ");
             }
-        } catch (java.util.NoSuchElementException ele) {
-            LOG.info("removeMyself: removing aborted");
-            return;
+            services.append(child.toString());
+            first = false;
         }
 
         desc  = desc.replaceAll(
@@ -857,21 +813,8 @@ public final class GroupInfo extends ServiceInfo {
 
     @Override
     public void removeInfo() {
-        final DefaultMutableTreeNode node = getNode();
-        if (node == null) {
-            return;
-        }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = node.children();
-        try {
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                child.removeInfo();
-            }
-        } catch (java.util.NoSuchElementException ele) {
-            LOG.info("removeInfo: removing aborted");
-            return;
+        for (final ServiceInfo child : getGroupServices()) {
+            child.removeInfo();
         }
         super.removeInfo();
     }
@@ -882,18 +825,9 @@ public final class GroupInfo extends ServiceInfo {
                                       final boolean testOnly) {
         final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (!testOnly) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = getNode().children();
-            try {
-                while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n = e.nextElement();
-                    final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                    child.getService().setRemoved(true);
-                    children.add(child);
-                }
-            } catch (java.util.NoSuchElementException ele) {
-                LOG.info("removeMyselfNoConfirm: removing aborted");
-                return;
+            for (final ServiceInfo child : getGroupServices()) {
+                child.getService().setRemoved(true);
+                children.add(child);
             }
         }
         if (getService().isNew()) {
@@ -963,21 +897,9 @@ public final class GroupInfo extends ServiceInfo {
         }
         sb.append("</b>");
 
-        final DefaultMutableTreeNode node = getNode();
-        if (node == null) {
-            return sb.toString();
-        }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = node.children();
-        try {
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                sb.append("\n&nbsp;&nbsp;&nbsp;");
-                sb.append(child.getToolTipText(testOnly));
-            }
-        } catch (java.util.NoSuchElementException ele) {
-            /* ignore */
+        for (final ServiceInfo child : getGroupServices()) {
+            sb.append("\n&nbsp;&nbsp;&nbsp;");
+            sb.append(child.getToolTipText(testOnly));
         }
 
         return sb.toString();
@@ -986,17 +908,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services on one of the hosts failed. */
     @Override
     boolean isOneFailed(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                     getHeartbeatId(testOnly),
-                                                     testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo gsi =
-                                   getBrowser().getServiceInfoFromCRMId(hbId);
-                if (gsi != null && gsi.isOneFailed(testOnly)) {
-                    return true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.isOneFailed(testOnly)) {
+                return true;
             }
         }
         return false;
@@ -1005,17 +919,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services on one of the hosts failed. */
     @Override
     boolean isOneFailedCount(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                     getHeartbeatId(testOnly),
-                                                     testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo gsi =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (gsi != null && gsi.isOneFailedCount(testOnly)) {
-                    return true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.isOneFailedCount(testOnly)) {
+                return true;
             }
         }
         return false;
@@ -1024,20 +930,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services failed to start. */
     @Override
     public boolean isFailed(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si == null) {
-                    continue;
-                }
-                if (si.isFailed(testOnly)) {
-                    return true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.isFailed(testOnly)) {
+                return true;
             }
         }
         return false;
@@ -1050,99 +945,87 @@ public final class GroupInfo extends ServiceInfo {
         Subtext prevSubtext = null;
         final Host dcHost = getBrowser().getDCHost();
 
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                     getHeartbeatId(testOnly),
-                                                     testOnly);
-        if (resources != null) {
-            for (final String resId : resources) {
-                final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(resId);
-                if (si == null) {
-                    continue;
-                }
-                final Subtext[] subtexts =
-                                     si.getSubtextsForGraph(testOnly);
+        for (final ServiceInfo child : getGroupServices()) {
+            final Subtext[] subtexts = child.getSubtextsForGraph(testOnly);
 
-                if (subtexts == null || subtexts.length == 0) {
-                    continue;
-                }
-                final Subtext sSubtext = subtexts[0];
-                if (prevSubtext == null
-                    || !sSubtext.getSubtext().equals(
-                                          prevSubtext.getSubtext())) {
-                    texts.add(new Subtext(sSubtext.getSubtext()
-                                          + ":",
-                                          sSubtext.getColor(),
-                                          Color.BLACK));
-                    prevSubtext = sSubtext;
-                }
-                String unmanaged = "";
-                if (!si.isManaged(testOnly)) {
-                    unmanaged = " / unmanaged";
-                }
-                String migrated = "";
-                if (si.getMigratedTo(testOnly) != null
-                    || si.getMigratedFrom(testOnly) != null) {
-                    migrated = " / migrated";
-                }
-                final HbConnectionInfo[] hbcis =
-                              getBrowser().getCRMGraph().getHbConnections(si);
-                String constraintLeft = "";
-                String constraint = "";
-                if (hbcis != null) {
-                    boolean scoreFirst = false;
-                    boolean scoreThen = false;
-                    boolean someConnection = false;
-                    for (final HbConnectionInfo hbci : hbcis) {
-                        if (hbci == null) {
-                            continue;
-                        }
-                        if (!someConnection
-                            && hbci.hasColocationOrOrder(si)) {
-                            someConnection = true;
-                        }
-                        if (!scoreFirst
-                            && !hbci.isOrdScoreNull(si, null)) {
-                            scoreFirst = true;
-                        }
-                        if (!scoreThen
-                            && !hbci.isOrdScoreNull(null, si)) {
-                            scoreThen = true;
-                        }
-                    }
-                    if (someConnection) {
-                        if (scoreFirst || scoreThen) {
-                            if (scoreFirst) {
-                                constraint = " \u2192"; /* -> */
-                            }
-                            if (scoreThen) {
-                                constraintLeft = "\u2192 "; /* -> */
-                            }
-                        } else {
-                            /* just colocation */
-                            constraint = " --"; /* -- */
-                        }
-                    }
-                }
-                texts.add(new Subtext("   "
-                                      + constraintLeft
-                                      + si.toString()
-                                      + unmanaged
-                                      + migrated
-                                      + constraint,
+            if (subtexts == null || subtexts.length == 0) {
+                continue;
+            }
+            final Subtext sSubtext = subtexts[0];
+            if (prevSubtext == null
+                || !sSubtext.getSubtext().equals(
+                                      prevSubtext.getSubtext())) {
+                texts.add(new Subtext(sSubtext.getSubtext()
+                                      + ":",
                                       sSubtext.getColor(),
                                       Color.BLACK));
-                boolean skip = true;
-                for (final Subtext st : subtexts) {
-                    if (skip) {
-                        skip = false;
+                prevSubtext = sSubtext;
+            }
+            String unmanaged = "";
+            if (!child.isManaged(testOnly)) {
+                unmanaged = " / unmanaged";
+            }
+            String migrated = "";
+            if (child.getMigratedTo(testOnly) != null
+                || child.getMigratedFrom(testOnly) != null) {
+                migrated = " / migrated";
+            }
+            final HbConnectionInfo[] hbcis =
+                          getBrowser().getCRMGraph().getHbConnections(child);
+            String constraintLeft = "";
+            String constraint = "";
+            if (hbcis != null) {
+                boolean scoreFirst = false;
+                boolean scoreThen = false;
+                boolean someConnection = false;
+                for (final HbConnectionInfo hbci : hbcis) {
+                    if (hbci == null) {
                         continue;
                     }
-                    texts.add(new Subtext("   " + st.getSubtext(),
-                                          st.getColor(),
-                                          Color.BLACK));
+                    if (!someConnection
+                        && hbci.hasColocationOrOrder(child)) {
+                        someConnection = true;
+                    }
+                    if (!scoreFirst
+                        && !hbci.isOrdScoreNull(child, null)) {
+                        scoreFirst = true;
+                    }
+                    if (!scoreThen
+                        && !hbci.isOrdScoreNull(null, child)) {
+                        scoreThen = true;
+                    }
                 }
+                if (someConnection) {
+                    if (scoreFirst || scoreThen) {
+                        if (scoreFirst) {
+                            constraint = " \u2192"; /* -> */
+                        }
+                        if (scoreThen) {
+                            constraintLeft = "\u2192 "; /* -> */
+                        }
+                    } else {
+                        /* just colocation */
+                        constraint = " --"; /* -- */
+                    }
+                }
+            }
+            texts.add(new Subtext("   "
+                                  + constraintLeft
+                                  + child.toString()
+                                  + unmanaged
+                                  + migrated
+                                  + constraint,
+                                  sSubtext.getColor(),
+                                  Color.BLACK));
+            boolean skip = true;
+            for (final Subtext st : subtexts) {
+                if (skip) {
+                    skip = false;
+                    continue;
+                }
+                texts.add(new Subtext("   " + st.getSubtext(),
+                                      st.getColor(),
+                                      Color.BLACK));
             }
         }
         return texts.toArray(new Subtext[texts.size()]);
@@ -1153,29 +1036,18 @@ public final class GroupInfo extends ServiceInfo {
      */
     @Override
     public List<Host> getMigratedFrom(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
         List<Host> hosts = super.getMigratedFrom(testOnly);
-        if (resources == null) {
+        final List<ServiceInfo> gs = getGroupServices();
+        if (gs.isEmpty()) {
             return null;
-        } else {
-            if (resources.isEmpty()) {
-                return null;
-            }
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null) {
-                    final List<Host> siHosts = si.getMigratedFrom(testOnly);
-                    if (siHosts != null) {
-                        if (hosts == null) {
-                            hosts = new ArrayList<Host>();
-                        }
-                        hosts.addAll(siHosts);
-                    }
+        }
+        for (final ServiceInfo child : gs) {
+            final List<Host> siHosts = child.getMigratedFrom(testOnly);
+            if (siHosts != null) {
+                if (hosts == null) {
+                    hosts = new ArrayList<Host>();
                 }
+                hosts.addAll(siHosts);
             }
         }
         return hosts;
@@ -1184,22 +1056,13 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether at least one service is unmaneged. */
     @Override
     public boolean isManaged(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources == null) {
+        final List<ServiceInfo> gs = getGroupServices();
+        if (gs.isEmpty()) {
             return true;
-        } else {
-            if (resources.isEmpty()) {
-                return true;
-            }
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && !si.isManaged(testOnly)) {
-                    return false;
-                }
+        }
+        for (final ServiceInfo child : gs) {
+            if (!child.isManaged(testOnly)) {
+                return false;
             }
         }
         return true;
@@ -1208,17 +1071,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether all of the services are started. */
     @Override
     boolean isStarted(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && !si.isStarted(testOnly)) {
-                    return false;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (!child.isStarted(testOnly)) {
+                return false;
             }
         }
         return true;
@@ -1227,17 +1082,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns whether one of the services is stopped. */
     @Override
     public boolean isStopped(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && si.isStopped(testOnly)) {
-                    return true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.isStopped(testOnly)) {
+                return true;
             }
         }
         return false;
@@ -1251,17 +1098,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns true if at least one service in the group are running. */
     boolean isOneRunning(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && si.isRunning(testOnly)) {
-                    return true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.isRunning(testOnly)) {
+                return true;
             }
         }
         return false;
@@ -1270,17 +1109,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns true if all services in the group are running. */
     @Override
     public boolean isRunning(final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null && !si.isRunning(testOnly)) {
-                    return false;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (!child.isRunning(testOnly)) {
+                return false;
             }
         }
         return true;
@@ -1306,37 +1137,19 @@ public final class GroupInfo extends ServiceInfo {
                                        final String[] params,
                                        final boolean fromServicesInfo,
                                        final boolean fromCloneInfo) {
-        final DefaultMutableTreeNode gn = getNode();
-        if (gn == null) {
-            return false;
-        }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> se = gn.children();
-        if (!se.hasMoreElements()) {
-            return false;
-        }
         boolean changed = super.checkResourceFieldsChanged(param,
                                                            params,
                                                            fromServicesInfo,
                                                            fromCloneInfo,
                                                            true);
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = gn.children();
-        try {
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-                if (gsi.checkResourceFieldsChanged(
-                                               null,
-                                               gsi.getParametersFromXML(),
-                                               fromServicesInfo,
-                                               fromCloneInfo,
-                                               true)) {
-                    changed = true;
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.checkResourceFieldsChanged(null,
+                                                 child.getParametersFromXML(),
+                                                 fromServicesInfo,
+                                                 fromCloneInfo,
+                                                 true)) {
+                changed = true;
             }
-        } catch (java.util.NoSuchElementException ele) {
-            return false;
         }
         return changed;
     }
@@ -1368,28 +1181,13 @@ public final class GroupInfo extends ServiceInfo {
                                                        fromServicesInfo,
                                                        fromCloneInfo,
                                                        true);
-        final DefaultMutableTreeNode gn = getNode();
-        if (gn != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = gn.children();
-            if (!e.hasMoreElements()) {
-                return false;
-            }
-            try {
-                while (e.hasMoreElements()) {
-                    final DefaultMutableTreeNode n = e.nextElement();
-                    final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-                    if (!gsi.checkResourceFieldsCorrect(
-                                                    null,
-                                                    gsi.getParametersFromXML(),
-                                                    fromServicesInfo,
-                                                    fromCloneInfo,
-                                                    true)) {
-                        cor = false;
-                    }
-                }
-            } catch (java.util.NoSuchElementException ele) {
-                return false;
+        for (final ServiceInfo child : getGroupServices()) {
+            if (!child.checkResourceFieldsCorrect(null,
+                                                  child.getParametersFromXML(),
+                                                  fromServicesInfo,
+                                                  fromCloneInfo,
+                                                  true)) {
+                cor = false;
             }
         }
         return cor;
@@ -1400,18 +1198,8 @@ public final class GroupInfo extends ServiceInfo {
     void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
         if (!Tools.getConfigData().isSlow()) {
-            final ClusterStatus cs = getBrowser().getClusterStatus();
-            final List<String> resources = cs.getGroupResources(
-                                                         getHeartbeatId(false),
-                                                         false);
-            if (resources != null) {
-                for (final String hbId : resources) {
-                    final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                    if (si != null) {
-                        si.updateMenus(pos);
-                    }
-                }
+            for (final ServiceInfo child : getGroupServices()) {
+                child.updateMenus(pos);
             }
         }
     }
@@ -1427,26 +1215,16 @@ public final class GroupInfo extends ServiceInfo {
                         final JCheckBox orderCB,
                         final List<JDialog> popups,
                         final boolean testOnly) {
-        final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                         getHeartbeatId(false),
-                                                         false);
-        if (resources != null) {
-            for (final String hbId : resources) {
-                final ServiceInfo si =
-                                    getBrowser().getServiceInfoFromCRMId(hbId);
-                if (si != null) {
-                    asi.addExistingServiceMenuItem("         " + si.toString(),
-                                                   si,
-                                                   dlm,
-                                                   callbackHash,
-                                                   list,
-                                                   colocationCB,
-                                                   orderCB,
-                                                   popups,
-                                                   testOnly);
-                }
-            }
+        for (final ServiceInfo child : getGroupServices()) {
+            asi.addExistingServiceMenuItem("         " + child.toString(),
+                                           child,
+                                           dlm,
+                                           callbackHash,
+                                           list,
+                                           colocationCB,
+                                           orderCB,
+                                           popups,
+                                           testOnly);
         }
     }
 
@@ -1463,23 +1241,25 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     public void revert() {
         super.revert();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
-        try {
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo gsi = (ServiceInfo) n.getUserObject();
-                if (gsi != null && gsi.checkResourceFieldsChanged(
-                                                  null,
-                                                  gsi.getParametersFromXML(),
-                                                  true,
-                                                  false,
-                                                  false)) {
-                    gsi.revert();
-                }
+        for (final ServiceInfo child : getGroupServices()) {
+            if (child.checkResourceFieldsChanged(null,
+                                                 child.getParametersFromXML(),
+                                                 true,
+                                                 false,
+                                                 false)) {
+                child.revert();
             }
-        } catch (java.util.NoSuchElementException ele) {
-            /* do nothing */
+        }
+    }
+
+    /** Return copy of the group services. */
+    private List<ServiceInfo> getGroupServices() {
+        mGroupServiceReadLock.lock();
+        try {
+            return Collections.unmodifiableList(
+                                    new ArrayList<ServiceInfo>(groupServices));
+        } finally {
+            mGroupServiceReadLock.unlock();
         }
     }
 }
