@@ -2238,8 +2238,7 @@ sub gui_test {
 		if ($ret != 0) {
 			exit $ret;
 		}
-		$status
-		    =~ s/((\d+) Nodes configured)\./$1, $2 expected votes/;
+		$status =~ s/((\d+) Nodes configured)\./$1, $2 expected votes/;
 		$status =~ s/!ONLINE!/Online: [ @o_nodes ]\n/;
 	} else {
 		my $crm_show = 
@@ -2280,6 +2279,7 @@ sub gui_test {
 				"TERM=dumb PATH=\$PATH:/usr/sbin /usr/sbin/crm status|sed 1,6d";
 		}
 		$status = _exec("$crm_status");
+		$status =~ s/((\d+) Nodes configured)$/$1, $2 expected votes/m;
 		$ret = $?;
 		if ($ret != 0) {
 			exit $ret;
