@@ -2230,7 +2230,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             new AccessMode(ConfigData.AccessType.RO, false),
                             new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-                private final Lock mUpdateLock = new ReentrantLock();
 
                 @Override
                 public String enablePredicate() {
@@ -2239,50 +2238,29 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
                 @Override
                 public void update() {
-                    final Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mUpdateLock.tryLock()) {
-                                try {
-                                    updateAndWait();
-                                } finally {
-                                    mUpdateLock.unlock();
-                                }
-                            }
-                        }
-                    });
-                    t.start();
-                }
-
-                public void updateAndWait() {
+                    Tools.isNotSwingThread();
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            setEnabled(false);
+                            updateAndWait();
                         }
                     });
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            removeAll();
-                        }
-                    });
+                }
+
+                public void updateAndWait() {
+                    Tools.isSwingThread();
+                    setEnabled(false);
+                    removeAll();
                     final List<UpdatableItem> volumeMenus =
                                     new ArrayList<UpdatableItem>();
                     for (final UpdatableItem u : dvi.createPopup()) {
                         volumeMenus.add(u);
                         u.update();
                     }
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final UpdatableItem u
-                                                 : volumeMenus) {
-                                add((JMenuItem) u);
-                            }
-                        }
-                    });
-                    super.update();
+                    for (final UpdatableItem u : volumeMenus) {
+                        add((JMenuItem) u);
+                    }
+                    super.updateAndWait();
                 }
             };
             items.add((UpdatableItem) volumesMenu);

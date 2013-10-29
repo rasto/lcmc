@@ -4774,7 +4774,6 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override
             public String enablePredicate() {
@@ -4795,40 +4794,26 @@ public class ServiceInfo extends EditableInfo {
 
             @Override
             public void update() {
-                final Thread t = new Thread(new Runnable() {
+                Tools.isNotSwingThread();
+                Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (mUpdateLock.tryLock()) {
-                            try {
-                                updateAndWait();
-                            } finally {
-                                mUpdateLock.unlock();
-                            }
-                        }
+                        updateAndWait();
                     }
                 });
-                t.start();
             }
 
-            private void updateAndWait() {
+            @Override
+            public void updateAndWait() {
+                Tools.isSwingThread();
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
                 final JCheckBox orderWi = new JCheckBox("Order", true);
                 colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colocationWi.setPreferredSize(colocationWi.getMinimumSize());
                 orderWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 orderWi.setPreferredSize(orderWi.getMinimumSize());
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setEnabled(false);
-                    }
-                });
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+                setEnabled(false);
+                removeAll();
 
                 final MyListModel<MyMenuItem> dlm =
                                                 new MyListModel<MyMenuItem>();
@@ -4871,25 +4856,19 @@ public class ServiceInfo extends EditableInfo {
                 colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colOrdPanel.add(colocationWi);
                 colOrdPanel.add(orderWi);
-                final MyMenu thisM = this;
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean ret =
-                                    Tools.getScrollingMenu(name,
-                                                           colOrdPanel,
-                                                           thisM,
-                                                           dlm,
-                                                           list,
-                                                           thisClass,
-                                                           popups,
-                                                           callbackHash);
-                        if (!ret) {
-                            setEnabled(false);
-                        }
-                    }
-                });
-                super.update();
+                final boolean ret =
+                            Tools.getScrollingMenu(name,
+                                                   colOrdPanel,
+                                                   this,
+                                                   dlm,
+                                                   list,
+                                                   thisClass,
+                                                   popups,
+                                                   callbackHash);
+                if (!ret) {
+                    setEnabled(false);
+                }
+                super.updateAndWait();
             }
         };
     }
@@ -5084,7 +5063,6 @@ public class ServiceInfo extends EditableInfo {
                           new AccessMode(ConfigData.AccessType.ADMIN, false),
                           new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override
             public String enablePredicate() {
@@ -5101,71 +5079,27 @@ public class ServiceInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mUpdateLock.tryLock()) {
-                            try {
-                                updateAndWait();
-                            } finally {
-                                mUpdateLock.unlock();
-                            }
-                        }
-                    }
-                });
-                t.start();
-            }
-
-            private void updateAndWait() {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                       setEnabled(false);
-                    }
-                });
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+            public void updateAndWait() {
+                Tools.isSwingThread();
+                setEnabled(false);
+                removeAll();
                 final Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 final ResourceAgent fsService =
                      crmXML.getResourceAgent("Filesystem",
                                              ResourceAgent.HEARTBEAT_PROVIDER,
                                              ResourceAgent.OCF_CLASS);
-                final MyMenu thisMenu = this;
                 if (crmXML.isLinbitDrbdPresent()) { /* just skip it, if it
                                                        is not */
                     final ResourceAgent linbitDrbdService =
                                                   crmXML.getHbLinbitDrbd();
                     /* Linbit:DRBD */
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            addDrbdLinbitMenu(thisMenu,
-                                              crmXML,
-                                              pos,
-                                              fsService,
-                                              testOnly);
-                        }
-                    });
+                    addDrbdLinbitMenu(this, crmXML, pos, fsService, testOnly);
                 }
                 if (crmXML.isDrbddiskPresent()) { /* just skip it,
                                                      if it is not */
                     /* drbddisk */
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            addDrbddiskMenu(thisMenu,
-                                            crmXML,
-                                            pos,
-                                            fsService,
-                                            testOnly);
-                        }
-                    });
+                    addDrbddiskMenu(this, crmXML, pos, fsService, testOnly);
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                          "IPaddr2",
@@ -5173,27 +5107,11 @@ public class ServiceInfo extends EditableInfo {
                                          ResourceAgent.OCF_CLASS);
                 if (ipService != null) { /* just skip it, if it is not*/
                     /* ipaddr */
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            addIpMenu(thisMenu,
-                                      pos,
-                                      ipService,
-                                      testOnly);
-                        }
-                    });
+                    addIpMenu(this, pos, ipService, testOnly);
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     /* Filesystem */
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            addFilesystemMenu(thisMenu,
-                                              pos,
-                                              fsService,
-                                              testOnly);
-                        }
-                    });
+                    addFilesystemMenu(this, pos, fsService, testOnly);
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -5232,40 +5150,30 @@ public class ServiceInfo extends EditableInfo {
                     final MyListModel<MyMenuItem> dlm =
                                                  new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
-                        Tools.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                addResourceAgentMenu(ra,
-                                                     dlm,
-                                                     pos,
-                                                     popups,
-                                                     colocationWi,
-                                                     orderWi,
-                                                     testOnly);
-                            }
-                        });
+                        addResourceAgentMenu(ra,
+                                             dlm,
+                                             pos,
+                                             popups,
+                                             colocationWi,
+                                             orderWi,
+                                             testOnly);
                     }
-                    Tools.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean ret = Tools.getScrollingMenu(
-                                    ClusterBrowser.getClassMenu(cl),
-                                    colOrdPanel,
-                                    classItem,
-                                    dlm,
-                                    new MyList<MyMenuItem>(dlm,
-                                                           getBackground()),
-                                    thisClass,
-                                    popups,
-                                    null);
-                            if (!ret) {
-                                classItem.setEnabled(false);
-                            }
-                            thisMenu.add(classItem);
-                        }
-                    });
+                    final boolean ret = Tools.getScrollingMenu(
+                            ClusterBrowser.getClassMenu(cl),
+                            colOrdPanel,
+                            classItem,
+                            dlm,
+                            new MyList<MyMenuItem>(dlm,
+                                                   getBackground()),
+                            thisClass,
+                            popups,
+                            null);
+                    if (!ret) {
+                        classItem.setEnabled(false);
+                    }
+                    add(classItem);
                 }
-                super.update();
+                super.updateAndWait();
             }
         };
     }

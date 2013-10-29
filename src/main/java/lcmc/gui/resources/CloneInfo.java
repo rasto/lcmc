@@ -779,7 +779,6 @@ final class CloneInfo extends ServiceInfo {
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     false)) {
             private static final long serialVersionUID = 1L;
-            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override
             public String enablePredicate() {
@@ -787,48 +786,18 @@ final class CloneInfo extends ServiceInfo {
             }
 
             @Override
-            public void update() {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mUpdateLock.tryLock()) {
-                            try {
-                                updateAndWait();
-                            } finally {
-                                mUpdateLock.unlock();
-                            }
-                        }
-                    }
-                });
-                t.start();
-            }
-
-            private void updateAndWait() {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setEnabled(false);
-                    }
-                });
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+            public void updateAndWait() {
+                Tools.isSwingThread();
+                setEnabled(false);
+                removeAll();
                 final ServiceInfo cs0 = containedService;
                 if (cs0 != null) {
                     for (final UpdatableItem u : cs0.createPopup()) {
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                add((JMenuItem) u);
-                                u.update();
-                            }
-                        });
+                        add((JMenuItem) u);
+                        u.updateAndWait();
                     }
                 }
-                super.update();
+                super.updateAndWait();
             }
         };
         items.add((UpdatableItem) csMenu);

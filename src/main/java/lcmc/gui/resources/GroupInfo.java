@@ -587,7 +587,6 @@ public final class GroupInfo extends ServiceInfo {
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override
             public String enablePredicate() {
@@ -599,35 +598,10 @@ public final class GroupInfo extends ServiceInfo {
             }
 
             @Override
-            public void update() {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mUpdateLock.tryLock()) {
-                            try {
-                                updateAndWait();
-                            } finally {
-                                mUpdateLock.unlock();
-                            }
-                        }
-                    }
-                });
-                t.start();
-            }
-
-            private void updateAndWait() {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setEnabled(false);
-                    }
-                });
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+            public void updateAndWait() {
+                Tools.isSwingThread();
+                setEnabled(false);
+                removeAll();
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
@@ -681,15 +655,9 @@ public final class GroupInfo extends ServiceInfo {
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            add(classItem);
-                        }
-                    });
+                    add(classItem);
                 }
-                Tools.waitForSwing();
-                super.update();
+                super.updateAndWait();
             }
         };
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -706,7 +674,6 @@ public final class GroupInfo extends ServiceInfo {
                         new AccessMode(ConfigData.AccessType.RO, false),
                         new AccessMode(ConfigData.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
-                    private final Lock mUpdateLock = new ReentrantLock();
 
                     @Override
                     public String enablePredicate() {
@@ -714,51 +681,20 @@ public final class GroupInfo extends ServiceInfo {
                     }
 
                     @Override
-                    public void update() {
-                        final Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mUpdateLock.tryLock()) {
-                                    try {
-                                        updateAndWait();
-                                    } finally {
-                                        mUpdateLock.unlock();
-                                    }
-                                }
-                            }
-                        });
-                        t.start();
-                    }
-
                     public void updateAndWait() {
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                setEnabled(false);
-                            }
-                        });
-                        Tools.invokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                removeAll();
-                            }
-                        });
+                        Tools.isSwingThread();
+                        setEnabled(false);
+                        removeAll();
                         final List<UpdatableItem> serviceMenus =
                                         new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : child.createPopup()) {
                             serviceMenus.add(u);
-                            u.update();
+                            u.updateAndWait();
                         }
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (final UpdatableItem u
-                                                     : serviceMenus) {
-                                    add((JMenuItem) u);
-                                }
-                            }
-                        });
-                        super.update();
+                        for (final UpdatableItem u : serviceMenus) {
+                            add((JMenuItem) u);
+                        }
+                        super.updateAndWait();
                     }
                 };
                 items.add((UpdatableItem) groupServicesMenu);

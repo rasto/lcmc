@@ -139,12 +139,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         super(text);
         if (shortDesc != null && !"".equals(shortDesc)) {
             toolTip = createToolTip();
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    toolTip.setTipText(shortDesc);
-                }
-            });
+            toolTip.setTipText(shortDesc);
         }
         setNormalFont();
         this.text1 = text;
@@ -268,41 +263,41 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         return true;
     }
 
-    /** Updates the menu item, checking the predicate and enablePredicate. */
     @Override
     public void update() {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                updateAndWait();
+            }
+        });
+    }
+
+    /** Updates the menu item, checking the predicate and enablePredicate. */
+    @Override
+    public void updateAndWait() {
         if (predicate()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                @Override
-                public void run() {
-                    setText(text1);
-                    if (icon1 != null) {
-                        setIcon(icon1);
-                    }
-                    if (toolTip != null
-                        && shortDesc1 != null
-                        && !shortDesc1.equals(text1)) {
-                        origToolTipText = shortDesc1;
-                        toolTip.setTipText(shortDesc1);
-                    }
-                }
-            });
+            setText(text1);
+            if (icon1 != null) {
+                setIcon(icon1);
+            }
+            if (toolTip != null
+                && shortDesc1 != null
+                && !shortDesc1.equals(text1)) {
+                origToolTipText = shortDesc1;
+                toolTip.setTipText(shortDesc1);
+            }
         } else {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                @Override
-                public void run() {
-                    setText(text2);
-                    if (icon1 != null) { /* icon1 is here on purpose */
-                        setIcon(icon2);
-                    }
-                    if (toolTip != null
-                        && shortDesc2 != null
-                        && !shortDesc2.equals(text2)) {
-                        origToolTipText = shortDesc2;
-                        toolTip.setTipText(shortDesc2);
-                    }
-                }
-            });
+            setText(text2);
+            if (icon1 != null) { /* icon1 is here on purpose */
+                setIcon(icon2);
+            }
+            if (toolTip != null
+                && shortDesc2 != null
+                && !shortDesc2.equals(text2)) {
+                origToolTipText = shortDesc2;
+                toolTip.setTipText(shortDesc2);
+            }
         }
         processAccessMode();
     }
@@ -313,43 +308,32 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-                setEnabled(disableTooltip == null && accessible);
-                setVisible(visible
-                           && Tools.getConfigData().isAccessible(
-                                                        visibleAccessMode));
-            }
-        });
+        setEnabled(disableTooltip == null && accessible);
+        setVisible(visible
+                   && Tools.getConfigData().isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                @Override
-                public void run() {
-                    if (!accessible && enableAccessMode.getAccessType()
-                                       != ConfigData.AccessType.NEVER) {
-                        String advanced = "";
-                        if (enableAccessMode.isAdvancedMode()) {
-                            advanced = "Advanced ";
-                        }
-                        setToolTipText0("<html><b>"
-                                        + getText()
-                                        + " (disabled)</b><br>available in \""
-                                        + advanced
-                                        + ConfigData.OP_MODES_MAP.get(
-                                              enableAccessMode.getAccessType())
-                                        + "\" mode</html>");
-                    } else if (disableTooltip != null) {
-                        setToolTipText0("<html><b>"
-                                        + getText()
-                                        + " (disabled)</b><br>"
-                                        + disableTooltip
-                                        + "</html>");
-                    } else if (origToolTipText != null) {
-                        setToolTipText0(origToolTipText);
-                    }
+            if (!accessible && enableAccessMode.getAccessType()
+                               != ConfigData.AccessType.NEVER) {
+                String advanced = "";
+                if (enableAccessMode.isAdvancedMode()) {
+                    advanced = "Advanced ";
                 }
-            });
+                setToolTipText0("<html><b>"
+                                + getText()
+                                + " (disabled)</b><br>available in \""
+                                + advanced
+                                + ConfigData.OP_MODES_MAP.get(
+                                      enableAccessMode.getAccessType())
+                                + "\" mode</html>");
+            } else if (disableTooltip != null) {
+                setToolTipText0("<html><b>"
+                                + getText()
+                                + " (disabled)</b><br>"
+                                + disableTooltip
+                                + "</html>");
+            } else if (origToolTipText != null) {
+                setToolTipText0(origToolTipText);
+            }
         }
     }
 

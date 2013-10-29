@@ -44,12 +44,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     /** Prepares a new <code>MyListModel</code> object. */
     public MyListModel() {
         super();
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                filterField.selectAll();
-            }
-        });
+        filterField.selectAll();
     }
 
     public FilterField getFilterField() {

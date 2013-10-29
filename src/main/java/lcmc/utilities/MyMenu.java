@@ -86,33 +86,32 @@ public class MyMenu extends JMenu implements UpdatableItem {
         return true;
     }
 
+    @Override
+    public void update() {
+        Tools.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                updateAndWait();
+            }
+        });
+    }
+
     /**
      * This function is usually overriden and is called when the menu and its
      * items are to be updated.
      */
     @Override
-    public void update() {
+    public void updateAndWait() {
         processAccessMode();
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final List<Component> copy = new ArrayList<Component>();
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final Component m : getMenuComponents()) {
-                            copy.add(m);
-                        }
-                    }
-                });
-                for (final Component m : copy) {
-                    if (m instanceof UpdatableItem) {
-                        ((UpdatableItem) m).update();
-                    }
-                }
+        final List<Component> copy = new ArrayList<Component>();
+        for (final Component m : getMenuComponents()) {
+            copy.add(m);
+        }
+        for (final Component m : copy) {
+            if (m instanceof UpdatableItem) {
+                ((UpdatableItem) m).updateAndWait();
             }
-        });
-        t.start();
+        }
     }
 
     /** Sets this item enabled and visible according to its access type. */
@@ -120,38 +119,28 @@ public class MyMenu extends JMenu implements UpdatableItem {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-                setEnabled(disableTooltip == null && accessible);
-            }
-        });
+        setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                @Override
-                public void run() {
-                    if (!accessible && enableAccessMode.getAccessType()
-                                       != ConfigData.AccessType.NEVER) {
-                        String advanced = "";
-                        if (enableAccessMode.isAdvancedMode()) {
-                            advanced = "Advanced ";
-                        }
-                        setToolTipText("<html><b>"
-                                       + getText()
-                                       + " (disabled)</b><br>available in \""
-                                       + advanced
-                                       + ConfigData.OP_MODES_MAP.get(
-                                              enableAccessMode.getAccessType())
-                                       + "\" mode</html>");
-                    } else if (disableTooltip != null) {
-                        setToolTipText("<html><b>"
-                                       + getText()
-                                       + " (disabled)</b><br>"
-                                       + disableTooltip
-                                       + "</html>");
-                    }
+            if (!accessible && enableAccessMode.getAccessType()
+                               != ConfigData.AccessType.NEVER) {
+                String advanced = "";
+                if (enableAccessMode.isAdvancedMode()) {
+                    advanced = "Advanced ";
                 }
-            });
+                setToolTipText("<html><b>"
+                               + getText()
+                               + " (disabled)</b><br>available in \""
+                               + advanced
+                               + ConfigData.OP_MODES_MAP.get(
+                                      enableAccessMode.getAccessType())
+                               + "\" mode</html>");
+            } else if (disableTooltip != null) {
+                setToolTipText("<html><b>"
+                               + getText()
+                               + " (disabled)</b><br>"
+                               + disableTooltip
+                               + "</html>");
+            }
         }
     }
 

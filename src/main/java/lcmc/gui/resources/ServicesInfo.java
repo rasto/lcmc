@@ -1315,7 +1315,6 @@ public final class ServicesInfo extends EditableInfo {
                         new AccessMode(ConfigData.AccessType.OP,
                                        false)) {
             private static final long serialVersionUID = 1L;
-            private final Lock mUpdateLock = new ReentrantLock();
 
             @Override
             public String enablePredicate() {
@@ -1329,34 +1328,10 @@ public final class ServicesInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mUpdateLock.tryLock()) {
-                            try {
-                                updateAndWait();
-                            } finally {
-                                mUpdateLock.unlock();
-                            }
-                        }
-                    }
-                });
-                t.start();
-            }
-            private void updateAndWait() {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        setEnabled(false);
-                    }
-                });
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+            public void updateAndWait() {
+                Tools.isSwingThread();
+                setEnabled(false);
+                removeAll();
                 Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 if (crmXML == null) {
@@ -1403,12 +1378,7 @@ public final class ServicesInfo extends EditableInfo {
                         ldMenuItem.setEnabled(false);
                     }
                     ldMenuItem.setPos(pos);
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            add(ldMenuItem);
-                        }
-                    });
+                    add(ldMenuItem);
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                          "IPaddr2",
@@ -1438,12 +1408,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     };
                     ipMenuItem.setPos(pos);
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            add(ipMenuItem);
-                        }
-                    });
+                    add(ipMenuItem);
                 }
                 if (crmXML.isDrbddiskPresent()
                     && (getBrowser().isDrbddiskPreferred()
@@ -1480,12 +1445,7 @@ public final class ServicesInfo extends EditableInfo {
                         ddMenuItem.setEnabled(false);
                     }
                     ddMenuItem.setPos(pos);
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            add(ddMenuItem);
-                        }
-                    });
+                    add(ddMenuItem);
                 }
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -1564,14 +1524,9 @@ public final class ServicesInfo extends EditableInfo {
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            add(classItem);
-                        }
-                    });
+                    add(classItem);
                 }
-                super.update();
+                super.updateAndWait();
             }
         };
         items.add((UpdatableItem) addServiceMenuItem);
