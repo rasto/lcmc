@@ -605,7 +605,7 @@ public final class GroupInfo extends ServiceInfo {
                     public void run() {
                         if (mUpdateLock.tryLock()) {
                             try {
-                                updateThread();
+                                updateAndWait();
                             } finally {
                                 mUpdateLock.unlock();
                             }
@@ -615,7 +615,7 @@ public final class GroupInfo extends ServiceInfo {
                 t.start();
             }
 
-            private void updateThread() {
+            private void updateAndWait() {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -720,7 +720,7 @@ public final class GroupInfo extends ServiceInfo {
                             public void run() {
                                 if (mUpdateLock.tryLock()) {
                                     try {
-                                        updateThread();
+                                        updateAndWait();
                                     } finally {
                                         mUpdateLock.unlock();
                                     }
@@ -730,7 +730,7 @@ public final class GroupInfo extends ServiceInfo {
                         t.start();
                     }
 
-                    public void updateThread() {
+                    public void updateAndWait() {
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {

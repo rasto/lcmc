@@ -2244,7 +2244,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         public void run() {
                             if (mUpdateLock.tryLock()) {
                                 try {
-                                    updateThread();
+                                    updateAndWait();
                                 } finally {
                                     mUpdateLock.unlock();
                                 }
@@ -2254,7 +2254,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                     t.start();
                 }
 
-                public void updateThread() {
+                public void updateAndWait() {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {

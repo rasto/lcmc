@@ -4800,7 +4800,7 @@ public class ServiceInfo extends EditableInfo {
                     public void run() {
                         if (mUpdateLock.tryLock()) {
                             try {
-                                updateThread();
+                                updateAndWait();
                             } finally {
                                 mUpdateLock.unlock();
                             }
@@ -4810,7 +4810,7 @@ public class ServiceInfo extends EditableInfo {
                 t.start();
             }
 
-            private void updateThread() {
+            private void updateAndWait() {
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
                 final JCheckBox orderWi = new JCheckBox("Order", true);
                 colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
@@ -5107,7 +5107,7 @@ public class ServiceInfo extends EditableInfo {
                     public void run() {
                         if (mUpdateLock.tryLock()) {
                             try {
-                                updateThread();
+                                updateAndWait();
                             } finally {
                                 mUpdateLock.unlock();
                             }
@@ -5117,7 +5117,7 @@ public class ServiceInfo extends EditableInfo {
                 t.start();
             }
 
-            private void updateThread() {
+            private void updateAndWait() {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {

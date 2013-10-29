@@ -793,7 +793,7 @@ final class CloneInfo extends ServiceInfo {
                     public void run() {
                         if (mUpdateLock.tryLock()) {
                             try {
-                                updateThread();
+                                updateAndWait();
                             } finally {
                                 mUpdateLock.unlock();
                             }
@@ -803,7 +803,7 @@ final class CloneInfo extends ServiceInfo {
                 t.start();
             }
 
-            private void updateThread() {
+            private void updateAndWait() {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
