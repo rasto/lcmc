@@ -899,12 +899,9 @@ public final class ServicesInfo extends EditableInfo {
                         /* remove the group service from the menu
                            that does not exist anymore. */
                         s.removeInfo();
-                    } else if (!testOnly) {
-                        s.updateMenus(null);
                     }
                 }
             }
-            g.updateMenus(null);
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
