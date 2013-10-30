@@ -71,7 +71,7 @@ public final class RoboTest {
     /** Confirm remove variable. */
     static final boolean CONFIRM_REMOVE = true;
     /** Y position of Primitive/Clone/MS radio buttons. */
-    static final int CLONE_RADIO_Y = 140;
+    static final int CLONE_RADIO_Y = 125;
     /** Host y position. */
     static final int HOST_Y = 100;
     /** Previous position of the mouse. */
