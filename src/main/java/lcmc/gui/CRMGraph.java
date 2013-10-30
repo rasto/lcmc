@@ -58,7 +58,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import javax.swing.JPopupMenu;
 import javax.swing.JMenu;
 import javax.swing.ImageIcon;
 import edu.uci.ics.jung.visualization.Layer;
@@ -750,33 +749,22 @@ public final class CRMGraph extends ResourceGraph {
 
     /** Handles right click on the service vertex and creates popup menu. */
     @Override
-    protected JPopupMenu handlePopupVertex(final Vertex v,
-                                           final List<Vertex> pickedV,
-                                           final Point2D p) {
+    protected void handlePopupVertex(final Vertex v,
+                                     final List<Vertex> pickedV,
+                                     final Point2D pos) {
+        Info info = null;
         if (pickedV.size() > 1) {
-            final Info msi = multiSelectionInfo;
-            if (msi != null) {
-                return msi.getPopup();
-            }
-        }
-        if (vertexToHostMap.containsKey(v)) {
-            final HostInfo hi = (HostInfo) getInfo(v);
-            if (hi == null) {
-                return null;
-            }
-            return hi.getPopup(p);
+            info = multiSelectionInfo;
+        } else if (vertexToHostMap.containsKey(v)) {
+            info = getInfo(v);
         } else if (vertexToConstraintPHMap.containsKey(v)) {
-            final ConstraintPHInfo cphi = vertexToConstraintPHMap.get(v);
-            if (cphi == null) {
-                return null;
-            }
-            return cphi.getPopup(p);
+            info = vertexToConstraintPHMap.get(v);
         } else {
-            final ServiceInfo si = (ServiceInfo) getInfo(v);
-            if (si == null) {
-                return null;
-            }
-            return si.getPopup(p);
+            info = (ServiceInfo) getInfo(v);
+        }
+        if (info != null) {
+            showPopup(info.getPopup(), pos);
+            info.updateMenus(pos);
         }
     }
 
@@ -834,20 +822,22 @@ public final class CRMGraph extends ResourceGraph {
 
     /** Handles right click on the edge and creates popup menu. */
     @Override
-    protected JPopupMenu handlePopupEdge(final Edge edge) {
+    protected void handlePopupEdge(final Edge edge, final Point2D pos) {
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+        final HbConnectionInfo info = edgeToHbconnectionMap.get(edge);
         mHbConnectionReadLock.unlock();
-        if (hbci == null) {
-            return null;
+        if (info != null) {
+            showPopup(info.getPopup(), pos);
+            info.updateMenus(pos);
         }
-        return hbci.getPopup();
     }
 
     /** Handles right click on the background and creates popup menu. */
     @Override
-    protected JPopupMenu handlePopupBackground(final Point2D pos) {
-        return getClusterBrowser().getServicesInfo().getPopup(pos);
+    protected void handlePopupBackground(final Point2D pos) {
+        final Info info = getClusterBrowser().getServicesInfo();
+        showPopup(info.getPopup(), pos);
+        info.updateMenus(pos);
     }
 
     /**

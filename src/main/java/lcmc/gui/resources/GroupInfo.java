@@ -58,7 +58,6 @@ import java.awt.geom.Point2D;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lcmc.utilities.MyButton;
 
@@ -600,7 +599,6 @@ public final class GroupInfo extends ServiceInfo {
             @Override
             public void updateAndWait() {
                 Tools.isSwingThread();
-                setEnabled(false);
                 removeAll();
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
@@ -683,7 +681,6 @@ public final class GroupInfo extends ServiceInfo {
                     @Override
                     public void updateAndWait() {
                         Tools.isSwingThread();
-                        setEnabled(false);
                         removeAll();
                         final List<UpdatableItem> serviceMenus =
                                         new ArrayList<UpdatableItem>();
@@ -1131,7 +1128,7 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Update menus with positions and calles their update methods. */
     @Override
-    void updateMenus(final Point2D pos) {
+    public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
         if (!Tools.getConfigData().isSlow()) {
             for (final ServiceInfo child : getGroupServices()) {

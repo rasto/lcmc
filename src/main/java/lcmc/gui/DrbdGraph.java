@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
-import javax.swing.JPopupMenu;
 import javax.swing.ImageIcon;
 
 /**
@@ -561,28 +560,21 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Handles popup in when block device vertex is clicked. */
     @Override
-    protected JPopupMenu handlePopupVertex(final Vertex v,
-                                           final List<Vertex> pickedV,
-                                           final Point2D p) {
+    protected void handlePopupVertex(final Vertex v,
+                                     final List<Vertex> pickedV,
+                                     final Point2D pos) {
+        Info info = null;
         if (pickedV.size() > 1) {
-            final Info msi = multiSelectionInfo;
-            if (msi != null) {
-                return msi.getPopup();
-            }
-        }
-        if (isVertexBlockDevice(v)) {
-            final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
-            if (bdi == null) {
-                return null;
-            }
-            return bdi.getPopup();
+            info = multiSelectionInfo;
+        } else if (isVertexBlockDevice(v)) {
+            info = getInfo(v);
         } else {
             /* host */
-            final HostDrbdInfo hi = (HostDrbdInfo) getInfo(v);
-            if (hi == null) {
-                return null;
-            }
-            return hi.getPopup();
+            info = (HostDrbdInfo) getInfo(v);
+        }
+        if (info != null) {
+            showPopup(info.getPopup(), pos);
+            info.updateMenus(pos);
         }
     }
 
@@ -640,9 +632,10 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Is called after right click on the resource edge. */
     @Override
-    protected JPopupMenu handlePopupEdge(final Edge edge) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
-        return dvi.getPopup();
+    protected void handlePopupEdge(final Edge edge, final Point2D pos) {
+        final DrbdVolumeInfo info = edgeToDrbdVolumeMap.get(edge);
+        showPopup(info.getPopup(), pos);
+        info.updateMenus(pos);
     }
 
 
@@ -651,8 +644,10 @@ public final class DrbdGraph extends ResourceGraph {
      * background popup menu.
      */
     @Override
-    protected JPopupMenu handlePopupBackground(final Point2D pos) {
-        return getDrbdInfo().getPopup(pos);
+    protected void handlePopupBackground(final Point2D pos) {
+        final DrbdInfo info = getDrbdInfo();
+        showPopup(info.getPopup(), pos);
+        info.updateMenus(pos);
     }
 
     ///**

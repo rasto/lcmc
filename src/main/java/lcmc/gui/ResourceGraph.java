@@ -859,9 +859,9 @@ public abstract class ResourceGraph {
     }
 
     /** Handles right click on the vertex. */
-    protected abstract JPopupMenu handlePopupVertex(final Vertex vertex,
-                                                    final List<Vertex> pickedV,
-                                                    final Point2D p);
+    protected abstract void handlePopupVertex(final Vertex vertex,
+                                              final List<Vertex> pickedV,
+                                              final Point2D p);
 
     /** Adds popup menu item for vertex. */
     final void addPopupItem(final Vertex v, final MyMenuItem item) {
@@ -874,12 +874,10 @@ public abstract class ResourceGraph {
     }
 
     /** Handles right click on the edge. */
-    protected abstract JPopupMenu handlePopupEdge(final Edge edge);
+    protected abstract void handlePopupEdge(final Edge edge, final Point2D pos);
 
     /** Handles right click on the background. */
-    protected JPopupMenu handlePopupBackground(final Point2D pos) {
-        return null;
-    }
+    protected abstract void handlePopupBackground(final Point2D pos);
 
     /** Updates all popup menus. */
     public final void updatePopupMenus() {
@@ -902,7 +900,7 @@ public abstract class ResourceGraph {
         final List<MyMenuItem> menus = edgeToMenus.get(edge);
         if (menus != null) {
             for (final MyMenuItem menu : menus) {
-                menu.update();
+                menu.updateAndWait();
             }
         }
     }
@@ -988,65 +986,15 @@ public abstract class ResourceGraph {
                                                               posY);
                         if (edge == null) {
                             /* background was clicked */
-                            final JPopupMenu backgroundPopup =
-                                                  handlePopupBackground(popP);
-                            if (backgroundPopup != null) {
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!vv.isShowing()
-                                            || !vv.isDisplayable()) {
-                                            return;
-                                        }
-                                        backgroundPopup.show(vv, posX, posY);
-                                    }
-                                });
-                            }
+                            handlePopupBackground(popP);
                             backgroundClicked();
                         } else {
-                            final JPopupMenu edgePopup = handlePopupEdge(edge);
-                            if (edgePopup != null) {
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!vv.isShowing()
-                                            || !vv.isDisplayable()) {
-                                            return;
-                                        }
-                                        edgePopup.show(vv, posX, posY);
-                                    }
-                                });
-                            }
+                            handlePopupEdge(edge, popP);
                             oneEdgePressed(edge);
                         }
                     } else {
                         final List<Vertex> pickedV = getPickedVertices();
-                        final JPopupMenu vertexPopup =
-                                           handlePopupVertex(v, pickedV, popP);
-                        if (vertexPopup != null) {
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!vv.isShowing()
-                                        || !vv.isDisplayable()) {
-                                        return;
-                                    }
-                                    vertexPopup.show(vv, posX, posY);
-                                    //Tools.invokeLater(new Runnable() {
-                                    //    @Override
-                                    //    public void run() {
-                                    //        vertexPopup.pack();
-                                    //    }
-                                    //});
-                                }
-                            });
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    vertexPopup.pack();
-                                }
-                            });
-                        }
+                        handlePopupVertex(v, pickedV, popP);
                         if (pickedV.size() < 2) {
                             oneVertexPressed(v); /* select this vertex */
                         }
@@ -1055,6 +1003,20 @@ public abstract class ResourceGraph {
             });
             thread.start();
         }
+    }
+
+    final protected void showPopup(final JPopupMenu popup, final Point2D p) {
+        final int posX = (int) p.getX();
+        final int posY = (int) p.getY();
+        Tools.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                if (vv.isShowing() && vv.isDisplayable()) {
+                    popup.show(vv, posX, posY);
+                    popup.repaint();
+                }
+            }
+        });
     }
 
     /** Removes info from the graph. */

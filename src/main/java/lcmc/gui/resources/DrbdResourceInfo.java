@@ -71,8 +71,6 @@ import javax.swing.SpringLayout;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.Lock;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -2237,25 +2235,14 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 }
 
                 @Override
-                public void update() {
-                    Tools.isNotSwingThread();
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateAndWait();
-                        }
-                    });
-                }
-
                 public void updateAndWait() {
                     Tools.isSwingThread();
-                    setEnabled(false);
                     removeAll();
                     final List<UpdatableItem> volumeMenus =
                                     new ArrayList<UpdatableItem>();
                     for (final UpdatableItem u : dvi.createPopup()) {
                         volumeMenus.add(u);
-                        u.update();
+                        u.updateAndWait();
                     }
                     for (final UpdatableItem u : volumeMenus) {
                         add((JMenuItem) u);

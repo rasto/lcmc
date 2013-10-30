@@ -4793,17 +4793,6 @@ public class ServiceInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
-                Tools.isNotSwingThread();
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateAndWait();
-                    }
-                });
-            }
-
-            @Override
             public void updateAndWait() {
                 Tools.isSwingThread();
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
@@ -5081,7 +5070,6 @@ public class ServiceInfo extends EditableInfo {
             @Override
             public void updateAndWait() {
                 Tools.isSwingThread();
-                setEnabled(false);
                 removeAll();
                 final Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
@@ -5649,8 +5637,9 @@ public class ServiceInfo extends EditableInfo {
                 return null; //TODO: enable only if it has items
             }
             @Override
-            public void update() {
-                super.update();
+            public void updateAndWait() {
+                super.updateAndWait();
+                Tools.isSwingThread();
                 final MyMenu self = this;
                 Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                     @Override

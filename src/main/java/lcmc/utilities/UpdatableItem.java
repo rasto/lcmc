@@ -31,10 +31,10 @@ import java.awt.geom.Point2D;
 public interface UpdatableItem {
     /** Position of the click on the graph when menu item appeared. */
     void setPos(Point2D pos);
-    /** Update function. */
-    void update();
     /** Update (not in EDT). */
     void updateAndWait();
     /** Cleanup the item. */
     void cleanup();
+
+    void setEnabled(boolean enable);
 }

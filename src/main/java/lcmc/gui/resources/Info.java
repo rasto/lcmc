@@ -33,6 +33,7 @@ import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyCellRenderer;
 import lcmc.utilities.MyButtonCellRenderer;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.MyMenu;
 
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
@@ -495,6 +496,7 @@ public class Info implements Comparable<Info> {
                             pm.show(c, x, y);
                         }
                     });
+                    updateMenus(null);
                 }
             }
         });
@@ -532,63 +534,26 @@ public class Info implements Comparable<Info> {
      */
     public final JPopupMenu getPopup() {
         mPopupLock.lock();
-        if (popup == null) {
-            final List<UpdatableItem> items = createPopup();
-            if (items != null) {
-                registerAllMenuItems(items);
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        popup = new JPopupMenu();
-                    }
-                });
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final UpdatableItem u : items) {
-                            popup.add((JMenuItem) u);
+        try {
+            Tools.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    if (popup == null) {
+                        final List<UpdatableItem> items = createPopup();
+                        if (items != null) {
+                            registerAllMenuItems(items);
+                            popup = new JPopupMenu();
+                            for (final UpdatableItem u : items) {
+                                popup.add((JMenuItem) u);
+                            }
                         }
                     }
-                });
-            }
-        }
-        final JPopupMenu popup0 = popup;
-        mPopupLock.unlock();
-        if (popup0 != null) {
-            updateMenus(null);
-        }
-        return popup0;
-    }
-
-    /** Returns popup on the spefified position. */
-    public final JPopupMenu getPopup(final Point2D pos) {
-        mPopupLock.lock();
-        if (popup == null) {
-            final List<UpdatableItem> items = createPopup();
-            if (items != null) {
-                registerAllMenuItems(items);
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        popup = new JPopupMenu();
-                    }
-                });
-                for (final UpdatableItem u : items) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            popup.add((JMenuItem) u);
-                        }
-                    });
                 }
-            }
+            });
+            return popup;
+        } finally {
+            mPopupLock.unlock();
         }
-        final JPopupMenu popup0 = popup;
-        mPopupLock.unlock();
-        if (popup0 != null) {
-            updateMenus(pos);
-        }
-        return popup0;
     }
 
     /** Adds listener that deselects the toggle button, when the popup menu
@@ -670,6 +635,7 @@ public class Info implements Comparable<Info> {
                                             showPopup(pm, b);
                                         }
                                     });
+                                    updateMenus(null);
                                 }
                             }
                         });
@@ -697,7 +663,8 @@ public class Info implements Comparable<Info> {
     }
 
     /** Update menus with positions and calles their update methods. */
-    void updateMenus(final Point2D pos) {
+    public void updateMenus(final Point2D pos) {
+        Tools.isNotSwingThread();
         mMenuListLock.lock();
         if (menuList == null) {
             mMenuListLock.unlock();
@@ -705,9 +672,28 @@ public class Info implements Comparable<Info> {
             final List<UpdatableItem> menuListCopy =
                                        new ArrayList<UpdatableItem>(menuList);
             mMenuListLock.unlock();
+            Tools.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    for (final UpdatableItem i : menuListCopy) {
+                        i.setPos(pos);
+                        if (i instanceof MyMenu) {
+                            i.setEnabled(false);
+                        } else {
+                            i.updateAndWait();
+                        }
+                    }
+                }
+            });
             for (final UpdatableItem i : menuListCopy) {
-                i.setPos(pos);
-                i.update();
+                if (i instanceof MyMenu) {
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            i.updateAndWait();
+                        }
+                    });
+                }
             }
             final int size = menuListCopy.size();
             if (size > maxMenuList) {

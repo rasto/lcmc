@@ -103,12 +103,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                toolTip.setTipText(text);
-            }
-        });
+        toolTip.setTipText(text);
         setNormalFont();
         addActionListener(this);
         Robot r = null;
@@ -118,6 +113,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
+        processAccessMode();
+        setIconAndTooltip();
+        Tools.isSwingThread();
     }
 
 
@@ -159,6 +157,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
             LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
+        processAccessMode();
+        setIconAndTooltip();
+        Tools.isSwingThread();
     }
 
     /**
@@ -194,6 +195,8 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         } else {
             this.shortDesc2 = shortDesc2;
         }
+        processAccessMode();
+        setIconAndTooltip();
     }
 
     /**
@@ -263,19 +266,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         return true;
     }
 
-    @Override
-    public void update() {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-                updateAndWait();
-            }
-        });
-    }
-
     /** Updates the menu item, checking the predicate and enablePredicate. */
     @Override
     public void updateAndWait() {
+        processAccessMode();
+        setIconAndTooltip();
+    }
+
+    private void setIconAndTooltip() {
         if (predicate()) {
             setText(text1);
             if (icon1 != null) {
@@ -299,7 +297,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                 toolTip.setTipText(shortDesc2);
             }
         }
-        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */

@@ -1008,8 +1008,8 @@ public final class HostInfo extends Info {
             }
 
             @Override
-            public void update() {
-                super.update();
+            public void updateAndWait() {
+                super.updateAndWait();
                 getBrowser().addAdvancedMenu(this);
             }
         };

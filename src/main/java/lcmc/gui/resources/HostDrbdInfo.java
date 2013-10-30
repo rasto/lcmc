@@ -862,8 +862,8 @@ public final class HostDrbdInfo extends Info {
             }
 
             @Override
-            public void update() {
-                super.update();
+            public void updateAndWait() {
+                super.updateAndWait();
                 getBrowser().addAdvancedMenu(this);
             }
         };
@@ -884,8 +884,8 @@ public final class HostDrbdInfo extends Info {
             }
 
             @Override
-            public void update() {
-                super.update();
+            public void updateAndWait() {
+                super.updateAndWait();
                 addLVMMenu(this);
             }
         };
@@ -986,9 +986,9 @@ public final class HostDrbdInfo extends Info {
             }
 
             @Override
-            public void update() {
+            public void updateAndWait() {
                 setText1(LV_CREATE_MENU_ITEM + volumeGroup);
-                super.update();
+                super.updateAndWait();
             }
         };
 

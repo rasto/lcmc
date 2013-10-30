@@ -52,8 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class holds clone service info object.
@@ -788,7 +786,6 @@ final class CloneInfo extends ServiceInfo {
             @Override
             public void updateAndWait() {
                 Tools.isSwingThread();
-                setEnabled(false);
                 removeAll();
                 final ServiceInfo cs0 = containedService;
                 if (cs0 != null) {
@@ -816,7 +813,7 @@ final class CloneInfo extends ServiceInfo {
 
     /** Update menus with positions and calles their update methods. */
     @Override
-    void updateMenus(final Point2D pos) {
+    public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
         final ServiceInfo cs = containedService;
         if (cs != null) {

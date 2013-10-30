@@ -69,8 +69,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JDialog;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import lcmc.EditClusterDialog;
 
 import lcmc.utilities.Logger;
@@ -1330,7 +1328,6 @@ public final class ServicesInfo extends EditableInfo {
             @Override
             public void updateAndWait() {
                 Tools.isSwingThread();
-                setEnabled(false);
                 removeAll();
                 Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();

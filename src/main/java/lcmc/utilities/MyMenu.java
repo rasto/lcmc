@@ -86,15 +86,15 @@ public class MyMenu extends JMenu implements UpdatableItem {
         return true;
     }
 
-    @Override
-    public void update() {
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                updateAndWait();
-            }
-        });
-    }
+    //@Override
+    //public void update() {
+    //    Tools.invokeAndWait(new Runnable() {
+    //        @Override
+    //        public void run() {
+    //            updateAndWait();
+    //        }
+    //    });
+    //}
 
     /**
      * This function is usually overriden and is called when the menu and its
@@ -102,7 +102,6 @@ public class MyMenu extends JMenu implements UpdatableItem {
      */
     @Override
     public void updateAndWait() {
-        processAccessMode();
         final List<Component> copy = new ArrayList<Component>();
         for (final Component m : getMenuComponents()) {
             copy.add(m);
@@ -112,6 +111,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
                 ((UpdatableItem) m).updateAndWait();
             }
         }
+        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */

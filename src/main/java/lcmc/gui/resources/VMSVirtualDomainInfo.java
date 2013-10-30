@@ -2764,13 +2764,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                    }
-                });
+            public void updateAndWait() {
+                removeAll();
                 final Point2D pos = getPos();
                 /* disk */
                 final MyMenuItem newDiskMenuItem = new MyMenuItem(
@@ -2915,7 +2910,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 };
                 newVideosMenuItem.setPos(pos);
                 add(newVideosMenuItem);
-                super.update();
+                super.updateAndWait();
             }
         };
     }

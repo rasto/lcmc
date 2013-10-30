@@ -615,10 +615,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
 
                 @Override
-                public void update() {
+                public void updateAndWait() {
                     setText1(LV_CREATE_MENU_ITEM
                              + bdis.iterator().next().getVGName());
-                    super.update();
+                    super.updateAndWait();
                 }
             };
             mis.add(mi);

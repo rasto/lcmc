@@ -1502,9 +1502,9 @@ public final class BlockDevInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
+            public void updateAndWait() {
                 setText1(LV_CREATE_MENU_ITEM + thisClass.getVGName());
-                super.update();
+                super.updateAndWait();
             }
         };
         mi.setToolTipText(LV_CREATE_MENU_DESCRIPTION);
@@ -1665,8 +1665,8 @@ public final class BlockDevInfo extends EditableInfo {
             }
 
             @Override
-            public void update() {
-                super.update();
+            public void updateAndWait() {
+                super.updateAndWait();
                 Cluster cluster = getHost().getCluster();
                 Host[] otherHosts = cluster.getHostsArray();
                 final List<MyMenu> hostMenus = new ArrayList<MyMenu>();
@@ -1706,14 +1706,9 @@ public final class BlockDevInfo extends EditableInfo {
                         }
 
                         @Override
-                        public void update() {
-                            super.update();
-                            Tools.invokeAndWait(new Runnable() {
-                                @Override
-                                public void run() {
-                                    removeAll();
-                                }
-                            });
+                        public void updateAndWait() {
+                            super.updateAndWait();
+                            removeAll();
                             Set<BlockDevInfo> blockDevInfos =
                                         oHost.getBrowser().getBlockDevInfos();
                             List<BlockDevInfo> blockDevInfosS =
@@ -1740,18 +1735,13 @@ public final class BlockDevInfo extends EditableInfo {
                             }
                         }
                     };
-                    hostMenu.update();
+                    hostMenu.updateAndWait();
                     hostMenus.add(hostMenu);
                 }
-                Tools.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
-                        for (final MyMenu hostMenu : hostMenus) {
-                            add(hostMenu);
-                        }
-                    }
-                });
+                removeAll();
+                for (final MyMenu hostMenu : hostMenus) {
+                    add(hostMenu);
+                }
             }
         };
         items.add(repMenuItem);
