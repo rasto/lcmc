@@ -136,45 +136,36 @@ public final class VGCreate extends LV {
                 break;
             }
         }
-        Tools.invokeLater(new EnableCreateRunnable(enable));
+        enableCreateButton(enable);
     }
 
-    private class EnableCreateRunnable implements Runnable {
-        private final boolean enable;
-        public EnableCreateRunnable(final boolean enable) {
-            super();
-            this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            boolean e = enable;
-            if (enable) {
-                boolean vgNameCorrect = true;
-                if ("".equals(vgNameWi.getStringValue())) {
-                    vgNameCorrect = false;
-                } else if (hostCheckBoxes != null) {
-                    for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            final Set<String> vgs =
-                                h.getVolumeGroupNames();
-                            if (vgs != null && vgs.contains(
-                                            vgNameWi.getStringValue())) {
-                                vgNameCorrect = false;
-                                break;
-                            }
+    /** Enable create button. */
+    private void enableCreateButton(boolean enable) {
+        if (enable) {
+            boolean vgNameCorrect = true;
+            if ("".equals(vgNameWi.getStringValue())) {
+                vgNameCorrect = false;
+            } else if (hostCheckBoxes != null) {
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
+                        final Set<String> vgs =
+                            h.getVolumeGroupNames();
+                        if (vgs != null && vgs.contains(
+                                        vgNameWi.getStringValue())) {
+                            vgNameCorrect = false;
+                            break;
                         }
                     }
                 }
-                if (vgNameCorrect) {
-                    vgNameWi.setBackground("", "", true);
-                } else {
-                    e = false;
-                    vgNameWi.wrongValue();
-                }
             }
-            createButton.setEnabled(e);
+            if (vgNameCorrect) {
+                vgNameWi.setBackground("", "", true);
+            } else {
+                enable = false;
+                vgNameWi.wrongValue();
+            }
         }
+        createButton.setEnabled(enable);
     }
 
     /** Returns array of volume group checkboxes. */
@@ -371,7 +362,13 @@ public final class VGCreate extends LV {
     private class CreateRunnable implements Runnable {
         @Override
         public void run() {
-            Tools.invokeAndWait(new EnableCreateRunnable(false));
+            Tools.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    enableCreateButton(false);
+                }
+            });
+                    
             disableComponents();
             getProgressBar().start(CREATE_TIMEOUT
                                    * hostCheckBoxes.size());
@@ -396,7 +393,12 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h);
                 }
-                checkButtons();
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkButtons();
+                    }
+                });
                 progressBarDoneError();
             } else {
                 progressBarDone();

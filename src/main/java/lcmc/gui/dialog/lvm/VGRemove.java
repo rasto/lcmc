@@ -117,25 +117,6 @@ public final class VGRemove extends LV {
         makeDefaultAndRequestFocus(removeButton);
     }
 
-    /** Enables and disabled buttons. */
-    protected void checkButtons() {
-        Tools.invokeLater(new EnableRemoveRunnable(true));
-    }
-
-    private class EnableRemoveRunnable implements Runnable {
-        private final boolean enable;
-        public EnableRemoveRunnable(final boolean enable) {
-            super();
-            this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            final boolean e = enable;
-            removeButton.setEnabled(e);
-        }
-    }
-
     private String getVGName(final BlockDevInfo bdi) {
         if (bdi.getBlockDevice().isDrbd()) {
             return bdi.getBlockDevice().getDrbdBlockDevice()
@@ -244,7 +225,7 @@ public final class VGRemove extends LV {
         SpringUtilities.makeCompactGrid(pane, 5, 1,  /* rows, cols */
                                               0, 0,  /* initX, initY */
                                               0, 0); /* xPad, yPad */
-        checkButtons();
+        removeButton.setEnabled(true);
         return pane;
     }
 
@@ -255,7 +236,12 @@ public final class VGRemove extends LV {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Tools.invokeAndWait(new EnableRemoveRunnable(false));
+                    Tools.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            removeButton.setEnabled(false);
+                        }
+                    });
                     disableComponents();
                     getProgressBar().start(REMOVE_TIMEOUT
                                            * hostCheckBoxes.size());
@@ -293,7 +279,12 @@ public final class VGRemove extends LV {
                     }
                     enableComponents();
                     if (oneFailed) {
-                        checkButtons();
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                removeButton.setEnabled(true);
+                            }
+                        });
                         progressBarDoneError();
                     } else {
                         progressBarDone();
@@ -335,7 +326,7 @@ public final class VGRemove extends LV {
         @Override
         public void itemStateChanged(final ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED || onDeselect) {
-                checkButtons();
+                removeButton.setEnabled(true);
             }
         }
     }

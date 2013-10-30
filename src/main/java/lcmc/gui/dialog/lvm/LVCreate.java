@@ -141,59 +141,51 @@ public final class LVCreate extends LV {
 
     /** Enables and disabled buttons. */
     protected void checkButtons() {
-        Tools.invokeLater(new EnableCreateRunnable(true));
+        enableCreateButton(true);
     }
 
-    private class EnableCreateRunnable implements Runnable {
-        private final boolean enable;
-        public EnableCreateRunnable(final boolean enable) {
-            super();
-            this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            boolean e = enable;
-            if (enable) {
-                final String maxBlockSize = getMaxBlockSize(
-                                                     getSelectedHostCbs());
-                final long maxSize = Long.parseLong(maxBlockSize);
-                maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
-                final long size = Tools.convertToKilobytes(
-                                                  sizeWi.getStringValue());
-                if (size > maxSize || size <= 0) {
-                    e = false;
-                    sizeWi.wrongValue();
-                } else {
-                    sizeWi.setBackground("", "", true);
-                }
-                boolean lvNameCorrect = true;
-                if ("".equals(lvNameWi.getStringValue())) {
-                    lvNameCorrect = false;
-                } else if (hostCheckBoxes != null) {
-                    for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            final Set<String> lvs =
-                                h.getLogicalVolumesFromVolumeGroup(
-                                                              volumeGroup);
-                            if (lvs != null
-                                && lvs.contains(
-                                        lvNameWi.getStringValue())) {
-                                lvNameCorrect = false;
-                                break;
-                            }
+    /** Enable create button. */
+    private void enableCreateButton(boolean enable) {
+        Tools.isSwingThread();
+        if (enable) {
+            final String maxBlockSize = getMaxBlockSize(
+                                                 getSelectedHostCbs());
+            final long maxSize = Long.parseLong(maxBlockSize);
+            maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
+            final long size = Tools.convertToKilobytes(
+                                              sizeWi.getStringValue());
+            if (size > maxSize || size <= 0) {
+                enable = false;
+                sizeWi.wrongValue();
+            } else {
+                sizeWi.setBackground("", "", true);
+            }
+            boolean lvNameCorrect = true;
+            if ("".equals(lvNameWi.getStringValue())) {
+                lvNameCorrect = false;
+            } else if (hostCheckBoxes != null) {
+                for (final Host h : hostCheckBoxes.keySet()) {
+                    if (hostCheckBoxes.get(h).isSelected()) {
+                        final Set<String> lvs =
+                            h.getLogicalVolumesFromVolumeGroup(
+                                                          volumeGroup);
+                        if (lvs != null
+                            && lvs.contains(
+                                    lvNameWi.getStringValue())) {
+                            lvNameCorrect = false;
+                            break;
                         }
                     }
                 }
-                if (lvNameCorrect) {
-                    lvNameWi.setBackground("", "", true);
-                } else {
-                    e = false;
-                    lvNameWi.wrongValue();
-                }
             }
-            createButton.setEnabled(e);
+            if (lvNameCorrect) {
+                lvNameWi.setBackground("", "", true);
+            } else {
+                enable = false;
+                lvNameWi.wrongValue();
+            }
         }
+        createButton.setEnabled(enable);
     }
 
     /** Returns the input pane. */
@@ -268,7 +260,12 @@ public final class LVCreate extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new EnableCreateRunnable(false));
+                        Tools.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                enableCreateButton(false);
+                            }
+                        });
                         disableComponents();
                         getProgressBar().start(CREATE_TIMEOUT
                                                * hostCheckBoxes.size());

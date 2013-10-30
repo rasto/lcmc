@@ -177,39 +177,25 @@ public final class LVResize extends LV {
         return true;
     }
 
-    /** Enables and disabled buttons. */
-    protected void checkButtons() {
-        Tools.invokeLater(new EnableResizeRunnable(true));
-    }
+    /** Enable remove button. */
+    private void enableResizeButton(boolean enable) {
+        if (enable) {
+            final long oldSize = Tools.convertToKilobytes(
+                                           oldSizeWi.getStringValue());
+            final long size = Tools.convertToKilobytes(
+                                              sizeWi.getStringValue());
+            final String maxBlockSize = getMaxBlockSize();
+            final long maxSize = Long.parseLong(maxBlockSize);
+            maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
 
-    private class EnableResizeRunnable implements Runnable {
-        private final boolean enable;
-        public EnableResizeRunnable(final boolean enable) {
-            super();
-            this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            boolean e = enable;
-            if (enable) {
-                final long oldSize = Tools.convertToKilobytes(
-                                               oldSizeWi.getStringValue());
-                final long size = Tools.convertToKilobytes(
-                                                  sizeWi.getStringValue());
-                final String maxBlockSize = getMaxBlockSize();
-                final long maxSize = Long.parseLong(maxBlockSize);
-                maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
-
-                if (oldSize >= size || size > maxSize) {
-                    e = false;
-                    sizeWi.wrongValue();
-                } else {
-                    sizeWi.setBackground("", "", true);
-                }
+            if (oldSize >= size || size > maxSize) {
+                enable = false;
+                sizeWi.wrongValue();
+            } else {
+                sizeWi.setBackground("", "", true);
             }
-            resizeButton.setEnabled(e);
         }
+        resizeButton.setEnabled(enable);
     }
 
     /** Set combo boxes with new values. */
@@ -275,8 +261,12 @@ public final class LVResize extends LV {
                     @Override
                     public void run() {
                         if (checkDRBD()) {
-                            Tools.invokeAndWait(
-                                               new EnableResizeRunnable(false));
+                            Tools.invokeAndWait(new Runnable() {
+                                @Override
+                                public void run() {
+                                    enableResizeButton(false);
+                                }
+                            });
                             disableComponents();
                             getProgressBar().start(RESIZE_TIMEOUT
                                                    * hostCheckBoxes.size());
@@ -318,7 +308,7 @@ public final class LVResize extends LV {
         sizeWi.addListeners(new WidgetListener() {
                                 @Override
                                 public void check(final Object value) {
-                                    checkButtons();
+                                    enableResizeButton(true);
                                 }
                             });
 
@@ -340,7 +330,7 @@ public final class LVResize extends LV {
                         new ItemListener() {
                             @Override
                             public void itemStateChanged(final ItemEvent e) {
-                                checkButtons();
+                                enableResizeButton(true);
                             }
                         });
             if (host == h) {
@@ -370,7 +360,7 @@ public final class LVResize extends LV {
         SpringUtilities.makeCompactGrid(pane, 4, 1,  /* rows, cols */
                                               0, 0,  /* initX, initY */
                                               0, 0); /* xPad, yPad */
-        checkButtons();
+        enableResizeButton(true);
         return pane;
     }
 
