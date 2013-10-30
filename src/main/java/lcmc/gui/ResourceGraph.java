@@ -360,12 +360,7 @@ public abstract class ResourceGraph {
         }
         removeExistingTestEdge();
         removeTestEdge();
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Tools.setMenuOpaque(component, true);
-            }
-        });
+        Tools.setMenuOpaque(component, true);
     }
 
     /** Is test animation running. */
@@ -928,14 +923,9 @@ public abstract class ResourceGraph {
          * object. */
         @Override
         public void mouseReleased(final MouseEvent e) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (getPickedVertices().size() > 1) {
-                        multiSelection();
-                    }
-                }
-            });
+            if (getPickedVertices().size() > 1) {
+                multiSelection();
+            }
             if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
                 handlePopup0(e);
             }
@@ -1129,12 +1119,7 @@ public abstract class ResourceGraph {
                 final Point2D p = new Point2D.Double(x, y);
                 vertexReleased(vertex, p);
             }
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scale();
-                }
-            });
+            scale();
         }
 
         /** Graph was pressed. */

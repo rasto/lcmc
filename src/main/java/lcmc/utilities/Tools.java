@@ -1671,30 +1671,20 @@ public final class Tools {
             @Override
             public void menuSelected(final MenuEvent e) {
                 final Point l = menu.getLocationOnScreen();
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (final JDialog otherP : popups) {
-                            otherP.dispose();
-                        }
-                        popup.setLocation(
+                for (final JDialog otherP : popups) {
+                    otherP.dispose();
+                }
+                popup.setLocation(
                            (int) (l.getX() + menu.getBounds().getWidth()),
                            (int) l.getY() - 1);
-                        popup.pack();
-                        popup.setVisible(true);
-                        typeToSearchField.requestFocus();
-                    }
-                });
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        /* Setting location again. Moving it one pixel fixes
-                           the "gray window" problem. */
-                        popup.setLocation(
+                popup.pack();
+                popup.setVisible(true);
+                typeToSearchField.requestFocus();
+                /* Setting location again. Moving it one pixel fixes
+                   the "gray window" problem. */
+                popup.setLocation(
                            (int) (l.getX() + menu.getBounds().getWidth()),
                            (int) l.getY());
-                    }
-                });
             }
         });
         return true;
@@ -2712,22 +2702,20 @@ public final class Tools {
         if (!getConfigData().isCheckSwing()) {
             return;
         }
-        final String st = Tools.getStackTrace();
-        if (st.indexOf("java.awt.event.InvocationEvent.dispatch") < 0) {
-            System.out.println("not a swing thread: " + st);
+        if (!SwingUtilities.isEventDispatchThread()) {
+            System.out.println("not a swing thread: " + Tools.getStackTrace());
         }
     }
 
     /**
-     * Print stack trace if it's not in a swing thread.
+     * Print stack trace if it's in a swing thread.
      */
     public static void isNotSwingThread() {
         if (!getConfigData().isCheckSwing()) {
             return;
         }
-        final String st = Tools.getStackTrace();
-        if (st.indexOf("java.awt.event.InvocationEvent.dispatch") >= 0) {
-            System.out.println("swing thread: " + st);
+        if (SwingUtilities.isEventDispatchThread()) {
+            System.out.println("swing thread: " + Tools.getStackTrace());
         }
     }
 }

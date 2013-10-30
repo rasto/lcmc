@@ -2049,7 +2049,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             cb = insideIpComboBoxHash;
                         }
                         final Host proxyHost = getProxyHost(host, wizard);
-                        cb.get(proxyHost).setValueAndWait(getIp(value));
+                        cb.get(proxyHost).setValue(getIp(value));
                     }
                 }
             });

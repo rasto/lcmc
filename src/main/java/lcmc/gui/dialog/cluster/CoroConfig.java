@@ -627,18 +627,12 @@ final class CoroConfig extends DialogCluster {
 
                         @Override
                         public void componentMoved(final ComponentEvent e) {
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (alreadyMoved) {
-                                        return;
-                                    }
-                                    alreadyMoved = true;
-                                    configScrollPane.getViewport()
-                                                    .setViewPosition(
-                                            label.getBounds().getLocation());
-                                }
-                            });
+                            if (alreadyMoved) {
+                                return;
+                            }
+                            alreadyMoved = true;
+                            configScrollPane.getViewport().setViewPosition(
+                                              label.getBounds().getLocation());
                         }
 
                         @Override

@@ -113,12 +113,7 @@ public final class ComboBox extends Widget {
                     o = null;
                 }
                 if (o == null) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            editor.setText("");
-                        }
-                    });
+                    editor.setText("");
                 }
             }
 
