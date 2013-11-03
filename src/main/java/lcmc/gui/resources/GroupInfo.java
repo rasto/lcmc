@@ -627,9 +627,13 @@ public final class GroupInfo extends ServiceInfo {
                                     ci.hidePopup();
                                 }
                                 hidePopup();
-                                for (final JDialog otherP : popups) {
-                                    otherP.dispose();
-                                }
+                                Tools.invokeLater(new Runnable() {
+                                    public void run() {
+                                        for (final JDialog otherP : popups) {
+                                            otherP.dispose();
+                                        }
+                                    }
+                                });
                                 if (ra.isLinbitDrbd()
                                     && !getBrowser()
                                                 .linbitDrbdConfirmDialog()) {

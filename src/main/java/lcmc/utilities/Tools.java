@@ -1558,9 +1558,13 @@ public final class Tools {
                         }
                     });
                 } else if (ch == KeyEvent.VK_ESCAPE) {
-                    for (final JDialog otherP : popups) {
-                        otherP.dispose();
-                    }
+                    Tools.invokeLater(new Runnable() {
+                        public void run() {
+                            for (final JDialog otherP : popups) {
+                                otherP.dispose();
+                            }
+                        }
+                    });
                     infoObject.hidePopup();
                 } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
                     final MyMenuItem item = list.getSelectedValue();
@@ -1610,9 +1614,13 @@ public final class Tools {
                                 }
                             });
                         } else if (ch == KeyEvent.VK_ESCAPE) {
-                            for (final JDialog otherP : popups) {
-                                otherP.dispose();
-                            }
+                            Tools.invokeLater(new Runnable() {
+                                public void run() {
+                                    for (final JDialog otherP : popups) {
+                                        otherP.dispose();
+                                    }
+                                }
+                            });
                             infoObject.hidePopup();
                         } else if (ch == KeyEvent.VK_SPACE
                                    || ch == KeyEvent.VK_ENTER) {
@@ -1645,27 +1653,22 @@ public final class Tools {
 
             @Override
             public void menuDeselected(final MenuEvent e) {
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                    @Override
-                    public void run() {
-                        boolean pVisible = false;
-                        JPopupMenu p = (JPopupMenu) menu.getParent();
-                        while (p != null) {
-                            if (p.isVisible()) {
-                                pVisible = true;
-                                break;
-                            }
-                            p = (JPopupMenu) p.getParent();
-                        }
-                        for (final JDialog otherP : popups) {
-                            if (popup != otherP || pVisible) {
-                                /* don't dispose the popup if it was clicked.
-                                 */
-                                otherP.dispose();
-                            }
-                        }
+                boolean pVisible = false;
+                JPopupMenu p = (JPopupMenu) menu.getParent();
+                while (p != null) {
+                    if (p.isVisible()) {
+                        pVisible = true;
+                        break;
                     }
-                });
+                    p = (JPopupMenu) p.getParent();
+                }
+                for (final JDialog otherP : popups) {
+                    if (popup != otherP || pVisible) {
+                        /* don't dispose the popup if it was clicked.
+                         */
+                        otherP.dispose();
+                    }
+                }
             }
 
             @Override

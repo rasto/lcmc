@@ -4727,9 +4727,13 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public void run() {
                         hidePopup();
-                        for (final JDialog otherP : popups) {
-                            otherP.dispose();
-                        }
+                        Tools.invokeLater(new Runnable() {
+                            public void run() {
+                                for (final JDialog otherP : popups) {
+                                    otherP.dispose();
+                                }
+                            }
+                        });
                         addServicePanel(asi,
                                         null,
                                         colocationWi.isSelected(),
@@ -5019,9 +5023,13 @@ public class ServiceInfo extends EditableInfo {
             @Override
             public void action() {
                 hidePopup();
-                for (final JDialog otherP : popups) {
-                    otherP.dispose();
-                }
+                Tools.invokeLater(new Runnable() {
+                    public void run() {
+                        for (final JDialog otherP : popups) {
+                            otherP.dispose();
+                        }
+                    }
+                });
                 if (ra.isLinbitDrbd()
                     &&
                      !getBrowser().linbitDrbdConfirmDialog()) {
