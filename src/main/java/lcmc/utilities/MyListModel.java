@@ -44,7 +44,6 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     /** Prepares a new <code>MyListModel</code> object. */
     public MyListModel() {
         super();
-        filterField.selectAll();
     }
 
     public FilterField getFilterField() {
@@ -74,12 +73,6 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         filteredItems.clear();
         String filter = filterField.getText();
         if (START_TEXT.equals(filter)) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-                @Override
-                public void run() {
-                    filterField.selectAll();
-                }
-            });
             filter = "";
         }
         for (int i = 0; i < items.size(); i++) {

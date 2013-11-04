@@ -1683,6 +1683,7 @@ public final class Tools {
                 popup.pack();
                 popup.setVisible(true);
                 typeToSearchField.requestFocus();
+                typeToSearchField.selectAll();
                 /* Setting location again. Moving it one pixel fixes
                    the "gray window" problem. */
                 popup.setLocation(
