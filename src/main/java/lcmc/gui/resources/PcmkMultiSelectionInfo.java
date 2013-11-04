@@ -290,7 +290,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         }
 
                         for (final HostInfo hi : selectedHostInfos) {
-                            getBrowser().updateHWInfo(hi.getHost());
+                            getBrowser().updateHWInfo(hi.getHost(),
+                                                      !Host.UPDATE_LVM);
                         }
                     }
                 }
@@ -346,7 +347,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                          Heartbeat.stopHeartbeat(host);
                      }
                      for (final HostInfo hi : selectedHostInfos) {
-                         getBrowser().updateHWInfo(hi.getHost());
+                         getBrowser().updateHWInfo(hi.getHost(),
+                                                   !Host.UPDATE_LVM);
                      }
                  }
              }
@@ -419,7 +421,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         }
                     }
                     for (final HostInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -478,7 +481,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                       Openais.startOpenais(hi.getHost());
                   }
                   for (final HostInfo hi : selectedHostInfos) {
-                      getBrowser().updateHWInfo(hi.getHost());
+                      getBrowser().updateHWInfo(hi.getHost(),
+                                                !Host.UPDATE_LVM);
                   }
               }
           };
@@ -528,7 +532,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         Heartbeat.startHeartbeat(hi.getHost());
                     }
                     for (final HostInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -581,7 +586,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         Corosync.startPacemaker(hi.getHost());
                     }
                     for (final HostInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };

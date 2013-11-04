@@ -672,7 +672,9 @@ public final class HostInfo extends Info {
                             }
                         }
 
-                        getBrowser().getClusterBrowser().updateHWInfo(host);
+                        getBrowser().getClusterBrowser().updateHWInfo(
+                                                            host,
+                                                            !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -714,7 +716,9 @@ public final class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
                         getHost().setCommLayerStopping(true);
                         Heartbeat.stopHeartbeat(getHost());
-                        getBrowser().getClusterBrowser().updateHWInfo(host);
+                        getBrowser().getClusterBrowser().updateHWInfo(
+                                                          host,
+                                                          !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -774,7 +778,9 @@ public final class HostInfo extends Info {
                     } else {
                         Corosync.startCorosync(getHost());
                     }
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                          host,
+                                                          !Host.UPDATE_LVM);
                 }
             };
         if (cb != null) {
@@ -826,7 +832,9 @@ public final class HostInfo extends Info {
                 public void action() {
                     getHost().setCommLayerStarting(true);
                     Openais.startOpenais(getHost());
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                         host,
+                                                         !Host.UPDATE_LVM);
                 }
             };
         if (cb != null) {
@@ -876,7 +884,9 @@ public final class HostInfo extends Info {
                 public void action() {
                     getHost().setCommLayerStarting(true);
                     Heartbeat.startHeartbeat(getHost());
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                         host,
+                                                         !Host.UPDATE_LVM);
                 }
             };
         if (cb != null) {
@@ -925,7 +935,9 @@ public final class HostInfo extends Info {
                 public void action() {
                     host.setPcmkStarting(true);
                     Corosync.startPacemaker(host);
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                         host,
+                                                         !Host.UPDATE_LVM);
                 }
             };
         if (cb != null) {

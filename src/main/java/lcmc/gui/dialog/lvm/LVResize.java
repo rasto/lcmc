@@ -273,7 +273,8 @@ public final class LVResize extends LV {
                             final boolean ret = resize(sizeWi.getStringValue());
                             final Host host = blockDevInfo.getHost();
                             host.getBrowser().getClusterBrowser().updateHWInfo(
-                                                                          host);
+                                                          host,
+                                                          Host.UPDATE_LVM);
                             setComboBoxes();
                             if (ret) {
                                 progressBarDone();

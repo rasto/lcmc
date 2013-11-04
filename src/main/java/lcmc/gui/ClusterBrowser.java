@@ -2677,17 +2677,18 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates host hardware info on all cluster hosts immediately. */
-    public void updateHWInfo() {
+    public void updateHWInfo(boolean updateLVM) {
         for (final Host h : getClusterHosts()) {
-            updateHWInfo(h);
+            updateHWInfo(h, updateLVM);
         }
     }
 
     /** Updates host hardware info immediately. */
-    public void updateHWInfo(final Host host) {
+    public void updateHWInfo(final Host host, boolean updateLVM) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph});
+                       new ResourceGraph[]{drbdGraph, crmGraph},
+                       updateLVM);
         Tools.invokeAndWait(new Runnable() {
             @Override
             public void run() {
@@ -2702,7 +2703,8 @@ public final class ClusterBrowser extends Browser {
     public void updateProxyHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph});
+                       new ResourceGraph[]{drbdGraph, crmGraph},
+                       !Host.UPDATE_LVM);
         updateCommonBlockDevices();
         drbdGraph.repaint();
     }

@@ -1090,7 +1090,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
                 @Override
                 public void action() {
-                    getBrowser().updateHWInfo();
+                    getBrowser().updateHWInfo(Host.UPDATE_LVM);
                 }
             };
         items.add((UpdatableItem) rescanLvmItem);

@@ -134,7 +134,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         DRBD.load(hi.getHost(), CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -169,7 +170,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                          CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -254,7 +256,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         DRBD.stopProxy(hi.getHost(), CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -286,7 +289,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         DRBD.startProxy(hi.getHost(), CRM.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost());
+                        getBrowser().updateHWInfo(hi.getHost(),
+                                                  !Host.UPDATE_LVM);
                     }
                 }
             };
@@ -371,7 +375,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 for (final Host h : hosts) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                            h,
+                                                            Host.UPDATE_LVM);
                 }
             }
         };
@@ -423,7 +429,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 for (final Host h : hosts) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                            h,
+                                                            Host.UPDATE_LVM);
                 }
             }
         };
@@ -680,7 +688,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         bdi.lvRemove(CRM.LIVE);
                     }
                     for (final Host h : selectedHosts) {
-                        getBrowser().updateHWInfo(h);
+                        getBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                     }
                 }
             }

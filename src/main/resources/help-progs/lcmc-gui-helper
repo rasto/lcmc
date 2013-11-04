@@ -119,8 +119,14 @@ if ($action eq "all") {
 } elsif ($action eq "hw-info-daemon") {
 	start_hw_info_daemon();
 } elsif ($action eq "hw-info") {
+	print get_hw_info();
+} elsif ($action eq "hw-info-lvm") {
 	clear_lvm_cache();
 	print get_hw_info();
+	print "vg-info\n";
+	print get_vg_info($NO_LVM_CACHE);
+	print "disk-info\n";
+	print get_disk_info($NO_LVM_CACHE);
 } elsif ($action eq "hw-info-lazy") {
 	print get_hw_info_lazy();
 } elsif ($action eq "installation-info") {
@@ -207,6 +213,10 @@ sub start_hw_info_daemon {
 		}
 		if ($count % 5 == 0) {
 			my $hw_info = get_hw_info($use_lvm_cache);
+			$hw_info .= "vg-info\n";
+			$hw_info .= get_vg_info($use_lvm_cache);
+			$hw_info .= "disk-info\n";
+			$hw_info .= get_disk_info($use_lvm_cache);
 			if ($hw_info ne $prev_hw_info) {
 				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info;
@@ -216,6 +226,10 @@ sub start_hw_info_daemon {
 			$count = 0;
 		} else {
 			my $hw_info_lazy = get_hw_info_lazy($use_lvm_cache);
+			$hw_info_lazy .= "vg-info\n";
+			$hw_info_lazy .= get_vg_info($use_lvm_cache);
+			$hw_info_lazy .= "disk-info\n";
+			$hw_info_lazy .= get_disk_info($use_lvm_cache);
 			if ($hw_info_lazy ne $prev_hw_info_lazy) {
 				print "--hw-info-start--".`date +%s%N`;
 				print $hw_info_lazy;
@@ -247,10 +261,6 @@ sub get_hw_info {
 	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
-	$out .= "disk-info\n";
-	$out .= get_disk_info($use_lvm_cache);
-	$out .= "vg-info\n";
-	$out .= get_vg_info($use_lvm_cache);
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
 	$out .= "crypto-info\n";
@@ -275,10 +285,6 @@ sub get_hw_info_lazy {
 	my $use_lvm_cache = shift;
 	my $out = "net-info\n";
 	$out .= get_net_info();
-	$out .= "disk-info\n";
-	$out .= get_disk_info($use_lvm_cache);
-	$out .= "vg-info\n";
-	$out .= get_vg_info($use_lvm_cache);
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
 	$out .= "mount-points-info\n";
@@ -728,7 +734,7 @@ sub get_disk_info {
 # returns volume group info
 sub get_vg_info {
 	my $use_cache = shift || 0;
-	if ($use_cache && $VG_CACHE) {
+	if ($use_cache && defined $VG_CACHE) {
 		return $VG_CACHE;
 	}
 	my $path = "/usr/sbin/";

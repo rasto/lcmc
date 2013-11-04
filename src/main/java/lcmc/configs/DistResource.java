@@ -170,6 +170,7 @@ public final class DistResource extends java.util.ListResourceBundle {
         {"GetHostAllInfo", SUDO + "@GUI-HELPER@ all"},
         {"HostHWInfoDaemon", SUDO + "@GUI-HELPER@ hw-info-daemon"},
         {"GetHostHWInfo", SUDO + "@GUI-HELPER@ hw-info"},
+        {"GetHostHWInfoLVM", SUDO + "@GUI-HELPER@ hw-info-lvm"},
         {"GetHostHWInfoLazy", "nice -n 19 " + SUDO + "@GUI-HELPER@ hw-info-lazy"},
         {"GetNetInfo",  SUDO + "@GUI-HELPER@ get-net-info"},
 

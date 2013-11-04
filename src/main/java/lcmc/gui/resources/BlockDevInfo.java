@@ -1282,7 +1282,8 @@ public final class BlockDevInfo extends EditableInfo {
                                                 thisBDI.getName()));
                 }
                 getBrowser().getClusterBrowser().updateHWInfo(
-                                                           thisBDI.getHost());
+                                                       thisBDI.getHost(),
+                                                       Host.UPDATE_LVM);
             }
         };
     }
@@ -1320,7 +1321,8 @@ public final class BlockDevInfo extends EditableInfo {
                                                 thisBDI.getName()));
                 }
                 getBrowser().getClusterBrowser().updateHWInfo(
-                                                            thisBDI.getHost());
+                                                        thisBDI.getHost(),
+                                                        Host.UPDATE_LVM);
             }
         };
     }
@@ -1547,7 +1549,9 @@ public final class BlockDevInfo extends EditableInfo {
                         "Cancel")) {
                     final boolean ret = lvRemove(false);
                     final Host host = getHost();
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        Host.UPDATE_LVM);
                 }
             }
         };

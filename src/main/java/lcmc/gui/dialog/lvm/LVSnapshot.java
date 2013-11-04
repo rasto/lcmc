@@ -224,7 +224,8 @@ public final class LVSnapshot extends LV {
                                                     sizeWi.getStringValue());
                         final Host host = blockDevInfo.getHost();
                         host.getBrowser().getClusterBrowser().updateHWInfo(
-                                                                         host);
+                                                             host,
+                                                             Host.UPDATE_LVM);
                         setComboBoxes();
                         if (ret) {
                             progressBarDone();

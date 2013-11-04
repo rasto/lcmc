@@ -391,7 +391,9 @@ public final class VGCreate extends LV {
             enableComponents();
             if (oneFailed) {
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                            h,
+                                                            Host.UPDATE_LVM);
                 }
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -404,7 +406,9 @@ public final class VGCreate extends LV {
                 progressBarDone();
                 disposeDialog();
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                            h,
+                                                            Host.UPDATE_LVM);
                 }
             }
         }

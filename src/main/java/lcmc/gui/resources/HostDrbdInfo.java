@@ -336,7 +336,9 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void action() {
                     DRBD.load(getHost(), testOnly);
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        !Host.UPDATE_LVM);
                 }
             };
         items.add(loadItem);
@@ -367,7 +369,9 @@ public final class HostDrbdInfo extends Info {
                     } else {
                         DRBD.startProxy(getHost(), testOnly);
                     }
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        !Host.UPDATE_LVM);
                 }
             };
         items.add(proxyItem);
@@ -402,7 +406,9 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void action() {
                     DRBD.proxyUp(host, DRBD.ALL, null, testOnly);
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        !Host.UPDATE_LVM);
                 }
             };
         items.add(allProxyUpItem);
@@ -437,7 +443,9 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void action() {
                     DRBD.proxyDown(host, DRBD.ALL, null, testOnly);
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        !Host.UPDATE_LVM);
                 }
             };
         items.add(allProxyDownItem);
@@ -464,7 +472,9 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void action() {
                     DRBD.adjust(getHost(), DRBD.ALL, null, testOnly);
-                    getBrowser().getClusterBrowser().updateHWInfo(host);
+                    getBrowser().getClusterBrowser().updateHWInfo(
+                                                        host,
+                                                        !Host.UPDATE_LVM);
                 }
             };
         items.add(adjustAllItem);

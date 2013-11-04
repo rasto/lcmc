@@ -282,7 +282,9 @@ public final class LVCreate extends LV {
                             }
                         }
                         for (final Host h : hostCheckBoxes.keySet()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                            h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                        h,
+                                                        Host.UPDATE_LVM);
                         }
                         final String maxBlockSize = getMaxBlockSize(
                                                       getSelectedHostCbs());

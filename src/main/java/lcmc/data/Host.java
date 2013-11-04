@@ -357,6 +357,7 @@ public final class Host implements Comparable<Host> {
                                                             GUI_OPTIONS_INFO,
                                                             VERSION_INFO,
                                                             DRBD_PROXY_INFO}));
+    public static final boolean UPDATE_LVM = true;
     /**
      * Prepares a new <code>Host</code> object. Initializes host browser and
      * host's resources.
@@ -1690,8 +1691,15 @@ public final class Host implements Comparable<Host> {
 
     /** Gets and stores hardware info about the host. */
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
-                          final ResourceGraph[] graphs) {
-        final Thread t = execCommand("GetHostHWInfo",
+                          final ResourceGraph[] graphs,
+                          final boolean updateLVM) {
+        String cmd;
+        if (updateLVM) {
+            cmd = "GetHostHWInfoLVM";
+        } else {
+            cmd = "GetHostHWInfo";
+        }
+        final Thread t = execCommand(cmd,
                          new ExecCallback() {
                              @Override
                              public void done(final String ans) {
@@ -1908,7 +1916,7 @@ public final class Host implements Comparable<Host> {
                                  }
                                  if (drbdUpdate != null
                                      || vmUpdate != null) {
-                                     cb.updateHWInfo(host);
+                                     cb.updateHWInfo(host, !Host.UPDATE_LVM);
                                  }
                                  if (drbdUpdate != null) {
                                      cb.updateServerStatus(host);

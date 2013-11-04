@@ -274,7 +274,9 @@ public final class VGRemove extends LV {
                     }
                     for (final Host h : hostCheckBoxes.keySet()) {
                         if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(h);
+                            h.getBrowser().getClusterBrowser().updateHWInfo(
+                                                           h,
+                                                           Host.UPDATE_LVM);
                         }
                     }
                     enableComponents();

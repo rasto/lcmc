@@ -37,6 +37,7 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.WidgetListener;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.Host;
 
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -223,8 +224,8 @@ final class CreateMD extends DrbdConfig {
         final String device = getDrbdVolumeInfo().getDevice();
         final ClusterBrowser browser =
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
-        browser.updateHWInfo(bdi1.getHost());
-        browser.updateHWInfo(bdi2.getHost());
+        browser.updateHWInfo(bdi1.getHost(), !Host.UPDATE_LVM);
+        browser.updateHWInfo(bdi2.getHost(), !Host.UPDATE_LVM);
         bdi1.getBlockDevice().setDrbdBlockDevice(
                                 bdi1.getHost().getDrbdBlockDevice(device));
         bdi2.getBlockDevice().setDrbdBlockDevice(
