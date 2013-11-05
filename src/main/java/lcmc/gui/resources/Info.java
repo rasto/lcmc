@@ -487,6 +487,7 @@ public class Info implements Comparable<Info> {
             public void run() {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
+                    updateMenus(null);
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -496,7 +497,6 @@ public class Info implements Comparable<Info> {
                             pm.show(c, x, y);
                         }
                     });
-                    updateMenus(null);
                 }
             }
         });
@@ -629,13 +629,13 @@ public class Info implements Comparable<Info> {
                             public void run() {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
+                                    updateMenus(null);
                                     Tools.invokeLater(new Runnable() {
                                     @Override
                                         public void run() {
                                             showPopup(pm, b);
                                         }
                                     });
-                                    updateMenus(null);
                                 }
                             }
                         });

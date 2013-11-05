@@ -66,6 +66,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.swing.JPopupMenu;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -763,8 +764,9 @@ public final class CRMGraph extends ResourceGraph {
             info = (ServiceInfo) getInfo(v);
         }
         if (info != null) {
-            showPopup(info.getPopup(), pos);
+            final JPopupMenu p = info.getPopup();
             info.updateMenus(pos);
+            showPopup(p, pos);
         }
     }
 
@@ -827,8 +829,9 @@ public final class CRMGraph extends ResourceGraph {
         final HbConnectionInfo info = edgeToHbconnectionMap.get(edge);
         mHbConnectionReadLock.unlock();
         if (info != null) {
-            showPopup(info.getPopup(), pos);
+            final JPopupMenu p = info.getPopup();
             info.updateMenus(pos);
+            showPopup(p, pos);
         }
     }
 
@@ -836,8 +839,9 @@ public final class CRMGraph extends ResourceGraph {
     @Override
     protected void handlePopupBackground(final Point2D pos) {
         final Info info = getClusterBrowser().getServicesInfo();
-        showPopup(info.getPopup(), pos);
+        final JPopupMenu p = info.getPopup();
         info.updateMenus(pos);
+        showPopup(p, pos);
     }
 
     /**

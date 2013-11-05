@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
 
 /**
  * This class creates graph and provides methods to add new block device
@@ -573,8 +574,9 @@ public final class DrbdGraph extends ResourceGraph {
             info = (HostDrbdInfo) getInfo(v);
         }
         if (info != null) {
-            showPopup(info.getPopup(), pos);
+            final JPopupMenu p = info.getPopup();
             info.updateMenus(pos);
+            showPopup(p, pos);
         }
     }
 
@@ -634,8 +636,9 @@ public final class DrbdGraph extends ResourceGraph {
     @Override
     protected void handlePopupEdge(final Edge edge, final Point2D pos) {
         final DrbdVolumeInfo info = edgeToDrbdVolumeMap.get(edge);
-        showPopup(info.getPopup(), pos);
+        final JPopupMenu p = info.getPopup();
         info.updateMenus(pos);
+        showPopup(p, pos);
     }
 
 
@@ -646,8 +649,9 @@ public final class DrbdGraph extends ResourceGraph {
     @Override
     protected void handlePopupBackground(final Point2D pos) {
         final DrbdInfo info = getDrbdInfo();
-        showPopup(info.getPopup(), pos);
+        final JPopupMenu p = info.getPopup();
         info.updateMenus(pos);
+        showPopup(p, pos);
     }
 
     ///**
