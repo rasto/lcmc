@@ -2533,7 +2533,7 @@ sub _exec {
 sub _execute {
 	my $cmd = shift;
 	if (!$cmd) {
-		_log(1, "ERROR: $0 unspecified command: line: " . (caller(1))[2], 1);
+		_log("ERROR: $0 unspecified command: line: " . (caller(1))[2], 1);
 	}
 	my $level = shift;
 	my $wantoutput = shift;
