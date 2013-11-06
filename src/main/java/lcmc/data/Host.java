@@ -284,6 +284,9 @@ public final class Host implements Comparable<Host> {
     public static final Pattern BDP = Pattern.compile("(\\D+)\\d+");
     /** DRBD bd pattern. */
     public static final Pattern DRBDP = Pattern.compile(".*\\/drbd\\d+$");
+    /** Block device / used pattern. */
+    public static final Pattern DISK_SPACE_P =
+                                            Pattern.compile("^(.*) (\\d+)$");
     /** Physical volumes on this host. */
     private List<BlockDevice> physicalVolumes = new ArrayList<BlockDevice>();
     /** Volume group information on this host. */
@@ -329,6 +332,7 @@ public final class Host implements Comparable<Host> {
 
     private static final String NET_INFO            = "net-info";
     private static final String DISK_INFO           = "disk-info";
+    private static final String DISK_SPACE          = "disk-space";
     private static final String VG_INFO             = "vg-info";
     private static final String FILESYSTEMS_INFO    = "filesystems-info";
     private static final String CRYPTO_INFO         = "crypto-info";
@@ -345,6 +349,7 @@ public final class Host implements Comparable<Host> {
     private static final Set<String> INFO_TYPES =
              new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
                                                             DISK_INFO,
+                                                            DISK_SPACE,
                                                             VG_INFO,
                                                             FILESYSTEMS_INFO,
                                                             CRYPTO_INFO,
@@ -2122,6 +2127,8 @@ public final class Host implements Comparable<Host> {
 
         final Set<String> changedTypes = new HashSet<String>();
 
+        final Map<String, String> diskSpaces = new HashMap<String, String>();
+
         newMountPoints.add("/mnt/");
         String guiOptionName = null;
 
@@ -2194,6 +2201,13 @@ public final class Host implements Comparable<Host> {
                 }
                 if (blockDevice.isPhysicalVolume()) {
                     newPhysicalVolumes.add(blockDevice);
+                }
+            } else if (DISK_SPACE.equals(type)) {
+                final Matcher dsM = DISK_SPACE_P.matcher(line);
+                if (dsM.matches()) {
+                    final String bdName = dsM.group(1);
+                    final String used = dsM.group(2);
+                    diskSpaces.put(bdName, used);
                 }
             } else if ("vg-info".equals(type)) {
                 final String[] vgi = line.split("\\s+");
@@ -2271,6 +2285,15 @@ public final class Host implements Comparable<Host> {
             drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsLVS = newVolumeGroupsLVS;
+        }
+        if (changedTypes.contains(DISK_SPACE)) {
+            for (final Map.Entry<String, String> entry
+                                                : diskSpaces.entrySet()) {
+                final BlockDevice bd = blockDevices.get(entry.getKey());
+                if (bd != null) {
+                    bd.setUsed(entry.getValue());
+                }
+            }
         }
 
         if (changedTypes.contains(VG_INFO)) {

@@ -130,7 +130,6 @@ public final class BlockDevice extends Resource {
     private static final String TOKEN_VG      = "vg";
     private static final String TOKEN_LV      = "lv";
     private static final String TOKEN_PV      = "pv";
-    private static final String TOKEN_USED    = "used";
     private static final String TOKEN_DISK_ID = "disk-id";
 
     /**
@@ -174,11 +173,6 @@ public final class BlockDevice extends Resource {
             this.volumeGroup        = tokens.get(TOKEN_VG);
             this.logicalVolume      = tokens.get(TOKEN_LV);
             this.vgOnPhysicalVolume = tokens.get(TOKEN_PV);
-            final String usedStr    = tokens.get(TOKEN_USED);
-
-            if (usedStr != null) {
-                this.used = Integer.parseInt(usedStr);
-            }
         }
     }
 
@@ -655,5 +649,12 @@ public final class BlockDevice extends Resource {
     /** Set DRBD backing disk. */
     public final void setDrbdBackingDisk(final String drbdBackingDisk) {
         this.drbdBackingDisk = drbdBackingDisk;
+    }
+
+    /** Set used. */
+    public final void setUsed(final String usedStr) {
+        if (usedStr != null) {
+            this.used = Integer.parseInt(usedStr);
+        }
     }
 }

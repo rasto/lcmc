@@ -95,6 +95,8 @@ if ($action eq "all") {
 	print get_net_info();
 	print "disk-info\n";
 	print get_disk_info($NO_LVM_CACHE);
+	print "disk-space\n";
+	print disk_space();
 	print "vg-info\n";
 	print get_vg_info($NO_LVM_CACHE);
 	print "filesystems-info\n";
@@ -127,6 +129,8 @@ if ($action eq "all") {
 	print get_vg_info($NO_LVM_CACHE);
 	print "disk-info\n";
 	print get_disk_info($NO_LVM_CACHE);
+	print "disk-space\n";
+	print disk_space();
 } elsif ($action eq "hw-info-lazy") {
 	print get_hw_info_lazy();
 } elsif ($action eq "installation-info") {
@@ -263,6 +267,8 @@ sub get_hw_info {
 	$out .= get_net_info();
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
+	$out .= "disk-space\n";
+	$out .= disk_space();
 	$out .= "crypto-info\n";
 	$out .= get_crypto_info();
 	$out .= "qemu-keymaps-info\n";
@@ -287,6 +293,8 @@ sub get_hw_info_lazy {
 	$out .= get_net_info();
 	$out .= "filesystems-info\n";
 	$out .= get_filesystems_info();
+	$out .= "disk-space\n";
+	$out .= disk_space();
 	$out .= "mount-points-info\n";
 	$out .= get_mount_points_info();
 	$out .= "installation-info\n";
@@ -438,7 +446,7 @@ sub get_mount {
 
 #
 # Returns hash with free disk space
-sub get_used {
+sub disk_space {
 	my $lvm_devs = shift;
 	my $drbd_devs = shift;
 	my %dev_to_used;
@@ -455,9 +463,9 @@ sub get_used {
 				}
 			}
 			$dev_to_used{$dev} = $used;
+			print "$dev $used\n"
 		}
 	}
-	return \%dev_to_used;
 }
 
 # get_swaps
@@ -642,7 +650,6 @@ sub get_disk_info {
 	my $dm_major_minor_to_dev = get_device_mapper_hash();
 	my $drbd_devs = get_drbd_devs();
 	my $dev_to_mount = get_mount($lvm_devs, $drbd_devs);
-	my $dev_to_used = get_used($lvm_devs, $drbd_devs);
 	my $dev_to_swap = get_swaps();
 	# read partition table
 	open PT, "/proc/partitions" or disk_info_error("cannot open /proc/partitions");
@@ -706,7 +713,6 @@ sub get_disk_info {
 
 		my $mount = $$dev_to_mount{$device} || $$dev_to_mount{$dev_sec};
 		my $swap = $$dev_to_swap{$device} || $$dev_to_swap{$dev_sec};
-		my $used = $$dev_to_used{$device} || $$dev_to_used{$dev_sec};
 
 		my $disk_ids_s = "";
 
@@ -720,7 +726,6 @@ sub get_disk_info {
 		$info.= "$device uuid:$dev_sec$disk_ids_s size:$blocks";
 		$info.= " mp:$mount" if $mount;
 		$info.= " fs:swap mp:swap" if $swap;
-		$info.= " used:$used" if defined $used;
 		$info.= " lv:".$lv_name if defined $lv_name;
 		$info.= " vg:".$lvm_group if defined $lvm_group;
 		$info.= " pv:".$$pvs{$name} if defined $$pvs{$name};
