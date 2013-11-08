@@ -102,7 +102,7 @@ public final class ProgressIndicatorPanel extends JComponent
     /** Notifies whether the animation is running or not. */
     private boolean started    = false;
     /** Alpha level of the veil, used for fade in/out. */
-    private int alphaLevel = 0;
+    private volatile int alphaLevel = 0;
     /** Duration of the veil's fade in/out. */
     private int rampDelay  = 1000;
     /** Ramp delay stop. */
@@ -159,20 +159,7 @@ public final class ProgressIndicatorPanel extends JComponent
      * </ul>.
      */
     public ProgressIndicatorPanel() {
-        this(0.40f);
-    }
-
-    /**
-     * Creates a new progress panel with default values:<br />
-     * <ul>
-     * <li>15 frames per second</li>
-     * <li>Fade in/out last 300 ms</li>
-     * </ul>.
-     * @param shieldA The alpha level between 0.0 and 1.0 of the colored
-     *                shield (or veil).
-     */
-    ProgressIndicatorPanel(final float shieldA) {
-        this(shieldA, 300);
+        this(0.40f, 300);
     }
 
     /**
@@ -182,8 +169,7 @@ public final class ProgressIndicatorPanel extends JComponent
      * @param rampDelay The duration, in milli seconds, of the fade in and
      *                  the fade out of the veil.
      */
-    ProgressIndicatorPanel(final float shield,
-                           final int rampDelay) {
+    private ProgressIndicatorPanel(final float shield, final int rampDelay) {
         super();
         this.rampDelay = rampDelay >= 0 ? rampDelay : 0;
         this.shield    = shield >= 0.0f ? shield : 0.0f;
@@ -453,11 +439,19 @@ public final class ProgressIndicatorPanel extends JComponent
                 }
 
                 final long time = System.currentTimeMillis();
+                if (start >= time) {
+                    continue;
+                }
                 if (lRampUp) {
                     int newAlphaLevel = alphaLevel
                         + (int) (MAX_ALPHA_LEVEL * (time - start) / rampDelay);
                     if (newAlphaLevel >= MAX_ALPHA_LEVEL) {
                         newAlphaLevel = MAX_ALPHA_LEVEL;
+                    } else if (newAlphaLevel < 0) {
+                        LOG.appWarning("wrong alpha: " + newAlphaLevel
+                                       + ", prev alpha: " + alphaLevel
+                                       + ", rampDelay: " + rampDelay
+                                       + ", t-s: " + (time - start));
                     }
                     alphaLevel = newAlphaLevel;
                 } else {
@@ -475,7 +469,6 @@ public final class ProgressIndicatorPanel extends JComponent
                     }
                     alphaLevel = newAlphaLevel;
                 }
-
 
                 final ArrayList<String> toRemove = new ArrayList<String>();
                 mTextsLock.lock();
