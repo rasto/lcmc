@@ -3425,8 +3425,9 @@ public final class CRMXML extends XML {
                 if ("node_state".equals(nodeStateNode.getNodeName())) {
                     final String uname = getAttribute(nodeStateNode, "uname");
                     final String id = getAttribute(nodeStateNode, "id");
-                    if (!id.equals(nodeID.get(uname))) {
+                    if (uname == null || !id.equals(nodeID.get(uname))) {
                         LOG.appWarning("parseCibQuery: skipping " + uname + " " + id);
+                        continue;
                     }
                     final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
