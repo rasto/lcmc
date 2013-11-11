@@ -1576,7 +1576,13 @@ public final class Tools {
                     //    }
                     //});
                     if (item != null) {
-                        item.action();
+                        final Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                item.action();
+                            }
+                        });
+                        thread.start();
                     }
                 }
             }
