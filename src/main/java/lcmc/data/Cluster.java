@@ -73,6 +73,8 @@ public final class Cluster implements Comparable<Cluster> {
                                  };
     /** Whether this cluster should be saved. */
     private boolean savable = true;
+    /** Whether the cluster tab is closable, e.g. during the cluster wizard.*/
+    private boolean tabClosable = true;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
@@ -392,5 +394,15 @@ public final class Cluster implements Comparable<Cluster> {
     @Override
     public int compareTo(final Cluster c) {
         return Tools.compareNames(getName(), c.getName());
+    }
+
+    /** Return whether the cluster tab is closable. */
+    public boolean isTabClosable() {
+        return tabClosable;
+    }
+
+    /** Set whether the cluster tab is closable. */
+    public void setTabClosable(final boolean tabClosable) {
+        this.tabClosable = tabClosable;
     }
 }

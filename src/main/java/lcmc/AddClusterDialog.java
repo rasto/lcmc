@@ -56,6 +56,7 @@ public final class AddClusterDialog {
     public void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
+        cluster.setTabClosable(false);
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -78,6 +79,7 @@ public final class AddClusterDialog {
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: "
                                + dialog.getClass().getName() + " canceled");
+                    cluster.setTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
@@ -103,6 +105,7 @@ public final class AddClusterDialog {
                 Tools.getGUIData().checkAddClusterButtons();
             }
         });
+        cluster.setTabClosable(true);
     }
 
     /** Whether the wizard was canceled. */

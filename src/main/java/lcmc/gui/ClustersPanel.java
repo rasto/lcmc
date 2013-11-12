@@ -170,9 +170,12 @@ public final class ClustersPanel extends JPanel {
                                  final Thread t = new Thread(new Runnable() {
                                      @Override
                                      public void run() {
-                                         Tools.stopCluster(cluster);
-                                         Tools.getGUIData().getEmptyBrowser()
-                                                .setDisconnected(cluster);
+                                         if (cluster.isTabClosable()) {
+                                             Tools.stopCluster(cluster);
+                                             Tools.getGUIData()
+                                                  .getEmptyBrowser()
+                                                  .setDisconnected(cluster);
+                                         }
                                      }
                                  });
                                  t.start();

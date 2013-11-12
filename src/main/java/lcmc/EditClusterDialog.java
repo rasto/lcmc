@@ -59,6 +59,7 @@ public final class EditClusterDialog {
 
     /** Shows step by step dialogs that configure a new cluster. */
     public void showDialogs() {
+        cluster.setTabClosable(false);
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -69,6 +70,7 @@ public final class EditClusterDialog {
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: "
                                + dialog.getClass().getName() + " canceled");
+                    cluster.setTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedButton(FINISH_BTN)) {
@@ -79,5 +81,6 @@ public final class EditClusterDialog {
             dialog = newdialog;
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
+        cluster.setTabClosable(true);
     }
 }
