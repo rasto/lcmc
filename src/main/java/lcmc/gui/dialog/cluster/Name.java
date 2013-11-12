@@ -73,16 +73,32 @@ public final class Name extends DialogCluster {
     /** Checks the field if it is correct and renames the tab. */
     @Override
     protected void checkFields(final Widget field) {
-        final boolean isValid =
-                            (nameField.getStringValue().trim().length() > 0);
+        final String name = nameField.getStringValue().trim();
+        boolean v = true;
+        if (name.length() == 0) {
+            v = false;
+        } else {
+            for (final Cluster c
+                    : Tools.getConfigData().getClusters().getClusterSet()) {
+                if (c != getCluster() && name.equals(c.getName())) {
+                    v = false;
+                    break;
+                }
+            }
+        }
+        final boolean isValid = v;
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
+                if (isValid) {
+                    nameField.setBackground(name, name, true);
+                } else {
+                    nameField.wrongValue();
+                }
             }
         });
-        Tools.getGUIData().renameSelectedClusterTab(
-                                        nameField.getStringValue().trim());
+        Tools.getGUIData().renameSelectedClusterTab(name);
     }
 
     /** Returns the title of the dialog. */
