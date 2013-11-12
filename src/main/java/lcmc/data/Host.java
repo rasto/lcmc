@@ -1695,6 +1695,11 @@ public final class Host implements Comparable<Host> {
     }
 
     /** Gets and stores hardware info about the host. */
+    public void getHWInfo(final boolean updateLVM) {
+        getHWInfo(new CategoryInfo[]{}, new ResourceGraph[]{}, updateLVM);
+    }
+
+    /** Gets and stores hardware info about the host. */
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
                           final ResourceGraph[] graphs,
                           final boolean updateLVM) {

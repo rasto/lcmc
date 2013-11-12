@@ -634,6 +634,15 @@ public final class HostInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override
+                public String enablePredicate() {
+                    final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
+                    return null;
+                }
+
+                @Override
                 public boolean predicate() {
                     /* when both are running it's openais. */
                     return getHost().isCsRunning() && !getHost().isAisRunning();
@@ -671,10 +680,7 @@ public final class HostInfo extends Info {
                                 Openais.stopOpenais(host);
                             }
                         }
-
-                        getBrowser().getClusterBrowser().updateHWInfo(
-                                                            host,
-                                                            !Host.UPDATE_LVM);
+                        updateClusterView(host);
                     }
                 }
             };
@@ -708,6 +714,15 @@ public final class HostInfo extends Info {
                 }
 
                 @Override
+                public String enablePredicate() {
+                    final Host h = getHost();
+                    if (!h.isInCluster()) {
+                        return NOT_IN_CLUSTER;
+                    }
+                    return null;
+                }
+
+                @Override
                 public void action() {
                     if (Tools.confirmDialog(
                          Tools.getString("HostInfo.confirmHeartbeatStop.Title"),
@@ -716,9 +731,7 @@ public final class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
                         getHost().setCommLayerStopping(true);
                         Heartbeat.stopHeartbeat(getHost());
-                        getBrowser().getClusterBrowser().updateHWInfo(
-                                                          host,
-                                                          !Host.UPDATE_LVM);
+                        updateClusterView(host);
                     }
                 }
             };
@@ -778,9 +791,7 @@ public final class HostInfo extends Info {
                     } else {
                         Corosync.startCorosync(getHost());
                     }
-                    getBrowser().getClusterBrowser().updateHWInfo(
-                                                          host,
-                                                          !Host.UPDATE_LVM);
+                    updateClusterView(host);
                 }
             };
         if (cb != null) {
@@ -832,9 +843,7 @@ public final class HostInfo extends Info {
                 public void action() {
                     getHost().setCommLayerStarting(true);
                     Openais.startOpenais(getHost());
-                    getBrowser().getClusterBrowser().updateHWInfo(
-                                                         host,
-                                                         !Host.UPDATE_LVM);
+                    updateClusterView(host);
                 }
             };
         if (cb != null) {
@@ -884,9 +893,7 @@ public final class HostInfo extends Info {
                 public void action() {
                     getHost().setCommLayerStarting(true);
                     Heartbeat.startHeartbeat(getHost());
-                    getBrowser().getClusterBrowser().updateHWInfo(
-                                                         host,
-                                                         !Host.UPDATE_LVM);
+                    updateClusterView(host);
                 }
             };
         if (cb != null) {
@@ -935,9 +942,7 @@ public final class HostInfo extends Info {
                 public void action() {
                     host.setPcmkStarting(true);
                     Corosync.startPacemaker(host);
-                    getBrowser().getClusterBrowser().updateHWInfo(
-                                                         host,
-                                                         !Host.UPDATE_LVM);
+                    updateClusterView(host);
                 }
             };
         if (cb != null) {
@@ -1163,5 +1168,16 @@ public final class HostInfo extends Info {
     public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
+    }
+
+    /* Update cluster view if available. */
+    private void updateClusterView(final Host host) {
+        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+        if (cb == null) {
+            host.setIsLoading();
+            host.getHWInfo(!Host.UPDATE_LVM);
+        } else {
+            cb.updateHWInfo(host, !Host.UPDATE_LVM);
+        }
     }
 }
