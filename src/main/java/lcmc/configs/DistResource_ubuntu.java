@@ -68,6 +68,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
         {"PmInst.install.1",
          "apt-get update && /usr/bin/apt-get -y install -o"
          + " 'DPkg::Options::force=--force-confnew' pacemaker corosync "
+         + " && mkdir /var/log/cluster"
          + " && (grep 'START=no' /etc/default/corosync && echo 'START=yes'>>/etc/default/corosync)"
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
