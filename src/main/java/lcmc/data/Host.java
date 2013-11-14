@@ -901,10 +901,14 @@ public final class Host implements Comparable<Host> {
                                                     getDist(),
                                                     distVersionString,
                                                     null));
-        setArch(Tools.getDistString("arch:" + detectedArch,
-                                    getDist(),
-                                    distVersionString,
-                                    null));
+        String arch = Tools.getDistString("arch:" + detectedArch,
+                                          getDist(),
+                                          distVersionString,
+                                          null);
+        if (arch == null) {
+            arch = detectedArch;
+        }
+        setArch(arch);
     }
 
     /** Returns the detected info to show. */
