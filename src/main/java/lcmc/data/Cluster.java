@@ -108,11 +108,12 @@ public final class Cluster implements Comparable<Cluster> {
 
     /** Removes the cluster. */
     public void removeCluster() {
+        LOG.debug1("removeCluster: " + getName());
         final ClusterBrowser cb = clusterBrowser;
         if (cb != null) {
-            clusterBrowser.stopServerStatus();
-            clusterBrowser.stopDrbdStatus();
-            clusterBrowser.stopClStatus();
+            cb.stopServerStatus();
+            cb.stopDrbdStatus();
+            cb.stopClStatus();
         }
     }
 
