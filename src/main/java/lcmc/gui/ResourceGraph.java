@@ -526,7 +526,11 @@ public abstract class ResourceGraph {
 
     /** Returns the vertex that represents the specified resource. */
     public Vertex getVertex(final Info i) {
-        return infoToVertexMap.get(i);
+        final Vertex v = infoToVertexMap.get(i);
+        if (v == null) {
+            LOG.appWarning("getVertex: no vertex for: " + i);
+        }
+        return v;
     }
 
     /** Removes the vertex that represents the specified resource. */

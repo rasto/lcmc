@@ -624,7 +624,7 @@ public final class Tools {
                 whether to save clusters specified from the command line
      */
     public static void save(final String filename, final boolean saveAll) {
-        LOG.debug("save: start");
+        LOG.debug1("save: start");
         final String text =
             Tools.getString("Tools.Saving").replaceAll(
                                            "@FILENAME@",

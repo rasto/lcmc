@@ -51,21 +51,21 @@ public final class Logger {
     /** Map with all errors, so that they don't appear more than once. */
     private final Set<String> appErrorHash = new HashSet<String>();
     /** String that starts error messages. */
-    private static final String ERROR_STRING = "ERROR: ";
+    private static final String ERROR_STRING      = "ERROR   : ";
     /** String that starts info messages. */
-    private static final String INFO_STRING = "INFO: ";
+    private static final String INFO_STRING       = "INFO    : ";
     /** String that starts debug messages. */
-    private static final String DEBUG_STRING = "DEBUG: ";
+    private static final String DEBUG_STRING      = "DEBUG   : ";
     /** String that starts debug messages. */
-    private static final String DEBUG1_STRING = "DEBUG(1): ";
+    private static final String DEBUG1_STRING     = "DEBUG(1): ";
     /** String that starts debug messages. */
-    private static final String DEBUG2_STRING = "DEBUG(2): ";
+    private static final String DEBUG2_STRING     = "DEBUG(2): ";
     /** String that starts trace messages. */
-    private static final String TRACE_STRING = "TRACE: ";
+    private static final String TRACE_STRING      = "TRACE   : ";
     /** string that starts application warnings. */
-    private static final String APPWARNING_STRING = "APPWARNING: ";
+    private static final String APPWARNING_STRING = "WARN    : ";
     /** String that starts application errors. */
-    private static final String APPERROR_STRING = "APPERROR: ";
+    private static final String APPERROR_STRING   = "APPERROR: ";
     /** Time when the application started in seconds. */
     private static final long START_TIME = System.currentTimeMillis() / 1000;
     /** Patterns that match exceptions that can be ignored. */

@@ -1815,6 +1815,7 @@ public final class Host implements Comparable<Host> {
     public void startHWInfoDaemon(final CategoryInfo[] infosToUpdate,
                                   final ResourceGraph[] graphs) {
         final Host host = this;
+        LOG.debug1("startHWInfoDaemon: " + getName());
         serverStatusThread = ssh.execCommand(
                                 Tools.getDistCommand(
                                                 "HostHWInfoDaemon",

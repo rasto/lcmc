@@ -104,6 +104,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     /** Returns parameters. */
     @Override
     public String[] getParametersFromXML() {
+        LOG.debug1("getParametersFromXML: start");
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (crmXML == null) {
             return null;

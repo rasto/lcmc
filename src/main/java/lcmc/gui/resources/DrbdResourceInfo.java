@@ -1715,6 +1715,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final List<Object> list = new ArrayList<Object>();
 
         list.add(null);
+        if (hostBrowser == null) {
+            throw new RuntimeException("getNetInterfaces: hostBrowser is null");
+        }
         @SuppressWarnings("unchecked")
         final Enumeration<DefaultMutableTreeNode> e =
                                 hostBrowser.getNetInterfacesNode().children();

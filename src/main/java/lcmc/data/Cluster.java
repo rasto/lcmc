@@ -93,6 +93,7 @@ public final class Cluster implements Comparable<Cluster> {
 
     /** Creates a new cluster browser object. */
     public void createClusterBrowser() {
+        LOG.debug1("createClusterBrowser: " + getName());
         clusterBrowser = new ClusterBrowser(this);
     }
 
