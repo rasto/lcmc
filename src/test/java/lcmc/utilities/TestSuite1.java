@@ -70,11 +70,11 @@ public final class TestSuite1 {
     public static final boolean QUICK = "true".equals(
                                             System.getProperty("test.quick"));
 
-    public static final String INFO_STRING = "INFO: ";
-    public static final String DEBUG_STRING = "DEBUG";
-    public static final String ERROR_STRING = "ERROR: ";
-    public static final String APPWARNING_STRING = "APPWARNING: ";
-    public static final String APPERROR_STRING = "APPERROR: ";
+    public static final String INFO_STRING       = "INFO    : ";
+    public static final String DEBUG_STRING      = "DEBUG";
+    public static final String ERROR_STRING      = "ERROR   : ";
+    public static final String APPWARNING_STRING = "WARN    : ";
+    public static final String APPERROR_STRING   = "APPERROR: ";
     public static final int NUMBER_OF_HOSTS;
     static {
         if (Tools.isNumber(System.getProperty("test.count"))) {
