@@ -528,7 +528,7 @@ public abstract class ResourceGraph {
     public Vertex getVertex(final Info i) {
         final Vertex v = infoToVertexMap.get(i);
         if (v == null) {
-            LOG.appWarning("getVertex: no vertex for: " + i);
+            LOG.debug1("getVertex: no vertex for: " + i);
         }
         return v;
     }
