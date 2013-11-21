@@ -20,6 +20,7 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Unit;
 import lcmc.data.AccessMode;
@@ -40,8 +41,8 @@ public final class WidgetFactory {
 
     /** Without units. */
     public static Widget createInstance(final Widget.Type type,
-                                        final String selectedValue,
-                                        final Object[] items,
+                                        final Value selectedValue,
+                                        final Value[] items,
                                         final String regexp,
                                         final int width,
                                         final Map<String, String> abbreviations,
@@ -59,8 +60,8 @@ public final class WidgetFactory {
     }
 
     public static Widget createInstance(Widget.Type type,
-                                        final String selectedValue,
-                                        final Object[] items,
+                                        final Value selectedValue,
+                                        final Value[] items,
                                         final Unit[] units,
                                         final String regexp,
                                         final int width,

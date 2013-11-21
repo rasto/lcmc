@@ -41,6 +41,8 @@ import java.awt.Component;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -188,7 +190,7 @@ public class Configuration extends DialogHost {
         getHost().setIps(hop, items);
         hostnames[hop] = hostname;
 
-        hostnameField[hop].setValue(hostname);
+        hostnameField[hop].setValue(new StringValue(hostname));
         LOG.debug1("checkDNS: got " + hostname + " (" + ip + ")");
         return true;
     }
@@ -225,12 +227,12 @@ public class Configuration extends DialogHost {
                 printErrorAndRetry(
                    Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
             }
-            final String[] items = getHost().getIps(hop);
+            final Value[] items = StringValue.getValues(getHost().getIps(hop));
             if (items != null) {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        ipCombo[hop].reloadComboBox(getHost().getIp(hop),
+                        ipCombo[hop].reloadComboBox(new StringValue(getHost().getIp(hop)),
                                                     items);
 
                         if (items.length > 1) {
@@ -269,11 +271,12 @@ public class Configuration extends DialogHost {
                 hostnameField[i].setEnabled(false);
                 if (Tools.isIp(hostnameEntered)) {
                     hostnames[i] = hostnameEntered;
-                    hostnameField[i].setValue(hostnameEntered);
                     getHost().setIp(hostnameEntered);
                     getHost().setIps(i, new String[]{hostnameEntered});
-                    ipCombo[i].reloadComboBox(hostnameEntered,
-                                              new String[]{hostnameEntered});
+                    final Value hostnameEnteredValue = new StringValue(hostnameEntered);
+                    hostnameField[i].setValue(hostnameEnteredValue);
+                    ipCombo[i].reloadComboBox(hostnameEnteredValue,
+                                              new Value[]{hostnameEnteredValue});
                     hostnameOk = true;
                 } else {
                     checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
@@ -364,7 +367,7 @@ public class Configuration extends DialogHost {
         for (int i = 0; i < hops; i++) {
             hostnameField[i] = WidgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
-                                      hostnames[i],
+                                      new StringValue(hostnames[i]),
                                       Widget.NO_ITEMS,
                                       Widget.NO_REGEXP,
                                       COMBO_BOX_WIDTH,
@@ -384,15 +387,15 @@ public class Configuration extends DialogHost {
                 getHost().setIps(i, null);
             }
             ipCombo[i] = WidgetFactory.createInstance(
-                                        Widget.Type.COMBOBOX,
-                                        getHost().getIp(i),
-                                        getHost().getIps(i),
-                                        Widget.NO_REGEXP,
-                                        COMBO_BOX_WIDTH,
-                                        Widget.NO_ABBRV,
-                                        new AccessMode(ConfigData.AccessType.RO,
-                                                       !AccessMode.ADVANCED),
-                                        Widget.NO_BUTTON);
+                                Widget.Type.COMBOBOX,
+                                new StringValue(getHost().getIp(i)),
+                                StringValue.getValues(getHost().getIps(i)),
+                                Widget.NO_REGEXP,
+                                COMBO_BOX_WIDTH,
+                                Widget.NO_ABBRV,
+                                new AccessMode(ConfigData.AccessType.RO,
+                                               !AccessMode.ADVANCED),
+                                Widget.NO_BUTTON);
 
             inputPane.add(ipCombo[i]);
             ipCombo[i].setEnabled(false);

@@ -29,6 +29,7 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 
 import java.util.Map;
+import lcmc.data.Value;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
@@ -91,18 +92,20 @@ final class IPaddrInfo extends ServiceInfo {
         Widget paramWi;
         if ("ip".equals(param)) {
             /* get networks */
-            String ip = getPreviouslySelected(param, prefix);
+            Value ip = getPreviouslySelected(param, prefix);
             if (ip == null) {
                 ip = getParamSaved(param);
             }
             Info defaultValue;
-            if (ip == null || "".equals(ip)) {
+            if (ip.isNothingSelected()) {
                 defaultValue = new StringInfo(
                         Tools.getString("ClusterBrowser.SelectNetInterface"),
-                        ip,
+                        ip.getValueForConfig(),
                         getBrowser());
             } else {
-                defaultValue = new StringInfo(ip, ip, getBrowser());
+                defaultValue = new StringInfo(ip.getValueForConfig(),
+                                              ip.getValueForConfig(),
+                                              getBrowser());
             }
             @SuppressWarnings("unchecked")
             final Info[] networks = enumToInfoArray(
@@ -144,7 +147,7 @@ final class IPaddrInfo extends ServiceInfo {
 
         final StringBuilder s = new StringBuilder(getName());
         final String inside = id + " / ";
-        String ip = getParamSaved("ip");
+        String ip = getParamSaved("ip").getValueForConfig();
         if (ip == null || "".equals(ip)) {
             ip = Tools.getString("ClusterBrowser.Ip.Unconfigured");
         }

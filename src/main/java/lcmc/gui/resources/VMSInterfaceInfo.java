@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -109,29 +111,29 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                                                 InterfaceData.TYPE }));
 
     /** Preferred values. */
-    private static final Map<String, String> PREFERRED_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
     /** Default values. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                               new HashMap<String, Value[]>();
     static {
-        PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, "default");
+        PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
-                            new String[]{null,
-                                         "default",
-                                         "e1000",
-                                         "ne2k_pci",
-                                         "pcnet",
-                                         "rtl8139",
-                                         "virtio"});
+                            new Value[]{new StringValue(),
+                                        new StringValue("default"),
+                                        new StringValue("e1000"),
+                                        new StringValue("ne2k_pci"),
+                                        new StringValue("pcnet"),
+                                        new StringValue("rtl8139"),
+                                        new StringValue("virtio")});
         POSSIBLE_VALUES.put(InterfaceData.TYPE,
-                            new String[]{"network", "bridge"});
+                            new Value[]{new StringValue("network"), new StringValue("bridge")});
         POSSIBLE_VALUES.put(InterfaceData.SCRIPT_PATH,
-                            new String[]{null,
-                                         "/etc/xen/scripts/vif-bridge"});
+                            new Value[]{new StringValue(),
+                                        new StringValue("/etc/xen/scripts/vif-bridge")});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -201,16 +203,16 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         if (InterfaceData.MAC_ADDRESS.equals(param)) {
-            return generateMacAddress();
+            return new StringValue(generateMacAddress());
         }
         return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -222,23 +224,23 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (InterfaceData.SOURCE_NETWORK.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
-                    final List<String> networks = vmsxml.getNetworks();
+                    final List<Value> networks = vmsxml.getNetworks();
                     networks.add(0, null);
-                    return networks.toArray(new String[networks.size()]);
+                    return networks.toArray(new Value[networks.size()]);
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null) {
-                    final List<String> bridges = h.getBridges();
+                    final List<Value> bridges = h.getBridges();
                     bridges.add(0, null);
-                    return bridges.toArray(new String[bridges.size()]);
+                    return bridges.toArray(new Value[bridges.size()]);
                 }
             }
         }
@@ -254,7 +256,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
-        final String type = getComboBoxValue(InterfaceData.TYPE);
+        final String type = getComboBoxValue(InterfaceData.TYPE).getValueForConfig();
         if ((InterfaceData.SOURCE_NETWORK.equals(param)
              && "network".equals(type))
             || (InterfaceData.SOURCE_BRIDGE.equals(param)
@@ -322,7 +324,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (allParams
                 || InterfaceData.SOURCE_NETWORK.equals(param)
                 || InterfaceData.SOURCE_BRIDGE.equals(param)
@@ -330,11 +332,11 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
             }
         }
-        setName(getParamSaved(InterfaceData.MAC_ADDRESS));
+        setName(getParamSaved(InterfaceData.MAC_ADDRESS).getValueForConfig());
         return parameters;
     }
 
@@ -441,20 +443,20 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         if (InterfaceData.TYPE.equals(param)) {
             for (final String p : sourceNetworkWi.keySet()) {
                 sourceNetworkWi.get(p).setVisible(
-                                               "network".equals(newValue));
+                                            "network".equals(newValue.getValueForConfig()));
             }
             for (final String p : sourceBridgeWi.keySet()) {
                 sourceBridgeWi.get(p).setVisible(
-                                                "bridge".equals(newValue));
+                                              "bridge".equals(newValue.getValueForConfig()));
             }
             checkOneParam(InterfaceData.SOURCE_NETWORK);
             checkOneParam(InterfaceData.SOURCE_BRIDGE);
         }
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+        if (isRequired(param) && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
         return true;
@@ -494,14 +496,14 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
             final InterfaceData interfaceData = interfaces.get(getName());
             if (interfaceData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                interfaceData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -527,8 +529,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        String source;
-        if ("network".equals(getParamSaved(InterfaceData.TYPE))) {
+        Value source;
+        if ("network".equals(getParamSaved(InterfaceData.TYPE).getValueForConfig())) {
             source = getParamSaved(InterfaceData.SOURCE_NETWORK);
         } else {
             source = getParamSaved(InterfaceData.SOURCE_BRIDGE);
@@ -536,10 +538,10 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         if (source == null) {
             s.append("new interface...");
         } else {
-            s.append(source);
+            s.append(source.getValueForConfig());
         }
 
-        final String saved = getParamSaved(InterfaceData.MAC_ADDRESS);
+        final String saved = getParamSaved(InterfaceData.MAC_ADDRESS).getValueForConfig();
         if (saved != null) {
             s.append(" (");
             if (saved.length() > 8) {

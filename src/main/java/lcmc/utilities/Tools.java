@@ -28,6 +28,7 @@ import lcmc.data.Cluster;
 import lcmc.data.Clusters;
 import lcmc.data.UserConfig;
 import lcmc.data.HostOptions;
+import lcmc.data.Value;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.Info;
@@ -2011,6 +2012,16 @@ public final class Tools {
         return list.toString();
     }
 
+    public static boolean valuesEqual(final Value v1, final Value v2) {
+        if (v1 == null && v2 == null) {
+            return true;
+        } else if (v1 == null || v2 == null) {
+            return false;
+        } else {
+            return v1.equals(v2);
+        }
+    }
+
     /**
      * Returns whether two objects are equal. Special handling for Units and
      * StringInfo objects.
@@ -2077,10 +2088,6 @@ public final class Tools {
             return ((Unit) o1).equals(o2);
         } else if (o2 instanceof Unit) {
             return ((Unit) o2).equals(o1);
-        } else if (o1 instanceof ComboInfo) {
-            return ((ComboInfo) o1).equals(o2);
-        } else if (o2 instanceof ComboInfo) {
-            return ((ComboInfo) o2).equals(o1);
         } else {
             return o1.equals(o2);
         }

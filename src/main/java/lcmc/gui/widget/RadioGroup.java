@@ -20,9 +20,9 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.data.AccessMode;
-import lcmc.gui.resources.Info;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
@@ -60,20 +60,20 @@ public final class RadioGroup extends Widget {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Value of the radio group. */
-    private String radioGroupValue;
+    private Value radioGroupValue;
     /** Radio group hash, from string that is displayed to the object. */
-    private final Map<String, Object> radioGroupHash =
-                                                 new HashMap<String, Object>();
+    private final Map<String, Value> radioGroupHash =
+                                                 new HashMap<String, Value>();
     /** Name to component hash. */
-    private final Map<String, JComponent> componentsHash =
-                                             new HashMap<String, JComponent>();
+    private final Map<Value, JComponent> componentsHash =
+                                             new HashMap<Value, JComponent>();
     /** group components lock. */
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
     /** Prepares a new <code>RadioGroup</code> object. */
-    public RadioGroup(final String selectedValue,
-                      final Object[] items,
+    public RadioGroup(final Value selectedValue,
+                      final Value[] items,
                       final String regexp,
                       final int width,
                       final AccessMode enableAccessMode,
@@ -85,28 +85,22 @@ public final class RadioGroup extends Widget {
     }
 
     /** Returns radio group with selected value. */
-    protected JComponent getRadioGroup(final String selectedValue,
-                                     final Object[] items) {
+    protected JComponent getRadioGroup(final Value selectedValue,
+                                     final Value[] items) {
         final ButtonGroup group = new ButtonGroup();
         final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
         mComponentsWriteLock.lock();
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
-            final Object item = items[i];
+            final Value item = items[i];
             final JRadioButton rb = new JRadioButton(item.toString());
             radioGroupHash.put(item.toString(), item);
             rb.setActionCommand(item.toString());
             group.add(rb);
             radioPanel.add(rb);
 
-            String v;
-            if (item instanceof Info) {
-                v = ((Info) item).getInternalValue();
-            } else {
-                v = item.toString();
-            }
-            componentsHash.put(v, rb);
-            if (v.equals(selectedValue)) {
+            componentsHash.put(item, rb);
+            if (item.equals(selectedValue)) {
                 rb.setSelected(true);
                 radioGroupValue = selectedValue;
             }
@@ -115,16 +109,10 @@ public final class RadioGroup extends Widget {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     mComponentsReadLock.lock();
-                    final Object item =
+                    final Value item =
                                     radioGroupHash.get(e.getActionCommand());
                     mComponentsReadLock.unlock();
-                    String v;
-                    if (item instanceof Info) {
-                        v = ((Info) item).getInternalValue();
-                    } else {
-                        v = item.toString();
-                    }
-                    radioGroupValue = v;
+                    radioGroupValue = item;
                 }
             });
         }
@@ -186,9 +174,9 @@ public final class RadioGroup extends Widget {
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
-        final Object value = radioGroupValue;
-        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
+    protected Value getValueInternal() {
+        final Value value = radioGroupValue;
+        if (value.isNothingSelected()) {
             return null;
         }
         return value;
@@ -227,7 +215,7 @@ public final class RadioGroup extends Widget {
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
+    protected void setValueAndWait0(final Value item) {
         if (item != null) {
             mComponentsReadLock.lock();
             final JRadioButton rb =
@@ -236,11 +224,7 @@ public final class RadioGroup extends Widget {
             if (rb != null) {
                 rb.setSelected(true);
             }
-            if (item instanceof Info) {
-                radioGroupValue = ((Info) item).getInternalValue();
-            } else {
-                radioGroupValue = (String) item;
-            }
+            radioGroupValue = item;
         }
     }
 
@@ -301,10 +285,10 @@ public final class RadioGroup extends Widget {
     }
 
     /** Returns item at the specified index. */
-    @Override
-    Object getItemAt(final int i) {
-        return getComponent();
-    }
+    //@Override
+    //Component getItemAt(final int i) {
+    //    return getComponent();
+    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override

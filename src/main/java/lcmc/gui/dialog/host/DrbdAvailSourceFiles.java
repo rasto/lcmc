@@ -25,9 +25,10 @@ package lcmc.gui.dialog.host;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+import lcmc.data.Value;
+import lcmc.data.StringValue;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.ComboInfo;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.SpringUtilities;
@@ -99,15 +100,16 @@ final class DrbdAvailSourceFiles extends DialogHost {
                         doneError(null, 1);
                         return;
                     }
-                    final List<ComboInfo> items = new ArrayList<ComboInfo>();
+                    final List<Value> items = new ArrayList<Value>();
                     for (final String versionString : versions) {
                         if (versionString != null
                             && versionString.length() > 16) {
                             final String version =
                                     versionString.substring(
-                                                   9,
-                                                   versionString.length() - 7);
-                            items.add(new ComboInfo(version, versionString));
+                                               9,
+                                               versionString.length() - 7);
+                            items.add(
+                                    new StringValue(versionString, version));
                         }
                     }
                     drbdTarballCombo.clear();
@@ -116,11 +118,11 @@ final class DrbdAvailSourceFiles extends DialogHost {
                         public void run() {
                             if (!items.isEmpty()) {
                                 drbdTarballCombo.reloadComboBox(
-                                       items.get(0).toString(),
-                                       items.toArray(new ComboInfo[items.size()]));
+                                       items.get(0),
+                                       items.toArray(new Value[items.size()]));
                             }
-                            final ComboInfo selectedItem =
-                                   (ComboInfo) drbdTarballCombo.getValue();
+                            final Value selectedItem =
+                                                 drbdTarballCombo.getValue();
                             drbdTarballCombo.setEnabled(true);
                             allDone(selectedItem);
                         }
@@ -151,13 +153,13 @@ final class DrbdAvailSourceFiles extends DialogHost {
      * Is called after everything is done. It adds listeners if called for the
      * first time.
      */
-    protected void allDone(final ComboInfo versionInfo) {
+    protected void allDone(final Value versionInfo) {
         if (versionInfo != null) {
             answerPaneSetText("http://oss.linbit.com/drbd/"
-                              + versionInfo.getStringValue());
+                              + versionInfo.getValueForGui());
             getHost().setDrbdVersionToInstall(versionInfo.toString());
             getHost().setDrbdVersionUrlStringToInstall(
-                                            versionInfo.getStringValue());
+                                            versionInfo.getValueForConfig());
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
@@ -229,7 +231,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
         drbdTarballCombo.addListeners(new WidgetListener() {
             @Override
             public void check(final Object value) {
-                final ComboInfo item = (ComboInfo) drbdTarballCombo.getValue();
+                final Value item = drbdTarballCombo.getValue();
                     allDone(item);
             }
         });

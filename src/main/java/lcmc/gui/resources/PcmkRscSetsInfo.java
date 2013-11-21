@@ -251,7 +251,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         mConstraintPHLock.unlock();
         final Map<String, String> attrs =
                                       new LinkedHashMap<String, String>();
-        attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
+        attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
         String colId = null;
         String ordId = null;
         final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =

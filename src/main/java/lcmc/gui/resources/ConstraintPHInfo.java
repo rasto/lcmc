@@ -41,6 +41,8 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -231,19 +233,19 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
     /** Returns default for this parameter. */
     @Override
-    public String getParamDefault(final String param) {
-        return "default";
+    public Value getParamDefault(final String param) {
+        return new StringValue("default");
     }
 
     /** Returns preferred value for this parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 
@@ -258,7 +260,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
      * down menu.
      */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
@@ -560,8 +562,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
         CRMXML.RscSet outColRscSet1 = null;
         CRMXML.RscSet outColRscSet2 = null;
         final String requireAll = (preference == Preference.AND)
-                                                    ? CRMXML.REQUIRE_ALL_TRUE
-                                                    : CRMXML.REQUIRE_ALL_FALSE;
+                                                    ? CRMXML.REQUIRE_ALL_TRUE.getValueForConfig()
+                                                    : CRMXML.REQUIRE_ALL_FALSE.getValueForConfig();
         for (final ServiceInfo serviceInfo : servicesAll) {
             final boolean isFrom = servicesFrom.contains(serviceInfo);
             final String idToAdd = serviceInfo.getService().getHeartbeatId();
@@ -589,7 +591,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         colRscSet1 = new CRMXML.RscSet(colId,
                                                        rscIds,
                                                        "false",
-                                                       CRMXML.REQUIRE_ALL_TRUE,
+                                                       CRMXML.REQUIRE_ALL_TRUE.getValueForConfig(),
                                                        null,
                                                        null);
                         outColRscSet1 = colRscSet1;
@@ -597,7 +599,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         colRscSet2 = new CRMXML.RscSet(colId,
                                                        rscIds,
                                                        "false",
-                                                       CRMXML.REQUIRE_ALL_TRUE,
+                                                       CRMXML.REQUIRE_ALL_TRUE.getValueForConfig(),
                                                        null,
                                                        null);
                         colRscSet1 = new CRMXML.RscSet(colId,
@@ -705,7 +707,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         ordRscSet1 = new CRMXML.RscSet(ordId,
                                                        rscIds,
                                                        "false",
-                                                       CRMXML.REQUIRE_ALL_TRUE,
+                                                       CRMXML.REQUIRE_ALL_TRUE.getValueForConfig(),
                                                        null,
                                                        null);
                         ordRscSet2 = new CRMXML.RscSet(ordId,
@@ -725,7 +727,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         ordRscSet2 = new CRMXML.RscSet(ordId,
                                                        rscIds,
                                                        "false",
-                                                       CRMXML.REQUIRE_ALL_TRUE,
+                                                       CRMXML.REQUIRE_ALL_TRUE.getValueForConfig(),
                                                        null,
                                                        null);
                         outOrdRscSet2 = ordRscSet2;
@@ -820,7 +822,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
         if (force) {
             final Map<String, String> attrs =
                                           new LinkedHashMap<String, String>();
-            attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
+            attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
             final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
             final Map<CRMXML.RscSet, Map<String, String>> rscSetsOrdAttrs =

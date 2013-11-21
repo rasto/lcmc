@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -72,14 +73,14 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
             final SerialData serialData = serials.get(getName());
             if (serialData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                              : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                   serialData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -105,7 +106,7 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(SerialData.TYPE);
+        final String type = getParamSaved(SerialData.TYPE).getValueForConfig();
         if (type == null) {
             s.append("new serial device...");
         } else {
@@ -127,7 +128,7 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(SerialData.SAVED_TYPE,
-                               getParamSaved(SerialData.TYPE));
+                               getParamSaved(SerialData.TYPE).getValueForConfig());
                 vmsxml.removeSerialXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,

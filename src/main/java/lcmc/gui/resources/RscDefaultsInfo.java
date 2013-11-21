@@ -34,6 +34,8 @@ import lcmc.utilities.Tools;
 import java.util.Collection;
 import java.util.Map;
 import javax.swing.JPanel;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -76,15 +78,12 @@ public final class RscDefaultsInfo extends EditableInfo {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
             for (String param : params) {
-                String value = resourceNode.get(param);
-                final String defaultValue = getParamDefault(param);
-                if (value == null) {
+                Value value = new StringValue(resourceNode.get(param));
+                final Value defaultValue = getParamDefault(param);
+                if (value.isNothingSelected()) {
                     value = defaultValue;
                 }
-                if (value == null) {
-                    value = "";
-                }
-                final String oldValue = getParamSaved(param);
+                final Value oldValue = getParamSaved(param);
                 final Widget wi = getWidget(param, null);
                 final boolean haveChanged =
                    !Tools.areEqual(value, oldValue)
@@ -116,14 +115,18 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         final CRMXML crmXML = getBrowser().getCRMXML();
-        return crmXML.checkMetaAttrParam(param, newValue);
+        if (newValue == null) {
+            return crmXML.checkMetaAttrParam(param, null);
+        } else {
+            return crmXML.checkMetaAttrParam(param, newValue.getValueForConfig());
+        }
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         if ("resource-stickiness".equals(param)) {
             return getBrowser().getServicesInfo().getResource().getValue(
                                                 "default-resource-stickiness");
@@ -134,12 +137,12 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns saved value for specified parameter. */
     @Override
-    protected String getParamSaved(final String param) {
+    protected Value getParamSaved(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        String value = super.getParamSaved(param);
+        Value value = super.getParamSaved(param);
         if (value == null) {
-            value = clStatus.getRscDefaultsParameter(param, false);
-            if (value == null) {
+            value = new StringValue(clStatus.getRscDefaultsParameter(param, false));
+            if (value.isNothingSelected()) {
                 value = getParamPreferred(param);
                 if (value == null) {
                     return getParamDefault(param);
@@ -151,14 +154,14 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getRscDefaultsPreferred(param);
     }
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (isCheckBox(param)) {
             return crmXML.getRscDefaultsCheckBoxChoices(param);

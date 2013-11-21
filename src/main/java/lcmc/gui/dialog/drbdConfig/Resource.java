@@ -45,6 +45,8 @@ import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -136,7 +138,7 @@ public final class Resource extends DrbdConfig {
                     && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
-                final String value = dri.getComboBoxValue(commonP);
+                final Value value = dri.getComboBoxValue(commonP);
                 drbdInfo.getResource().setValue(commonP, value);
                 drbdInfo.getWidget(commonP, null).setValue(value);
             }
@@ -211,25 +213,25 @@ public final class Resource extends DrbdConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         /* common options */
-        final Map<String, String> commonPreferredValue =
-                                                new HashMap<String, String>();
-        commonPreferredValue.put(DrbdXML.PROTOCOL_PARAM, "C");
-        commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, "0");
-        commonPreferredValue.put(CRAM_HMAC_ALG, "sha1");
-        commonPreferredValue.put(SHARED_SECRET, getRandomSecret());
-        commonPreferredValue.put(ON_IO_ERROR, "detach");
-        commonPreferredValue.put(PROXY_MEMLIMIT, "100M");
-        commonPreferredValue.put(PROXY_PLUGIN_ZLIB, "level 9");
+        final Map<String, Value> commonPreferredValue =
+                                                new HashMap<String, Value>();
+        commonPreferredValue.put(DrbdXML.PROTOCOL_PARAM, new StringValue("C"));
+        commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, new StringValue("0"));
+        commonPreferredValue.put(CRAM_HMAC_ALG, new StringValue("sha1"));
+        commonPreferredValue.put(SHARED_SECRET, new StringValue(getRandomSecret()));
+        commonPreferredValue.put(ON_IO_ERROR, new StringValue("detach"));
+        commonPreferredValue.put(PROXY_MEMLIMIT, new StringValue("100M"));
+        commonPreferredValue.put(PROXY_PLUGIN_ZLIB, new StringValue("level 9"));
         if (drbdInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 /* for the first resource set common options. */
-                final String commonValue =
+                final Value commonValue =
                                       drbdInfo.getResource().getValue(commonP);
                 if (commonPreferredValue.containsKey(commonP)) {
-                    final String defaultValue =
+                    final Value defaultValue =
                                drbdInfo.getParamDefault(commonP);
-                    if ((defaultValue == null && "".equals(commonValue))
-                        || (defaultValue != null
+                    if ((defaultValue.isNothingSelected() && commonValue.isNothingSelected())
+                        || (!defaultValue.isNothingSelected()
                             && defaultValue.equals(commonValue))) {
                         drbdInfo.getWidget(commonP, null).setValue(
                                             commonPreferredValue.get(commonP));
@@ -244,9 +246,9 @@ public final class Resource extends DrbdConfig {
         } else {
             /* resource options, if not defined in common section. */
             for (final String commonP : COMMON_PARAMS) {
-                final String commonValue =
+                final Value commonValue =
                                       drbdInfo.getResource().getValue(commonP);
-                if ("".equals(commonValue)
+                if (commonValue.isNothingSelected()
                     && commonPreferredValue.containsKey(commonP)) {
                     dri.getResource().setValue(
                                             commonP,

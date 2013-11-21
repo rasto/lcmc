@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import lcmc.data.Value;
 
 /**
  * This class holds resource data.
@@ -41,17 +42,17 @@ public class Resource {
     /** Name of the resource. */
     private String name = null;
     /** Map from parameter name to the saved value. */
-    private final Map<String, String> savedValue =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> savedValue =
+                                                new HashMap<String, Value>();
     /** Map from parameter to its possible choices for pulldown menus. */
-    private final Map<String, Object[]> possibleChoicesMap =
-                                                new HashMap<String, Object[]>();
+    private final Map<String, Value[]> possibleChoicesMap =
+                                                new HashMap<String, Value[]>();
     /** Map from parameter name to its default value. */
-    private final Map<String, String> defaultValueMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> defaultValueMap =
+                                                new HashMap<String, Value>();
     /** Map from parameter name to its preferred value. */
-    private final Map<String, String> preferredValueMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> preferredValueMap =
+                                                new HashMap<String, Value>();
 
     /** Whether the resource is newly allocated. */
     private boolean newResource = false;
@@ -76,12 +77,12 @@ public class Resource {
     }
 
     /** Sets value for paramter. */
-    public final void setValue(final String param, final String value) {
+    public final void setValue(final String param, final Value value) {
         savedValue.put(param, value);
     }
 
     /** Returns value for a parameter. */
-    public String getValue(final String param) {
+    public Value getValue(final String param) {
         return savedValue.get(param);
     }
 
@@ -123,9 +124,9 @@ public class Resource {
      * @return
      *          list of default values.
      */
-    protected List<Object> getPossibleChoices(final String param,
-                                              final Object[] values) {
-        final List<Object> possibleChoices = new ArrayList<Object>();
+    protected List<Value> getPossibleChoices(final String param,
+                                             final Value[] values) {
+        final List<Value> possibleChoices = new ArrayList<Value>();
         if (values == null) {
             return possibleChoices;
         }
@@ -135,38 +136,38 @@ public class Resource {
 
     /** Sets possible choices for parameter combo box. */
     public final void setPossibleChoices(final String param,
-                                         final Object[] possibleChoices) {
+                                         final Value[] possibleChoices) {
         possibleChoicesMap.remove(param);
         possibleChoicesMap.put(param, possibleChoices);
     }
 
     /** Returns possible choices for parameter combo box. */
-    public Object[] getPossibleChoices(final String param) {
-        final List<Object> possibleChoices =
+    public Value[] getPossibleChoices(final String param) {
+        final List<Value> possibleChoices =
                              getPossibleChoices(param,
                                                 possibleChoicesMap.get(param));
-        return possibleChoices.toArray(new Object[possibleChoices.size()]);
+        return possibleChoices.toArray(new Value[possibleChoices.size()]);
     }
 
     /** Sets default value for the parameter. */
     public final void setDefaultValue(final String param,
-                               final String defaultValue) {
+                               final Value defaultValue) {
         defaultValueMap.put(param, defaultValue);
     }
 
     /** Returns default value for the parameter. */
-    public final String getDefaultValue(final String param) {
+    public final Value getDefaultValue(final String param) {
         return defaultValueMap.get(param);
     }
 
     /** Sets preferred value for the parameter. */
     final void setPreferredValue(final String param,
-                                        final String preferredValue) {
+                                        final Value preferredValue) {
         preferredValueMap.put(param, preferredValue);
     }
 
     /** Returns the preferred value for the parameter. */
-    public final String getPreferredValue(final String param) {
+    public final Value getPreferredValue(final String param) {
         return preferredValueMap.get(param);
     }
 

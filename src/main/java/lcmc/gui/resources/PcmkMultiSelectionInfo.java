@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -1383,19 +1384,19 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
      * @see EditableInfo#getParamPossibleChoices()
      */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
     /** @see EditableInfo#checkParam() */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
     /** @see EditableInfo#getParamDefault() */
     @Override
-    public String getParamDefault(final String param) {
+    public Value getParamDefault(final String param) {
         return null;
     }
 
@@ -1403,7 +1404,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
      * @see EditableInfo#getParamPreferred()
      */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 

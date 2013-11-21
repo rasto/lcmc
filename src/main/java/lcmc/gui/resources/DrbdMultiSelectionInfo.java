@@ -56,6 +56,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import lcmc.data.Value;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
@@ -1799,19 +1800,19 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
      * @see EditableInfo#getParamPossibleChoices()
      */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
     /** @see EditableInfo#checkParam() */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
     /** @see EditableInfo#getParamDefault() */
     @Override
-    public String getParamDefault(final String param) {
+    public Value getParamDefault(final String param) {
         return null;
     }
 
@@ -1819,7 +1820,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
      * @see EditableInfo#getParamPreferred()
      */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 

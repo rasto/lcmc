@@ -59,7 +59,7 @@ public final class DrbdProxy {
      * Return whether there's a valid proxy config.
      */
     static boolean parse(final String text,
-                         final Map<String, String> nameValueMap)
+                         final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         final StringTokenizer st = new StringTokenizer(text);
         while (st.hasMoreTokens()) {
@@ -91,7 +91,7 @@ public final class DrbdProxy {
      * }
      */
     private static void parsePlugin(final StringTokenizer st,
-                                    final Map<String, String> nameValueMap)
+                                    final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         final String nextToken = st.nextToken();
         if (!"{".equals(nextToken)) {
@@ -117,7 +117,7 @@ public final class DrbdProxy {
     private static boolean parseStatement(
                                     final String prefix,
                                     final StringTokenizer st,
-                                    final Map<String, String> nameValueMap)
+                                    final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         String nextToken = st.nextToken();
         if ("plugin".equals(nextToken)) {
@@ -127,7 +127,7 @@ public final class DrbdProxy {
             return DONE;
         } else if (endOfStatement(nextToken)) {
             final String param = nextToken.substring(0, nextToken.length() - 1);
-            final String value = DrbdXML.CONFIG_YES;
+            final Value value = DrbdXML.CONFIG_YES;
             nameValueMap.put(prefix + param, value);
             return !DONE;
         }
@@ -149,7 +149,7 @@ public final class DrbdProxy {
                 break;
             }
         }
-        nameValueMap.put(prefix + param, value);
+        nameValueMap.put(prefix + param, new StringValue(value));
         if (!eos) {
             throw new Exceptions.DrbdConfigException(
                                             "proxy config: statement error");

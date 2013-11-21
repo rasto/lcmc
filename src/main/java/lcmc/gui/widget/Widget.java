@@ -20,6 +20,8 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -119,7 +121,7 @@ public abstract class Widget extends JPanel {
     public static final String NOTHING_SELECTED_DISPLAY =
                                 Tools.getString("Widget.NothingSelected");
     /** Nothing selected string, that returns null, if selected. */
-    public static final String NOTHING_SELECTED_INTERNAL = null;
+    public static final Value NOTHING_SELECTED_INTERNAL = null;
     /** Label of this component. */
     private JLabel label = null;
     /** Whether the component should be enabled. */
@@ -149,8 +151,8 @@ public abstract class Widget extends JPanel {
     private boolean newFlag = true;
 
     public static final Type GUESS_TYPE = null;
-    public static final String NO_DEFAULT = null;
-    public static final Object[] NO_ITEMS = null;
+    public static final Value NO_DEFAULT = new StringValue(null);
+    public static final Value[] NO_ITEMS = null;
     public static final String NO_REGEXP = null;
     public static final Map<String, String> NO_ABBRV = null;
     public static final MyButton NO_BUTTON = null;
@@ -212,8 +214,8 @@ public abstract class Widget extends JPanel {
         processAccessMode();
     }
 
-    public void reloadComboBox(final String selectedValue,
-                               final Object[] items) {
+    public void reloadComboBox(final Value selectedValue,
+                               final Value[] items) {
     }
 
     /** Sets the tooltip text. */
@@ -310,7 +312,7 @@ public abstract class Widget extends JPanel {
      */
     public abstract String getStringValue();
 
-    public final Object getValue() {
+    public final Value getValue() {
         mValueReadLock.lock();
         try {
             return getValueInternal();
@@ -320,7 +322,7 @@ public abstract class Widget extends JPanel {
     }
 
     /** Return value, that user have chosen in the field or typed in. */
-    abstract Object getValueInternal();
+    abstract Value getValueInternal();
 
     /** Clears the combo box. */
     public void clear() {
@@ -395,9 +397,9 @@ public abstract class Widget extends JPanel {
     abstract boolean isEditable();
 
     /** Sets item/value in the component and waits till it is set. */
-    public final void setValueAndWait(final Object item) {
+    public final void setValueAndWait(final Value item) {
         newFlag = false;
-        if (Tools.areEqual(item, getValue())) {
+        if (Tools.valuesEqual(item, getValue())) {
             return;
         }
         mValueWriteLock.lock();
@@ -409,10 +411,10 @@ public abstract class Widget extends JPanel {
     }
 
     /** Sets item/value in the component and waits till it is set. */
-    protected abstract void setValueAndWait0(final Object item);
+    protected abstract void setValueAndWait0(final Value item);
 
     /** Sets item/value in the component, disable listeners. */
-    public final void setValueNoListeners(final Object item) {
+    public final void setValueNoListeners(final Value item) {
         newFlag = false;
         if (Tools.areEqual(item, getValue())) {
             return;
@@ -432,7 +434,7 @@ public abstract class Widget extends JPanel {
     }
 
     /** Sets item/value in the component. */
-    public final void setValue(final Object item) {
+    public final void setValue(final Value item) {
         newFlag = false;
         if (Tools.areEqual(item, getValue())) {
             return;
@@ -474,7 +476,7 @@ public abstract class Widget extends JPanel {
                                 final Thread t = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        wl.check(text);
+                                        wl.check(new StringValue(text));
                                     }
                                 });
                                 t.start();
@@ -509,7 +511,7 @@ public abstract class Widget extends JPanel {
             public void itemStateChanged(final ItemEvent e) {
                 if (wl.isEnabled()
                     && e.getStateChange() == ItemEvent.SELECTED) {
-                    final Object value = e.getItem();
+                    final Value value = (Value) e.getItem();
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -538,8 +540,8 @@ public abstract class Widget extends JPanel {
     }
 
     /** Sets background without considering the label. */
-    public final void setBackground(final Object defaultValue,
-                                    final Object savedValue,
+    public final void setBackground(final Value defaultValue,
+                                    final Value savedValue,
                                     final boolean required) {
         setBackground(null, defaultValue, null, savedValue, required);
     }
@@ -553,9 +555,9 @@ public abstract class Widget extends JPanel {
      * TODO: rename the function
      */
     public final void setBackground(final String defaultLabel,
-                                    final Object defaultValue,
+                                    final Value defaultValue,
                                     final String savedLabel,
-                                    final Object savedValue,
+                                    final Value savedValue,
                                     final boolean required) {
         if (getParent() == null) {
             return;
@@ -566,7 +568,7 @@ public abstract class Widget extends JPanel {
         } else {
             comp = componentPart;
         }
-        final Object value = getValue();
+        final Value value = getValue();
         String labelText = null;
         if (savedLabel != null) {
             labelText = label.getText();
@@ -606,13 +608,13 @@ public abstract class Widget extends JPanel {
     }
 
     /** Workaround for jcombobox so that it works with default button. */
-    static class ActivateDefaultButtonListener extends KeyAdapter
+    static class ActivateDefaultButtonListener<E> extends KeyAdapter
                                                implements ActionListener {
         /** Combobox, that should work with default button. */
-        private final JComboBox box;
+        private final JComboBox<E> box;
 
         /** Creates new ActivateDefaultButtonListener. */
-        ActivateDefaultButtonListener(final JComboBox box) {
+        ActivateDefaultButtonListener(final JComboBox<E> box) {
             super();
             this.box = box;
         }
@@ -819,9 +821,9 @@ public abstract class Widget extends JPanel {
     }
 
     /** Returns item at the specified index. */
-    Object getItemAt(final int i) {
-        return null;
-    }
+    //Value getItemAt(final int i) {
+    //    return null;
+    //}
 
     /** Cleanup whatever would cause a leak. */
     public void cleanup() {

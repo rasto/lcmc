@@ -77,6 +77,7 @@ import java.util.HashMap;
 import java.util.Collections;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -86,7 +87,7 @@ import lcmc.utilities.LoggerFactory;
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
-public class Info implements Comparable<Info> {
+public class Info implements Comparable<Info>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Menu node of this object. */
@@ -1203,5 +1204,32 @@ public class Info implements Comparable<Info> {
                                              componentToEditAccessMode.get(c));
             c.setEditable(accessible);
         }
+    }
+    
+    
+       @Override
+    public final String getValueForConfig() {
+        return name;
+    }
+
+    @Override
+    public final String getValueForGui() {
+        return toString();
+    }
+
+    /** Returns the string that is used for config. */
+    @Override
+    public final String getValueForConfigWithUnit() {
+        return getValueForConfig();
+    }
+
+    @Override
+    public Unit getUnit() {
+        return null;
+    }
+
+    @Override
+    public boolean isNothingSelected() {
+        return name == null;
     }
 }

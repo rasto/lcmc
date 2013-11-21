@@ -26,6 +26,7 @@ import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 
 import java.util.Map;
+import lcmc.data.StringValue;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
@@ -59,7 +60,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
             s.append(':');
         }
         s.append(getName());
-        final String string = getParamSaved("drbd_resource");
+        final String string = getParamSaved("drbd_resource").getValueForConfig();
         if (string == null) {
             s.insert(0, "new ");
         } else {
@@ -74,12 +75,12 @@ final class LinbitDrbdInfo extends ServiceInfo {
 
     /** Returns resource name. */
     String getResourceName() {
-        return getParamSaved("drbd_resource");
+        return getParamSaved("drbd_resource").getValueForConfig();
     }
 
     /** Sets resource name. TODO: not used? */
     void setResourceName(final String resourceName) {
-        getResource().setValue("drbd_resource", resourceName);
+        getResource().setValue("drbd_resource", new StringValue(resourceName));
     }
 
     /** Removes the linbit::drbd service. */

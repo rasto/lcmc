@@ -59,6 +59,7 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lcmc.data.Value;
 import lcmc.utilities.MyButton;
 
 import lcmc.utilities.Logger;
@@ -111,18 +112,15 @@ public final class GroupInfo extends ServiceInfo {
                 || PCMK_ID.equals(param)) {
                 continue;
             }
-            String value = getComboBoxValue(param);
-            if (value == null) {
-                value = "";
-            }
+            Value value = getComboBoxValue(param);
             if (value.equals(getParamDefault(param))) {
                 continue;
             }
-            if (!"".equals(value)) {
+            if (!value.isNothingSelected()) {
                 if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
-                    groupMetaArgs.put("ordered", value);
+                    groupMetaArgs.put("ordered", value.getValueForConfig());
                 } else {
-                    groupMetaArgs.put(param, value);
+                    groupMetaArgs.put(param, value.getValueForConfig());
                 }
             }
         }
@@ -195,12 +193,12 @@ public final class GroupInfo extends ServiceInfo {
                     || PCMK_ID.equals(param)) {
                     continue;
                 }
-                final String value = ci.getComboBoxValue(param);
+                final Value value = ci.getComboBoxValue(param);
                 if (value.equals(ci.getParamDefault(param))) {
                     continue;
                 }
-                if (!GUI_ID.equals(param) && !"".equals(value)) {
-                    cloneMetaArgs.put(param, value);
+                if (!GUI_ID.equals(param) && !value.isNothingSelected()) {
+                    cloneMetaArgs.put(param, value.getValueForConfig());
                 }
             }
         }
@@ -268,7 +266,7 @@ public final class GroupInfo extends ServiceInfo {
                 getBrowser().mHeartbeatIdToServiceUnlock();
             }
             if (getService().isNew()) {
-                final String id = getComboBoxValue(GUI_ID);
+                final String id = getComboBoxValue(GUI_ID).getValueForConfig();
                 getService().setIdAndCrmId(id);
                 if (getTypeRadioGroup() != null) {
                     getTypeRadioGroup().setEnabled(false);
@@ -302,8 +300,8 @@ public final class GroupInfo extends ServiceInfo {
                                        new LinkedHashMap<String, String>();
                 final Map<String, String> ordAttrs =
                                        new LinkedHashMap<String, String>();
-                colAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
-                ordAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING);
+                colAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
+                ordAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
                 if (getService().isMaster()) {
                     colAttrs.put("with-rsc-role", "Master");
                     ordAttrs.put("first-action", "promote");
@@ -337,15 +335,15 @@ public final class GroupInfo extends ServiceInfo {
                     || PCMK_ID.equals(param)) {
                     continue;
                 }
-                final String value = getComboBoxValue(param);
+                final Value value = getComboBoxValue(param);
                 if (value.equals(getParamDefault(param))) {
                     continue;
                 }
-                if (!"".equals(value)) {
+                if (!value.isNothingSelected()) {
                     if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
-                        groupMetaArgs.put("ordered", value);
+                        groupMetaArgs.put("ordered", value.getValueForConfig());
                     } else {
-                        groupMetaArgs.put(param, value);
+                        groupMetaArgs.put(param, value.getValueForConfig());
                     }
                 }
             }
@@ -628,6 +626,7 @@ public final class GroupInfo extends ServiceInfo {
                                 }
                                 hidePopup();
                                 Tools.invokeLater(new Runnable() {
+                                    @Override
                                     public void run() {
                                         for (final JDialog otherP : popups) {
                                             otherP.dispose();

@@ -34,6 +34,8 @@ import lcmc.gui.widget.Widget;
 import lcmc.utilities.Unit;
 import java.util.Map;
 import java.util.HashMap;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * An implementation of an dialog with log files.
@@ -48,7 +50,7 @@ public final class CmdLog extends HostLogs {
     private String command = "CmdLog.Processed";
     /** Time in minutes of the logs. */
     private TextfieldWithUnit timeTF;
-    private static final String DEFAULT_TIME = "5m";
+    private static final Value DEFAULT_TIME = new StringValue("5m");
 
     /** Prepares a new <code>CmdLog</code> object. */
     public CmdLog(final Host host) {

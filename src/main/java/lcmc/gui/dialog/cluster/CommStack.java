@@ -42,6 +42,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -71,7 +73,7 @@ final class CommStack extends DialogCluster {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        if (ConfigData.HEARTBEAT_NAME.equals(chooseStackCombo.getValue())) {
+        if (ConfigData.HEARTBEAT_NAME.equals(chooseStackCombo.getValue().getValueForConfig())) {
             Tools.getConfigData().setLastInstalledClusterStack(
                                                     ConfigData.HEARTBEAT_NAME);
             return new HbConfig(this, getCluster());
@@ -158,7 +160,7 @@ final class CommStack extends DialogCluster {
             }
         }
         if (!aisIsPossible && hbIsPossible) {
-            chooseStackCombo.setValue(ConfigData.HEARTBEAT_NAME);
+            chooseStackCombo.setValue(new StringValue(ConfigData.HEARTBEAT_NAME));
         }
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
@@ -248,10 +250,10 @@ final class CommStack extends DialogCluster {
         }
         chooseStackCombo = WidgetFactory.createInstance(
                                           Widget.Type.RADIOGROUP,
-                                          defaultValue,
-                                          new String[]{
-                                                   ConfigData.HEARTBEAT_NAME,
-                                                   ConfigData.COROSYNC_NAME},
+                                          new StringValue(defaultValue),
+                                          new Value[]{
+                                                 new StringValue(ConfigData.HEARTBEAT_NAME),
+                                                 new StringValue(ConfigData.COROSYNC_NAME)},
                                           Widget.NO_REGEXP,
                                           500,
                                           Widget.NO_ABBRV,

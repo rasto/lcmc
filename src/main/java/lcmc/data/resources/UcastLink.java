@@ -24,6 +24,8 @@
 package lcmc.data.resources;
 
 import lcmc.data.Host;
+import lcmc.data.Value;
+import lcmc.utilities.Unit;
 
 /**
  * This class holds data of one ucast link for heartbeat.
@@ -32,7 +34,7 @@ import lcmc.data.Host;
  * @version $Id$
  *
  */
-public final class UcastLink extends Resource {
+public final class UcastLink extends Resource implements Value {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Host object. */
@@ -68,5 +70,30 @@ public final class UcastLink extends Resource {
     /** Returns the host. */
     public Host getHost() {
         return host;
+    }
+
+    @Override
+    public String getValueForGui() {
+        return toString();
+    }
+
+    @Override
+    public String getValueForConfig() {
+        return getInterface();
+    }
+
+    @Override
+    public boolean isNothingSelected() {
+        return netInterface == null;
+    }
+
+    @Override
+    public Unit getUnit() {
+        return null;
+    }
+
+    @Override
+    public String getValueForConfigWithUnit() {
+        return getValueForConfig();
     }
 }

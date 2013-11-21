@@ -40,6 +40,8 @@ import java.awt.Component;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.ArrayList;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 
 /**
@@ -150,8 +152,8 @@ public class NewHost extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostField.setBackground(getHost().getHostnameEntered(),
-                                            getHost().getHostnameEntered(),
+                    hostField.setBackground(new StringValue(getHost().getHostnameEntered()),
+                                            new StringValue(getHost().getHostnameEntered()),
                                             true);
                 }
             });
@@ -163,15 +165,15 @@ public class NewHost extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    usernameField.setBackground(getHost().getUsername(),
-                                                getHost().getUsername(),
+                    usernameField.setBackground(new StringValue(getHost().getUsername()),
+                                                new StringValue(getHost().getUsername()),
                                                 true);
                     if (useSudoField != null) {
                         if (Host.ROOT_USER.equals(us)) {
-                            useSudoField.setValueAndWait("false");
+                            useSudoField.setValueAndWait(new StringValue("false"));
                             useSudoField.setEnabled(false);
                         } else {
-                            useSudoField.setValueAndWait("true");
+                            useSudoField.setValueAndWait(new StringValue("true"));
                             useSudoField.setEnabled(true);
                         }
                     }
@@ -185,8 +187,8 @@ public class NewHost extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    sshPortField.setBackground(getHost().getSSHPort(),
-                                               getHost().getSSHPort(),
+                    sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
+                                               new StringValue(getHost().getSSHPort()),
                                                true);
                 }
             });
@@ -248,7 +250,7 @@ public class NewHost extends DialogHost {
                 @Override
                 public void run() {
                     hostField.setValue(
-                                Tools.getConfigData().getAutoHosts().get(0));
+                                new StringValue(Tools.getConfigData().getAutoHosts().get(0)));
                 }
             });
             Tools.sleep(3000);
@@ -282,7 +284,7 @@ public class NewHost extends DialogHost {
         }
         hostField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       hn,
+                                       new StringValue(hn),
                                        Widget.NO_ITEMS,
                                        regexp,
                                        FIELD_WIDTH,
@@ -302,8 +304,8 @@ public class NewHost extends DialogHost {
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField);
         inputPane.add(hostField);
-        hostField.setBackground(getHost().getHostnameEntered(),
-                                getHost().getHostnameEntered(),
+        hostField.setBackground(new StringValue(getHost().getHostnameEntered()),
+                                new StringValue(getHost().getHostnameEntered()),
                                 true);
 
         /* SSH Port */
@@ -320,7 +322,7 @@ public class NewHost extends DialogHost {
         }
         sshPortField = WidgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
-                                      sshPort,
+                                      new StringValue(sshPort),
                                       Widget.NO_ITEMS,
                                       "^\\d+$",
                                       50,
@@ -331,8 +333,8 @@ public class NewHost extends DialogHost {
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField);
         inputPane.add(sshPortField);
-        sshPortField.setBackground(getHost().getSSHPort(),
-                                   getHost().getSSHPort(),
+        sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
+                                   new StringValue(getHost().getSSHPort()),
                                    true);
 
 
@@ -348,16 +350,16 @@ public class NewHost extends DialogHost {
                 userName = SSH_ROOT_USER;
             }
         }
-        final List<String> users = new ArrayList<String>();
+        final List<Value> users = new ArrayList<Value>();
         final String user = System.getProperty("user.name");
         if (!SSH_ROOT_USER.equals(user)) {
-            users.add(SSH_ROOT_USER);
+            users.add(new StringValue(SSH_ROOT_USER));
         }
-        users.add(user);
+        users.add(new StringValue(user));
         usernameField = WidgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
-                                   userName,
-                                   users.toArray(new String[users.size()]),
+                                   new StringValue(userName),
+                                   users.toArray(new Value[users.size()]),
                                    regexp,
                                    FIELD_WIDTH,
                                    Widget.NO_ABBRV,
@@ -368,8 +370,8 @@ public class NewHost extends DialogHost {
         addCheckField(usernameField);
         usernameLabel.setLabelFor(usernameField);
         inputPane.add(usernameField);
-        usernameField.setBackground(getHost().getUsername(),
-                                    getHost().getUsername(),
+        usernameField.setBackground(new StringValue(getHost().getUsername()),
+                                    new StringValue(getHost().getUsername()),
                                     true);
         /* use sudo */
         final JLabel useSudoLabel = new JLabel(
@@ -383,10 +385,12 @@ public class NewHost extends DialogHost {
                 useSudo = false;
             }
         }
+        final Value useSudoValue = new StringValue(useSudo.toString());
         useSudoField = WidgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
-                                      useSudo.toString(),
-                                      new String[]{"true", "false"},
+                                      useSudoValue,
+                                      new Value[]{new StringValue("true"),
+                                                  new StringValue("false")},
                                       Widget.NO_REGEXP,
                                       50,
                                       Widget.NO_ABBRV,
@@ -396,8 +400,8 @@ public class NewHost extends DialogHost {
         //addCheckField(useSudoField);
         useSudoLabel.setLabelFor(useSudoField);
         inputPane.add(useSudoField);
-        useSudoField.setBackground(useSudo,
-                                   useSudo,
+        useSudoField.setBackground(useSudoValue,
+                                   useSudoValue,
                                    true);
 
         SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols

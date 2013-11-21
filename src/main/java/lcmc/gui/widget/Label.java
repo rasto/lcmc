@@ -20,6 +20,8 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
@@ -45,7 +47,7 @@ public final class Label extends Widget {
     private static final long serialVersionUID = 1L;
 
     /** Prepares a new <code>Label</code> object. */
-    public Label(final String selectedValue,
+    public Label(final Value selectedValue,
                  final String regexp,
                  final int width,
                  final AccessMode enableAccessMode,
@@ -57,8 +59,8 @@ public final class Label extends Widget {
     }
 
     /** Returns new MTextField with default value. */
-    private JComponent getLabelField(final String value) {
-        return new JLabel(value);
+    private JComponent getLabelField(final Value value) {
+        return new JLabel(value.getValueForGui());
     }
 
     /**
@@ -76,8 +78,8 @@ public final class Label extends Widget {
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
-        return ((JLabel) getComponent()).getText();
+    protected Value getValueInternal() {
+        return new StringValue(((JLabel) getComponent()).getText());
     }
 
     /** Returns whether component is editable or not. */
@@ -88,8 +90,8 @@ public final class Label extends Widget {
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
-        ((JLabel) getComponent()).setText((String) item);
+    protected void setValueAndWait0(final Value item) {
+        ((JLabel) getComponent()).setText(item.getValueForGui());
     }
 
     /** Returns document object of the component. */
@@ -123,10 +125,10 @@ public final class Label extends Widget {
     }
 
     /** Returns item at the specified index. */
-    @Override
-    Object getItemAt(final int i) {
-        return getComponent();
-    }
+    //@Override
+    //Component getItemAt(final int i) {
+    //    return getComponent();
+    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override

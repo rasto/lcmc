@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -93,13 +95,13 @@ final class HbOrderInfo extends EditableInfo
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String ordId = getService().getHeartbeatId();
-        final Map<String, String> resourceNode = new HashMap<String, String>();
+        final Map<String, Value> resourceNode = new HashMap<String, Value>();
 
         if (serviceInfoParent == null || serviceInfoChild == null) {
             /* rsc set placeholder */
             final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
             final String score = orderData.getScore();
-            resourceNode.put(CRMXML.SCORE_STRING, score);
+            resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
         } else if (serviceInfoParent.isConstraintPH()
                    || serviceInfoChild.isConstraintPH()) {
             /* rsc set edge */
@@ -112,9 +114,9 @@ final class HbOrderInfo extends EditableInfo
                 cphi = (ConstraintPHInfo) serviceInfoChild;
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
             }
-            resourceNode.put("sequential", rscSet.getSequential());
-            resourceNode.put(CRMXML.REQUIRE_ALL_ATTR, rscSet.getRequireAll());
-            resourceNode.put("action", rscSet.getOrderAction());
+            resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
+            resourceNode.put(CRMXML.REQUIRE_ALL_ATTR, new StringValue(rscSet.getRequireAll()));
+            resourceNode.put("action", new StringValue(rscSet.getOrderAction()));
         } else {
             final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
             if (orderData != null) {
@@ -123,24 +125,21 @@ final class HbOrderInfo extends EditableInfo
                 final String firstAction = orderData.getFirstAction();
                 final String thenAction = orderData.getThenAction();
 
-                resourceNode.put(CRMXML.SCORE_STRING, score);
-                resourceNode.put("symmetrical", symmetrical);
-                resourceNode.put("first-action", firstAction);
-                resourceNode.put("then-action", thenAction);
+                resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+                resourceNode.put("symmetrical", new StringValue(symmetrical));
+                resourceNode.put("first-action", new StringValue(firstAction));
+                resourceNode.put("then-action", new StringValue(thenAction));
             }
         }
 
         final String[] params = getParametersFromXML();
         if (params != null) {
             for (String param : params) {
-                String value = resourceNode.get(param);
+                Value value = resourceNode.get(param);
                 if (value == null) {
                     value = getParamDefault(param);
                 }
-                if ("".equals(value)) {
-                    value = null;
-                }
-                final String oldValue = getParamSaved(param);
+                final Value oldValue = getParamSaved(param);
                 if ((value == null && value != oldValue)
                     || (value != null && !value.equals(oldValue))) {
                     getResource().setValue(param, value);
@@ -190,19 +189,19 @@ final class HbOrderInfo extends EditableInfo
      * constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        return getBrowser().getCRMXML().checkOrderParam(param, newValue);
+    protected boolean checkParam(final String param, final Value newValue) {
+        return getBrowser().getCRMXML().checkOrderParam(param, newValue.getValueForConfig());
     }
 
     /** Returns default for this parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return getBrowser().getCRMXML().getOrderParamDefault(param);
     }
 
     /** Returns preferred value for this parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return getBrowser().getCRMXML().getOrderParamPreferred(param);
     }
 
@@ -240,7 +239,7 @@ final class HbOrderInfo extends EditableInfo
      * down menu.
      */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if ("action".equals(param)) {
             /* rsc set */
             return getBrowser().getCRMXML().getOrderParamPossibleChoices(
@@ -306,13 +305,14 @@ final class HbOrderInfo extends EditableInfo
     }
 
     /** Returns attributes of this colocation. */
+    //TODO: what uses it?
     protected Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
-            if (!Tools.areEqual(value, getParamDefault(param))) {
-                attrs.put(param, value);
+            final Value value = getComboBoxValue(param);
+            if (!value.equals(getParamDefault(param))) {
+                attrs.put(param, value.getValueForConfig());
             }
         }
         return attrs;
@@ -325,12 +325,12 @@ final class HbOrderInfo extends EditableInfo
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = false;
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (!value.equals(getParamSaved(param))) {
                 changed = true;
             }
             if (!value.equals(getParamDefault(param))) {
-                attrs.put(param, value);
+                attrs.put(param, value.getValueForConfig());
             }
         }
         if (changed) {
@@ -479,10 +479,10 @@ final class HbOrderInfo extends EditableInfo
         final String score = data.getScore();
         if (score == null) {
             return 0;
-        } else if (CRMXML.INFINITY_STRING.equals(score)
-                   || CRMXML.PLUS_INFINITY_STRING.equals(score)) {
+        } else if (CRMXML.INFINITY_STRING.getValueForConfig().equals(score)
+                   || CRMXML.PLUS_INFINITY_STRING.getValueForConfig().equals(score)) {
             return 1000000;
-        } else if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
+        } else if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
             return -1000000;
         }
         return Integer.parseInt(score);

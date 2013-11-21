@@ -20,36 +20,17 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.utilities;
+
+package lcmc.data;
+
+import lcmc.utilities.Unit;
 
 /**
- * This class provides an object that can be used in boxes where name and its
- * string representation is different.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-public final class ComboInfo {
-    /** Internal String. */
-    private final String string;
-    /** Name. */
-    private final String name;
-
-    /** Creates a new ComboInfo object. */
-    public ComboInfo(final String name, final String string) {
-        this.name = name;
-        this.string = string;
-    }
-
-    /** Returns the name. It will be shown to the user. */
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    /** Returns the string that is used internally. */
-    public String getStringValue() {
-        return string;
-    }
+public interface Value {
+    public String getValueForGui();
+    public String getValueForConfig();
+    public boolean isNothingSelected();
+    public Unit getUnit();
+    public String getValueForConfigWithUnit();
 }

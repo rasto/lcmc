@@ -74,6 +74,8 @@ import javax.swing.JTextArea;
 import javax.swing.JComponent;
 import java.awt.Component;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -135,8 +137,8 @@ final class HbConfig extends DialogCluster {
     private static final Map<String, String> OPTION_REGEXPS =
                                                  new HashMap<String, String>();
     /** Default values. */
-    private static final Map<String, String> OPTION_DEFAULTS =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> OPTION_DEFAULTS =
+                                                 new HashMap<String, Value>();
     /** Option sizes. */
     private static final Map<String, Integer> OPTION_SIZES =
                                                 new HashMap<String, Integer>();
@@ -156,14 +158,14 @@ final class HbConfig extends DialogCluster {
         OPTION_REGEXPS.put(AUTOJOIN, "\\w*");
         OPTION_REGEXPS.put(NODE, ".*?");
         /* defaults */
-        OPTION_DEFAULTS.put(KEEPALIVE, "2");
-        OPTION_DEFAULTS.put(WARNTIME, "20");
-        OPTION_DEFAULTS.put(DEADTIME, "30");
-        OPTION_DEFAULTS.put(INITDEAD, "30");
-        OPTION_DEFAULTS.put(CRM, "respawn");
-        OPTION_DEFAULTS.put(COMPRESSION, "bz2");
-        OPTION_DEFAULTS.put(COMPRESSION_THRESHOLD, "20");
-        OPTION_DEFAULTS.put(TRADITIONAL_COMPRESSION, "on");
+        OPTION_DEFAULTS.put(KEEPALIVE, new StringValue("2"));
+        OPTION_DEFAULTS.put(WARNTIME, new StringValue("20"));
+        OPTION_DEFAULTS.put(DEADTIME, new StringValue("30"));
+        OPTION_DEFAULTS.put(INITDEAD, new StringValue("30"));
+        OPTION_DEFAULTS.put(CRM, new StringValue("respawn"));
+        OPTION_DEFAULTS.put(COMPRESSION, new StringValue("bz2"));
+        OPTION_DEFAULTS.put(COMPRESSION_THRESHOLD, new StringValue("20"));
+        OPTION_DEFAULTS.put(TRADITIONAL_COMPRESSION, new StringValue("on"));
         /* sizes */
         OPTION_SIZES.put(CRM, 100);
         OPTION_SIZES.put(COMPRESSION, 80);
@@ -173,8 +175,8 @@ final class HbConfig extends DialogCluster {
         OPTION_SIZES.put(NODE, 300);
     }
     /** Option values. */
-    private final Map<String, String[]> optionValues =
-                                               new HashMap<String, String[]>();
+    private final Map<String, Value[]> optionValues =
+                                               new HashMap<String, Value[]>();
     /** Option checkboxes. */
     private final Map<String, Widget> optionsW =
                                             new HashMap<String, Widget>();
@@ -219,13 +221,13 @@ final class HbConfig extends DialogCluster {
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
     /** Multicast type string. */
-    private static final String MCAST_TYPE = "mcast";
+    private static final Value MCAST_TYPE = new StringValue("mcast");
     /** Broadcast type string. */
-    private static final String BCAST_TYPE = "bcast";
+    private static final Value BCAST_TYPE = new StringValue("bcast");
     /** Unicast type string. */
-    private static final String UCAST_TYPE = "ucast";
+    private static final Value UCAST_TYPE = new StringValue("ucast");
     /** Serial type. */
-    private static final String SERIAL_TYPE = "serial";
+    private static final Value SERIAL_TYPE = new StringValue("serial");
     /** Width of the address combobox. */
     private static final int ADDR_COMBOBOX_WIDTH = 160;
     /** Width of the link combobox. */
@@ -270,22 +272,34 @@ final class HbConfig extends DialogCluster {
             config.append(host.getHostname());
         }
         /* choices */
-        optionValues.put(NODE, new String[]{config.toString(), ""});
-        optionValues.put(CRM, new String[]{"respawn", "on", "off"});
-        optionValues.put(COMPRESSION, new String[]{"", "zlib", "bz2"});
+        optionValues.put(NODE, new Value[]{new StringValue(config.toString()),
+                                           new StringValue()});
+        optionValues.put(CRM, new Value[]{new StringValue("respawn"),
+                                          new StringValue("on"),
+                                          new StringValue("off")});
+        optionValues.put(COMPRESSION, new Value[]{new StringValue(),
+                                                  new StringValue("zlib"),
+                                                  new StringValue("bz2")});
         optionValues.put(TRADITIONAL_COMPRESSION,
-                         new String[]{"", "on", "off"});
-        optionValues.put(LOGFACILITY, new String[]{"local0",
-                                                   "local1",
-                                                   "local2",
-                                                   "local3",
-                                                   "local4",
-                                                   "local5",
-                                                   "local6",
-                                                   "local7",
-                                                   "none"});
-        optionValues.put(USE_LOGD, new String[]{"", "on", "off"});
-        optionValues.put(AUTOJOIN, new String[]{"", "any", "other", "none"});
+                         new Value[]{new StringValue(),
+                                     new StringValue("on"),
+                                     new StringValue("off")});
+        optionValues.put(LOGFACILITY, new Value[]{new StringValue("local0"),
+                                                  new StringValue("local1"),
+                                                  new StringValue("local2"),
+                                                  new StringValue("local3"),
+                                                  new StringValue("local4"),
+                                                  new StringValue("local5"),
+                                                  new StringValue("local6"),
+                                                  new StringValue("local7"),
+                                                  new StringValue("none")});
+        optionValues.put(USE_LOGD, new Value[]{new StringValue(),
+                                               new StringValue("on"),
+                                               new StringValue("off")});
+        optionValues.put(AUTOJOIN, new Value[]{new StringValue(),
+                                               new StringValue("any"),
+                                               new StringValue("other"),
+                                               new StringValue("none")});
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
                               Tools.getDefaultColor("ConfigDialog.Button"));
@@ -494,9 +508,9 @@ final class HbConfig extends DialogCluster {
         }
         for (final String option : OPTIONS) {
             if (opValues.containsKey(option)) {
-                optionsW.get(option).setValue(opValues.get(option));
+                optionsW.get(option).setValue(new StringValue(opValues.get(option)));
             } else {
-                optionsW.get(option).setValue("");
+                optionsW.get(option).setValue(new StringValue());
             }
         }
     }
@@ -849,7 +863,7 @@ final class HbConfig extends DialogCluster {
      * button' accordingly.
      */
     private void checkInterface() {
-        final String type = typeW.getStringValue();
+        final Value type = typeW.getValue();
         String addr       = "";
         String iface      = "";
         String serial     = "";
@@ -880,7 +894,7 @@ final class HbConfig extends DialogCluster {
         }
 
         for (final CastAddress c : castAddresses) {
-            if (c.equals(type, iface, addr, serial)) {
+            if (c.equals(type.getValueForConfig(), iface, addr, serial)) {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -977,7 +991,7 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Adds interface to the config panel. It must be called from a thread. */
-    private void addInterface(final String type) {
+    private void addInterface(final Value type) {
         String iface      = "";
         String addr       = "";
         String serial     = "";
@@ -992,7 +1006,7 @@ final class HbConfig extends DialogCluster {
         } else if (SERIAL_TYPE.equals(type)) {
             serial = serialW.getStringValue();
         }
-        castAddresses.add(new CastAddress(type, iface, addr, serial));
+        castAddresses.add(new CastAddress(type.getValueForConfig(), iface, addr, serial));
         updateConfigPanelEditable(true);
         checkInterface();
     }
@@ -1004,10 +1018,10 @@ final class HbConfig extends DialogCluster {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         final Host[] hosts = getCluster().getHostsArray();
-        final String[] types = {MCAST_TYPE,
-                                BCAST_TYPE,
-                                UCAST_TYPE,
-                                SERIAL_TYPE};
+        final Value[] types = {MCAST_TYPE,
+                               BCAST_TYPE,
+                               UCAST_TYPE,
+                               SERIAL_TYPE};
 
         typeW = WidgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
@@ -1021,11 +1035,11 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_BUTTON);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        String defaultNi = null;
+        NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
             if (!n.isLocalHost()) {
-                defaultNi = n.toString();
+                defaultNi = n;
                 break;
             }
         }
@@ -1077,10 +1091,10 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_BUTTON);
 
         /* serial links */
-        final String[] serialDevs = {"/dev/ttyS0",
-                                     "/dev/ttyS1",
-                                     "/dev/ttyS2",
-                                     "/dev/ttyS3"};
+        final Value[] serialDevs = {new StringValue("/dev/ttyS0"),
+                                    new StringValue("/dev/ttyS1"),
+                                    new StringValue("/dev/ttyS2"),
+                                    new StringValue("/dev/ttyS3")};
 
         serialW = WidgetFactory.createInstance(
                                      Widget.GUESS_TYPE,
@@ -1103,7 +1117,7 @@ final class HbConfig extends DialogCluster {
                               + "(\\d \\d{0,3})?)?)?)?)?$";
         addrW = WidgetFactory.createInstance(
                                      Widget.GUESS_TYPE,
-                                     "239.192.0.0 694 1 0",
+                                     new StringValue("239.192.0.0 694 1 0"),
                                      Widget.NO_ITEMS,
                                      regexp,
                                      ADDR_COMBOBOX_WIDTH,
@@ -1116,7 +1130,7 @@ final class HbConfig extends DialogCluster {
             new WidgetListener() {
                 @Override
                 public void check(final Object value) {
-                    final String type = typeW.getStringValue();
+                    final Value type = typeW.getValue();
                     if (type != null) {
                         if (MCAST_TYPE.equals(type)
                             || BCAST_TYPE.equals(type)) {
@@ -1200,7 +1214,7 @@ final class HbConfig extends DialogCluster {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    final String type = typeW.getStringValue();
+                    final Value type = typeW.getValue();
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {

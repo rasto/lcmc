@@ -20,6 +20,8 @@
 
 package lcmc.utilities;
 
+import lcmc.data.Value;
+
 public abstract class WidgetListener {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;

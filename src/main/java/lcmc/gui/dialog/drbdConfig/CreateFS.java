@@ -46,6 +46,8 @@ import javax.swing.JComponent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -74,17 +76,17 @@ final class CreateFS extends DrbdConfig {
     private final MyButton makeFsButton = new MyButton(
                 Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
     /** No host string. (none) */
-    private static final String NO_HOST_STRING =
-                    Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString");
+    private static final Value NO_HOST_STRING =
+                    new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
     /** No file system (use existing data). */
-    private static final String NO_FILESYSTEM_STRING =
-                Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem");
+    private static final Value NO_FILESYSTEM_STRING =
+                new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem"));
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
     /** Skip sync false. */
-    private static final String SKIP_SYNC_FALSE = "false";
+    private static final Value SKIP_SYNC_FALSE = new StringValue("false");
     /** Skip sync true. */
-    private static final String SKIP_SYNC_TRUE = "true";
+    private static final Value SKIP_SYNC_TRUE = new StringValue("true");
 
     /** Prepares a new <code>CreateFS</code> object. */
     CreateFS(final WizardDialog previousDialog,
@@ -101,7 +103,7 @@ final class CreateFS extends DrbdConfig {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
             final boolean testOnly = false;
-            if (SKIP_SYNC_TRUE.equals(skipSyncW.getStringValue())) {
+            if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
                 bdiPri.skipInitialFullSync(testOnly);
             }
             bdiPri.forcePrimary(testOnly);
@@ -155,7 +157,7 @@ final class CreateFS extends DrbdConfig {
                 BlockDevInfo bdiPri = getPrimaryBD();
                 BlockDevInfo bdiSec = getSecondaryBD();
                 final boolean testOnly = false;
-                if (SKIP_SYNC_TRUE.equals(skipSyncW.getStringValue())) {
+                if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
                     bdiPri.skipInitialFullSync(testOnly);
                 }
                 bdiPri.forcePrimary(testOnly);
@@ -230,8 +232,8 @@ final class CreateFS extends DrbdConfig {
      * was chosen by user.
      */
     protected void checkButtons() {
-        final boolean noHost = hostW.getStringValue().equals(NO_HOST_STRING);
-        final boolean noFileSystem = filesystemW.getStringValue().equals(
+        final boolean noHost = hostW.getValue().equals(NO_HOST_STRING);
+        final boolean noFileSystem = filesystemW.getValue().equals(
                                                         NO_FILESYSTEM_STRING);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -291,23 +293,23 @@ final class CreateFS extends DrbdConfig {
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* host */
-        final String[] hostNames = new String[3];
-        hostNames[0] = NO_HOST_STRING;
+        final Value[] hosts = new Value[3];
+        hosts[0] = NO_HOST_STRING;
         int i = 1;
         for (final Host host : getDrbdVolumeInfo().getHosts()) {
-            hostNames[i] = host.getName();
+            hosts[i] = host;
             i++;
         }
         final JLabel hostLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
-        String defaultHost = NO_HOST_STRING;
+        Value defaultHost = NO_HOST_STRING;
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            defaultHost = hostNames[1];
+            defaultHost = hosts[1];
         }
         hostW = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        defaultHost,
-                                       hostNames,
+                                       hosts,
                                        Widget.NO_REGEXP,
                                        COMBOBOX_WIDTH,
                                        Widget.NO_ABBRV,
@@ -327,13 +329,13 @@ final class CreateFS extends DrbdConfig {
         /* Filesystem */
         final JLabel filesystemLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.Filesystem"));
-        String defaultValue = NO_FILESYSTEM_STRING;
+        Value defaultValue = NO_FILESYSTEM_STRING;
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            defaultValue = "ext3";
+            defaultValue = new StringValue("ext3");
         }
         final StringInfo[] filesystems =
             getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
-                                                                defaultValue);
+                                             defaultValue.getValueForConfig());
 
         filesystemW = WidgetFactory.createInstance(
                                      Widget.Type.COMBOBOX,
@@ -351,10 +353,10 @@ final class CreateFS extends DrbdConfig {
                             @Override
                             public void check(final Object value) {
                                 if (NO_HOST_STRING.equals(
-                                                hostW.getStringValue())
+                                                hostW.getValue())
                                     && !NO_FILESYSTEM_STRING.equals(
-                                            filesystemW.getStringValue())) {
-                                    hostW.setValue(hostNames[1]);
+                                            filesystemW.getValue())) {
+                                    hostW.setValue(hosts[1]);
                                 } else {
                                     checkButtons();
                                 }
@@ -375,8 +377,8 @@ final class CreateFS extends DrbdConfig {
         skipSyncW = WidgetFactory.createInstance(
                                       Widget.Type.CHECKBOX,
                                       SKIP_SYNC_FALSE,
-                                      new String[]{SKIP_SYNC_TRUE,
-                                                   SKIP_SYNC_FALSE},
+                                      new Value[]{SKIP_SYNC_TRUE,
+                                                  SKIP_SYNC_FALSE},
                                       Widget.NO_REGEXP,
                                       COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,

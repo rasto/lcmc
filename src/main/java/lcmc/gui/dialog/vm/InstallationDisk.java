@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -150,14 +151,14 @@ final class InstallationDisk extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
-        vmsdi.getResource().setValue(DiskData.TYPE, "file");
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE CDROM");
-        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hdc");
-        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
-        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, "default");
-        vmsdi.getResource().setValue(DiskData.READONLY, "True");
+        vmsdi.getResource().setValue(DiskData.TYPE, new StringValue("file"));
+        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, new StringValue("IDE CDROM"));
+        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hdc"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
+        vmsdi.getResource().setValue(DiskData.READONLY, new StringValue("True"));
         vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
-                                     VMSDiskInfo.LIBVIRT_IMAGE_LOCATION);
+                                     new StringValue(VMSDiskInfo.LIBVIRT_IMAGE_LOCATION));
         vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,

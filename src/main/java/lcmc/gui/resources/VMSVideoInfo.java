@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -86,14 +88,17 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{VideoData.MODEL_TYPE}));
 
     /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                               new HashMap<String, Value[]>();
     static {
         POSSIBLE_VALUES.put(VideoData.MODEL_TYPE,
-                            new String[]{"cirrus", "vga", "vmvga", "xen"});
+                            new Value[]{new StringValue("cirrus"),
+                                        new StringValue("vga"),
+                                        new StringValue("vmvga"),
+                                        new StringValue("xen")});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -142,13 +147,13 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -160,7 +165,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -239,7 +244,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
-                               getParamSaved(VideoData.MODEL_TYPE));
+                               getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -270,7 +275,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> params = super.getHWParameters(allParams);
-        setName(getParamSaved(VideoData.MODEL_TYPE));
+        setName(getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
         return params;
     }
 
@@ -322,8 +327,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+    protected boolean checkParam(final String param, final Value newValue) {
+        if (isRequired(param) && (newValue.isNothingSelected())) {
             return false;
         }
         return true;
@@ -338,14 +343,14 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             final VideoData videoData = videos.get(getName());
             if (videoData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                   videoData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -371,7 +376,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(VideoData.MODEL_TYPE);
+        final String type = getParamSaved(VideoData.MODEL_TYPE).getValueForConfig();
         if (type == null) {
             s.append("new video device...");
         } else {
@@ -393,7 +398,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
-                               getParamSaved(VideoData.MODEL_TYPE));
+                               getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
                 vmsxml.removeVideoXML(getVMSVirtualDomainInfo().getDomainName(),
                                       parameters,
                                       virshOptions);

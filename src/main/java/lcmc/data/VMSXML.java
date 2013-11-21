@@ -78,8 +78,8 @@ public final class VMSXML extends XML {
     /** List of domain names. */
     private final List<String> domainNames = new ArrayList<String>();
     /** Map from configs to names. */
-    private final Map<String, String> configsMap =
-                                            new HashMap<String, String>();
+    private final Map<Value, String> configsMap =
+                                            new HashMap<Value, String>();
     /** Map from names to configs. */
     private final Map<String, String> namesConfigsMap =
                                             new HashMap<String, String>();
@@ -132,8 +132,8 @@ public final class VMSXML extends XML {
     private final Map<String, Map<String, VideoData>> videosMap =
                        new LinkedHashMap<String, Map<String, VideoData>>();
     /** Map from domain name and network name to the network data. */
-    private final Map<String, NetworkData> networkMap =
-                                    new LinkedHashMap<String, NetworkData>();
+    private final Map<Value, NetworkData> networkMap =
+                                    new LinkedHashMap<Value, NetworkData>();
     /** Directories where are source files. */
     private final Set<String> sourceFileDirs = new TreeSet<String>();
     /** All used mac addresses. */
@@ -1458,7 +1458,7 @@ public final class VMSXML extends XML {
                                                             bridgeDelay,
                                                             bridgeForwardDelay);
 
-            networkMap.put(name, networkData);
+            networkMap.put(new StringValue(name), networkData);
         }
     }
 
@@ -2096,7 +2096,7 @@ public final class VMSXML extends XML {
         final Node configNode = getChildNode(vmNode, "config");
         final String type = parseConfig(configNode, domainName);
         final String configName = getConfigName(type, domainName);
-        configsMap.put(configName, domainName);
+        configsMap.put(new StringValue(configName), domainName);
         namesConfigsMap.put(domainName, configName);
     }
 
@@ -2167,13 +2167,13 @@ public final class VMSXML extends XML {
     }
 
     /** Returns configs of all vms. */
-    public Set<String> getConfigs() {
+    public Set<Value> getConfigs() {
         return configsMap.keySet();
     }
 
     /** Returns domain name from config file. */
     public String getNameFromConfig(final String config) {
-        return configsMap.get(config);
+        return configsMap.get(new StringValue(config));
     }
 
     /** Returns value. */
@@ -2197,8 +2197,8 @@ public final class VMSXML extends XML {
     }
 
     /** Returns array of networks. */
-    public List<String> getNetworks() {
-        return new ArrayList<String>(networkMap.keySet());
+    public List<Value> getNetworks() {
+        return new ArrayList<Value>(networkMap.keySet());
     }
 
     /** Returns array of input devices. */
@@ -2277,20 +2277,20 @@ public final class VMSXML extends XML {
             this.uuid = uuid;
             this.autostart = autostart;
             if (autostart) {
-                setValue(AUTOSTART, "true");
+                setValue(AUTOSTART, new StringValue("true"));
             } else {
-                setValue(AUTOSTART, "false");
+                setValue(AUTOSTART, new StringValue("false"));
             }
             this.forwardMode = forwardMode;
-            setValue(FORWARD_MODE, forwardMode);
+            setValue(FORWARD_MODE, new StringValue(forwardMode));
             this.bridgeName = bridgeName;
-            setValue(BRIDGE_NAME, bridgeName);
+            setValue(BRIDGE_NAME, new StringValue(bridgeName));
             this.bridgeSTP = bridgeSTP;
-            setValue(BRIDGE_STP, bridgeSTP);
+            setValue(BRIDGE_STP, new StringValue(bridgeSTP));
             this.bridgeDelay = bridgeDelay;
-            setValue(BRIDGE_DELAY, bridgeDelay);
+            setValue(BRIDGE_DELAY, new StringValue(bridgeDelay));
             this.bridgeForwardDelay = bridgeForwardDelay;
-            setValue(BRIDGE_FORWARD_DELAY, bridgeForwardDelay);
+            setValue(BRIDGE_FORWARD_DELAY, new StringValue(bridgeForwardDelay));
         }
 
         /** Whether it is autostart. */
@@ -2626,48 +2626,48 @@ public final class VMSXML extends XML {
                         final boolean shareable) {
             super();
             this.type = type;
-            setValue(TYPE, type);
+            setValue(TYPE, new StringValue(type));
             this.targetDev = targetDev;
-            setValue(TARGET_DEVICE, targetDev);
+            setValue(TARGET_DEVICE, new StringValue(targetDev));
             this.sourceFile = sourceFile;
-            setValue(SOURCE_FILE, sourceFile);
+            setValue(SOURCE_FILE, new StringValue(sourceFile));
             this.sourceDev = sourceDev;
-            setValue(SOURCE_DEVICE, sourceDev);
+            setValue(SOURCE_DEVICE, new StringValue(sourceDev));
 
             this.sourceProtocol = sourceProtocol;
-            setValue(SOURCE_PROTOCOL, sourceProtocol);
+            setValue(SOURCE_PROTOCOL, new StringValue(sourceProtocol));
             this.sourceName = sourceName;
-            setValue(SOURCE_NAME, sourceName);
+            setValue(SOURCE_NAME, new StringValue(sourceName));
             this.sourceHostName = sourceHostName;
-            setValue(SOURCE_HOST_NAME, sourceHostName);
+            setValue(SOURCE_HOST_NAME, new StringValue(sourceHostName));
             this.sourceHostPort = sourceHostPort;
-            setValue(SOURCE_HOST_PORT, sourceHostPort);
+            setValue(SOURCE_HOST_PORT, new StringValue(sourceHostPort));
             this.authUsername = authUsername;
-            setValue(AUTH_USERNAME, authUsername);
+            setValue(AUTH_USERNAME, new StringValue(authUsername));
             this.authSecretType = authSecretType;
-            setValue(AUTH_SECRET_TYPE, authSecretType);
+            setValue(AUTH_SECRET_TYPE, new StringValue(authSecretType));
             this.authSecretUuid = authSecretUuid;
-            setValue(AUTH_SECRET_UUID, authSecretUuid);
+            setValue(AUTH_SECRET_UUID, new StringValue(authSecretUuid));
 
             this.targetBusType = targetBusType;
-            setValue(TARGET_BUS_TYPE, targetBusType);
+            setValue(TARGET_BUS_TYPE, new StringValue(targetBusType));
             this.driverName = driverName;
-            setValue(DRIVER_NAME, driverName);
+            setValue(DRIVER_NAME, new StringValue(driverName));
             this.driverType = driverType;
-            setValue(DRIVER_TYPE, driverType);
+            setValue(DRIVER_TYPE, new StringValue(driverType));
             this.driverCache = driverCache;
-            setValue(DRIVER_CACHE, driverCache);
+            setValue(DRIVER_CACHE, new StringValue(driverCache));
             this.readonly = readonly;
             if (readonly) {
-                setValue(READONLY, "True");
+                setValue(READONLY, new StringValue("True"));
             } else {
-                setValue(READONLY, "False");
+                setValue(READONLY, new StringValue("False"));
             }
             this.shareable = shareable;
             if (shareable) {
-                setValue(SHAREABLE, "True");
+                setValue(SHAREABLE, new StringValue("True"));
             } else {
-                setValue(SHAREABLE, "False");
+                setValue(SHAREABLE, new StringValue("False"));
             }
         }
 
@@ -2785,13 +2785,13 @@ public final class VMSXML extends XML {
                               final String targetDir) {
             super();
             this.type = type;
-            setValue(TYPE, type);
+            setValue(TYPE, new StringValue(type));
             this.sourceDir = sourceDir;
-            setValue(SOURCE_DIR, sourceDir);
+            setValue(SOURCE_DIR, new StringValue(sourceDir));
             this.sourceName = sourceName;
-            setValue(SOURCE_NAME, sourceName);
+            setValue(SOURCE_NAME, new StringValue(sourceName));
             this.targetDir = targetDir;
-            setValue(TARGET_DIR, targetDir);
+            setValue(TARGET_DIR, new StringValue(targetDir));
         }
 
         /** Returns type. */
@@ -2818,14 +2818,14 @@ public final class VMSXML extends XML {
     /** Class that holds data about virtual hardware. */
     private abstract static class HardwareData {
         /** Name value pairs. */
-        private final Map<String, String> valueMap =
-                                                new HashMap<String, String>();
+        private final Map<String, Value> valueMap =
+                                                new HashMap<String, Value>();
         /** Sets value of this parameter. */
-        final void setValue(final String param, final String value) {
+        final void setValue(final String param, final Value value) {
             valueMap.put(param, value);
         }
         /** Returns value of this parameter. */
-        public final String getValue(final String param) {
+        public final Value getValue(final String param) {
             return valueMap.get(param);
         }
     }
@@ -2868,16 +2868,16 @@ public final class VMSXML extends XML {
                              final String scriptPath) {
             super();
             this.type = type;
-            setValue(TYPE, type);
-            setValue(MAC_ADDRESS, macAddress);
+            setValue(TYPE, new StringValue(type));
+            setValue(MAC_ADDRESS, new StringValue(macAddress));
             this.sourceNetwork = sourceNetwork;
-            setValue(SOURCE_NETWORK, sourceNetwork);
+            setValue(SOURCE_NETWORK, new StringValue(sourceNetwork));
             this.sourceBridge = sourceBridge;
-            setValue(SOURCE_BRIDGE, sourceBridge);
+            setValue(SOURCE_BRIDGE, new StringValue(sourceBridge));
             this.targetDev = targetDev;
-            setValue(TARGET_DEV, targetDev);
-            setValue(MODEL_TYPE, modelType);
-            setValue(SCRIPT_PATH, scriptPath);
+            setValue(TARGET_DEV, new StringValue(targetDev));
+            setValue(MODEL_TYPE, new StringValue(modelType));
+            setValue(SCRIPT_PATH, new StringValue(scriptPath));
         }
 
         /** Returns type. */
@@ -2922,9 +2922,9 @@ public final class VMSXML extends XML {
                             final String bus) {
             super();
             this.type = type;
-            setValue(TYPE, type);
+            setValue(TYPE, new StringValue(type));
             this.bus = bus;
-            setValue(BUS, bus);
+            setValue(BUS, new StringValue(bus));
         }
 
         /** Returns type. */
@@ -2972,13 +2972,13 @@ public final class VMSXML extends XML {
                             final String xauth) {
             super();
             this.type = type;
-            setValue(TYPE, type);
-            setValue(PORT, port);
-            setValue(LISTEN, listen);
-            setValue(PASSWD, passwd);
-            setValue(KEYMAP, keymap);
-            setValue(DISPLAY, display);
-            setValue(XAUTH, xauth);
+            setValue(TYPE, new StringValue(type));
+            setValue(PORT, new StringValue(port));
+            setValue(LISTEN, new StringValue(listen));
+            setValue(PASSWD, new StringValue(passwd));
+            setValue(KEYMAP, new StringValue(keymap));
+            setValue(DISPLAY, new StringValue(display));
+            setValue(XAUTH, new StringValue(xauth));
         }
 
         /** Returns type. */
@@ -3000,7 +3000,7 @@ public final class VMSXML extends XML {
         public SoundData(final String model) {
             super();
             this.model = model;
-            setValue(MODEL, model);
+            setValue(MODEL, new StringValue(model));
         }
 
         /** Returns model. */
@@ -3052,16 +3052,16 @@ public final class VMSXML extends XML {
                                   final String targetPort) {
             super();
             this.type = type;
-            setValue(TYPE, type);
-            setValue(SOURCE_PATH, sourcePath);
-            setValue(BIND_SOURCE_MODE, bindSourceMode);
-            setValue(BIND_SOURCE_HOST, bindSourceHost);
-            setValue(BIND_SOURCE_SERVICE, bindSourceService);
-            setValue(CONNECT_SOURCE_MODE, connectSourceMode);
-            setValue(CONNECT_SOURCE_HOST, connectSourceHost);
-            setValue(CONNECT_SOURCE_SERVICE, connectSourceService);
-            setValue(PROTOCOL_TYPE, protocolType);
-            setValue(TARGET_PORT, targetPort);
+            setValue(TYPE, new StringValue(type));
+            setValue(SOURCE_PATH, new StringValue(sourcePath));
+            setValue(BIND_SOURCE_MODE, new StringValue(bindSourceMode));
+            setValue(BIND_SOURCE_HOST, new StringValue(bindSourceHost));
+            setValue(BIND_SOURCE_SERVICE, new StringValue(bindSourceService));
+            setValue(CONNECT_SOURCE_MODE, new StringValue(connectSourceMode));
+            setValue(CONNECT_SOURCE_HOST, new StringValue(connectSourceHost));
+            setValue(CONNECT_SOURCE_SERVICE, new StringValue(connectSourceService));
+            setValue(PROTOCOL_TYPE, new StringValue(protocolType));
+            setValue(TARGET_PORT, new StringValue(targetPort));
         }
 
         /** Returns model. */
@@ -3143,9 +3143,9 @@ public final class VMSXML extends XML {
                          final String modelHeads) {
             super();
             this.modelType = modelType;
-            setValue(MODEL_TYPE, modelType);
-            setValue(MODEL_VRAM, modelVRAM);
-            setValue(MODEL_HEADS, modelHeads);
+            setValue(MODEL_TYPE, new StringValue(modelType));
+            setValue(MODEL_VRAM, new StringValue(modelVRAM));
+            setValue(MODEL_HEADS, new StringValue(modelHeads));
         }
 
         /** Returns model. */
@@ -3182,7 +3182,7 @@ public final class VMSXML extends XML {
     }
 
     /** Returns source file directories. */
-    public Set<String> getsourceFileDirs() {
+    public Set<String> getSourceFileDirs() {
         return sourceFileDirs;
     }
 

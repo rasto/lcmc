@@ -37,6 +37,8 @@ import java.util.TreeSet;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
@@ -51,12 +53,12 @@ final class VirtualDomainInfo extends ServiceInfo {
     private static final String CONFIG_PARAM = "config";
     private static final String HYPERVISOR_PARAM = "hypervisor";
     /** Hypervisor choices. */
-    private static final String[] HYPERVISORS = new String[]{"qemu:///system",
-                                                             "xen:///",
-                                                             "lxc:///",
-                                                             "vbox:///",
-                                                             "openvz:///system",
-                                                             "uml:///system"};
+    private static final Value[] HYPERVISORS = new Value[]{new StringValue("qemu:///system"),
+                                                           new StringValue("xen:///"),
+                                                           new StringValue("lxc:///"),
+                                                           new StringValue("vbox:///"),
+                                                           new StringValue("openvz:///system"),
+                                                           new StringValue("uml:///system")};
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
 
     /** Creates the VirtualDomainInfo object. */
@@ -110,12 +112,12 @@ final class VirtualDomainInfo extends ServiceInfo {
     /** Connects with VMSVirtualDomainInfo object. */
     @Override
     public VMSVirtualDomainInfo connectWithVMS() {
-        final String config = getParamSaved(CONFIG_PARAM);
+        final Value config = getParamSaved(CONFIG_PARAM);
         VMSVirtualDomainInfo newVMSVDI = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
-                final String name = vxml.getNameFromConfig(config);
+                final String name = vxml.getNameFromConfig(config.getValueForConfig());
                 newVMSVDI = getBrowser().findVMSVirtualDomainInfo(name);
                 if (newVMSVDI != null) {
                     newVMSVDI.setUsedByCRM(true);
@@ -262,16 +264,16 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (CONFIG_PARAM.equals(param)) {
-            final Set<String> configs = new TreeSet<String>();
+            final Set<Value> configs = new TreeSet<Value>();
             for (final Host host : getBrowser().getClusterHosts()) {
                 final VMSXML vxml = getBrowser().getVMSXML(host);
                 if (vxml != null) {
                     configs.addAll(vxml.getConfigs());
                 }
             }
-            return configs.toArray(new String[configs.size()]);
+            return configs.toArray(new Value[configs.size()]);
         } else if (HYPERVISOR_PARAM.equals(param)) {
             return HYPERVISORS;
         } else {
@@ -297,11 +299,11 @@ final class VirtualDomainInfo extends ServiceInfo {
         s.append(getName());
         final String string;
         final String id = getService().getId();
-        final String configName = getParamSaved(CONFIG_PARAM);
+        final Value configName = getParamSaved(CONFIG_PARAM);
         if (configName == null) {
             string = id;
         } else {
-            final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName);
+            final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName.getValueForConfig());
             if (m.matches()) {
                 string = m.group(1);
             } else {

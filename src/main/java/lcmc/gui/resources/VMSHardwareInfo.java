@@ -60,6 +60,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 import lcmc.utilities.Logger;
@@ -425,13 +427,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         });
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : getParametersFromXML()) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (allParams
-                || !Tools.areEqual(getParamSaved(param), value)) {
-                if (Tools.areEqual(getParamDefault(param), value)) {
+                || !getParamSaved(param).equals(value)) {
+                if (getParamDefault(param).equals(value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
             }
         }
@@ -615,7 +617,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (ret == JFileChooser.APPROVE_OPTION
             && fc.getSelectedFile() != null) {
             final String name = fc.getSelectedFile().getAbsolutePath();
-            paramWi.setValue(name);
+            paramWi.setValue(new StringValue(name));
         }
     }
 
@@ -689,7 +691,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Saves all preferred values. */
     public final void savePreferredValues() {
         for (final String param : getParametersFromXML()) {
-            final String pv = getParamPreferred(param);
+            final Value pv = getParamPreferred(param);
             if (pv != null) {
                 getResource().setValue(param, pv);
             }

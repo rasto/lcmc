@@ -55,6 +55,7 @@ import java.awt.event.ActionEvent;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lcmc.data.Value;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -139,19 +140,19 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     protected final boolean checkParam(final String param,
-                                       final String newValue) {
+                                       final Value newValue) {
         return false;
     }
 
     /** Returns default for this parameter. */
     @Override
-    protected final String getParamDefault(final String param) {
+    protected final Value getParamDefault(final String param) {
         return null;
     }
 
     /** Returns preferred value for this parameter. */
     @Override
-    protected final String getParamPreferred(final String param) {
+    protected final Value getParamPreferred(final String param) {
         return null;
     }
 
@@ -166,7 +167,7 @@ public class HbConnectionInfo extends EditableInfo {
      * down menu.
      */
     @Override
-    protected final Object[] getParamPossibleChoices(final String param) {
+    protected final Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 

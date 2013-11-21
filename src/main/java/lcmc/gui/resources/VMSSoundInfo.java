@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -68,14 +70,17 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
 
     /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                               new HashMap<String, Value[]>();
     static {
         POSSIBLE_VALUES.put(SoundData.MODEL,
-                            new String[]{"ac97", "es1370", "pcspk", "sb16"});
+                            new Value[]{new StringValue("ac97"),
+                                         new StringValue("es1370"),
+                                         new StringValue("pcspk"),
+                                         new StringValue("sb16")});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -120,13 +125,13 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -138,7 +143,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -217,7 +222,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(SoundData.SAVED_MODEL,
-                               getParamSaved(SoundData.MODEL));
+                               getParamSaved(SoundData.MODEL).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -248,7 +253,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> params = super.getHWParameters(allParams);
-        setName(getParamSaved(SoundData.MODEL));
+        setName(getParamSaved(SoundData.MODEL).getValueForConfig());
         return params;
     }
 
@@ -296,8 +301,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+    protected boolean checkParam(final String param, final Value newValue) {
+        if (isRequired(param) && (newValue.isNothingSelected())) {
             return false;
         }
         return true;
@@ -312,14 +317,14 @@ final class VMSSoundInfo extends VMSHardwareInfo {
             final SoundData soundData = sounds.get(getName());
             if (soundData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue = soundData.getValue(param);
+                            final Value savedValue = soundData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
                             }
@@ -344,7 +349,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String model = getParamSaved(SoundData.MODEL);
+        final String model = getParamSaved(SoundData.MODEL).getValueForConfig();
         if (model == null) {
             s.append("new sound device...");
         } else {
@@ -366,7 +371,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(SoundData.SAVED_MODEL,
-                               getParamSaved(SoundData.MODEL));
+                               getParamSaved(SoundData.MODEL).getValueForConfig());
                 vmsxml.removeSoundXML(getVMSVirtualDomainInfo().getDomainName(),
                                       parameters,
                                       virshOptions);

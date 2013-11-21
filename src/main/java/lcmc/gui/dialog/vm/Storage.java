@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -150,23 +151,24 @@ final class Storage extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
-        vmsdi.getResource().setValue(DiskData.TYPE, "file");
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, "IDE Disk");
-        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, "hda");
-        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, "raw");
-        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, "default");
+        vmsdi.getResource().setValue(DiskData.TYPE, new StringValue("file"));
+        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, new StringValue("IDE Disk"));
+        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hda"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
         if ("xen".equals(getVMSVirtualDomainInfo().getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "file");
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("file"));
         } else {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, "qemu");
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("qemu"));
         }
-        vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
-                                     "/var/lib/libvirt/images/"
+        vmsdi.getResource().setValue(
+                     DiskData.SOURCE_FILE,
+                     new StringValue("/var/lib/libvirt/images/"
                                      +
                                      getVMSVirtualDomainInfo().getComboBoxValue(
                                                          VMSXML.VM_PARAM_NAME)
-                                     + ".img");
+                                     + ".img"));
         vmsdi.addWizardParams(
                       optionsPanel,
                       PARAMS,

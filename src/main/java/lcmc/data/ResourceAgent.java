@@ -90,11 +90,11 @@ public final class ResourceAgent {
     private final Map<String, String> paramPreferred =
                                                  new HashMap<String, String>();
     /** Map from parameter to an array of its possible choices. */
-    private final Map<String, String[]> paramPossibleChoices =
-                                               new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramPossibleChoices =
+                                               new HashMap<String, Value[]>();
     /** Map from m/s parameter to an array of its possible choices. */
-    private final Map<String, String[]> paramPossibleChoicesMS =
-                                               new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramPossibleChoicesMS =
+                                               new HashMap<String, Value[]>();
     /** Name of the hb service in the pull down menus. */
     private final String menuName;
     /** Map that holds default values for operations. The keys are the name and
@@ -392,7 +392,7 @@ public final class ResourceAgent {
     }
 
     /** Sets the possible choices for the parameter. */
-    void setParamPossibleChoices(final String param, final String[] choices) {
+    void setParamPossibleChoices(final String param, final Value[] choices) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -402,7 +402,7 @@ public final class ResourceAgent {
 
     /** Sets the possible choices for the parameter. */
     void setParamPossibleChoicesMS(final String param,
-                                   final String[] choices) {
+                                   final Value[] choices) {
         if (!masterParameters.contains(param)) {
             wrongParameterError(param);
             return;
@@ -411,13 +411,13 @@ public final class ResourceAgent {
     }
 
     /** Gets the array of the possible choices of the parameter. */
-    String[] getParamPossibleChoices(final String param) {
+    Value[] getParamPossibleChoices(final String param) {
         return paramPossibleChoices.get(param);
     }
 
     /** Gets the array of the possible choices of the m/s parameter. */
-    String[] getParamPossibleChoicesMS(final String param) {
-        final String[] ret = paramPossibleChoicesMS.get(param);
+    Value[] getParamPossibleChoicesMS(final String param) {
+        final Value[] ret = paramPossibleChoicesMS.get(param);
         if (ret == null) {
             return getParamPossibleChoices(param);
         }

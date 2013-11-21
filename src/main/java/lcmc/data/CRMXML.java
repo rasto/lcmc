@@ -93,17 +93,17 @@ public final class CRMXML extends XML {
     private final Map<String, String> paramGlobalLongDescMap =
                                                 new HashMap<String, String>();
     /** Map from global parameter to its default value. */
-    private final Map<String, String> paramGlobalDefaultMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramGlobalDefaultMap =
+                                                new HashMap<String, Value>();
     /** Map from global parameter to its preferred value. */
-    private final Map<String, String> paramGlobalPreferredMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramGlobalPreferredMap =
+                                                new HashMap<String, Value>();
     /** Map from global parameter to its type. */
     private final Map<String, String> paramGlobalTypeMap =
                                                 new HashMap<String, String>();
     /** Map from global parameter to the array of possible choices. */
-    private final Map<String, String[]> paramGlobalPossibleChoices =
-                                              new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramGlobalPossibleChoices =
+                                              new HashMap<String, Value[]>();
     /** List of parameters for colocations. */
     private final List<String> colParams = new ArrayList<String>();
     /** List of parameters for colocation in resource sets.
@@ -122,22 +122,22 @@ public final class CRMXML extends XML {
     private final Map<String, String> paramColLongDescMap =
                                                 new HashMap<String, String>();
     /** Map from colocation parameter to its default value. */
-    private final Map<String, String> paramColDefaultMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramColDefaultMap =
+                                                new HashMap<String, Value>();
     /** Map from colocation parameter to its preferred value. */
-    private final Map<String, String> paramColPreferredMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramColPreferredMap =
+                                                new HashMap<String, Value>();
     /** Map from colocation parameter to its type. */
     private final Map<String, String> paramColTypeMap =
                                                 new HashMap<String, String>();
     /** Map from colocation parameter to the array of possible choices. */
-    private final Map<String, String[]> paramColPossibleChoices =
-                                              new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramColPossibleChoices =
+                                              new HashMap<String, Value[]>();
 
     /** Map from colocation parameter to the array of possible choices for
      * master/slave resource. */
-    private final Map<String, String[]> paramColPossibleChoicesMS =
-                                              new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramColPossibleChoicesMS =
+                                              new HashMap<String, Value[]>();
 
     /** List of parameters for order. */
     private final List<String> ordParams = new ArrayList<String>();
@@ -155,21 +155,21 @@ public final class CRMXML extends XML {
     private final Map<String, String> paramOrdLongDescMap =
                                              new HashMap<String, String>();
     /** Map from order parameter to its default value. */
-    private final Map<String, String> paramOrdDefaultMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramOrdDefaultMap =
+                                                new HashMap<String, Value>();
     /** Map from order parameter to its preferred value. */
-    private final Map<String, String> paramOrdPreferredMap =
-                                                new HashMap<String, String>();
+    private final Map<String, Value> paramOrdPreferredMap =
+                                                new HashMap<String, Value>();
     /** Map from order parameter to its type. */
     private final Map<String, String> paramOrdTypeMap =
                                                 new HashMap<String, String>();
     /** Map from order parameter to the array of possible choices. */
-    private final Map<String, String[]> paramOrdPossibleChoices =
-                                              new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramOrdPossibleChoices =
+                                              new HashMap<String, Value[]>();
     /** Map from order parameter to the array of possible choices for
      * master/slave resource. */
-    private final Map<String, String[]> paramOrdPossibleChoicesMS =
-                                              new HashMap<String, String[]>();
+    private final Map<String, Value[]> paramOrdPossibleChoicesMS =
+                                              new HashMap<String, Value[]>();
     /** Predefined group as heartbeat service. */
     private final ResourceAgent hbGroup =
                                   new ResourceAgent(ConfigData.PM_GROUP_NAME,
@@ -195,17 +195,17 @@ public final class CRMXML extends XML {
     /** Whether linbit::drbd ra is present. */
     private boolean linbitDrbdPresent;
     /** Choices for combo box in stonith hostlists. */
-    private final List<String> hostlistChoices = new ArrayList<String>();
+    private final List<Value> hostlistChoices = new ArrayList<Value>();
     /** Parameters of some RAs that are not advanced. */
     private static final MultiKeyMap<String, String> RA_PARAM_SECTION =
                                             new MultiKeyMap<String, String>();
 
     /** Pacemaker "true" string. */
-    static final String PCMK_TRUE = "true";
+    static final Value PCMK_TRUE = new StringValue("true");
     /** Pacemaker "false" string. */
-    static final String PCMK_FALSE = "false";
+    static final Value PCMK_FALSE = new StringValue("false");
     /** Disabled string. */
-    public static final String DISABLED_STRING = "disabled";
+    public static final Value DISABLED_STRING = new StringValue("disabled");
     /** Boolean parameter type. */
     private static final String PARAM_TYPE_BOOLEAN = "boolean";
     /** Integer parameter type. */
@@ -219,25 +219,25 @@ public final class CRMXML extends XML {
     /** Fail count prefix. */
     private static final String FAIL_COUNT_PREFIX = "fail-count-";
     /** Attribute roles. */
-    private static final String[] ATTRIBUTE_ROLES = {null,
-                                                     "Stopped",
-                                                     "Started"};
-    /** Atribute roles for master/slave resource. */
-    private static final String[] ATTRIBUTE_ROLES_MS = {null,
-                                                        "Stopped",
-                                                        "Started",
-                                                        "Master",
-                                                        "Slave"};
+    private static final Value[] ATTRIBUTE_ROLES = {new StringValue(),
+                                                    new StringValue("Stopped"),
+                                                    new StringValue("Started")};
+    /** Attribute roles for master/slave resource. */
+    private static final Value[] ATTRIBUTE_ROLES_MS = {new StringValue(),
+                                                       new StringValue("Stopped"),
+                                                       new StringValue("Started"),
+                                                       new StringValue("Master"),
+                                                       new StringValue("Slave")};
     /** Attribute actions. */
-    private static final String[] ATTRIBUTE_ACTIONS = {null,
-                                                       "start",
-                                                       "stop"};
+    private static final Value[] ATTRIBUTE_ACTIONS = {new StringValue(),
+                                                      new StringValue( "start"),
+                                                      new StringValue( "stop")};
     /** Attribute actions for master/slave. */
-    private static final String[] ATTRIBUTE_ACTIONS_MS = {null,
-                                                          "start",
-                                                          "promote",
-                                                          "demote",
-                                                          "stop"};
+    private static final Value[] ATTRIBUTE_ACTIONS_MS = {new StringValue(),
+                                                         new StringValue("start"),
+                                                         new StringValue("promote"),
+                                                         new StringValue("demote"),
+                                                         new StringValue("stop")};
     /** Target role stopped. */
     public static final String TARGET_ROLE_STOPPED = "stopped";
     /** Target role started. */
@@ -247,19 +247,19 @@ public final class CRMXML extends XML {
     /** Target role slave. */
     public static final String TARGET_ROLE_SLAVE = "slave";
     /** INFINITY keyword. */
-    public static final String INFINITY_STRING = "INFINITY";
+    public static final Value INFINITY_STRING = new StringValue("INFINITY");
     /** Alternative INFINITY keyword. */
-    public static final String PLUS_INFINITY_STRING = "+INFINITY";
+    public static final Value PLUS_INFINITY_STRING = new StringValue("+INFINITY");
     /** -INFINITY keyword. */
-    public static final String MINUS_INFINITY_STRING = "-INFINITY";
+    public static final Value MINUS_INFINITY_STRING = new StringValue("-INFINITY");
     /** Choices for integer fields. */
-    private static final String[] INTEGER_VALUES = {null,
-                                                    "0",
-                                                    "2",
-                                                    "100",
-                                                    INFINITY_STRING,
-                                                    MINUS_INFINITY_STRING,
-                                                    PLUS_INFINITY_STRING};
+    private static final Value[] INTEGER_VALUES = {new StringValue(),
+                                                   new StringValue("0"),
+                                                   new StringValue("2"),
+                                                   new StringValue("100"),
+                                                   INFINITY_STRING,
+                                                   MINUS_INFINITY_STRING,
+                                                   PLUS_INFINITY_STRING};
     /** Name of the stonith timeout instance attribute. */
     private static final String STONITH_TIMEOUT_INSTANCE_ATTR =
                                                             "stonith-timeout";
@@ -317,9 +317,9 @@ public final class CRMXML extends XML {
     private static final String GROUP_COLLOCATED_META_ATTR = "collocated";
 
     /** Require all "true" value. */
-    public static final String REQUIRE_ALL_TRUE = PCMK_TRUE;
+    public static final Value REQUIRE_ALL_TRUE = PCMK_TRUE;
     /** Require all "false" value. */
-    public static final String REQUIRE_ALL_FALSE = PCMK_FALSE;
+    public static final Value REQUIRE_ALL_FALSE = PCMK_FALSE;
     /** Name of the require-all resource set attribute. */
     public static final String REQUIRE_ALL_ATTR = "require-all";
 
@@ -340,11 +340,11 @@ public final class CRMXML extends XML {
                                 M_A_RSC_DEFAULTS_ACCESS_TYPE =
                                   new HashMap<String, ConfigData.AccessType>();
     /** Possible choices for meta attributes. */
-    private static final Map<String, String[]> M_A_POSSIBLE_CHOICES =
-                                                new HashMap<String, String[]>();
+    private static final Map<String, Value[]> M_A_POSSIBLE_CHOICES =
+                                                new HashMap<String, Value[]>();
     /** Possible choices for m/s meta attributes. */
-    private static final Map<String, String[]> M_A_POSSIBLE_CHOICES_MS =
-                                                new HashMap<String, String[]>();
+    private static final Map<String, Value[]> M_A_POSSIBLE_CHOICES_MS =
+                                                new HashMap<String, Value[]>();
     /** Short descriptions for meta attributes. */
     private static final Map<String, String> M_A_SHORT_DESC =
                                                 new HashMap<String, String>();
@@ -352,17 +352,16 @@ public final class CRMXML extends XML {
     private static final Map<String, String> M_A_LONG_DESC =
                                                 new HashMap<String, String>();
     /** Defaults for meta attributes. */
-    private static final Map<String, String> M_A_DEFAULT =
-                                                new HashMap<String, String>();
+    private static final Map<String, Value> M_A_DEFAULT =
+                                                new HashMap<String, Value>();
     /** Types for meta attributes. */
     private static final Map<String, String> M_A_TYPE =
                                                 new HashMap<String, String>();
     /** Preferred values for meta attributes. */
-    private static final Map<String, String> M_A_PREFERRED =
-                                                new HashMap<String, String>();
+    private static final Map<String, Value> M_A_PREFERRED =
+                                                new HashMap<String, Value>();
     /** Array of boolean values names in the cluster manager. */
-    private static final String[] PCMK_BOOLEAN_VALUES = {PCMK_TRUE, PCMK_FALSE};
-
+    private static final Value[] PCMK_BOOLEAN_VALUES = {PCMK_TRUE, PCMK_FALSE};
     private static final List<String> IGNORE_DEFAULTS_FOR =
                                                     new ArrayList<String>();
 
@@ -384,14 +383,14 @@ public final class CRMXML extends XML {
         /* target-role */
         M_A_POSSIBLE_CHOICES.put(
                TARGET_ROLE_META_ATTR,
-               new String[]{null, TARGET_ROLE_STARTED, TARGET_ROLE_STOPPED});
+               new Value[]{new StringValue(), new StringValue(TARGET_ROLE_STARTED), new StringValue(TARGET_ROLE_STOPPED)});
         M_A_POSSIBLE_CHOICES_MS.put(
                    TARGET_ROLE_META_ATTR,
-                   new String[]{null,
-                                TARGET_ROLE_MASTER,
-                                TARGET_ROLE_STARTED,
-                                TARGET_ROLE_SLAVE,
-                                TARGET_ROLE_STOPPED});
+                   new Value[]{new StringValue(),
+                               new StringValue(TARGET_ROLE_MASTER),
+                               new StringValue(TARGET_ROLE_STARTED),
+                               new StringValue(TARGET_ROLE_SLAVE),
+                               new StringValue(TARGET_ROLE_STOPPED)});
         M_A_SHORT_DESC.put(TARGET_ROLE_META_ATTR,
                            Tools.getString("CRMXML.TargetRole.ShortDesc"));
         M_A_LONG_DESC.put(TARGET_ROLE_META_ATTR,
@@ -421,12 +420,14 @@ public final class CRMXML extends XML {
 
         /* priority */
         M_A_POSSIBLE_CHOICES.put(PRIORITY_META_ATTR,
-                                 new String[]{"0", "5", "10"});
+                                 new Value[]{new StringValue("0"),
+                                             new StringValue("5"),
+                                             new StringValue("10")});
         M_A_SHORT_DESC.put(PRIORITY_META_ATTR,
                            Tools.getString("CRMXML.Priority.ShortDesc"));
         M_A_LONG_DESC.put(PRIORITY_META_ATTR,
                           Tools.getString("CRMXML.Priority.LongDesc"));
-        M_A_DEFAULT.put(PRIORITY_META_ATTR, "0");
+        M_A_DEFAULT.put(PRIORITY_META_ATTR, new StringValue("0"));
         M_A_TYPE.put(PRIORITY_META_ATTR, PARAM_TYPE_INTEGER);
 
         /* resource-stickiness since 2.1.4 */
@@ -438,13 +439,16 @@ public final class CRMXML extends XML {
         M_A_LONG_DESC.put(
                         RESOURCE_STICKINESS_META_ATTR,
                         Tools.getString("CRMXML.ResourceStickiness.LongDesc"));
-        M_A_DEFAULT.put(RESOURCE_STICKINESS_META_ATTR, "0");
+        M_A_DEFAULT.put(RESOURCE_STICKINESS_META_ATTR, new StringValue("0"));
         M_A_TYPE.put(RESOURCE_STICKINESS_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_NOT_ADVANCED.add(RESOURCE_STICKINESS_META_ATTR);
 
         /* migration-threshold */
         M_A_POSSIBLE_CHOICES.put(MIGRATION_THRESHOLD_META_ATTR,
-                                 new String[]{DISABLED_STRING, "0", "5", "10"});
+                                 new Value[]{DISABLED_STRING,
+                                             new StringValue("0"),
+                                             new StringValue("5"),
+                                             new StringValue("10")});
         M_A_SHORT_DESC.put(
                       MIGRATION_THRESHOLD_META_ATTR,
                       Tools.getString("CRMXML.MigrationThreshold.ShortDesc"));
@@ -463,18 +467,18 @@ public final class CRMXML extends XML {
 
         /* multiple-active */
         M_A_POSSIBLE_CHOICES.put(MULTIPLE_ACTIVE_META_ATTR,
-                                 new String[]{"stop_start",
-                                              "stop_only",
-                                              "block"});
+                                 new Value[]{new StringValue("stop_start"),
+                                             new StringValue("stop_only"),
+                                             new StringValue("block")});
         M_A_SHORT_DESC.put(MULTIPLE_ACTIVE_META_ATTR,
                            Tools.getString("CRMXML.MultipleActive.ShortDesc"));
         M_A_LONG_DESC.put(MULTIPLE_ACTIVE_META_ATTR,
                           Tools.getString("CRMXML.MultipleActive.LongDesc"));
-        M_A_DEFAULT.put(MULTIPLE_ACTIVE_META_ATTR, "stop_start");
+        M_A_DEFAULT.put(MULTIPLE_ACTIVE_META_ATTR, new StringValue("stop_start"));
 
         /* master-max */
         M_A_SHORT_DESC.put(MASTER_MAX_META_ATTR, "M/S Master-Max");
-        M_A_DEFAULT.put(MASTER_MAX_META_ATTR, "1");
+        M_A_DEFAULT.put(MASTER_MAX_META_ATTR, new StringValue("1"));
         M_A_TYPE.put(MASTER_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(MASTER_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(MASTER_MAX_META_ATTR,
@@ -483,7 +487,7 @@ public final class CRMXML extends XML {
                                          ConfigData.AccessType.GOD);
         /* master-node-max */
         M_A_SHORT_DESC.put(MASTER_NODE_MAX_META_ATTR, "M/S Master-Node-Max");
-        M_A_DEFAULT.put(MASTER_NODE_MAX_META_ATTR, "1");
+        M_A_DEFAULT.put(MASTER_NODE_MAX_META_ATTR, new StringValue("1"));
         M_A_TYPE.put(MASTER_NODE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(MASTER_NODE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(MASTER_NODE_MAX_META_ATTR,
@@ -492,8 +496,8 @@ public final class CRMXML extends XML {
                                          ConfigData.AccessType.GOD);
         /* clone-max */
         M_A_SHORT_DESC.put(CLONE_MAX_META_ATTR, "Clone Max");
-        M_A_DEFAULT.put(CLONE_MAX_META_ATTR, "");
-        M_A_PREFERRED.put(CLONE_MAX_META_ATTR, "2");
+        M_A_DEFAULT.put(CLONE_MAX_META_ATTR, new StringValue(""));
+        M_A_PREFERRED.put(CLONE_MAX_META_ATTR, new StringValue("2"));
         M_A_TYPE.put(CLONE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(CLONE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_MAX_META_ATTR, "Clone Resource Defaults");
@@ -501,7 +505,7 @@ public final class CRMXML extends XML {
                                          ConfigData.AccessType.GOD);
         /* clone-node-max */
         M_A_SHORT_DESC.put(CLONE_NODE_MAX_META_ATTR, "Clone Node Max");
-        M_A_DEFAULT.put(CLONE_NODE_MAX_META_ATTR, "1");
+        M_A_DEFAULT.put(CLONE_NODE_MAX_META_ATTR, new StringValue("1"));
         M_A_TYPE.put(CLONE_NODE_MAX_META_ATTR, PARAM_TYPE_INTEGER);
         M_A_POSSIBLE_CHOICES.put(CLONE_NODE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_NODE_MAX_META_ATTR, "Clone Resource Defaults");
@@ -568,16 +572,16 @@ public final class CRMXML extends XML {
     public CRMXML(final Host host, final ServicesInfo ssi) {
         super();
         this.host = host;
-        final String[] booleanValues = PCMK_BOOLEAN_VALUES;
-        final String hbBooleanTrue = booleanValues[0];
-        final String hbBooleanFalse = booleanValues[1];
+        final Value[] booleanValues = PCMK_BOOLEAN_VALUES;
+        final Value hbBooleanTrue = booleanValues[0];
+        final Value hbBooleanFalse = booleanValues[1];
         /* hostlist choices for stonith */
-        hostlistChoices.add("");
+        hostlistChoices.add(new StringValue());
         final String[] hosts = host.getCluster().getHostNames();
         if (hosts != null && hosts.length < 8) {
-            hostlistChoices.add(Tools.join(" ", hosts));
+            hostlistChoices.add(new StringValue(Tools.join(" ", hosts)));
             for (final String h : hosts) {
-                hostlistChoices.add(h);
+                hostlistChoices.add(new StringValue(h));
             }
         }
         /* clones */
@@ -637,7 +641,7 @@ public final class CRMXML extends XML {
         paramGlobalLongDescMap.put("default-action-timeout",
                                 "Transition Timeout");
         paramGlobalTypeMap.put("default-action-timeout", PARAM_TYPE_INTEGER);
-        paramGlobalDefaultMap.put("default-action-timeout", "20");
+        paramGlobalDefaultMap.put("default-action-timeout", new StringValue("20"));
         paramGlobalPossibleChoices.put("default-action-timeout",
                                        INTEGER_VALUES);
         globalRequiredParams.add("default-action-timeout");
@@ -653,7 +657,7 @@ public final class CRMXML extends XML {
                                PARAM_TYPE_INTEGER);
         paramGlobalPossibleChoices.put("default-resource-stickiness",
                                        INTEGER_VALUES);
-        paramGlobalDefaultMap.put("default-resource-stickiness", "0");
+        paramGlobalDefaultMap.put("default-resource-stickiness", new StringValue("0"));
         globalRequiredParams.add("default-resource-stickiness");
 
         /* no quorum policy */
@@ -661,12 +665,12 @@ public final class CRMXML extends XML {
         paramGlobalShortDescMap.put("no-quorum-policy", "No Quorum Policy");
         paramGlobalLongDescMap.put("no-quorum-policy", "No Quorum Policy");
         paramGlobalTypeMap.put("no-quorum-policy", PARAM_TYPE_STRING);
-        paramGlobalDefaultMap.put("no-quorum-policy", "stop");
+        paramGlobalDefaultMap.put("no-quorum-policy", new StringValue("stop"));
         paramGlobalPossibleChoices.put("no-quorum-policy",
-                                       new String[]{"ignore",
-                                                    "stop",
-                                                    "freeze",
-                                                    "suicide"});
+                                       new Value[]{new StringValue("ignore"),
+                                                   new StringValue("stop"),
+                                                   new StringValue("freeze"),
+                                                   new StringValue("suicide")});
         globalRequiredParams.add("no-quorum-policy");
         globalNotAdvancedParams.add("no-quorum-policy");
 
@@ -680,14 +684,14 @@ public final class CRMXML extends XML {
                                PARAM_TYPE_INTEGER);
         paramGlobalPossibleChoices.put("default-resource-failure-stickiness",
                                        INTEGER_VALUES);
-        paramGlobalDefaultMap.put("default-resource-failure-stickiness", "0");
+        paramGlobalDefaultMap.put("default-resource-failure-stickiness", new StringValue("0"));
         globalRequiredParams.add("default-resource-failure-stickiness");
 
         paramGlobalPossibleChoices.put("placement-strategy",
-                                       new String[]{"default",
-                                                    "utilization",
-                                                    "minimal",
-                                                    "balanced"});
+                                       new Value[]{new StringValue("default"),
+                                                   new StringValue("utilization"),
+                                                   new StringValue("minimal"),
+                                                   new StringValue("balanced")});
 
         final String hbV = host.getHeartbeatVersion();
         final String pcmkV = host.getPacemakerVersion();
@@ -761,12 +765,12 @@ public final class CRMXML extends XML {
                     paramGlobalShortDescMap.put(param, name);
                     paramGlobalLongDescMap.put(param, name);
                     paramGlobalTypeMap.put(param, PARAM_TYPE_STRING);
-                    paramGlobalDefaultMap.put(param, "");
+                    paramGlobalDefaultMap.put(param, new StringValue());
                 }
-                paramGlobalDefaultMap.put("stonith-action", "reboot");
+                paramGlobalDefaultMap.put("stonith-action", new StringValue("reboot"));
                 paramGlobalPossibleChoices.put("stonith-action",
-                                               new String[]{"reboot",
-                                                            "poweroff"});
+                                               new Value[]{new StringValue("reboot"),
+                                                           new StringValue("poweroff")});
 
                 paramGlobalTypeMap.put("is-managed-default",
                                        PARAM_TYPE_BOOLEAN);
@@ -1132,8 +1136,8 @@ public final class CRMXML extends XML {
     }
 
     /** Returns choices for check box. (True, False). */
-    public String[] getCheckBoxChoices(final ResourceAgent ra,
-                                       final String param) {
+    public Value[] getCheckBoxChoices(final ResourceAgent ra,
+                                      final String param) {
         final String paramDefault = getParamDefault(ra, param);
         return getCheckBoxChoices(paramDefault);
     }
@@ -1143,19 +1147,19 @@ public final class CRMXML extends XML {
      * The problem is, that heartbeat kept changing the lower and upper case in
      * the true and false values.
      */
-    private String[] getCheckBoxChoices(final String paramDefault) {
+    private Value[] getCheckBoxChoices(final String paramDefault) {
         if (paramDefault != null) {
             if ("yes".equals(paramDefault) || "no".equals(paramDefault)) {
-                return new String[]{"yes", "no"};
+                return new Value[]{new StringValue("yes"), new StringValue("no")};
             } else if ("Yes".equals(paramDefault)
                        || "No".equals(paramDefault)) {
-                return new String[]{"Yes", "No"};
+                return new Value[]{new StringValue("Yes"), new StringValue("No")};
             } else if (PCMK_TRUE.equals(paramDefault)
                        || PCMK_FALSE.equals(paramDefault)) {
                 return PCMK_BOOLEAN_VALUES.clone();
             } else if ("True".equals(paramDefault)
                        || "False".equals(paramDefault)) {
-                return new String[]{"True", "False"};
+                return new Value[]{new StringValue("True"), new StringValue("False")};
             }
         }
         return PCMK_BOOLEAN_VALUES.clone();
@@ -1172,6 +1176,7 @@ public final class CRMXML extends XML {
         }
         Collections.sort(services,
                          new Comparator<ResourceAgent>() {
+                              @Override
                               public int compare(final ResourceAgent s1,
                                                  final ResourceAgent s2) {
                                   return s1.getName().compareToIgnoreCase(
@@ -1263,12 +1268,12 @@ public final class CRMXML extends XML {
     }
 
     /** Returns default value for the global parameter. */
-    public String getGlobalParamDefault(final String param) {
+    public Value getGlobalParamDefault(final String param) {
         return paramGlobalDefaultMap.get(param);
     }
 
     /** Returns the preferred value for the global parameter. */
-    public String getGlobalParamPreferred(final String param) {
+    public Value getGlobalParamPreferred(final String param) {
         return paramGlobalPreferredMap.get(param);
     }
 
@@ -1287,7 +1292,7 @@ public final class CRMXML extends XML {
      * Returns possible choices for a global parameter, that will be displayed
      * in the combo box.
      */
-    public String[] getGlobalParamPossibleChoices(final String param) {
+    public Value[] getGlobalParamPossibleChoices(final String param) {
         return paramGlobalPossibleChoices.get(param);
     }
 
@@ -1295,7 +1300,7 @@ public final class CRMXML extends XML {
      * Returns possible choices for a parameter, that will be displayed in
      * the combo box.
      */
-    public String[] getParamPossibleChoices(final ResourceAgent ra,
+    public Value[] getParamPossibleChoices(final ResourceAgent ra,
                                             final String param,
                                             final boolean ms) {
         if (ms) {
@@ -1473,27 +1478,27 @@ public final class CRMXML extends XML {
     }
 
     /** Returns default of the meta attribute. */
-    public String getRscDefaultsDefault(final String param) {
+    public Value getRscDefaultsDefault(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_DEFAULT.get(newParam);
     }
 
     /** Returns preferred of the meta attribute. */
-    public String getRscDefaultsPreferred(final String param) {
+    public Value getRscDefaultsPreferred(final String param) {
         return null;
     }
 
     /** Returns preferred of the meta attribute. */
-    public String[] getRscDefaultsPossibleChoices(final String param) {
+    public Value[] getRscDefaultsPossibleChoices(final String param) {
         final String newParam = convertRscDefaultsParam(param);
         return M_A_POSSIBLE_CHOICES.get(newParam);
     }
 
     /** Returns choices for check box. (True, False). */
-    public String[] getRscDefaultsCheckBoxChoices(final String param) {
+    public Value[] getRscDefaultsCheckBoxChoices(final String param) {
         final String newParam = convertRscDefaultsParam(param);
-        final String paramDefault = getRscDefaultsDefault(newParam);
-        return getCheckBoxChoices(paramDefault);
+        final Value paramDefault = getRscDefaultsDefault(newParam);
+        return getCheckBoxChoices(paramDefault.getValueForConfig());
     }
 
     /** Returns short description of the default meta attr parameter. */
@@ -1599,8 +1604,8 @@ public final class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.equals(value)
-                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE.getValueForConfig().equals(value)
+                && !PCMK_FALSE.getValueForConfig().equals(value)
                 && !"True".equals(value)
                 && !"False".equals(value)) {
                 correctValue = false;
@@ -1634,8 +1639,8 @@ public final class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.equals(value)
-                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE.getValueForConfig().equals(value)
+                && !PCMK_FALSE.getValueForConfig().equals(value)
                 && !"True".equals(value)
                 && !"False".equals(value)) {
 
@@ -1682,9 +1687,11 @@ public final class CRMXML extends XML {
                                      M_A_POSSIBLE_CHOICES_MS.get(newName));
         ra.setParamShortDesc(name, M_A_SHORT_DESC.get(newName));
         ra.setParamLongDesc(name, M_A_LONG_DESC.get(newName));
-        ra.setParamDefault(name, M_A_DEFAULT.get(newName));
+        ra.setParamDefault(name, StringValue.getValueForConfig(
+                                                    M_A_DEFAULT.get(newName)));
         ra.setParamType(name, M_A_TYPE.get(newName));
-        ra.setParamPreferred(name, M_A_PREFERRED.get(newName));
+        ra.setParamPreferred(name, StringValue.getValueForConfig(
+                                                  M_A_PREFERRED.get(newName)));
     }
 
     /**
@@ -1791,7 +1798,7 @@ public final class CRMXML extends XML {
                                                                     "default");
                     if (defaultValue == null && ra.isStonith()
                         && PARAM_TYPE_BOOLEAN.equals(type)) {
-                        defaultValue = PCMK_FALSE;
+                        defaultValue = PCMK_FALSE.getValueForConfig();
                     }
                     if (ra.isIPaddr() && "nic".equals(param)) {
                         // workaround for default value in IPaddr and IPaddr2
@@ -1824,8 +1831,7 @@ public final class CRMXML extends XML {
                     && ("hostlist".equals(param))) {
                     ra.setParamPossibleChoices(
                              param,
-                             hostlistChoices.toArray(
-                                          new String[hostlistChoices.size()]));
+                             hostlistChoices.toArray(new Value[hostlistChoices.size()]));
                 }
                 final String section = RA_PARAM_SECTION.get(ra.getName(),
                                                             param);
@@ -1852,14 +1858,18 @@ public final class CRMXML extends XML {
             ra.setParamLongDesc(STONITH_PRIORITY_INSTANCE_ATTR,
                         Tools.getString("CRMXML.stonith-priority.LongDesc"));
             ra.setParamPossibleChoices(STONITH_PRIORITY_INSTANCE_ATTR,
-                                       new String[]{"0", "5", "10"});
+                                       new Value[]{new StringValue("0"),
+                                                   new StringValue("5"),
+                                                   new StringValue("10")});
             ra.setParamType(STONITH_PRIORITY_INSTANCE_ATTR, PARAM_TYPE_INTEGER);
             ra.setParamDefault(STONITH_PRIORITY_INSTANCE_ATTR, "0");
 
             /* pcmk_host_check for stonithd */
             ra.addParameter(PCMK_HOST_CHECK_PARAM);
             ra.setParamPossibleChoices(PCMK_HOST_CHECK_PARAM,
-             new String[]{"", PCMK_HOST_CHECK_DYNAMIC, PCMK_HOST_CHECK_STATIC});
+                   new Value[]{new StringValue(),
+                               new StringValue(PCMK_HOST_CHECK_DYNAMIC),
+                               new StringValue(PCMK_HOST_CHECK_STATIC)});
             ra.setParamShortDesc(PCMK_HOST_CHECK_PARAM,
                         Tools.getString("CRMXML.pcmk_host_check.ShortDesc"));
             ra.setParamLongDesc(PCMK_HOST_CHECK_PARAM,
@@ -1876,8 +1886,7 @@ public final class CRMXML extends XML {
             ra.setParamType(PCMK_HOST_LIST_PARAM, PARAM_TYPE_STRING);
             ra.setParamPossibleChoices(
                              PCMK_HOST_LIST_PARAM,
-                             hostlistChoices.toArray(
-                                          new String[hostlistChoices.size()]));
+                             hostlistChoices.toArray(new Value[hostlistChoices.size()]));
 
             /* pcmk_host_map for stonithd */
             ra.addParameter(PCMK_HOST_MAP_PARAM);
@@ -1925,18 +1934,16 @@ public final class CRMXML extends XML {
     private void parseStonithActions(final ResourceAgent ra,
                                      final Node actionsNode) {
         final NodeList actionNodes = actionsNode.getChildNodes();
-        final List<String> actions = new ArrayList<String>();
+        final List<Value> actions = new ArrayList<Value>();
         for (int i = 0; i < actionNodes.getLength(); i++) {
             final Node actionNode = actionNodes.item(i);
             if (actionNode.getNodeName().equals("action")) {
                 final String name = getAttribute(actionNode, "name");
-                actions.add(name);
+                actions.add(new StringValue(name));
             }
         }
-        ra.setParamPossibleChoices(
-                             FENCING_ACTION_PARAM,
-                             actions.toArray(
-                                          new String[actions.size()]));
+        ra.setParamPossibleChoices(FENCING_ACTION_PARAM,
+                                   actions.toArray(new Value[actions.size()]));
     }
 
     /**
@@ -2074,7 +2081,7 @@ public final class CRMXML extends XML {
 
         /* get <resource-agent> */
         final NodeList resAgents = metadataNode.getChildNodes();
-        final String[] booleanValues = PCMK_BOOLEAN_VALUES;
+        final Value[] booleanValues = PCMK_BOOLEAN_VALUES;
 
         for (int i = 0; i < resAgents.getLength(); i++) {
             final Node resAgentNode = resAgents.item(i);
@@ -2131,7 +2138,7 @@ public final class CRMXML extends XML {
                         }
                         if (!"expected-quorum-votes".equals(param)) {
                             // TODO: workaround
-                            paramGlobalDefaultMap.put(param, defaultValue);
+                            paramGlobalDefaultMap.put(param, new StringValue(defaultValue));
                         }
                         if (PARAM_TYPE_BOOLEAN.equals(type)) {
                             paramGlobalPossibleChoices.put(param,
@@ -3577,12 +3584,12 @@ public final class CRMXML extends XML {
     }
 
     /** Returns default value for the order parameter. */
-    public String getOrderParamDefault(final String param) {
+    public Value getOrderParamDefault(final String param) {
         return paramOrdDefaultMap.get(param);
     }
 
     /** Returns the preferred value for the order parameter. */
-    public String getOrderParamPreferred(final String param) {
+    public Value getOrderParamPreferred(final String param) {
         return paramOrdPreferredMap.get(param);
     }
 
@@ -3590,8 +3597,8 @@ public final class CRMXML extends XML {
      * Returns possible choices for a order parameter, that will be displayed
      * in the combo box.
      */
-    public String[] getOrderParamPossibleChoices(final String param,
-                                                 final boolean ms) {
+    public Value[] getOrderParamPossibleChoices(final String param,
+                                                final boolean ms) {
         if (ms) {
             return paramOrdPossibleChoicesMS.get(param);
         } else {
@@ -3640,8 +3647,8 @@ public final class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.equals(value)
-                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE.getValueForConfig().equals(value)
+                && !PCMK_FALSE.getValueForConfig().equals(value)
                 && !"True".equals(value)
                 && !"False".equals(value)) {
 
@@ -3725,12 +3732,12 @@ public final class CRMXML extends XML {
     }
 
     /** Returns default value for the colocation parameter. */
-    public String getColocationParamDefault(final String param) {
+    public Value getColocationParamDefault(final String param) {
         return paramColDefaultMap.get(param);
     }
 
     /** Returns the preferred value for the colocation parameter. */
-    public String getColocationParamPreferred(final String param) {
+    public Value getColocationParamPreferred(final String param) {
         return paramColPreferredMap.get(param);
     }
 
@@ -3738,7 +3745,7 @@ public final class CRMXML extends XML {
      * Returns possible choices for a colocation parameter, that will be
      * displayed in the combo box.
      */
-    public String[] getColocationParamPossibleChoices(final String param,
+    public Value[] getColocationParamPossibleChoices(final String param,
                                                       final boolean ms) {
         if (ms) {
             return paramColPossibleChoicesMS.get(param);
@@ -3789,8 +3796,8 @@ public final class CRMXML extends XML {
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.equals(value)
-                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE.getValueForConfig().equals(value)
+                && !PCMK_FALSE.getValueForConfig().equals(value)
                 && !"True".equals(value)
                 && !"False".equals(value)) {
 

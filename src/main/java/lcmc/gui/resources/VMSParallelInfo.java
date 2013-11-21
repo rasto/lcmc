@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -72,14 +73,14 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
             final ParallelData parallelData = parallels.get(getName());
             if (parallelData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                   parallelData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -105,7 +106,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(ParallelData.TYPE);
+        final String type = getParamSaved(ParallelData.TYPE).getValueForConfig();
         if (type == null) {
             s.append("new parallel device...");
         } else {
@@ -127,7 +128,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(ParallelData.SAVED_TYPE,
-                               getParamSaved(ParallelData.TYPE));
+                               getParamSaved(ParallelData.TYPE).getValueForConfig());
                 vmsxml.removeParallelXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,

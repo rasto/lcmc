@@ -67,6 +67,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 import lcmc.EditClusterDialog;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -126,32 +128,29 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final String sectionString = dxml.getSection(param);
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
-            String value;
-            final String defaultValue = getParamDefault(param);
+            Value value;
+            final Value defaultValue = getParamDefault(param);
             if (DrbdXML.GLOBAL_SECTION.equals(section)) {
                 value = dxml.getGlobalConfigValue(param);
                 if (value == null) {
                     value = defaultValue;
                 }
-                if (value == null) {
-                    value = "";
-                }
             } else {
                 value = dxml.getCommonConfigValue(section, param);
-                if ("".equals(value)) {
+                if (value == null || value.isNothingSelected()) {
                     value = defaultValue;
                 }
             }
             if ("usage-count".equals(param)) {
                 value = getComboBoxValue(param);
-                if ("".equals(value)) {
-                    value = "yes"; /* we don't get this parameter from
-                                      the dump. */
+                if (value == null || value.isNothingSelected()) {
+                    /* we don't get this parameter from the dump. */
+                    value = DrbdXML.CONFIG_YES;
                 }
             }
-            final String oldValue = getParamSaved(param);
+            final Value oldValue = getParamSaved(param);
             final Widget wi = getWidget(param, null);
-            if (!Tools.areEqual(value, oldValue)) {
+            if (Tools.valuesEqual(value, oldValue)) {
                 getResource().setValue(param, value);
                 if (wi != null) {
                     wi.setValueAndWait(value);
@@ -199,10 +198,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
             global.append("global {\n");
             final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
-                String value = getComboBoxValue(param);
-                if (value == null || "".equals(value)) {
+                Value value = getComboBoxValue(param);
+                if (value.isNothingSelected()) {
                     if ("usage-count".equals(param)) {
-                        value = "yes";
+                        value = DrbdXML.CONFIG_YES;
                     } else {
                         continue;
                     }
@@ -223,7 +222,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         global.append("\t\t");
                         global.append(param);
                         global.append('\t');
-                        global.append(Tools.escapeConfig(value));
+                        global.append(Tools.escapeConfig(value.getValueForConfig()));
                         global.append(";\n");
                     }
                 }
@@ -772,7 +771,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final String name = dri.getName();
         dri.getDrbdResource().setDefaultValue(
                                         DrbdResourceInfo.DRBD_RES_PARAM_NAME,
-                                        name);
+                                        new StringValue(name));
         getBrowser().getDrbdResHash().put(name, dri);
         getBrowser().putDrbdResHash();
 
@@ -852,8 +851,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final String section = sectionString.replaceAll("-options$", "");
             final String[] params = dxml.getSectionParams(sectionString);
             for (String param : params) {
-                String value = dxml.getConfigValue(name, section, param);
-                if ("".equals(value)) {
+                Value value = dxml.getConfigValue(name, section, param);
+                if (value == null || value.isNothingSelected()) {
                     value = dxml.getParamDefault(param);
                 }
                 dri.getDrbdResource().setValue(param, value);

@@ -20,6 +20,8 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
@@ -50,13 +52,13 @@ public class Checkbox extends Widget {
     static final String CHECKBOX_TRUE = "True";
     static final String CHECKBOX_FALSE = "False";
     /** Name for the 'true' value. */
-    private String checkBoxTrue = CHECKBOX_TRUE;
+    private Value checkBoxTrue = new StringValue(CHECKBOX_TRUE);
     /** Name for the 'false' value. */
-    private String checkBoxFalse = CHECKBOX_FALSE;
+    private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
 
     /** Prepares a new <code>Checkbox</code> object. */
-    public Checkbox(final String selectedValue,
-                    final Object[] items,
+    public Checkbox(final Value selectedValue,
+                    final Value[] items,
                     final String regexp,
                     final int width,
                     final AccessMode enableAccessMode,
@@ -65,14 +67,14 @@ public class Checkbox extends Widget {
               enableAccessMode,
               fieldButton);
         if (items != null && items.length == 2) {
-            checkBoxTrue  = (String) items[0];
-            checkBoxFalse = (String) items[1];
+            checkBoxTrue  = items[0];
+            checkBoxFalse = items[1];
         }
         addComponent(getCheckBox(selectedValue), width);
     }
 
     /** Returns check box for boolean values. */
-    private JComponent getCheckBox(final String selectedValue) {
+    private JComponent getCheckBox(final Value selectedValue) {
         final JCheckBox cb = new JCheckBox();
         if (selectedValue != null) {
             cb.setSelected(selectedValue.equals(checkBoxTrue));
@@ -92,24 +94,24 @@ public class Checkbox extends Widget {
      */
     @Override
     public String getStringValue() {
-        final Object o = getValue();
-        if (o == null) {
+        final Value v = getValue();
+        if (v == null) {
             return "";
         }
-        return o.toString();
+        return v.getValueForConfig();
     }
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
-        Object value;
+    protected Value getValueInternal() {
+        Value value;
         final JCheckBox cbox = (JCheckBox) getComponent();
         if (cbox.getSelectedObjects() == null) {
             value = checkBoxFalse;
         } else {
             value = checkBoxTrue;
         }
-        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
+        if (value.isNothingSelected()) {
             return null;
         }
         return value;
@@ -123,7 +125,7 @@ public class Checkbox extends Widget {
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
+    protected void setValueAndWait0(final Value item) {
         if (item != null) {
             ((JCheckBox) getComponent()).setSelected(item.equals(checkBoxTrue));
         }
@@ -161,10 +163,10 @@ public class Checkbox extends Widget {
     }
 
     /** Returns item at the specified index. */
-    @Override
-    Object getItemAt(final int i) {
-        return getComponent();
-    }
+    //@Override
+    //Value getItemAt(final int i) {
+    //    return getComponent();
+    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override
@@ -182,7 +184,13 @@ public class Checkbox extends Widget {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 if (wl.isEnabled()) {
-                    final Object value = e.getItem();
+                    Value v;
+                    if (((JCheckBox) e.getItem()).isSelected()) {
+                        v = checkBoxTrue;
+                    } else {
+                        v = checkBoxFalse;
+                    }
+                    final Value value = v;
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {

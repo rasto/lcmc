@@ -561,8 +561,8 @@ public final class BlockDevice extends Resource {
 
     /** Returns string with stored meta disk and index in the parenthesis. */
     String getMetaDiskString() {
-        return getMetaDiskString(getValue("DrbdMetaDisk"),
-                                 getValue("DrbdMetaDiskIndex"));
+        return getMetaDiskString(getValue("DrbdMetaDisk").getValueForConfig(),
+                                 getValue("DrbdMetaDiskIndex").getValueForConfig());
     }
 
     /** Returns section by which the parameter is grouped in the views. */

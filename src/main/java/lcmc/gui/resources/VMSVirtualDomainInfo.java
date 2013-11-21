@@ -88,6 +88,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -217,16 +219,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Previous type. */
     private volatile String prevType = null;
     /** Autostart possible values - hosts. */
-    private final String[] autostartPossibleValues;
+    private final Value[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** Virsh options. */
-    private static final String VIRSH_OPTION_KVM    = "";
-    private static final String VIRSH_OPTION_XEN    = "-c 'xen:///'";
-    private static final String VIRSH_OPTION_LXC    = "-c 'lxc:///'";
-    private static final String VIRSH_OPTION_VBOX   = "-c 'vbox:///session'";
-    private static final String VIRSH_OPTION_OPENVZ = "-c 'openvz:///system'";
-    private static final String VIRSH_OPTION_UML    = "-c 'uml:///system'";
+    private static final Value VIRSH_OPTION_KVM    = new StringValue();
+    private static final Value VIRSH_OPTION_XEN    = new StringValue("-c 'xen:///'");
+    private static final Value VIRSH_OPTION_LXC    = new StringValue("-c 'lxc:///'");
+    private static final Value VIRSH_OPTION_VBOX   = new StringValue("-c 'vbox:///session'");
+    private static final Value VIRSH_OPTION_OPENVZ = new StringValue("-c 'openvz:///system'");
+    private static final Value VIRSH_OPTION_UML    = new StringValue("-c 'uml:///system'");
     /** Domain types. */
     static final String DOMAIN_TYPE_KVM = "kvm";
     private static final String DOMAIN_TYPE_XEN    = "xen";
@@ -237,7 +239,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
 
 
-    private static final String[] VIRSH_OPTIONS = new String[]{
+    private static final Value[] VIRSH_OPTIONS = new Value[]{
                                                             VIRSH_OPTION_KVM,
                                                             VIRSH_OPTION_XEN,
                                                             VIRSH_OPTION_LXC,
@@ -322,17 +324,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     /** Map of default values. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Preferred values. */
-    private static final Map<String, String> PREFERRED_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
     /** Types of some of the field. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
                                        new HashMap<String, Widget.Type>();
     /** Possible values for some fields. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                          new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                          new HashMap<String, Value[]>();
     /** Whether parameter is an integer. */
     private static final List<String> IS_INTEGER = new ArrayList<String>();
     /** Required version for a parameter. */
@@ -388,10 +390,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     static final String PARALLEL_TABLE = "parallel";
     /** Video devices table. */
     static final String VIDEO_TABLE = "video";
+    
+    private static final Value VM_TRUE = new StringValue("True");
+    
+    private static final Value VM_FALSE = new StringValue("False");
+    
     /** Defined on host string value. */
-    private static final String DEFINED_ON_HOST_TRUE = "True";
+    private static final Value DEFINED_ON_HOST_TRUE = VM_TRUE;
     /** Not defined on host string value. */
-    private static final String DEFINED_ON_HOST_FALSE = "False";
+    private static final Value DEFINED_ON_HOST_FALSE = VM_FALSE;
     /** Wizard prefix string. */
     private static final String WIZARD_HOST_PREFIX = Widget.WIZARD_PREFIX + ':';
     /** Virtual System header. */
@@ -441,14 +448,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private static final Map<Integer, Integer> VIDEO_DEFAULT_WIDTHS =
                                                new HashMap<Integer, Integer>();
     /** Type HVM. */
-    private static final String TYPE_HVM = "hvm";
+    private static final Value TYPE_HVM = new StringValue("hvm");
     /** Type Linux. */
-    private static final String TYPE_LINUX = "linux";
+    private static final Value TYPE_LINUX = new StringValue("linux");
     /** Type exe. */
-    private static final String TYPE_EXE = "exe";
+    private static final Value TYPE_EXE = new StringValue("exe");
     /** Type UML. */
-    private static final String TYPE_UML = "uml";
+    private static final Value TYPE_UML = new StringValue("uml");
 
+    private static final Value NO_SELECTION_VALUE = new StringValue();
+    
     /** Width of the button field. */
     private static final int CONTROL_BUTTON_WIDTH = 80;
     static {
@@ -621,38 +630,38 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, Widget.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_HAP, Widget.Type.CHECKBOX);
 
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, "512M");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, "512M");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, new StringValue("512M"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, new StringValue("512M"));
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE, TYPE_HVM);
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH, "x86_64");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE, "pc");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, "True");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_APIC, "True");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_PAE, "True");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_CLOCK_OFFSET, "utc");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF, "destroy");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_REBOOT, "restart");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, "restart");
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, "/usr/bin/kvm");
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH, new StringValue("x86_64"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE, new StringValue("pc"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_ACPI, VM_TRUE);
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_APIC, VM_TRUE);
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_PAE, VM_TRUE);
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_CLOCK_OFFSET, new StringValue("utc"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_POWEROFF, new StringValue("destroy"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_REBOOT, new StringValue("restart"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_ON_CRASH, new StringValue("restart"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, new StringValue("/usr/bin/kvm"));
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "hd");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, DOMAIN_TYPE_KVM);
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, "1");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, "False");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, "False");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_PAE, "False");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_HAP, "False");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, new StringValue("hd"));
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_KVM));
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, new StringValue("1"));
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_ACPI, VM_FALSE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_APIC, VM_FALSE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_PAE, VM_FALSE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_HAP, VM_FALSE);
 
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPU_MATCH, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY, "");
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES, "");
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPU_MATCH, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_MODEL, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_VENDOR, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY, NO_SELECTION_VALUE);
+        DEFAULTS_MAP.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES, NO_SELECTION_VALUE);
 
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_MEMORY, true);
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
@@ -687,64 +696,85 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                      "fd",
                                                      null)});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
-                            new String[]{});
+                            new Value[]{});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
-                            new String[]{DOMAIN_TYPE_KVM,
-                                         DOMAIN_TYPE_XEN,
-                                         DOMAIN_TYPE_LXC,
-                                         DOMAIN_TYPE_OPENVZ,
-                                         DOMAIN_TYPE_VBOX,
-                                         DOMAIN_TYPE_UML,
-                                         });
+                            new Value[]{new StringValue(DOMAIN_TYPE_KVM),
+                                        new StringValue(DOMAIN_TYPE_XEN),
+                                        new StringValue(DOMAIN_TYPE_LXC),
+                                        new StringValue(DOMAIN_TYPE_OPENVZ),
+                                        new StringValue(DOMAIN_TYPE_VBOX),
+                                        new StringValue(DOMAIN_TYPE_UML),
+                                        });
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOTLOADER,
-                            new String[]{"", "/usr/bin/pygrub"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("/usr/bin/pygrub")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE,
-                            new String[]{TYPE_HVM, TYPE_LINUX, TYPE_EXE});
+                            new Value[]{TYPE_HVM, TYPE_LINUX, TYPE_EXE});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_ARCH,
-                            new String[]{"", "x86_64", "i686"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("x86_64"),
+                                        new StringValue("i686")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_TYPE_MACHINE,
-                            new String[]{"", "pc", "pc-0.12"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("pc"),
+                                        new StringValue("pc-0.12")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_INIT,
-                            new String[]{"", "/bin/sh", "/init"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("/bin/sh"),
+                                        new StringValue("/init")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CLOCK_OFFSET,
-                            new String[]{"utc", "localtime"});
+                            new Value[]{new StringValue("utc"),
+                                        new StringValue("localtime")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_POWEROFF,
-                            new String[]{"destroy",
-                                         "restart",
-                                         "preserve",
-                                         "rename-restart"});
+                            new Value[]{new StringValue("destroy"),
+                                        new StringValue("restart"),
+                                        new StringValue("preserve"),
+                                        new StringValue("rename-restart")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_REBOOT,
-                            new String[]{"restart",
-                                         "destroy",
-                                         "preserve",
-                                         "rename-restart"});
+                            new Value[]{new StringValue("restart"),
+                                        new StringValue("destroy"),
+                                        new StringValue("preserve"),
+                                        new StringValue("rename-restart")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_ON_CRASH,
-                            new String[]{"restart",
-                                         "destroy",
-                                         "preserve",
-                                         "rename-restart",
-                                         "coredump-destroy", /* since 0.8.4 */
-                                         "coredump-restart"}); /* since 0.8.4*/
+                            new Value[]{new StringValue("restart"),
+                                         new StringValue("destroy"),
+                                         new StringValue("preserve"),
+                                         new StringValue("rename-restart"),
+                                         new StringValue("coredump-destroy"), /* since 0.8.4 */
+                                         new StringValue("coredump-restart")}); /* since 0.8.4*/
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_EMULATOR,
-                            new String[]{"/usr/bin/kvm",
-                                         "/usr/bin/qemu"});
+                            new Value[]{new StringValue("/usr/bin/kvm"),
+                                        new StringValue("/usr/bin/qemu")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPU_MATCH,
-                            new String[]{"", "exact", "minimum", "strict"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("exact"),
+                                        new StringValue("minimum"),
+                                        new StringValue("strict")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS,
-                            new String[]{"", "1", "2"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("1"),
+                                        new StringValue("2")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES,
-                            new String[]{"", "1", "2", "4", "8"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("1"),
+                                        new StringValue("2"),
+                                        new StringValue("4"),
+                                        new StringValue("8")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_THREADS,
-                            new String[]{"", "1", "2"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("1"),
+                                        new StringValue("2")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_FEATURE_POLICY,
-                            new String[]{"",
-                                         "force",
-                                         "require",
-                                         "optional",
-                                         "disable",
-                                         "forbid"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("force"),
+                                        new StringValue("require"),
+                                        new StringValue("optional"),
+                                        new StringValue("disable"),
+                                        new StringValue("forbid")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
-                            new String[]{"", "aes", "aes apic"});
+                            new Value[]{NO_SELECTION_VALUE,
+                                        new StringValue("aes"),
+                                        new StringValue("aes apic")});
         IS_INTEGER.add(VMSXML.VM_PARAM_VCPU);
         IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_SOCKETS);
         IS_INTEGER.add(VMSXML.VM_PARAM_CPUMATCH_TOPOLOGY_CORES);
@@ -769,13 +799,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         super(name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getDistString("KVM.emulator");
-        final List<String> hostsList = new ArrayList<String>();
+        final List<Value> hostsList = new ArrayList<Value>();
         hostsList.add(null);
         for (final Host h : getBrowser().getClusterHosts()) {
-            hostsList.add(h.getName());
+            hostsList.add(new StringValue(h.getName()));
         }
         autostartPossibleValues =
-                              hostsList.toArray(new String[hostsList.size()]);
+                              hostsList.toArray(new Value[hostsList.size()]);
 
         setResource(new Resource(name));
     }
@@ -1893,7 +1923,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             final Widget hwi = definedOnHostComboBoxHash.get(h.getName());
             if (hwi != null) {
-                String value;
+                Value value;
                 if ((vmsxml != null
                         && vmsxml.getDomainNames().contains(getDomainName()))) {
                     value = DEFINED_ON_HOST_TRUE;
@@ -1904,16 +1934,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             }
         }
         for (final String param : getParametersFromXML()) {
-            final String oldValue = getParamSaved(param);
-            String value = null;
+            final Value oldValue = getParamSaved(param);
+            Value value = null;
             final Widget wi = getWidget(param, null);
             for (final Host h : getDefinedOnHosts()) {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null && value == null) {
-                    value = getParamSaved(param);
-                    final String savedValue =
-                                       vmsxml.getValue(getDomainName(), param);
-                    if (savedValue == null) {
+                    value = getParamSaved(param); //TODO: unused
+                    final Value savedValue =
+                                  new StringValue(vmsxml.getValue(getDomainName(), param));
+                    if (savedValue.isNothingSelected()) {
                         value = getParamDefault(param);
                     } else {
                         value = savedValue;
@@ -1993,7 +2023,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         int rows = 0;
         boolean running = false;
         for (final Host host : getBrowser().getClusterHosts()) {
-            String defaultValue = null;
+            Value defaultValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if (vmsxml != null && vmsxml.isRunning(getDomainName())) {
                 running = true;
@@ -3494,43 +3524,43 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         if (preferredEmulator != null
             && VMSXML.VM_PARAM_EMULATOR.equals(param)) {
-            return preferredEmulator;
+            return new StringValue(preferredEmulator);
         }
         return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+    protected boolean checkParam(final String param, final Value newValue) {
+        if (isRequired(param) && (newValue.isNothingSelected())) {
             return false;
         }
         if (VMSXML.VM_PARAM_MEMORY.equals(param)) {
-            final long mem = Tools.convertToKilobytes(newValue);
+            final long mem = Tools.convertToKilobytes(newValue.getValueForConfig());
             if (mem < 4096) {
                 return false;
             }
             final long curMem = Tools.convertToKilobytes(
-                        getComboBoxValue(VMSXML.VM_PARAM_CURRENTMEMORY));
+                        getComboBoxValue(VMSXML.VM_PARAM_CURRENTMEMORY).getValueForConfig());
             if (mem < curMem) {
                 return false;
             }
         } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
-            final long curMem = Tools.convertToKilobytes(newValue);
+            final long curMem = Tools.convertToKilobytes(newValue.getValueForConfig());
             if (curMem < 4096) {
                 return false;
             }
             final long mem = Tools.convertToKilobytes(
-                             getComboBoxValue(VMSXML.VM_PARAM_MEMORY));
+                             getComboBoxValue(VMSXML.VM_PARAM_MEMORY).getValueForConfig());
             if (mem < curMem) {
                 getWidget(VMSXML.VM_PARAM_MEMORY, null).setValue(newValue);
             }
@@ -3566,10 +3596,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                               Widget.WIZARD_PREFIX);
                 if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
                     if (emWi != null) {
-                        emWi.setValue(xenLibPath + "/bin/qemu-dm");
+                        emWi.setValue(new StringValue(xenLibPath + "/bin/qemu-dm"));
                     }
                     if (loWi != null) {
-                        loWi.setValue(xenLibPath + "/boot/hvmloader");
+                        loWi.setValue(new StringValue(xenLibPath + "/boot/hvmloader"));
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_XEN);
@@ -3578,14 +3608,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_HVM);
                     }
                     if (inWi != null) {
-                        inWi.setValue("");
+                        inWi.setValue(NO_SELECTION_VALUE);
                     }
                 } else if (Tools.areEqual(DOMAIN_TYPE_LXC, newValue)) {
                     if (emWi != null) {
-                        emWi.setValue(lxcLibPath + "/libvirt_lxc");
+                        emWi.setValue(new StringValue(lxcLibPath + "/libvirt_lxc"));
                     }
                     if (loWi != null) {
-                        loWi.setValue("");
+                        loWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_LXC);
@@ -3594,14 +3624,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_EXE);
                     }
                     if (inWi != null) {
-                        inWi.setValue("/bin/sh");
+                        inWi.setValue(new StringValue("/bin/sh"));
                     }
                 } else if (Tools.areEqual(DOMAIN_TYPE_VBOX, newValue)) {
                     if (emWi != null) {
-                        emWi.setValue(xenLibPath + "");
+                        emWi.setValue(new StringValue(xenLibPath + ""));
                     }
                     if (loWi != null) {
-                        loWi.setValue(xenLibPath + "");
+                        loWi.setValue(new StringValue(xenLibPath + ""));
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_VBOX);
@@ -3610,14 +3640,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_HVM);
                     }
                     if (inWi != null) {
-                        inWi.setValue("");
+                        inWi.setValue(NO_SELECTION_VALUE);
                     }
                 } else if (Tools.areEqual(DOMAIN_TYPE_OPENVZ, newValue)) {
                     if (emWi != null) {
-                        emWi.setValue("");
+                        emWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (loWi != null) {
-                        loWi.setValue("");
+                        loWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_OPENVZ);
@@ -3626,14 +3656,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_EXE);
                     }
                     if (inWi != null) {
-                        inWi.setValue("/sbin/init");
+                        inWi.setValue(new StringValue("/sbin/init"));
                     }
                 } else if (Tools.areEqual(DOMAIN_TYPE_UML, newValue)) {
                     if (emWi != null) {
-                        emWi.setValue("");
+                        emWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (loWi != null) {
-                        loWi.setValue("");
+                        loWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_UML);
@@ -3642,14 +3672,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_UML);
                     }
                     if (inWi != null) {
-                        inWi.setValue("");
+                        inWi.setValue(NO_SELECTION_VALUE);
                     }
                 } else {
                     if (emWi != null) {
-                        emWi.setValue("/usr/bin/kvm");
+                        emWi.setValue(new StringValue("/usr/bin/kvm"));
                     }
                     if (loWi != null) {
-                        loWi.setValue("");
+                        loWi.setValue(NO_SELECTION_VALUE);
                     }
                     if (voWi != null) {
                         voWi.setValue(VIRSH_OPTION_KVM);
@@ -3658,7 +3688,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         typeWi.setValue(TYPE_HVM);
                     }
                     if (inWi != null) {
-                        inWi.setValue("");
+                        inWi.setValue(NO_SELECTION_VALUE);
                     }
                 }
             }
@@ -3675,7 +3705,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (VMSXML.VM_PARAM_AUTOSTART.equals(param)) {
             return autostartPossibleValues;
         } else if (VMSXML.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
@@ -3686,14 +3716,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             for (final Host host : getBrowser().getClusterHosts()) {
                 models.addAll(host.getCPUMapModels());
             }
-            return models.toArray(new String[models.size()]);
+            return models.toArray(new Value[models.size()]);
         } else if (VMSXML.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
             final Set<String> vendors = new LinkedHashSet<String>();
             vendors.add("");
             for (final Host host : getBrowser().getClusterHosts()) {
                 vendors.addAll(host.getCPUMapVendors());
             }
-            return vendors.toArray(new String[vendors.size()]);
+            return vendors.toArray(new Value[vendors.size()]);
         }
         return POSSIBLE_VALUES.get(param);
     }
@@ -3762,10 +3792,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
-        setName(getComboBoxValue(VMSXML.VM_PARAM_NAME));
+        setName(getComboBoxValue(VMSXML.VM_PARAM_NAME).getValueForConfig());
         for (final String param : getParametersFromXML()) {
-            final String value = getComboBoxValue(param);
-            parameters.put(param, value);
+            final Value value = getComboBoxValue(param);
+            parameters.put(param, value.getValueForConfig());
             getResource().setValue(param, value);
         }
         final List<Host> definedOnHosts = new ArrayList<Host>();
@@ -5095,8 +5125,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
             final Widget wizardHostWi = definedOnHostComboBoxHash.get(
                                            WIZARD_HOST_PREFIX + host.getName());
-            final String value = hostWi.getStringValue();
-            String savedValue;
+            final Value value = hostWi.getValue();
+            Value savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
@@ -5381,7 +5411,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         }
         for (final Host h : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(h.getName());
-            String savedValue;
+            Value savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (getResource().isNew()
                 || (vmsxml != null
@@ -5413,7 +5443,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         for (final String pv : PREFERRED_MAP.keySet()) {
             if (preferredEmulator != null
                 && VMSXML.VM_PARAM_EMULATOR.equals(pv)) {
-                getResource().setValue(pv, preferredEmulator);
+                getResource().setValue(pv, new StringValue(preferredEmulator));
             } else {
                 getResource().setValue(pv, PREFERRED_MAP.get(pv));
             }
@@ -5440,7 +5470,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Return virsh options like -c xen:///. */
     public String getVirshOptions() {
-        return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS);
+        return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS).getValueForConfig();
     }
 
     /** Return whether domain type needs "display" section. */

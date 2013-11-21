@@ -20,11 +20,12 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
-import lcmc.gui.resources.Info;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
@@ -67,14 +68,14 @@ public final class TextfieldWithUnit extends Widget {
     /** Text field in widget with units. */
     private final JTextField textFieldPart;
     /** Combo box with units. */
-    private final MComboBox<Object> unitComboBox;
+    private final MComboBox<Unit> unitComboBox;
     /** Pattern that matches value and unit. */
     private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
     /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
 
     /** Prepares a new <code>TextfieldWithUnit</code> object. */
-    public TextfieldWithUnit(final String selectedValue,
+    public TextfieldWithUnit(final Value selectedValue,
                              final Unit[] units,
                              final String regexp,
                              final int width,
@@ -88,17 +89,14 @@ public final class TextfieldWithUnit extends Widget {
         final JPanel newComp = new JPanel();
         newComp.setLayout(new SpringLayout());
 
-        String number = "";
-        String unit = "";
-        if (selectedValue != null) {
-            final Matcher m = unitPattern.matcher(selectedValue);
-            if (m.matches()) {
-                number = m.group(1);
-                final String parsedUnit = m.group(2);
-                if (!"".equals(parsedUnit)) {
-                    unit = parsedUnit;
-                }
-            }
+        String number;
+        Unit unit;
+        if (selectedValue == null) {
+            number = null;
+            unit = null;
+        } else {
+            number = selectedValue.getValueForConfig();
+            unit = selectedValue.getUnit();
         }
 
         /* text field */
@@ -141,18 +139,18 @@ public final class TextfieldWithUnit extends Widget {
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private MComboBox<Object> getComboBox(
-                                  final String selectedValue,
-                                  final Object[] items,
+    private MComboBox<Unit> getComboBox(
+                                  final Unit selectedValue,
+                                  final Unit[] items,
                                   final String regexp,
                                   final Map<String, String> abbreviations) {
-        final List<Object> comboList = new ArrayList<Object>();
+        final List<Unit> comboList = new ArrayList<Unit>();
 
-        final Object selectedValueInfo = ComboBox.addItems(comboList,
+        final Unit selectedValueInfo = addItems(comboList,
                                                            selectedValue,
                                                            items);
-        final MComboBox<Object> cb = new MComboBox<Object>(comboList.toArray(
-                                            new Object[comboList.size()]));
+        final MComboBox<Unit> cb = new MComboBox<Unit>(comboList.toArray(
+                                            new Unit[comboList.size()]));
         final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
@@ -163,18 +161,14 @@ public final class TextfieldWithUnit extends Widget {
             cb.setSelectedItem(selectedValueInfo);
         }
         /* workround, so that default button works */
-        editor.addKeyListener(new ActivateDefaultButtonListener(cb));
+        editor.addKeyListener(new ActivateDefaultButtonListener<Unit>(cb));
 
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(final FocusEvent e) {
-                Object o = getValue();
-                if (o != null && !Tools.isStringClass(o)
-                    && ((Info) o).getInternalValue() == null) {
-                    o = null;
-                }
-                if (o == null) {
+                Value v = getValue();
+                if (v.isNothingSelected()) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -206,39 +200,28 @@ public final class TextfieldWithUnit extends Widget {
      */
     @Override
     public String getStringValue() {
-        final Object o = getValue();
-        if (o == null) {
-            return "";
-        }
-        final Object o0 = ((Object[]) o)[0];
-        final Object o1 = ((Object[]) o)[1];
-        String v = o0.toString();
-        if (v != null && !"".equals(v) && o1 != null
-            && o1 instanceof Unit) {
-            v += ((Unit) o1).getShortName();
-        }
-        return v;
+        final Value v = getValue();
+        return v.getValueForConfigWithUnit();
     }
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
+    protected Value getValueInternal() {
         String text = textFieldPart.getText();
         if (text == null) {
             text = "";
         }
-        final Object unit = unitComboBox.getSelectedItem();
-        if (!Tools.isStringClass(unit)) {
-            final Unit u = (Unit) unit;
-            if (u.isPlural() == "1".equals(text)) {
-                u.setPlural(!"1".equals(text));
+        final Unit unit = ((Unit) unitComboBox.getSelectedItem());
+        if (unit != null) {
+            if (unit.isPlural() == "1".equals(text)) {
+                unit.setPlural(!"1".equals(text));
                 unitComboBox.repaint();
             }
             final boolean accessible =
                      Tools.getConfigData().isAccessible(getEnableAccessMode());
             if ("".equals(text)) {
-                if (!u.isEmpty()) {
-                    u.setEmpty(true);
+                if (!unit.isEmpty()) {
+                    unit.setEmpty(true);
                     unitEnabled = false;
                     Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
                                       new Runnable() {
@@ -250,8 +233,8 @@ public final class TextfieldWithUnit extends Widget {
                     });
                 }
             } else {
-                if (u.isEmpty()) {
-                    u.setEmpty(false);
+                if (unit.isEmpty()) {
+                    unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
                         Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
@@ -266,11 +249,7 @@ public final class TextfieldWithUnit extends Widget {
                 }
             }
         }
-        final Object value = new Object[]{text, unit};
-
-        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
-            return null;
-        }
+        final Value value = new StringValue(text, text, unit);
         return value;
     }
 
@@ -305,10 +284,10 @@ public final class TextfieldWithUnit extends Widget {
 
     /** Set item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
+    protected void setValueAndWait0(final Value item) {
         Matcher m = null;
         if (item != null) {
-            m = unitPattern.matcher((String) item);
+            m = unitPattern.matcher(item.getValueForConfig());
         }
         String number = "";
         String unit = "";
@@ -322,9 +301,9 @@ public final class TextfieldWithUnit extends Widget {
 
         textFieldPart.setText(number);
 
-        Object selectedUnitInfo = null;
+        Unit selectedUnitInfo = null;
         for (Unit u : units) {
-            if (u.equals(unit)) {
+            if (u.equals(unit)) { //TODO:
                 selectedUnitInfo = u;
             }
         }
@@ -377,10 +356,10 @@ public final class TextfieldWithUnit extends Widget {
     }
 
     /** Return item at the specified index. */
-    @Override
-    Object getItemAt(final int i) {
-        return getComponent();
-    }
+    //@Override
+    //Value getItemAt(final int i) {
+    //    return getComponent();
+    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override
@@ -394,5 +373,24 @@ public final class TextfieldWithUnit extends Widget {
         for (final ItemListener il : unitComboBox.getItemListeners()) {
             unitComboBox.removeItemListener(il);
         }
+    }
+
+    private static Unit addItems(final List<Unit> comboList,
+                                     final Unit selectedValue,
+                                     final Unit[] items) {
+        Unit selectedUnit = null;
+        if (items != null) {
+            for (int i = 0; i < items.length; i++) {
+                if (items[i].equals(selectedValue)) {
+                    selectedUnit = items[i];
+                }
+                comboList.add(items[i]);
+            }
+            if (selectedUnit == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedUnit = selectedValue;
+            }
+        }
+        return selectedUnit;
     }
 }

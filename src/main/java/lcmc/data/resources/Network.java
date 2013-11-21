@@ -23,6 +23,8 @@
 
 package lcmc.data.resources;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 
 import lcmc.utilities.Logger;
@@ -73,8 +75,8 @@ public final class Network extends Resource {
 
     /** Returns value of the parameter. */
     @Override
-    public String getValue(final String parameter) {
+    public Value getValue(final String parameter) {
         LOG.appError("getValue: wrong call to getValue");
-        return "???";
+        return new StringValue("???");
     }
 }

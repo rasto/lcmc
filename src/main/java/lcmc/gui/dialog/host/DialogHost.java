@@ -33,11 +33,14 @@ import lcmc.utilities.MyButton;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
 import java.util.List;
 import java.util.ArrayList;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * DialogHost.
@@ -136,7 +139,7 @@ public abstract class DialogHost extends WizardDialog {
     protected abstract String getHostDialogTitle();
 
     /** This class holds install method names, and their indeces. */
-    public static final class InstallMethods {
+    public static final class InstallMethods implements Value {
         /** Name of the method like "CD". */
         private final String name;
         /** Index of the method. */
@@ -182,6 +185,31 @@ public abstract class DialogHost extends WizardDialog {
         /** Returns whether the installation method is "linbit". */
         boolean isLinbitMethod() {
             return "linbit".equals(method);
+        }
+
+        @Override
+        public String getValueForGui() {
+            return name;
+        }
+
+        @Override
+        public String getValueForConfig() {
+            return name;
+        }
+
+        @Override
+        public boolean isNothingSelected() {
+            return name == null;
+        }
+
+        @Override
+        public Unit getUnit() {
+            return null;
+        }
+
+        @Override
+        public String getValueForConfigWithUnit() {
+            return getValueForConfig();
         }
     }
 
@@ -230,8 +258,8 @@ public abstract class DialogHost extends WizardDialog {
         }
         final Widget instMethodWi = WidgetFactory.createInstance(
                        Widget.Type.COMBOBOX,
-                       defaultValue,
-                       (Object[]) methods.toArray(
+                       new StringValue(defaultValue),
+                       (Value[]) methods.toArray(
                                            new InstallMethods[methods.size()]),
                        Widget.NO_REGEXP,
                        0,    /* width */

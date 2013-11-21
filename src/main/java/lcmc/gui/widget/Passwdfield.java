@@ -20,6 +20,8 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
@@ -42,7 +44,7 @@ public final class Passwdfield extends Textfield {
     private static final long serialVersionUID = 1L;
 
     /** Prepares a new <code>Passwdfield</code> object. */
-    public Passwdfield(final String selectedValue,
+    public Passwdfield(final Value selectedValue,
                        final String regexp,
                        final int width,
                        final AccessMode enableAccessMode,
@@ -57,14 +59,14 @@ public final class Passwdfield extends Textfield {
     }
 
     /** Returns new JPasswordField with default value. */
-    private JComponent getPasswdField(final String value,
+    private JComponent getPasswdField(final Value value,
                                       final String regexp) {
         JPasswordField pf;
         if (regexp == null) {
-            pf = new JPasswordField(value);
+            pf = new JPasswordField(value.getValueForConfig());
         } else {
             pf = new JPasswordField(new PatternDocument(regexp),
-                                    value,
+                                    value.getValueForConfig(),
                                     0);
         }
         return pf;
@@ -72,10 +74,10 @@ public final class Passwdfield extends Textfield {
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
-        final Object value =
-                 new String(((JPasswordField) getComponent()).getPassword());
-        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
+    protected Value getValueInternal() {
+        final Value value =
+             new StringValue(new String(((JPasswordField) getComponent()).getPassword()));
+        if (value.isNothingSelected()) {
             return null;
         }
         return value;
@@ -83,8 +85,8 @@ public final class Passwdfield extends Textfield {
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
-        ((JPasswordField) getComponent()).setText((String) item);
+    protected void setValueAndWait0(final Value item) {
+        ((JPasswordField) getComponent()).setText(item.getValueForConfig());
     }
 
     /** Returns document object of the component. */

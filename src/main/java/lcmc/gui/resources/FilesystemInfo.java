@@ -33,6 +33,8 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
 
 import java.util.Map;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -134,7 +136,7 @@ final class FilesystemInfo extends ServiceInfo {
             });
             getInfoPanel();
             waitForInfoPanel();
-            final String dir = getComboBoxValue("directory");
+            final String dir = getComboBoxValue("directory").getValueForConfig();
             boolean confirm = false; /* confirm only once */
             for (Host host : getBrowser().getClusterHosts()) {
                 final String statCmd =
@@ -197,7 +199,7 @@ final class FilesystemInfo extends ServiceInfo {
                                     return;
                                 }
                                 final String selectedValue =
-                                                     getParamSaved("fstype");
+                                                  getParamSaved("fstype").getValueForConfig();
                                 String createdFs;
                                 if (selectedValue == null
                                     || "".equals(selectedValue)) {
@@ -209,7 +211,7 @@ final class FilesystemInfo extends ServiceInfo {
                                 }
                                 if (createdFs != null
                                     && !"".equals(createdFs)) {
-                                    fstypeParamWi.setValue(createdFs);
+                                    fstypeParamWi.setValue(new StringValue(createdFs));
                                 }
                             }
                         }
@@ -223,17 +225,17 @@ final class FilesystemInfo extends ServiceInfo {
                                   final int width) {
         Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
-            String selectedValue = getPreviouslySelected(param, prefix);
+            Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
             final DrbdVolumeInfo selectedInfo =
-                            getBrowser().getDrbdVolumeFromDev(selectedValue);
+                            getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
             if (selectedInfo != null) {
-                selectedValue = selectedInfo.toString();
+                selectedValue = selectedInfo;
             }
             Info defaultValue = null;
-            if (selectedValue == null || "".equals(selectedValue)) {
+            if (selectedValue.isNothingSelected()) {
                 defaultValue = new StringInfo(
                            Tools.getString("ClusterBrowser.SelectBlockDevice"),
                            "",
@@ -258,19 +260,19 @@ final class FilesystemInfo extends ServiceInfo {
             addParamComboListeners(paramWi);
             widgetAdd(param, prefix, paramWi);
         } else if ("fstype".equals(param)) {
-            final String defaultValue =
-                        Tools.getString("ClusterBrowser.SelectFilesystem");
-            String selectedValue = getPreviouslySelected(param, prefix);
+            final Value defaultValue =
+                        new StringValue(Tools.getString("ClusterBrowser.SelectFilesystem"));
+            Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            if (selectedValue == null || "".equals(selectedValue)) {
+            if (selectedValue.isNothingSelected()) {
                 selectedValue = defaultValue;
             }
             paramWi = WidgetFactory.createInstance(
                               Widget.GUESS_TYPE,
                               selectedValue,
-                              getBrowser().getCommonFileSystems(defaultValue),
+                              getBrowser().getCommonFileSystems(defaultValue.getValueForConfig()),
                               Widget.NO_REGEXP,
                               width,
                               Widget.NO_ABBRV,
@@ -284,24 +286,21 @@ final class FilesystemInfo extends ServiceInfo {
             paramWi.setEditable(false);
         } else if ("directory".equals(param)) {
             final String[] cmp = getBrowser().getCommonMountPoints();
-            Object[] items = new Object[cmp.length + 1];
+            Value[] items = new Value[cmp.length + 1];
             System.arraycopy(cmp,
                              0,
                              items,
                              1,
                              cmp.length);
-            final String defaultValue =
-                           Tools.getString("ClusterBrowser.SelectMountPoint");
-            items[0] = new StringInfo(
-                            defaultValue,
-                            null,
-                            getBrowser());
+            final Value defaultValue =
+                      new StringValue(Tools.getString("ClusterBrowser.SelectMountPoint"));
+            items[0] = defaultValue;
             getResource().setPossibleChoices(param, items);
-            String selectedValue = getPreviouslySelected(param, prefix);
+            Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            if (selectedValue == null || "".equals(selectedValue)) {
+            if (selectedValue.isNothingSelected()) {
                 selectedValue = defaultValue;
             }
             final String regexp = "^.+$";
@@ -334,9 +333,9 @@ final class FilesystemInfo extends ServiceInfo {
 
         final StringBuilder s = new StringBuilder(getName());
         final DrbdVolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(
-                                             getParamSaved(FS_RES_PARAM_DEV));
+                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         if (dvi == null) {
-            id = getParamSaved(FS_RES_PARAM_DEV);
+            id = getParamSaved(FS_RES_PARAM_DEV).getValueForConfig();
         } else {
             id = dvi.getDrbdResourceInfo().getName();
             s.delete(0, s.length());
@@ -358,7 +357,7 @@ final class FilesystemInfo extends ServiceInfo {
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final boolean testOnly) {
         final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
-                                            getParamSaved(FS_RES_PARAM_DEV));
+                                            getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, testOnly);
         if (oldDvi != null && !testOnly) {
             final Thread t = new Thread(new Runnable() {
@@ -382,13 +381,13 @@ final class FilesystemInfo extends ServiceInfo {
             return;
         }
         final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
-                                            getParamSaved(FS_RES_PARAM_DEV));
+                                            getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         if (oldDvi != null) {
             // TODO: disabled because it does not work well at the moment.
             return;
         }
         final DrbdVolumeInfo newDvi = getBrowser().getDrbdVolumeFromDev(
-                                          getComboBoxValue(FS_RES_PARAM_DEV));
+                                          getComboBoxValue(FS_RES_PARAM_DEV).getValueForConfig());
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
@@ -478,15 +477,15 @@ final class FilesystemInfo extends ServiceInfo {
         super.reloadComboBoxes();
         final DrbdVolumeInfo selectedInfo =
                                 getBrowser().getDrbdVolumeFromDev(
-                                            getParamSaved(FS_RES_PARAM_DEV));
-        String selectedValue;
+                                            getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
+        Value selectedValue;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
         } else {
-            selectedValue = selectedInfo.toString();
+            selectedValue = selectedInfo;
         }
         Info defaultValue = null;
-        if (selectedValue == null || "".equals(selectedValue)) {
+        if (selectedValue.isNothingSelected()) {
             defaultValue = new StringInfo(
                        Tools.getString("ClusterBrowser.SelectBlockDevice"),
                        "",
@@ -495,7 +494,7 @@ final class FilesystemInfo extends ServiceInfo {
         final Info[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
                                                                   getName());
         if (blockDeviceParamWi != null) {
-            final String value = blockDeviceParamWi.getStringValue();
+            final Value value = blockDeviceParamWi.getValue();
             blockDeviceParamWi.reloadComboBox(value,
                                               commonBlockDevInfos);
         }

@@ -43,6 +43,7 @@ import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
 /**
  * This class implements LVM snapshot dialog.
  *
@@ -142,9 +143,10 @@ public final class LVSnapshot extends LV {
 
     private void setComboBoxes() {
         final String maxBlockSize = getMaxBlockSize();
-        sizeWi.setValue(Tools.convertKilobytes(Long.toString(
-                                     Long.parseLong(maxBlockSize) / 2)));
-        maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
+        sizeWi.setValue(new StringValue(Tools.convertKilobytes(Long.toString(
+                                     Long.parseLong(maxBlockSize) / 2))));
+        maxSizeWi.setValue(
+                       new StringValue(Tools.convertKilobytes(maxBlockSize)));
     }
 
     /** Returns the input pane. */
@@ -176,7 +178,7 @@ public final class LVSnapshot extends LV {
         }
         lvNameWi = WidgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
-                                      defaultName,
+                                      new StringValue(defaultName),
                                       Widget.NO_ITEMS,
                                       Widget.NO_REGEXP,
                                       250,
@@ -200,14 +202,15 @@ public final class LVSnapshot extends LV {
                                       Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(Tools.convertKilobytes(newBlockSize),
-                                       getUnits(),
-                                       Widget.NO_REGEXP,
-                                       250,
-                                       Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.OP,
-                                                      !AccessMode.ADVANCED),
-                                       Widget.NO_BUTTON);
+        sizeWi = new TextfieldWithUnit(
+                       new StringValue(Tools.convertKilobytes(newBlockSize)),
+                       getUnits(),
+                       Widget.NO_REGEXP,
+                       250,
+                       Widget.NO_ABBRV,
+                       new AccessMode(ConfigData.AccessType.OP,
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi);
         snapshotButton.addActionListener(new ActionListener() {
@@ -245,14 +248,14 @@ public final class LVSnapshot extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                                    Tools.convertKilobytes(maxBlockSize),
-                                    getUnits(),
-                                    Widget.NO_REGEXP,
-                                    250,
-                                    Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.OP,
-                                                   !AccessMode.ADVANCED),
-                                    Widget.NO_BUTTON);
+                        new StringValue(Tools.convertKilobytes(maxBlockSize)),
+                        getUnits(),
+                        Widget.NO_REGEXP,
+                        250,
+                        Widget.NO_ABBRV,
+                        new AccessMode(ConfigData.AccessType.OP,
+                                       !AccessMode.ADVANCED),
+                        Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeWi);

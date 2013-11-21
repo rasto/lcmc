@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -69,16 +71,17 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{InputDevData.TYPE}));
 
     /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                               new HashMap<String, Value[]>();
     static {
         POSSIBLE_VALUES.put(InputDevData.TYPE,
-                            new String[]{"tablet", "mouse"});
+                            new Value[]{new StringValue("tablet"),
+                                        new StringValue("mouse")});
         POSSIBLE_VALUES.put(InputDevData.BUS,
-                            new String[]{"usb"}); /* no ps2 */
+                            new Value[]{new StringValue("usb")}); /* no ps2 */
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -123,13 +126,13 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -141,7 +144,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -220,9 +223,9 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(InputDevData.SAVED_TYPE,
-                               getParamSaved(InputDevData.TYPE));
+                               getParamSaved(InputDevData.TYPE).getValueForConfig());
                 parameters.put(InputDevData.SAVED_BUS,
-                               getParamSaved(InputDevData.BUS));
+                               getParamSaved(InputDevData.BUS).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -307,8 +310,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+    protected boolean checkParam(final String param, final Value newValue) {
+        if (isRequired(param) && (newValue.isNothingSelected())) {
             return false;
         }
         return true;
@@ -323,14 +326,14 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
             final InputDevData inputDevData = inputDevs.get(getName());
             if (inputDevData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                              : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                inputDevData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -356,14 +359,14 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(InputDevData.TYPE);
+        final String type = getParamSaved(InputDevData.TYPE).getValueForConfig();
         if (type == null) {
             s.append("new input device...");
         } else {
             s.append(type);
         }
 
-        final String bus = getParamSaved(InputDevData.BUS);
+        final String bus = getParamSaved(InputDevData.BUS).getValueForConfig();
         if (bus != null) {
             s.append(" (");
             s.append(bus);
@@ -385,9 +388,9 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(InputDevData.SAVED_TYPE,
-                               getParamSaved(InputDevData.TYPE));
+                               getParamSaved(InputDevData.TYPE).getValueForConfig());
                 parameters.put(InputDevData.SAVED_BUS,
-                               getParamSaved(InputDevData.BUS));
+                               getParamSaved(InputDevData.BUS).getValueForConfig());
                 vmsxml.removeInputDevXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
@@ -404,9 +407,9 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
      */
     @Override
     protected String isRemoveable() {
-        final String type = getParamSaved(InputDevData.TYPE);
+        final String type = getParamSaved(InputDevData.TYPE).getValueForConfig();
         if (type != null && "mouse".equals(type)) {
-            final String bus = getParamSaved(InputDevData.BUS);
+            final String bus = getParamSaved(InputDevData.BUS).getValueForConfig();
             if (bus != null && "ps2".equals(bus)) {
                 return "You can never remove this one";
             }

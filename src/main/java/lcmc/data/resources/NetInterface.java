@@ -26,9 +26,12 @@ package lcmc.data.resources;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Unit;
 
 /**
  * This class holds data of one network interface.
@@ -37,7 +40,7 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class NetInterface extends Resource {
+public final class NetInterface extends Resource implements Value {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(NetInterface.class);
@@ -51,6 +54,8 @@ public final class NetInterface extends Resource {
     private final String networkIp;
     /** Whether it is a bridge. */
     private final boolean bridge;
+
+
     /** Address family. */
     public enum AF {IPV4, IPV6, SSOCKS, SDP};
     /** Address family. */
@@ -229,15 +234,15 @@ public final class NetInterface extends Resource {
 
     /** Returns value for parameter. */
     @Override
-    public String getValue(final String parameter) {
+    public Value getValue(final String parameter) {
         if ("ip".equals(parameter)) {
-            return ip;
+            return new StringValue(ip);
         }
         if ("String".equals(parameter)) {
-            return ip;
+            return new StringValue(ip);
         } else {
             LOG.appError("getValue: Unknown parameter: " + parameter, "");
-            return "";
+            return null;
         }
     }
 
@@ -272,5 +277,30 @@ public final class NetInterface extends Resource {
     /** Return whether it's a localhost. */
     public boolean isLocalHost() {
         return "lo".equals(getName());
+    }
+
+    @Override
+    public String getValueForGui() {
+        return getName();
+    }
+
+    @Override
+    public String getValueForConfig() {
+        return getName();
+    }
+
+    @Override
+    public boolean isNothingSelected() {
+        return getName() == null;
+    }
+
+    @Override
+    public Unit getUnit() {
+        return null;
+    }
+
+    @Override
+    public String getValueForConfigWithUnit() {
+        return getValueForConfig();
     }
 }

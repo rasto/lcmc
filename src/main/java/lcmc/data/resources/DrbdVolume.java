@@ -23,6 +23,8 @@
 
 package lcmc.data.resources;
 
+import lcmc.data.StringValue;
+
 /**
  * This class holds data of one drbd volumes.
  *
@@ -56,7 +58,7 @@ implements ClusterBlockDeviceInterface {
     /** Sets drbd device. */
     public void setDevice(final String device) {
         this.device = device;
-        setValue("device", device);
+        setValue("device", new StringValue(device));
     }
 
     /**

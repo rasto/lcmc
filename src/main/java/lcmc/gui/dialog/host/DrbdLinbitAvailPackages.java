@@ -47,6 +47,8 @@ import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -150,8 +152,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                     @Override
                                     public void run() {
                                         drbdDistCombo.reloadComboBox(
-                                                    getHost().getDistVersion(),
-                                                    items);
+                                            new StringValue(
+                                                  getHost().getDistVersion()),
+                                            StringValue.getValues(items));
                                         drbdDistCombo.setEnabled(true);
                                     }
                                 });
@@ -181,7 +184,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                 public void run() {
                     drbdKernelDirCombo.reloadComboBox(
                                                 null,
-                                                new String[]{NO_MATCH_STRING});
+                                                new Value[]{new StringValue(NO_MATCH_STRING)});
                 }
             });
             availArchs();
@@ -200,8 +203,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                     @Override
                                     public void run() {
                                         drbdKernelDirCombo.reloadComboBox(
-                                                getHost().getKernelVersion(),
-                                                items);
+                                            new StringValue(
+                                               getHost().getKernelVersion()),
+                                            StringValue.getValues(items));
                                         drbdKernelDirCombo.setEnabled(true);
                                     }
                                 });
@@ -237,7 +241,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                 @Override
                 public void run() {
                     drbdArchCombo.reloadComboBox(null,
-                                                 new String[]{NO_MATCH_STRING});
+                                                 new Value[]{new StringValue(NO_MATCH_STRING)});
                     drbdArchCombo.setEnabled(false);
                 }
             });
@@ -257,8 +261,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                     @Override
                                     public void run() {
                                         drbdArchCombo.reloadComboBox(
-                                                        arch,
-                                                        items);
+                                                new StringValue(arch),
+                                                StringValue.getValues(items));
                                         drbdArchCombo.setEnabled(true);
                                     }
                                 });
@@ -468,7 +472,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                     if (drbdDistItems == null || !drbdDistItems.contains(v)) {
                         v = NO_MATCH_STRING;
                     }
-                    drbdDistCombo.setValue(v);
+                    drbdDistCombo.setValue(new StringValue(v));
                 }
             });
 
@@ -483,7 +487,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                         || !drbdKernelDirItems.contains(v)) {
                         v = NO_MATCH_STRING;
                     }
-                    drbdKernelDirCombo.setValue(v);
+                    drbdKernelDirCombo.setValue(new StringValue(v));
                 }
             });
 

@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JComponent;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
@@ -92,7 +93,7 @@ public final class Name extends DialogCluster {
             public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
                 if (isValid) {
-                    nameField.setBackground(name, name, true);
+                    nameField.setBackground(new StringValue(name), new StringValue(name), true);
                 } else {
                     nameField.wrongValue();
                 }
@@ -146,7 +147,7 @@ public final class Name extends DialogCluster {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        nameField.setValue(name);
+                        nameField.setValue(new StringValue(name));
                     }
                 });
             }
@@ -171,7 +172,7 @@ public final class Name extends DialogCluster {
         final String regexp = "^[ ,\\w.-]+$";
         nameField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       getCluster().getName(),
+                                       new StringValue(getCluster().getName()),
                                        Widget.NO_ITEMS,
                                        regexp,
                                        NAME_FIELD_WIDTH,

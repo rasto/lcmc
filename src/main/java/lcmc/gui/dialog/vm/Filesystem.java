@@ -35,6 +35,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -135,7 +136,7 @@ final class Filesystem extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsfi.savePreferredValues();
-        vmsfi.getResource().setValue(FilesystemData.TYPE, "mount");
+        vmsfi.getResource().setValue(FilesystemData.TYPE, new StringValue("mount"));
         vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,

@@ -48,6 +48,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.util.regex.Matcher;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -295,15 +297,15 @@ final class CreateMD extends DrbdConfig {
         final String createNewMetadataDestroyData = Tools.getString(
                     "Dialog.DrbdConfig.CreateMD.CreateNewMetadataDestroyData");
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isHaveToCreateMD()) {
-            final String[] choices = {createNewMetadata,
-                                      createNewMetadataDestroyData};
+            final Value[] choices = {new StringValue(createNewMetadata),
+                                     new StringValue(createNewMetadataDestroyData)};
             makeMDButton.setEnabled(true);
             makeMDButton.setText(
                  Tools.getString("Dialog.DrbdConfig.CreateMD.CreateMDButton"));
             final String metadataDefault = createNewMetadata;
             metadataWi = WidgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
-                                        metadataDefault,
+                                        new StringValue(metadataDefault),
                                         choices,
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
@@ -312,9 +314,9 @@ final class CreateMD extends DrbdConfig {
                                                        !AccessMode.ADVANCED),
                                         Widget.NO_BUTTON);
         } else {
-            final String[] choices = {useExistingMetadata,
-                                      createNewMetadata,
-                                      createNewMetadataDestroyData};
+            final Value[] choices = {new StringValue(useExistingMetadata),
+                                     new StringValue(createNewMetadata),
+                                     new StringValue(createNewMetadataDestroyData)};
             makeMDButton.setEnabled(false);
             makeMDButton.setText(
                Tools.getString("Dialog.DrbdConfig.CreateMD.OverwriteMDButton"));
@@ -325,7 +327,7 @@ final class CreateMD extends DrbdConfig {
             }
             metadataWi = WidgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
-                                        metadataDefault,
+                                        new StringValue(metadataDefault),
                                         choices,
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,

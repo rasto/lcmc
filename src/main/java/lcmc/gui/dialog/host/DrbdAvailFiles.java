@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -87,9 +89,10 @@ public class DrbdAvailFiles extends DialogHost {
         getProgressBar().start(4000);
         getHost().setDrbdBuildToInstall(getHost().getDetectedKernelVersion());
         /* get drbd available versions and continue with availBuilds */
-        final String[] versions = getHost().getAvailableDrbdVersions();
+        final Value[] versions = StringValue.getValues(
+                                        getHost().getAvailableDrbdVersions());
         if (versions != null && versions.length != 0) {
-            final String version = versions[versions.length - 1];
+            final Value version = versions[versions.length - 1];
             drbdVersionCombo.reloadComboBox(version, versions);
             Tools.waitForSwing();
         }
@@ -125,10 +128,10 @@ public class DrbdAvailFiles extends DialogHost {
                                     defaultValue =
                                             defaultValue.replaceAll("-", "_");
                                 }
-                                final String defaultValueCopy = defaultValue;
                                 drbdBuildCombo.clear();
-                                drbdBuildCombo.reloadComboBox(defaultValueCopy,
-                                                              items);
+                                drbdBuildCombo.reloadComboBox(
+                                                new StringValue(defaultValue),
+                                                StringValue.getValues(items));
                                 Tools.waitForSwing();
                                 final String selectedItem =
                                                drbdBuildCombo.getStringValue();

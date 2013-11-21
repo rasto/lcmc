@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * Object that holds a colocation constraint information.
@@ -82,7 +84,7 @@ final class HbColocationInfo extends EditableInfo
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String colId = getService().getHeartbeatId();
-        final Map<String, String> resourceNode = new HashMap<String, String>();
+        final Map<String, Value> resourceNode = new HashMap<String, Value>();
 
         if (serviceInfoRsc == null
             || serviceInfoWithRsc == null) {
@@ -90,7 +92,7 @@ final class HbColocationInfo extends EditableInfo
             final CRMXML.ColocationData colocationData =
                             clStatus.getColocationData(colId);
             final String score = colocationData.getScore();
-            resourceNode.put(CRMXML.SCORE_STRING, score);
+            resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
         } else if (serviceInfoRsc.isConstraintPH()
                    || serviceInfoWithRsc.isConstraintPH()) {
             /* rsc set edge */
@@ -103,8 +105,8 @@ final class HbColocationInfo extends EditableInfo
                 cphi = (ConstraintPHInfo) serviceInfoWithRsc;
                 rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
             }
-            resourceNode.put("sequential", rscSet.getSequential());
-            resourceNode.put("role", rscSet.getColocationRole());
+            resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
+            resourceNode.put("role", new StringValue(rscSet.getColocationRole()));
         } else {
             final CRMXML.ColocationData colocationData =
                             clStatus.getColocationData(colId);
@@ -115,9 +117,9 @@ final class HbColocationInfo extends EditableInfo
                 final String rscRole = colocationData.getRscRole();
                 final String withRscRole = colocationData.getWithRscRole();
 
-                resourceNode.put(CRMXML.SCORE_STRING, score);
-                resourceNode.put("rsc-role", rscRole);
-                resourceNode.put("with-rsc-role", withRscRole);
+                resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+                resourceNode.put("rsc-role", new StringValue(rscRole));
+                resourceNode.put("with-rsc-role", new StringValue(withRscRole));
             }
         }
 
@@ -125,14 +127,11 @@ final class HbColocationInfo extends EditableInfo
         final String[] params = getParametersFromXML();
         if (params != null) {
             for (String param : params) {
-                String value = resourceNode.get(param);
+                Value value = resourceNode.get(param);
                 if (value == null) {
                     value = getParamDefault(param);
                 }
-                if ("".equals(value)) {
-                    value = null;
-                }
-                final String oldValue = getParamSaved(param);
+                final Value oldValue = getParamSaved(param);
                 if ((value == null && value != oldValue)
                     || (value != null && !value.equals(oldValue))) {
                     getResource().setValue(param, value);
@@ -182,19 +181,19 @@ final class HbColocationInfo extends EditableInfo
      * constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        return getBrowser().getCRMXML().checkColocationParam(param, newValue);
+    protected boolean checkParam(final String param, final Value newValue) {
+        return getBrowser().getCRMXML().checkColocationParam(param, newValue.getValueForConfig());
     }
 
     /** Returns default for this parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return getBrowser().getCRMXML().getColocationParamDefault(param);
     }
 
     /** Returns preferred value for this parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return getBrowser().getCRMXML().getColocationParamPreferred(param);
     }
 
@@ -237,7 +236,7 @@ final class HbColocationInfo extends EditableInfo
      * down menu.
      */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if ("role".equals(param)) {
             return getBrowser().getCRMXML().getColocationParamPossibleChoices(
                                 param,
@@ -303,16 +302,17 @@ final class HbColocationInfo extends EditableInfo
     }
 
     /** Returns attributes of this colocation. */
+    //TODO: what is using it?
     protected Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (!value.equals(getParamSaved(param))) {
                 changed = true;
             }
-            attrs.put(param, value);
+            attrs.put(param, value.getValueForConfig());
         }
         return attrs;
     }
@@ -324,11 +324,11 @@ final class HbColocationInfo extends EditableInfo
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (!value.equals(getParamSaved(param))) {
                 changed = true;
             }
-            attrs.put(param, value);
+            attrs.put(param, value.getValueForConfig());
         }
         if (changed) {
             final String colId = getService().getHeartbeatId();
@@ -445,10 +445,10 @@ final class HbColocationInfo extends EditableInfo
         final String score = data.getScore();
         if (score == null) {
             return 0;
-        } else if (CRMXML.INFINITY_STRING.equals(score)
-                   || CRMXML.PLUS_INFINITY_STRING.equals(score)) {
+        } else if (CRMXML.INFINITY_STRING.getValueForConfig().equals(score)
+                   || CRMXML.PLUS_INFINITY_STRING.getValueForConfig().equals(score)) {
             return 1000000;
-        } else if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
+        } else if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
             return -1000000;
         }
         return Integer.parseInt(score);

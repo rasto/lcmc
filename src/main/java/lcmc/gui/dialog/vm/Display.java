@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -139,8 +140,8 @@ final class Display extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsgi.savePreferredValues();
-        vmsgi.getResource().setValue(GraphicsData.TYPE, "vnc");
-        vmsgi.getResource().setValue(GraphicsData.PORT, "auto");
+        vmsgi.getResource().setValue(GraphicsData.TYPE, new StringValue("vnc"));
+        vmsgi.getResource().setValue(GraphicsData.PORT, new StringValue("auto"));
 
         vmsgi.addWizardParams(
                       optionsPanel,

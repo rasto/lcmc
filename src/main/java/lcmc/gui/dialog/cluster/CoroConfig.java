@@ -68,6 +68,8 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -118,7 +120,7 @@ final class CoroConfig extends DialogCluster {
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
     /** Multicast type string. */
-    private static final String MCAST_TYPE = "mcast";
+    private static final Value MCAST_TYPE = new StringValue("mcast");
     /** Width of the address combobox. */
     private static final int ADDR_COMBOBOX_WIDTH = 100;
     /** Width of the port combobox. */
@@ -329,7 +331,7 @@ final class CoroConfig extends DialogCluster {
                 final Matcher endParenthesesM =
                                             endParenthesesP.matcher(line);
                 if (endParenthesesM.matches()) {
-                    aisCastAddresses.add(new AisCastAddress(MCAST_TYPE,
+                    aisCastAddresses.add(new AisCastAddress(MCAST_TYPE.getValueForConfig(),
                                                             bindnetaddr,
                                                             mcastaddr,
                                                             mcastport));
@@ -716,7 +718,7 @@ final class CoroConfig extends DialogCluster {
      * button' accordingly.
      */
     private void checkInterface() {
-        final String type  = typeW.getStringValue();
+        final Value type  = typeW.getValue();
         String address     = "";
         String bindnetaddr = "";
         String port        = "";
@@ -729,7 +731,7 @@ final class CoroConfig extends DialogCluster {
         }
 
         for (final AisCastAddress c : aisCastAddresses) {
-            if (c.equals("\t", type, bindnetaddr, address, port)) {
+            if (c.equals("\t", type.getValueForConfig(), bindnetaddr, address, port)) {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -900,7 +902,7 @@ final class CoroConfig extends DialogCluster {
     }
 
     /** Adds interface to the config panel. It must be called from a thread. */
-    private void addInterface(final String type) {
+    private void addInterface(final Value type) {
         String bindnetaddr = "";
         String addr        = "";
         String port        = "";
@@ -915,7 +917,7 @@ final class CoroConfig extends DialogCluster {
             port = portW.getStringValue();
         }
         aisCastAddresses.add(
-            new AisCastAddress(type,
+            new AisCastAddress(type.getValueForConfig(),
                                bindnetaddr,
                                addr,
                                port));
@@ -929,7 +931,7 @@ final class CoroConfig extends DialogCluster {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         final Host[] hosts = getCluster().getHostsArray();
-        final String[] types = {MCAST_TYPE};
+        final Value[] types = {MCAST_TYPE};
 
         typeW = WidgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
@@ -944,11 +946,11 @@ final class CoroConfig extends DialogCluster {
         typeW.setEnabled(false);
 
         final NetInterface[] ni = hosts[0].getNetInterfaces();
-        String defaultNi = null;
+        NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
             if (!n.isLocalHost()) {
-                defaultNi = n.toString();
+                defaultNi = n;
                 break;
             }
         }
@@ -974,7 +976,7 @@ final class CoroConfig extends DialogCluster {
         final String regexp = "^[\\d.]+$";
         addrW = WidgetFactory.createInstance(
               Widget.GUESS_TYPE,
-              Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress"),
+              new StringValue(Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress")),
               Widget.NO_ITEMS,
               regexp,
               ADDR_COMBOBOX_WIDTH,
@@ -1000,7 +1002,7 @@ final class CoroConfig extends DialogCluster {
         final String portRegexp = "^\\d+$";
         portW = WidgetFactory.createInstance(
                 Widget.GUESS_TYPE,
-                Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort"),
+                new StringValue(Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort")),
                 Widget.NO_ITEMS,
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
@@ -1030,7 +1032,7 @@ final class CoroConfig extends DialogCluster {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    final String type = typeW.getStringValue();
+                    final Value type = typeW.getValue();
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {

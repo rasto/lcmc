@@ -73,8 +73,8 @@ public final class DrbdXML extends XML {
     /** Drbd config filename. */
     private String configFile = "unknown";
     /** Map from parameter name to the default value. */
-    private final Map<String, String> paramDefaultMap =
-                                               new HashMap<String, String>();
+    private final Map<String, Value> paramDefaultMap =
+                                               new HashMap<String, Value>();
     /** Map from parameter name to its type. */
     private final Map<String, String> paramTypeMap =
                                                 new HashMap<String, String>();
@@ -109,8 +109,8 @@ public final class DrbdXML extends XML {
                                                 new HashMap<String, Boolean>();
 
     /** Map from parameter name to its items if there is a choice list. */
-    private final Map<String, List<Object>> paramItemsMap =
-                                    new LinkedHashMap<String, List<Object>>();
+    private final Map<String, List<Value>> paramItemsMap =
+                                    new LinkedHashMap<String, List<Value>>();
     /** List of all parameters. */
     private final List<String> parametersList = new ArrayList<String>();
     /** List of all global parameters. */
@@ -119,8 +119,8 @@ public final class DrbdXML extends XML {
     private final List<String> requiredParametersList =
                                                     new ArrayList<String>();
     /** Map from resource option to the value. */
-    private final Map<String, Map<String, String>> optionsMap =
-                                    new HashMap<String, Map<String, String>>();
+    private final Map<String, Map<String, Value>> optionsMap =
+                                    new HashMap<String, Map<String, Value>>();
 
     /** List with drbd resources. */
     private final List<String> resourceList = new ArrayList<String>();
@@ -217,26 +217,26 @@ public final class DrbdXML extends XML {
     }
 
     /** Yes / true drbd config value. */
-    public static final String CONFIG_YES = "yes";
+    public static final Value CONFIG_YES = new StringValue("yes");
     /** No / false drbd config value. */
-    public static final String CONFIG_NO = "no";
+    public static final Value CONFIG_NO = new StringValue("no");
     /** Hardcoded defaults, for options that have it but we don't get
         it from the drbdsetup. */
-    static final Map<String, String> HARDCODED_DEFAULTS =
-                                                new HashMap<String, String>();
+    static final Map<String, Value> HARDCODED_DEFAULTS =
+                                                new HashMap<String, Value>();
     static {
-        HARDCODED_DEFAULTS.put("usage-count", "");
+        HARDCODED_DEFAULTS.put("usage-count", new StringValue());
         HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
 
-        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, "C");
-        HARDCODED_DEFAULTS.put("after-sb-0pri", "disconnect");
-        HARDCODED_DEFAULTS.put("after-sb-1pri", "disconnect");
-        HARDCODED_DEFAULTS.put("after-sb-2pri", "disconnect");
-        HARDCODED_DEFAULTS.put("rr-conflict", "disconnect");
-        HARDCODED_DEFAULTS.put("on-io-error", "pass_on");
-        HARDCODED_DEFAULTS.put("fencing", "dont-care");
-        HARDCODED_DEFAULTS.put("on-no-data-accessible", "io-error");
-        HARDCODED_DEFAULTS.put("on-congestion", "block");
+        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, new StringValue("C"));
+        HARDCODED_DEFAULTS.put("after-sb-0pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("after-sb-1pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("after-sb-2pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("rr-conflict", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("on-io-error", new StringValue("pass_on"));
+        HARDCODED_DEFAULTS.put("fencing", new StringValue("dont-care"));
+        HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
+        HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
     }
 
     /** Prepares a new <code>DrbdXML</code> object. */
@@ -244,7 +244,7 @@ public final class DrbdXML extends XML {
         super();
         addSpecialParameter("resource", "name", true);
         for (final Host host : hosts) {
-            String output = null;
+            String output;
             if (drbdParameters.get(host) == null) {
                 output = updateDrbdParameters(host);
                 drbdParameters.put(host, output);
@@ -400,26 +400,23 @@ public final class DrbdXML extends XML {
     }
 
     /** Gets default for the parameter. */
-    public String getParamDefault(final String param) {
-        final String defaultValue = paramDefaultMap.get(param);
+    public Value getParamDefault(final String param) {
+        final Value defaultValue = paramDefaultMap.get(param);
 
-        if (defaultValue == null) {
-            return "";
-        }
         if (hasUnitPrefix(param)) {
             final StringBuilder defaultValueBuf =
-                                               new StringBuilder(defaultValue);
+                                               new StringBuilder(defaultValue.getValueForConfig());
             final String unit = getDefaultUnit(param);
             if (unit != null) {
                 defaultValueBuf.append(unit);
             }
-            return defaultValueBuf.toString();
+            return new StringValue(defaultValueBuf.toString());
         }
         return defaultValue;
     }
 
     /** Gets preferred value for the parameter. */
-    public String getParamPreferred(final String param) {
+    public Value getParamPreferred(final String param) {
         // TODO:
         return null;
     }
@@ -432,21 +429,21 @@ public final class DrbdXML extends XML {
     /**
      * Checks parameter according to its type. Returns false if value is wrong.
      */
-    public boolean checkParam(final String param, final String rawValue) {
+    public boolean checkParam(final String param, final Value rawValue) {
         final String type = paramTypeMap.get(param);
         boolean correctValue = true;
 
-        String value = rawValue;
+        Value value = rawValue;
         String unit = null;
         if (rawValue != null && hasUnitPrefix(param)) {
             /* number with unit */
             final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
-            final Matcher m = p.matcher(rawValue);
+            final Matcher m = p.matcher(rawValue.getValueForConfig());
             if (m.matches()) {
                 /* remove unit from value */
                 unit = m.group(1).toUpperCase();
-                value = rawValue.substring(0,
-                                           rawValue.length() - unit.length());
+                value = new StringValue(rawValue.getValueForConfig().substring(0,
+                            rawValue.getValueForConfig().length() - unit.length())); //TODO:
             }
         }
 
@@ -463,7 +460,7 @@ public final class DrbdXML extends XML {
             }
         } else if ("numeric".equals(type)) {
             final Pattern p = Pattern.compile("(-?\\d+)|\\d*");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             } else if ((unit == null
@@ -475,9 +472,9 @@ public final class DrbdXML extends XML {
                 /* except sectors */
                 long v;
                 if (unit == null) {
-                    v = Long.parseLong(rawValue) / 1024;
+                    v = Long.parseLong(rawValue.getValueForConfig()) / 1024;
                 } else {
-                    v = Tools.convertToKilobytes(rawValue);
+                    v = Tools.convertToKilobytes(rawValue.getValueForConfig());
                 }
                 if (paramMaxMap.get(param) != null
                     && v > paramMaxMap.get(param).longValue()) {
@@ -487,7 +484,7 @@ public final class DrbdXML extends XML {
                     correctValue = false;
                 }
             } else if (!"s".equalsIgnoreCase(unit)) {
-                final long v = Tools.convertUnits(rawValue);
+                final long v = Tools.convertUnits(rawValue.getValueForConfig());
                 if (paramMaxMap.get(param) != null
                     && v > paramMaxMap.get(param).longValue()) {
                     correctValue = false;
@@ -547,10 +544,10 @@ public final class DrbdXML extends XML {
     private void addParameter(final String section,
                               final String param,
                               final String defaultValue,
-                              final Object[] items,
+                              final Value[] items,
                               final boolean required) {
         addParameter(section, param, defaultValue, required);
-        final List<Object> l = new ArrayList<Object>();
+        final List<Value> l = new ArrayList<Value>();
         for (int i = 0; i < items.length; i++) {
             if (!l.contains(items[i])) {
                 l.add(items[i]);
@@ -575,7 +572,7 @@ public final class DrbdXML extends XML {
                               final String defaultValue,
                               final boolean required) {
         addParameter(section, param, required);
-        paramDefaultMap.put(param, defaultValue);
+        paramDefaultMap.put(param, new StringValue(defaultValue));
     }
 
     /** Adds parameter with the specified type. */
@@ -609,12 +606,12 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns possible choices. */
-    public Object[] getPossibleChoices(final String param) {
-        final List<Object> items = paramItemsMap.get(param);
+    public Value[] getPossibleChoices(final String param) {
+        final List<Value> items = paramItemsMap.get(param);
         if (items == null) {
             return null;
         } else {
-            return items.toArray(new Object[items.size()]);
+            return items.toArray(new Value[items.size()]);
         }
     }
 
@@ -640,17 +637,17 @@ public final class DrbdXML extends XML {
 
     /** Parses the global node in the drbd config. */
     private void parseConfigGlobalNode(final Node globalNode,
-                                       final Map<String, String> nameValueMap) {
+                                       final Map<String, Value> nameValueMap) {
         final NodeList options = globalNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             final String nodeName = option.getNodeName();
             if ("dialog-refresh".equals(nodeName)) {
                 final String dialogRefresh = getAttribute(option, "refresh");
-                nameValueMap.put(nodeName, dialogRefresh);
+                nameValueMap.put(nodeName, new StringValue(dialogRefresh));
             } else if ("minor-count".equals(nodeName)) {
                 final String minorCount = getAttribute(option, "count");
-                nameValueMap.put(nodeName, minorCount);
+                nameValueMap.put(nodeName, new StringValue(minorCount));
             } else if ("disable-ip-verification".equals(nodeName)) {
                 nameValueMap.put(nodeName, CONFIG_YES);
             } else if ("usage-count".equals(nodeName)) {
@@ -658,7 +655,7 @@ public final class DrbdXML extends XML {
                 /* TODO: "count" is guessed. */
                 final String usageCount = getAttribute(option, "count");
                 if (usageCount != null) {
-                    nameValueMap.put(nodeName, usageCount);
+                    nameValueMap.put(nodeName, new StringValue(usageCount));
                 }
             }
         }
@@ -690,52 +687,54 @@ public final class DrbdXML extends XML {
                     continue;
                 }
                 if ("handler".equals(type)) {
-                    final List<Object> items = new ArrayList<Object>();
-                    items.add("");
+                    final List<Value> items = new ArrayList<Value>();
+                    items.add(new StringValue());
                     paramItemsMap.put(name, items);
                     paramDefaultMap.put(name, HARDCODED_DEFAULTS.get(name));
                 } else if ("boolean".equals(type)) {
-                    final List<Object> l = new ArrayList<Object>();
+                    final List<Value> l = new ArrayList<Value>();
                     l.add(CONFIG_YES);
                     l.add(CONFIG_NO);
                     paramItemsMap.put(name, l);
                     paramDefaultMap.put(name, CONFIG_NO);
                 }
                 if ("fence-peer".equals(name)) {
-                    final List<Object> l = new ArrayList<Object>();
-                    l.add("");
+                    final List<Value> l = new ArrayList<Value>();
+                    l.add(new StringValue());
                     if (!"".equals(host.getArch())) {
-                        l.add(host.getHeartbeatLibPath()
-                              + "/drbd-peer-outdater -t 5");
+                        l.add(new StringValue(host.getHeartbeatLibPath()
+                                              + "/drbd-peer-outdater -t 5"));
                     }
-                    l.add("/usr/lib/drbd/crm-fence-peer.sh");
+                    l.add(new StringValue("/usr/lib/drbd/crm-fence-peer.sh"));
                     paramItemsMap.put(name, l);
                 } else if ("after-resync-target".equals(name)) {
-                    final List<Object> l = new ArrayList<Object>();
-                    l.add("");
-                    l.add("/usr/lib/drbd/crm-unfence-peer.sh");
+                    final List<Value> l = new ArrayList<Value>();
+                    l.add(new StringValue());
+                    l.add(new StringValue(
+                                       "/usr/lib/drbd/crm-unfence-peer.sh"));
                     paramItemsMap.put(name, l);
                 } else if ("split-brain".equals(name)) {
-                    final List<Object> l = new ArrayList<Object>();
-                    l.add("");
-                    l.add("/usr/lib/drbd/notify-split-brain.sh root");
+                    final List<Value> l = new ArrayList<Value>();
+                    l.add(new StringValue());
+                    l.add(new StringValue(
+                                "/usr/lib/drbd/notify-split-brain.sh root"));
                     paramItemsMap.put(name, l);
                 } else if ("become-primary-on".equals(name)) {
-                    final List<Object> l = new ArrayList<Object>();
-                    l.add("");
-                    l.add("both");
+                    final List<Value> l = new ArrayList<Value>();
+                    l.add(new StringValue());
+                    l.add(new StringValue("both"));
                     for (final Host h : hosts) {
-                        l.add(h.getName());
+                        l.add(new StringValue(h.getName()));
                     }
                     paramItemsMap.put(name, l);
                 } else if ("verify-alg".equals(name)
                            || "csums-alg".equals(name)
                            || "data-integrity-alg".equals(name)
                            || "cram-hmac-alg".equals(name)) {
-                    final List<Object> l = new ArrayList<Object>();
-                    l.add("");
+                    final List<Value> l = new ArrayList<Value>();
+                    l.add(new StringValue());
                     for (final String cr : host.getCryptoModules()) {
-                        l.add(cr);
+                        l.add(new StringValue(cr));
                     }
                     paramItemsMap.put(name, l);
                 }
@@ -751,9 +750,12 @@ public final class DrbdXML extends XML {
                         paramMaxMap.put(name,
                                         new BigInteger(getText(optionInfo)));
                     } else if ("handler".equals(tag)) {
-                        paramItemsMap.get(name).add(getText(optionInfo));
+                        paramItemsMap.get(name).add(
+                                       new StringValue(getText(optionInfo)));
                     } else if ("default".equals(tag)) {
-                        paramDefaultMap.put(name, getText(optionInfo));
+                        paramDefaultMap.put(
+                                       name,
+                                       new StringValue(getText(optionInfo)));
                     } else if ("unit".equals(tag)) {
                         paramUnitLongMap.put(name, getText(optionInfo));
                     } else if ("unit_prefix".equals(tag)) {
@@ -799,7 +801,7 @@ public final class DrbdXML extends XML {
     /** Parses section node and creates map with option name value pairs. */
     private void parseConfigSectionNode(
                                     final Node sectionNode,
-                                    final Map<String, String> nameValueMap) {
+                                    final Map<String, Value> nameValueMap) {
         final NodeList options = sectionNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
@@ -807,7 +809,7 @@ public final class DrbdXML extends XML {
                 final String name = getAttribute(option, "name");
                 String value = getAttribute(option, "value");
                 if (value == null) { /* boolean option */
-                    value = CONFIG_YES;
+                    value = CONFIG_YES.getValueForConfig();
                 } else if (hasUnitPrefix(name)) { /* with unit */
                     final Pattern p = Pattern.compile("\\d+([kmgs])");
                     final Matcher m = p.matcher(value);
@@ -819,7 +821,7 @@ public final class DrbdXML extends XML {
                                 + unit;
                     }
                 }
-                nameValueMap.put(name, value);
+                nameValueMap.put(name, new StringValue(value));
             } else if (option.getNodeName().equals("section")) {
                 final String name = getAttribute(option, "name");
                 if ("plugin".equals(name)) {
@@ -832,7 +834,7 @@ public final class DrbdXML extends XML {
 
     /** Parse proxy XML plugin section. */
     private void parseProxyPluginNode(final NodeList options,
-                                      final Map<String, String> nameValueMap) {
+                                      final Map<String, Value> nameValueMap) {
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
             if (option.getNodeName().equals("option")) {
@@ -848,9 +850,9 @@ public final class DrbdXML extends XML {
                 } else {
                     /* boolean */
                     name = DrbdProxy.PLUGIN_PREFIX + nameValues;
-                    value = CONFIG_YES;
+                    value = CONFIG_YES.getValueForConfig();
                 }
-                nameValueMap.put(name, value);
+                nameValueMap.put(name, new StringValue(value));
             }
         }
     }
@@ -1016,10 +1018,10 @@ public final class DrbdXML extends XML {
             }
         }
         resourceHostProxyMap.put(resName, hostName, new HostProxy(proxyHostName,
-                                                                  insideIp,
-                                                                  insidePort,
-                                                                  outsideIp,
-                                                                  outsidePort));
+                                                                  new StringValue(insideIp),
+                                                                  new StringValue(insidePort),
+                                                                  new StringValue(outsideIp),
+                                                                  new StringValue(outsidePort)));
         proxyHostNames.add(proxyHostName);
     }
 
@@ -1116,15 +1118,15 @@ public final class DrbdXML extends XML {
                                          final String resName) {
         final String resProtocol = getAttribute(resourceNode, PROTOCOL_PARAM);
         if (resProtocol != null) {
-            Map<String, String> nameValueMap =
+            Map<String, Value> nameValueMap =
                                     optionsMap.get(resName + "." + "resource");
             if (nameValueMap == null) {
-                nameValueMap = new HashMap<String, String>();
+                nameValueMap = new HashMap<String, Value>();
             } else {
                 optionsMap.remove(resName + "." + "resource");
             }
 
-            nameValueMap.put(PROTOCOL_PARAM, resProtocol);
+            nameValueMap.put(PROTOCOL_PARAM, new StringValue(resProtocol));
             optionsMap.put(resName + "." + "resource", nameValueMap);
         }
         final NodeList c = resourceNode.getChildNodes();
@@ -1141,10 +1143,10 @@ public final class DrbdXML extends XML {
                     secName = "proxy";
                     /* workaround for broken proxy xml in common section
                        at least till drbd 8.4.2 */
-                    Map<String, String> nameValueMap =
+                    Map<String, Value> nameValueMap =
                                        optionsMap.get(resName + "." + secName);
                     if (nameValueMap == null) {
-                        nameValueMap = new HashMap<String, String>();
+                        nameValueMap = new HashMap<String, Value>();
                     } else {
                         optionsMap.remove(resName + "." + secName);
                     }
@@ -1166,10 +1168,10 @@ public final class DrbdXML extends XML {
                     /* <resource> */
                     secName = getAttribute(n, "name");
 
-                    Map<String, String> nameValueMap =
+                    Map<String, Value> nameValueMap =
                                        optionsMap.get(resName + "." + secName);
                     if (nameValueMap == null) {
-                        nameValueMap = new HashMap<String, String>();
+                        nameValueMap = new HashMap<String, Value>();
                     } else {
                         optionsMap.remove(resName + "." + secName);
                     }
@@ -1216,12 +1218,12 @@ public final class DrbdXML extends XML {
         configFile = getAttribute(configNode, "file");
 
         final NodeList resources = configNode.getChildNodes();
-        Map<String, String> globalNameValueMap = optionsMap.get(GLOBAL_SECTION);
+        Map<String, Value> globalNameValueMap = optionsMap.get(GLOBAL_SECTION);
         if (globalNameValueMap == null) {
-            globalNameValueMap = new HashMap<String, String>();
+            globalNameValueMap = new HashMap<String, Value>();
             optionsMap.put(GLOBAL_SECTION, globalNameValueMap);
         }
-        globalNameValueMap.put("usage-count", "yes");
+        globalNameValueMap.put("usage-count", CONFIG_YES);
         globalNameValueMap.put("disable-ip-verification", CONFIG_NO);
 
         for (int i = 0; i < resources.getLength(); i++) {
@@ -1246,50 +1248,39 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns value from drbd global config identified by option name. */
-    public String getGlobalConfigValue(final String optionName) {
-        final Map<String, String> option = optionsMap.get(GLOBAL_SECTION);
-        String value = null;
+    public Value getGlobalConfigValue(final String optionName) {
+        final Map<String, Value> option = optionsMap.get(GLOBAL_SECTION);
         if (option != null) {
-            value = option.get(optionName);
+            return option.get(optionName);
         }
-        if (value == null) {
-            return "";
-        }
-        return value;
+        return null;
     }
 
     /**
      * Returns value from drbd config identified by resource, section and
      * option name.
      */
-    public String getConfigValue(final String res,
-                                 final String section,
-                                 final String optionName) {
-        final Map<String, String> option = optionsMap.get(res + "." + section);
+    public Value getConfigValue(final String res,
+                                final String section,
+                                final String optionName) {
+        final Map<String, Value> option = optionsMap.get(res + "." + section);
 
-        String value = null;
+        Value value = null;
         if (option != null) {
             value = option.get(optionName);
         }
 
-        if (value == null) {
-            return "";
-        }
         return value;
     }
 
     /** Returns config value from the common section. */
-    public String getCommonConfigValue(final String section,
+    public Value getCommonConfigValue(final String section,
                                        final String optionName) {
-        String value = null;
-        final Map<String, String> option =
+        Value value = null;
+        final Map<String, Value> option =
                                 optionsMap.get("Section.Common." + section);
         if (option != null) {
             value = option.get(optionName);
-        }
-
-        if (value == null) {
-            return "";
         }
         return value;
     }
@@ -1523,16 +1514,16 @@ public final class DrbdXML extends XML {
 
     public class HostProxy {
         private final String proxyHostName;
-        private final String insideIp;
-        private final String insidePort;
-        private final String outsideIp;
-        private final String outsidePort;
+        private final Value insideIp;
+        private final Value insidePort;
+        private final Value outsideIp;
+        private final Value outsidePort;
 
         public HostProxy(final String proxyHostName,
-                         final String insideIp,
-                         final String insidePort,
-                         final String outsideIp,
-                         final String outsidePort) {
+                         final Value insideIp,
+                         final Value insidePort,
+                         final Value outsideIp,
+                         final Value outsidePort) {
             this.proxyHostName = proxyHostName;
             this.insideIp = insideIp;
             this.insidePort = insidePort;
@@ -1544,19 +1535,19 @@ public final class DrbdXML extends XML {
             return proxyHostName;
         }
 
-        public String getInsideIp() {
+        public Value getInsideIp() {
             return insideIp;
         }
 
-        public String getInsidePort() {
+        public Value getInsidePort() {
             return insidePort;
         }
 
-        public String getOutsideIp() {
+        public Value getOutsideIp() {
             return outsideIp;
         }
 
-        public String getOutsidePort() {
+        public Value getOutsidePort() {
             return outsidePort;
         }
     }

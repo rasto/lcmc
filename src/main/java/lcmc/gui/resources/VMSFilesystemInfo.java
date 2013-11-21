@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -55,7 +57,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     private final Map<String, Widget> sourceNameWi =
                                             new HashMap<String, Widget>();
     /** Choices for source directories. */
-    private final String[] sourceDirs;
+    private final Value[] sourceDirs;
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
                                                 FilesystemData.SOURCE_DIR,
@@ -102,14 +104,14 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     }
 
     /** Preferred values. */
-    private static final Map<String, String> PREFERRED_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
     /** Defaults. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                              new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                              new HashMap<String, Value[]>();
     /** Filesystem types. */
     private static final String MOUNT_TYPE = "mount";
     /** Filesystem types. */
@@ -123,9 +125,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                         new StringInfo[]{
                              new StringInfo("Mount", MOUNT_TYPE, null),
                              new StringInfo("Template", TEMPLATE_TYPE, null)});
-        POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new String[]{"/"});
-        PREFERRED_MAP.put(FilesystemData.TYPE, "mount");
-        PREFERRED_MAP.put(FilesystemData.TARGET_DIR, "/");
+        POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new Value[]{new StringValue("/")});
+        PREFERRED_MAP.put(FilesystemData.TYPE, new StringValue("mount"));
+        PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -135,12 +137,14 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
         final List<Host> hosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
-        final Set<String> sds = new LinkedHashSet<String>();
-        sds.add(null);
+        final Set<Value> sds = new LinkedHashSet<Value>();
+        sds.add(new StringValue());
         for (final Host h : hosts) {
-            sds.addAll(h.getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC));
+            for (final String guiOps : h.getGuiOptions(Host.VM_FILESYSTEM_SOURCE_DIR_LXC)) {
+                sds.add(new StringValue(guiOps));
+            }
         }
-        sourceDirs = sds.toArray(new String[sds.size()]);
+        sourceDirs = sds.toArray(new Value[sds.size()]);
     }
 
     /** Adds fs table with only this fs to the main panel. */
@@ -184,13 +188,13 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -208,7 +212,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             return sourceDirs;
         }
@@ -224,7 +228,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
-        final String type = getComboBoxValue(FilesystemData.TYPE);
+        final String type = getComboBoxValue(FilesystemData.TYPE).getValueForConfig();
         if ((FilesystemData.SOURCE_DIR.equals(param)
               && MOUNT_TYPE.equals(type))
              || (FilesystemData.SOURCE_NAME.equals(param)
@@ -282,23 +286,23 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         final String[] params = getRealParametersFromXML();
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (allParams) {
-                if (Tools.areEqual(getParamDefault(param), value)) {
+                if (getParamDefault(param).equals(value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
-            } else if (!Tools.areEqual(getParamSaved(param), value)) {
+            } else if (!getParamSaved(param).equals(value)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
             }
         }
         parameters.put(FilesystemData.SAVED_TARGET_DIR, getName());
-        setName(getParamSaved(FilesystemData.TARGET_DIR));
+        setName(getParamSaved(FilesystemData.TARGET_DIR).getValueForConfig());
         return parameters;
     }
 
@@ -391,23 +395,23 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     }
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         if (FilesystemData.TYPE.equals(param)) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     for (final String p : sourceDirWi.keySet()) {
                         sourceDirWi.get(p).setVisible(
-                                                MOUNT_TYPE.equals(newValue));
+                                                MOUNT_TYPE.equals(newValue.getValueForConfig()));
                     }
                     for (final String p : sourceNameWi.keySet()) {
                         sourceNameWi.get(p).setVisible(
-                                               TEMPLATE_TYPE.equals(newValue));
+                                               TEMPLATE_TYPE.equals(newValue.getValueForConfig()));
                     }
                 }
             });
         }
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+        if (isRequired(param) && (newValue == null || "".equals(newValue.getValueForConfig()))) {
             return false;
         }
         return true;
@@ -434,14 +438,14 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             final FilesystemData filesystemData = filesystems.get(getName());
             if (filesystemData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                filesystemData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -492,8 +496,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         if (name == null) {
             return "new FS...";
         }
-        String saved;
-        final String type = getComboBoxValue(FilesystemData.TYPE);
+        Value saved;
+        final String type = getComboBoxValue(FilesystemData.TYPE).getValueForConfig();
 
         if (MOUNT_TYPE.equals(type)) {
             saved = getParamSaved(FilesystemData.SOURCE_DIR);
@@ -503,7 +507,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         if (saved == null) {
             s.append("new...");
         } else {
-            s.append(saved);
+            s.append(saved.getValueForConfig());
         }
         s.append(" -> ");
         s.append(name);
@@ -542,7 +546,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                   final String prefix,
                                   final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
-            final String sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
+            final Value sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
             final String regexp = ".*[^/]?$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
@@ -589,7 +593,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             widgetAdd(param, prefix, paramWi);
             return paramWi;
         } else if (FilesystemData.SOURCE_NAME.equals(param)) {
-            final String sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
+            final Value sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
             final Widget paramWi = WidgetFactory.createInstance(
                                     getFieldType(param),
                                     sourceName,

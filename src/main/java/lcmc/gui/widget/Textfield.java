@@ -20,6 +20,8 @@
 
 package lcmc.gui.widget;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
@@ -47,7 +49,7 @@ public class Textfield extends Widget {
     private static final long serialVersionUID = 1L;
 
     /** Prepares a new <code>Textfield</code> object. */
-    public Textfield(final String selectedValue,
+    public Textfield(final Value selectedValue,
                      final String regexp,
                      final int width,
                      final Map<String, String> abbreviations,
@@ -60,15 +62,19 @@ public class Textfield extends Widget {
     }
 
     /** Returns new MTextField with default value. */
-    private JComponent getTextField(final String value,
+    private JComponent getTextField(final Value value,
                                     final String regexp,
                                     final Map<String, String> abbreviations) {
         MTextField tf;
         if (regexp == null) {
-            tf = new MTextField(value);
+            if (value == null) {
+                tf = new MTextField(null);
+            } else {
+                tf = new MTextField(value.getValueForConfig());
+            }
         } else {
             tf = new MTextField(new PatternDocument(regexp, abbreviations),
-                                value,
+                                value.getValueForConfig(),
                                 0);
         }
         return tf;
@@ -80,18 +86,15 @@ public class Textfield extends Widget {
      */
     @Override
     public String getStringValue() {
-        final Object o = getValue();
-        if (o == null) {
-            return "";
-        }
-        return o.toString();
+        final Value v = getValue();
+        return v.getValueForConfig();
     }
 
     /** Return value, that user have chosen in the field or typed in. */
     @Override
-    protected Object getValueInternal() {
-        final Object value = ((MTextField) getComponent()).getText();
-        if (NOTHING_SELECTED_DISPLAY.equals(value)) {
+    protected Value getValueInternal() {
+        final Value value = new StringValue(((MTextField) getComponent()).getText());
+        if (value.isNothingSelected()) {
             return null;
         }
         return value;
@@ -105,8 +108,12 @@ public class Textfield extends Widget {
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
-    protected void setValueAndWait0(final Object item) {
-        ((MTextField) getComponent()).setText((String) item);
+    protected void setValueAndWait0(final Value item) {
+        if (item == null) {
+            ((MTextField) getComponent()).setText(null);
+        } else {
+            ((MTextField) getComponent()).setText(item.getValueForConfig());
+        }
     }
 
     /** Returns document object of the component. */
@@ -153,10 +160,10 @@ public class Textfield extends Widget {
     }
 
     /** Returns item at the specified index. */
-    @Override
-    Object getItemAt(final int i) {
-        return getComponent();
-    }
+    //@Override
+    //Value getItemAt(final int i) {
+    //    return getComponent();
+    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override

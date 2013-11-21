@@ -23,6 +23,8 @@
 
 package lcmc.data.resources;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -58,12 +60,12 @@ public final class CommonBlockDevice extends Resource {
 
     /** Return value for parameter. */
     @Override
-    public String getValue(final String parameter) {
+    public Value getValue(final String parameter) {
         if ("device".equals(parameter)) {
-            return getName();
+            return new StringValue(getName());
         } else {
             LOG.appError("getValue: unknown parameter: " + parameter, "");
-            return "";
+            return null;
         }
     }
 
@@ -77,9 +79,9 @@ public final class CommonBlockDevice extends Resource {
      * @return null
      */
     @Override
-    public String[] getPossibleChoices(final String param) {
+    public Value[] getPossibleChoices(final String param) {
         LOG.appError("getPossibleChoices: wrong call");
-        return new String[]{};
+        return new Value[]{};
     }
 
 }

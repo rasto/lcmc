@@ -57,7 +57,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import lcmc.data.StringValue;
 
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -134,8 +136,8 @@ public class Init extends DialogCluster {
     private final Widget useOpenaisButton = WidgetFactory.createInstance(
                                    Widget.Type.RADIOGROUP,
                                    Widget.NO_DEFAULT,
-                                   new String[]{COROSYNC_INIT_SCRIPT,
-                                                OPENAIS_INIT_SCRIPT},
+                                   new Value[]{new StringValue(COROSYNC_INIT_SCRIPT),
+                                               new StringValue(OPENAIS_INIT_SCRIPT)},
                                    Widget.NO_REGEXP,
                                    0,
                                    Widget.NO_ABBRV,
@@ -839,9 +841,9 @@ public class Init extends DialogCluster {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         final JScrollPane s = new JScrollPane(mainPanel);
         if (oneStartedAsOpenais || noCorosync) {
-            useOpenaisButton.setValue(OPENAIS_INIT_SCRIPT);
+            useOpenaisButton.setValue(new StringValue(OPENAIS_INIT_SCRIPT));
         } else {
-            useOpenaisButton.setValue(COROSYNC_INIT_SCRIPT);
+            useOpenaisButton.setValue(new StringValue(COROSYNC_INIT_SCRIPT));
         }
         useOpenaisButton.setEnabled(false);
         useOpenaisButton.setBackgroundColor(Color.WHITE);

@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -88,8 +90,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     /** Preferred values. */
-    private static final Map<String, String> PREFERRED_VALUES =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> PREFERRED_VALUES =
+                                                 new HashMap<String, Value>();
     /** Whether the parameter is editable only in advanced mode. */
     private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.KEYMAP}));
@@ -99,11 +101,11 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.TYPE}));
 
     /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, Object[]> POSSIBLE_VALUES =
-                                               new HashMap<String, Object[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                               new HashMap<String, Value[]>();
     static {
         FIELD_TYPES.put(GraphicsData.TYPE, Widget.Type.RADIOGROUP);
         FIELD_TYPES.put(GraphicsData.PASSWD, Widget.Type.PASSWDFIELD);
@@ -114,22 +116,23 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(GraphicsData.KEYMAP, "Keymap");
         SHORTNAME_MAP.put(GraphicsData.DISPLAY, "Display");
         SHORTNAME_MAP.put(GraphicsData.XAUTH, "Xauth File");
-        PREFERRED_VALUES.put(GraphicsData.PORT, "-1");
-        PREFERRED_VALUES.put(GraphicsData.DISPLAY, ":0.0");
+        PREFERRED_VALUES.put(GraphicsData.PORT, new StringValue("-1"));
+        PREFERRED_VALUES.put(GraphicsData.DISPLAY, new StringValue(":0.0"));
         PREFERRED_VALUES.put(GraphicsData.XAUTH,
-                             System.getProperty("user.home") + "/.Xauthority");
+                             new StringValue(System.getProperty("user.home") + "/.Xauthority"));
         POSSIBLE_VALUES.put(GraphicsData.TYPE,
-                            new String[]{"vnc", "sdl"});
+                            new Value[]{new StringValue("vnc"),
+                                        new StringValue("sdl")});
         POSSIBLE_VALUES.put(
             GraphicsData.XAUTH,
-            new String[]{null,
-                         System.getProperty("user.home") + "/.Xauthority"});
-        POSSIBLE_VALUES.put(GraphicsData.DISPLAY, new String[]{null, ":0.0"});
+            new Value[]{new StringValue(),
+                        new StringValue(System.getProperty("user.home") + "/.Xauthority")});
+        POSSIBLE_VALUES.put(GraphicsData.DISPLAY, new Value[]{new StringValue(),
+                                                              new StringValue(":0.0")});
         POSSIBLE_VALUES.put(GraphicsData.PORT,
-                            new StringInfo[]{
-                                        new StringInfo("auto", "-1", null),
-                                        new StringInfo("5900", "5900", null),
-                                        new StringInfo("5901", "5901", null)});
+                            new Value[]{new StringValue("-1", "auto"),
+                                        new StringValue("5900", "5900"),
+                                        new StringValue("5901", "5901")});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -180,13 +183,13 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return PREFERRED_VALUES.get(param);
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -198,7 +201,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (GraphicsData.LISTEN.equals(param)) {
             Map<String, Integer> networksIntersection = null;
 
@@ -208,23 +211,18 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 networksIntersection =
                             host.getNetworksIntersection(networksIntersection);
             }
-            final List<StringInfo> commonNetworks = new ArrayList<StringInfo>();
-            commonNetworks.add(null);
-            commonNetworks.add(new StringInfo("All Interfaces/0.0.0.0",
-                                              "0.0.0.0",
-                                              null));
-            commonNetworks.add(new StringInfo("localhost/127.0.0.1",
-                                              "127.0.0.1", null));
+            final List<Value> commonNetworks = new ArrayList<Value>();
+            commonNetworks.add(new StringValue());
+            commonNetworks.add(new StringValue("0.0.0.0", "All Interfaces/0.0.0.0"));
+            commonNetworks.add(new StringValue("127.0.0.1", "localhost/127.0.0.1"));
             if (networksIntersection != null) {
                 for (final String netIp : networksIntersection.keySet()) {
-                    final StringInfo network = new StringInfo(netIp,
-                                                              netIp,
-                                                              null);
+                    final Value network = new StringValue(netIp);
                     commonNetworks.add(network);
                 }
             }
             return commonNetworks.toArray(
-                                        new StringInfo[commonNetworks.size()]);
+                                        new StringValue[commonNetworks.size()]);
         } else if (GraphicsData.KEYMAP.equals(param)) {
             List<String> keymaps = null;
             final List<Host> definedOnHosts =
@@ -247,9 +245,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 }
             }
             if (keymaps == null) {
-                return new String[]{null};
+                return new StringValue[]{new StringValue()};
             }
-            return keymaps.toArray(new String[keymaps.size()]);
+            return keymaps.toArray(new Value[keymaps.size()]);
         }
         return POSSIBLE_VALUES.get(param);
     }
@@ -327,22 +325,22 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
         final Map<String, String> parameters = new HashMap<String, String>();
         String[] params = {};
         boolean vnc = false;
-        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
+        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE).getValueForConfig())) {
             vnc = true;
             params = VNC_PARAMETERS;
-        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
+        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE).getValueForConfig())) {
             params = SDL_PARAMETERS;
         }
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (allParams || !Tools.areEqual(getParamSaved(param), value)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
                 if (vnc) {
-                    if (GraphicsData.PORT.equals(param) && "-1".equals(value)) {
+                    if (GraphicsData.PORT.equals(param) && "-1".equals(value.getValueForConfig())) {
                         parameters.put(GraphicsData.AUTOPORT, "yes");
                     } else {
                         parameters.put(GraphicsData.AUTOPORT, "no");
@@ -351,9 +349,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             }
         }
         setName(VMSXML.graphicsDisplayName(
-                                        getParamSaved(GraphicsData.TYPE),
-                                        getParamSaved(GraphicsData.PORT),
-                                        getParamSaved(GraphicsData.DISPLAY)));
+                                        getParamSaved(GraphicsData.TYPE).getValueForConfig(),
+                                        getParamSaved(GraphicsData.PORT).getValueForConfig(),
+                                        getParamSaved(GraphicsData.DISPLAY).getValueForConfig()));
         return parameters;
     }
 
@@ -379,7 +377,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(GraphicsData.SAVED_TYPE,
-                               getParamSaved(GraphicsData.TYPE));
+                               getParamSaved(GraphicsData.TYPE).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -453,10 +451,10 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns true if the value of the parameter is ok. */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         if (GraphicsData.TYPE.equals(param)) {
-            final boolean vnc = "vnc".equals(newValue);
-            final boolean sdl = "sdl".equals(newValue);
+            final boolean vnc = "vnc".equals(newValue.getValueForConfig());
+            final boolean sdl = "sdl".equals(newValue.getValueForConfig());
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
@@ -481,7 +479,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 }
             });
         }
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+        if (isRequired(param) && (newValue.isNothingSelected())) {
             return false;
         }
         return true;
@@ -496,14 +494,14 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             final GraphicsData graphicsData = graphicDisplays.get(getName());
             if (graphicsData != null) {
                 for (final String param : getParametersFromXML()) {
-                    final String oldValue = getParamSaved(param);
-                    String value = getParamSaved(param);
+                    final Value oldValue = getParamSaved(param);
+                    Value value = getParamSaved(param);
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final String savedValue =
+                            final Value savedValue =
                                                graphicsData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
@@ -521,9 +519,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             }
         }
         setName(VMSXML.graphicsDisplayName(
-                                        getParamSaved(GraphicsData.TYPE),
-                                        getParamSaved(GraphicsData.PORT),
-                                        getParamSaved(GraphicsData.DISPLAY)));
+                           getParamSaved(GraphicsData.TYPE).getValueForConfig(),
+                           getParamSaved(GraphicsData.PORT).getValueForConfig(),
+                           getParamSaved(GraphicsData.DISPLAY).getValueForConfig()));
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.GRAPHICS_TABLE);
         checkResourceFieldsChanged(null, getParametersFromXML());
@@ -555,7 +553,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(GraphicsData.SAVED_TYPE,
-                               getParamSaved(GraphicsData.TYPE));
+                               getParamSaved(GraphicsData.TYPE).getValueForConfig());
                 vmsxml.removeGraphicsXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
@@ -653,9 +651,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override
     public String[] getRealParametersFromXML() {
-        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE))) {
+        if ("vnc".equals(getComboBoxValue(GraphicsData.TYPE).getValueForConfig())) {
             return VNC_PARAMETERS.clone();
-        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE))) {
+        } else if ("sdl".equals(getComboBoxValue(GraphicsData.TYPE).getValueForConfig())) {
             return SDL_PARAMETERS.clone();
         }
         return PARAMETERS.clone();

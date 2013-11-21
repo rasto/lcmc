@@ -22,6 +22,8 @@
 
 package lcmc.utilities;
 
+import lcmc.data.Value;
+
 /**
  * This class provides unit object with short and long name for combo boxes.
  *
@@ -29,7 +31,7 @@ package lcmc.utilities;
  * @version $Id$
  *
  */
-public final class Unit {
+public final class Unit implements Value {
     /** Short name. */
     private final String shortName;
     /** Secondary short name used for comparisons. */
@@ -89,7 +91,7 @@ public final class Unit {
     /** Returns true if units are equals. */
     @Override
     public boolean equals(final Object o) {
-        if (o == null) {
+        if (o == null || !(o instanceof Unit)) {
             return false;
         }
 
@@ -114,5 +116,30 @@ public final class Unit {
             return "";
         }
         return shortName;
+    }
+
+    @Override
+    public String getValueForGui() {
+        return name;
+    }
+
+    @Override
+    public String getValueForConfig() {
+        return shortName;
+    }
+
+    @Override
+    public boolean isNothingSelected() {
+        return shortName == null;
+    }
+
+    @Override
+    public Unit getUnit() {
+        return null;
+    }
+
+    @Override
+    public String getValueForConfigWithUnit() {
+        return getValueForConfig();
     }
 }

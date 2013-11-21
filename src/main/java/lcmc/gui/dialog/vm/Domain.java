@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -155,7 +156,7 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, "CD-ROM");
+        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, new StringValue("CD-ROM"));
         vdi.savePreferredValues();
         vdi.addWizardParams(
                       optionsPanel,

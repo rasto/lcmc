@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -144,9 +145,9 @@ final class Network extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsii.savePreferredValues();
-        vmsii.getResource().setValue(InterfaceData.TYPE, "network");
-        vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, "default");
-        vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, "");
+        vmsii.getResource().setValue(InterfaceData.TYPE, new StringValue("network"));
+        vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
+        vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
         vmsii.addWizardParams(
                       optionsPanel,
                       PARAMS,
@@ -155,7 +156,7 @@ final class Network extends VMConfig {
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
         vmsii.getWidget(InterfaceData.MODEL_TYPE,
-                        Widget.WIZARD_PREFIX).setValue("");
+                        Widget.WIZARD_PREFIX).setValue(new StringValue());
 
         panel.add(optionsPanel);
 

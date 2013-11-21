@@ -32,6 +32,7 @@ import lcmc.data.DrbdProxy;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
+import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 
@@ -76,13 +77,13 @@ abstract class DrbdGuiInfo extends EditableInfo {
      * and other constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         return getBrowser().getDrbdXML().checkParam(param, newValue);
     }
 
     /** Returns default value of the parameter. */
     @Override
-    public String getParamDefault(final String param) {
+    public Value getParamDefault(final String param) {
         return getBrowser().getDrbdXML().getParamDefault(param);
     }
 
@@ -95,13 +96,13 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
     /** Returns the preferred value for the drbd parameter. */
     @Override
-    protected final String getParamPreferred(final String param) {
+    protected final Value getParamPreferred(final String param) {
         return getBrowser().getDrbdXML().getParamPreferred(param);
     }
 
     /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
-    protected final Object[] getParamPossibleChoices(final String param) {
+    protected final Value[] getParamPossibleChoices(final String param) {
         return getBrowser().getDrbdXML().getPossibleChoices(param);
     }
 
@@ -218,10 +219,10 @@ abstract class DrbdGuiInfo extends EditableInfo {
                                   final String prefix,
                                   final int width) {
         Widget paramWi;
-        final Object[] possibleChoices = getParamPossibleChoices(param);
+        final Value[] possibleChoices = getParamPossibleChoices(param);
         getResource().setPossibleChoices(param, possibleChoices);
         if (hasUnitPrefix(param)) {
-            String selectedValue = getParamSaved(param);
+            Value selectedValue = getParamSaved(param);
             if (selectedValue == null) {
                 selectedValue = getParamPreferred(param);
                 if (selectedValue == null) {
@@ -239,7 +240,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 unitPart = unit.substring(index);
             }
             final Widget.Type type = null;
-            Unit[] units = null;
+            Unit[] units;
             if ("".equals(unit)) {
                 units = new Unit[]{
                     new Unit("", "", "", ""),
@@ -335,8 +336,8 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 final StringBuilder sectionConfig = new StringBuilder("");
                 boolean inPlugin = false;
                 for (String param : params) {
-                    final String value = getComboBoxValue(param);
-                    if (value == null || "".equals(value)) {
+                    final Value value = getComboBoxValue(param);
+                    if (value.isNothingSelected()) {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
@@ -368,23 +369,23 @@ abstract class DrbdGuiInfo extends EditableInfo {
                             }
                         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
                             /* resync-after parameter > 8.4 */
-                            if (!value.equals(Tools.getString(
+                            if (!value.getValueForConfig().equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
                                 sectionConfig.append("\t\t");
                                 sectionConfig.append(param);
                                 sectionConfig.append('\t');
                                 sectionConfig.append(
-                                        Tools.escapeConfig(value));
+                                        Tools.escapeConfig(value.getValueForConfig()));
                                 sectionConfig.append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
                             /* after parameter < 8.4 */
                             /* we get drbd device here, so it is converted
                              * to the resource. */
-                            if (!value.equals(Tools.getString(
+                            if (!value.getValueForConfig().equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
                                 final DrbdResourceInfo v0 =
-                                     getBrowser().getDrbdResHash().get(value);
+                                     getBrowser().getDrbdResHash().get(value.getValueForConfig());
                                 getBrowser().putDrbdResHash();
                                 if (v0 != null) {
                                     final String v = v0.getName();
@@ -403,7 +404,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                             sectionConfig.append("\t\t");
                             sectionConfig.append(param);
                             sectionConfig.append('\t');
-                            sectionConfig.append(Tools.escapeConfig(value));
+                            sectionConfig.append(Tools.escapeConfig(value.getValueForConfig()));
                             sectionConfig.append(";\n");
                         }
                     }

@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -145,47 +147,41 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                       Arrays.asList(new String[]{ParallelSerialData.TYPE}));
 
     /** Default name. */
-    private static final Map<String, String> DEFAULTS_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> DEFAULTS_MAP =
+                                                 new HashMap<String, Value>();
     /** Preferred values map. */
-    private static final Map<String, String> PREFERRED_MAP =
-                                                 new HashMap<String, String>();
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
     /** Possible values. */
-    private static final Map<String, StringInfo[]> POSSIBLE_VALUES =
-                                           new HashMap<String, StringInfo[]>();
+    private static final Map<String, Value[]> POSSIBLE_VALUES =
+                                           new HashMap<String, Value[]>();
     static {
         POSSIBLE_VALUES.put(
             ParallelSerialData.TYPE,
-            new StringInfo[]{new StringInfo("Physical Host Char Device (dev)",
-                                            "dev",
-                                            null),
-                             new StringInfo("Plain File", "file", null),
-                             new StringInfo("Null Device", "null", null),
-                             new StringInfo("Named Pipe", "pipe", null),
-                             new StringInfo("PTTY", "pty", null),
-                             new StringInfo("Standard Input/Output",
-                                            "stdio",
-                                            null),
-                             new StringInfo("TCP Console", "tcp", null),
-                             new StringInfo("UDP Console", "udp", null),
-                             new StringInfo("Unix Socket", "unix", null),
-                             new StringInfo("Virtual Console", "vc", null)});
+            new Value[]{new StringValue("dev", "Physical Host Char Device (dev)"),
+                        new StringValue("file", "Plain File"),
+                        new StringValue( "null", "Null Device"),
+                        new StringValue("pipe", "Named Pipe"),
+                        new StringValue("pty", "PTTY"),
+                        new StringValue("stdio","Standard Input/Output"),
+                        new StringValue("tcp", "TCP Console"),
+                        new StringValue("udp", "UDP Console"),
+                        new StringValue("unix", "Unix Socket"),
+                        new StringValue("vc", "Virtual Console")});
         POSSIBLE_VALUES.put(
             ParallelSerialData.SOURCE_MODE,
-            new StringInfo[]{new StringInfo("Server (bind)", "bind", null),
-                             new StringInfo("Client (connect)",
-                                            "connect",
-                                            null)});
+            new Value[]{new StringValue("bind", "Server (bind)"),
+                        new StringValue("connect", "Client (connect)")});
         POSSIBLE_VALUES.put(
             ParallelSerialData.PROTOCOL_TYPE,
-            new StringInfo[]{new StringInfo("telnet", "telnet", null),
-                             new StringInfo("raw", "raw", null)});
-        DEFAULTS_MAP.put(ParallelSerialData.TARGET_PORT, "generate");
-        PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_HOST, "127.0.0.1");
-        PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_SERVICE, "4555");
-        PREFERRED_MAP.put(ParallelSerialData.CONNECT_SOURCE_HOST, "127.0.0.1");
-        PREFERRED_MAP.put(ParallelSerialData.CONNECT_SOURCE_SERVICE, "4556");
-        PREFERRED_MAP.put(ParallelSerialData.PROTOCOL_TYPE, "telnet");
+            new Value[]{new StringValue("telnet"),
+                        new StringValue("raw")});
+        DEFAULTS_MAP.put(ParallelSerialData.TARGET_PORT, new StringValue("generate"));
+        PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_HOST, new StringValue("127.0.0.1"));
+        PREFERRED_MAP.put(ParallelSerialData.BIND_SOURCE_SERVICE, new StringValue("4555"));
+        PREFERRED_MAP.put(ParallelSerialData.CONNECT_SOURCE_HOST, new StringValue("127.0.0.1"));
+        PREFERRED_MAP.put(ParallelSerialData.CONNECT_SOURCE_SERVICE, new StringValue("4556"));
+        PREFERRED_MAP.put(ParallelSerialData.PROTOCOL_TYPE, new StringValue("telnet"));
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -231,13 +227,13 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns preferred value for specified parameter. */
     @Override
-    protected final String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return PREFERRED_MAP.get(param);
     }
 
     /** Returns default value for specified parameter. */
     @Override
-    protected final String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return DEFAULTS_MAP.get(param);
     }
 
@@ -249,7 +245,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected final Object[] getParamPossibleChoices(final String param) {
+    protected final Value[] getParamPossibleChoices(final String param) {
         return POSSIBLE_VALUES.get(param);
     }
 
@@ -329,7 +325,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 parameters.put(ParallelSerialData.SAVED_TYPE,
-                               getParamSaved(ParallelSerialData.TYPE));
+                               getParamSaved(ParallelSerialData.TYPE).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -366,14 +362,14 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             }
         });
         final List<String> params = PARAMETERS_MAP.get(
-                                    getComboBoxValue(ParallelSerialData.TYPE));
+                                    getComboBoxValue(ParallelSerialData.TYPE).getValueForConfig());
         final Map<String, String> parameters = new HashMap<String, String>();
         if (params == null) {
             return parameters;
         }
-        String type = null;
+        Value type = null;
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (ParallelSerialData.TYPE.equals(param)) {
                 type = value;
             }
@@ -381,7 +377,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
-                    parameters.put(param, value);
+                    parameters.put(param, value.getValueForConfig());
                 }
             }
         }
@@ -421,7 +417,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected final boolean checkParam(final String param,
-                                       final String newValue) {
+                                       final Value newValue) {
         if (ParallelSerialData.TYPE.equals(param)) {
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -453,7 +449,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                         final String prefix,
                                         final int width) {
         if (ParallelSerialData.SOURCE_PATH.equals(param)) {
-            final String sourceFile =
+            final Value sourceFile =
                                 getParamSaved(ParallelSerialData.SOURCE_PATH);
             final String regexp = "[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
@@ -485,7 +481,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                             String directory;
                             if (oldDir == null || "".equals(oldDir)) {
                                 final String type = getComboBoxValue(
-                                                      ParallelSerialData.TYPE);
+                                                      ParallelSerialData.TYPE).getValueForConfig();
                                 if ("dev".equals(type)) {
                                     directory = "/dev";
                                 } else {
@@ -530,7 +526,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Return saved value of target port. */
     final String getTargetPort() {
-        return getParamSaved(ParallelSerialData.TARGET_PORT);
+        return getParamSaved(ParallelSerialData.TARGET_PORT).getValueForConfig();
     }
 
     /** Returns real parameters. */

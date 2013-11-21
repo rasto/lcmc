@@ -51,6 +51,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import lcmc.data.StringValue;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -186,13 +187,13 @@ public final class LVResize extends LV {
                                               sizeWi.getStringValue());
             final String maxBlockSize = getMaxBlockSize();
             final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
+            maxSizeWi.setValue(new StringValue(Tools.convertKilobytes(maxBlockSize)));
 
             if (oldSize >= size || size > maxSize) {
                 enable = false;
                 sizeWi.wrongValue();
             } else {
-                sizeWi.setBackground("", "", true);
+                sizeWi.setBackground(new StringValue(), new StringValue(), true);
             }
         }
         resizeButton.setEnabled(enable);
@@ -203,11 +204,13 @@ public final class LVResize extends LV {
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
         final String maxBlockSize = getMaxBlockSize();
-        oldSizeWi.setValue(Tools.convertKilobytes(oldBlockSize));
-        sizeWi.setValue(Tools.convertKilobytes(Long.toString(
+        oldSizeWi.setValue(
+                      new StringValue(Tools.convertKilobytes(oldBlockSize)));
+        sizeWi.setValue(new StringValue(Tools.convertKilobytes(Long.toString(
                                     (Long.parseLong(oldBlockSize)
-                                     + Long.parseLong(maxBlockSize)) / 2)));
-        maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
+                                     + Long.parseLong(maxBlockSize)) / 2))));
+        maxSizeWi.setValue(
+                      new StringValue(Tools.convertKilobytes(maxBlockSize)));
     }
 
     /** Returns the input pane. */
@@ -224,14 +227,14 @@ public final class LVResize extends LV {
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
         oldSizeWi = new TextfieldWithUnit(
-                                      Tools.convertKilobytes(oldBlockSize),
-                                      getUnits(),
-                                      Widget.NO_REGEXP,
-                                      250,
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
-                                      Widget.NO_BUTTON);
+                      new StringValue(Tools.convertKilobytes(oldBlockSize)),
+                      getUnits(),
+                      Widget.NO_REGEXP,
+                      250,
+                      Widget.NO_ABBRV,
+                      new AccessMode(ConfigData.AccessType.OP,
+                                     !AccessMode.ADVANCED),
+                      Widget.NO_BUTTON);
         oldSizeWi.setEnabled(false);
         inputPane.add(oldSizeLabel);
         inputPane.add(oldSizeWi);
@@ -244,14 +247,15 @@ public final class LVResize extends LV {
                                       + Long.parseLong(maxBlockSize)) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(Tools.convertKilobytes(newBlockSize),
-                                       getUnits(),
-                                       Widget.NO_REGEXP,
-                                       250,
-                                       Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.OP,
-                                                      !AccessMode.ADVANCED),
-                                       Widget.NO_BUTTON);
+        sizeWi = new TextfieldWithUnit(
+                       new StringValue(Tools.convertKilobytes(newBlockSize)),
+                       getUnits(),
+                       Widget.NO_REGEXP,
+                       250,
+                       Widget.NO_ABBRV,
+                       new AccessMode(ConfigData.AccessType.OP,
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi);
         resizeButton.addActionListener(new ActionListener() {
@@ -294,14 +298,14 @@ public final class LVResize extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                                      Tools.convertKilobytes(maxBlockSize),
-                                      getUnits(),
-                                      Widget.NO_REGEXP,
-                                      250,
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
-                                      Widget.NO_BUTTON);
+                       new StringValue(Tools.convertKilobytes(maxBlockSize)),
+                       getUnits(),
+                       Widget.NO_REGEXP,
+                       250,
+                       Widget.NO_ABBRV,
+                       new AccessMode(ConfigData.AccessType.OP,
+                                      !AccessMode.ADVANCED),
+                       Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeWi);

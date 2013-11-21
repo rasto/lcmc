@@ -67,6 +67,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Unit;
 
 
 /**
@@ -76,7 +77,7 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class Host implements Comparable<Host> {
+public final class Host implements Comparable<Host>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     /** Serial version UID. */
@@ -135,7 +136,7 @@ public final class Host implements Comparable<Host> {
     /** Map of network interfaces of this host with bridges. */
     private List<NetInterface> netInterfaces = new ArrayList<NetInterface>();
     /** Bridges. */
-    private List<String> bridges = new ArrayList<String>();
+    private List<Value> bridges = new ArrayList<Value>();
     /** Available file systems. */
     private Set<String> fileSystems = new TreeSet<String>();
     /** Available crypto modules. */
@@ -582,8 +583,8 @@ public final class Host implements Comparable<Host> {
     }
 
     /** Get net interfaces that are bridges. */
-    public List<String> getBridges() {
-        return new ArrayList<String>(bridges);
+    public List<Value> getBridges() {
+        return new ArrayList<Value>(bridges);
     }
 
     /** Returns blockDevices. */
@@ -2117,7 +2118,7 @@ public final class Host implements Comparable<Host> {
                                      new LinkedHashMap<String, BlockDevice>();
         final List<NetInterface> newNetInterfaces =
                                                 new ArrayList<NetInterface>();
-        final List<String> newBridges = new ArrayList<String>();
+        final List<Value> newBridges = new ArrayList<Value>();
         final Map<String, Long> newVolumeGroups =
                                      new LinkedHashMap<String, Long>();
         final Map<String, Set<String>> newVolumeGroupsLVS =
@@ -2161,7 +2162,7 @@ public final class Host implements Comparable<Host> {
                         newNetInterfaces.add(netInterface);
                     }
                     if (netInterface.isBridge()) {
-                        newBridges.add(netInterface.getName());
+                        newBridges.add(new StringValue(netInterface.getName()));
                     }
                 } catch (UnknownHostException e) {
                     LOG.appWarning("parseHostInfo: cannot parse: net-info: "
@@ -3227,6 +3228,31 @@ public final class Host implements Comparable<Host> {
     @Override
     public int compareTo(final Host h) {
         return Tools.compareNames(getName(), h.getName());
+    }
+
+    @Override
+    public String getValueForGui() {
+        return getName();
+    }
+
+    @Override
+    public String getValueForConfig() {
+        return getName();
+    }
+
+    @Override
+    public boolean isNothingSelected() {
+        return getName() == null;
+    }
+
+    @Override
+    public Unit getUnit() {
+        return null;
+    }
+
+    @Override
+    public String getValueForConfigWithUnit() {
+        return getValueForConfig();
     }
 }
 

@@ -24,6 +24,7 @@
 package lcmc.data.resources;
 
 import lcmc.data.ConfigData;
+import lcmc.data.StringValue;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -141,7 +142,7 @@ public class Service extends Resource {
             }
         }
         LOG.debug1("setHeartbeatId: set crm id: " + crmId + ", id: " + id);
-        setValue("id", id);
+        setValue("id", new StringValue(id));
     }
 
     /** Sets the id. */
@@ -187,7 +188,7 @@ public class Service extends Resource {
     public final void setIdAndCrmId(final String id) {
         this.id = id;
         crmId = getCrmIdFromId(id);
-        setValue("id", id);
+        setValue("id", new StringValue(id));
     }
 
     /** Sets whether the service was removed. */

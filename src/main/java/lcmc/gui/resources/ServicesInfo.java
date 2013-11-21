@@ -70,6 +70,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JDialog;
 
 import lcmc.EditClusterDialog;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -143,19 +145,19 @@ public final class ServicesInfo extends EditableInfo {
 
     /** Returns default for this global parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return getBrowser().getCRMXML().getGlobalParamDefault(param);
     }
 
     /** Returns preferred value for this global parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return getBrowser().getCRMXML().getGlobalParamPreferred(param);
     }
 
     /** Returns possible choices for pulldown menus if applicable. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return getBrowser().getCRMXML().getGlobalParamPossibleChoices(param);
     }
 
@@ -164,8 +166,8 @@ public final class ServicesInfo extends EditableInfo {
      * constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
-        return getBrowser().getCRMXML().checkGlobalParam(param, newValue);
+    protected boolean checkParam(final String param, final Value newValue) {
+        return getBrowser().getCRMXML().checkGlobalParam(param, newValue.getValueForConfig());
     }
 
     /** Returns whether the global parameter is of the integer type. */
@@ -261,27 +263,27 @@ public final class ServicesInfo extends EditableInfo {
         /* update pacemaker */
         final Map<String, String> args = new HashMap<String, String>();
         for (final String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (value.equals(getParamDefault(param))) {
                 continue;
             }
 
-            if ("".equals(value)) {
+            if (value.isNothingSelected()) {
                 continue;
             }
-            args.put(param, value);
+            args.put(param, value.getValueForConfig());
         }
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         final String[] rdiParams = rdi.getParametersFromXML();
         final Map<String, String> rdiMetaArgs =
                                            new LinkedHashMap<String, String>();
         for (final String param : rdiParams) {
-            final String value = rdi.getComboBoxValue(param);
+            final Value value = rdi.getComboBoxValue(param);
             if (value.equals(rdi.getParamDefault(param))) {
                     continue;
             }
-            if (!"".equals(value)) {
-                rdiMetaArgs.put(param, value);
+            if (!value.isNothingSelected()) {
+                rdiMetaArgs.put(param, value.getValueForConfig());
             }
         }
         final String rscDefaultsId =
@@ -319,8 +321,8 @@ public final class ServicesInfo extends EditableInfo {
     public void setGlobalConfig(final ClusterStatus clStatus) {
         final String[] params = getParametersFromXML();
         for (String param : params) {
-            final String value = clStatus.getGlobalParam(param);
-            final String oldValue = getParamSaved(param);
+            final Value value = new StringValue(clStatus.getGlobalParam(param));
+            final Value oldValue = getParamSaved(param);
             if (value != null && !value.equals(oldValue)) {
                 getResource().setValue(param, value);
                 final Widget wi = getWidget(param, null);
@@ -1482,6 +1484,7 @@ public final class ServicesInfo extends EditableInfo {
                             public void action() {
                                 hidePopup();
                                 Tools.invokeLater(new Runnable() {
+                                    @Override
                                     public void run() {
                                         for (final JDialog otherP : popups) {
                                             otherP.dispose();
@@ -1989,11 +1992,11 @@ public final class ServicesInfo extends EditableInfo {
         if (newWi == null || oldWi == null) {
             return;
         }
-        final String oldValue = oldWi.getStringValue();
+        final Value oldValue = oldWi.getValue();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                if ("".equals(oldValue)) {
+                if (oldValue.isNothingSelected()) {
                     newWi.setValueNoListeners(null);
                 } else {
                     newWi.setValueNoListeners(oldValue);
@@ -2076,8 +2079,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                         if (oldCi != null) {
                             final CloneInfo oci = oldCi;
-                            final String v =
-                                    newSi.getTypeRadioGroup().getStringValue();
+                            final Value v = newSi.getTypeRadioGroup().getValue();
                             if (oci.getService().isMaster()) {
                                 if (!ServiceInfo.MASTER_SLAVE_TYPE_STRING.equals(v)) {
                                     newSi.getTypeRadioGroup().setValue(

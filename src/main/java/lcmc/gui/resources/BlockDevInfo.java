@@ -75,6 +75,8 @@ import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -95,7 +97,7 @@ public final class BlockDevInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Keyword that denotes flexible meta-disk. */
-    private static final String DRBD_MD_TYPE_FLEXIBLE = "Flexible";
+    private static final Value DRBD_MD_TYPE_FLEXIBLE = new StringValue("Flexible");
     /** Internal parameter name of drbd meta-disk. */
     private static final String DRBD_MD_PARAM         = "DrbdMetaDisk";
     /** Internal parameter name of drbd meta-disk index. */
@@ -470,8 +472,8 @@ public final class BlockDevInfo extends EditableInfo {
         config.append(";\n")
               .append(tabs)
               .append(getBlockDevice().getMetaDiskString(
-                                       getComboBoxValue(DRBD_MD_PARAM),
-                                       getComboBoxValue(DRBD_MD_INDEX_PARAM)))
+                                   getComboBoxValue(DRBD_MD_PARAM).getValueForConfig(),
+                                   getComboBoxValue(DRBD_MD_INDEX_PARAM).getValueForConfig()))
               .append(';');
         return config.toString();
     }
@@ -489,7 +491,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns possible choices of this paramter. */
     @Override
-    protected Object[] getPossibleChoices(final String param) {
+    protected Value[] getPossibleChoices(final String param) {
         return getBlockDevice().getPossibleChoices(param);
     }
 
@@ -528,17 +530,14 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns true if a paramter is correct. */
     @Override
-    protected boolean checkParam(final String param, String value) {
+    protected boolean checkParam(final String param, Value value) {
         boolean ret = true;
-        if (value == null) {
-            value = "";
-        }
-        if ("".equals(value) && isRequired(param)) {
+        if (value.isNothingSelected() && isRequired(param)) {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
                 if (!getHost().isServerStatusLatch()) {
-                    final boolean internal = "internal".equals(value);
+                    final boolean internal = "internal".equals(value.getValueForConfig());
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
                                                   Widget.WIZARD_PREFIX);
@@ -567,12 +566,12 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            if (getBrowser().getUsedPorts().contains(value)
+            if (getBrowser().getUsedPorts().contains(value.getValueForConfig())
                 && !value.equals(getBlockDevice().getValue(param))) {
                 ret = false;
             }
             final Pattern p = Pattern.compile(".*\\D.*");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (m.matches() && !DRBD_MD_TYPE_FLEXIBLE.equals(value)) {
                 ret = false;
             }
@@ -651,18 +650,17 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns possible choices for the parameter. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         if (DRBD_MD_PARAM.equals(param)) {
             /* meta disk */
-            final StringInfo internalMetaDisk =
-                    new StringInfo(Tools.getString(
-                                        "HostBrowser.MetaDisk.Internal"),
-                                   "internal",
-                                   getBrowser());
-            final String defaultMetaDiskString = internalMetaDisk.toString();
+            final Value internalMetaDisk =
+                    new StringValue("internal",
+                                    Tools.getString(
+                                        "HostBrowser.MetaDisk.Internal"));
+            final Value defaultMetaDiskString = internalMetaDisk;
             getBrowser().lockBlockDevInfosRead();
             @SuppressWarnings("unchecked")
-            final Info[] blockDevices = getAvailableBlockDevicesForMetaDisk(
+            final Value[] blockDevices = getAvailableBlockDevicesForMetaDisk(
                                             internalMetaDisk,
                                             getName(),
                                             getBrowser().getBlockDevInfos());
@@ -673,18 +671,25 @@ public final class BlockDevInfo extends EditableInfo {
             return blockDevices;
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
 
-            String defaultMetaDiskIndex = getBlockDevice().getValue(
-                                                       DRBD_MD_INDEX_PARAM);
+            Value dmdiValue = getBlockDevice().getValue(DRBD_MD_INDEX_PARAM);
+
+            String defaultMetaDiskIndex;
+            if (dmdiValue == null) {
+                defaultMetaDiskIndex = null;
+            } else {
+                defaultMetaDiskIndex = dmdiValue.getValueForConfig();
+            }
+
             if ("internal".equals(defaultMetaDiskIndex)) {
                 defaultMetaDiskIndex =
                          Tools.getString("HostBrowser.MetaDisk.Internal");
             }
 
-            String[] indeces = new String[11];
+            Value[] indeces = new Value[11];
             int index = 0;
             if (defaultMetaDiskIndex == null) {
-                defaultMetaDiskIndex = DRBD_MD_TYPE_FLEXIBLE;
-            } else if (!DRBD_MD_TYPE_FLEXIBLE.equals(defaultMetaDiskIndex)) {
+                defaultMetaDiskIndex = DRBD_MD_TYPE_FLEXIBLE.getValueForConfig();
+            } else if (!DRBD_MD_TYPE_FLEXIBLE.getValueForConfig().equals(defaultMetaDiskIndex)) {
                 index = Integer.valueOf(defaultMetaDiskIndex) - 5;
                 if (index < 0) {
                     index = 0;
@@ -693,7 +698,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             indeces[0] = DRBD_MD_TYPE_FLEXIBLE;
             for (int i = 1; i < 11; i++) {
-                indeces[i] = Integer.toString(index);
+                indeces[i] = new StringValue(Integer.toString(index));
                 index++;
             }
 
@@ -706,13 +711,13 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns default for this parameter. */
     @Override
-    protected String getParamDefault(final String param) {
+    protected Value getParamDefault(final String param) {
         return getBlockDevice().getDefaultValue(param);
     }
 
     /** Returns preferred value of this parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return getBlockDevice().getPreferredValue(param);
     }
 
@@ -727,12 +732,12 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns block devices that are available for drbd meta-disk. */
-    protected Info[] getAvailableBlockDevicesForMetaDisk(
-                               final Info defaultValue,
+    protected Value[] getAvailableBlockDevicesForMetaDisk(
+                               final Value defaultValue,
                                final String serviceName,
                                final Set<BlockDevInfo> blockDevInfos) {
-        final List<Info> list = new ArrayList<Info>();
-        final String savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
+        final List<Value> list = new ArrayList<Value>();
+        final Value savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
 
         if (defaultValue != null) {
             list.add(defaultValue);
@@ -740,12 +745,12 @@ public final class BlockDevInfo extends EditableInfo {
 
         for (final BlockDevInfo bdi : blockDevInfos) {
             final BlockDevice bd = bdi.getBlockDevice();
-            if (bd.toString().equals(savedMetaDisk)
+            if (bdi.equals(savedMetaDisk)
                 || (!bd.isDrbd() && !bd.isUsedByCRM() && !bd.isMounted())) {
                 list.add(bdi);
             }
         }
-        return list.toArray(new Info[list.size()]);
+        return list.toArray(new Value[list.size()]);
     }
 
     /** DRBD attach. */
@@ -1951,7 +1956,7 @@ public final class BlockDevInfo extends EditableInfo {
                     if (oBdi != null && oBdi.getBlockDevice().isPrimary()
                         && !"yes".equals(
                             drbdVolumeInfo.getDrbdResourceInfo().getParamSaved(
-                                                       ALLOW_TWO_PRIMARIES))) {
+                                    ALLOW_TWO_PRIMARIES).getValueForConfig())) {
                         oBdi.setSecondary(testOnly);
                     }
                     setPrimary(testOnly);
@@ -2589,29 +2594,28 @@ public final class BlockDevInfo extends EditableInfo {
         final DrbdXML dxml = clusterBrowser.getDrbdXML();
         final String hostName = getHost().getName();
         final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-        String value = null;
+        Value value = null;
         final String volumeNr = dvi.getName();
         for (final String param : getParametersFromXML()) {
             if (DRBD_MD_PARAM.equals(param)) {
-                value = dxml.getMetaDisk(hostName, resName, volumeNr);
-                if (!"internal".equals(value)) {
+                final String metaDisk = dxml.getMetaDisk(hostName, resName, volumeNr);     
+                if (value == null
+                    || !"internal".equals(value.getValueForConfig())) {
                     final BlockDevInfo mdI =
-                                   drbdGraph.findBlockDevInfo(hostName, value);
+                                   drbdGraph.findBlockDevInfo(hostName, metaDisk);
                     if (mdI != null) {
                         getBlockDevice().setMetaDisk(mdI.getBlockDevice());
                     }
                 }
+                value = new StringValue(metaDisk);
             } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-                value = dxml.getMetaDiskIndex(hostName, resName, volumeNr);
+                value = new StringValue(dxml.getMetaDiskIndex(hostName, resName, volumeNr));
             }
-            final String defaultValue = getParamDefault(param);
+            final Value defaultValue = getParamDefault(param);
             if (value == null) {
                 value = defaultValue;
             }
-            if (value == null) {
-                value = "";
-            }
-            final String oldValue = getParamSaved(param);
+            final Value oldValue = getParamSaved(param);
             final Widget wi = getWidget(param, null);
             if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
@@ -2713,7 +2717,7 @@ public final class BlockDevInfo extends EditableInfo {
     /** Return whether two primaries are allowed. */
     boolean allowTwoPrimaries() {
         final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
-        return "yes".equals(dri.getParamSaved(ALLOW_TWO_PRIMARIES));
+        return "yes".equals(dri.getParamSaved(ALLOW_TWO_PRIMARIES).getValueForConfig());
     }
 
     /**

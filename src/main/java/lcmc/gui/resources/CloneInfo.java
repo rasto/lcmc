@@ -51,6 +51,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
+import lcmc.data.Value;
 
 
 /**
@@ -720,7 +721,7 @@ final class CloneInfo extends ServiceInfo {
             role = "Master";
         }
         final HostLocation hostLoc =
-                                new HostLocation(CRMXML.MINUS_INFINITY_STRING,
+                                new HostLocation(CRMXML.MINUS_INFINITY_STRING.getValueForConfig(),
                                                  "eq",
                                                  null,
                                                  role);
@@ -828,9 +829,9 @@ final class CloneInfo extends ServiceInfo {
         if (cs != null) {
             String name;
             if (getService().isMaster()) {
-                name = MASTER_SLAVE_TYPE_STRING;
+                name = MASTER_SLAVE_TYPE_STRING.getValueForConfig();
             } else {
-                name = CLONE_TYPE_STRING;
+                name = CLONE_TYPE_STRING.getValueForConfig();
             }
             return name + " " + super.getSection(param);
         }
@@ -839,7 +840,7 @@ final class CloneInfo extends ServiceInfo {
 
     /** Returns possible choices for drop down lists. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(getResourceAgent(), param);

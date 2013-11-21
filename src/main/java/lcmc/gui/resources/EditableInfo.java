@@ -59,6 +59,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -120,7 +121,7 @@ public abstract class EditableInfo extends Info {
         return null;
     }
     /** Returns the possible choices for pull down menus if applicable. */
-    protected abstract Object[] getParamPossibleChoices(String param);
+    protected abstract Value[] getParamPossibleChoices(String param);
     /** Returns array of all parameters. */
     public abstract String[] getParametersFromXML(); // TODO: no XML
     /** Old apply button, is used for wizards. */
@@ -412,11 +413,10 @@ public abstract class EditableInfo extends Info {
                     height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
                 if (paramWi.getValue() == null
-                    || Widget.NOTHING_SELECTED_DISPLAY.equals(
-                                                      paramWi.getValue())) {
+                    || paramWi.getValue().isNothingSelected()) {
                     rpwi.setValueAndWait(null);
                 } else {
-                    final Object value = paramWi.getStringValue();
+                    final Value value = paramWi.getValue();
                     rpwi.setValueAndWait(value);
                 }
             }
@@ -560,11 +560,10 @@ public abstract class EditableInfo extends Info {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null
-                                || Widget.NOTHING_SELECTED_DISPLAY.equals(
-                                                         paramWi.getValue())) {
+                                || paramWi.getValue().isNothingSelected()) {
                                 realParamWi.setValueAndWait(null);
                             } else {
-                                final Object value = paramWi.getStringValue();
+                                final Value value = paramWi.getValue();
                                 realParamWi.setValueAndWait(value);
                             }
                         }
@@ -602,30 +601,18 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Get stored value in the combo box. */
-    public final String getComboBoxValue(final String param) {
+    public final Value getComboBoxValue(final String param) {
         final Widget wi = getWidget(param, null);
         if (wi == null) {
             return null;
         }
-        final Object o = wi.getValue();
-        String value;
-        if (Tools.isStringClass(o)) {
-            value = wi.getStringValue();
-        } else if (o instanceof Object[]) {
-            value = ((Object[]) o)[0].toString();
-            if (((Object[]) o)[1] instanceof Unit) {
-                value += ((Unit) ((Object[]) o)[1]).getShortName();
-            }
-        } else {
-            value = ((Info) o).getInternalValue();
-        }
-        return value;
+        return wi.getValue();
     }
 
     /** Stores values in the combo boxes in the component c. */
     protected void storeComboBoxValues(final String[] params) {
         for (String param : params) {
-            final String value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             getResource().setValue(param, value);
             final Widget wi = getWidget(param, null);
             if (wi != null) {
@@ -640,10 +627,10 @@ public abstract class EditableInfo extends Info {
                                   final int width) {
         getResource().setPossibleChoices(param, getParamPossibleChoices(param));
         /* set default value */
-        String initValue = getPreviouslySelected(param, prefix);
+        Value initValue = getPreviouslySelected(param, prefix);
         if (initValue == null) {
-            final String value = getParamSaved(param);
-            if (value == null || "".equals(value)) {
+            final Value value = getParamSaved(param);
+            if (value == null || value.isNothingSelected()) {
                 if (getResource().isNew()) {
                     initValue = getResource().getPreferredValue(param);
                     if (initValue == null) {
@@ -662,11 +649,11 @@ public abstract class EditableInfo extends Info {
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
             abbreviations = new HashMap<String, String>();
-            abbreviations.put("i", CRMXML.INFINITY_STRING);
-            abbreviations.put("I", CRMXML.INFINITY_STRING);
-            abbreviations.put("+", CRMXML.PLUS_INFINITY_STRING);
-            abbreviations.put("d", CRMXML.DISABLED_STRING);
-            abbreviations.put("D", CRMXML.DISABLED_STRING);
+            abbreviations.put("i", CRMXML.INFINITY_STRING.getValueForConfig());
+            abbreviations.put("I", CRMXML.INFINITY_STRING.getValueForConfig());
+            abbreviations.put("+", CRMXML.PLUS_INFINITY_STRING.getValueForConfig());
+            abbreviations.put("d", CRMXML.DISABLED_STRING.getValueForConfig());
+            abbreviations.put("D", CRMXML.DISABLED_STRING.getValueForConfig());
         }
         Widget.Type type = getFieldType(param);
         Unit[] units = null;
@@ -704,11 +691,11 @@ public abstract class EditableInfo extends Info {
      * the stored value. This is needed to disable apply button, if some of
      * the values are invalid or none of the parameters have changed.
      */
-    protected abstract boolean checkParam(String param, String newValue);
+    protected abstract boolean checkParam(String param, Value newValue);
 
     /** Checks whether this value matches the regexp of this field. */
     protected final boolean checkRegexp(final String param,
-                                        final String newValue) {
+                                        final Value newValue) {
         String regexp = getParamRegexp(param);
         if (regexp == null) {
             final Widget wi = getWidget(param, null);
@@ -718,7 +705,7 @@ public abstract class EditableInfo extends Info {
         }
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
-            final Matcher m = p.matcher(newValue);
+            final Matcher m = p.matcher(newValue.getValueForConfig());
             if (m.matches()) {
                 return true;
             }
@@ -749,15 +736,15 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Returns default value of a parameter. */
-    protected abstract String getParamDefault(String param);
+    protected abstract Value getParamDefault(String param);
 
     /** Returns saved value of a parameter. */
-    protected String getParamSaved(final String param) {
+    protected Value getParamSaved(final String param) {
         return getResource().getValue(param);
     }
 
     /** Returns preferred value of a parameter. */
-    protected abstract String getParamPreferred(String param);
+    protected abstract Value getParamPreferred(String param);
 
     /** Returns short description of a parameter. */
     protected abstract String getParamShortDesc(String param);
@@ -769,7 +756,7 @@ public abstract class EditableInfo extends Info {
      * Returns possible choices in a combo box, if possible choices are
      * null, instead of combo box a text field will be generated.
      */
-    protected Object[] getPossibleChoices(final String param) {
+    protected Value[] getPossibleChoices(final String param) {
         return getResource().getPossibleChoices(param);
     }
 
@@ -801,15 +788,15 @@ public abstract class EditableInfo extends Info {
      * from default value, default value will be returned.
      */
     protected final String getToolTipText(final String param, final Widget wi) {
-        final String defaultValue = getParamDefault(param);
+        final Value defaultValue = getParamDefault(param);
         final StringBuilder ret = new StringBuilder(120);
         if (wi != null) {
-            final Object value = wi.getStringValue();
+            final String value = wi.getStringValue();
             ret.append("<b>");
             ret.append(value);
             ret.append("</b>");
         }
-        if (defaultValue != null && !defaultValue.equals("")) {
+        if (defaultValue != null && !defaultValue.isNothingSelected()) {
             ret.append("<table><tr><td><b>");
             ret.append(Tools.getString("Browser.ParamDefault"));
             ret.append("</b></td><td>");
@@ -877,21 +864,9 @@ public abstract class EditableInfo extends Info {
                 if (wi == null) {
                     continue;
                 }
-                String newValue;
-                final Object o = wi.getValue();
-                if (Tools.isStringClass(o)) {
-                    newValue = wi.getStringValue();
-                } else if (o instanceof Object[]) {
-                    final Object o0 = ((Object[]) o)[0];
-                    final Object o1 = ((Object[]) o)[1];
-                    newValue = o0.toString();
-                    if (o1 != null
-                        && o1 instanceof Unit) {
-                        newValue += ((Unit) o1).getShortName();
-                    }
-                } else {
-                    newValue = ((Info) o).getInternalValue();
-                }
+                Value newValue;
+                final Value o = wi.getValue();
+                newValue = o;
 
                 if (param == null || otherParam.equals(param)
                     || !paramCorrectValueMap.containsKey(param)) {
@@ -901,16 +876,8 @@ public abstract class EditableInfo extends Info {
                     if (wizardWi != null) {
                         wizardWi.setDisabledReason(enable);
                         wizardWi.setEnabled(enable == null);
-                        final Object wo = wizardWi.getValue();
-                        if (Tools.isStringClass(wo)) {
-                            newValue = wizardWi.getStringValue();
-                        } else if (wo instanceof Object[]) {
-                            newValue =
-                                   ((Object[]) wo)[0].toString()
-                                   + ((Unit) ((Object[]) wo)[1]).getShortName();
-                        } else {
-                            newValue = ((Info) wo).getInternalValue();
-                        }
+                        final Value wo = wizardWi.getValue();
+                        newValue = wo;
                     }
                     wi.setDisabledReason(enable);
                     wi.setEnabled(enable == null);
@@ -920,18 +887,14 @@ public abstract class EditableInfo extends Info {
                         if (isTimeType(otherParam)
                             || hasUnitPrefix(otherParam)) {
                             wi.setBackground(
-                                        Tools.extractUnit(
-                                           getParamDefault(otherParam)),
-                                        Tools.extractUnit(
-                                           getParamSaved(otherParam)),
-                                        isRequired(otherParam));
+                                           getParamDefault(otherParam),
+                                           getParamSaved(otherParam),
+                                           isRequired(otherParam));
                             if (wizardWi != null) {
                                 wizardWi.setBackground(
-                                    Tools.extractUnit(
-                                              getParamDefault(otherParam)),
-                                    Tools.extractUnit(
-                                        getParamSaved(otherParam)),
-                                    isRequired(otherParam));
+                                           getParamDefault(otherParam),
+                                           getParamSaved(otherParam),
+                                           isRequired(otherParam));
                             }
                         } else {
                             wi.setBackground(
@@ -983,9 +946,9 @@ public abstract class EditableInfo extends Info {
                 if (oldValue == null) {
                     oldValue = getParamDefault(otherParam);
                 }
-                if (isTimeType(otherParam) || hasUnitPrefix(otherParam)) {
-                    oldValue = Tools.extractUnit((String) oldValue);
-                }
+                //if (isTimeType(otherParam) || hasUnitPrefix(otherParam)) {
+                //    oldValue = oldValue.getValueForConfig();
+                //}
                 if (!Tools.areEqual(newValue, oldValue)) {
                     changedValue = true;
                 }
@@ -1076,12 +1039,12 @@ public abstract class EditableInfo extends Info {
             return;
         }
         for (final String param : params) {
-            String v = getParamSaved(param);
+            Value v = getParamSaved(param);
             if (v == null) {
                 v = getParamDefault(param);
             }
             final Widget wi = getWidget(param, null);
-            if (wi != null && !Tools.areEqual(wi.getStringValue(), v)) {
+            if (wi != null && !wi.getValue().equals(v)) {
                 wi.setValue(v);
                 final Widget wizardWi = getWidget(param, Widget.WIZARD_PREFIX);
                 if (wizardWi != null) {
@@ -1142,11 +1105,11 @@ public abstract class EditableInfo extends Info {
 
     /** Return previously selected value of the parameter. This is used, when
      *  primitive changes to and from clone. */
-    protected final String getPreviouslySelected(final String param,
-                                                 final String prefix) {
+    protected final Value getPreviouslySelected(final String param,
+                                                final String prefix) {
         final Widget prevParamWi = getWidget(param, prefix);
         if (prevParamWi != null) {
-            return prevParamWi.getStringValue();
+            return prevParamWi.getValue();
         }
         return null;
     }

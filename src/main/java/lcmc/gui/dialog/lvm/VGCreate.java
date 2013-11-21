@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import lcmc.data.StringValue;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {
@@ -159,7 +160,7 @@ public final class VGCreate extends LV {
                 }
             }
             if (vgNameCorrect) {
-                vgNameWi.setBackground("", "", true);
+                vgNameWi.setBackground(new StringValue(), new StringValue(), true);
             } else {
                 enable = false;
                 vgNameWi.wrongValue();
@@ -233,7 +234,7 @@ public final class VGCreate extends LV {
         }
         vgNameWi = WidgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
-                                      defaultName,
+                                      new StringValue(defaultName),
                                       Widget.NO_ITEMS,
                                       Widget.NO_REGEXP,
                                       250,

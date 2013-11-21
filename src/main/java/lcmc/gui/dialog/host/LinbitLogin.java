@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
+import lcmc.data.StringValue;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
@@ -169,7 +170,7 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(userLabel);
         downloadUserField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       Tools.getConfigData().getDownloadUser(),
+                                       new StringValue(Tools.getConfigData().getDownloadUser()),
                                        Widget.NO_ITEMS,
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
@@ -189,7 +190,7 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(passwordLabel);
         downloadPasswordField = WidgetFactory.createInstance(
                                   Widget.Type.PASSWDFIELD,
-                                  Tools.getConfigData().getDownloadPassword(),
+                                  new StringValue(Tools.getConfigData().getDownloadPassword()),
                                   Widget.NO_ITEMS,
                                   Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,

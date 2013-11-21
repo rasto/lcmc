@@ -54,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import lcmc.data.StringValue;
 
 /** Create LV dialog. */
 public final class LVCreate extends LV {
@@ -151,14 +152,14 @@ public final class LVCreate extends LV {
             final String maxBlockSize = getMaxBlockSize(
                                                  getSelectedHostCbs());
             final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeWi.setValue(Tools.convertKilobytes(maxBlockSize));
+            maxSizeWi.setValue(new StringValue(Tools.convertKilobytes(maxBlockSize)));
             final long size = Tools.convertToKilobytes(
                                               sizeWi.getStringValue());
             if (size > maxSize || size <= 0) {
                 enable = false;
                 sizeWi.wrongValue();
             } else {
-                sizeWi.setBackground("", "", true);
+                sizeWi.setBackground(new StringValue(), new StringValue(), true);
             }
             boolean lvNameCorrect = true;
             if ("".equals(lvNameWi.getStringValue())) {
@@ -179,7 +180,7 @@ public final class LVCreate extends LV {
                 }
             }
             if (lvNameCorrect) {
-                lvNameWi.setBackground("", "", true);
+                lvNameWi.setBackground(new StringValue(), new StringValue(), true);
             } else {
                 enable = false;
                 lvNameWi.wrongValue();
@@ -220,7 +221,7 @@ public final class LVCreate extends LV {
         }
         lvNameWi = WidgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
-                                      defaultName,
+                                      new StringValue(defaultName),
                                       Widget.NO_ITEMS,
                                       Widget.NO_REGEXP,
                                       250,
@@ -244,7 +245,7 @@ public final class LVCreate extends LV {
                                              Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(Tools.convertKilobytes(newBlockSize),
+        sizeWi = new TextfieldWithUnit(new StringValue(Tools.convertKilobytes(newBlockSize)),
                                        getUnits(),
                                        Widget.NO_REGEXP,
                                        250,
@@ -289,8 +290,8 @@ public final class LVCreate extends LV {
                         final String maxBlockSize = getMaxBlockSize(
                                                       getSelectedHostCbs());
                         final long maxSize = Long.parseLong(maxBlockSize);
-                        maxSizeWi.setValue(Tools.convertKilobytes(
-                                                                maxBlockSize));
+                        maxSizeWi.setValue(new StringValue(Tools.convertKilobytes(
+                                                               maxBlockSize)));
                         enableComponents();
                         if (oneFailed) {
                             progressBarDoneError();
@@ -307,7 +308,7 @@ public final class LVCreate extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                                      Tools.convertKilobytes(maxBlockSize),
+                                      new StringValue(Tools.convertKilobytes(maxBlockSize)),
                                       getUnits(),
                                       Widget.NO_REGEXP,
                                       250,

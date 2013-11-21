@@ -63,6 +63,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -122,22 +124,27 @@ public final class DrbdVolumeInfo extends EditableInfo
             }});
 
     /** Short descriptions for parameters. */
-    private static final Map<String, Object[]> POSSIBLE_CHOICES =
-                Collections.unmodifiableMap(new HashMap<String, Object[]>() {
+    private static final Map<String, Value[]> POSSIBLE_CHOICES =
+                Collections.unmodifiableMap(new HashMap<String, Value[]>() {
                     private static final long serialVersionUID = 1L;
                 {
-                    put(DRBD_VOL_PARAM_DEV, new String[]{"/dev/drbd0",
-                                                         "/dev/drbd1",
-                                                         "/dev/drbd2",
-                                                         "/dev/drbd3",
-                                                         "/dev/drbd4",
-                                                         "/dev/drbd5",
-                                                         "/dev/drbd6",
-                                                         "/dev/drbd7",
-                                                         "/dev/drbd8",
-                                                         "/dev/drbd9"});
+                    put(DRBD_VOL_PARAM_DEV, new Value[]{new StringValue("/dev/drbd0"),
+                                                        new StringValue("/dev/drbd1"),
+                                                        new StringValue("/dev/drbd2"),
+                                                        new StringValue("/dev/drbd3"),
+                                                        new StringValue("/dev/drbd4"),
+                                                        new StringValue("/dev/drbd5"),
+                                                        new StringValue("/dev/drbd6"),
+                                                        new StringValue("/dev/drbd7"),
+                                                        new StringValue("/dev/drbd8"),
+                                                        new StringValue("/dev/drbd9")});
                     put(DRBD_VOL_PARAM_NUMBER,
-                        new String[]{"0", "1", "2", "3", "4", "5"});
+                        new Value[]{new StringValue("0"),
+                                    new StringValue("1"),
+                                    new StringValue("2"),
+                                    new StringValue("3"),
+                                    new StringValue("4"),
+                                    new StringValue("5")});
                 }});
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
@@ -156,7 +163,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         this.device = device;
         hosts = getHostsFromBlockDevices(blockDevInfos);
         setResource(new DrbdVolume(name));
-        getResource().setValue(DRBD_VOL_PARAM_DEV, device);
+        getResource().setValue(DRBD_VOL_PARAM_DEV, new StringValue(device));
         getResource().setNew(true);
     }
     /** Returns info panel. */
@@ -262,8 +269,8 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         /* resource name */
         getResource().setValue(DRBD_VOL_PARAM_NUMBER,
-                               getResource().getName());
-        getResource().setValue(DRBD_VOL_PARAM_DEV, getDevice());
+                               new StringValue(getResource().getName()));
+        getResource().setValue(DRBD_VOL_PARAM_DEV, new StringValue(getDevice()));
 
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
@@ -637,7 +644,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             final String bsString = getFirstBlockDevInfo()
                                             .getBlockDevice().getBlockSize();
             final String rateString =
-                        getDrbdResourceInfo().getResource().getValue("rate");
+                        getDrbdResourceInfo().getResource().getValue("rate").getValueForConfig();
             if (spString != null && bsString != null && rateString != null) {
                 final double sp = Double.parseDouble(spString);
                 final double bs = Double.parseDouble(bsString);
@@ -990,7 +997,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         }
         di.waitForInfoPanel();
         di.getWidget("1", null).setValueAndWait(
-                                            getDrbdResourceInfo().getName());
+                                            new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, testOnly);
     }
 
@@ -1026,7 +1033,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();
         ldi.getWidget("drbd_resource", null).setValueAndWait(
-                                            getDrbdResourceInfo().getName());
+                                            new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
         ldi.apply(dcHost, testOnly);
@@ -1191,9 +1198,9 @@ public final class DrbdVolumeInfo extends EditableInfo
             getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
 
-            final String volumeNr = getParamSaved(DRBD_VOL_PARAM_NUMBER);
+            final String volumeNr = getParamSaved(DRBD_VOL_PARAM_NUMBER).getValueForConfig();
             setName(volumeNr);
-            final String drbdDevStr = getParamSaved(DRBD_VOL_PARAM_DEV);
+            final String drbdDevStr = getParamSaved(DRBD_VOL_PARAM_DEV).getValueForConfig();
             device = drbdDevStr;
             //getDrbdResource().setDevice(drbdDevStr);
 
@@ -1244,13 +1251,13 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns the preferred value for the drbd parameter. */
     @Override
-    protected String getParamPreferred(final String param) {
+    protected Value getParamPreferred(final String param) {
         return null;
     }
 
     /** Returns default value of the parameter. */
     @Override
-    public String getParamDefault(final String param) {
+    public Value getParamDefault(final String param) {
         return null;
     }
 
@@ -1259,7 +1266,7 @@ public final class DrbdVolumeInfo extends EditableInfo
      * and other constraints.
      */
     @Override
-    protected boolean checkParam(final String param, final String newValue) {
+    protected boolean checkParam(final String param, final Value newValue) {
         if (getResource().isNew() && DRBD_VOL_PARAM_DEV.equals(param)) {
             if (getBrowser().getDrbdDevHash().containsKey(newValue)) {
                 getBrowser().putDrbdDevHash();
@@ -1272,7 +1279,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
-    protected Object[] getParamPossibleChoices(final String param) {
+    protected Value[] getParamPossibleChoices(final String param) {
         return POSSIBLE_CHOICES.get(param);
     }
 
