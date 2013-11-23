@@ -125,7 +125,7 @@ public abstract class DialogHost extends WizardDialog {
         final StringBuilder s = new StringBuilder(50);
         s.append(getHostDialogTitle());
         if (host != null
-            && !host.getName().equals("")
+            && !host.getName().isEmpty()
             && !host.getName().equals("unknown")) {
 
             s.append(" (");
@@ -227,7 +227,7 @@ public abstract class DialogHost extends WizardDialog {
             final String index = Integer.toString(i);
             final String text =
                     getHost().getDistString(prefix + ".install.text." + index);
-            if (text == null || text.equals("")) {
+            if (text == null || text.isEmpty()) {
                 if (i > 9) {
                     break;
                 }

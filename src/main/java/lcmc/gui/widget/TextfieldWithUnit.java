@@ -303,7 +303,7 @@ public final class TextfieldWithUnit extends Widget {
 
         Unit selectedUnitInfo = null;
         for (Unit u : units) {
-            if (u.equals(unit)) { //TODO:
+            if (u.getShortName().equals(unit)) { //TODO:
                 selectedUnitInfo = u;
             }
         }

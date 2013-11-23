@@ -2548,9 +2548,11 @@ public final class ClusterBrowser extends Browser {
     /** Returns object that holds data of all VMs. */
     public VMSXML getVMSXML(final Host host) {
         mVMSReadLock.lock();
-        final VMSXML vxml = vmsXML.get(host);
-        mVMSReadLock.unlock();
-        return vxml;
+        try {
+            return vmsXML.get(host);
+        } finally {
+            mVMSReadLock.unlock();
+        }
     }
 
     /**

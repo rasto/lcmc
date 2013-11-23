@@ -257,7 +257,7 @@ final class CloneInfo extends ServiceInfo {
         if (cs != null) {
             final String failCount = cs.getFailCount(hostName, testOnly);
             if (failCount != null) {
-                if (CRMXML.INFINITY_STRING.equals(failCount)) {
+                if (CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount)) {
                     fcString = " failed";
                 } else {
                     fcString = " failed: " + failCount;

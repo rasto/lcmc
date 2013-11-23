@@ -81,24 +81,24 @@ public final class StringValue implements Value {
 
     /** Returns the display name. It will be shown in the GUI. */
     @Override
-    public final String toString() {
+    public String toString() {
         return valueForGui;
     }
 
     /** Returns the string that is used for config. */
     @Override
-    public final String getValueForConfig() {
+    public String getValueForConfig() {
         return valueForConfig;
     }
 
     @Override
-    public final String getValueForGui() {
+    public String getValueForGui() {
         return valueForGui;
     }
 
     /** Returns the string that is used for config. */
     @Override
-    public final String getValueForConfigWithUnit() {
+    public String getValueForConfigWithUnit() {
         if (unit == null) {
             return valueForConfig;
         } else {

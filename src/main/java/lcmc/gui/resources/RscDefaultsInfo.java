@@ -120,7 +120,7 @@ public final class RscDefaultsInfo extends EditableInfo {
         if (newValue == null) {
             return crmXML.checkMetaAttrParam(param, null);
         } else {
-            return crmXML.checkMetaAttrParam(param, newValue.getValueForConfig());
+            return crmXML.checkMetaAttrParam(param, newValue);
         }
     }
 

@@ -46,7 +46,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
     /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
     /** Prepares a new <code>DrbdGuiInfo</code> object. */
-    public DrbdGuiInfo(final String name, final Browser browser) {
+    DrbdGuiInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 

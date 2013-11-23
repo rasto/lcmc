@@ -2477,6 +2477,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             return vmsdi;
         }
         Tools.invokeAndWait(new Runnable() {
+            @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
                 int i = 0;
@@ -3823,7 +3824,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final String value =
                 definedOnHostComboBoxHash.get(host.getName()).getStringValue();
             final boolean needConsole = needConsole();
-            if (DEFINED_ON_HOST_TRUE.equals(value)) {
+            if (DEFINED_ON_HOST_TRUE.getValueForConfig().equals(value)) {
                 Node domainNode = null;
                 VMSXML vmsxml = null;
                 if (getResource().isNew()) {
@@ -5083,11 +5084,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             if ((vmsxml == null
                  || (!getResource().isNew()
                      && !vmsxml.getDomainNames().contains(getDomainName())))
-                && DEFINED_ON_HOST_TRUE.equals(value)) {
+                && DEFINED_ON_HOST_TRUE.getValueForConfig().equals(value)) {
                 changed = true;
             } else if (vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
-                       && DEFINED_ON_HOST_FALSE.equals(value)) {
+                       && DEFINED_ON_HOST_FALSE.getValueForConfig().equals(value)) {
                 changed = true;
             }
         }

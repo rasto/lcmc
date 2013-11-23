@@ -204,6 +204,13 @@ public final class CRMXML extends XML {
     static final Value PCMK_TRUE = new StringValue("true");
     /** Pacemaker "false" string. */
     static final Value PCMK_FALSE = new StringValue("false");
+
+    private static final Value PCMK_TRUE_2 = new StringValue("True");
+    private static final Value PCMK_FALSE_2 = new StringValue("False");
+
+    private static final Value PCMK_YES = new StringValue("yes");
+    private static final Value PCMK_NO = new StringValue("no");
+
     /** Disabled string. */
     public static final Value DISABLED_STRING = new StringValue("disabled");
     /** Boolean parameter type. */
@@ -1154,8 +1161,8 @@ public final class CRMXML extends XML {
             } else if ("Yes".equals(paramDefault)
                        || "No".equals(paramDefault)) {
                 return new Value[]{new StringValue("Yes"), new StringValue("No")};
-            } else if (PCMK_TRUE.equals(paramDefault)
-                       || PCMK_FALSE.equals(paramDefault)) {
+            } else if (PCMK_TRUE.getValueForConfig().equals(paramDefault)
+                       || PCMK_FALSE.getValueForConfig().equals(paramDefault)) {
                 return PCMK_BOOLEAN_VALUES.clone();
             } else if ("True".equals(paramDefault)
                        || "False".equals(paramDefault)) {
@@ -1459,7 +1466,7 @@ public final class CRMXML extends XML {
     }
 
     /** Checks meta attribute param. */
-    public boolean checkMetaAttrParam(final String param, final String value) {
+    public boolean checkMetaAttrParam(final String param, final Value value) {
         final String newParam = convertRscDefaultsParam(param);
         final String type = M_A_TYPE.get(newParam);
         final boolean required = isRscDefaultsRequired(newParam);
@@ -1580,7 +1587,7 @@ public final class CRMXML extends XML {
      */
     public boolean checkParam(final ResourceAgent ra,
                               final String param,
-                              final String value) {
+                              final Value value) {
         final String type = getParamType(ra, param);
         final boolean required = isRequired(ra, param);
         final boolean metaAttr = isMetaAttr(ra, param);
@@ -1595,36 +1602,36 @@ public final class CRMXML extends XML {
                                          final boolean required,
                                          final boolean metaAttr,
                                          final String param,
-                                         String value) {
-        if (metaAttr
-            && isRscDefaultsInteger(param)
-            && DISABLED_STRING.equals(value)) {
-            value = "";
-        }
+                                         Value value) {
+        //if (metaAttr
+        //    && isRscDefaultsInteger(param)
+        //    && DISABLED_STRING.equals(value)) {
+        //    value = "";
+        //}
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.getValueForConfig().equals(value)
-                && !PCMK_FALSE.getValueForConfig().equals(value)
-                && !"True".equals(value)
-                && !"False".equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE_2.equals(value)
+                && !PCMK_FALSE_2.equals(value)) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if ((value == null || "".equals(value)) && required) {
+        } else if (value.isNothingSelected() && required) {
             correctValue = false;
         }
         return correctValue;
@@ -1634,34 +1641,33 @@ public final class CRMXML extends XML {
      * Checks global parameter according to its type. Returns false if value
      * does not fit the type.
      */
-    public boolean checkGlobalParam(final String param, final String value) {
+    public boolean checkGlobalParam(final String param, final Value value) {
         final String type = getGlobalParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.getValueForConfig().equals(value)
-                && !PCMK_FALSE.getValueForConfig().equals(value)
-                && !"True".equals(value)
-                && !"False".equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE_2.equals(value)
+                && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                 Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if ((value == null || "".equals(value))
-                   && isGlobalRequired(param)) {
+        } else if (value.isNothingSelected() && isGlobalRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -3642,34 +3648,33 @@ public final class CRMXML extends XML {
      * Checks order parameter according to its type. Returns false if value
      * does not fit the type.
      */
-    public boolean checkOrderParam(final String param, final String value) {
+    public boolean checkOrderParam(final String param, final Value value) {
         final String type = getOrderParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.getValueForConfig().equals(value)
-                && !PCMK_FALSE.getValueForConfig().equals(value)
-                && !"True".equals(value)
-                && !"False".equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE_2.equals(value)
+                && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if ((value == null || "".equals(value))
-                   && isOrderRequired(param)) {
+        } else if (value.isNothingSelected() && isOrderRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -3791,34 +3796,33 @@ public final class CRMXML extends XML {
      * does not fit the type.
      */
     public boolean checkColocationParam(final String param,
-                                        final String value) {
+                                        final Value value) {
         final String type = getColocationParamType(param);
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
-            if (!"yes".equals(value) && !"no".equals(value)
-                && !PCMK_TRUE.getValueForConfig().equals(value)
-                && !PCMK_FALSE.getValueForConfig().equals(value)
-                && !"True".equals(value)
-                && !"False".equals(value)) {
+            if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
+                && !PCMK_TRUE.equals(value)
+                && !PCMK_FALSE.equals(value)
+                && !PCMK_TRUE_2.equals(value)
+                && !PCMK_FALSE_2.equals(value)) {
 
                 correctValue = false;
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value);
+            final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if ((value == null || "".equals(value))
-                   && isColocationRequired(param)) {
+        } else if (value.isNothingSelected() && isColocationRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -4179,7 +4183,7 @@ public final class CRMXML extends XML {
         /** Returns whether the resouce set requires all resources to be
          *  started . */
         public boolean isRequireAll() {
-            return requireAll == null || REQUIRE_ALL_TRUE.equals(requireAll);
+            return requireAll == null || REQUIRE_ALL_TRUE.getValueForConfig().equals(requireAll);
         }
     }
 

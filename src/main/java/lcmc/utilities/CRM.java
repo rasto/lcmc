@@ -559,7 +559,7 @@ public final class CRM {
             }
             final String requireAll = rscSet.getRequireAll();
             if (requireAll != null
-                && !requireAll.equals(CRMXML.REQUIRE_ALL_TRUE)) {
+                && !requireAll.equals(CRMXML.REQUIRE_ALL_TRUE.getValueForConfig())) {
                 attrs.put(CRMXML.REQUIRE_ALL_ATTR, requireAll);
             }
         }
@@ -1220,7 +1220,7 @@ public final class CRM {
             if (convertHash.containsKey(attr)) {
                 attr = convertHash.get(attr);
             }
-            xml.append("\" " + attr + "=\"");
+            xml.append("\" ").append(attr).append("=\"");
             xml.append(value);
         }
         xml.append("\"/>'");

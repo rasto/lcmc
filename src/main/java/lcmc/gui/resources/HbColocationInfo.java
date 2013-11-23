@@ -182,7 +182,7 @@ final class HbColocationInfo extends EditableInfo
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getCRMXML().checkColocationParam(param, newValue.getValueForConfig());
+        return getBrowser().getCRMXML().checkColocationParam(param, newValue);
     }
 
     /** Returns default for this parameter. */

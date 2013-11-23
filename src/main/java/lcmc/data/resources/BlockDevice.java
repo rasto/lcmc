@@ -642,17 +642,17 @@ public final class BlockDevice extends Resource {
     }
 
     /** Return DRBD config disk. */
-    public final String getDrbdBackingDisk() {
+    public String getDrbdBackingDisk() {
         return drbdBackingDisk;
     }
 
     /** Set DRBD backing disk. */
-    public final void setDrbdBackingDisk(final String drbdBackingDisk) {
+    public void setDrbdBackingDisk(final String drbdBackingDisk) {
         this.drbdBackingDisk = drbdBackingDisk;
     }
 
     /** Set used. */
-    public final void setUsed(final String usedStr) {
+    public void setUsed(final String usedStr) {
         if (usedStr != null) {
             this.used = Integer.parseInt(usedStr);
         }

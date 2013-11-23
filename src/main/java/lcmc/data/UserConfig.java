@@ -184,6 +184,7 @@ public final class UserConfig extends XML {
                     continue;
                 }
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         Tools.getGUIData().addClusterTab(cluster);
                     }
@@ -194,6 +195,7 @@ public final class UserConfig extends XML {
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
                     Tools.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             Tools.getGUIData().getClustersPanel().removeTab(
                                                                        cluster);
@@ -208,6 +210,7 @@ public final class UserConfig extends XML {
                             host.waitOnLoading();
                         }
                         Tools.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 final ClusterTab ct = cluster.getClusterTab();
                                 if (ct != null) {

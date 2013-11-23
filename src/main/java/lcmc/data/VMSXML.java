@@ -1362,8 +1362,11 @@ public final class VMSXML extends XML {
         oldConfig = output;
         final Document document = getXMLDocument(output);
         mXMLDocumentWriteLock.lock();
-        xmlDocument = document;
-        mXMLDocumentWriteLock.unlock();
+        try {
+            xmlDocument = document;
+        } finally {
+            mXMLDocumentWriteLock.unlock();
+        }
         if (document == null) {
             return false;
         }

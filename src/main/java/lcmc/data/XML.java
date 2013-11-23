@@ -115,7 +115,7 @@ abstract class XML {
         final DocumentBuilderFactory factory =
             DocumentBuilderFactory.newInstance();
         if (factory == null
-            || xml.equals("")
+            || xml.isEmpty()
             || xml.equals("no resources defined!")) {
             return null;
         }

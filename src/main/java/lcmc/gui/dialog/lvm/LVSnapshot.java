@@ -109,7 +109,7 @@ public final class LVSnapshot extends LV {
 
     private class EnableSnapshotRunnable implements Runnable {
         private final boolean enable;
-        public EnableSnapshotRunnable(final boolean enable) {
+        EnableSnapshotRunnable(final boolean enable) {
             super();
             this.enable = enable;
         }

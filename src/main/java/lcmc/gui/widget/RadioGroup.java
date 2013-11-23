@@ -65,8 +65,8 @@ public final class RadioGroup extends Widget {
     private final Map<String, Value> radioGroupHash =
                                                  new HashMap<String, Value>();
     /** Name to component hash. */
-    private final Map<Value, JComponent> componentsHash =
-                                             new HashMap<Value, JComponent>();
+    private final Map<String, JComponent> componentsHash =
+                                             new HashMap<String, JComponent>();
     /** group components lock. */
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
@@ -99,7 +99,7 @@ public final class RadioGroup extends Widget {
             group.add(rb);
             radioPanel.add(rb);
 
-            componentsHash.put(item, rb);
+            componentsHash.put(item.getValueForConfig(), rb);
             if (item.equals(selectedValue)) {
                 rb.setSelected(true);
                 radioGroupValue = selectedValue;
@@ -219,7 +219,7 @@ public final class RadioGroup extends Widget {
         if (item != null) {
             mComponentsReadLock.lock();
             final JRadioButton rb =
-                            (JRadioButton) componentsHash.get(item);
+                            (JRadioButton) componentsHash.get(item.getValueForConfig());
             mComponentsReadLock.unlock();
             if (rb != null) {
                 rb.setSelected(true);

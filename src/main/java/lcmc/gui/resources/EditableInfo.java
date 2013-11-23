@@ -285,9 +285,9 @@ public abstract class EditableInfo extends Info {
         private final boolean advanced;
 
         /** Creates new panel part object. */
-        public PanelPart(final String section,
-                         final ConfigData.AccessType accessType,
-                         final boolean advanced) {
+        PanelPart(final String section,
+                  final ConfigData.AccessType accessType,
+                  final boolean advanced) {
             this.section = section;
             this.accessType = accessType;
             this.advanced = advanced;

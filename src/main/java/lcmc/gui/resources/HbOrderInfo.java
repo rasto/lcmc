@@ -190,7 +190,7 @@ final class HbOrderInfo extends EditableInfo
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getCRMXML().checkOrderParam(param, newValue.getValueForConfig());
+        return getBrowser().getCRMXML().checkOrderParam(param, newValue);
     }
 
     /** Returns default for this parameter. */

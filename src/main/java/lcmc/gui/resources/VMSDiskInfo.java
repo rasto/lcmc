@@ -852,7 +852,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                             }
                         }
                     }
-                } else if ("virtio/disk".equals(newValue)) {
+                } else if ("virtio/disk".equals(newValue.getValueForConfig())) {
                     for (final String p : driverTypeWi.keySet()) {
                         driverTypeWi.get(p).setValue(new StringValue("raw"));
                     }

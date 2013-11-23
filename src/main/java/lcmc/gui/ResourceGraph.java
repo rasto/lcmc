@@ -1402,7 +1402,7 @@ public abstract class ResourceGraph {
             /* main text */
             final String mainText = getMainText((Vertex) v, isTestOnly());
             TextLayout mainTextLayout = null;
-            if (mainText != null && !mainText.equals("")) {
+            if (mainText != null && !mainText.isEmpty()) {
                 mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
                 int iconWidth = 64;
                 if (icons == null) {
@@ -1419,7 +1419,7 @@ public abstract class ResourceGraph {
             final String iconText = getIconText((Vertex) v, isTestOnly());
             int iconTextWidth = 0;
             TextLayout iconTextLayout = null;
-            if (iconText != null && !iconText.equals("")) {
+            if (iconText != null && !iconText.isEmpty()) {
                 iconTextLayout = getVertexTextLayout(g2d, iconText, 0.8);
                 iconTextWidth =
                             (int) iconTextLayout.getBounds().getWidth();

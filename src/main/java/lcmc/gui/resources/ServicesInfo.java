@@ -167,7 +167,7 @@ public final class ServicesInfo extends EditableInfo {
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getCRMXML().checkGlobalParam(param, newValue.getValueForConfig());
+        return getBrowser().getCRMXML().checkGlobalParam(param, newValue);
     }
 
     /** Returns whether the global parameter is of the integer type. */

@@ -341,7 +341,7 @@ public final class DrbdXML extends XML {
      * a drbd event.
      */
     public void update(final String configString) {
-        if (configString != null && !configString.equals("")) {
+        if (configString != null && !configString.isEmpty()) {
             oldConfig = configString;
             parseConfig(configString);
         }
@@ -358,7 +358,7 @@ public final class DrbdXML extends XML {
                                 new StringBuilder(param.replaceAll("\\-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
         if (paramUnitLongMap.containsKey(param)) {
-            name.append(" (" + paramUnitLongMap.get(param) + ")");
+            name.append(" (").append(paramUnitLongMap.get(param)).append(")");
         }
         return name.toString();
     }
@@ -447,7 +447,7 @@ public final class DrbdXML extends XML {
             }
         }
 
-        if (value == null || "".equals(value)) {
+        if (value.isNothingSelected()) {
             if (isRequired(param)) {
                 correctValue = false;
             } else {

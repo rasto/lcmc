@@ -321,7 +321,7 @@ public final class VGRemove extends LV {
         /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
         /** Create ItemChangeListener object. */
-        public ItemChangeListener(final boolean onDeselect) {
+        ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;
         }

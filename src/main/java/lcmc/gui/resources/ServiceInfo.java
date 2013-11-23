@@ -531,7 +531,7 @@ public class ServiceInfo extends EditableInfo {
                 if (prevWi == null) {
                     continue;
                 }
-                if (!visible && !prevWi.getStringValue().equals("")) {
+                if (!visible && !prevWi.getStringValue().isEmpty()) {
                     visible = true;
                 }
                 if (wi != null && wi.isVisible() != visible) {
@@ -1040,8 +1040,8 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if ((CRMXML.INFINITY_STRING.equals(score)
-                 || CRMXML.PLUS_INFINITY_STRING.equals(score))
+            if ((CRMXML.INFINITY_STRING.getValueForConfig().equals(score)
+                 || CRMXML.PLUS_INFINITY_STRING.getValueForConfig().equals(score))
                 && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
@@ -1072,7 +1072,7 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if (CRMXML.MINUS_INFINITY_STRING.equals(score)) {
+            if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
                 return hosts;
@@ -1105,7 +1105,7 @@ public class ServiceInfo extends EditableInfo {
                 score = hostLocation.getScore();
                 op = hostLocation.getOperation();
             }
-            if (CRMXML.MINUS_INFINITY_STRING.equals(score)
+            if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)
                 && "eq".equals(op)) {
                 final List<Host> hosts = new ArrayList<Host>();
                 hosts.add(host);
@@ -1180,7 +1180,7 @@ public class ServiceInfo extends EditableInfo {
         final String failCount = getFailCount(hostName,
                                               testOnly);
         return failCount != null
-               && CRMXML.INFINITY_STRING.equals(failCount);
+               && CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount);
     }
 
     /** Returns whether the resource has failed to start. */
@@ -1301,7 +1301,7 @@ public class ServiceInfo extends EditableInfo {
                                                                  serviceName,
                                                                  i.getName());
 
-            if (si == null && !name.equals(defaultValue)) {
+            if (si == null && !name.equals(defaultValue.getName())) {
                 list.add(i);
             }
         }
@@ -1791,7 +1791,7 @@ public class ServiceInfo extends EditableInfo {
             nothingSelected = true;
         }
         boolean sameAs = true;
-        if (META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+        if (META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.toString())) {
             sameAs = false;
         }
         final String[] params = getParametersFromXML();
@@ -2243,7 +2243,7 @@ public class ServiceInfo extends EditableInfo {
             return false;
         }
         final CRMXML crmXML = getBrowser().getCRMXML();
-        return crmXML.checkParam(resourceAgent, param, newValue.getValueForConfig());
+        return crmXML.checkParam(resourceAgent, param, newValue);
     }
 
     /** Returns default value for specified parameter. */
@@ -2391,7 +2391,7 @@ public class ServiceInfo extends EditableInfo {
                 nothingSelected = true;
             }
             boolean sameAs = true;
-            if (META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+            if (META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.toString())) {
                 sameAs = false;
             }
             if (!sameAs || nothingSelected) {
@@ -3142,7 +3142,7 @@ public class ServiceInfo extends EditableInfo {
         if (sameAsMetaAttrsWi != null) {
             final Info i = sameAsMetaAttrsWiValue();
             if (!Widget.NOTHING_SELECTED_DISPLAY.equals(i.toString())
-                && !META_ATTRS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
+                && !META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(i.toString())) {
                 final ServiceInfo si  = (ServiceInfo) i;
                 final ClusterStatus cs = getBrowser().getClusterStatus();
                 metaAttrsRefId = cs.getMetaAttrsId(
@@ -5000,6 +5000,7 @@ public class ServiceInfo extends EditableInfo {
             public void action() {
                 hidePopup();
                 Tools.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         for (final JDialog otherP : popups) {
                             otherP.dispose();
@@ -6428,9 +6429,11 @@ public class ServiceInfo extends EditableInfo {
     public final Widget getOperationsComboBox(final String op,
                                                 final String param) {
         mOperationsComboBoxHashReadLock.lock();
-        final Widget wi = operationsComboBoxHash.get(op, param);
-        mOperationsComboBoxHashReadLock.unlock();
-        return wi;
+        try {
+            return operationsComboBoxHash.get(op, param);
+        } finally {
+            mOperationsComboBoxHashReadLock.unlock();
+        }
     }
 
     /** Return same as operations combo box. */

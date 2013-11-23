@@ -219,7 +219,7 @@ public final class ConfigData {
 
     /** Gets user for download area. */
     public String getDownloadUser() {
-        if (savedDownloadUser != null && !savedDownloadUser.equals("")) {
+        if (savedDownloadUser != null && !savedDownloadUser.isEmpty()) {
             downloadUser = savedDownloadUser;
             savedDownloadUser = "";
         }
@@ -229,7 +229,7 @@ public final class ConfigData {
     /** Gets password for download area. */
     public String getDownloadPassword() {
         if (savedDownloadPassword != null
-            && !savedDownloadPassword.equals("")) {
+            && !savedDownloadPassword.isEmpty()) {
             downloadPassword = savedDownloadPassword;
             savedDownloadPassword = "";
         }

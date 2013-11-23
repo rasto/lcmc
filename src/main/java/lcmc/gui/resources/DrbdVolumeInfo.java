@@ -1268,7 +1268,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (getResource().isNew() && DRBD_VOL_PARAM_DEV.equals(param)) {
-            if (getBrowser().getDrbdDevHash().containsKey(newValue)) {
+            if (getBrowser().getDrbdDevHash().containsKey(newValue.getValueForConfig())) {
                 getBrowser().putDrbdDevHash();
                 return false;
             }

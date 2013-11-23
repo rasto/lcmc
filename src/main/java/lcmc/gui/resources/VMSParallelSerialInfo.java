@@ -424,12 +424,12 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 public void run() {
                     for (final String param : PARAMETERS) {
                         getWidget(param, null).setVisible(
-                             PARAMETERS_MAP.get(newValue).contains(param));
+                             PARAMETERS_MAP.get(newValue.getValueForConfig()).contains(param));
                     }
                 }
             });
         }
-        if (isRequired(param) && (newValue == null || "".equals(newValue))) {
+        if (isRequired(param) && newValue.isNothingSelected()) {
             return false;
         }
         return true;
@@ -533,7 +533,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     @Override
     String[] getRealParametersFromXML() {
        final List<String> params = PARAMETERS_MAP.get(
-                                    getComboBoxValue(ParallelSerialData.TYPE));
+                                    getComboBoxValue(ParallelSerialData.TYPE).getValueForConfig());
        if (params == null) {
            return PARAMETERS.clone();
        }

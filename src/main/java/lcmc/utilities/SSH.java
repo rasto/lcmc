@@ -1015,6 +1015,7 @@ public final class SSH {
          * The callback may be invoked several times, depending on how many
          * questions-sets the server sends.
          */
+        @Override
         public String[] replyToChallenge(final String name,
                                          final String instruction,
                                          final int numPrompts,

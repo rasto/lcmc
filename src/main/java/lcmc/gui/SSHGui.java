@@ -196,7 +196,7 @@ public final class SSHGui {
             this.isPassword = isPassword;
             final List<String> strippedContent = new ArrayList<String>();
             for (final String s : content) {
-                if (s != null && !s.equals("")) {
+                if (s != null && !s.isEmpty()) {
                     /* strip some html */
                     strippedContent.add(s.replaceAll("\\<.*?\\>", "")
                                          .replaceAll("&nbsp;", " "));
@@ -219,7 +219,7 @@ public final class SSHGui {
             }
 
             for (final String el : content) {
-                if ((el == null) || (el.equals(""))) {
+                if ((el == null) || (el.isEmpty())) {
                     continue;
                 }
                 final JLabel contentLabel = new JLabel(el);

@@ -23,10 +23,8 @@ package lcmc.gui.widget;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
-import lcmc.gui.resources.Info;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
@@ -38,7 +36,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.ComboBoxEditor;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;

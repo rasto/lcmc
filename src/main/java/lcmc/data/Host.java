@@ -902,14 +902,14 @@ public final class Host implements Comparable<Host>, Value {
                                                     getDist(),
                                                     distVersionString,
                                                     null));
-        String arch = Tools.getDistString("arch:" + detectedArch,
-                                          getDist(),
-                                          distVersionString,
-                                          null);
-        if (arch == null) {
-            arch = detectedArch;
+        String arch0 = Tools.getDistString("arch:" + detectedArch,
+                                           getDist(),
+                                           distVersionString,
+                                           null);
+        if (arch0 == null) {
+            arch0 = detectedArch;
         }
-        setArch(arch);
+        setArch(arch0);
     }
 
     /** Returns the detected info to show. */
@@ -2599,7 +2599,7 @@ public final class Host implements Comparable<Host>, Value {
             if (y < 0) {
                 y = 0;
             }
-            lines.append(id + ";x=" + x + ";y=" + y + "\n");
+            lines.append(id).append(";x=").append(x).append(";y=").append(y).append("\n");
         }
         getSSH().createConfig(lines.toString(),
                               "drbdgui.cf",
@@ -2921,7 +2921,7 @@ public final class Host implements Comparable<Host>, Value {
                       final int maxHosts) {
         Tools.sleep(1500);
         final StringBuilder command = new StringBuilder(50);
-        command.append(DistResource.SUDO + replaceVars("@GUI-HELPER@"));
+        command.append(DistResource.SUDO).append(replaceVars("@GUI-HELPER@"));
         command.append(' ');
         command.append(checkCommand);
         command.append(' ');

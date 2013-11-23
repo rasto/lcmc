@@ -329,14 +329,11 @@ public final class HostBrowser extends Browser {
      */
     public Set<BlockDevInfo> getBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
-        /* the comparison conditions in the tree set can change afterwards and
-           the contains function may not work properly, hence wrapping it to
-           linked hash set. */
-        final Set<BlockDevInfo> values = new LinkedHashSet<BlockDevInfo>(
-                                                new TreeSet<BlockDevInfo>(
-                                                      blockDevInfos.values()));
-        mBlockDevInfosReadLock.unlock();
-        return values;
+        try {
+            return new LinkedHashSet<BlockDevInfo>(new TreeSet<BlockDevInfo>(blockDevInfos.values()));
+        } finally {
+            mBlockDevInfosReadLock.unlock();
+        }
     }
 
     /** Returns map of net interface objects with its net info objects. */
