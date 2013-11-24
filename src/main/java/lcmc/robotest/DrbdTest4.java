@@ -22,6 +22,8 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import lcmc.gui.widget.Widget;
 import static lcmc.robotest.RoboTest.*;
 import static lcmc.robotest.DrbdTest1.*;
@@ -62,7 +64,7 @@ final class DrbdTest4 {
                 chooseDrbdResource(cluster);
             } else {
                 /* existing drbd resource */
-                moveTo("DRBD Resource", Widget.MComboBox.class);
+                moveTo("DRBD Resource", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_DOWN); /* drbd: r0 */
                 sleep(200);
@@ -104,14 +106,14 @@ final class DrbdTest4 {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", Widget.MComboBox.class);
+        moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", Widget.MComboBox.class);
+        moveTo("Fence peer", MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -121,7 +123,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -142,7 +144,7 @@ final class DrbdTest4 {
         sleep(2000);
         leftClick();
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -156,7 +158,7 @@ final class DrbdTest4 {
         leftClick();
         sleep(10000);
         checkDRBDTest(drbdTest, 2.11); /* 2.11 */
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         sleep(6000);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
@@ -175,14 +177,14 @@ final class DrbdTest4 {
         sleep(2000);
         leftClick();
 
-        moveTo("Protocol", Widget.MComboBox.class);
+        moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", Widget.MComboBox.class);
+        moveTo("Fence peer", MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -192,7 +194,7 @@ final class DrbdTest4 {
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -206,7 +208,7 @@ final class DrbdTest4 {
         leftClick();
         checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);

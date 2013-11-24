@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JCheckBox;
 import lcmc.data.Cluster;
-import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.*;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -75,7 +76,7 @@ final class VMTest1 {
             leftClick();
             sleep(10000);
             dialogColorTest("new domain");
-            moveTo("Domain name", Widget.MTextField.class); /* domain name */
+            moveTo("Domain name", MTextField.class); /* domain name */
             leftClick();
             press(KeyEvent.VK_D);
             sleep(200);
@@ -88,7 +89,7 @@ final class VMTest1 {
                 sleep(200);
             }
             /* type */
-            moveTo("Domain Type", Widget.MComboBox.class);
+            moveTo("Domain Type", MComboBox.class);
             leftClick();
             sleep(1000);
             if ("lxc".equals(type)) {
@@ -110,7 +111,7 @@ final class VMTest1 {
             if ("lxc".equals(type)) {
                 /* filesystem */
                 dialogColorTest("filesystem");
-                moveTo("Source Dir", Widget.MComboBox.class);
+                moveTo("Source Dir", MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -154,7 +155,7 @@ final class VMTest1 {
                 /* source file */
                 dialogColorTest("source file");
 
-                moveTo("File", Widget.MComboBox.class);
+                moveTo("File", MComboBox.class);
                 sleep(2000);
                 leftClick();
                 sleep(2000);
@@ -264,7 +265,7 @@ final class VMTest1 {
             leftClick();
             sleepNoFactor(5000);
 
-            moveTo("Number of CPUs", Widget.MTextField.class);
+            moveTo("Number of CPUs", MTextField.class);
             sleep(1000);
             leftClick();
             sleep(500);
@@ -323,7 +324,7 @@ final class VMTest1 {
                 moveTo("Disk/block device");
                 leftClick();
                 sleep(2000);
-                moveTo("Device", Widget.MComboBox.class);
+                moveTo("Device", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
                 press(KeyEvent.VK_D);
@@ -359,7 +360,7 @@ final class VMTest1 {
                 moveTo("Disk/block device");
                 leftClick();
                 sleep(2000);
-                moveTo("Device", Widget.MComboBox.class);
+                moveTo("Device", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
                 press(KeyEvent.VK_D);
@@ -372,7 +373,7 @@ final class VMTest1 {
                 press(KeyEvent.VK_A);
                 press(KeyEvent.VK_2);
                 press(KeyEvent.VK_ENTER);
-                moveTo("Disk Type", Widget.MComboBox.class);
+                moveTo("Disk Type", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_DOWN);
                 press(KeyEvent.VK_DOWN);

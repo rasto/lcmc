@@ -92,8 +92,8 @@ public abstract class ConfigDialog {
     /** Answer pane. The pane were texts can be easily written. */
     private JEditorPane answerPane = null;
     /** Components that were disabled and can be enabled later. */
-    private final List<JComponent> disabledComponents =
-                                                new ArrayList<JComponent>();
+    private final List<Component> disabledComponents =
+                                                new ArrayList<Component>();
     /** Size of the imput pane. */
     private static final int INPUT_PANE_HEIGHT = 200;
     /** Gate to synchronize the non-modal dialog and the answer.*/
@@ -602,7 +602,7 @@ public abstract class ConfigDialog {
      * were enabled are stored in disabledComponents list so that they
      * can be later enabled with call to enableComponents.
      */
-    protected final void disableComponents(final JComponent[] components) {
+    protected final void disableComponents(final Component[] components) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -613,7 +613,7 @@ public abstract class ConfigDialog {
                         option.setEnabled(false);
                     }
                 }
-                for (final JComponent c : components) {
+                for (final Component c : components) {
                     if (c.isEnabled()) {
                         disabledComponents.add(c);
                         c.setEnabled(false);
@@ -637,12 +637,12 @@ public abstract class ConfigDialog {
      * the ones that are in componentsToDisable array.
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
-        final HashSet<JComponent> ctdHash =
-                new HashSet<JComponent>(Arrays.asList(componentsToDisable));
+        final HashSet<Component> ctdHash =
+                new HashSet<Component>(Arrays.asList(componentsToDisable));
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                for (final JComponent dc : disabledComponents) {
+                for (final Component dc : disabledComponents) {
                     if (!ctdHash.contains(dc)) {
                         dc.setEnabled(true);
                     }
@@ -703,7 +703,7 @@ public abstract class ConfigDialog {
 
     /** Returns panel with checkbox. */
     protected final JPanel getComponentPanel(final String text,
-                                             final JComponent component) {
+                                             final Component component) {
         final JPanel mp = new JPanel(
                      new FlowLayout(FlowLayout.LEFT, 0, 0));
         mp.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));

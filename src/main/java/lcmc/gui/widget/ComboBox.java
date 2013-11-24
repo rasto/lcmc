@@ -55,7 +55,7 @@ import java.util.HashSet;
  *
  */
 //TODO: public final class ComboBox<E> extends Widget {
-public final class ComboBox extends Widget {
+public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Scrollbar max rows. */
@@ -102,7 +102,7 @@ public final class ComboBox extends Widget {
             cb.setSelectedItem(selectedValueInfo);
         }
         /* workround, so that default button works */
-        editor.addKeyListener(new ActivateDefaultButtonListener(cb));
+        editor.addKeyListener(new ActivateDefaultButtonListener<Value>(cb));
 
         /* removing select... keyword */
         editor.addFocusListener(new FocusListener() {
@@ -124,7 +124,7 @@ public final class ComboBox extends Widget {
 
     /** Returns true if combo box has changed. */
     private boolean comboBoxChanged(final Value[] items) {
-        final MComboBox<Value> cb = (MComboBox<Value>) getComponent();
+        final MComboBox<Value> cb = getInternalComponent();
         if (items.length != cb.getItemCount()) {
             return true;
         }
@@ -144,7 +144,7 @@ public final class ComboBox extends Widget {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                final MComboBox cb = (MComboBox) getComponent();
+                final MComboBox<Value> cb = getInternalComponent();
                 final Value selectedItem = (Value) cb.getSelectedItem();
                 boolean selectedChanged = false;
                 if (selectedValue == null
@@ -172,7 +172,7 @@ public final class ComboBox extends Widget {
                     final HashSet<String> itemCache = new HashSet<String>();
                     cb.setSelectedIndex(-1);
                     cb.removeAllItems();
-                    for (final Object item : comboList) {
+                    for (final Value item : comboList) {
                         if (!itemCache.contains(item.toString())) {
                             cb.addItem(item);
                             itemCache.add(item.toString());
@@ -210,7 +210,7 @@ public final class ComboBox extends Widget {
     @Override
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
-        final JComponent comp = getComponent();
+        final JComponent comp = getInternalComponent();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
@@ -248,7 +248,7 @@ public final class ComboBox extends Widget {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        final MComboBox<Value> cb = (MComboBox<Value>) getComponent();
+        final MComboBox<Value> cb = getInternalComponent();
         Value value;
         if (cb.isEditable()) {
             final JTextComponent editor =
@@ -280,7 +280,7 @@ public final class ComboBox extends Widget {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ((MComboBox) getComponent()).removeAllItems();
+                ((MComboBox) getInternalComponent()).removeAllItems();
             }
         });
     }
@@ -288,36 +288,36 @@ public final class ComboBox extends Widget {
     /** Returns whether component is editable or not. */
     @Override
     boolean isEditable() {
-        return ((MComboBox) getComponent()).isEditable();
+        return ((MComboBox) getInternalComponent()).isEditable();
     }
 
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
         Tools.isSwingThread();
-        final MComboBox<Value> cb = (MComboBox<Value>) getComponent();
+        final MComboBox<Value> cb = getInternalComponent();
         cb.setSelectedItem(item);
-        if (Tools.isStringClass(item)) {
-            Value selectedObject = null;
-            for (int i = 0; i < cb.getItemCount(); i++) {
-                final Value it = cb.getItemAt(i);
-                if (it.equals(item)) {
-                    selectedObject = it;
-                    cb.setSelectedItem(it);
-                    break;
-                }
-            }
-            if (selectedObject == null) {
-                cb.addItem(item);
-                cb.setSelectedItem(item);
-            }
-        }
+        //if (Tools.isStringClass(item)) {
+        //    Value selectedObject = null;
+        //    for (int i = 0; i < cb.getItemCount(); i++) {
+        //        final Value it = cb.getItemAt(i);
+        //        if (it.equals(item)) {
+        //            selectedObject = it;
+        //            cb.setSelectedItem(it);
+        //            break;
+        //        }
+        //    }
+        //    if (selectedObject == null) {
+        //        cb.addItem(item);
+        //        cb.setSelectedItem(item);
+        //    }
+        //}
     }
 
     /** Set selected index. */
     @Override
     public void setSelectedIndex(final int index) {
-        final MComboBox cb = (MComboBox) getComponent();
+        final MComboBox<Value> cb = getInternalComponent();
         cb.setSelectedIndex(index);
     }
 
@@ -355,7 +355,7 @@ public final class ComboBox extends Widget {
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
         addDocumentListener(getDocument(), wl);
-        ((MComboBox) getComponent()).addItemListener(getItemListener(wl));
+        ((MComboBox) getInternalComponent()).addItemListener(getItemListener(wl));
     }
 
     @Override
@@ -367,7 +367,7 @@ public final class ComboBox extends Widget {
     /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        final JComponent comp = getComponent();
+        final JComponent comp = getInternalComponent();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
@@ -386,7 +386,7 @@ public final class ComboBox extends Widget {
     @Override
     public void cleanup() {
         getWidgetListeners().clear();
-        final MComboBox thisCB = ((MComboBox) getComponent());
+        final MComboBox<Value> thisCB = getInternalComponent();
         final AbstractDocument dc = (AbstractDocument) getDocument();
         for (final DocumentListener dl : dc.getDocumentListeners()) {
             dc.removeDocumentListener(dl);
@@ -398,7 +398,7 @@ public final class ComboBox extends Widget {
 
     /** Returns the text component of the combo box. */
     private JTextComponent getTextComponent() {
-        final JComponent comp = getComponent();
+        final JComponent comp = getInternalComponent();
         final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
     }

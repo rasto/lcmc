@@ -67,6 +67,7 @@ import java.awt.event.ItemEvent;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 
+import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -439,11 +440,11 @@ public final class AllHostsInfo extends Info {
         final JPanel label = new JPanel();
         label.setBackground(Browser.PANEL_BACKGROUND);
         label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
-        final JTextField clusterTF = new Widget.MTextField(CLUSTER_NAME_PH);
+        final JTextField clusterTF = new MTextField(CLUSTER_NAME_PH);
         label.add(clusterTF);
         final List<JTextField> hostsTF = new ArrayList<JTextField>();
         for (int i = 1; i < 3; i++) {
-            final JTextField nl = new Widget.MTextField("node" + i + "...", 15);
+            final JTextField nl = new MTextField("node" + i + "...", 15);
             nl.setToolTipText("<html><b>enter the node name or ip</b><br>node"
                               + i + "<br>or ...<br>"
                               + System.getProperty("user.name")

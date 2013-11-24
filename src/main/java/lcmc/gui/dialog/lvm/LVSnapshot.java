@@ -99,7 +99,7 @@ public final class LVSnapshot extends LV {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        makeDefaultAndRequestFocusLater(sizeWi);
+        makeDefaultAndRequestFocusLater(sizeWi.getComponent());
     }
 
     /** Enables and disabled buttons. */
@@ -187,7 +187,7 @@ public final class LVSnapshot extends LV {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
-        inputPane.add(lvNameWi);
+        inputPane.add(lvNameWi.getComponent());
         inputPane.add(new JLabel());
         lvNameWi.addListeners(new WidgetListener() {
                                   @Override
@@ -212,7 +212,7 @@ public final class LVSnapshot extends LV {
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
-        inputPane.add(sizeWi);
+        inputPane.add(sizeWi.getComponent());
         snapshotButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -258,7 +258,7 @@ public final class LVSnapshot extends LV {
                         Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
-        inputPane.add(maxSizeWi);
+        inputPane.add(maxSizeWi.getComponent());
         inputPane.add(new JLabel());
         sizeWi.addListeners(new WidgetListener() {
                                 @Override

@@ -375,7 +375,7 @@ public class Configuration extends DialogHost {
                                       new AccessMode(ConfigData.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
-            inputPane.add(hostnameField[i]);
+            inputPane.add(hostnameField[i].getComponent());
         }
 
         final JLabel ipLabel = new JLabel(
@@ -397,7 +397,7 @@ public class Configuration extends DialogHost {
                                                !AccessMode.ADVANCED),
                                 Widget.NO_BUTTON);
 
-            inputPane.add(ipCombo[i]);
+            inputPane.add(ipCombo[i].getComponent());
             ipCombo[i].setEnabled(false);
         }
 

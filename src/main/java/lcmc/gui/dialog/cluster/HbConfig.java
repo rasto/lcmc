@@ -733,7 +733,7 @@ final class HbConfig extends DialogCluster {
                 /* timeouts */
                 for (final String option : OPTIONS) {
                     configPanel.add(getComponentPanel(option,
-                                                      optionsW.get(option)));
+                                                      optionsW.get(option).getComponent()));
                 }
                 configPanel.add(new JLabel(" "));
                 if (castAddresses.size() < 2) {
@@ -1288,12 +1288,12 @@ final class HbConfig extends DialogCluster {
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
-        mcast.add(typeW);
-        mcast.add(ifaceW);
-        mcast.add(addrW);
-        mcast.add(serialW);
-        mcast.add(ucastLink1W);
-        mcast.add(ucastLink2W);
+        mcast.add(typeW.getComponent());
+        mcast.add(ifaceW.getComponent());
+        mcast.add(addrW.getComponent());
+        mcast.add(serialW.getComponent());
+        mcast.add(ucastLink1W.getComponent());
+        mcast.add(ucastLink2W.getComponent());
         mcast.add(addButton);
         mcast.setMaximumSize(mcast.getPreferredSize());
         mcast.setAlignmentX(Component.LEFT_ALIGNMENT);

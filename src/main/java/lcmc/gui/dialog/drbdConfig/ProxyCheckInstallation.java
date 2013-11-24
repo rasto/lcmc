@@ -269,7 +269,7 @@ final class ProxyCheckInstallation extends DialogHost {
         pane.add(new JLabel("Proxy"));
         pane.add(proxyLabel);
         pane.add(proxyIcon);
-        pane.add(proxyInstMethodWi);
+        pane.add(proxyInstMethodWi.getComponent());
         pane.add(proxyButton);
 
         SpringUtilities.makeCompactGrid(pane, 1, 5,  //rows, cols

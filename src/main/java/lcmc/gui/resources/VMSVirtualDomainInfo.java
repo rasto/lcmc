@@ -2087,7 +2087,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             wi.setLabel(label, null);
             addField(hostPanel,
                      label,
-                     wi,
+                     wi.getComponent(),
                      ClusterBrowser.SERVICE_LABEL_WIDTH,
                      ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                      0);

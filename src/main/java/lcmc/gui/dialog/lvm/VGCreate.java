@@ -124,7 +124,7 @@ public final class VGCreate extends LV {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        makeDefaultAndRequestFocusLater(vgNameWi);
+        makeDefaultAndRequestFocusLater(vgNameWi.getComponent());
         makeDefaultButton(createButton);
     }
 
@@ -243,7 +243,7 @@ public final class VGCreate extends LV {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("VG Name"));
-        inputPane.add(vgNameWi);
+        inputPane.add(vgNameWi.getComponent());
 
         createButton.addActionListener(new CreateActionListener());
         inputPane.add(createButton);

@@ -22,7 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
-import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.*;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -101,7 +101,7 @@ final class DrbdTest1 {
 
     static void chooseDrbdResourceInterface(final String hostName,
                                             final boolean proxy) {
-        moveTo("on " + hostName, Widget.MComboBox.class); /* interface */
+        moveTo("on " + hostName, MComboBox.class); /* interface */
         leftClick();
         sleep(500);
         if (proxy) {

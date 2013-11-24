@@ -22,6 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
+import java.awt.Component;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -73,7 +74,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        disableComponents(new JComponent[]{drbdTarballCombo});
+        disableComponents(new Component[]{drbdTarballCombo.getComponent()});
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -217,7 +218,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                                       Widget.NO_BUTTON);
 
         //drbdTarballCombo.setEnabled(false);
-        pane.add(drbdTarballCombo);
+        pane.add(drbdTarballCombo.getComponent());
 
         SpringUtilities.makeCompactGrid(pane, 1, 1,  // rows, cols
                                               1, 1,  // initX, initY

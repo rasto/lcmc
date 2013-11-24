@@ -45,7 +45,7 @@ import java.awt.event.ItemEvent;
  * @version $Id$
  *
  */
-public class Checkbox extends Widget {
+public class Checkbox extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -105,7 +105,7 @@ public class Checkbox extends Widget {
     @Override
     protected Value getValueInternal() {
         Value value;
-        final JCheckBox cbox = (JCheckBox) getComponent();
+        final JCheckBox cbox = (JCheckBox) getInternalComponent();
         if (cbox.getSelectedObjects() == null) {
             value = checkBoxFalse;
         } else {
@@ -127,7 +127,7 @@ public class Checkbox extends Widget {
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item != null) {
-            ((JCheckBox) getComponent()).setSelected(item.equals(checkBoxTrue));
+            ((JCheckBox) getInternalComponent()).setSelected(item.equals(checkBoxTrue));
         }
     }
 
@@ -141,13 +141,13 @@ public class Checkbox extends Widget {
     @Override
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
-        ((JCheckBox) getComponent()).addItemListener(getItemListener(wl));
+        ((JCheckBox) getInternalComponent()).addItemListener(getItemListener(wl));
     }
 
     @Override
     protected void setComponentBackground(final Color backgroundColor,
                                           final Color compColor) {
-        getComponent().setBackground(backgroundColor);
+        getInternalComponent().setBackground(backgroundColor);
     }
 
     /** Sets background color. */
@@ -157,7 +157,7 @@ public class Checkbox extends Widget {
             @Override
             public void run() {
                 setBackground(bg);
-                getComponent().setBackground(bg);
+                getInternalComponent().setBackground(bg);
             }
         });
     }
@@ -173,8 +173,8 @@ public class Checkbox extends Widget {
     public void cleanup() {
         getWidgetListeners().clear();
         for (final ItemListener il
-                            : ((JCheckBox) getComponent()).getItemListeners()) {
-            ((JCheckBox) getComponent()).removeItemListener(il);
+                            : ((JCheckBox) getInternalComponent()).getItemListeners()) {
+            ((JCheckBox) getInternalComponent()).removeItemListener(il);
         }
     }
 

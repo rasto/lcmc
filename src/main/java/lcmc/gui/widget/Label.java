@@ -42,7 +42,7 @@ import java.awt.Color;
  * @version $Id$
  *
  */
-public final class Label extends Widget {
+public final class Label extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -79,7 +79,7 @@ public final class Label extends Widget {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        return new StringValue(((JLabel) getComponent()).getText());
+        return new StringValue(((JLabel) getInternalComponent()).getText());
     }
 
     /** Returns whether component is editable or not. */
@@ -91,7 +91,7 @@ public final class Label extends Widget {
     /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        ((JLabel) getComponent()).setText(item.getValueForGui());
+        ((JLabel) getInternalComponent()).setText(item.getValueForGui());
     }
 
     /** Returns document object of the component. */
@@ -109,7 +109,7 @@ public final class Label extends Widget {
     @Override
     protected void setComponentBackground(final Color backgroundColor,
                                           final Color compColor) {
-        getComponent().setBackground(backgroundColor);
+        getInternalComponent().setBackground(backgroundColor);
     }
 
     /** Sets background color. */
@@ -119,7 +119,7 @@ public final class Label extends Widget {
             @Override
             public void run() {
                 setBackground(bg);
-                getComponent().setBackground(bg);
+                getInternalComponent().setBackground(bg);
             }
         });
     }

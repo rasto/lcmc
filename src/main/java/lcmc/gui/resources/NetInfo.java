@@ -109,27 +109,34 @@ public class NetInfo extends Info {
         return (NetInterface) getResource();
     }
 
-    /** Returns whether ips equal. */
-    @Override
-    public boolean equals(final Object value) {
-        if (Tools.isStringClass(value)) {
-            // TODO: race is here
-            final NetInterface ni = getNetInterface();
-            if (value == null) {
-                return false;
-            }
-            if (ni == null) {
-                return false;
-            }
-            final String ip = ni.getIp();
-            if (ip == null) {
-                return false;
-            }
-            return ip.equals(value.toString());
-        } else {
-            return toString().equals(value.toString());
-        }
-    }
+    ///** Returns whether ips equal. */
+    //@Override
+    //public boolean equals(final Object value) {
+    //    if (value == null) {
+    //        return false;
+    //    }
+    //    String vfc = null;
+    //    if (value instanceof lcmc.data.Value) {
+    //        vfc = ((lcmc.data.Value) value).getValueForConfig();
+    //    }
+    //    //if (Tools.isStringClass(value)) {
+    //    //    // TODO: race is here
+    //    //    final NetInterface ni = getNetInterface();
+    //    //    if (value == null) {
+    //    //        return false;
+    //    //    }
+    //    //    if (ni == null) {
+    //    //        return false;
+    //    //    }
+    //    //    final String ip = ni.getIp();
+    //    //    if (ip == null) {
+    //    //        return false;
+    //    //    }
+    //    //    return ip.equals(value.toString());
+    //    //} else {
+    //    //    return toString().equals(value.toString());
+    //    //}
+    //}
 
     /**
      * Whether this interface is localhost.
@@ -138,13 +145,8 @@ public class NetInfo extends Info {
         return "lo".equals(getName());
     }
 
-    //public int hashCode() {
-    //    return toString().hashCode();
-    //}
-
     @Override
-    public int hashCode() {
-        int hash = 3;
-        return hash;
+    public final String getValueForConfig() {
+        return getNetInterface().getIp();
     }
 }

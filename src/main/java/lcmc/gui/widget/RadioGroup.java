@@ -56,7 +56,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id$
  *
  */
-public final class RadioGroup extends Widget {
+public final class RadioGroup extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Value of the radio group. */
@@ -185,7 +185,7 @@ public final class RadioGroup extends Widget {
     /** Sets component visible or invisible. */
     @Override
     protected void setComponentsVisible(final boolean visible) {
-        final JComponent comp = getComponent();
+        final JComponent comp = getInternalComponent();
         final JLabel label = getLabel();
         Tools.invokeLater(new Runnable() {
             @Override
@@ -252,7 +252,7 @@ public final class RadioGroup extends Widget {
     @Override
     protected void setComponentBackground(final Color backgroundColor,
                                           final Color compColor) {
-        getComponent().setBackground(backgroundColor);
+        getInternalComponent().setBackground(backgroundColor);
         mComponentsReadLock.lock();
         try {
             for (final JComponent c : componentsHash.values()) {
@@ -266,7 +266,7 @@ public final class RadioGroup extends Widget {
     /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        final JComponent comp = getComponent();
+        final JComponent comp = getInternalComponent();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {

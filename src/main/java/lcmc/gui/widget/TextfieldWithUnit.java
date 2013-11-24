@@ -60,7 +60,7 @@ import java.util.regex.Matcher;
  * @version $Id$
  *
  */
-public final class TextfieldWithUnit extends Widget {
+public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Array of unit objects. */

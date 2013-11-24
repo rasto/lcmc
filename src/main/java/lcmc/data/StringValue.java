@@ -144,14 +144,14 @@ public final class StringValue implements Value {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof Value)) {
             return false;
         }
-        final StringValue other = (StringValue) obj;
-        if ((this.valueForConfig == null) ? (other.valueForConfig != null) : !this.valueForConfig.equals(other.valueForConfig)) {
+        final Value other = (Value) obj;
+        if ((this.valueForConfig == null) ? (other.getValueForConfig() != null) : !this.valueForConfig.equals(other.getValueForConfig())) {
             return false;
         }
-        if (this.unit != other.unit && (this.unit == null || !this.unit.equals(other.unit))) {
+        if (this.unit != other.getUnit() && (this.unit == null || !this.unit.equals(other.getUnit()))) {
             return false;
         }
         return true;

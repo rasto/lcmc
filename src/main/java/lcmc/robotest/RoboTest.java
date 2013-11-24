@@ -25,7 +25,6 @@ package lcmc.robotest;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.configs.AppDefaults;
-import lcmc.gui.widget.Widget;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.resources.Info;
@@ -49,6 +48,8 @@ import javax.swing.AbstractButton;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -990,7 +991,7 @@ public final class RoboTest {
         final String quorum = cluster.getBrowser()
                     .getClusterStatus().getGlobalParam("no-quorum-policy");
         if (!"ignore".equals(quorum)) {
-            moveTo("No Quorum Policy", Widget.MComboBox.class);
+            moveTo("No Quorum Policy", MComboBox.class);
             leftClick();
             press(KeyEvent.VK_DOWN);
             press(KeyEvent.VK_UP);
@@ -1009,7 +1010,7 @@ public final class RoboTest {
     static void setLocation(final Integer[] events) {
         moveScrollBar(true);
 
-        moveTo("on ", Widget.MComboBox.class);
+        moveTo("on ", MComboBox.class);
         sleep(1000);
         leftClick();
         sleep(1000);
@@ -1054,7 +1055,7 @@ public final class RoboTest {
     static void setTimeouts(final boolean migrateTimeouts) {
         sleep(3000);
         moveScrollBar(true);
-        moveTo("Start / Timeout", Widget.MTextField.class);
+        moveTo("Start / Timeout", MTextField.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_2);
@@ -1064,7 +1065,7 @@ public final class RoboTest {
         press(KeyEvent.VK_0);
         sleep(5000);
 
-        moveTo("Stop / Timeout", Widget.MTextField.class);
+        moveTo("Stop / Timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
         sleep(200);
@@ -1073,7 +1074,7 @@ public final class RoboTest {
         press(KeyEvent.VK_2);
         sleep(5000);
 
-        moveTo("Monitor / Timeout", Widget.MTextField.class);
+        moveTo("Monitor / Timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
         sleep(200);
@@ -1082,7 +1083,7 @@ public final class RoboTest {
         press(KeyEvent.VK_4);
         sleep(5000);
 
-        moveTo("Monitor / Interval", Widget.MTextField.class);
+        moveTo("Monitor / Interval", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
         sleep(200);
@@ -1091,14 +1092,14 @@ public final class RoboTest {
         press(KeyEvent.VK_1);
         sleep(5000);
         if (migrateTimeouts) {
-            moveTo("Reload / Timeout", Widget.MTextField.class);
+            moveTo("Reload / Timeout", MTextField.class);
             leftClick();
             press(KeyEvent.VK_BACK_SPACE);
             sleep(200);
             press(KeyEvent.VK_BACK_SPACE);
             sleep(5000);
 
-            moveTo("Migrate_to / Timeout", Widget.MTextField.class);
+            moveTo("Migrate_to / Timeout", MTextField.class);
             leftClick();
             press(KeyEvent.VK_1);
             sleep(200);
@@ -1107,7 +1108,7 @@ public final class RoboTest {
             press(KeyEvent.VK_3);
             sleep(5000);
 
-            moveTo("Migrate_from / T", Widget.MTextField.class);
+            moveTo("Migrate_from / T", MTextField.class);
             leftClick();
             press(KeyEvent.VK_1);
             sleep(200);
@@ -1258,7 +1259,7 @@ public final class RoboTest {
         sleep(1000);
         leftClick(); /* select */
 
-        moveTo("Target Role", Widget.MComboBox.class);
+        moveTo("Target Role", MComboBox.class);
         sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);

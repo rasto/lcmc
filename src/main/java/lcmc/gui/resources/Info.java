@@ -285,6 +285,32 @@ public class Info implements Comparable<Info>, Value {
         return null;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
+        hash = 59 * hash + (this.getUnit() != null ? this.getUnit().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Value)) {
+            return false;
+        }
+        final Value other = (Value) obj;
+        if ((this.getValueForConfig() == null) ? (other.getValueForConfig() != null) : !this.getValueForConfig().equals(other.getValueForConfig())) {
+            return false;
+        }
+        if (this.getUnit() != other.getUnit() && (this.getUnit() == null || !this.getUnit().equals(other.getUnit()))) {
+            return false;
+        }
+        return true;
+    }
+
     ///**
     // * Returns whether two info objects are equal.
     // */
@@ -292,14 +318,7 @@ public class Info implements Comparable<Info>, Value {
     //    if (value == null) {
     //        return false;
     //    }
-    //    if (Tools.isStringClass(value)) {
-    //        return name.equals(value.toString());
-    //    } else {
-    //        if (toString() == null) {
-    //            return false;
-    //        }
-    //        return toString().equals(value.toString());
-    //    }
+    //    return toString().equals(value.toString());
     //}
 
     //public int hashCode() {
@@ -1205,10 +1224,9 @@ public class Info implements Comparable<Info>, Value {
             c.setEditable(accessible);
         }
     }
-    
-    
-       @Override
-    public final String getValueForConfig() {
+ 
+    @Override
+    public String getValueForConfig() {
         return name;
     }
 

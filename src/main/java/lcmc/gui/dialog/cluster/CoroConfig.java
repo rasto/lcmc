@@ -178,9 +178,10 @@ final class CoroConfig extends DialogCluster {
                                 for (AisCastAddress ca : aisCastAddresses) {
                                     config.append('\n');
                                     config.append(ca.getConfigString(
-                                                                ringnumber++,
+                                                                ringnumber,
                                                                 "\t"));
                                     config.append('\n');
+                                    ringnumber++;
                                 }
                                 config.append("}\n");
                                 final String serviceVersion =
@@ -591,8 +592,9 @@ final class CoroConfig extends DialogCluster {
                 for (final AisCastAddress c : aisCastAddresses) {
                     configPanel.add(new JLabel(""));
                     final String[] interfaceLines =
-                                c.getConfigString(ringnumber++,
+                                c.getConfigString(ringnumber,
                                                   SPACE_TAB).split(NEWLINE);
+                    ringnumber++;
                     boolean firstLine = true;
                     for (final String interfaceLine : interfaceLines) {
                         if (firstLine) {
@@ -1105,10 +1107,10 @@ final class CoroConfig extends DialogCluster {
         mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
-        mcast.add(typeW);
-        mcast.add(ifaceW);
-        mcast.add(addrW);
-        mcast.add(portW);
+        mcast.add(typeW.getComponent());
+        mcast.add(ifaceW.getComponent());
+        mcast.add(addrW.getComponent());
+        mcast.add(portW.getComponent());
         mcast.add(addButton);
         mcast.setPreferredSize(mcast.getMinimumSize());
         mcast.setAlignmentX(Component.LEFT_ALIGNMENT);

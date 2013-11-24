@@ -534,7 +534,7 @@ public class ServiceInfo extends EditableInfo {
                 if (!visible && !prevWi.getStringValue().isEmpty()) {
                     visible = true;
                 }
-                if (wi != null && wi.isVisible() != visible) {
+                if (wi != null && wi.getComponent().isVisible() != visible) {
                     final boolean v = visible;
                     final Widget c = wi;
                     c.setVisible(v);
@@ -1127,7 +1127,7 @@ public class ServiceInfo extends EditableInfo {
         String fcString = "";
         final String failCount = getFailCount(hostName, testOnly);
         if (failCount != null) {
-            if (CRMXML.INFINITY_STRING.equals(failCount)) {
+            if (CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount)) {
                 fcString = " failed";
             } else {
                 fcString = " failed: " + failCount;
@@ -1706,7 +1706,7 @@ public class ServiceInfo extends EditableInfo {
             wi.setLabel(label, text);
             addField(panel,
                      label,
-                     wi,
+                     wi.getComponent(),
                      leftWidth,
                      rightWidth,
                      0);
@@ -1745,7 +1745,7 @@ public class ServiceInfo extends EditableInfo {
                          new AccessMode(ConfigData.AccessType.ADMIN,
                                         false),
                          Widget.NO_BUTTON);
-        addField(panel, pingLabel, pingWi, leftWidth, rightWidth, 0);
+        addField(panel, pingLabel, pingWi.getComponent(), leftWidth, rightWidth, 0);
         pingWi.setLabel(pingLabel,
                         Tools.getString("ServiceInfo.PingdToolTip"));
         if (resourceAgent.isPingService() && savedPingOperation == null) {
@@ -2061,7 +2061,7 @@ public class ServiceInfo extends EditableInfo {
         saPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         addField(saPanel,
                  label,
-                 sameAsOperationsWi,
+                 sameAsOperationsWi.getComponent(),
                  leftWidth,
                  rightWidth,
                  0);
@@ -2168,7 +2168,7 @@ public class ServiceInfo extends EditableInfo {
                 }
                 addField(panel,
                          wiLabel,
-                         wi,
+                         wi.getComponent(),
                          leftWidth,
                          rightWidth,
                          0);
@@ -2886,7 +2886,7 @@ public class ServiceInfo extends EditableInfo {
             final JPanel tp = new JPanel();
             tp.setBackground(ClusterBrowser.PANEL_BACKGROUND);
             tp.setLayout(new BoxLayout(tp, BoxLayout.Y_AXIS));
-            tp.add(typeRadioGroup);
+            tp.add(typeRadioGroup.getComponent());
             typeRadioGroup.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             optionsPanel.add(tp);
         }

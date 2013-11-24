@@ -38,7 +38,6 @@ import lcmc.gui.SpringUtilities;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JComponent;
 import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
@@ -55,6 +54,7 @@ import java.util.regex.Matcher;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import org.apache.commons.collections15.map.MultiKeyMap;
@@ -232,8 +232,8 @@ public abstract class EditableInfo extends Info {
      * with spring layout for this.
      */
     public final void addField(final JPanel panel,
-                               final JComponent left,
-                               final JComponent right,
+                               final Component left,
+                               final Component right,
                                final int leftWidth,
                                final int rightWidth,
                                int height) {
@@ -396,7 +396,7 @@ public abstract class EditableInfo extends Info {
             if (paramWi instanceof Label) {
                 height = Tools.getDefaultSize("Browser.LabelFieldHeight");
             }
-            addField(panel, label, paramWi, leftWidth, rightWidth, height);
+            addField(panel, label, paramWi.getComponent(), leftWidth, rightWidth, height);
         }
         final boolean wizard = Widget.WIZARD_PREFIX.equals(prefix);
         for (final String param : params) {
@@ -480,7 +480,7 @@ public abstract class EditableInfo extends Info {
                         sameAsCombo.setLabel(label, "");
                         addField(saPanel,
                                  label,
-                                 sameAsCombo,
+                                 sameAsCombo.getComponent(),
                                  leftWidth,
                                  rightWidth,
                                  0);

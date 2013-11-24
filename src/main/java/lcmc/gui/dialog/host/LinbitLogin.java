@@ -180,8 +180,8 @@ public class LinbitLogin extends DialogHost {
                                        Widget.NO_BUTTON);
 
         addCheckField(downloadUserField);
-        userLabel.setLabelFor(downloadUserField);
-        inputPane.add(downloadUserField);
+        userLabel.setLabelFor(downloadUserField.getComponent());
+        inputPane.add(downloadUserField.getComponent());
 
         /* password */
         final JLabel passwordLabel = new JLabel(
@@ -200,8 +200,8 @@ public class LinbitLogin extends DialogHost {
                                   Widget.NO_BUTTON);
 
         addCheckField(downloadPasswordField);
-        passwordLabel.setLabelFor(downloadPasswordField);
-        inputPane.add(downloadPasswordField);
+        passwordLabel.setLabelFor(downloadPasswordField.getComponent());
+        inputPane.add(downloadPasswordField.getComponent());
 
         /* save */
         final JLabel saveLabel = new JLabel("");

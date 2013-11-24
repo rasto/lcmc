@@ -22,10 +22,10 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
 import java.awt.event.KeyEvent;
+import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.gui.widget.Widget;
 
 /**
  * This class is used to test the GUI.
@@ -63,7 +63,7 @@ final class PcmkTestH {
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(200);
-        moveTo("Target Role", Widget.MComboBox.class);
+        moveTo("Target Role", MComboBox.class);
         sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);

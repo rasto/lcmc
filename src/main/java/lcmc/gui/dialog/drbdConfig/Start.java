@@ -177,7 +177,7 @@ public final class Start extends WizardDialog {
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(drbdResourceLabel);
-        inputPane.add(drbdResourceWi);
+        inputPane.add(drbdResourceWi.getComponent());
         SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad

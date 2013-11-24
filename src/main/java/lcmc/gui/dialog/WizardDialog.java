@@ -29,6 +29,7 @@ import lcmc.utilities.CancelCallback;
 import lcmc.gui.ProgressBar;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
@@ -243,7 +244,7 @@ public abstract class WizardDialog extends ConfigDialog {
     }
 
     /** Requests focus. */
-    protected final void makeDefaultAndRequestFocus(final JComponent b) {
+    protected final void makeDefaultAndRequestFocus(final Component b) {
         if (b instanceof JButton) {
             getDialogPanel().getRootPane().setDefaultButton((JButton) b);
         }
@@ -251,7 +252,7 @@ public abstract class WizardDialog extends ConfigDialog {
     }
 
     /** Requests focus in the swing thread. */
-    protected final void makeDefaultAndRequestFocusLater(final JComponent b) {
+    protected final void makeDefaultAndRequestFocusLater(final Component b) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {

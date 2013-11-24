@@ -847,8 +847,8 @@ public class Init extends DialogCluster {
         }
         useOpenaisButton.setEnabled(false);
         useOpenaisButton.setBackgroundColor(Color.WHITE);
-        useOpenaisButton.setMaximumSize(useOpenaisButton.getMinimumSize());
-        p.add(useOpenaisButton);
+        useOpenaisButton.getComponent().setMaximumSize(useOpenaisButton.getComponent().getMinimumSize());
+        p.add(useOpenaisButton.getComponent());
         p.add(s);
         return p;
     }

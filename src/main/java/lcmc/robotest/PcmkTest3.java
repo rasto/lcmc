@@ -21,8 +21,9 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
-import lcmc.gui.widget.Widget;
 import java.awt.event.KeyEvent;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -60,7 +61,7 @@ final class PcmkTest3 {
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
 
-            moveTo("block device", Widget.MComboBox.class); /* choose drbd */
+            moveTo("block device", MComboBox.class); /* choose drbd */
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -69,7 +70,7 @@ final class PcmkTest3 {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", Widget.MComboBox.class);
+            moveTo("mount point", MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -78,7 +79,7 @@ final class PcmkTest3 {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", Widget.MComboBox.class);
+            moveTo("filesystem type", MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_E);
@@ -107,14 +108,14 @@ final class PcmkTest3 {
             leftClick(); /* choose fs */
 
             checkTest(testName, 4);
-            moveTo("Name", Widget.MTextField.class);
+            moveTo("Name", MTextField.class);
             leftClick();
             press(KeyEvent.VK_X);
             sleep(200);
             press(KeyEvent.VK_Y);
             sleep(200);
 
-            moveTo("block device", Widget.MComboBox.class); /* choose drbd */
+            moveTo("block device", MComboBox.class); /* choose drbd */
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -123,7 +124,7 @@ final class PcmkTest3 {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", Widget.MComboBox.class);
+            moveTo("mount point", MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_DOWN);
@@ -132,7 +133,7 @@ final class PcmkTest3 {
             sleep(200);
             press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", Widget.MComboBox.class);
+            moveTo("filesystem type", MComboBox.class);
             leftClick();
             sleep(2000);
             press(KeyEvent.VK_E);

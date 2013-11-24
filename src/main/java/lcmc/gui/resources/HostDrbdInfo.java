@@ -229,19 +229,19 @@ public final class HostDrbdInfo extends Info {
     }
 
 
-    /**
-     * Compares this host info name with specified hostdrbdinfo's name.
-     *
-     * @param otherHI
-     *              other host info
-     * @return true if they are equal
-     */
-    boolean equals(final HostDrbdInfo otherHI) {
-        if (otherHI == null) {
-            return false;
-        }
-        return otherHI.toString().equals(host.getName());
-    }
+    ///**
+    // * Compares this host info name with specified hostdrbdinfo's name.
+    // *
+    // * @param otherHI
+    // *              other host info
+    // * @return true if they are equal
+    // */
+    //boolean equals(final HostDrbdInfo otherHI) {
+    //    if (otherHI == null) {
+    //        return false;
+    //    }
+    //    return otherHI.toString().equals(host.getName());
+    //}
 
     /** Returns string representation of the host. It's same as name. */
     @Override
@@ -1073,5 +1073,10 @@ public final class HostDrbdInfo extends Info {
     private String getMenuToolTip(final String cmd, final String res) {
         return getHost().getDistString(cmd).replaceAll("@RES-VOL@", res)
                                            .replaceAll("@.*?@", "");
+    }
+
+    @Override
+    public String getValueForConfig() {
+        return host.getName();
     }
 }

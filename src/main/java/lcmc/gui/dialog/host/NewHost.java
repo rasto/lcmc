@@ -302,8 +302,8 @@ public class NewHost extends DialogHost {
         }
 
         addCheckField(hostField);
-        hostLabel.setLabelFor(hostField);
-        inputPane.add(hostField);
+        hostLabel.setLabelFor(hostField.getComponent());
+        inputPane.add(hostField.getComponent());
         hostField.setBackground(new StringValue(getHost().getHostnameEntered()),
                                 new StringValue(getHost().getHostnameEntered()),
                                 true);
@@ -331,8 +331,8 @@ public class NewHost extends DialogHost {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         addCheckField(sshPortField);
-        sshPortLabel.setLabelFor(sshPortField);
-        inputPane.add(sshPortField);
+        sshPortLabel.setLabelFor(sshPortField.getComponent());
+        inputPane.add(sshPortField.getComponent());
         sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
                                    new StringValue(getHost().getSSHPort()),
                                    true);
@@ -368,8 +368,8 @@ public class NewHost extends DialogHost {
                                    Widget.NO_BUTTON);
         usernameField.setEditable(true);
         addCheckField(usernameField);
-        usernameLabel.setLabelFor(usernameField);
-        inputPane.add(usernameField);
+        usernameLabel.setLabelFor(usernameField.getComponent());
+        inputPane.add(usernameField.getComponent());
         usernameField.setBackground(new StringValue(getHost().getUsername()),
                                     new StringValue(getHost().getUsername()),
                                     true);
@@ -398,8 +398,8 @@ public class NewHost extends DialogHost {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         //addCheckField(useSudoField);
-        useSudoLabel.setLabelFor(useSudoField);
-        inputPane.add(useSudoField);
+        useSudoLabel.setLabelFor(useSudoField.getComponent());
+        inputPane.add(useSudoField.getComponent());
         useSudoField.setBackground(useSudoValue,
                                    useSudoValue,
                                    true);

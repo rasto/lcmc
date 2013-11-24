@@ -428,7 +428,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_BUTTON);
 
         drbdDistCombo.setEnabled(false);
-        pane.add(drbdDistCombo);
+        pane.add(drbdDistCombo.getComponent());
         drbdKernelDirCombo = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
@@ -441,7 +441,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_BUTTON);
 
         drbdKernelDirCombo.setEnabled(false);
-        pane.add(drbdKernelDirCombo);
+        pane.add(drbdKernelDirCombo.getComponent());
         drbdArchCombo = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
@@ -454,7 +454,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_BUTTON);
 
         drbdArchCombo.setEnabled(false);
-        pane.add(drbdArchCombo);
+        pane.add(drbdArchCombo.getComponent());
         pane.add(Box.createHorizontalGlue());
         pane.add(Box.createRigidArea(new Dimension(10, 0)));
         return pane;

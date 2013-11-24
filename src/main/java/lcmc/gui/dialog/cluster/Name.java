@@ -181,8 +181,8 @@ public final class Name extends DialogCluster {
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         addCheckField(nameField);
-        nameLabel.setLabelFor(nameField);
-        pane.add(nameField);
+        nameLabel.setLabelFor(nameField.getComponent());
+        pane.add(nameField.getComponent());
 
         SpringUtilities.makeCompactGrid(pane, 1, 2,  // rows, cols
                                               1, 1,  // initX, initY

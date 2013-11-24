@@ -23,7 +23,7 @@ package lcmc.robotest;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
-import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.GenericWidget.MTextField;
 import static lcmc.robotest.RoboTest.*;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -54,7 +54,7 @@ final class VMTest4 {
             sleep(500);
             leftClick();
             sleep(1000);
-            moveTo("Domain name", Widget.MTextField.class);
+            moveTo("Domain name", MTextField.class);
             final Point2D p = getAppPosition();
             if (!isColor((int) p.getX(),
                          (int) p.getY(),

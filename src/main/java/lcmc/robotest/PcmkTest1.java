@@ -22,10 +22,11 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.*;
 import lcmc.Exceptions;
-import lcmc.gui.widget.Widget;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -143,7 +144,7 @@ final class PcmkTest1 {
         moveTo("IPaddr2");
         leftClick();
 
-        moveTo("IPv4 address", Widget.MComboBox.class);
+        moveTo("IPv4 address", MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN);
@@ -161,7 +162,7 @@ final class PcmkTest1 {
         /* CIDR netmask 24 */
         sleep(10000);
 
-        moveTo("CIDR netmask", Widget.MTextField.class); /* CIDR */
+        moveTo("CIDR netmask", MTextField.class); /* CIDR */
         sleep(3000);
         leftClick();
         sleep(2000);
@@ -178,7 +179,7 @@ final class PcmkTest1 {
 
         /* pingd */
         moveScrollBar(true);
-        moveTo("pingd", Widget.MComboBox.class);
+        moveTo("pingd", MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN); /* no ping */
@@ -193,7 +194,7 @@ final class PcmkTest1 {
         sleep(2000);
         checkTest(testName, 2.1); /* 2.1 */
 
-        moveTo("pingd", Widget.MComboBox.class);
+        moveTo("pingd", MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_UP); /* no ping */
@@ -361,7 +362,7 @@ final class PcmkTest1 {
             sleep(1000);
             moveTo(Tools.getString("ClusterBrowser.SameAs"),
                    2,
-                   Widget.MComboBox.class);
+                   MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -379,7 +380,7 @@ final class PcmkTest1 {
 
             moveTo(Tools.getString("ClusterBrowser.SameAs"),
                    2,
-                   Widget.MComboBox.class);
+                   MComboBox.class);
             sleep(2000);
             leftClick();
             sleep(1000);
@@ -682,7 +683,7 @@ final class PcmkTest1 {
         checkTest(testName, 11.9);
         sleep(3000);
         /* set clone max to 1 */
-        moveTo("Clone Max", Widget.MComboBox.class);
+        moveTo("Clone Max", MComboBox.class);
         sleep(3000);
         leftClick();
         sleep(3000);

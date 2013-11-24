@@ -76,7 +76,7 @@ public final class Passwdfield extends Textfield {
     @Override
     protected Value getValueInternal() {
         final Value value =
-             new StringValue(new String(((JPasswordField) getComponent()).getPassword()));
+             new StringValue(new String(((JPasswordField) getInternalComponent()).getPassword()));
         if (value.isNothingSelected()) {
             return null;
         }
@@ -86,24 +86,24 @@ public final class Passwdfield extends Textfield {
     /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        ((JPasswordField) getComponent()).setText(item.getValueForConfig());
+        ((JPasswordField) getInternalComponent()).setText(item.getValueForConfig());
     }
 
     /** Returns document object of the component. */
     @Override
     public Document getDocument() {
-        return ((JPasswordField) getComponent()).getDocument();
+        return ((JPasswordField) getInternalComponent()).getDocument();
     }
 
     /** Requests focus if applicable. */
     @Override
     public void requestFocus() {
-        ((JPasswordField) getComponent()).requestFocus();
+        ((JPasswordField) getInternalComponent()).requestFocus();
     }
 
     /** Selects the whole text in the widget if applicable. */
     @Override
     void selectAll() {
-        ((JPasswordField) getComponent()).selectAll();
+        ((JPasswordField) getInternalComponent()).selectAll();
     }
 }

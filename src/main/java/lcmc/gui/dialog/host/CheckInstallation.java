@@ -549,17 +549,17 @@ final class CheckInstallation extends DialogHost {
         pane.add(hbPmJLabel);
         pane.add(hbPmLabel);
         pane.add(hbPmIcon);
-        pane.add(hbPmInstMethodWi);
+        pane.add(hbPmInstMethodWi.getComponent());
         pane.add(hbPmButton);
         pane.add(pmJLabel);
         pane.add(pmLabel);
         pane.add(pmIcon);
-        pane.add(pmInstMethodWi);
+        pane.add(pmInstMethodWi.getComponent());
         pane.add(pmButton);
         pane.add(new JLabel("Drbd"));
         pane.add(drbdLabel);
         pane.add(drbdIcon);
-        pane.add(drbdInstMethodWi);
+        pane.add(drbdInstMethodWi.getComponent());
         pane.add(drbdButton);
 
         SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols

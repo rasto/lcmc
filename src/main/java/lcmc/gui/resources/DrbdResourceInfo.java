@@ -1392,7 +1392,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             wi.setLabel(label, addr);
             addField(panel,
                      label,
-                     wi,
+                     wi.getComponent(),
                      leftWidth,
                      rightWidth,
                      0);
@@ -1426,7 +1426,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final JLabel label = new JLabel(port);
         addField(panel,
                  label,
-                 pwi,
+                 pwi.getComponent(),
                  leftWidth,
                  rightWidth,
                  0);
@@ -1528,7 +1528,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                   Tools.getString("DrbdResourceInfo.ProxyInsidePort.ToolTip"));
         addField(panel,
                  insidePortLabel,
-                 insidePortWi,
+                 insidePortWi.getComponent(),
                  leftWidth,
                  rightWidth,
                  0);
@@ -1572,7 +1572,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                  Tools.getString("DrbdResourceInfo.ProxyOutsidePort.ToolTip"));
         addField(panel,
                  outsidePortLabel,
-                 outsidePortWi,
+                 outsidePortWi.getComponent(),
                  leftWidth,
                  rightWidth,
                  0);
@@ -1635,7 +1635,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final JPanel panel = new JPanel();
             addField(panel,
                      insideIpLabel,
-                     iIpWi,
+                     iIpWi.getComponent(),
                      leftWidth,
                      rightWidth,
                      0);
@@ -1664,7 +1664,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                    Tools.getString("DrbdResourceInfo.ProxyOutsideIp.ToolTip"));
             addField(panel,
                      outsideIpLabel,
-                     oIpWi,
+                     oIpWi.getComponent(),
                      leftWidth,
                      rightWidth,
                      0);

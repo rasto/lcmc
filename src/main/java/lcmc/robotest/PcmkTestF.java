@@ -22,7 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
-import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
@@ -93,7 +93,7 @@ final class PcmkTestF {
         }
         checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo("Resource Stickiness", Widget.MComboBox.class);
+        moveTo("Resource Stickiness", MComboBox.class);
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);

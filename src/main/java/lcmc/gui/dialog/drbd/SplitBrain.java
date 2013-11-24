@@ -181,7 +181,7 @@ public final class SplitBrain extends DrbdConfig {
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(hostLabel);
-        inputPane.add(hostWi);
+        inputPane.add(hostWi.getComponent());
         resolveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

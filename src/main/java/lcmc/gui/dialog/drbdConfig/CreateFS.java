@@ -323,7 +323,7 @@ final class CreateFS extends DrbdConfig {
                                 }
                             });
         inputPane.add(hostLabel);
-        inputPane.add(hostW);
+        inputPane.add(hostW.getComponent());
         inputPane.add(new JLabel(""));
 
         /* Filesystem */
@@ -348,7 +348,7 @@ final class CreateFS extends DrbdConfig {
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
         inputPane.add(filesystemLabel);
-        inputPane.add(filesystemW);
+        inputPane.add(filesystemW.getComponent());
         filesystemW.addListeners(new WidgetListener() {
                             @Override
                             public void check(final Object value) {
@@ -389,7 +389,7 @@ final class CreateFS extends DrbdConfig {
         skipSyncW.setBackgroundColor(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         inputPane.add(skipSyncLabel);
-        inputPane.add(skipSyncW);
+        inputPane.add(skipSyncW.getComponent());
         inputPane.add(new JLabel(""));
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 3,  // rows, cols

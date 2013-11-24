@@ -22,6 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
+import java.awt.Component;
 import lcmc.data.Host;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
@@ -80,7 +81,8 @@ public class DrbdAvailFiles extends DialogHost {
         listenersAdded = false;
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
-        disableComponents(new JComponent[]{drbdVersionCombo, drbdBuildCombo});
+        disableComponents(new Component[]{drbdVersionCombo.getComponent(),
+                                          drbdBuildCombo.getComponent()});
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -284,7 +286,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       new AccessMode(ConfigData.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
-        pane.add(drbdVersionCombo);
+        pane.add(drbdVersionCombo.getComponent());
 
         /* build combo box */
         drbdBuildCombo = WidgetFactory.createInstance(
@@ -298,7 +300,7 @@ public class DrbdAvailFiles extends DialogHost {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
-        pane.add(drbdBuildCombo);
+        pane.add(drbdBuildCombo.getComponent());
 
         SpringUtilities.makeCompactGrid(pane, 1, 2,  // rows, cols
                                               1, 1,  // initX, initY
@@ -315,7 +317,7 @@ public class DrbdAvailFiles extends DialogHost {
                 public void check(final Object value) {
                     enableComponentsLater(
                             new JComponent[]{buttonClass(nextButton())});
-                    disableComponents(new JComponent[]{drbdBuildCombo});
+                    disableComponents(new Component[]{drbdBuildCombo.getComponent()});
                     final String item = drbdVersionCombo.getStringValue();
                     Tools.invokeLater(
                         new Runnable() {

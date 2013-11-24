@@ -23,7 +23,8 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import lcmc.Exceptions;
 import lcmc.data.Cluster;
-import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.GenericWidget.MTextField;
+import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.*;
 import static lcmc.robotest.DrbdTest1.*;
 import lcmc.utilities.Logger;
@@ -66,14 +67,14 @@ final class DrbdTest8 {
             robot.mouseWheel(70);
 
             moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
-                   Widget.MComboBox.class); /* outside */
+                   MComboBox.class); /* outside */
             leftClick();
             sleep(500);
             press(KeyEvent.VK_E);
             sleep(500);
             press(KeyEvent.VK_ENTER);
 
-            moveTo(Widget.MComboBox.class, 8); /* outside */
+            moveTo(MComboBox.class, 8); /* outside */
             leftClick();
             sleep(500);
             press(KeyEvent.VK_E);
@@ -131,14 +132,14 @@ final class DrbdTest8 {
         moveTo(900, 300);
         robot.mouseWheel(100);
 
-        moveTo("Protocol", Widget.MComboBox.class);
+        moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol b */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", Widget.MComboBox.class);
+        moveTo("Fence peer", MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -149,20 +150,20 @@ final class DrbdTest8 {
         sleep(2000);
         Tools.getGUIData().expandTerminalSplitPane(1);
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
         press(KeyEvent.VK_9);
         sleep(2000);
 
-        moveTo("Max buffers", Widget.MTextField.class);
+        moveTo("Max buffers", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(1000);
-        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
+        moveTo("Max buffers", MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_DOWN);
@@ -175,9 +176,9 @@ final class DrbdTest8 {
         final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
             if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
-                moveTo("After", Widget.MComboBox.class);
+                moveTo("After", MComboBox.class);
             } else {
-                moveTo("after", Widget.MComboBox.class);
+                moveTo("after", MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
@@ -205,7 +206,7 @@ final class DrbdTest8 {
         sleep(2000);
         leftClick();
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
@@ -219,7 +220,7 @@ final class DrbdTest8 {
         leftClick();
         sleep(10000);
         checkDRBDTest(drbdTest, 2.11); /* 2.11 */
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         sleep(6000);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
@@ -242,14 +243,14 @@ final class DrbdTest8 {
         moveTo(900, 300);
         robot.mouseWheel(100);
 
-        moveTo("Protocol", Widget.MComboBox.class);
+        moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol a */
         sleep(200);
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Fence peer", Widget.MComboBox.class);
+        moveTo("Fence peer", MComboBox.class);
         leftClick();
         sleep(2000);
         press(KeyEvent.VK_DOWN);
@@ -259,14 +260,14 @@ final class DrbdTest8 {
         press(KeyEvent.VK_ENTER);
         sleep(2000);
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);
         press(KeyEvent.VK_5);
         sleep(2000);
 
-        moveTo("Max buffers", Widget.MTextField.class);
+        moveTo("Max buffers", MTextField.class);
         leftClick();
         sleep(1000);
         leftClick();
@@ -281,7 +282,7 @@ final class DrbdTest8 {
         sleep(500);
         press(KeyEvent.VK_8);
         sleep(500);
-        moveTo("Max buffers", Widget.MComboBox.class); /* Unit */
+        moveTo("Max buffers", MComboBox.class); /* Unit */
         leftClick();
         sleep(1000);
         press(KeyEvent.VK_UP);
@@ -292,9 +293,9 @@ final class DrbdTest8 {
         moveScrollBar(true);
         try {
             if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
-                moveTo("After", Widget.MComboBox.class);
+                moveTo("After", MComboBox.class);
             } else {
-                moveTo("after", Widget.MComboBox.class);
+                moveTo("after", MComboBox.class);
             }
         } catch (Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
@@ -315,7 +316,7 @@ final class DrbdTest8 {
         leftClick();
         checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
-        moveTo("Wfc timeout", Widget.MTextField.class);
+        moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
         sleep(1000);

@@ -265,7 +265,7 @@ final class CommStack extends DialogCluster {
         chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);
         inputPane.add(getProgressBarPane(null));
-        inputPane.add(chooseStackCombo);
+        inputPane.add(chooseStackCombo.getComponent());
         SpringUtilities.makeCompactGrid(inputPane, 2, 1,  // rows, cols
                                                    0, 0,  // initX, initY
                                                    0, 0); // xPad, yPad

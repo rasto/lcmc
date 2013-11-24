@@ -177,10 +177,10 @@ public final class DrbdXML extends XML {
     /** Ping timeout parameter. */
     public static final String PING_TIMEOUT_PARAM = "ping-timeout";
     /** DRBD communication protocols. */
-    static final StringInfo[] PROTOCOLS =
-        {new StringInfo(PROTOCOL_A,             "A", null),
-         new StringInfo("B / Semi-Synchronous", "B", null),
-         new StringInfo(PROTOCOL_C,             "C", null)};
+    static final Value[] PROTOCOLS =
+        {new StringValue("A", PROTOCOL_A),
+         new StringValue("B", "B / Semi-Synchronous"),
+         new StringValue("C", PROTOCOL_C)};
     /** Some non advanced parameters. */
     static final List<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
     static {
@@ -447,7 +447,7 @@ public final class DrbdXML extends XML {
             }
         }
 
-        if (value.isNothingSelected()) {
+        if (value == null || value.isNothingSelected()) {
             if (isRequired(param)) {
                 correctValue = false;
             } else {

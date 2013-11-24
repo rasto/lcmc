@@ -44,7 +44,7 @@ import java.util.Map;
  * @version $Id$
  *
  */
-public class Textfield extends Widget {
+public class Textfield extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
@@ -93,7 +93,7 @@ public class Textfield extends Widget {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        final Value value = new StringValue(((MTextField) getComponent()).getText());
+        final Value value = new StringValue(((MTextField) getInternalComponent()).getText());
         if (value.isNothingSelected()) {
             return null;
         }
@@ -110,16 +110,16 @@ public class Textfield extends Widget {
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item == null) {
-            ((MTextField) getComponent()).setText(null);
+            ((MTextField) getInternalComponent()).setText(null);
         } else {
-            ((MTextField) getComponent()).setText(item.getValueForConfig());
+            ((MTextField) getInternalComponent()).setText(item.getValueForConfig());
         }
     }
 
     /** Returns document object of the component. */
     @Override
     public Document getDocument() {
-        return ((MTextField) getComponent()).getDocument();
+        return ((MTextField) getInternalComponent()).getDocument();
     }
 
     /** Adds item listener to the component. */
@@ -132,19 +132,19 @@ public class Textfield extends Widget {
     @Override
     protected void setComponentBackground(final Color backgroundColor,
                                           final Color compColor) {
-        getComponent().setBackground(compColor);
+        getInternalComponent().setBackground(compColor);
     }
 
     /** Requests focus if applicable. */
     @Override
     public void requestFocus() {
-        ((MTextField) getComponent()).requestFocus();
+        ((MTextField) getInternalComponent()).requestFocus();
     }
 
     /** Selects the whole text in the widget if applicable. */
     @Override
     void selectAll() {
-        ((MTextField) getComponent()).selectAll();
+        ((MTextField) getInternalComponent()).selectAll();
     }
 
     /** Sets background color. */
@@ -154,7 +154,7 @@ public class Textfield extends Widget {
             @Override
             public void run() {
                 setBackground(bg);
-                getComponent().setBackground(bg);
+                getInternalComponent().setBackground(bg);
             }
         });
     }

@@ -1631,7 +1631,7 @@ public final class CRMXML extends XML {
             if (!m.matches()) {
                 correctValue = false;
             }
-        } else if (value.isNothingSelected() && required) {
+        } else if ((value == null || value.isNothingSelected()) && required) {
             correctValue = false;
         }
         return correctValue;

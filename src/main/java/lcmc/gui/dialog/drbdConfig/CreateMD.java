@@ -338,7 +338,7 @@ final class CreateMD extends DrbdConfig {
         }
 
         inputPane.add(metadataLabel);
-        inputPane.add(metadataWi);
+        inputPane.add(metadataWi.getComponent());
         metadataWi.addListeners(
             new WidgetListener() {
                 @Override

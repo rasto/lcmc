@@ -131,7 +131,7 @@ public final class LVResize extends LV {
     protected void initDialogAfterVisible() {
         enableComponents();
         if (checkDRBD()) {
-            makeDefaultAndRequestFocusLater(sizeWi);
+            makeDefaultAndRequestFocusLater(sizeWi.getComponent());
         }
     }
 
@@ -237,7 +237,7 @@ public final class LVResize extends LV {
                       Widget.NO_BUTTON);
         oldSizeWi.setEnabled(false);
         inputPane.add(oldSizeLabel);
-        inputPane.add(oldSizeWi);
+        inputPane.add(oldSizeWi.getComponent());
         inputPane.add(new JLabel());
 
         final String maxBlockSize = getMaxBlockSize();
@@ -257,7 +257,7 @@ public final class LVResize extends LV {
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
-        inputPane.add(sizeWi);
+        inputPane.add(sizeWi.getComponent());
         resizeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -308,7 +308,7 @@ public final class LVResize extends LV {
                        Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
-        inputPane.add(maxSizeWi);
+        inputPane.add(maxSizeWi.getComponent());
         inputPane.add(new JLabel());
         sizeWi.addListeners(new WidgetListener() {
                                 @Override
