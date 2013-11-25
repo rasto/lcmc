@@ -50,7 +50,6 @@ import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.ServicesInfo;
 import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.resources.GroupInfo;
-import lcmc.gui.resources.StringInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.NetworkInfo;
 import lcmc.gui.resources.DrbdInfo;
@@ -99,6 +98,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -2361,18 +2362,18 @@ public final class ClusterBrowser extends Browser {
     }
 
     /**
-     * Returns common file systems on all nodes as StringInfo array.
+     * Returns common file systems on all nodes as StringValue array.
      * The defaultValue is stored as the first item in the array.
      */
-    public StringInfo[] getCommonFileSystems(final String defaultValue) {
-        StringInfo[] cfs =  new StringInfo[commonFileSystems.length + 2];
-        cfs[0] = new StringInfo(defaultValue, null, this);
+    public Value[] getCommonFileSystems(final String defaultValue) {
+        Value[] cfs =  new Value[commonFileSystems.length + 2];
+        cfs[0] = new StringValue(null, defaultValue);
         int i = 1;
         for (String cf : commonFileSystems) {
-            cfs[i] = new StringInfo(cf, cf, this);
+            cfs[i] = new StringValue(cf);
             i++;
         }
-        cfs[i] = new StringInfo("none", "none", this);
+        cfs[i] = new StringValue("none");
             i++;
         return cfs;
     }

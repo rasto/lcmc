@@ -667,34 +667,18 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
         // TODO: no virsh command for os-boot
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT,
-                           new StringInfo[]{
-                                      new StringInfo("Hard Disk",
-                                                     "hd",
-                                                     null),
-                                      new StringInfo("Network (PXE)",
-                                                     "network",
-                                                     null),
-                                      new StringInfo("CD-ROM",
-                                                     "cdrom",
-                                                     null),
-                                      new StringInfo("Floppy",
-                                                     "fd",
-                                                     null)});
+                            new Value[]{
+                                 new StringValue("hd", "Hard Disk"),
+                                 new StringValue("network", "Network (PXE)"),
+                                 new StringValue("cdrom", "CD-ROM"),
+                                 new StringValue("fd", "Floppy")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT_2,
-                           new StringInfo[]{
-                                      null,
-                                      new StringInfo("Hard Disk",
-                                                     "hd",
-                                                     null),
-                                      new StringInfo("Network (PXE)",
-                                                     "network",
-                                                     null),
-                                      new StringInfo("CD-ROM",
-                                                     "cdrom",
-                                                     null),
-                                      new StringInfo("Floppy",
-                                                     "fd",
-                                                     null)});
+                            new Value[]{
+                                    null,
+                                    new StringValue("hd", "Hard Disk"),
+                                    new StringValue("network", "Network (PXE)"),
+                                    new StringValue("cdrom", "CD-ROM"),
+                                    new StringValue("fd", "Floppy")});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
                             new Value[]{});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,

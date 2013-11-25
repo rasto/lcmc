@@ -29,6 +29,7 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 
 import java.util.Map;
+import lcmc.data.StringValue;
 import lcmc.data.Value;
 
 /**
@@ -96,19 +97,16 @@ final class IPaddrInfo extends ServiceInfo {
             if (ip == null) {
                 ip = getParamSaved(param);
             }
-            Info defaultValue;
+            Value defaultValue;
             if (ip.isNothingSelected()) {
-                defaultValue = new StringInfo(
-                        Tools.getString("ClusterBrowser.SelectNetInterface"),
+                defaultValue = new StringValue(
                         ip.getValueForConfig(),
-                        getBrowser());
+                        Tools.getString("ClusterBrowser.SelectNetInterface"));
             } else {
-                defaultValue = new StringInfo(ip.getValueForConfig(),
-                                              ip.getValueForConfig(),
-                                              getBrowser());
+                defaultValue = new StringValue(ip.getValueForConfig());
             }
             @SuppressWarnings("unchecked")
-            final Info[] networks = enumToInfoArray(
+            final Value[] networks = enumToInfoArray(
                                     defaultValue,
                                     getName(),
                                     getBrowser().getNetworksNode().children());

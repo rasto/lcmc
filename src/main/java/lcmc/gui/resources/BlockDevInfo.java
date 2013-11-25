@@ -993,12 +993,12 @@ public final class BlockDevInfo extends EditableInfo {
             getBlockDevice().setNew(false);
             storeComboBoxValues(params);
 
-            final Object o = getWidget(DRBD_MD_PARAM, null).getValue();
-            if (Tools.isStringInfoClass(o)) {
+            final Value v = getWidget(DRBD_MD_PARAM, null).getValue();
+            if (v.isNothingSelected()) {
                 getBlockDevice().setMetaDisk(null); /* internal */
             } else {
                 final BlockDevice metaDisk =
-                                        ((BlockDevInfo) o).getBlockDevice();
+                                        ((BlockDevInfo) v).getBlockDevice();
                 getBlockDevice().setMetaDisk(metaDisk);
             }
             getBrowser().getDrbdGraph().getDrbdInfo().setAllApplyButtons();

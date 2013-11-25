@@ -122,9 +122,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     static {
         POSSIBLE_VALUES.put(FilesystemData.TYPE,
-                        new StringInfo[]{
-                             new StringInfo("Mount", MOUNT_TYPE, null),
-                             new StringInfo("Template", TEMPLATE_TYPE, null)});
+                            new Value[]{
+                                 new StringValue(MOUNT_TYPE, "Mount"),
+                                 new StringValue(TEMPLATE_TYPE, "Template")});
         POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new Value[]{new StringValue("/")});
         PREFERRED_MAP.put(FilesystemData.TYPE, new StringValue("mount"));
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));

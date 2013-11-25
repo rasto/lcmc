@@ -29,7 +29,6 @@ import lcmc.gui.resources.ProxyNetInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
-import lcmc.gui.resources.StringInfo;
 import lcmc.Exceptions;
 
 import org.w3c.dom.Document;

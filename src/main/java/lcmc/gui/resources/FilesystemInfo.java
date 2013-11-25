@@ -234,14 +234,13 @@ final class FilesystemInfo extends ServiceInfo {
             if (selectedInfo != null) {
                 selectedValue = selectedInfo;
             }
-            Info defaultValue = null;
+            Value defaultValue = null;
             if (selectedValue.isNothingSelected()) {
-                defaultValue = new StringInfo(
-                           Tools.getString("ClusterBrowser.SelectBlockDevice"),
+                defaultValue = new StringValue(
                            "",
-                           getBrowser());
+                           Tools.getString("ClusterBrowser.SelectBlockDevice"));
             }
-            final Info[] commonBlockDevInfos =
+            final Value[] commonBlockDevInfos =
                                         getCommonBlockDevInfos(defaultValue,
                                                                getName());
             blockDeviceParamWi = WidgetFactory.createInstance(
@@ -484,15 +483,14 @@ final class FilesystemInfo extends ServiceInfo {
         } else {
             selectedValue = selectedInfo;
         }
-        Info defaultValue = null;
+        Value defaultValue = null;
         if (selectedValue.isNothingSelected()) {
-            defaultValue = new StringInfo(
-                       Tools.getString("ClusterBrowser.SelectBlockDevice"),
+            defaultValue = new StringValue(
                        "",
-                       getBrowser());
+                       Tools.getString("ClusterBrowser.SelectBlockDevice"));
         }
-        final Info[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
-                                                                  getName());
+        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
+                                                                   getName());
         if (blockDeviceParamWi != null) {
             final Value value = blockDeviceParamWi.getValue();
             blockDeviceParamWi.reloadComboBox(value,

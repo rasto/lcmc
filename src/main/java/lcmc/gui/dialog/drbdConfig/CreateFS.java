@@ -31,7 +31,6 @@ import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.StringInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -333,7 +332,7 @@ final class CreateFS extends DrbdConfig {
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             defaultValue = new StringValue("ext3");
         }
-        final StringInfo[] filesystems =
+        final Value[] filesystems =
             getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
                                              defaultValue.getValueForConfig());
 

@@ -661,19 +661,6 @@ public final class ToolsTest1 extends TestCase {
         assertTrue(Tools.isStringClass((Object) null));
         assertFalse(Tools.isStringClass(new Object()));
         assertFalse(Tools.isStringClass(new StringBuilder()));
-        assertFalse(Tools.isStringClass(
-                new lcmc.gui.resources.StringInfo("name", "string", null)));
-    }
-
-    @Test
-    public void testIsStringInfoClass() {
-        assertFalse(Tools.isStringInfoClass("string"));
-        assertFalse(Tools.isStringInfoClass((String) null));
-        assertFalse(Tools.isStringInfoClass((Object) null));
-        assertFalse(Tools.isStringInfoClass(new Object()));
-        assertFalse(Tools.isStringInfoClass(new StringBuilder()));
-        assertTrue(Tools.isStringInfoClass(
-                new lcmc.gui.resources.StringInfo("name", "string", null)));
     }
 
     @Test

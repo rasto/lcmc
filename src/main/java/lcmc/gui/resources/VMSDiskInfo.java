@@ -342,9 +342,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                             new Value[]{new StringValue(),
                                          new StringValue("ceph"),
                                          new StringValue("iscsi")});
-        for (final StringInfo tbt : (StringInfo[]) POSSIBLE_VALUES.get(
-                                                  DiskData.TARGET_BUS_TYPE)) {
-            TARGET_BUS_TYPES.put(tbt.getInternalValue(), tbt.toString());
+        for (final Value tbt : POSSIBLE_VALUES.get(DiskData.TARGET_BUS_TYPE)) {
+            TARGET_BUS_TYPES.put(tbt.getValueForConfig(), tbt.getValueForGui());
         }
         DEFAULTS_MAP.put(DiskData.READONLY, new StringValue("False"));
         DEFAULTS_MAP.put(DiskData.SHAREABLE, new StringValue("False"));

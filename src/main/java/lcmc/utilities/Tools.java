@@ -1179,15 +1179,6 @@ public final class Tools {
         return false;
     }
 
-    /** Returns thrue if object is in StringInfo class. */
-    public static boolean isStringInfoClass(final Object o) {
-        if (o != null
-            && o.getClass().getName().equals("lcmc.gui.resources.StringInfo")) {
-            return true;
-        }
-        return false;
-    }
-
     /** Escapes for config file. */
     public static String escapeConfig(final String value) {
         if (value == null) {
@@ -2026,8 +2017,7 @@ public final class Tools {
     }
 
     /**
-     * Returns whether two objects are equal. Special handling for Units and
-     * StringInfo objects.
+     * Returns whether two objects are equal. Special handling for Unit.
      */
     public static boolean areEqual(final Object o1, final Object o2) {
         if (o1 == null && o2 == null) {

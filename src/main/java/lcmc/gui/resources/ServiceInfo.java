@@ -548,7 +548,7 @@ public class ServiceInfo extends EditableInfo {
             final Info info = sameAsMetaAttrsWiValue();
             final boolean defaultValues =
                     info != null
-                    && META_ATTRS_DEFAULT_VALUES_TEXT.equals(info.toString());
+                    && META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.toString());
             final boolean nothingSelected =
                       info == null
                       || Widget.NOTHING_SELECTED_DISPLAY.equals(
@@ -1284,11 +1284,11 @@ public class ServiceInfo extends EditableInfo {
      * Converts enumeration to the info array, get objects from
      * hash if they exist.
      */
-    protected Info[] enumToInfoArray(
-                                 final Info defaultValue,
+    protected Value[] enumToInfoArray(
+                                 final Value defaultValue,
                                  final String serviceName,
                                  final Enumeration<DefaultMutableTreeNode> e) {
-        final List<Info> list = new ArrayList<Info>();
+        final List<Value> list = new ArrayList<Value>();
         if (defaultValue != null) {
             list.add(defaultValue);
         }
@@ -1301,11 +1301,11 @@ public class ServiceInfo extends EditableInfo {
                                                                  serviceName,
                                                                  i.getName());
 
-            if (si == null && !name.equals(defaultValue.getName())) {
+            if (si == null && !i.equals(defaultValue)) {
                 list.add(i);
             }
         }
-        return list.toArray(new Info[list.size()]);
+        return list.toArray(new Value[list.size()]);
     }
 
     /**
@@ -1327,10 +1327,10 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         /* ping */
-        final Object o = pingComboBox.getValue();
+        final Value o = pingComboBox.getValue();
         String value = null;
         if (o != null) {
-            value = ((StringInfo) o).getInternalValue();
+            value = o.getValueForConfig();
         }
         savedPingOperation = value;
     }
@@ -1499,9 +1499,9 @@ public class ServiceInfo extends EditableInfo {
      * Returns info object of all block devices on all hosts that have the
      * same names and other attributes.
      */
-    Info[] getCommonBlockDevInfos(final Info defaultValue,
+    Value[] getCommonBlockDevInfos(final Value defaultValue,
                                   final String serviceName) {
-        final List<Info> list = new ArrayList<Info>();
+        final List<Value> list = new ArrayList<Value>();
 
         /* drbd resources */
         @SuppressWarnings("unchecked")
@@ -1527,7 +1527,7 @@ public class ServiceInfo extends EditableInfo {
                     final DefaultMutableTreeNode vn = drbdVolumes.nextElement();
                     final CommonDeviceInterface drbdVol =
                                    (CommonDeviceInterface) vn.getUserObject();
-                    list.add((Info) drbdVol);
+                    list.add((Value) drbdVol);
                 }
             }
         }
@@ -1540,10 +1540,10 @@ public class ServiceInfo extends EditableInfo {
             final DefaultMutableTreeNode n = wids.nextElement();
             final CommonDeviceInterface wid =
                                      (CommonDeviceInterface) n.getUserObject();
-            list.add((Info) wid);
+            list.add((Value) wid);
         }
 
-        return list.toArray(new Info[list.size()]);
+        return list.toArray(new Value[list.size()]);
     }
 
     /**
@@ -1871,17 +1871,16 @@ public class ServiceInfo extends EditableInfo {
      * Returns all services except this one, that are of the same type
      * for meta attributes.
      */
-    private Info[] getSameServicesMetaAttrs() {
-        final List<Info> sl = new ArrayList<Info>();
-        sl.add(new StringInfo(Widget.NOTHING_SELECTED_DISPLAY,
-                              null,
-                              getBrowser()));
-        sl.add(new StringInfo(META_ATTRS_DEFAULT_VALUES_TEXT.getValueForGui(),
-                              META_ATTRS_DEFAULT_VALUES,
-                              getBrowser()));
+    private Value[] getSameServicesMetaAttrs() {
+        final List<Value> sl = new ArrayList<Value>();
+        sl.add(new StringValue(null, Widget.NOTHING_SELECTED_DISPLAY));
+        sl.add(new StringValue(
+                           META_ATTRS_DEFAULT_VALUES,
+                           META_ATTRS_DEFAULT_VALUES_TEXT.getValueForGui()));
+                              
         final Host dcHost = getBrowser().getDCHost();
         if (isMetaAttrReferenced() || Tools.versionBeforePacemaker(dcHost)) {
-            return sl.toArray(new Info[sl.size()]);
+            return sl.toArray(new Value[sl.size()]);
         }
         getBrowser().lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash =
@@ -1919,26 +1918,23 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         getBrowser().unlockNameToServiceInfo();
-        return sl.toArray(new Info[sl.size()]);
+        return sl.toArray(new Value[sl.size()]);
     }
 
     /**
      * Returns all services except this one, that are of the same type
      * for operations.
      */
-    private Info[] getSameServicesOperations() {
-        final List<Info> sl = new ArrayList<Info>();
-        sl.add(new StringInfo(Widget.NOTHING_SELECTED_DISPLAY,
-                              null,
-                              getBrowser()));
-        sl.add(new StringInfo(OPERATIONS_DEFAULT_VALUES_TEXT,
-                              OPERATIONS_DEFAULT_VALUES,
-                              getBrowser()));
+    private Value[] getSameServicesOperations() {
+        final List<Value> sl = new ArrayList<Value>();
+        sl.add(new StringValue(null, Widget.NOTHING_SELECTED_DISPLAY));
+        sl.add(new StringValue(OPERATIONS_DEFAULT_VALUES,
+                               OPERATIONS_DEFAULT_VALUES_TEXT));
         final Host dcHost = getBrowser().getDCHost();
         final String pmV = dcHost.getPacemakerVersion();
         final String hbV = dcHost.getHeartbeatVersion();
         if (isOperationReferenced() || Tools.versionBeforePacemaker(dcHost)) {
-            return sl.toArray(new Info[sl.size()]);
+            return sl.toArray(new Value[sl.size()]);
         }
         getBrowser().lockNameToServiceInfo();
         final Map<String, ServiceInfo> idToInfoHash =
@@ -1976,7 +1972,7 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         getBrowser().unlockNameToServiceInfo();
-        return sl.toArray(new Info[sl.size()]);
+        return sl.toArray(new Value[sl.size()]);
     }
 
     /**
@@ -3046,9 +3042,9 @@ public class ServiceInfo extends EditableInfo {
         final Widget pwi = pingComboBox;
         if (pwi != null) {
             String value = null;
-            final Object o = pwi.getValue();
-            if (o != null) {
-                value = ((StringInfo) o).getInternalValue();
+            final Value v = pwi.getValue();
+            if (v != null) {
+                value = v.getValueForConfig();
             }
             final String locationId = null;
             if (!Tools.areEqual(savedPingOperation,
@@ -3543,7 +3539,7 @@ public class ServiceInfo extends EditableInfo {
         savedOperationsId = refCRMId;
         savedOperationIdRef = getBrowser().getServiceInfoFromCRMId(refCRMId);
         final Info i = sameAsOperationsWiValue();
-        if (i == null || (i instanceof StringInfo)) {
+        if (i == null || i.isNothingSelected()) {
             savedOperationsId = null;
         } else {
             savedOperationIdRef = (ServiceInfo) i;
@@ -5182,10 +5178,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final StringInfo gi = new StringInfo(
-                                            ConfigData.PM_GROUP_NAME,
-                                            ConfigData.PM_GROUP_NAME,
-                                            getBrowser());
+                    final Value gi = new StringValue(ConfigData.PM_GROUP_NAME);
                     final CRMXML crmXML = getBrowser().getCRMXML();
                     addServicePanel(crmXML.getHbGroup(),
                                     getPos(),

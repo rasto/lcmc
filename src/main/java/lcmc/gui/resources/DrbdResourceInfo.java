@@ -420,12 +420,12 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             widgetAdd(param, prefix, paramWi);
         } else if (DRBD_RES_PARAM_AFTER.equals(param)
                    || DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
-            final List<Info> l = new ArrayList<Info>();
+            final List<Value> l = new ArrayList<Value>();
             final Value defaultItem = getParamSaved(param);
-            final StringInfo di = new StringInfo(
-                                        Tools.getString("ClusterBrowser.None"),
+            final Value di = new StringValue(
                                         "-1",
-                                        getBrowser());
+                                        Tools.getString("ClusterBrowser.None")
+                                        );
             l.add(di);
             final Map<String, DrbdResourceInfo> drbdResHash =
                                                 getBrowser().getDrbdResHash();
@@ -447,7 +447,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             resyncAfterParamWi = WidgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
                                       defaultItem,
-                                      l.toArray(new Info[l.size()]),
+                                      l.toArray(new Value[l.size()]),
                                       Widget.NO_REGEXP,
                                       width,
                                       Widget.NO_ABBRV,
@@ -736,7 +736,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns common file systems. */
-    public StringInfo[] getCommonFileSystems(final String defaultValue) {
+    public Value[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
     }
 
@@ -2175,12 +2175,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!getDrbdInfo().atLeastVersion("8.4")) {
             param = DRBD_RES_PARAM_AFTER_8_3;
         }
-        final List<Info> l = new ArrayList<Info>();
+        final List<Value> l = new ArrayList<Value>();
         final Value defaultItem = getParamSaved(param);
-        final StringInfo di = new StringInfo(
-                                    Tools.getString("ClusterBrowser.None"),
+        final StringValue di = new StringValue(
                                     "-1",
-                                    getBrowser());
+                                    Tools.getString("ClusterBrowser.None"));
         l.add(di);
         final Map<String, DrbdResourceInfo> drbdResHash =
                                             getBrowser().getDrbdResHash();
@@ -2203,7 +2202,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (resyncAfterParamWi != null) {
             final Value value = resyncAfterParamWi.getValue();
             resyncAfterParamWi.reloadComboBox(value,
-                                              l.toArray(new Info[l.size()]));
+                                              l.toArray(new Value[l.size()]));
         }
     }
     /** Creates popup for the block device. */

@@ -26,7 +26,6 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.utilities.Tools;
 import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.StringInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
@@ -45,6 +44,8 @@ import javax.swing.SpringLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
@@ -161,15 +162,15 @@ public final class Start extends WizardDialog {
                     Tools.getString("Dialog.DrbdConfig.Start.DrbdResource"));
         final String newDrbdResource =
                     Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
-        final List<Info> choices = new ArrayList<Info>();
-        choices.add(new StringInfo(newDrbdResource, null, null));
+        final List<Value> choices = new ArrayList<Value>();
+        choices.add(new StringValue(null, newDrbdResource));
         for (final DrbdResourceInfo dri : drbdInfo.getDrbdResources()) {
             choices.add(dri);
         }
         drbdResourceWi = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     Widget.NO_DEFAULT,
-                                    choices.toArray(new Info[choices.size()]),
+                                    choices.toArray(new Value[choices.size()]),
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
